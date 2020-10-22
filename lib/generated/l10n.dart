@@ -14,7 +14,7 @@ class DivocLocalizations {
   DivocLocalizations();
   
   static DivocLocalizations current;
-  
+
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
 
@@ -36,7 +36,7 @@ class DivocLocalizations {
   /// `Title English`
   String get title {
     return Intl.message(
-      'Title English',
+      'Divoc',
       name: 'title',
       desc: '',
       args: [],

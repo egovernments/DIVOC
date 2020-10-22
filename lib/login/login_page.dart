@@ -1,11 +1,13 @@
+import 'dart:async';
+
 import 'package:divoc/login/auth_repository.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
-  final AuthRepository authRepository = AuthRepositoryImpl();
-
   @override
   Widget build(BuildContext context) {
+    final authRepository = context.watch<AuthRepository>();
     return Scaffold(
       appBar: AppBar(
         title: Text("Login"),
@@ -33,7 +35,12 @@ class LoginPage extends StatelessWidget {
                   onPressed: () => {
                     authRepository
                         .login("username", "password")
-                        .then((value) => {Navigator.pushNamed(context, '/')}),
+                        .then((value) => {
+                              scheduleMicrotask(() => {
+                                    Navigator.pushReplacementNamed(
+                                        context, '/home')
+                                  })
+                            }),
                   },
                 ))
           ],

@@ -27,8 +27,9 @@ class ProviderApp extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate
         ],
-        supportedLocales: [Locale('en', ''), Locale('af', '')],
+        supportedLocales: [Locale('en', ''), Locale('hi', '')],
         onGenerateTitle: (context) => DivocLocalizations.of(context).title,
+        home: repository.isLoggedIn ? HomePage() : LoginPage(),
         routes: {
           DivocRoutes.home: (context) => HomePage(),
           DivocRoutes.login: (context) => LoginPage(),
