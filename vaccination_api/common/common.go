@@ -3,7 +3,6 @@ package common
 import (
 	"encoding/json"
 	"os"
-
 	"github.com/natefinch/lumberjack"
 	log "github.com/sirupsen/logrus"
 )

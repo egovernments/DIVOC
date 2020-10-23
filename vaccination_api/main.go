@@ -1,11 +1,11 @@
 package main
 
 import (
-	"./common"
-	"./controller"
 	"github.com/gin-gonic/gin"
 	"io"
 	"os"
+	"vaccination-module/common"
+	"vaccination-module/controller"
 )
 
 type Main struct {
@@ -43,10 +43,6 @@ func (m *Main) initServer() error {
 	m.router = gin.Default()
 	v1 := m.router.Group("/api/v1")
 	{
-		admin := v1.Group("/admin")
-		{
-			admin.POST("/auth", controller.Authenticate)
-		}
 		operator := v1.Group("/operator")
 		{
 			operator.POST("/login", controller.OperatorLogin)

@@ -1,22 +1,30 @@
 package controller
 
 import (
-	"../models"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"vaccination-module/models"
 )
 
 func OperatorLogin(ctx *gin.Context) {
 	var auth models.Auth
 	if ctx.ShouldBindJSON(&auth) != nil {
-		ctx.JSON(http.StatusBadRequest, "")
+		badRequest(ctx)
+		return
 	}
-	if auth.Mobile != "0000000000" {
+	if auth.Mobile == "" || len(auth.Mobile) < 10 {
+		badRequest(ctx)
+		return
+	} else if auth.Mobile != "98765443210" {
 		ctx.JSON(http.StatusUnauthorized, "")
 		log.Debug("User unauthorized")
 	} else {
 		ctx.JSON(http.StatusOK, auth)
 		log.Debug("User authorized " + auth.Mobile)
 	}
+}
+
+func badRequest(ctx *gin.Context) {
+	ctx.JSON(http.StatusBadRequest, "")
 }

@@ -2,3 +2,11 @@
 *.iml
 *.log
 .DS_Store
+vaccination-module
+main
+core
+*.*.swp
+*.orig
+*.o
+*.a
+*.so
