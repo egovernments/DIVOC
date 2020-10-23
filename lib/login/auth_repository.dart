@@ -1,4 +1,5 @@
 import 'package:divoc/base/share_preferences.dart';
+import 'package:divoc/data_source/network.dart';
 import 'package:divoc/model/user.dart';
 import 'package:meta/meta.dart';
 import 'package:key_value_store/key_value_store.dart';
@@ -15,8 +16,9 @@ abstract class AuthRepository {
 
 class AuthRepositoryImpl implements AuthRepository {
   final KeyValueStore keyValueStore;
+  final ApiClient apiClient;
 
-  AuthRepositoryImpl({@required this.keyValueStore});
+  AuthRepositoryImpl({@required this.keyValueStore, @required this.apiClient});
 
   @override
   Future<bool> forgotPassword(String email) async {
@@ -25,9 +27,14 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> login(String username, String password) async {
-    await Future.delayed(Duration(seconds: 3));
-    keyValueStore.setBool(IS_LOGGED_IN, true);
-    return Future.value(User("demo", "demo@demo", "Demo"));
+    try {
+      var response = await apiClient.login(username, password);
+      print(response);
+      //keyValueStore.setBool(IS_LOGGED_IN, true);
+      return Future.value(User("demo", "demo@demo", "Demo"));
+    } catch (e) {
+      return Future.error(e);
+    }
   }
 
   @override
@@ -39,7 +46,7 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   bool get isLoggedIn {
     final isLoggedIn = keyValueStore.getBool(IS_LOGGED_IN);
-    if(isLoggedIn==null){
+    if (isLoggedIn == null) {
       return false;
     }
     return isLoggedIn;

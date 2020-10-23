@@ -7,3 +7,28 @@ class Pair<F, S> {
   @override
   String toString() => 'Pair[$first, $second]';
 }
+
+class ResponseState<T> {
+  Status status;
+  T data;
+  String message;
+
+  ResponseState.loading(this.message) : status = Status.LOADING;
+
+  ResponseState.completed(this.data) : status = Status.COMPLETED;
+
+  ResponseState.error(this.message) : status = Status.ERROR;
+
+  @override
+  String toString() {
+    return "Status : $status \n Message : $message \n Data : $data";
+  }
+}
+
+enum Status { LOADING, COMPLETED, ERROR }
+
+class Response<T> {
+  int code;
+  String message;
+  T data;
+}
