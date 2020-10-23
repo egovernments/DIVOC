@@ -16,7 +16,8 @@ class HomePage extends StatelessWidget {
     ];
 
     return DefaultTabController(
-      length: 2,
+      length: tabsList.length,
+      initialIndex: 1,
       child: Scaffold(
         appBar: AppBar(
           title: Text(DivocLocalizations.of(context).title),
