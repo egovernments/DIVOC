@@ -27,6 +27,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> login(String username, String password) async {
+    print(username + " " + password);
     try {
       var response = await apiClient.login(username, password);
       print(response);

@@ -14,7 +14,7 @@ class DivocLocalizations {
   DivocLocalizations();
   
   static DivocLocalizations current;
-
+  
   static const AppLocalizationDelegate delegate =
     AppLocalizationDelegate();
 
@@ -33,11 +33,51 @@ class DivocLocalizations {
     return Localizations.of<DivocLocalizations>(context, DivocLocalizations);
   }
 
-  /// `Title English`
+  /// `DIVOC`
   String get title {
     return Intl.message(
-      'Divoc',
+      'DIVOC',
       name: 'title',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Welcome to the DIVOC\nVaccine Administration Portal`
+  String get loginTitle {
+    return Intl.message(
+      'Welcome to the DIVOC\nVaccine Administration Portal',
+      name: 'loginTitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please login to your DIVOC Account`
+  String get loginSubtitle {
+    return Intl.message(
+      'Please login to your DIVOC Account',
+      name: 'loginSubtitle',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `GET OTP`
+  String get labelOTP {
+    return Intl.message(
+      'GET OTP',
+      name: 'labelOTP',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Login`
+  String get labelLogin {
+    return Intl.message(
+      'Login',
+      name: 'labelLogin',
       desc: '',
       args: [],
     );

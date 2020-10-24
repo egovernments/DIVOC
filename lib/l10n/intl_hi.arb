@@ -1,3 +1,7 @@
 {
-  "title": "Title Hindi"
+  "title": "DIVOC",
+  "loginTitle": "Welcome to the DIVOC\nVaccine Administration Portal",
+  "loginSubtitle": "Please login to your DIVOC Account",
+  "labelOTP": "GET OTP",
+  "labelLogin": "Login"
 }

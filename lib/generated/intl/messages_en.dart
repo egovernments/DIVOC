@@ -21,6 +21,10 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-    "title" : MessageLookupByLibrary.simpleMessage("Title English")
+    "labelLogin" : MessageLookupByLibrary.simpleMessage("Login"),
+    "labelOTP" : MessageLookupByLibrary.simpleMessage("GET OTP"),
+    "loginSubtitle" : MessageLookupByLibrary.simpleMessage("Please login to your DIVOC Account"),
+    "loginTitle" : MessageLookupByLibrary.simpleMessage("Welcome to the DIVOC\nVaccine Administration Portal"),
+    "title" : MessageLookupByLibrary.simpleMessage("DIVOC")
   };
 }
