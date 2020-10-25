@@ -1,10 +1,8 @@
 import 'package:divoc/base/routes.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/generated/l10n.dart';
-import 'package:divoc/home/home_model.dart';
 import 'package:divoc/home/home_page.dart';
 import 'package:divoc/login/auth_repository.dart';
-import 'package:divoc/login/login_model.dart';
 import 'package:divoc/login/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -26,7 +24,7 @@ class ProviderApp extends StatelessWidget {
       ],
       child: Portal(
         child: MaterialApp(
-          theme: DivocTheme.theme,
+          theme: DivocTheme.appTheme,
           localizationsDelegates: [
             DivocLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -34,7 +32,6 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          onGenerateTitle: (context) => DivocLocalizations.of(context).title,
           home: repository.isLoggedIn ? HomePage() : LoginPage(),
           routes: {
             DivocRoutes.home: (context) => HomePage(),

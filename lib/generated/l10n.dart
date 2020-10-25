@@ -73,11 +73,21 @@ class DivocLocalizations {
     );
   }
 
-  /// `Login`
+  /// `LOGIN`
   String get labelLogin {
     return Intl.message(
-      'Login',
+      'LOGIN',
       name: 'labelLogin',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `TERMS OF USE. PRIVACY POLICY`
+  String get tAndC {
+    return Intl.message(
+      'TERMS OF USE. PRIVACY POLICY',
+      name: 'tAndC',
       desc: '',
       args: [],
     );
