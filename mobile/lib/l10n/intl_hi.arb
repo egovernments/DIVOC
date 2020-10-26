@@ -3,5 +3,9 @@
   "loginTitle": "Welcome to the DIVOC\nVaccine Administration Portal",
   "loginSubtitle": "Please login to your DIVOC Account",
   "labelOTP": "GET OTP",
-  "labelLogin": "Login"
+  "labelLogin": "LOGIN",
+  "tAndC": "TERMS OF USE. PRIVACY POLICY",
+  "selectProgram": "Please select Vaccine Program",
+  "labelNext": "Next",
+  "vaccineLabel": "You are registering {vaccineName} for:"
 }

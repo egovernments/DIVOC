@@ -1,8 +1,11 @@
 import 'package:divoc/base/common_widget.dart';
-import 'package:divoc/base/constants.dart';
-import 'package:divoc/base/utils.dart';
-import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/forms/user_details_form.dart';
+import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
+import 'package:divoc/forms/program_selection.dart';
+import 'package:divoc/forms/single_field_form.dart';
+import 'package:divoc/forms/vaccination_program_page.dart';
+import 'package:divoc/forms/navigation_flow.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,100 +14,79 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeModel(),
-      child: Scaffold(
-        appBar: PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: DivocHeader(
-            showHeaderMenu: true,
-            showHelpMenu: true,
+      builder: (context, widget) {
+        return Scaffold(
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: DivocHeader(),
           ),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Card(
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.all(40.0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 100,
-                    ),
-                    Image(
-                      width: 50,
-                      image: AssetImage(ImageAssetPath.SYRINGE),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(32.0),
-                      child: Text(
-                        DivocLocalizations.of(context).selectProgram,
-                        textAlign: TextAlign.center,
-                        style: Theme.of(context).textTheme.headline6,
-                      ),
-                    ),
-                    Consumer<HomeModel>(
-                      builder: (context, homeModel, child) {
-                        if (homeModel.state.status == Status.LOADING) {
-                          return CircularProgressIndicator();
-                        }
-                        return ProgramSelectionWidget(
-                          programs: homeModel.state.data,
-                          selectedVaccine: homeModel.selectedVaccine,
-                          onChanged: (value) {
-                            homeModel.vaccineSelected(value);
-                          },
-                        );
-                      },
-                    ),
-                    SizedBox(
-                      height: 32,
-                    ),
-                    RaisedButton(
-                      child: Text(DivocLocalizations.of(context).labelNext),
-                      onPressed: () {
-                        //TODO Navigate to new screen
-                      },
-                    )
-                  ],
-                ),
-              ),
-            ),
+          body: NavigationFormFlow(
+            routes: _flows,
+            builder: (routeInfo, arguments) {
+              return getWidgetByRouteName(routeInfo, arguments);
+            },
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class ProgramSelectionWidget extends StatelessWidget {
-  final List<VaccineProgram> programs;
-  final ValueChanged<String> onChanged;
-  final String selectedVaccine;
-
-  ProgramSelectionWidget({this.selectedVaccine, this.programs, this.onChanged});
-
-  @override
-  Widget build(BuildContext context) {
-    List<DropdownMenuItem> map = programs
-        .map((program) => DropdownMenuItem(
-              value: program.id,
-              child: ListTile(
-                title: Text(program.name),
-              ),
-            ))
-        .toList();
-
-    return DropdownButton(
-      icon: Icon(Icons.keyboard_arrow_down_outlined),
-      iconSize: 24,
-      elevation: 16,
-      value: selectedVaccine,
-      hint: Text("Select Program"),
-      isExpanded: true,
-      items: map,
-      onChanged: (value) {
-        onChanged(value);
+        );
       },
     );
   }
 }
+
+Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
+  switch (routeInfo.currentRouteName) {
+    case '/':
+      return SelectProgramScreen(routeInfo);
+    case 'vaccineProgram':
+      return VaccinationProgram(routeInfo, arguments);
+    case 'preEnroll':
+      return SingleFieldForm(
+        title: "Enter Pre Enrolment Code",
+        btnText: "Next",
+        onNext: (context, value) {
+          NavigationFormFlow.push(
+              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+        },
+      );
+    case 'preEnroll':
+      return SingleFieldForm(
+        title: "Enter Pre Enrolment Code",
+        btnText: "Next",
+        onNext: (context, value) {
+          NavigationFormFlow.push(
+              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+        },
+      );
+    case 'verifyUserDetails':
+      return UserDetailsScreen(routeInfo);
+    default:
+      return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
+  }
+}
+
+const List<String> _flows = [
+  '/vaccineProgram',
+
+  //Verify Recipient Flow
+  '/vaccineProgram',
+  '/vaccineProgram/preEnroll',
+  '/vaccineProgram/preEnroll/verifyUserDetails',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp/upcoming',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
+
+  //EnrollFlow
+  '/vaccineProgram/enroll',
+  '/vaccineProgram/enroll/userForm',
+  '/vaccineProgram/enroll/userForm/govt',
+  '/vaccineProgram/enroll/userForm/voucher',
+  '/vaccineProgram/enroll/userForm/voucher/verifyVoucher',
+  '/vaccineProgram/enroll/userForm/voucher/verifyVoucher/upcoming',
+  '/vaccineProgram/enroll/userForm/direct',
+
+  //Recipient Queue
+  '/vaccineProgram/upcoming',
+  '/vaccineProgram/generateCert',
+];

@@ -3,4 +3,5 @@ class ImageAssetPath {
   static const String HEADER_MENU = "assets/header_menu.png";
   static const String HEADER_HELP = "assets/header_help.png";
   static const String SYRINGE = "assets/syringe.png";
+  static const String VACCINE_PROGRAM = "assets/vaccine_program_icon.png";
 }

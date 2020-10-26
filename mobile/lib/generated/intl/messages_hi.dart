@@ -19,12 +19,18 @@ typedef String MessageIfAbsent(String messageStr, List<dynamic> args);
 class MessageLookup extends MessageLookupByLibrary {
   String get localeName => 'hi';
 
+  static m0(vaccineName) => "You are registering ${vaccineName} for:";
+
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
-    "labelLogin" : MessageLookupByLibrary.simpleMessage("Login"),
+    "labelLogin" : MessageLookupByLibrary.simpleMessage("LOGIN"),
+    "labelNext" : MessageLookupByLibrary.simpleMessage("Next"),
     "labelOTP" : MessageLookupByLibrary.simpleMessage("GET OTP"),
     "loginSubtitle" : MessageLookupByLibrary.simpleMessage("Please login to your DIVOC Account"),
     "loginTitle" : MessageLookupByLibrary.simpleMessage("Welcome to the DIVOC\nVaccine Administration Portal"),
-    "title" : MessageLookupByLibrary.simpleMessage("DIVOC")
+    "selectProgram" : MessageLookupByLibrary.simpleMessage("Please select Vaccine Program"),
+    "tAndC" : MessageLookupByLibrary.simpleMessage("TERMS OF USE. PRIVACY POLICY"),
+    "title" : MessageLookupByLibrary.simpleMessage("DIVOC"),
+    "vaccineLabel" : m0
   };
 }

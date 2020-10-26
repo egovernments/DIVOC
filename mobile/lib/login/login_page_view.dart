@@ -2,16 +2,11 @@ import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/login/login_model.dart';
 import 'package:flutter/material.dart';
 
-class LoginFormPage extends StatefulWidget {
+class LoginFormPage extends StatelessWidget {
   final LoginPageDetails _loginPageDetails;
 
-  const LoginFormPage(this._loginPageDetails);
+  LoginFormPage(this._loginPageDetails);
 
-  @override
-  _LoginFormPageState createState() => _LoginFormPageState();
-}
-
-class _LoginFormPageState extends State<LoginFormPage> {
   final GlobalKey<FormState> _formState = GlobalKey<FormState>();
 
   @override
@@ -44,16 +39,17 @@ class _LoginFormPageState extends State<LoginFormPage> {
               Form(
                 key: _formState,
                 child: TextFormField(
+                  textAlign: TextAlign.center,
                   keyboardType: TextInputType.phone,
                   onSaved: (value) {
-                    widget._loginPageDetails.callApi(value);
+                    _loginPageDetails.callApi(value);
                   },
                   validator: (value) {
                     var msg = value.isEmpty ? "Cannot be Empty" : null;
                     return msg;
                   },
                   decoration: buildInputDecoration(
-                    widget._loginPageDetails.isMobileNumber,
+                    _loginPageDetails.isMobileNumber,
                   ),
                 ),
               ),
@@ -61,7 +57,7 @@ class _LoginFormPageState extends State<LoginFormPage> {
                 height: 24,
               ),
               RaisedButton(
-                child: Text(widget._loginPageDetails.labelText),
+                child: Text(_loginPageDetails.labelText),
                 onPressed: () {
                   if (_formState.currentState.validate()) {
                     _formState.currentState.save();

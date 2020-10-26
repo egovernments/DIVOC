@@ -33,7 +33,7 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: CustomNavigatorScreen(),
+          home: repository.isLoggedIn ? HomePage() : LoginPage(),
           routes: {
             DivocRoutes.home: (context) => HomePage(),
             DivocRoutes.login: (context) => LoginPage(),

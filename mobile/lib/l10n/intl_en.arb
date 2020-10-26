@@ -6,5 +6,6 @@
   "labelLogin": "LOGIN",
   "tAndC": "TERMS OF USE. PRIVACY POLICY",
   "selectProgram": "Please select Vaccine Program",
-  "labelNext": "Next"
+  "labelNext": "Next",
+  "vaccineLabel": "You are registering {vaccineName} for:"
 }

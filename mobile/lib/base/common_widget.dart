@@ -18,11 +18,27 @@ class LoadingOverlay extends StatelessWidget {
   }
 }
 
+class DivocForm extends StatelessWidget {
+  final Widget child;
+
+  DivocForm({@required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Card(
+        child: child,
+      ),
+    );
+  }
+}
+
 class DivocHeader extends StatelessWidget {
   final bool showHeaderMenu;
   final bool showHelpMenu;
 
-  DivocHeader({this.showHeaderMenu = false, this.showHelpMenu = false});
+  DivocHeader({this.showHeaderMenu = true, this.showHelpMenu = true});
 
   @override
   Widget build(BuildContext context) {
@@ -38,9 +54,7 @@ class DivocHeader extends StatelessWidget {
                 flex: 7,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: Image(
-                    image: AssetImage(ImageAssetPath.DIVOC_LOGO),
-                  ),
+                  child: Image.asset(ImageAssetPath.DIVOC_LOGO),
                 ),
               ),
               Visibility(
@@ -50,9 +64,7 @@ class DivocHeader extends StatelessWidget {
                   child: SizedBox(
                     width: 25,
                     height: 25,
-                    child: Image(
-                      image: AssetImage(ImageAssetPath.HEADER_HELP),
-                    ),
+                    child: Image.asset(ImageAssetPath.HEADER_HELP),
                   ),
                 ),
               ),
@@ -65,9 +77,7 @@ class DivocHeader extends StatelessWidget {
                     child: SizedBox(
                       width: 40,
                       height: 40,
-                      child: Image(
-                        image: AssetImage(ImageAssetPath.HEADER_MENU),
-                      ),
+                      child: Image.asset(ImageAssetPath.HEADER_MENU),
                     ),
                   ),
                 ),

@@ -20,10 +20,11 @@ class NavigationFormFlow extends StatelessWidget {
         key: _navigationState,
         onGenerateRoute: (RouteSettings settings) {
           print(settings.name);
+          print(settings.arguments);
           return MaterialPageRoute(
             builder: (context) {
               var routeInfo = _buildRouteInfo(settings.name);
-              return builder(routeInfo);
+              return builder(routeInfo, settings.arguments);
             },
           );
         },
@@ -49,7 +50,7 @@ class NavigationFormFlow extends StatelessWidget {
   }
 }
 
-typedef WidgetFunction = Widget Function(RouteInfo routeInfo);
+typedef WidgetFunction = Widget Function(RouteInfo routeInfo, Object arguments);
 
 class RouteInfo {
   final List<RouteMeta> nextRoutesMeta;

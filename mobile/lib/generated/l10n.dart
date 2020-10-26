@@ -112,6 +112,16 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `You are registering {vaccineName} for:`
+  String vaccineLabel(Object vaccineName) {
+    return Intl.message(
+      'You are registering $vaccineName for:',
+      name: 'vaccineLabel',
+      desc: '',
+      args: [vaccineName],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {
