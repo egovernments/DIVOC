@@ -8,16 +8,16 @@ class Pair<F, S> {
   String toString() => 'Pair[$first, $second]';
 }
 
-class ResponseState<T> {
+class Resource<T> {
   Status status;
   T data;
   String message;
 
-  ResponseState.loading(this.message) : status = Status.LOADING;
+  Resource.loading(this.message) : status = Status.LOADING;
 
-  ResponseState.completed(this.data) : status = Status.COMPLETED;
+  Resource.completed(this.data) : status = Status.COMPLETED;
 
-  ResponseState.error(this.message) : status = Status.ERROR;
+  Resource.error(this.message) : status = Status.ERROR;
 
   @override
   String toString() {

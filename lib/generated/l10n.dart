@@ -92,6 +92,26 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Please select Vaccine Program`
+  String get selectProgram {
+    return Intl.message(
+      'Please select Vaccine Program',
+      name: 'selectProgram',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Next`
+  String get labelNext {
+    return Intl.message(
+      'Next',
+      name: 'labelNext',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

@@ -31,7 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
     try {
       var response = await apiClient.login(username, password);
       print(response);
-      //keyValueStore.setBool(IS_LOGGED_IN, true);
+      keyValueStore.setBool(IS_LOGGED_IN, true);
       return Future.value(User("demo", "demo@demo", "Demo"));
     } catch (e) {
       return Future.error(e);
