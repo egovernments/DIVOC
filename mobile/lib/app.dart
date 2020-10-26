@@ -1,6 +1,7 @@
 import 'package:divoc/base/routes.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_page.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/login/login_page.dart';
@@ -32,7 +33,7 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: repository.isLoggedIn ? HomePage() : LoginPage(),
+          home: CustomNavigatorScreen(),
           routes: {
             DivocRoutes.home: (context) => HomePage(),
             DivocRoutes.login: (context) => LoginPage(),
