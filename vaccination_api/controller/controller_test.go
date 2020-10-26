@@ -53,3 +53,29 @@ func TestAuthenticate(t *testing.T) {
 		})
 	}
 }
+
+func TestOperatorConfiguration(t *testing.T) {
+	type args struct {
+		body string
+		want int
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		{
+			name: "ShouldGetConfiguration",
+			args: args{ body : "" , want: 200},
+
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			ctx, _ := gin.CreateTestContext(w)
+			ctx.Request, _ =  http.NewRequest("POST", "/configuration", strings.NewReader("{}"))
+			OperatorConfiguration(ctx)
+			assert.Equal(t, tt.args.want, w.Result().StatusCode)
+		})
+	}
+}

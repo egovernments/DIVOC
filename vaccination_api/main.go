@@ -46,6 +46,7 @@ func (m *Main) initServer() error {
 		operator := v1.Group("/operator")
 		{
 			operator.POST("/login", controller.OperatorLogin)
+			operator.POST("/configuration", controller.OperatorConfiguration)
 		}
 	}
 

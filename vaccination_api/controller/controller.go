@@ -6,6 +6,9 @@ import (
 	"net/http"
 	"vaccination-module/models"
 )
+func badRequest(ctx *gin.Context) {
+	ctx.JSON(http.StatusBadRequest, "")
+}
 
 func OperatorLogin(ctx *gin.Context) {
 	var auth models.Auth
@@ -25,6 +28,8 @@ func OperatorLogin(ctx *gin.Context) {
 	}
 }
 
-func badRequest(ctx *gin.Context) {
-	ctx.JSON(http.StatusBadRequest, "")
+func OperatorConfiguration(ctx *gin.Context) { //todo move to backing registry
+	configuration := models.OperatorConfiguration{DailyLimit:10, Programs: []string{"C19 Vaccination"}}
+	configuration.Programs = append(configuration.Programs, "C19 v2 Vaccination")
+	ctx.JSON(http.StatusOK, configuration)
 }
