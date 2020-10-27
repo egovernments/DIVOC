@@ -122,6 +122,16 @@ class DivocLocalizations {
       args: [vaccineName],
     );
   }
+
+  /// `Register with {name}`
+  String register(Object name) {
+    return Intl.message(
+      'Register with $name',
+      name: 'register',
+      desc: '',
+      args: [name],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

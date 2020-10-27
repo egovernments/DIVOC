@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 class UserDetailsScreen extends StatelessWidget {
   final RouteInfo routeInfo;
+  final String programName = "Covid-19 Vaccine (C19)";
 
   UserDetailsScreen(this.routeInfo);
 
@@ -12,27 +13,80 @@ class UserDetailsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return DivocForm(
       child: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              DivocLocalizations.of(context).vaccineLabel(programName),
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          SizedBox(
+            height: 16,
+          ),
+          FieldDetailsWidget("Vivek Singh", "Gender: Male | DOB: 28/10/1990"),
+          FieldDetailsWidget("Program Name", programName),
+          SizedBox(
+            height: 36,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              DivocLocalizations.of(context).register("Aadhar"),
+              style: Theme.of(context).textTheme.headline6,
+              textAlign: TextAlign.center,
+            ),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.max,
+            children: routeInfo.nextRoutesMeta
+                .map((item) => Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: RaisedButton(
+                        child: Text(item.nextRouteName),
+                        onPressed: () {
+                          final nextRoutePath = item.fullNextRoutePath;
+                          NavigationFormFlow.push(context, nextRoutePath);
+                        },
+                      ),
+                    ))
+                .toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class FieldDetailsWidget extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  FieldDetailsWidget(this.title, this.subtitle);
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
         children: [
           Text(
-            DivocLocalizations.of(context)
-                .vaccineLabel("Covid-19 Vaccine (C19)"),
+            title,
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
-          ListView.builder(
-            shrinkWrap: true,
-            itemCount: routeInfo.nextRoutesMeta.length,
-            itemBuilder: (BuildContext context, int index) {
-              return RaisedButton(
-                child: Text(routeInfo.nextRoutesMeta[index].nextRouteName),
-                onPressed: () {
-                  final nextRoutePath =
-                      routeInfo.nextRoutesMeta[index].fullNextRoutePath;
-                  NavigationFormFlow.push(context, nextRoutePath);
-                },
-              );
-            },
-          )
+          SizedBox(
+            height: 4,
+          ),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.caption,
+            textAlign: TextAlign.center,
+          ),
         ],
       ),
     );

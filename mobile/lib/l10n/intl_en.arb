@@ -7,5 +7,6 @@
   "tAndC": "TERMS OF USE. PRIVACY POLICY",
   "selectProgram": "Please select Vaccine Program",
   "labelNext": "Next",
-  "vaccineLabel": "You are registering {vaccineName} for:"
+  "vaccineLabel": "You are registering {vaccineName} for:",
+  "register": "Register with {name}"
 }
