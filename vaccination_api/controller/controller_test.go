@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"vaccination-module/models"
 )
 
 func TestAuthenticate(t *testing.T) {
@@ -58,6 +60,7 @@ func TestOperatorConfiguration(t *testing.T) {
 	type args struct {
 		body string
 		want int
+		DailyLimit int32
 	}
 	tests := []struct {
 		name string
@@ -65,7 +68,7 @@ func TestOperatorConfiguration(t *testing.T) {
 	}{
 		{
 			name: "ShouldGetConfiguration",
-			args: args{ body : "" , want: 200},
+			args: args{ body : "" , want: 200, DailyLimit: 10},
 
 		},
 	}
@@ -76,6 +79,9 @@ func TestOperatorConfiguration(t *testing.T) {
 			ctx.Request, _ =  http.NewRequest("POST", "/configuration", strings.NewReader("{}"))
 			OperatorConfiguration(ctx)
 			assert.Equal(t, tt.args.want, w.Result().StatusCode)
+			var res = models.OperatorConfiguration{}
+			_ = json.Unmarshal([]byte(w.Body.String()), &res)
+			assert.Equal(t, tt.args.DailyLimit ,res.DailyLimit)
 		})
 	}
 }
