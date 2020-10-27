@@ -61,8 +61,6 @@ class SelectProgramScreen extends StatelessWidget {
                       routeInfo.nextRoutesMeta[0].fullNextRoutePath;
                   Navigator.of(context).pushNamed(nextRoutePath,
                       arguments: homeModel.selectedVaccine);
-                  /*    NavigationFormFlow.push(
-                      context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);*/
                 },
               )
             ],

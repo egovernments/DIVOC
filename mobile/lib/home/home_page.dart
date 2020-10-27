@@ -1,5 +1,6 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/forms/new_user_form.dart';
+import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/home/flow_screen.dart';
@@ -94,6 +95,9 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
     case 'newEnroll':
       return NewUserEnrollForm(routeInfo);
 
+    case 'payment':
+      return SelectPaymentForm(routeInfo);
+
     case 'upcoming':
       return UpComingForm();
 
@@ -118,12 +122,12 @@ const List<String> _flows = [
 
   //EnrollFlow
   '/vaccineProgram/newEnroll',
-  '/vaccineProgram/newEnroll/userForm',
-  '/vaccineProgram/newEnroll/userForm/govt',
-  '/vaccineProgram/newEnroll/userForm/voucher',
-  '/vaccineProgram/newEnroll/userForm/voucher/verifyVoucher',
-  '/vaccineProgram/newEnroll/userForm/voucher/verifyVoucher/upcoming',
-  '/vaccineProgram/newEnroll/userForm/direct',
+  '/vaccineProgram/newEnroll/payment',
+  '/vaccineProgram/newEnroll/payment/govt',
+  '/vaccineProgram/newEnroll/payment/voucher',
+  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher',
+  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher/upcoming',
+  '/vaccineProgram/newEnroll/payment/direct',
 
   //Recipient Queue
   '/vaccineProgram/upcoming',

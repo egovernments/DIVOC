@@ -132,6 +132,16 @@ class DivocLocalizations {
       args: [name],
     );
   }
+
+  /// `Select Payment`
+  String get selectPayment {
+    return Intl.message(
+      'Select Payment',
+      name: 'selectPayment',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

@@ -8,5 +8,6 @@
   "selectProgram": "Please select Vaccine Program",
   "labelNext": "Next",
   "vaccineLabel": "You are registering {vaccineName} for:",
-  "register": "Register with {name}"
+  "register": "Register with {name}",
+  "selectPayment": "Select Payment"
 }
