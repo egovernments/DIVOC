@@ -1,4 +1,6 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/forms/new_user_form.dart';
+import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
@@ -58,6 +60,43 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       );
     case 'verifyUserDetails':
       return UserDetailsScreen(routeInfo);
+
+    case 'aadharManually':
+      return SingleFieldForm(
+        title: "Enter Aadhar Number",
+        btnText: "Generate OTP",
+        onNext: (context, value) {
+          NavigationFormFlow.push(
+              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+        },
+      );
+
+    case 'scanQR':
+      return SingleFieldForm(
+        title: "Your Aadhar Number",
+        btnText: "Generate OTP",
+        onNext: (context, value) {
+          NavigationFormFlow.push(
+              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+        },
+      );
+
+    case 'aadharOtp':
+      return SingleFieldForm(
+        title: "Enter OTP",
+        btnText: "Verify",
+        onNext: (context, value) {
+          NavigationFormFlow.push(
+              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+        },
+      );
+
+    case 'newEnroll':
+      return NewUserEnrollForm(routeInfo);
+
+    case 'upcoming':
+      return UpComingForm();
+
     default:
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
   }
@@ -78,13 +117,13 @@ const List<String> _flows = [
   '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
 
   //EnrollFlow
-  '/vaccineProgram/enroll',
-  '/vaccineProgram/enroll/userForm',
-  '/vaccineProgram/enroll/userForm/govt',
-  '/vaccineProgram/enroll/userForm/voucher',
-  '/vaccineProgram/enroll/userForm/voucher/verifyVoucher',
-  '/vaccineProgram/enroll/userForm/voucher/verifyVoucher/upcoming',
-  '/vaccineProgram/enroll/userForm/direct',
+  '/vaccineProgram/newEnroll',
+  '/vaccineProgram/newEnroll/userForm',
+  '/vaccineProgram/newEnroll/userForm/govt',
+  '/vaccineProgram/newEnroll/userForm/voucher',
+  '/vaccineProgram/newEnroll/userForm/voucher/verifyVoucher',
+  '/vaccineProgram/newEnroll/userForm/voucher/verifyVoucher/upcoming',
+  '/vaccineProgram/newEnroll/userForm/direct',
 
   //Recipient Queue
   '/vaccineProgram/upcoming',
