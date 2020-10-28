@@ -21,10 +21,20 @@ class NavigationFormFlow extends StatelessWidget {
         onGenerateRoute: (RouteSettings settings) {
           print(settings.name);
           print(settings.arguments);
-          return MaterialPageRoute(
-            builder: (context) {
-              var routeInfo = _buildRouteInfo(settings.name);
+          var routeInfo = _buildRouteInfo(settings.name);
+          return PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) {
               return builder(routeInfo, settings.arguments);
+            },
+            transitionsBuilder:
+                (context, animation, secondaryAnimation, child) {
+              return SlideTransition(
+                position: Tween<Offset>(
+                  begin: const Offset(1, 0),
+                  end: Offset.zero,
+                ).animate(animation),
+                child: child,
+              );
             },
           );
         },
@@ -49,6 +59,8 @@ class NavigationFormFlow extends StatelessWidget {
     return RouteInfo(routeMeta, routePath, currentRoute);
   }
 }
+
+class SlidePageRoute extends PageRouteBuilder {}
 
 typedef WidgetFunction = Widget Function(RouteInfo routeInfo, Object arguments);
 
