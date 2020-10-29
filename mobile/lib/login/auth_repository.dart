@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:divoc/base/share_preferences.dart';
+import 'package:divoc/base/utils.dart';
 import 'package:divoc/data_source/network.dart';
 import 'package:divoc/model/user.dart';
 import 'package:meta/meta.dart';
@@ -8,6 +11,8 @@ abstract class AuthRepository {
   Future<User> login(String username, String password);
 
   Future<bool> forgotPassword(String email);
+
+  Future<bool> requestOtp(String mobileNumber);
 
   Future<bool> logout(String email);
 
@@ -27,14 +32,12 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<User> login(String username, String password) async {
-    print(username + " " + password);
     try {
       var response = await apiClient.login(username, password);
-      print(response);
-      keyValueStore.setBool(IS_LOGGED_IN, true);
-      return Future.value(User("demo", "demo@demo", "Demo"));
-    } catch (e) {
-      return Future.error(e);
+      keyValueStore.setString(USER_DETAILS, jsonEncode(response));
+      return Future.value(response);
+    } on Exception catch (e) {
+      throw handleNetworkError(e);
     }
   }
 
@@ -46,10 +49,21 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   bool get isLoggedIn {
-    final isLoggedIn = keyValueStore.getBool(IS_LOGGED_IN);
-    if (isLoggedIn == null) {
+    final userDetails = keyValueStore.getString(USER_DETAILS);
+    if (userDetails == null) {
       return false;
     }
-    return isLoggedIn;
+    return true;
+  }
+
+  @override
+  Future<bool> requestOtp(String mobileNumber) async {
+    try {
+      var response = await apiClient.requestOtp(mobileNumber);
+      print(response);
+      return Future.value(true);
+    } on Exception catch (e) {
+      throw handleNetworkError(e);
+    }
   }
 }

@@ -7,3 +7,11 @@ class ImageAssetPath {
   static const String VOUCHER = "assets/voucher_icon.png";
   static const String BARCODE_SAMPLE = "assets/barcode_sample.png";
 }
+
+class PaddingSize {
+  static const TINY = 3.0;
+  static const SMALL = 6.0;
+  static const NORMAL = 12.0;
+  static const LARGE = 24.0;
+  static const EXTRA_LARGE = 42.0;
+}

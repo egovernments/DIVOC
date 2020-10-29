@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:divoc/model/user.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'network.g.dart';
@@ -8,8 +9,11 @@ abstract class ApiClient {
   factory ApiClient(Dio dio, {String baseUrl}) = _ApiClient;
 
   @GET("/login")
-  Future<String> login(
+  Future<User> login(
     @Query("mobile") String mobileNumber,
     @Query("otp") String otp,
   );
+
+  @GET("/requestOtp")
+  Future<String> requestOtp(@Query("mobile") String mobileNumber);
 }

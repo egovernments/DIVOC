@@ -36,12 +36,14 @@ dependencies:
   shared_preferences:
   retrofit: any
   logger: any
+  json_annotation: any
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   retrofit_generator: any
   build_runner: any
+  json_serializable: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
