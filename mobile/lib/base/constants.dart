@@ -9,3 +9,11 @@ class ImageAssetPath {
   static const String CLOSE_ICON = "assets/close.png";
   static const String ARROW_ICON = "assets/arrow.png";
 }
+
+class PaddingSize {
+  static const TINY = 3.0;
+  static const SMALL = 6.0;
+  static const NORMAL = 12.0;
+  static const LARGE = 24.0;
+  static const EXTRA_LARGE = 42.0;
+}

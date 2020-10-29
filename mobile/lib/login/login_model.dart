@@ -1,40 +1,53 @@
+import 'package:divoc/base/utils.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:flutter/widgets.dart';
 
 class LoginModel extends ChangeNotifier {
   final AuthRepository _authRepository;
 
-  LoginFlow _currentState = LoginFlow.MOBILE_NUMBER;
+  LoginFlow _flowState = LoginFlow.MOBILE_NUMBER;
 
-  bool _isLoading = false;
+  Resource<bool> _currentState = Resource.idle();
 
-  bool get isLoading => _isLoading;
+  Resource<bool> get currentState => _currentState;
 
-  LoginFlow get currentState => _currentState;
+  LoginFlow get flowState => _flowState;
 
   bool get isLoggedIn => _authRepository.isLoggedIn;
 
   LoginModel(this._authRepository);
 
   String _mobileNumber = '';
+  String _otp = '';
+
+  String get mobileNumber => _mobileNumber;
+
+  String get otp => _otp;
 
   void requestOtp(String mobileNumber) {
-    _isLoading = true;
+    _currentState = Resource.loading("Loading...");
+    _mobileNumber = mobileNumber;
     notifyListeners();
-    _authRepository.login(mobileNumber, "").then((value) {
-      _mobileNumber = mobileNumber;
-      _isLoading = false;
-      _currentState = LoginFlow.LOGIN;
+    _authRepository.requestOtp(mobileNumber).then((value) {
+      _currentState = Resource.completed(true);
+      _flowState = LoginFlow.LOGIN;
+      notifyListeners();
+    }).catchError((Object error) {
+      _currentState = handleError<bool>(error);
       notifyListeners();
     });
   }
 
   void verifyOtp(String otp) {
-    _isLoading = true;
+    _currentState = Resource.loading("Loading...");
+    _otp = otp;
     notifyListeners();
     _authRepository.login(_mobileNumber, otp).then((value) {
-      _isLoading = false;
-      _currentState = LoginFlow.SUCCESS;
+      _currentState = Resource.completed(true);
+      _flowState = LoginFlow.SUCCESS;
+      notifyListeners();
+    }).catchError((Object error) {
+      _currentState = handleError<bool>(error);
       notifyListeners();
     });
   }

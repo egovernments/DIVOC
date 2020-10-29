@@ -17,7 +17,7 @@ class _ApiClient implements ApiClient {
   String baseUrl;
 
   @override
-  Future<String> login(mobileNumber, otp) async {
+  Future<User> login(mobileNumber, otp) async {
     ArgumentError.checkNotNull(mobileNumber, 'mobileNumber');
     ArgumentError.checkNotNull(otp, 'otp');
     const _extra = <String, dynamic>{};
@@ -26,7 +26,25 @@ class _ApiClient implements ApiClient {
       r'otp': otp
     };
     final _data = <String, dynamic>{};
-    final _result = await _dio.request<String>('/login',
+    final _result = await _dio.request<Map<String, dynamic>>('/login',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    final value = User.fromJson(_result.data);
+    return value;
+  }
+
+  @override
+  Future<String> requestOtp(mobileNumber) async {
+    ArgumentError.checkNotNull(mobileNumber, 'mobileNumber');
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'mobile': mobileNumber};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.request<String>('/requestOtp',
         queryParameters: queryParameters,
         options: RequestOptions(
             method: 'GET',
