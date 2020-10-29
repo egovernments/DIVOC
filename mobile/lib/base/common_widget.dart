@@ -1,5 +1,6 @@
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 class LoadingOverlay extends StatelessWidget {
@@ -37,8 +38,8 @@ class DivocForm extends StatelessWidget {
 class DivocHeader extends StatelessWidget {
   final bool showHeaderMenu;
   final bool showHelpMenu;
-
-  DivocHeader({this.showHeaderMenu = true, this.showHelpMenu = true});
+  final HomePage homePage;
+  DivocHeader(this.homePage, {this.showHeaderMenu = true, this.showHelpMenu = true});
 
   @override
   Widget build(BuildContext context) {
@@ -72,13 +73,16 @@ class DivocHeader extends StatelessWidget {
                 visible: showHeaderMenu,
                 child: Expanded(
                   flex: 2,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Image.asset(ImageAssetPath.HEADER_MENU),
+                  child: FlatButton(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SizedBox(
+                        width: 40,
+                        height: 40,
+                        child: Image.asset(ImageAssetPath.HEADER_MENU),
+                      ),
                     ),
+                    onPressed: () => { if(homePage!=null) homePage.openDrawer()},
                   ),
                 ),
               )

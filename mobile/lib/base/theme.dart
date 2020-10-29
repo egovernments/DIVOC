@@ -4,13 +4,13 @@ class DivocTheme {
   static ThemeData get appTheme {
     final themeData = ThemeData.light();
     final textTheme = themeData.textTheme;
-    final body1 = textTheme.body1.copyWith(decorationColor: Colors.transparent);
+    final foreColor = 0xff88C6A9;
     return ThemeData(
-      primaryColor: Color(0xff88C6A9),
+      primaryColor: Color(foreColor),
       primaryColorLight: Color(0xffE6FFF4),
       scaffoldBackgroundColor: Color(0xffF0FAF8),
       buttonTheme: ButtonThemeData(
-        buttonColor: Color(0xff88C6A9),
+        buttonColor: Color(foreColor),
         textTheme: ButtonTextTheme.accent,
         colorScheme: themeData.colorScheme.copyWith(
           secondary: Colors.white,
