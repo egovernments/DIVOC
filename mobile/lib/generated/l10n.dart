@@ -142,6 +142,36 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Invalid Mobile Number`
+  String get invalidMobile {
+    return Intl.message(
+      'Invalid Mobile Number',
+      name: 'invalidMobile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Invalid OTP`
+  String get invalidOTP {
+    return Intl.message(
+      'Invalid OTP',
+      name: 'invalidOTP',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `No Internet connection`
+  String get msgNoInternet {
+    return Intl.message(
+      'No Internet connection',
+      name: 'msgNoInternet',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

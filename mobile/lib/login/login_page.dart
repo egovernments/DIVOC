@@ -3,10 +3,11 @@ import 'dart:async';
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/routes.dart';
 import 'package:divoc/base/theme.dart';
+import 'package:divoc/base/utils.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/login/login_model.dart';
-import 'package:divoc/login/login_page_view.dart';
+import 'package:divoc/login/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
@@ -27,19 +28,27 @@ class LoginPage extends StatelessWidget {
           child: Scaffold(
             body: Consumer<LoginModel>(
               builder: (context, loginModel, child) {
-                if (!loginModel.isLoading) {
-                  if (loginModel.currentState == LoginFlow.LOGIN) {
+                if (loginModel.currentState.status == Status.ERROR) {
+                  scheduleMicrotask(() => {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(loginModel.currentState.message),
+                          ),
+                        )
+                      });
+                } else if (loginModel.currentState.status != Status.LOADING) {
+                  if (loginModel.flowState == LoginFlow.LOGIN) {
                     scheduleMicrotask(() {
                       _navigationState.currentState.pushNamed(LoginRoute.otp);
                     });
-                  } else if (loginModel.currentState == LoginFlow.SUCCESS) {
+                  } else if (loginModel.flowState == LoginFlow.SUCCESS) {
                     scheduleMicrotask(() {
                       Navigator.pushReplacementNamed(context, DivocRoutes.home);
                     });
                   }
                 }
                 return PortalEntry(
-                  visible: loginModel.isLoading,
+                  visible: loginModel.currentState.status == Status.LOADING,
                   portal: LoadingOverlay(),
                   child: Column(
                     children: [
@@ -57,7 +66,7 @@ class LoginPage extends StatelessWidget {
                           onGenerateRoute: (RouteSettings settings) {
                             if (settings.name == LoginRoute.otp) {
                               return MaterialPageRoute(builder: (context) {
-                                return LoginFormPage(
+                                return LoginForm(
                                   LoginOTPDetails(
                                     loginModel,
                                     divocLocalizations,
@@ -66,7 +75,7 @@ class LoginPage extends StatelessWidget {
                               });
                             }
                             return MaterialPageRoute(builder: (context) {
-                              return LoginFormPage(
+                              return LoginForm(
                                 LoginMobileDetails(
                                   loginModel,
                                   divocLocalizations,

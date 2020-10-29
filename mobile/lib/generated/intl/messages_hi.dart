@@ -25,6 +25,8 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "invalidMobile" : MessageLookupByLibrary.simpleMessage("Invalid Mobile Number"),
+    "invalidOTP" : MessageLookupByLibrary.simpleMessage("Invalid OTP"),
     "labelLogin" : MessageLookupByLibrary.simpleMessage("LOGIN"),
     "labelNext" : MessageLookupByLibrary.simpleMessage("Next"),
     "labelOTP" : MessageLookupByLibrary.simpleMessage("GET OTP"),
