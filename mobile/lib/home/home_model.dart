@@ -1,42 +1,38 @@
 import 'package:divoc/base/utils.dart';
+import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/model/vaccine_programs.dart';
 import 'package:flutter/widgets.dart';
+import 'package:json_annotation/json_annotation.dart';
 
 class HomeModel extends ChangeNotifier {
   Resource<List<VaccineProgram>> _resource;
 
   Resource<List<VaccineProgram>> get state => _resource;
 
-  HomeModel() {
+  HomeRepository _homeRepository;
+
+  HomeModel(HomeRepository homeRepository) {
+    _homeRepository = homeRepository;
     getVaccinePrograms();
   }
 
   void getVaccinePrograms() {
     _resource = Resource.loading("Loading");
     notifyListeners();
-    Future.delayed(Duration(seconds: 2), () {
-      _resource = Resource.completed(programs);
+
+    _homeRepository.loadVaccines().then((value) {
+      _resource = Resource.completed(value);
+      notifyListeners();
+    }).catchError((Object error) {
+      _resource = handleError<List<VaccineProgram>>(error);
       notifyListeners();
     });
   }
 
-  String selectedVaccine;
+  VaccineProgram selectedVaccine;
 
-  void vaccineSelected(value) {
+  void vaccineSelected(VaccineProgram value) {
     selectedVaccine = value;
     notifyListeners();
   }
-}
-
-final programs = [
-  VaccineProgram("covid19", "Covid-19 Vaccine (C19)"),
-  VaccineProgram("measles", "Measles Rubella (MR) vaccine"),
-  VaccineProgram("pneumococcal", "Pneumococcal Conjugate Vaccine (PCV)"),
-  VaccineProgram("rotavirus", "Rotavirus vaccine (RVV)"),
-];
-
-class VaccineProgram {
-  final String id;
-  final String name;
-
-  VaccineProgram(this.id, this.name);
 }

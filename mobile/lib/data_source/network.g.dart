@@ -55,4 +55,23 @@ class _ApiClient implements ApiClient {
     final value = _result.data;
     return value;
   }
+
+  @override
+  Future<List<VaccineProgram>> vaccinePrograms() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.request<List<dynamic>>('/vaccinePrograms',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    var value = _result.data
+        .map((dynamic i) => VaccineProgram.fromJson(i as Map<String, dynamic>))
+        .toList();
+    return value;
+  }
 }

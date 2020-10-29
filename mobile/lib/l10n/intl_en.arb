@@ -12,5 +12,6 @@
   "selectPayment": "Select Payment",
   "invalidMobile": "Invalid Mobile Number",
   "invalidOTP": "Invalid OTP",
-  "msgNoInternet": "No Internet connection"
+  "msgNoInternet": "No Internet connection",
+  "programSelectError": "Please select one program"
 }

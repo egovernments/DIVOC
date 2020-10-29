@@ -1,5 +1,6 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
+import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
@@ -12,6 +13,7 @@ import 'package:divoc/forms/program_selection.dart';
 import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/vaccination_program_page.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/home/home_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,8 +32,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var homeRepository = context.watch<HomeRepository>();
     return ChangeNotifierProvider(
-      create: (_) => HomeModel(),
+      create: (_) => HomeModel(homeRepository),
       builder: (context, widget) {
         return Scaffold(
           key: _scaffoldKey,
@@ -57,7 +60,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
     case '/':
       return SelectProgramScreen(routeInfo);
     case 'vaccineProgram':
-      return VaccinationProgram(routeInfo, arguments);
+      return VaccinationProgramForm(routeInfo, arguments);
     case 'preEnroll':
       return SingleFieldForm(
         title: "Enter Pre Enrolment Code",

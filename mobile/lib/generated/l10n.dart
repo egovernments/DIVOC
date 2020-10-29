@@ -9,6 +9,8 @@ import 'intl/messages_all.dart';
 // **************************************************************************
 
 // ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
+// ignore_for_file: join_return_with_assignment, prefer_final_in_for_each
+// ignore_for_file: avoid_redundant_argument_values
 
 class DivocLocalizations {
   DivocLocalizations();
@@ -168,6 +170,16 @@ class DivocLocalizations {
     return Intl.message(
       'No Internet connection',
       name: 'msgNoInternet',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Please select one program`
+  String get programSelectError {
+    return Intl.message(
+      'Please select one program',
+      name: 'programSelectError',
       desc: '',
       args: [],
     );

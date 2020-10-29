@@ -1,5 +1,7 @@
 import 'package:dio/dio.dart';
+import 'package:divoc/forms/vaccination_program_page.dart';
 import 'package:divoc/model/user.dart';
+import 'package:divoc/model/vaccine_programs.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'network.g.dart';
@@ -16,4 +18,7 @@ abstract class ApiClient {
 
   @GET("/requestOtp")
   Future<String> requestOtp(@Query("mobile") String mobileNumber);
+
+  @GET("/vaccinePrograms")
+  Future<List<VaccineProgram>> vaccinePrograms();
 }

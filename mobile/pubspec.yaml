@@ -33,7 +33,7 @@ dependencies:
   flutter_portal: ^0.3.0
   key_value_store_flutter: ^1.0.0
   key_value_store_web: ^1.0.0
-  shared_preferences: ^0.5.12+2
+  shared_preferences: ^0.4.3
   retrofit: ^1.3.4+1
   logger: ^0.9.4
   json_annotation: ^3.1.0
@@ -42,7 +42,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   retrofit_generator: ^1.4.0
-  build_runner: ^1.10.4
+  build_runner: any
   json_serializable: ^3.5.0
 
 # For information on the generic Dart part of this file, see the
