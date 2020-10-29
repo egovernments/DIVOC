@@ -11,5 +11,7 @@
   "register": "Register with {name}",
   "selectPayment": "Select Payment",
   "invalidMobile": "Invalid Mobile Number",
-  "invalidOTP": "Invalid OTP"
+  "invalidOTP": "Invalid OTP",
+  "msgNoInternet": "No Internet connection",
+  "programSelectError": "Please select one program"
 }

@@ -33,6 +33,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "loginSubtitle" : MessageLookupByLibrary.simpleMessage("Please login to your DIVOC Account"),
     "loginTitle" : MessageLookupByLibrary.simpleMessage("Welcome to the DIVOC\nVaccine Administration Portal"),
     "msgNoInternet" : MessageLookupByLibrary.simpleMessage("No Internet connection"),
+    "programSelectError" : MessageLookupByLibrary.simpleMessage("Please select one program"),
     "register" : m0,
     "selectPayment" : MessageLookupByLibrary.simpleMessage("Select Payment"),
     "selectProgram" : MessageLookupByLibrary.simpleMessage("Please select Vaccine Program"),

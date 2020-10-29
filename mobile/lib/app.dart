@@ -1,8 +1,10 @@
 import 'package:divoc/base/routes.dart';
 import 'package:divoc/base/theme.dart';
+import 'package:divoc/data_source/network.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_page.dart';
+import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/login/login_page.dart';
 import 'package:flutter/material.dart';
@@ -11,17 +13,23 @@ import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
 
 class ProviderApp extends StatelessWidget {
-  final AuthRepository repository;
+  final AuthRepository authRepository;
+  final HomeRepository homeRepository;
+  final ApiClient apiClient;
 
   ProviderApp({
-    @required this.repository,
+    @required this.authRepository,
+    @required this.homeRepository,
+    @required this.apiClient,
   });
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        Provider(create: (_) => repository),
+        Provider<AuthRepository>(create: (_) => authRepository),
+        Provider<ApiClient>(create: (_) => apiClient),
+        Provider<HomeRepository>(create: (_) => homeRepository),
       ],
       child: Portal(
         child: MaterialApp(
@@ -33,7 +41,7 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: repository.isLoggedIn ? HomePage() : LoginPage(),
+          home: authRepository.isLoggedIn ? HomePage() : LoginPage(),
           routes: {
             DivocRoutes.home: (context) => HomePage(),
             DivocRoutes.login: (context) => LoginPage(),
