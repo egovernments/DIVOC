@@ -1,10 +1,11 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/model/vaccine_programs.dart';
 import 'package:flutter/material.dart';
 
-class VaccinationProgram extends StatelessWidget {
-  final String programName;
+class VaccinationProgramForm extends StatelessWidget {
+  final VaccineProgram vaccineProgram;
   final RouteInfo routeInfo;
 
   final programFlow = [
@@ -14,7 +15,7 @@ class VaccinationProgram extends StatelessWidget {
     "Generate Certificates"
   ];
 
-  VaccinationProgram(this.routeInfo, this.programName);
+  VaccinationProgramForm(this.routeInfo, this.vaccineProgram);
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +33,7 @@ class VaccinationProgram extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text(
-                programName,
+                vaccineProgram.name,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),

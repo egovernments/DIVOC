@@ -172,6 +172,16 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Please select one program`
+  String get programSelectError {
+    return Intl.message(
+      'Please select one program',
+      name: 'programSelectError',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {
