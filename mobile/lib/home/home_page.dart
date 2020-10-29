@@ -1,9 +1,11 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/forms/voucher_verfication_form.dart';
+import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
 import 'package:divoc/forms/program_selection.dart';
@@ -14,15 +16,29 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void openDrawer() {
+    _scaffoldKey.currentState.openDrawer();
+  }
+
+  void closeDrawer() {
+    if (_scaffoldKey.currentState.isDrawerOpen) {
+      _scaffoldKey.currentState.openEndDrawer();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => HomeModel(),
       builder: (context, widget) {
         return Scaffold(
+          key: _scaffoldKey,
+          drawer: CustomDrawer(this),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(),
+            child: DivocHeader(this),
           ),
           body: NavigationFormFlow(
             routes: _flows,
