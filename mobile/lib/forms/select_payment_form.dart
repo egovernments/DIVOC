@@ -1,4 +1,5 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/base/constants.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
@@ -12,12 +13,13 @@ class SelectPaymentForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DivocForm(
+      title: DivocLocalizations.of(context).titlePayment,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(PaddingSize.SMALL),
             child: Text(
               DivocLocalizations.of(context).selectPayment,
               style: Theme.of(context).textTheme.headline6,

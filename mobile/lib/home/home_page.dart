@@ -6,6 +6,7 @@ import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/forms/voucher_verfication_form.dart';
+import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
 import 'package:divoc/forms/program_selection.dart';
@@ -52,36 +53,45 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
     case 'preEnroll':
       return PreEnrollmentForm(routeInfo);
     case 'verifyUserDetails':
-      return UserDetailsScreen(routeInfo);
+      return UserDetailsForm(routeInfo, arguments);
 
     case 'aadharManually':
-      return SingleFieldForm(
-        title: "Enter Aadhar Number",
-        btnText: "Generate OTP",
-        onNext: (context, value) {
-          NavigationFormFlow.push(
-              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-        },
+      return DivocForm(
+        title: DivocLocalizations.current.titleVerifyRecipient,
+        child: SingleFieldForm(
+          title: "Enter Aadhar Number",
+          btnText: "Generate OTP",
+          onNext: (context, value) {
+            NavigationFormFlow.push(
+                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+          },
+        ),
       );
 
     case 'scanQR':
-      return SingleFieldForm(
-        title: "Your Aadhar Number",
-        btnText: "Generate OTP",
-        onNext: (context, value) {
-          NavigationFormFlow.push(
-              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-        },
+      return DivocForm(
+        title: DivocLocalizations.current.titleVerifyRecipient,
+        child: SingleFieldForm(
+          title: "Your Aadhar Number",
+          btnText: "Generate OTP",
+          onNext: (context, value) {
+            NavigationFormFlow.push(
+                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+          },
+        ),
       );
 
     case 'aadharOtp':
-      return SingleFieldForm(
-        title: "Enter OTP",
-        btnText: "Verify",
-        onNext: (context, value) {
-          NavigationFormFlow.push(
-              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-        },
+      return DivocForm(
+        title: DivocLocalizations.current.titleVerifyRecipient,
+        child: SingleFieldForm(
+          title: "Enter OTP",
+          btnText: "Verify",
+          onNext: (context, value) {
+            NavigationFormFlow.push(
+                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+          },
+        ),
       );
 
     case 'newEnroll':

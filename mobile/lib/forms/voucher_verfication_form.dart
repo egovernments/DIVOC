@@ -13,8 +13,9 @@ class VoucherVerificationForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DivocForm(
+      title: DivocLocalizations.of(context).titlePayment,
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(PaddingSize.NORMAL),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           mainAxisSize: MainAxisSize.max,

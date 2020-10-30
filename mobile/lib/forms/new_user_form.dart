@@ -1,4 +1,5 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
 import 'navigation_flow.dart';
@@ -11,6 +12,7 @@ class NewUserEnrollForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DivocForm(
+      title: DivocLocalizations.of(context).titleDetailsRecipient,
       child: SingleChildScrollView(
         child: Column(
           children: [
