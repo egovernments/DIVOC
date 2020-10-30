@@ -8,13 +8,15 @@ import 'package:flutter/material.dart';
 class UserDetailsForm extends StatelessWidget {
   final RouteInfo routeInfo;
   final EnrollUser enrollUser;
+  final List<String> buttonTitle = ["Enter Manually", "Scan QR"];
 
   UserDetailsForm(this.routeInfo, this.enrollUser);
 
   @override
   Widget build(BuildContext context) {
+    final localizations = DivocLocalizations.of(context);
     return DivocForm(
-      title: DivocLocalizations.of(context).titleVerifyRecipient,
+      title: localizations.titleVerifyRecipient,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
@@ -32,8 +34,9 @@ class UserDetailsForm extends StatelessWidget {
             height: 16,
           ),
           FieldDetailsWidget(enrollUser.name,
-              "Gender: ${enrollUser.gender} | DOB: ${enrollUser.dob}"),
-          FieldDetailsWidget("Program Name", enrollUser.programName),
+              "${localizations.labelGender}: ${enrollUser.gender} | ${localizations.labelDOB}: ${enrollUser.dob}"),
+          FieldDetailsWidget(
+              localizations.labelProgram, enrollUser.programName),
           SizedBox(
             height: 36,
           ),
@@ -45,23 +48,40 @@ class UserDetailsForm extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: routeInfo.nextRoutesMeta
-                .map((item) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        child: Text(item.nextRouteName),
-                        onPressed: () {
-                          final nextRoutePath = item.fullNextRoutePath;
-                          NavigationFormFlow.push(context, nextRoutePath);
-                        },
-                      ),
-                    ))
-                .toList(),
+          Padding(
+            padding: const EdgeInsets.all(PaddingSize.NORMAL),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
+              children: routeInfo.nextRoutesMeta
+                  .asMap()
+                  .map(
+                    (index, program) => MapEntry(
+                      index,
+                      buildButton(context, index),
+                    ),
+                  )
+                  .values
+                  .toList(),
+            ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget buildButton(BuildContext context, int index) {
+    return Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(PaddingSize.NORMAL),
+        child: FormButton(
+          text: buttonTitle[index],
+          onPressed: () {
+            final nextRoutePath =
+                routeInfo.nextRoutesMeta[index].fullNextRoutePath;
+            NavigationFormFlow.push(context, nextRoutePath);
+          },
+        ),
       ),
     );
   }
@@ -84,8 +104,8 @@ class FieldDetailsWidget extends StatelessWidget {
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
           ),
-          SizedBox(
-            height: 4,
+          Padding(
+            padding: const EdgeInsets.only(bottom: PaddingSize.SMALL),
           ),
           Text(
             subtitle,
