@@ -66,23 +66,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
     case 'vaccineProgram':
       return VaccinationProgramForm(routeInfo, arguments);
     case 'preEnroll':
-      return SingleFieldForm(
-        title: "Enter Pre Enrolment Code",
-        btnText: "Next",
-        onNext: (context, value) {
-          NavigationFormFlow.push(
-              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-        },
-      );
-    case 'preEnroll':
-      return SingleFieldForm(
-        title: "Enter Pre Enrolment Code",
-        btnText: "Next",
-        onNext: (context, value) {
-          NavigationFormFlow.push(
-              context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-        },
-      );
+      return PreEnrollmentForm(routeInfo);
     case 'verifyUserDetails':
       return UserDetailsScreen(routeInfo);
 

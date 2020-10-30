@@ -41,14 +41,14 @@ class SelectProgramScreen extends StatelessWidget {
             ),
             Consumer<HomeModel>(
               builder: (context, homeModel, child) {
-                if (homeModel.state.status == Status.LOADING) {
+                if (homeModel.resourceVaccine.status == Status.LOADING) {
                   return Expanded(
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   );
                 }
-                final vaccinePrograms = homeModel.state.data;
+                final vaccinePrograms = homeModel.resourceVaccine.data;
                 return ProgramSelectionDropdownWidget(
                   programs: vaccinePrograms,
                   onTap: (index) {
