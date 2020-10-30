@@ -35,10 +35,10 @@ class HomePage extends StatelessWidget {
       builder: (context, widget) {
         return Scaffold(
           key: _scaffoldKey,
-          drawer: CustomDrawer(this),
+          drawer: CustomDrawer(this.closeDrawer),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(this),
+            child: DivocHeader(this.openDrawer),
           ),
           body: NavigationFormFlow(
             routes: _flows,
