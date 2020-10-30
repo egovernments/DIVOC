@@ -31,28 +31,41 @@ class VaccinationProgramForm extends StatelessWidget {
               width: 50,
             ),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(PaddingSize.LARGE),
               child: Text(
                 vaccineProgram.name,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),
-            Expanded(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: programFlow.length,
-                itemBuilder: (BuildContext context, int index) {
-                  return RaisedButton(
-                    child: Text(programFlow[index]),
-                    onPressed: () {
-                      final nextRoutePath =
-                          routeInfo.nextRoutesMeta[index].fullNextRoutePath;
-                      NavigationFormFlow.push(context, nextRoutePath);
-                    },
-                  );
-                },
-              ),
-            )
+            Column(
+                children: programFlow
+                    .asMap()
+                    .map(
+                      (index, program) => MapEntry(
+                        index,
+                        Padding(
+                          padding: const EdgeInsets.all(PaddingSize.TINY),
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: OutlineButton(
+                              padding: const EdgeInsets.all(PaddingSize.NORMAL),
+                              borderSide: BorderSide(
+                                color:
+                                    Theme.of(context).textTheme.caption.color,
+                              ),
+                              child: Text(program),
+                              onPressed: () {
+                                final nextRoutePath = routeInfo
+                                    .nextRoutesMeta[index].fullNextRoutePath;
+                                NavigationFormFlow.push(context, nextRoutePath);
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                    .values
+                    .toList()),
           ],
         ),
       ),

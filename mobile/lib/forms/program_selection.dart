@@ -22,7 +22,7 @@ class SelectProgramScreen extends StatelessWidget {
         padding: const EdgeInsets.all(40.0),
         child: Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Image.asset(
               ImageAssetPath.SYRINGE,
@@ -42,13 +42,20 @@ class SelectProgramScreen extends StatelessWidget {
             Consumer<HomeModel>(
               builder: (context, homeModel, child) {
                 if (homeModel.state.status == Status.LOADING) {
-                  return CircularProgressIndicator();
+                  return Expanded(
+                    child: Center(
+                      child: CircularProgressIndicator(),
+                    ),
+                  );
                 }
+                final vaccinePrograms = homeModel.state.data;
                 return ProgramSelectionDropdownWidget(
-                  programs: homeModel.state.data,
-                  selectedVaccine: homeModel.selectedVaccine,
-                  onChanged: (value) {
-                    homeModel.vaccineSelected(value);
+                  programs: vaccinePrograms,
+                  onTap: (index) {
+                    final nextRoutePath =
+                        routeInfo.nextRoutesMeta[0].fullNextRoutePath;
+                    Navigator.of(context).pushNamed(nextRoutePath,
+                        arguments: vaccinePrograms[index]);
                   },
                 );
               },
@@ -56,21 +63,6 @@ class SelectProgramScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
             ),
-            RaisedButton(
-              child: Text(DivocLocalizations.of(context).labelNext),
-              onPressed: () {
-                var homeModel = context.read<HomeModel>();
-                if (homeModel.selectedVaccine != null) {
-                  final nextRoutePath =
-                      routeInfo.nextRoutesMeta[0].fullNextRoutePath;
-                  Navigator.of(context).pushNamed(nextRoutePath,
-                      arguments: homeModel.selectedVaccine);
-                } else {
-                  context.showSnackbarMessage(
-                      DivocLocalizations.of(context).programSelectError);
-                }
-              },
-            )
           ],
         ),
       ),
@@ -80,11 +72,9 @@ class SelectProgramScreen extends StatelessWidget {
 
 class ProgramSelectionDropdownWidget extends StatelessWidget {
   final List<VaccineProgram> programs;
-  final ValueChanged<VaccineProgram> onChanged;
-  final VaccineProgram selectedVaccine;
+  final ValueChanged<int> onTap;
 
-  ProgramSelectionDropdownWidget(
-      {this.selectedVaccine, this.programs, this.onChanged});
+  ProgramSelectionDropdownWidget({this.programs, this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -92,21 +82,15 @@ class ProgramSelectionDropdownWidget extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
         itemBuilder: (context, index) {
-          final selectedColor = selectedVaccine != null &&
-                  programs[index].id == selectedVaccine.id
-              ? Colors.blue
-              : defaultTextColor;
           return ListTile(
             title: Text(
               programs[index].name,
-              style: TextStyle(color: selectedColor),
             ),
             trailing: Icon(
               Icons.navigate_next,
-              color: selectedColor,
             ),
             onTap: () {
-              onChanged(programs[index]);
+              onTap(index);
             },
           );
         },

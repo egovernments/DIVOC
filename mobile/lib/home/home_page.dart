@@ -1,4 +1,5 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/base/theme.dart';
 import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
@@ -27,11 +28,14 @@ class HomePage extends StatelessWidget {
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: DivocHeader(),
           ),
-          body: NavigationFormFlow(
-            routes: _flows,
-            builder: (routeInfo, arguments) {
-              return getWidgetByRouteName(routeInfo, arguments);
-            },
+          body: Theme(
+            data: DivocTheme.formTheme,
+            child: NavigationFormFlow(
+              routes: _flows,
+              builder: (routeInfo, arguments) {
+                return getWidgetByRouteName(routeInfo, arguments);
+              },
+            ),
           ),
         );
       },

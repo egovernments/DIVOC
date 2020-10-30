@@ -25,4 +25,15 @@ class DivocTheme {
       scaffoldBackgroundColor: Colors.white,
     );
   }
+
+  static ThemeData get formTheme {
+    return appTheme.copyWith(
+        buttonTheme: ButtonThemeData(
+          textTheme: ButtonTextTheme.accent,
+          colorScheme: appTheme.colorScheme.copyWith(
+            secondary: Color(0xff646D82),
+          ),
+        )
+    );
+  }
 }
