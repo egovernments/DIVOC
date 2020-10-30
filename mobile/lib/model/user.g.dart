@@ -21,3 +21,20 @@ Map<String, dynamic> _$UserToJson(User instance) => <String, dynamic>{
       'name': instance.name,
       'role': instance.role,
     };
+
+EnrollUser _$EnrollUserFromJson(Map<String, dynamic> json) {
+  return EnrollUser(
+    json['dob'] as String,
+    json['gender'] as String,
+    json['name'] as String,
+    json['programName'] as String,
+  );
+}
+
+Map<String, dynamic> _$EnrollUserToJson(EnrollUser instance) =>
+    <String, dynamic>{
+      'dob': instance.dob,
+      'gender': instance.gender,
+      'name': instance.name,
+      'programName': instance.programName,
+    };

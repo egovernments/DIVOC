@@ -21,4 +21,7 @@ abstract class ApiClient {
 
   @GET("/vaccinePrograms")
   Future<List<VaccineProgram>> vaccinePrograms();
+
+  @GET("/enrollment")
+  Future<EnrollUser> getEnrollmentDetails(@Query("id") String enrollmentID);
 }

@@ -38,35 +38,35 @@ class VaccinationProgramForm extends StatelessWidget {
               ),
             ),
             Column(
-                children: programFlow
-                    .asMap()
-                    .map(
-                      (index, program) => MapEntry(
-                        index,
-                        Padding(
-                          padding: const EdgeInsets.all(PaddingSize.TINY),
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: OutlineButton(
-                              padding: const EdgeInsets.all(PaddingSize.NORMAL),
-                              borderSide: BorderSide(
-                                color:
-                                    Theme.of(context).textTheme.caption.color,
-                              ),
-                              child: Text(program),
-                              onPressed: () {
-                                final nextRoutePath = routeInfo
-                                    .nextRoutesMeta[index].fullNextRoutePath;
-                                NavigationFormFlow.push(context, nextRoutePath);
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
-                    )
-                    .values
-                    .toList()),
+              children: programFlow
+                  .asMap()
+                  .map(
+                    (index, program) => MapEntry(
+                      index,
+                      buildButton(context, program, index),
+                    ),
+                  )
+                  .values
+                  .toList(),
+            ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget buildButton(BuildContext context, String program, int index) {
+    return Padding(
+      padding: const EdgeInsets.all(PaddingSize.TINY),
+      child: SizedBox(
+        width: double.infinity,
+        child: FormButton(
+          text: program,
+          onPressed: () {
+            final nextRoutePath =
+                routeInfo.nextRoutesMeta[index].fullNextRoutePath;
+            NavigationFormFlow.push(context, nextRoutePath);
+          },
         ),
       ),
     );

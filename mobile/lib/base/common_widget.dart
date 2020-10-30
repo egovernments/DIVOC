@@ -113,3 +113,22 @@ class DivocFooter extends StatelessWidget {
     );
   }
 }
+
+class FormButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onPressed;
+
+  FormButton({this.text, this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return OutlineButton(
+      padding: const EdgeInsets.all(PaddingSize.NORMAL),
+      borderSide: BorderSide(
+        color: Theme.of(context).textTheme.caption.color,
+      ),
+      child: Text(text),
+      onPressed: onPressed,
+    );
+  }
+}

@@ -16,3 +16,18 @@ class User {
 
   Map<String, dynamic> toJson() => _$UserToJson(this);
 }
+
+@JsonSerializable()
+class EnrollUser {
+  final String dob;
+  final String gender;
+  final String name;
+  final String programName;
+
+
+  EnrollUser(this.dob, this.gender, this.name, this.programName);
+
+  factory EnrollUser.fromJson(Map<String, dynamic> json) => _$EnrollUserFromJson(json);
+
+  Map<String, dynamic> toJson() => _$EnrollUserToJson(this);
+}
