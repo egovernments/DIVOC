@@ -78,7 +78,6 @@ class ProgramSelectionDropdownWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final defaultTextColor = Theme.of(context).textTheme.caption.color;
     return Expanded(
       child: ListView.builder(
         itemBuilder: (context, index) {
@@ -94,7 +93,7 @@ class ProgramSelectionDropdownWidget extends StatelessWidget {
             },
           );
         },
-        itemCount: programs.length,
+        itemCount: programs != null ? programs.length : 0,
       ),
     );
   }

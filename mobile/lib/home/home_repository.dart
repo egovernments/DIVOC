@@ -1,6 +1,7 @@
 import 'package:divoc/base/utils.dart';
 import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/vaccination_program_page.dart';
+import 'package:divoc/model/patients.dart';
 import 'package:divoc/model/user.dart';
 import 'package:divoc/model/vaccine_programs.dart';
 import 'package:flutter/foundation.dart';
@@ -10,6 +11,8 @@ abstract class HomeRepository {
   Future<List<VaccineProgram>> loadVaccines();
 
   Future<EnrollUser> getEnrollmentDetails(String enrollmentNumber);
+
+  Future<List<PatientDetails>> getPatientDetails(String facilityId);
 }
 
 class HomeRepositoryImpl extends HomeRepository {
@@ -32,6 +35,16 @@ class HomeRepositoryImpl extends HomeRepository {
   Future<EnrollUser> getEnrollmentDetails(String enrollmentNumber) async {
     try {
       var response = await apiClient.getEnrollmentDetails(enrollmentNumber);
+      return Future.value(response);
+    } on Exception catch (e) {
+      throw handleNetworkError(e);
+    }
+  }
+
+  @override
+  Future<List<PatientDetails>> getPatientDetails(String facilityId) async {
+    try {
+      var response = await apiClient.getPatientDetails(facilityId);
       return Future.value(response);
     } on Exception catch (e) {
       throw handleNetworkError(e);

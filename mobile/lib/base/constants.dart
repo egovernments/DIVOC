@@ -9,6 +9,8 @@ class ImageAssetPath {
   static const String CLOSE_ICON = "assets/close.png";
   static const String ARROW_ICON = "assets/arrow.png";
   static const String USER_PROFILE = "assets/user_profile.png";
+  static const String VACCINE_DE_ACTIVE = "assets/vaccine_deactive.png";
+  static const String VACCINE_ACTIVE = "assets/vaccine_active.png";
 }
 
 class PaddingSize {
