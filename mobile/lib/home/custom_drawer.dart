@@ -1,12 +1,19 @@
 import 'package:divoc/base/constants.dart';
+import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 
 class CustomDrawer extends StatelessWidget {
-  final HomePage homePage;
+  final closeDrawer;
 
-  CustomDrawer(this.homePage);
+  CustomDrawer(this.closeDrawer);
+
+  final rightArrow = Image.asset(
+    ImageAssetPath.ARROW_ICON,
+    width: 20,
+    height: 20,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -29,16 +36,16 @@ class CustomDrawer extends StatelessWidget {
                               width: 25,
                               height: 25,
                             ),
-                            onPressed: homePage.closeDrawer)),
+                            onPressed: this.closeDrawer)),
                     SizedBox(
                       height: 64,
                     ),
-                    DrawerMenuItem("Verify Recipient", null),
-                    DrawerMenuItem("Enroll Recipient", null),
-                    DrawerMenuItem("Recipient Queue", null),
-                    DrawerMenuItem("Change Language", null),
-                    DrawerMenuItem("Raise an issue", null),
-                    DrawerMenuItem("Logout", null),
+                    ListTile(title: Text("Verify Recipient".toUpperCase()), trailing: rightArrow,),
+                    ListTile(title: Text("Enroll Recipient".toUpperCase()), trailing: rightArrow,),
+                    ListTile(title: Text("Recipient Queue".toUpperCase()), trailing: rightArrow, ),
+                    ListTile(title: Text("Change Language".toUpperCase()), trailing: rightArrow,),
+                    ListTile(title: Text("Raise an issue".toUpperCase()), trailing: rightArrow,),
+                    ListTile(title: Text("Logout".toUpperCase()), trailing: rightArrow,),
                   ]),
             )),
       ),
@@ -46,29 +53,3 @@ class CustomDrawer extends StatelessWidget {
   }
 }
 
-class DrawerMenuItem extends StatelessWidget {
-  String text;
-  VoidCallback handler;
-
-  DrawerMenuItem(this.text, this.handler);
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(children: [
-      Align(
-          alignment: Alignment.topLeft,
-          child: FlatButton(
-            onPressed: handler,
-            child: Text(text.toUpperCase()),
-          )),
-      Expanded(
-          child: Align(
-              alignment: Alignment.topRight,
-              child: Image.asset(
-                ImageAssetPath.ARROW_ICON,
-                width: 20,
-                height: 20,
-              ))),
-    ]);
-  }
-}

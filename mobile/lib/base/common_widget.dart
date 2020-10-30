@@ -38,8 +38,8 @@ class DivocForm extends StatelessWidget {
 class DivocHeader extends StatelessWidget {
   final bool showHeaderMenu;
   final bool showHelpMenu;
-  final HomePage homePage;
-  DivocHeader(this.homePage, {this.showHeaderMenu = true, this.showHelpMenu = true});
+  final openDrawer;
+  DivocHeader(this.openDrawer, {this.showHeaderMenu = true, this.showHelpMenu = true});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,7 @@ class DivocHeader extends StatelessWidget {
                         child: Image.asset(ImageAssetPath.HEADER_MENU),
                       ),
                     ),
-                    onPressed: () => { if(homePage!=null) homePage.openDrawer()},
+                    onPressed: () => { if(this.openDrawer!=null) this.openDrawer()},
                   ),
                 ),
               )
