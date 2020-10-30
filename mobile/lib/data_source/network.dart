@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:divoc/forms/vaccination_program_page.dart';
+import 'package:divoc/model/patients.dart';
 import 'package:divoc/model/user.dart';
 import 'package:divoc/model/vaccine_programs.dart';
 import 'package:retrofit/retrofit.dart';
@@ -24,4 +25,8 @@ abstract class ApiClient {
 
   @GET("/enrollment")
   Future<EnrollUser> getEnrollmentDetails(@Query("id") String enrollmentID);
+
+  @GET("/upcomingPatient")
+  Future<List<PatientDetails>> getPatientDetails(
+      @Query("facultyId") String facultyId);
 }

@@ -25,7 +25,7 @@ class Resource<T> {
 
   Resource.error(this.message) : status = Status.ERROR;
 
-  Resource.idle() : status = Status.IDLE;
+  Resource.idle({this.data}) : status = Status.IDLE;
 
   @override
   String toString() {

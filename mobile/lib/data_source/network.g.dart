@@ -92,4 +92,24 @@ class _ApiClient implements ApiClient {
     final value = EnrollUser.fromJson(_result.data);
     return value;
   }
+
+  @override
+  Future<List<PatientDetails>> getPatientDetails(facultyId) async {
+    ArgumentError.checkNotNull(facultyId, 'facultyId');
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'facultyId': facultyId};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.request<List<dynamic>>('/upcomingPatient',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    var value = _result.data
+        .map((dynamic i) => PatientDetails.fromJson(i as Map<String, dynamic>))
+        .toList();
+    return value;
+  }
 }
