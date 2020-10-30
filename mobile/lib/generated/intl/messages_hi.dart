@@ -27,9 +27,15 @@ class MessageLookup extends MessageLookupByLibrary {
   static _notInlinedMessages(_) => <String, Function> {
     "invalidMobile" : MessageLookupByLibrary.simpleMessage("Invalid Mobile Number"),
     "invalidOTP" : MessageLookupByLibrary.simpleMessage("Invalid OTP"),
+    "labelAadhaar" : MessageLookupByLibrary.simpleMessage("Aadhaar"),
+    "labelDOB" : MessageLookupByLibrary.simpleMessage("DOB"),
+    "labelEnterManually" : MessageLookupByLibrary.simpleMessage("ENTER MANUALLY"),
+    "labelGender" : MessageLookupByLibrary.simpleMessage("Gender"),
     "labelLogin" : MessageLookupByLibrary.simpleMessage("LOGIN"),
     "labelNext" : MessageLookupByLibrary.simpleMessage("Next"),
     "labelOTP" : MessageLookupByLibrary.simpleMessage("GET OTP"),
+    "labelProgram" : MessageLookupByLibrary.simpleMessage("Program Name"),
+    "labelScanQR" : MessageLookupByLibrary.simpleMessage("Scan with QR"),
     "loginSubtitle" : MessageLookupByLibrary.simpleMessage("Please login to your DIVOC Account"),
     "loginTitle" : MessageLookupByLibrary.simpleMessage("Welcome to the DIVOC\nVaccine Administration Portal"),
     "msgNoInternet" : MessageLookupByLibrary.simpleMessage("No Internet connection"),
@@ -39,6 +45,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "selectProgram" : MessageLookupByLibrary.simpleMessage("Please select Vaccine Program"),
     "tAndC" : MessageLookupByLibrary.simpleMessage("TERMS OF USE. PRIVACY POLICY"),
     "title" : MessageLookupByLibrary.simpleMessage("DIVOC"),
+    "titleVerifyRecipient" : MessageLookupByLibrary.simpleMessage("Verify Vaccination Recipient"),
     "vaccineLabel" : m1
   };
 }

@@ -1,25 +1,29 @@
 import 'package:divoc/base/common_widget.dart';
+import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/model/user.dart';
 import 'package:flutter/material.dart';
 
-class UserDetailsScreen extends StatelessWidget {
+class UserDetailsForm extends StatelessWidget {
   final RouteInfo routeInfo;
-  final String programName = "Covid-19 Vaccine (C19)";
+  final EnrollUser enrollUser;
 
-  UserDetailsScreen(this.routeInfo);
+  UserDetailsForm(this.routeInfo, this.enrollUser);
 
   @override
   Widget build(BuildContext context) {
     return DivocForm(
+      title: DivocLocalizations.of(context).titleVerifyRecipient,
       child: Column(
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(PaddingSize.LARGE),
             child: Text(
-              DivocLocalizations.of(context).vaccineLabel(programName),
+              DivocLocalizations.of(context)
+                  .vaccineLabel(enrollUser.programName),
               style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
@@ -27,15 +31,16 @@ class UserDetailsScreen extends StatelessWidget {
           SizedBox(
             height: 16,
           ),
-          FieldDetailsWidget("Vivek Singh", "Gender: Male | DOB: 28/10/1990"),
-          FieldDetailsWidget("Program Name", programName),
+          FieldDetailsWidget(enrollUser.name,
+              "Gender: ${enrollUser.gender} | DOB: ${enrollUser.dob}"),
+          FieldDetailsWidget("Program Name", enrollUser.programName),
           SizedBox(
             height: 36,
           ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              DivocLocalizations.of(context).register("Aadhar"),
+              DivocLocalizations.of(context).register("Aadhaar"),
               style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),

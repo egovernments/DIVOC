@@ -13,5 +13,15 @@
   "invalidMobile": "Invalid Mobile Number",
   "invalidOTP": "Invalid OTP",
   "msgNoInternet": "No Internet connection",
-  "programSelectError": "Please select one program"
+  "programSelectError": "Please select one program",
+  "labelGender": "Gender",
+  "labelDOB": "DOB",
+  "labelProgram": "Program Name",
+  "labelAadhaar": "Aadhaar",
+  "labelEnterManually": "ENTER MANUALLY",
+  "labelScanQR": "Scan with QR",
+  "titleVerifyRecipient": "Verify Vaccination Recipient",
+  "titleUpcomingRecipient": "Upcoming, Vaccination Recipients",
+  "titleDetailsRecipient": "Add details of Vaccination Recipient",
+  "titlePayment": "Payment"
 }

@@ -21,15 +21,51 @@ class LoadingOverlay extends StatelessWidget {
 
 class DivocForm extends StatelessWidget {
   final Widget child;
+  final String title;
 
-  DivocForm({@required this.child});
+  DivocForm({@required this.child, this.title});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Card(
-        child: child,
+    return Column(
+      children: [
+        title != null ? FormTitle(title) : Container(),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Card(
+              child: child,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class FormTitle extends StatelessWidget {
+  final String title;
+
+  FormTitle(this.title);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+          border: Border(
+              bottom: BorderSide(
+        color: Theme.of(context).primaryColor,
+        width: 2.0,
+      ))),
+      child: ListTile(
+        title: Text(
+          title,
+          textAlign: TextAlign.center,
+          style: Theme.of(context)
+              .textTheme
+              .bodyText2
+              .copyWith(color: Colors.black),
+        ),
       ),
     );
   }

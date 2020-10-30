@@ -184,6 +184,106 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Gender`
+  String get labelGender {
+    return Intl.message(
+      'Gender',
+      name: 'labelGender',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DOB`
+  String get labelDOB {
+    return Intl.message(
+      'DOB',
+      name: 'labelDOB',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Program Name`
+  String get labelProgram {
+    return Intl.message(
+      'Program Name',
+      name: 'labelProgram',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Aadhaar`
+  String get labelAadhaar {
+    return Intl.message(
+      'Aadhaar',
+      name: 'labelAadhaar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `ENTER MANUALLY`
+  String get labelEnterManually {
+    return Intl.message(
+      'ENTER MANUALLY',
+      name: 'labelEnterManually',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Scan with QR`
+  String get labelScanQR {
+    return Intl.message(
+      'Scan with QR',
+      name: 'labelScanQR',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Verify Vaccination Recipient`
+  String get titleVerifyRecipient {
+    return Intl.message(
+      'Verify Vaccination Recipient',
+      name: 'titleVerifyRecipient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Upcoming, Vaccination Recipients`
+  String get titleUpcomingRecipient {
+    return Intl.message(
+      'Upcoming, Vaccination Recipients',
+      name: 'titleUpcomingRecipient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Add details of Vaccination Recipient`
+  String get titleDetailsRecipient {
+    return Intl.message(
+      'Add details of Vaccination Recipient',
+      name: 'titleDetailsRecipient',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Payment`
+  String get titlePayment {
+    return Intl.message(
+      'Payment',
+      name: 'titlePayment',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

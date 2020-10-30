@@ -1,17 +1,15 @@
 import 'dart:async';
 
+import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/base/common_widget.dart';
-import 'package:divoc/base/constants.dart';
 import 'package:divoc/base/utils.dart';
 import 'package:divoc/forms/enrollment_model.dart';
 import 'package:divoc/forms/navigation_flow.dart';
-import 'package:divoc/forms/navigation_flow.dart';
-import 'package:divoc/home/home_model.dart';
+import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/home_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
-import 'package:divoc/base/common_extension.dart';
 
 typedef OnNext = Function(BuildContext context, String value);
 
@@ -29,47 +27,45 @@ class SingleFieldForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DivocForm(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Text(
-            title,
-            style: Theme.of(context).textTheme.headline6,
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formState,
-              child: TextFormField(
-                initialValue: defaultValue,
-                autofocus: true,
-                textAlign: TextAlign.center,
-                keyboardType: TextInputType.phone,
-                onSaved: (value) {
-                  onNext(context, value);
-                },
-                validator: (value) {
-                  var msg = value.isEmpty ? "Cannot be Empty" : null;
-                  return msg;
-                },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formState,
+            child: TextFormField(
+              initialValue: defaultValue,
+              textAlign: TextAlign.center,
+              keyboardType: TextInputType.phone,
+              onSaved: (value) {
+                onNext(context, value);
+              },
+              validator: (value) {
+                var msg = value.isEmpty ? "Cannot be Empty" : null;
+                return msg;
+              },
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
               ),
             ),
           ),
-          FormButton(
-            text: btnText,
-            onPressed: () {
-              if (_formState.currentState.validate()) {
-                _formState.currentState.save();
-              }
-            },
-          )
-        ],
-      ),
+        ),
+        FormButton(
+          text: btnText,
+          onPressed: () {
+            if (_formState.currentState.validate()) {
+              FocusScope.of(context).unfocus();
+              _formState.currentState.save();
+            }
+          },
+        )
+      ],
     );
   }
 }
@@ -90,8 +86,9 @@ class PreEnrollmentForm extends StatelessWidget {
           scheduleMicrotask(() {
             switch (status) {
               case Status.COMPLETED:
-                NavigationFormFlow.push(
-                    context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                Navigator.of(context).pushNamed(
+                    routeInfo.nextRoutesMeta[0].fullNextRoutePath,
+                    arguments: enrollModel.enrollUser.data);
                 break;
               case Status.ERROR:
                 context.showSnackbarMessage(enrollModel.enrollUser.message);
@@ -102,13 +99,16 @@ class PreEnrollmentForm extends StatelessWidget {
           return PortalEntry(
             visible: status == Status.LOADING,
             portal: LoadingOverlay(),
-            child: SingleFieldForm(
-              title: "Enter Pre Enrolment Code",
-              btnText: "Next",
-              defaultValue: enrollModel.enrollmentId,
-              onNext: (context, value) {
-                enrollModel.getEnrollmentDetails(value);
-              },
+            child: DivocForm(
+              title: DivocLocalizations.of(context).titleVerifyRecipient,
+              child: SingleFieldForm(
+                title: "Enter Pre Enrolment Code",
+                btnText: "Next",
+                defaultValue: enrollModel.enrollmentId,
+                onNext: (context, value) {
+                  enrollModel.getEnrollmentDetails(value);
+                },
+              ),
             ),
           );
         },
