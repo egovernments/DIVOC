@@ -1,3 +1,5 @@
+export const API_ROOT_URL = 'https://api.covid19india.org/v4';
+
 export const STATE_NAMES = [
     'Andhra Pradesh',
     'Arunachal Pradesh',

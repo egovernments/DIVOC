@@ -6,3 +6,18 @@
 .dropdown {
     text-align: left;
 }
+
+.details-row{
+    display: flex;
+    margin-left: 50px;
+    justify-content: flex-end;
+}
+
+.details{
+    padding: 20px;
+    
+}
+
+.box {
+    display: flex;
+}
