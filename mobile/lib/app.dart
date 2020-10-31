@@ -2,9 +2,9 @@ import 'package:divoc/base/routes.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/data_source/network.dart';
 import 'package:divoc/generated/l10n.dart';
-import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_page.dart';
 import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/home/operator_home_page.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/login/login_page.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +41,7 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: authRepository.isLoggedIn ? HomePage() : LoginPage(),
+          home: authRepository.isLoggedIn ? OperatorHomePage() : LoginPage(),
           routes: {
             DivocRoutes.home: (context) => HomePage(),
             DivocRoutes.login: (context) => LoginPage(),

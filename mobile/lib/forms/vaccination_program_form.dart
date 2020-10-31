@@ -34,6 +34,7 @@ class VaccinationProgramForm extends StatelessWidget {
               padding: const EdgeInsets.all(PaddingSize.LARGE),
               child: Text(
                 vaccineProgram.name,
+                textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headline6,
               ),
             ),

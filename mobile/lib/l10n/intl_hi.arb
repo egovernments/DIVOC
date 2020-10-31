@@ -9,7 +9,7 @@
   "labelNext": "Next",
   "vaccineLabel": "You are registering {vaccineName} for:",
   "register": "Register with {name}",
-  "selectPayment": "Select Payment",
+  "selectPayment": "Please select payment mode",
   "invalidMobile": "Invalid Mobile Number",
   "invalidOTP": "Invalid OTP",
   "msgNoInternet": "No Internet connection",
@@ -20,5 +20,11 @@
   "labelAadhaar": "Aadhaar",
   "labelEnterManually": "ENTER MANUALLY",
   "labelScanQR": "Scan with QR",
-  "titleVerifyRecipient": "Verify Vaccination Recipient"
+  "titleVerifyRecipient": "Verify Vaccination Recipient",
+  "titleUpcomingRecipient": "Upcoming, Vaccination Recipients",
+  "titleDetailsRecipient": "Add details of Vaccination Recipient",
+  "titlePayment": "Payment",
+  "titleEnterVaccineManually": "Enter Vaccine Details Manually",
+  "titleVerifyAadhaar": "Verify Aadhaar",
+  "titleVerifyVaccineDetailsManually": "Enter Vaccine Details Manually"
 }

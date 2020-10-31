@@ -27,6 +27,7 @@ class DivocForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisSize: MainAxisSize.max,
       children: [
         title != null ? FormTitle(title) : Container(),
         Expanded(

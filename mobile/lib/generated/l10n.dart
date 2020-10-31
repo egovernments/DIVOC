@@ -9,6 +9,8 @@ import 'intl/messages_all.dart';
 // **************************************************************************
 
 // ignore_for_file: non_constant_identifier_names, lines_longer_than_80_chars
+// ignore_for_file: join_return_with_assignment, prefer_final_in_for_each
+// ignore_for_file: avoid_redundant_argument_values
 
 class DivocLocalizations {
   DivocLocalizations();
@@ -133,10 +135,10 @@ class DivocLocalizations {
     );
   }
 
-  /// `Select Payment`
+  /// `Please select payment mode`
   String get selectPayment {
     return Intl.message(
-      'Select Payment',
+      'Please select payment mode',
       name: 'selectPayment',
       desc: '',
       args: [],
@@ -278,6 +280,46 @@ class DivocLocalizations {
     return Intl.message(
       'Payment',
       name: 'titlePayment',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter Vaccine Details Manually`
+  String get titleEnterVaccineManually {
+    return Intl.message(
+      'Enter Vaccine Details Manually',
+      name: 'titleEnterVaccineManually',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Verify Aadhaar`
+  String get titleVerifyAadhaar {
+    return Intl.message(
+      'Verify Aadhaar',
+      name: 'titleVerifyAadhaar',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Enter Vaccine Details Manually`
+  String get titleVerifyVaccineDetailsManually {
+    return Intl.message(
+      'Enter Vaccine Details Manually',
+      name: 'titleVerifyVaccineDetailsManually',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `SELECT APPROVED VACCINE`
+  String get titleSelectApprovedVaccine {
+    return Intl.message(
+      'SELECT APPROVED VACCINE',
+      name: 'titleSelectApprovedVaccine',
       desc: '',
       args: [],
     );

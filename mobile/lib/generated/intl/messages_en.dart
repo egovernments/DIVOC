@@ -41,14 +41,18 @@ class MessageLookup extends MessageLookupByLibrary {
     "msgNoInternet" : MessageLookupByLibrary.simpleMessage("No Internet connection"),
     "programSelectError" : MessageLookupByLibrary.simpleMessage("Please select one program"),
     "register" : m0,
-    "selectPayment" : MessageLookupByLibrary.simpleMessage("Select Payment"),
+    "selectPayment" : MessageLookupByLibrary.simpleMessage("Please select payment mode"),
     "selectProgram" : MessageLookupByLibrary.simpleMessage("Please select Vaccine Program"),
     "tAndC" : MessageLookupByLibrary.simpleMessage("TERMS OF USE. PRIVACY POLICY"),
     "title" : MessageLookupByLibrary.simpleMessage("DIVOC"),
     "titleDetailsRecipient" : MessageLookupByLibrary.simpleMessage("Add details of Vaccination Recipient"),
+    "titleEnterVaccineManually" : MessageLookupByLibrary.simpleMessage("Enter Vaccine Details Manually"),
     "titlePayment" : MessageLookupByLibrary.simpleMessage("Payment"),
+    "titleSelectApprovedVaccine" : MessageLookupByLibrary.simpleMessage("SELECT APPROVED VACCINE"),
     "titleUpcomingRecipient" : MessageLookupByLibrary.simpleMessage("Upcoming, Vaccination Recipients"),
+    "titleVerifyAadhaar" : MessageLookupByLibrary.simpleMessage("Verify Aadhaar"),
     "titleVerifyRecipient" : MessageLookupByLibrary.simpleMessage("Verify Vaccination Recipient"),
+    "titleVerifyVaccineDetailsManually" : MessageLookupByLibrary.simpleMessage("Enter Vaccine Details Manually"),
     "vaccineLabel" : m1
   };
 }
