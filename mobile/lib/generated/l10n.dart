@@ -135,10 +135,10 @@ class DivocLocalizations {
     );
   }
 
-  /// `Select Payment`
+  /// `Please select payment mode`
   String get selectPayment {
     return Intl.message(
-      'Select Payment',
+      'Please select payment mode',
       name: 'selectPayment',
       desc: '',
       args: [],

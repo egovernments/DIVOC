@@ -41,7 +41,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "msgNoInternet" : MessageLookupByLibrary.simpleMessage("No Internet connection"),
     "programSelectError" : MessageLookupByLibrary.simpleMessage("Please select one program"),
     "register" : m0,
-    "selectPayment" : MessageLookupByLibrary.simpleMessage("Select Payment"),
+    "selectPayment" : MessageLookupByLibrary.simpleMessage("Please select payment mode"),
     "selectProgram" : MessageLookupByLibrary.simpleMessage("Please select Vaccine Program"),
     "tAndC" : MessageLookupByLibrary.simpleMessage("TERMS OF USE. PRIVACY POLICY"),
     "title" : MessageLookupByLibrary.simpleMessage("DIVOC"),
