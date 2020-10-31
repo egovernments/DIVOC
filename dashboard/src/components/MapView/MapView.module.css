@@ -60,3 +60,60 @@
     clear:both;
     display: flex;
 }
+
+.container {
+    display: flex;
+}
+
+.map-container{
+    /* background-color: #C1CFD933; */
+    padding: 400px;
+}
+
+.heading{
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.centres{
+    display: flex;
+}
+
+.centre-box{
+    border: 1px solid #91C5FF;
+    border-radius: 10px 0px 0px 10px;
+    padding: 20px;
+    display: flex;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.box-shape {
+    border: 1px solid #91C5FF;
+    padding: 20px;
+    display: flex;
+    text-align: left;
+    margin-bottom: 10px;
+}
+.details{
+    padding-left: 10px;
+}
+
+.private-box {
+    border: 1px solid #91C5FF;
+    border-radius: 0px 10px 10px 0px;
+    padding: 20px;
+    display: flex;
+    text-align: left;
+    margin-bottom: 10px;
+}
+
+.numbers{
+    color: #479EFF;
+    font-weight: bold;
+}
+
+.texts {
+    color: #1D1D1D;
+    font-size: 10px;
+}
