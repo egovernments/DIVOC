@@ -1,0 +1,62 @@
+
+.top-heading {
+    display: flex;
+    margin-left: 20px;
+    padding-left: 10px;
+}
+
+.image {
+    align-items: flex-start;
+}
+
+.heading-content{
+    color: #1D1D1D;
+    font-size: 25px;
+    font-weight: lighter;
+    font-family: 'Proxima Nova';
+    padding-left: 5px;
+    padding-top: 10px;
+}
+
+.population {
+    margin-left: auto;
+    margin-right: 50px;
+    text-align: right;
+    font-weight: bolder;
+}
+
+.population-field {
+    font-size: 15px;
+    color: #1D1D1D;
+}
+
+.population-figures {
+    font-size: 20px;
+    color: #74C9A7;
+}
+
+.dropdown {
+   float:left; 
+   margin-left: 50px;
+}
+
+.state-text-field{
+    text-align: left;
+    padding-left: 5px;
+    padding-bottom: 10px;
+}
+
+.state-dropdown {
+    padding: 20px;
+    padding-right: 400px;
+    color: #479EFF;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+}
+
+.checkbox {
+    clear:both;
+    display: flex;
+}
