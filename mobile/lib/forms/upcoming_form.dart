@@ -67,9 +67,8 @@ class UpComingForm extends StatelessWidget {
             child: FormButton(
               text: "Next Recipient",
               onPressed: () {
-                Navigator.of(context).popUntil(
-                    (predicate) => predicate.settings.name == '/selectVaccine');
-                //TODO: fix to home route navigation
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    "/", (route) => route.settings.name == "/");
               },
             ),
           )
