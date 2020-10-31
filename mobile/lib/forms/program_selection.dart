@@ -81,16 +81,27 @@ class ProgramSelectionDropdownWidget extends StatelessWidget {
     return Expanded(
       child: ListView.builder(
         itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(
-              programs[index].name,
+          return Padding(
+            padding: const EdgeInsets.all(PaddingSize.SMALL),
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Theme.of(context).textTheme.caption.color,
+                ),
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ListTile(
+                title: Text(
+                  programs[index].name,
+                ),
+                trailing: Icon(
+                  Icons.navigate_next,
+                ),
+                onTap: () {
+                  onTap(index);
+                },
+              ),
             ),
-            trailing: Icon(
-              Icons.navigate_next,
-            ),
-            onTap: () {
-              onTap(index);
-            },
           );
         },
         itemCount: programs != null ? programs.length : 0,

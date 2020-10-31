@@ -7,6 +7,7 @@ import 'navigation_flow.dart';
 
 class SelectPaymentForm extends StatelessWidget {
   final RouteInfo routeInfo;
+  final buttonNames = ["Government", "Voucher", "Direct"];
 
   SelectPaymentForm(this.routeInfo);
 
@@ -33,19 +34,44 @@ class SelectPaymentForm extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
             children: routeInfo.nextRoutesMeta
-                .map((item) => Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: RaisedButton(
-                        child: Text(item.nextRouteName),
-                        onPressed: () {
-                          final nextRoutePath = item.fullNextRoutePath;
-                          NavigationFormFlow.push(context, nextRoutePath);
-                        },
-                      ),
-                    ))
+                .asMap()
+                .map(
+                  (index, item) => MapEntry(
+                    index,
+                    buildPaymentButtons(context, item, index),
+                  ),
+                )
+                .values
                 .toList(),
           ),
         ],
+      ),
+    );
+  }
+
+  Padding buildPaymentButtons(BuildContext context, RouteMeta item, int index) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: PaddingSize.LARGE,
+        right: PaddingSize.LARGE,
+        top: PaddingSize.SMALL,
+        bottom: PaddingSize.SMALL,
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Theme.of(context).textTheme.caption.color,
+          ),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: ListTile(
+          title: Text(buttonNames[index]),
+          trailing: Icon(Icons.navigate_next),
+          onTap: () {
+            final nextRoutePath = item.fullNextRoutePath;
+            NavigationFormFlow.push(context, nextRoutePath);
+          },
+        ),
       ),
     );
   }
