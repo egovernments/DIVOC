@@ -1,0 +1,14 @@
+.header{
+    padding: 15px;
+    display: flex;
+    box-shadow: 0px 6px 20px #C1CFD933;
+}
+
+.divoc-logo{
+    margin-right: auto;
+    padding-left: 5px;
+}
+
+.image1{
+    margin-left: auto;
+}
