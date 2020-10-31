@@ -2,6 +2,7 @@ import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/new_user_form.dart';
+import 'package:divoc/forms/placeholder_text_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
@@ -105,6 +106,15 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
 
     case 'upcoming':
       return UpComingForm();
+
+    case 'govt':
+      return MessageForm(routeInfo, "Verify Government Payment");
+
+    case 'direct':
+      return MessageForm(routeInfo, "Verify Direct Payment");
+
+    case 'verifyVoucher':
+      return MessageForm(routeInfo, "Voucher Payment Verified");
 
     default:
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
