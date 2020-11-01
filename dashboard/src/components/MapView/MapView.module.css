@@ -1,8 +1,6 @@
 
 .top-heading {
     display: flex;
-    margin-left: 20px;
-    padding-left: 10px;
 }
 
 .image {
@@ -12,8 +10,8 @@
 .heading-content{
     color: #1D1D1D;
     font-size: 25px;
-    font-weight: lighter;
-    font-family: 'Proxima Nova';
+    font-weight: normal;
+    /*font-family: 'Proxima Nova', serif;*/
     padding-left: 5px;
     padding-top: 10px;
 }
@@ -37,7 +35,6 @@
 
 .dropdown {
    float:left; 
-   margin-left: 50px;
 }
 
 .state-text-field{
@@ -56,7 +53,8 @@
     border-radius: 10px;
 }
 
-.checkbox {
+.type-of-bubbles {
+    padding-top: 1em;
     clear:both;
     display: flex;
 }
@@ -67,7 +65,8 @@
 
 .map-container{
     /* background-color: #C1CFD933; */
-    padding: 400px;
+    /*padding: 400px;*/
+    padding: 1em;
 }
 
 .heading{
@@ -116,4 +115,7 @@
 .texts {
     color: #1D1D1D;
     font-size: 10px;
+}
+.map-container{
+    margin-left: 1em;
 }
