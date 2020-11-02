@@ -12,6 +12,7 @@ function Report() {
     const [ covidData, setCovidData ] = useState([])
     const [ selectedState, setSelectedState ] = useState("TT")
     const [districts, setDistricts] = useState({});
+    const [stateList, setStateList] = useState({});
     
     useEffect(()=>{
         fetchData();
@@ -40,6 +41,12 @@ function Report() {
             district_list = district_list.districts
             setDistricts(district_list)
         }
+    }
+
+    function conditionalRenderingOfTable() {
+        if(Object.keys(districts).length === 0)
+            return <ReportTable data={covidData} rowName="state"/> 
+        return <ReportTable data={covidData} rowName="district" selectedState={selectedState}/>
     }
 
     return(
@@ -83,8 +90,7 @@ function Report() {
                     <TextBox  number="7,72,055" text="Total Issued" color="#74C9A7" />
                 </div>
             </div>
-            {districts ? 
-            <ReportTable data={covidData} /> : ''}
+            {conditionalRenderingOfTable()}
         </div>
         
     );
