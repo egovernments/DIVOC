@@ -55,6 +55,7 @@ class LoginPage extends StatelessWidget {
                       Padding(
                         padding: const EdgeInsets.all(32.0),
                         child: DivocHeader(
+                          null,
                           showHelpMenu: false,
                           showHeaderMenu: false,
                         ),

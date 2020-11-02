@@ -31,7 +31,11 @@ class OperatorHomePage extends StatelessWidget {
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(),
+            child: DivocHeader(
+              () {
+                //TODO: Open drawer
+              },
+            ),
           ),
           body: Theme(
             data: DivocTheme.operatorTheme,

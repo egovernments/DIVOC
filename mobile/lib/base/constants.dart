@@ -6,6 +6,8 @@ class ImageAssetPath {
   static const String VACCINE_PROGRAM = "assets/vaccine_program_icon.png";
   static const String VOUCHER = "assets/voucher_icon.png";
   static const String BARCODE_SAMPLE = "assets/barcode_sample.png";
+  static const String CLOSE_ICON = "assets/close.png";
+  static const String ARROW_ICON = "assets/arrow.png";
   static const String VACCINE_DE_ACTIVE = "assets/vaccine_deactive.png";
   static const String VACCINE_ACTIVE = "assets/vaccine_active.png";
 }
