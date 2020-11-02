@@ -13,7 +13,7 @@ class LoginModel extends ChangeNotifier {
 
   LoginFlow get flowState => _flowState;
 
-  bool get isLoggedIn => _authRepository.isLoggedIn;
+  bool get isLoggedIn => _authRepository.currentUser != null;
 
   LoginModel(this._authRepository);
 

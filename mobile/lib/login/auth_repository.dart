@@ -16,7 +16,7 @@ abstract class AuthRepository {
 
   Future<bool> logout(String email);
 
-  bool get isLoggedIn;
+  User get currentUser;
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -48,12 +48,13 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  bool get isLoggedIn {
+  User get currentUser {
     final userDetails = keyValueStore.getString(USER_DETAILS);
-    if (userDetails == null) {
-      return false;
+    if (userDetails != null) {
+      final decodeMap = json.decode(userDetails);
+      return User.fromJson(decodeMap);
     }
-    return true;
+    return null;
   }
 
   @override

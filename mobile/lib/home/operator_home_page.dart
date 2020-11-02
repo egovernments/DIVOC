@@ -54,7 +54,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyAadhaar,
         child: SingleFieldForm(
-          title: "Set a unique PIN",
+          title: "Enter PIN",
           btnText: "Confirm",
           onNext: (context, value) {
             NavigationFormFlow.push(
