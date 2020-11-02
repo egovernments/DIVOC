@@ -25,6 +25,7 @@ class MessageLookup extends MessageLookupByLibrary {
 
   final messages = _notInlinedMessages(_notInlinedMessages);
   static _notInlinedMessages(_) => <String, Function> {
+    "confirmPatientMsg" : MessageLookupByLibrary.simpleMessage("I confirm the above details are verified before administering the vaccine"),
     "invalidMobile" : MessageLookupByLibrary.simpleMessage("Invalid Mobile Number"),
     "invalidOTP" : MessageLookupByLibrary.simpleMessage("Invalid OTP"),
     "labelAadhaar" : MessageLookupByLibrary.simpleMessage("Aadhaar"),

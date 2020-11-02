@@ -27,5 +27,6 @@
   "titleEnterVaccineManually": "Enter Vaccine Details Manually",
   "titleVerifyAadhaar": "Verify Aadhaar",
   "titleVerifyVaccineDetailsManually": "Enter Vaccine Details Manually",
-  "titleSelectApprovedVaccine": "SELECT APPROVED VACCINE"
+  "titleSelectApprovedVaccine": "SELECT APPROVED VACCINE",
+  "confirmPatientMsg": "I confirm the above details are verified before administering the vaccine"
 }
