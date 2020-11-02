@@ -8,7 +8,7 @@ import certificate_data from '../../DummyData/certificate_data.json';
 import Centre from '../../Images/Centre.svg';
 import Private from '../../Images/Private.svg';
 import TextBox from '../TextBox/TextBox';
-import DropDown from '../DropDown/DropDown';
+import StateDropDown from '../StateDropDown/StateDropDown';
 import {STATE_NAMES} from '../../constants';
 
 function Home() {
@@ -16,6 +16,7 @@ function Home() {
     const [isCentresClicked, setCentresClicked] = useState(true);
     const [isCertificatesClicked, setCertificatesClicked] = useState(false);
     const [tableData, setTableData] = useState([]);
+    const [ selectedState, setSelectedState ] = useState([{ value: 'India', label: 'TT'}])
 
     useEffect(() => {
         const newTableData  = []
@@ -77,7 +78,7 @@ function Home() {
                 </div>
             </div>
             <div className={styles['dropdown']}>
-                <DropDown dropdownList={STATE_NAMES} placeHolder="All of India"/>
+                <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India" setSelectedItem={setSelectedState}/>
             </div>
             <div className={styles['checkbox']}>
                 <Checkbox title={"Active"} handleCheckboxChange={handleActiveCheckboxChange} defaultValue={isActiveClicked} />

@@ -1,37 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import DropDown from '../DropDown/DropDown';
+import StateDropDown from '../StateDropDown/StateDropDown';
 import {STATE_NAMES,API_ROOT_URL} from '../../constants';
 import styles from './ReportView.module.css';
 import TextBox from '../TextBox/TextBox';
 import ReportTable from '../ReportTable/ReportTable';
 import { format } from 'date-fns';
+import state_and_districts from '../../DummyData/state_and_districts.json';
 
 
 function Report() {
-    const [covidData,setCovidData] = useState([])
+    const [ covidData, setCovidData ] = useState([])
+    const [ selectedState, setSelectedState ] = useState("TT")
+    const [districts, setDistricts] = useState({});
     
     useEffect(()=>{
         fetchData();
     },[])
 
+    useEffect(() => {
+        setDistrictsForSelectedState();
+      }, [selectedState]);
+
     const fetchData = async () => {
         let date = new Date();
         date = format(date.setDate(date.getDate()-1),'yyyy-MM-dd')
-        const data = await fetch(`${API_ROOT_URL}/data${date ? `-${date}` : ''}.json`).then((response) => {
+        const data = await fetch(`${API_ROOT_URL}/data-2020-10-31.json`).then((response) => {
             return response.json();
           });
+
+        console.log("covid response",data)
         setCovidData(data);
     }
+
+    const setDistrictsForSelectedState = () => {
+        console.log("district selection under progress for ",selectedState)
+        let district_list = {}
+        district_list = Object.values(state_and_districts['states']).filter( state => state.code === selectedState)[0]
+        if(district_list !== undefined){
+            district_list = district_list.districts
+            setDistricts(district_list)
+        }
+    }
+
     return(
         <div>
             <div className={styles['dropdown-row']}>  
                 <div className={'dropdown'}>
                     <span>Select State</span>
-                    <DropDown dropdownList={STATE_NAMES} placeHolder="Select State"/>  
+                    <StateDropDown 
+                        dropdownList={STATE_NAMES} 
+                        placeHolder="Select State" 
+                        setSelectedItem={setSelectedState}
+                    />  
                 </div>
                 <div className={'dropdown'}>
                     <span>Select City</span>
-                    <DropDown dropdownList={STATE_NAMES} placeHolder="Select City"/>
+                    {/* <DistrictDropDown
+                        dropdownList={districts} 
+                        placeHolder="Select City"
+                        // setSelectedItem={setDistricts}
+                    /> */}
                 </div> 
             </div>
             <div className={styles['details-row']}>
@@ -55,9 +83,8 @@ function Report() {
                     <TextBox  number="7,72,055" text="Total Issued" color="#74C9A7" />
                 </div>
             </div>
-            <ReportTable
-                data={covidData}
-            />
+            {districts ? 
+            <ReportTable data={covidData} /> : ''}
         </div>
         
     );

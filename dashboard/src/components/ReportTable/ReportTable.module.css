@@ -1,9 +1,16 @@
 .table-container {
   height:500px;
   overflow:auto;  
-  margin-left: 30px;
+  margin: 0px 10px 0px 10px;
+  width: 100%;
 }
 
+.table{
+  width: 100%;
+}
+.td{
+  width: 10%;
+}
 .td-start{
   color: #4E4E4E;
   font-weight: bolder;
@@ -14,7 +21,6 @@
 .td-header{
   box-shadow: 0px 6px 20px #C1CFD933;
   background: #848484;
-  padding: 10px;
   border-radius: 10px 10px 0px 0px;
   color: #FFFFFF;
   font-weight: bolder;
@@ -25,7 +31,6 @@
   box-shadow: 0px 6px 20px #C1CFD933;
   border-radius: 0px 0px 10px 10px;
   background: #F7F7F7;
-  padding: 10px;
   color: #4E4E4E;
   font-size: 12px;
 }
@@ -35,4 +40,24 @@
   text-align: left;
   color: #737783;
   font-size: 12px;
+}
+
+.td-cell{
+  box-shadow: 0px 6px 20px #C1CFD933;
+  border-radius: 0px 0px 0px 0px;
+  padding:10px;
+  color: #4E4E4E;
+  font-size: 10px;
+}
+
+.cell1{
+  background: #F7F7F7;
+}
+
+.cell2 {
+  background: #F7FBFF;
+}
+
+.cell3{
+  background: #F2F7F5;
 }
