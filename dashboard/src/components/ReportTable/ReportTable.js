@@ -23,6 +23,18 @@ function ReportTable( {
         selectedState
     }) {
 
+
+    function showTableCells(stateCode) {
+        return(
+            <>
+                <td className={`${styles['td-cell']} ${styles['cell2']}`} >{govt_authorized_centres[stateCode]}</td>
+                <td className={`${styles['td-cell']} ${styles['cell2']}`}>{private_authorized_centres[stateCode]}</td>
+                <td className={`${styles['td-cell']} ${styles['cell3']}`}>{certificate_via_govt[stateCode]}</td>
+                <td className={`${styles['td-cell']} ${styles['cell3']}`}>{certificate_via_vouchers[stateCode]}</td>
+                <td className={`${styles['td-cell']} ${styles['cell3']}`}>{direct_certificates[stateCode]}</td>
+            </>
+        )
+    }
     function showStateRelatedData() {
         return( 
             Object.keys(data).map((stateCode) => {
@@ -31,11 +43,7 @@ function ReportTable( {
                         <td className={`${styles['td-state']} ${styles['td']}`}>{STATE_NAMES[stateCode]}</td>
                         <td className={`${styles['td-cell']} ${styles['cell1']}`}>{data[stateCode].total['confirmed']}</td>
                         <td className={`${styles['td-cell']} ${styles['cell1']}`}>{data[stateCode].total['tested']}</td>
-                        <td className={`${styles['td-cell']} ${styles['cell2']}`} >{govt_authorized_centres[stateCode]}</td>
-                        <td className={`${styles['td-cell']} ${styles['cell2']}`}>{private_authorized_centres[stateCode]}</td>
-                        <td className={`${styles['td-cell']} ${styles['cell3']}`}>{certificate_via_govt[stateCode]}</td>
-                        <td className={`${styles['td-cell']} ${styles['cell3']}`}>{certificate_via_vouchers[stateCode]}</td>
-                        <td className={`${styles['td-cell']} ${styles['cell3']}`}>{direct_certificates[stateCode]}</td>
+                        {showTableCells(stateCode)}
                     </tr>
                 )
             })
@@ -51,6 +59,7 @@ function ReportTable( {
                         <td className={`${styles['td-state']} ${styles['td']}`}>{district}</td>
                         <td className={`${styles['td-cell']} ${styles['cell1']}`}>{districtList[district].total['confirmed']}</td>
                         <td className={`${styles['td-cell']} ${styles['cell1']}`}>{districtList[district].total['tested']}</td>
+                        {showTableCells(selectedState)}
                     </tr>
                 )
             })
