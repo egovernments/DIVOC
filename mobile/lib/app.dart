@@ -41,13 +41,21 @@ class ProviderApp extends StatelessWidget {
             GlobalWidgetsLocalizations.delegate
           ],
           supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: authRepository.isLoggedIn ? OperatorHomePage() : LoginPage(),
+          home: getInitialPage(),
           routes: {
-            DivocRoutes.home: (context) => HomePage(),
+            DivocRoutes.home: (context) => getInitialPage(),
             DivocRoutes.login: (context) => LoginPage(),
           },
         ),
       ),
     );
+  }
+
+  Widget getInitialPage() {
+    final user = authRepository.currentUser;
+    if (user != null) {
+      return user.role == 'admin' ? OperatorHomePage() : HomePage();
+    }
+    return LoginPage();
   }
 }
