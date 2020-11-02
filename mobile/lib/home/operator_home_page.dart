@@ -1,6 +1,7 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/data_source/network.dart';
+import 'package:divoc/forms/cerfify_details_form.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/placeholder_text_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
@@ -33,7 +34,7 @@ class OperatorHomePage extends StatelessWidget {
             child: DivocHeader(),
           ),
           body: Theme(
-            data: DivocTheme.formTheme,
+            data: DivocTheme.operatorTheme,
             child: NavigationFormFlow(
               routes: _flows,
               builder: (routeInfo, arguments) {
@@ -74,52 +75,8 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
     case 'vaccineManually':
       return SelectVaccineManuallyForm(routeInfo);
 
-    /*case 'scanQR':
-      return DivocForm(
-        title: DivocLocalizations.current.titleVerifyRecipient,
-        child: SingleFieldForm(
-          title: "Your Aadhar Number",
-          btnText: "Generate OTP",
-          onNext: (context, value) {
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-          },
-        ),
-      );
-
-    case 'aadharOtp':
-      return DivocForm(
-        title: DivocLocalizations.current.titleVerifyRecipient,
-        child: SingleFieldForm(
-          title: "Enter OTP",
-          btnText: "Verify",
-          onNext: (context, value) {
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-          },
-        ),
-      );
-
-    case 'newEnroll':
-      return NewUserEnrollForm(routeInfo);
-
-    case 'payment':
-      return SelectPaymentForm(routeInfo);
-
-    case 'voucher':
-      return VoucherVerificationForm(routeInfo);
-
-    case 'upcoming':
-      return UpComingForm();
-
-    case 'govt':
-      return MessageForm(routeInfo, "Verify Government Payment");
-
-    case 'direct':
-      return MessageForm(routeInfo, "Verify Direct Payment");
-
-    case 'verifyVoucher':
-      return MessageForm(routeInfo, "Voucher Payment Verified");*/
+    case 'certifyDetails':
+      return CertifyDetailsForm(routeInfo);
 
     default:
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
@@ -130,9 +87,8 @@ const List<String> _flows = [
   //Verify Recipient Flow
   '/upcomingRecipients',
   '/upcomingRecipients/vaccineManually',
-  '/upcomingRecipients/vaccineManually/recipientDetails',
-  '/upcomingRecipients/vaccineManually/recipientDetails/certify',
-  '/upcomingRecipients/vaccineManually/recipientDetails/certify/upcomingRecipients',
+  '/upcomingRecipients/vaccineManually/certifyDetails',
+  '/upcomingRecipients/vaccineManually/certifyDetails/upcomingRecipients',
   '/upcomingRecipients/scanQR',
   '/upcomingRecipients/scanQR/certify',
   '/upcomingRecipients/scanQR/certify/upcomingRecipients',

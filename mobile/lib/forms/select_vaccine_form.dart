@@ -20,62 +20,70 @@ class SelectVaccineManuallyForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return DivocForm(
       title: DivocLocalizations.of(context).titleVerifyVaccineDetailsManually,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: PaddingSize.LARGE,
-              bottom: PaddingSize.LARGE,
+      child: Expanded(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(
+                top: PaddingSize.TINY,
+                bottom: PaddingSize.TINY,
+              ),
+              child: Text(
+                DivocLocalizations.of(context).titleSelectApprovedVaccine,
+                style: Theme.of(context).textTheme.caption,
+              ),
             ),
-            child: Text(
-              DivocLocalizations.of(context).titleSelectApprovedVaccine,
-              style: Theme.of(context).textTheme.caption,
+            ValueListenableBuilder(
+              valueListenable: valueNotifier,
+              builder: (context, approvedVaccine, child) {
+                final dropdownMenus = approvedVaccines
+                    .map((e) => DropdownMenuItem<ApproveVaccines>(
+                          child: Text(e.name),
+                          value: e,
+                        ))
+                    .toList();
+                return DropdownButton<ApproveVaccines>(
+                    value: approvedVaccine,
+                    items: dropdownMenus,
+                    onChanged: (value) {
+                      valueNotifier.value = value;
+                    });
+              },
             ),
-          ),
-          ValueListenableBuilder(
-            valueListenable: valueNotifier,
-            builder: (context, approvedVaccine, child) {
-              final dropdownMenus = approvedVaccines
-                  .map((e) => DropdownMenuItem<ApproveVaccines>(
-                        child: Text(e.name),
-                        value: e,
-                      ))
-                  .toList();
-              return DropdownButton<ApproveVaccines>(
-                  value: approvedVaccine,
-                  items: dropdownMenus,
-                  onChanged: (value) {
-                    valueNotifier.value = value;
-                  });
-            },
-          ),
-          Padding(
-            padding: const EdgeInsets.only(
-              top: PaddingSize.LARGE,
-              bottom: PaddingSize.LARGE,
+            Padding(
+              padding: const EdgeInsets.only(
+                top: PaddingSize.TINY,
+                bottom: PaddingSize.TINY,
+              ),
+              child: Text(
+                "BATCH ID",
+                style: Theme.of(context).textTheme.caption,
+              ),
             ),
-            child: Text(
-              "BATCH ID",
-              style: Theme.of(context).textTheme.caption,
+            ValueListenableBuilder<ApproveVaccines>(
+              valueListenable: valueNotifier,
+              builder: (context, value, child) {
+                return Text(
+                  value != null ? value.batchId : "",
+                );
+              },
             ),
-          ),
-          ValueListenableBuilder<ApproveVaccines>(
-            valueListenable: valueNotifier,
-            builder: (context, value, child) {
-              return Text(
-                value != null ? value.batchId : "",
-              );
-            },
-          ),
-          FormButton(
-            text: "Done",
-            onPressed: () {
-              Navigator.of(context)
-                  .pushNamed(_routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-            },
-          )
-        ],
+            Padding(
+              padding: const EdgeInsets.all(PaddingSize.LARGE),
+            ),
+            FormButton(
+              text: "Done",
+              onPressed: () {
+                Navigator.of(context)
+                    .pushNamed(_routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+              },
+            ),
+            SizedBox(
+              width: double.infinity,
+            )
+          ],
+        ),
       ),
     );
   }

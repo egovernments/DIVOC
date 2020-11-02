@@ -324,6 +324,16 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `I confirm the above details are verified before administering the vaccine`
+  String get confirmPatientMsg {
+    return Intl.message(
+      'I confirm the above details are verified before administering the vaccine',
+      name: 'confirmPatientMsg',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

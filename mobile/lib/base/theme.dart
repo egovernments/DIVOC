@@ -36,4 +36,16 @@ class DivocTheme {
         )
     );
   }
+
+  static ThemeData get operatorTheme {
+    return appTheme.copyWith(
+        scaffoldBackgroundColor: Color(0xffEFF5FD),
+        buttonTheme: ButtonThemeData(
+          textTheme: ButtonTextTheme.accent,
+          colorScheme: appTheme.colorScheme.copyWith(
+            secondary: Color(0xff646D82),
+          ),
+        )
+    );
+  }
 }
