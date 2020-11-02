@@ -20,5 +20,11 @@
   "labelAadhaar": "Aadhaar",
   "labelEnterManually": "ENTER MANUALLY",
   "labelScanQR": "Scan with QR",
-  "titleVerifyRecipient": "Verify Vaccination Recipient"
+  "titleVerifyRecipient": "Verify Vaccination Recipient",
+  "titleUpcomingRecipient": "Upcoming, Vaccination Recipients",
+  "titleDetailsRecipient": "Add details of Vaccination Recipient",
+  "titlePayment": "Payment",
+  "titleEnterVaccineManually": "Enter Vaccine Details Manually",
+  "titleVerifyAadhaar": "Verify Aadhaar",
+  "titleVerifyVaccineDetailsManually": "Enter Vaccine Details Manually"
 }

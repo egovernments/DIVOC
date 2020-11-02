@@ -4,6 +4,7 @@ import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/placeholder_text_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
+import 'package:divoc/forms/select_vaccine_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/forms/voucher_verfication_form.dart';
@@ -15,10 +16,11 @@ import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/vaccination_program_form.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/model/patients.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class HomePage extends StatelessWidget {
+class OperatorHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var homeRepository = context.watch<HomeRepository>();
@@ -48,20 +50,11 @@ class HomePage extends StatelessWidget {
 Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
   switch (routeInfo.currentRouteName) {
     case '/':
-      return SelectProgramScreen(routeInfo);
-    case 'vaccineProgram':
-      return VaccinationProgramForm(routeInfo, arguments);
-    case 'preEnroll':
-      return PreEnrollmentForm(routeInfo);
-    case 'verifyUserDetails':
-      return UserDetailsForm(routeInfo, arguments);
-
-    case 'aadharManually':
       return DivocForm(
-        title: DivocLocalizations.current.titleVerifyRecipient,
+        title: DivocLocalizations.current.titleVerifyAadhaar,
         child: SingleFieldForm(
-          title: "Enter Aadhar Number",
-          btnText: "Generate OTP",
+          title: "Set a unique PIN",
+          btnText: "Confirm",
           onNext: (context, value) {
             NavigationFormFlow.push(
                 context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
@@ -69,7 +62,19 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         ),
       );
 
-    case 'scanQR':
+    case 'upcomingRecipients':
+      return UpComingForm(
+        onScanClicked: (context, PatientDetails patientDetails) {
+          Navigator.of(context).pushNamed(
+              routeInfo.nextRoutesMeta[0].fullNextRoutePath,
+              arguments: patientDetails);
+        },
+      );
+
+    case 'vaccineManually':
+      return SelectVaccineManuallyForm(routeInfo);
+
+    /*case 'scanQR':
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
@@ -105,9 +110,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return VoucherVerificationForm(routeInfo);
 
     case 'upcoming':
-      return UpComingForm(
-        showNextButton: true,
-      );
+      return UpComingForm();
 
     case 'govt':
       return MessageForm(routeInfo, "Verify Government Payment");
@@ -116,7 +119,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return MessageForm(routeInfo, "Verify Direct Payment");
 
     case 'verifyVoucher':
-      return MessageForm(routeInfo, "Voucher Payment Verified");
+      return MessageForm(routeInfo, "Voucher Payment Verified");*/
 
     default:
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
@@ -124,29 +127,13 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
 }
 
 const List<String> _flows = [
-  '/vaccineProgram',
-
   //Verify Recipient Flow
-  '/vaccineProgram',
-  '/vaccineProgram/preEnroll',
-  '/vaccineProgram/preEnroll/verifyUserDetails',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp/upcoming',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
-
-  //EnrollFlow
-  '/vaccineProgram/newEnroll',
-  '/vaccineProgram/newEnroll/payment',
-  '/vaccineProgram/newEnroll/payment/govt/upcoming',
-  '/vaccineProgram/newEnroll/payment/voucher',
-  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher',
-  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher/upcoming',
-  '/vaccineProgram/newEnroll/payment/direct/upcoming',
-
-  //Recipient Queue
-  '/vaccineProgram/upcoming',
-  '/vaccineProgram/generateCert',
+  '/upcomingRecipients',
+  '/upcomingRecipients/vaccineManually',
+  '/upcomingRecipients/vaccineManually/recipientDetails',
+  '/upcomingRecipients/vaccineManually/recipientDetails/certify',
+  '/upcomingRecipients/vaccineManually/recipientDetails/certify/upcomingRecipients',
+  '/upcomingRecipients/scanQR',
+  '/upcomingRecipients/scanQR/certify',
+  '/upcomingRecipients/scanQR/certify/upcomingRecipients',
 ];

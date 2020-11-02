@@ -9,7 +9,15 @@ import 'package:divoc/model/patients.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+typedef OnScanClicked = Function(
+    BuildContext context, PatientDetails patientDetails);
+
 class UpComingForm extends StatelessWidget {
+  final OnScanClicked onScanClicked;
+  final bool showNextButton;
+
+  UpComingForm({this.onScanClicked, this.showNextButton = false});
+
   @override
   Widget build(BuildContext context) {
     var homeRepository = context.watch<HomeRepository>();
@@ -62,14 +70,17 @@ class UpComingForm extends StatelessWidget {
               );
             },
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FormButton(
-              text: "Next Recipient",
-              onPressed: () {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    "/", (route) => route.settings.name == "/");
-              },
+          Visibility(
+            visible: showNextButton,
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FormButton(
+                text: "Next Recipient",
+                onPressed: () {
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                      "/", (route) => route.settings.name == "/");
+                },
+              ),
             ),
           )
         ],
@@ -94,6 +105,7 @@ class UpComingForm extends StatelessWidget {
             ),
             Expanded(
               child: UpcomingPatientListWidget(
+                onScanClicked: onScanClicked,
                 patients: upcomingPatients,
               ),
             ),
@@ -156,12 +168,11 @@ class UpcomingInfoWidget extends StatelessWidget {
 }
 
 class UpcomingPatientListWidget extends StatelessWidget {
-  const UpcomingPatientListWidget({
-    Key key,
-    @required this.patients,
-  }) : super(key: key);
-
+  final OnScanClicked onScanClicked;
   final List<PatientDetails> patients;
+
+  const UpcomingPatientListWidget(
+      {@required this.patients, this.onScanClicked});
 
   @override
   Widget build(BuildContext context) {
@@ -189,6 +200,11 @@ class UpcomingPatientListWidget extends StatelessWidget {
                 ? ImageAssetPath.VACCINE_ACTIVE
                 : ImageAssetPath.VACCINE_DE_ACTIVE),
           ),
+          onTap: () {
+            if (onScanClicked != null) {
+              onScanClicked(context, patient);
+            }
+          },
         );
       },
     );

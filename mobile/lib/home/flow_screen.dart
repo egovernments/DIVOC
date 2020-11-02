@@ -1,3 +1,4 @@
+import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:flutter/material.dart';
 
@@ -16,8 +17,8 @@ class FlowScreen extends StatelessWidget {
           child: ListView.builder(
             itemCount: routes.length,
             itemBuilder: (context, index) {
-              return RaisedButton(
-                child: Text(routes[index].nextRouteName),
+              return FormButton(
+                text: routes[index].nextRouteName,
                 onPressed: () {
                   NavigationFormFlow.push(
                       context, routes[index].fullNextRoutePath);
@@ -26,26 +27,6 @@ class FlowScreen extends StatelessWidget {
             },
           ),
         ),
-      ),
-    );
-  }
-}
-
-class CustomNavigatorScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Navigation Flow"),
-      ),
-      body: NavigationFormFlow(
-      //  routes: _flows,
-        builder: (routeInfo,arguments) {
-          print(routeInfo.currentRouteName);
-          //TODO Build form based on current route
-          return FlowScreen(
-              routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
-        },
       ),
     );
   }
