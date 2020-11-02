@@ -12,14 +12,13 @@ function DropDown({ dropdownList, placeHolder}) {
 
     const normalizeStateNames = () => {
                 let data = []
-                dropdownList.forEach((state, index) => {
+                Object.keys(dropdownList).map(state => {
                     let newData = {}
-                    newData.id = index;
                     newData.selected = false;
-                    newData.key = "projects";
-                    newData.name = state
-                    data.push(state)
-                });
+                    newData.key = state;
+                    newData.name = dropdownList[state]
+                    data.push(dropdownList[state])
+                })
                 setStateList(data)
     }
 

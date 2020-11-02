@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import DropDown from '../DropDown/DropDown';
 import {STATE_NAMES,API_ROOT_URL} from '../../constants';
-import styles from './Report.module.css';
+import styles from './ReportView.module.css';
 import TextBox from '../TextBox/TextBox';
 import ReportTable from '../ReportTable/ReportTable';
 import { format } from 'date-fns';
@@ -14,17 +14,14 @@ function Report() {
         fetchData();
     },[])
 
-    function fetchData() {
-
-
+    const fetchData = async () => {
         let date = new Date();
         date = format(date.setDate(date.getDate()-1),'yyyy-MM-dd')
-        const data = fetch(`${API_ROOT_URL}/data${date ? `-${date}` : ''}.json`).then((response) => {
+        const data = await fetch(`${API_ROOT_URL}/data${date ? `-${date}` : ''}.json`).then((response) => {
             return response.json();
           });
         setCovidData(data);
     }
-
     return(
         <div>
             <div className={styles['dropdown-row']}>  

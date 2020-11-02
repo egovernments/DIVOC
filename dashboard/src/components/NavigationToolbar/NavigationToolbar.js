@@ -5,7 +5,7 @@ import MapView from '../MapView/MapView';
 import Country from '../../Images/Country.svg';
 import Stats from '../../Images/Stats.svg';
 import Repo from '../../Images/Repo.svg';
-import Report from '../Report/Report';
+import Report from '../ReportView/ReportView';
 
 
 

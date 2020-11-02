@@ -8,6 +8,8 @@ import certificate_data from '../../DummyData/certificate_data.json';
 import Centre from '../../Images/Centre.svg';
 import Private from '../../Images/Private.svg';
 import TextBox from '../TextBox/TextBox';
+import DropDown from '../DropDown/DropDown';
+import {STATE_NAMES} from '../../constants';
 
 function Home() {
     const [isActiveClicked, setActiveClicked] = useState(false);
@@ -75,7 +77,7 @@ function Home() {
                 </div>
             </div>
             <div className={styles['dropdown']}>
-                Drop Down
+                <DropDown dropdownList={STATE_NAMES} placeHolder="All of India"/>
             </div>
             <div className={styles['checkbox']}>
                 <Checkbox title={"Active"} handleCheckboxChange={handleActiveCheckboxChange} defaultValue={isActiveClicked} />
