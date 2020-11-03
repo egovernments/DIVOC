@@ -70,8 +70,9 @@ function Home() {
 
 
     return(
-        <div>
+        <div className={styles['map-container']}>
             <div className={styles['dropdown']}>
+                <div className={styles['select-state']}>Select State</div>
                 <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India" setSelectedItem={setSelectedState}/>
             </div>
             <div className={styles['type-of-bubbles']}>
@@ -83,7 +84,6 @@ function Home() {
                 <DataTable tableData={tableData}/>
                 <div className={styles['map-container']}><IndiaMap data={tableData}/></div>
                 <div>
-                    <div>State details</div>
                     <div style={{textAlign: 'left'}}>
                         <span className={styles['heading']} style={{color: '#479EFF'}}>Centres</span>
                         <div className={styles['centres']}>
@@ -93,7 +93,7 @@ function Home() {
                             </div>
                             <div className={styles['private-box']}>
                                 <img src={Private} alt="Private"/>
-                                <TextBox number={2} text={'Private'} color={'#479EFF'}/>
+                                <TextBox number={0} text={'Private'} color={'#479EFF'}/>
                             </div>
                         </div>
                     </div>
@@ -111,11 +111,11 @@ function Home() {
                             <div className={styles['centre-box']}>
                                 <TextBox number={34987} text={'Govt Funded'} color={'#74C9A7'}/>
                             </div>
-                            <div className={styles['box-shape']}>
+                            <div className={styles['middle-shape']}>
                                 <TextBox number={8987} text={'Vouchers'} color={'#74C9A7'}/>
                             </div>
                             <div className={styles['private-box']}>
-                                <TextBox number={8987} text={'Self-funded'} color={'#74C9A7'}/>
+                                <TextBox number={0} text={'Self-funded'} color={'#74C9A7'}/>
                             </div>
                         </div>
                     </div>

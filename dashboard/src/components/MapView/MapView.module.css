@@ -30,9 +30,14 @@
 }
 
 .map-container{
-    /* background-color: #C1CFD933; */
-    /*padding: 400px;*/
     padding: 1em;
+}
+
+.select-state {
+    padding: 10px;
+    text-align: left;
+    color: #1D1D1D;
+    font-weight: bold;
 }
 
 .heading{
@@ -51,14 +56,16 @@
     display: flex;
     text-align: left;
     margin-bottom: 10px;
+    width: 90px;
 }
 
-.box-shape {
+.middle-shape {
     border: 1px solid #91C5FF;
     padding: 20px;
     display: flex;
     text-align: left;
     margin-bottom: 10px;
+    width: 90px;
 }
 .details{
     padding-left: 10px;
@@ -71,6 +78,7 @@
     display: flex;
     text-align: left;
     margin-bottom: 10px;
+    width: 90px;
 }
 
 .numbers{
