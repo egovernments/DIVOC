@@ -1,6 +1,7 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
@@ -20,9 +21,11 @@ class SelectVaccineManuallyForm extends StatelessWidget {
   Widget build(BuildContext context) {
     return DivocForm(
       title: DivocLocalizations.of(context).titleVerifyVaccineDetailsManually,
-      child: Expanded(
+      child: Padding(
+        padding: const EdgeInsets.all(PaddingSize.NORMAL),
         child: Column(
           mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: const EdgeInsets.only(
@@ -31,7 +34,7 @@ class SelectVaccineManuallyForm extends StatelessWidget {
               ),
               child: Text(
                 DivocLocalizations.of(context).titleSelectApprovedVaccine,
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
             ValueListenableBuilder(
@@ -46,6 +49,7 @@ class SelectVaccineManuallyForm extends StatelessWidget {
                 return DropdownButton<ApproveVaccines>(
                     value: approvedVaccine,
                     items: dropdownMenus,
+                    hint: Text("Select Vaccine"),
                     onChanged: (value) {
                       valueNotifier.value = value;
                     });
@@ -53,31 +57,46 @@ class SelectVaccineManuallyForm extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.only(
-                top: PaddingSize.TINY,
-                bottom: PaddingSize.TINY,
+                top: PaddingSize.LARGE,
+                bottom: PaddingSize.NORMAL,
               ),
               child: Text(
                 "BATCH ID",
-                style: Theme.of(context).textTheme.caption,
+                style: Theme.of(context).textTheme.bodyText1,
               ),
             ),
             ValueListenableBuilder<ApproveVaccines>(
               valueListenable: valueNotifier,
               builder: (context, value, child) {
-                return Text(
-                  value != null ? value.batchId : "",
+                return Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(PaddingSize.NORMAL),
+                    child: Text(
+                      value != null ? value.batchId : "No Batch Selected",
+                    ),
+                  ),
                 );
               },
             ),
             Padding(
               padding: const EdgeInsets.all(PaddingSize.LARGE),
             ),
-            FormButton(
-              text: "Done",
-              onPressed: () {
-                Navigator.of(context)
-                    .pushNamed(_routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-              },
+            Center(
+              child: FormButton(
+                text: "Done",
+                onPressed: () {
+                  if (valueNotifier.value == null) {
+                    context.showSnackbarMessage("Please select vaccine");
+                  } else {
+                    Navigator.of(context).pushNamed(
+                        _routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                  }
+                },
+              ),
             ),
             SizedBox(
               width: double.infinity,
