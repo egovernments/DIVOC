@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
+import styles from './StateDropDown.module.css';
 
 function DropDown({ 
         dropdownList, 
@@ -38,6 +39,10 @@ function DropDown({
                 onChange={handleChange} 
                 placeholder={placeHolder}
                 value={listOfStates[listOfStates.length - 1]}
+                className={styles['dropdown']}
+                placeholderClassName={styles['place-holder']}
+                menuClassName={styles['menu-items']}
+                controlClassName={styles['control-class']}
             />
         </div>
     );

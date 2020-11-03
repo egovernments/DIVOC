@@ -69,14 +69,6 @@ function Home() {
 
     return(
         <div>
-            <div className={styles['top-heading']}>
-                <img className={styles['image']} src={Injection} alt="Injection"/>
-                <p className={styles['heading-content']}>Vaccine Program Overview</p>
-                <div className={styles['population']}>
-                    <p className={styles['population-field']}>POPULATION</p>
-                    <p className={styles['population-figures']}>1,380,004,385</p>
-                </div>
-            </div>
             <div className={styles['dropdown']}>
                 <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India" setSelectedItem={setSelectedState}/>
             </div>

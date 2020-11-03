@@ -1,21 +1,36 @@
+.report-container{
+    margin: 30px;
+}
 .dropdown-row {
     display: flex;
     width: 100%;
 }
 
+.select-state {
+    padding: 10px;
+    text-align: left;
+    color: #1D1D1D;
+    font-weight: bold;
+}
+.row-heading{
+    color: #1D1D1D;
+    font-size: 10px;
+    font-weight: bolder;
+}
 .dropdown {
     text-align: left;
 }
 
 .details-row{
     display: flex;
-    margin-left: 50px;
-    justify-content: flex-end;
+    justify-content: center;
 }
 
 .details{
-    padding: 20px;
-    
+    margin: 30px;
+    text-align: left;
+    padding-left: 50px;
+    padding-right: 50px;
 }
 
 .box {

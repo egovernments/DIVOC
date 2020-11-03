@@ -12,7 +12,6 @@ function Report() {
     const [ covidData, setCovidData ] = useState([])
     const [ selectedState, setSelectedState ] = useState("TT")
     const [districts, setDistricts] = useState({});
-    const [stateList, setStateList] = useState({});
     
     useEffect(()=>{
         fetchData();
@@ -50,35 +49,27 @@ function Report() {
     }
 
     return(
-        <div>
+        <div className={styles["report-container"]}>
             <div className={styles['dropdown-row']}>  
                 <div className={'dropdown'}>
-                    <span>Select State</span>
+                    <div className={styles['select-state']}>Select State</div>
                     <StateDropDown 
                         dropdownList={STATE_NAMES} 
                         placeHolder="Select State" 
                         setSelectedItem={setSelectedState}
                     />  
                 </div>
-                <div className={'dropdown'}>
-                    <span>Select City</span>
-                    {/* <DistrictDropDown
-                        dropdownList={districts} 
-                        placeHolder="Select City"
-                        // setSelectedItem={setDistricts}
-                    /> */}
-                </div> 
             </div>
             <div className={styles['details-row']}>
                 <div className={styles['details']}>
-                    <span>COVID PREVALENCE</span>
+                    <span className={styles['row-heading']}>COVID PREVALENCE</span>
                     <div className={styles['box']}>
                         <TextBox  number="7,72,055" text="Tested" color="#1D1D1D" />
                         <TextBox  number="7,78,50,403" text="Active" color="#1D1D1D" />
                     </div>
                 </div>
                 <div className={styles['details']}>
-                    <span>PROGRAM SETUP</span>
+                    <span className={styles['row-heading']}>PROGRAM SETUP</span>
                     <div className={styles['box']}>
                         <TextBox  number="123" text="Government" color="#479EFF" />
                         <TextBox  number="32" text="Private" color="#479EFF" />
@@ -86,7 +77,7 @@ function Report() {
                     </div>
                 </div>
                 <div className={styles['details']}>
-                    <span>CERTIFICATES</span>
+                    <span className={styles['row-heading']}>CERTIFICATES</span>
                     <TextBox  number="7,72,055" text="Total Issued" color="#74C9A7" />
                 </div>
             </div>
