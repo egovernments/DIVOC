@@ -9,12 +9,15 @@ import Centre from '../../Images/Centre.svg';
 import Private from '../../Images/Private.svg';
 import TextBox from '../TextBox/TextBox';
 import IndiaMap from "../IndiaMap/IndiaMap";
+import StateDropDown from '../StateDropDown/StateDropDown';
+import {STATE_NAMES} from '../../constants';
 
 function Home() {
     const [isActiveClicked, setActiveClicked] = useState(false);
     const [isCentresClicked, setCentresClicked] = useState(true);
     const [isCertificatesClicked, setCertificatesClicked] = useState(true);
     const [tableData, setTableData] = useState([]);
+    const [ selectedState, setSelectedState ] = useState([{ value: 'India', label: 'TT'}])
 
     useEffect(() => {
         const newTableData  = []
@@ -67,17 +70,9 @@ function Home() {
 
 
     return(
-        <div className={styles['map-container']}>
-            <div className={styles['top-heading']}>
-                <img className={styles['image']} src={Injection} alt="Injection"/>
-                <p className={styles['heading-content']}>Vaccine Program Overview</p>
-                <div className={styles['population']}>
-                    <p className={styles['population-field']}>POPULATION</p>
-                    <p className={styles['population-figures']}>1,380,004,385</p>
-                </div>
-            </div>
+        <div>
             <div className={styles['dropdown']}>
-                Select State <select><option>All Of India</option><option>Karnataka</option></select>
+                <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India" setSelectedItem={setSelectedState}/>
             </div>
             <div className={styles['type-of-bubbles']}>
                 <Checkbox title={"Active"} color="#7C8289" handleCheckboxChange={handleActiveCheckboxChange} defaultValue={isActiveClicked} />
