@@ -91,7 +91,7 @@ class UpComingForm extends StatelessWidget {
   Padding buildUpcomingList(
       BuildContext context, List<PatientDetails> upcomingPatients) {
     return Padding(
-      padding: const EdgeInsets.all(8.0),
+      padding: const EdgeInsets.all(PaddingSize.NORMAL),
       child: Card(
         child: Column(
           children: [
@@ -146,19 +146,33 @@ class UpcomingInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            VaccineInfo(_upcomingInfo.verified, "Verified"),
-            VaccineInfo(_upcomingInfo.waiting, "Waiting"),
-            VaccineInfo(_upcomingInfo.vaccinated, "Vaccinated"),
-          ],
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(PaddingSize.NORMAL),
+              child: VaccineInfo(
+                _upcomingInfo.waiting,
+                "Recipients Waiting",
+              ),
+            ),
+          ),
         ),
-      ),
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(PaddingSize.NORMAL),
+              child: VaccineInfo(
+                _upcomingInfo.vaccinated,
+                "Certificates Issued",
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

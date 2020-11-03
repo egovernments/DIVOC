@@ -1,7 +1,5 @@
 import 'package:divoc/base/common_widget.dart';
-import 'package:divoc/base/constants.dart';
 import 'package:divoc/base/theme.dart';
-import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/placeholder_text_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';

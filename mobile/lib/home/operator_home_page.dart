@@ -2,6 +2,7 @@ import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
 import 'package:divoc/forms/cerfify_details_form.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/forms/operator_upcoming_form.dart';
 import 'package:divoc/forms/select_vaccine_form.dart';
 import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
@@ -77,7 +78,7 @@ Widget getWidgetByRouteName(
       );
 
     case 'upcomingRecipients':
-      return UpComingForm(
+      return OperatorUpComingForm(
         onScanClicked: (context, PatientDetails patientDetails) {
           Navigator.of(context).pushNamed(
               routeInfo.nextRoutesMeta[0].fullNextRoutePath,
