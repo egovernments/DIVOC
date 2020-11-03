@@ -146,33 +146,19 @@ class UpcomingInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Expanded(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(PaddingSize.NORMAL),
-              child: VaccineInfo(
-                _upcomingInfo.waiting,
-                "Recipients Waiting",
-              ),
-            ),
-          ),
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            VaccineInfo(_upcomingInfo.verified, "Verified"),
+            VaccineInfo(_upcomingInfo.waiting, "Waiting"),
+            VaccineInfo(_upcomingInfo.vaccinated, "Vaccinated"),
+          ],
         ),
-        Expanded(
-          child: Card(
-            child: Padding(
-              padding: const EdgeInsets.all(PaddingSize.NORMAL),
-              child: VaccineInfo(
-                _upcomingInfo.vaccinated,
-                "Certificates Issued",
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 }

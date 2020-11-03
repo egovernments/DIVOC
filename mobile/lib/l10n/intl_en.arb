@@ -28,5 +28,11 @@
   "titleVerifyAadhaar": "Verify Aadhaar",
   "titleVerifyVaccineDetailsManually": "Enter Vaccine Details Manually",
   "titleSelectApprovedVaccine": "SELECT APPROVED VACCINE",
-  "confirmPatientMsg": "I confirm the above details are verified before administering the vaccine"
+  "confirmPatientMsg": "I confirm the above details are verified before administering the vaccine",
+  "labelName": "Name",
+  "labelEmail": "Email",
+  "labelMobile": "Mobile",
+  "labelNationality": "Nationality",
+  "labelDone": "DONE",
+  "msgCannotBeEmpty": "Cannot be Empty"
 }

@@ -334,6 +334,66 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Name`
+  String get labelName {
+    return Intl.message(
+      'Name',
+      name: 'labelName',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Email`
+  String get labelEmail {
+    return Intl.message(
+      'Email',
+      name: 'labelEmail',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Mobile`
+  String get labelMobile {
+    return Intl.message(
+      'Mobile',
+      name: 'labelMobile',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Nationality`
+  String get labelNationality {
+    return Intl.message(
+      'Nationality',
+      name: 'labelNationality',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `DONE`
+  String get labelDone {
+    return Intl.message(
+      'DONE',
+      name: 'labelDone',
+      desc: '',
+      args: [],
+    );
+  }
+
+  /// `Cannot be Empty`
+  String get msgCannotBeEmpty {
+    return Intl.message(
+      'Cannot be Empty',
+      name: 'msgCannotBeEmpty',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

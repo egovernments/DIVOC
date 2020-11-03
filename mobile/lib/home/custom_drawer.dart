@@ -1,4 +1,5 @@
 import 'package:divoc/base/constants.dart';
+import 'package:divoc/home/change_language_page.dart';
 import 'package:divoc/model/app_session.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,6 +55,11 @@ class CustomDrawer extends StatelessWidget {
                     ListTile(
                       title: Text("Change Language".toUpperCase()),
                       trailing: rightArrow,
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => ChangeLanguagePage(),
+                        ));
+                      },
                     ),
                     ListTile(
                       title: Text("Raise an issue".toUpperCase()),

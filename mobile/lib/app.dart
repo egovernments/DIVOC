@@ -46,6 +46,7 @@ class ProviderApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate
             ],
             supportedLocales: [Locale('en', ''), Locale('hi', '')],
+            locale: Locale(value.selectedLanguage.code, ''),
             home: getInitialPage(),
             routes: {
               DivocRoutes.home: (context) => getInitialPage(),

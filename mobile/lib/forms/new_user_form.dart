@@ -25,6 +25,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = DivocLocalizations.of(context);
     return DivocForm(
       title: DivocLocalizations.of(context).titleDetailsRecipient,
       child: SingleChildScrollView(
@@ -40,7 +41,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
                   return msg;
                 },
                 decoration: InputDecoration(
-                  labelText: "Name",
+                  labelText: localizations.labelName,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -55,7 +56,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
                   return msg;
                 },
                 decoration: InputDecoration(
-                  labelText: "Email",
+                  labelText: localizations.labelEmail,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -70,7 +71,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
                   return msg;
                 },
                 decoration: InputDecoration(
-                  labelText: "Mobile",
+                  labelText: localizations.labelMobile,
                   prefixText: "+91 ",
                   border: OutlineInputBorder(),
                 ),
@@ -89,7 +90,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
                   return msg;
                 },
                 decoration: InputDecoration(
-                  labelText: "DOB",
+                  labelText: localizations.labelDOB,
                   prefixIcon: IconButton(
                     icon: Icon(Icons.date_range),
                     onPressed: () async {
@@ -115,7 +116,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
                   return msg;
                 },
                 decoration: InputDecoration(
-                  labelText: "Nationality",
+                  labelText: localizations.labelNationality,
                   border: OutlineInputBorder(),
                 ),
               ),
@@ -123,7 +124,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FormButton(
-                text: "DONE",
+                text: localizations.labelDone,
                 onPressed: () {
                   NavigationFormFlow.push(context,
                       widget.routeInfo.nextRoutesMeta[0].fullNextRoutePath);

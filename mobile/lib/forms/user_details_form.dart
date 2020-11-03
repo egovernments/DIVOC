@@ -43,7 +43,7 @@ class UserDetailsForm extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Text(
-              DivocLocalizations.of(context).register("Aadhaar"),
+              localizations.register(localizations.labelAadhaar),
               style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),

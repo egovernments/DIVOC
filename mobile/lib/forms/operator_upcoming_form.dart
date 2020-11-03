@@ -42,7 +42,7 @@ class OperatorUpComingForm extends StatelessWidget {
                   left: PaddingSize.NORMAL,
                   right: PaddingSize.NORMAL,
                 ),
-                child: UpcomingInfoWidget(value),
+                child: OperatorUpcomingInfoWidget(value),
               );
             },
           ),
@@ -168,6 +168,44 @@ class OperatorUpComingForm extends StatelessWidget {
         "NAME",
         style: headerTextTheme,
       ),
+    );
+  }
+}
+
+class OperatorUpcomingInfoWidget extends StatelessWidget {
+  final UpcomingInfo _upcomingInfo;
+
+  OperatorUpcomingInfoWidget(this._upcomingInfo);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(PaddingSize.NORMAL),
+              child: VaccineInfo(
+                _upcomingInfo.waiting,
+                "Recipients Waiting",
+              ),
+            ),
+          ),
+        ),
+        Expanded(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(PaddingSize.NORMAL),
+              child: VaccineInfo(
+                _upcomingInfo.vaccinated,
+                "Certificates Issued",
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
