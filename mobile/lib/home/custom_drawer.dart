@@ -37,8 +37,9 @@ class CustomDrawer extends StatelessWidget {
                               height: 25,
                             ),
                             onPressed: this.closeDrawer)),
+                    Align(alignment: Alignment.topLeft, child:Image.asset(ImageAssetPath.USER_PROFILE, width: 64, height: 64,)),
                     SizedBox(
-                      height: 64,
+                      height: 32,
                     ),
                     ListTile(title: Text("Verify Recipient".toUpperCase()), trailing: rightArrow,),
                     ListTile(title: Text("Enroll Recipient".toUpperCase()), trailing: rightArrow,),
