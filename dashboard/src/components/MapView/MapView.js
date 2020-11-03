@@ -8,13 +8,14 @@ import certificate_data from '../../DummyData/certificate_data.json';
 import Centre from '../../Images/Centre.svg';
 import Private from '../../Images/Private.svg';
 import TextBox from '../TextBox/TextBox';
+import IndiaMap from "../IndiaMap/IndiaMap";
 import StateDropDown from '../StateDropDown/StateDropDown';
 import {STATE_NAMES} from '../../constants';
 
 function Home() {
     const [isActiveClicked, setActiveClicked] = useState(false);
     const [isCentresClicked, setCentresClicked] = useState(true);
-    const [isCertificatesClicked, setCertificatesClicked] = useState(false);
+    const [isCertificatesClicked, setCertificatesClicked] = useState(true);
     const [tableData, setTableData] = useState([]);
     const [ selectedState, setSelectedState ] = useState([{ value: 'India', label: 'TT'}])
 
@@ -23,6 +24,7 @@ function Home() {
         const item = {}
         item["Centres"] = centres_data
         newTableData.push(item)
+        newTableData.push({"Certificates":certificate_data})
         setTableData(newTableData)
     },[])
 
@@ -72,14 +74,14 @@ function Home() {
             <div className={styles['dropdown']}>
                 <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India" setSelectedItem={setSelectedState}/>
             </div>
-            <div className={styles['checkbox']}>
-                <Checkbox title={"Active"} handleCheckboxChange={handleActiveCheckboxChange} defaultValue={isActiveClicked} />
-                <Checkbox title={"Centres"} handleCheckboxChange={handleCentresCheckboxChange} defaultValue={isCentresClicked} />
-                <Checkbox title={"Certificates"} handleCheckboxChange={handleCertificatesCheckboxChange} defaultValue={isCertificatesClicked} />
+            <div className={styles['type-of-bubbles']}>
+                <Checkbox title={"Active"} color="#7C8289" handleCheckboxChange={handleActiveCheckboxChange} defaultValue={isActiveClicked} />
+                <Checkbox title={"Centres"} color="#479EFF" handleCheckboxChange={handleCentresCheckboxChange} defaultValue={isCentresClicked} />
+                <Checkbox title={"Certificates"} color="#74C9A7" handleCheckboxChange={handleCertificatesCheckboxChange} defaultValue={isCertificatesClicked} />
             </div>
             <div className={styles['container']}>
                 <DataTable tableData={tableData}/>
-                <div className={styles['map-container']}>map</div>
+                <div className={styles['map-container']}><IndiaMap data={tableData}/></div>
                 <div>
                     <div>State details</div>
                     <div style={{textAlign: 'left'}}>
@@ -119,7 +121,6 @@ function Home() {
                     </div>
                 </div>
             </div>
-           
         </div>
     );
 }
