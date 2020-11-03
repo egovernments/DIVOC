@@ -14,7 +14,7 @@ abstract class AuthRepository {
 
   Future<bool> requestOtp(String mobileNumber);
 
-  Future<bool> logout(String email);
+  Future<bool> logout();
 
   User get currentUser;
 }
@@ -42,9 +42,9 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<bool> logout(String email) {
-    // TODO: implement logout
-    throw UnimplementedError();
+  Future<bool> logout() {
+    keyValueStore.clear();
+    return Future.value(true);
   }
 
   @override

@@ -1,27 +1,32 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
-import 'package:divoc/data_source/network.dart';
 import 'package:divoc/forms/cerfify_details_form.dart';
-import 'package:divoc/forms/new_user_form.dart';
-import 'package:divoc/forms/placeholder_text_form.dart';
-import 'package:divoc/forms/select_payment_form.dart';
+import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/forms/select_vaccine_form.dart';
+import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
-import 'package:divoc/forms/user_details_form.dart';
-import 'package:divoc/forms/voucher_verfication_form.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
-import 'package:divoc/forms/program_selection.dart';
-import 'package:divoc/forms/single_field_form.dart';
-import 'package:divoc/forms/vaccination_program_form.dart';
-import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/model/patients.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class OperatorHomePage extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  void openDrawer() {
+    _scaffoldKey.currentState.openDrawer();
+  }
+
+  void closeDrawer() {
+    if (_scaffoldKey.currentState.isDrawerOpen) {
+      _scaffoldKey.currentState.openEndDrawer();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var homeRepository = context.watch<HomeRepository>();
@@ -29,13 +34,11 @@ class OperatorHomePage extends StatelessWidget {
       create: (_) => HomeModel(homeRepository),
       builder: (context, widget) {
         return Scaffold(
+          key: _scaffoldKey,
+          drawer: CustomDrawer(this.closeDrawer),
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(
-              () {
-                //TODO: Open drawer
-              },
-            ),
+            child: DivocHeader(this.openDrawer),
           ),
           body: Theme(
             data: DivocTheme.operatorTheme,

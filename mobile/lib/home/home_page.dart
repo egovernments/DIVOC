@@ -89,7 +89,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
-          title: "Your Aadhar Number",
+          title: "Your Aadhaar Number",
           btnText: "Generate OTP",
           onNext: (context, value) {
             NavigationFormFlow.push(

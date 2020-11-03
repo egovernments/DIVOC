@@ -7,6 +7,7 @@ import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/home/operator_home_page.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/login/login_page.dart';
+import 'package:divoc/model/app_session.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_portal/flutter_portal.dart';
@@ -23,6 +24,8 @@ class ProviderApp extends StatelessWidget {
     @required this.apiClient,
   });
 
+  final ValueNotifier<int> restartValueNotifier = ValueNotifier(0);
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -30,22 +33,25 @@ class ProviderApp extends StatelessWidget {
         Provider<AuthRepository>(create: (_) => authRepository),
         Provider<ApiClient>(create: (_) => apiClient),
         Provider<HomeRepository>(create: (_) => homeRepository),
+        ChangeNotifierProvider(create: (context) => AppSession(authRepository))
       ],
-      child: Portal(
-        child: MaterialApp(
-          theme: DivocTheme.appTheme,
-          localizationsDelegates: [
-            DivocLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate
-          ],
-          supportedLocales: [Locale('en', ''), Locale('hi', '')],
-          home: getInitialPage(),
-          routes: {
-            DivocRoutes.home: (context) => getInitialPage(),
-            DivocRoutes.login: (context) => LoginPage(),
-          },
+      child: Consumer<AppSession>(
+        builder: (context, value, child) => Portal(
+          child: MaterialApp(
+            theme: DivocTheme.appTheme,
+            localizationsDelegates: [
+              DivocLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate
+            ],
+            supportedLocales: [Locale('en', ''), Locale('hi', '')],
+            home: getInitialPage(),
+            routes: {
+              DivocRoutes.home: (context) => getInitialPage(),
+              DivocRoutes.login: (context) => LoginPage(),
+            },
+          ),
         ),
       ),
     );

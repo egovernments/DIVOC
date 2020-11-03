@@ -1,8 +1,7 @@
 import 'package:divoc/base/constants.dart';
-import 'package:divoc/forms/navigation_flow.dart';
-import 'package:divoc/home/home_page.dart';
+import 'package:divoc/model/app_session.dart';
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 
 class CustomDrawer extends StatelessWidget {
   final closeDrawer;
@@ -40,16 +39,37 @@ class CustomDrawer extends StatelessWidget {
                     SizedBox(
                       height: 64,
                     ),
-                    ListTile(title: Text("Verify Recipient".toUpperCase()), trailing: rightArrow,),
-                    ListTile(title: Text("Enroll Recipient".toUpperCase()), trailing: rightArrow,),
-                    ListTile(title: Text("Recipient Queue".toUpperCase()), trailing: rightArrow, ),
-                    ListTile(title: Text("Change Language".toUpperCase()), trailing: rightArrow,),
-                    ListTile(title: Text("Raise an issue".toUpperCase()), trailing: rightArrow,),
-                    ListTile(title: Text("Logout".toUpperCase()), trailing: rightArrow,),
+                    ListTile(
+                      title: Text("Verify Recipient".toUpperCase()),
+                      trailing: rightArrow,
+                    ),
+                    ListTile(
+                      title: Text("Enroll Recipient".toUpperCase()),
+                      trailing: rightArrow,
+                    ),
+                    ListTile(
+                      title: Text("Recipient Queue".toUpperCase()),
+                      trailing: rightArrow,
+                    ),
+                    ListTile(
+                      title: Text("Change Language".toUpperCase()),
+                      trailing: rightArrow,
+                    ),
+                    ListTile(
+                      title: Text("Raise an issue".toUpperCase()),
+                      trailing: rightArrow,
+                    ),
+                    ListTile(
+                      title: Text("Logout".toUpperCase()),
+                      trailing: rightArrow,
+                      onTap: () {
+                        var appSession = context.read<AppSession>();
+                        appSession.logout();
+                      },
+                    ),
                   ]),
             )),
       ),
     );
   }
 }
-
