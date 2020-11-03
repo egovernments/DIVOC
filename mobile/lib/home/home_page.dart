@@ -39,16 +39,16 @@ class HomePage extends StatelessWidget {
     return ChangeNotifierProvider(
       create: (_) => HomeModel(homeRepository),
       builder: (context, widget) {
-        return Scaffold(
-          key: _scaffoldKey,
-          drawer: CustomDrawer(this.closeDrawer),
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(this.openDrawer),
-          ),
-          body: Theme(
-            data: DivocTheme.formTheme,
-            child: NavigationFormFlow(
+        return Theme(
+          data: DivocTheme.formTheme,
+          child: Scaffold(
+            key: _scaffoldKey,
+            drawer: CustomDrawer(this.closeDrawer),
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(kToolbarHeight),
+              child: DivocHeader(this.openDrawer),
+            ),
+            body: NavigationFormFlow(
               routes: _flows,
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(routeInfo, arguments);
@@ -169,7 +169,7 @@ const List<String> _flows = [
   '/vaccineProgram/newEnroll/payment/voucher',
   '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher',
   '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher/upcoming',
-  '/vaccineProgram/newEnroll/payment/direct/upcoming',
+  '/vaccineProgram/newEnroll/payment/upcoming',
 
   //Recipient Queue
   '/vaccineProgram/upcoming',

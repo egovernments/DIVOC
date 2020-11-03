@@ -65,6 +65,7 @@ class SelectPaymentForm extends StatelessWidget {
           borderRadius: BorderRadius.circular(8.0),
         ),
         child: ListTile(
+          enabled: index != 0,
           title: Text(buttonNames[index]),
           trailing: Icon(Icons.navigate_next),
           onTap: () {

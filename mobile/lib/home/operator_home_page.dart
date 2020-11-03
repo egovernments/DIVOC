@@ -10,6 +10,7 @@ import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
 import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/model/patients.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -29,23 +30,25 @@ class OperatorHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var homeRepository = context.watch<HomeRepository>();
+    final homeRepository = context.watch<HomeRepository>();
+    final authRepository = context.watch<AuthRepository>();
     return ChangeNotifierProvider(
       create: (_) => HomeModel(homeRepository),
       builder: (context, widget) {
-        return Scaffold(
-          key: _scaffoldKey,
-          drawer: CustomDrawer(this.closeDrawer),
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(kToolbarHeight),
-            child: DivocHeader(this.openDrawer),
-          ),
-          body: Theme(
-            data: DivocTheme.operatorTheme,
-            child: NavigationFormFlow(
+        return Theme(
+          data: DivocTheme.operatorTheme,
+          child: Scaffold(
+            key: _scaffoldKey,
+            drawer: CustomDrawer(this.closeDrawer),
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(kToolbarHeight),
+              child: DivocHeader(this.openDrawer),
+            ),
+            body: NavigationFormFlow(
               routes: _flows,
               builder: (routeInfo, arguments) {
-                return getWidgetByRouteName(routeInfo, arguments);
+                return getWidgetByRouteName(
+                    authRepository, routeInfo, arguments);
               },
             ),
           ),
@@ -55,15 +58,18 @@ class OperatorHomePage extends StatelessWidget {
   }
 }
 
-Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
+Widget getWidgetByRouteName(
+    AuthRepository authRepository, RouteInfo routeInfo, Object arguments) {
   switch (routeInfo.currentRouteName) {
     case '/':
+      var userPin = authRepository.getPin;
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyAadhaar,
         child: SingleFieldForm(
-          title: "Enter PIN",
+          title: userPin != null && userPin.isNotEmpty? "Enter PIN" : "Set unique PIN",
           btnText: "Confirm",
           onNext: (context, value) {
+            authRepository.setPin = value;
             NavigationFormFlow.push(
                 context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
           },

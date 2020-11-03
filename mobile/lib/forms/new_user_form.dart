@@ -108,7 +108,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: TextFormField(
-                keyboardType: TextInputType.datetime,
+                keyboardType: TextInputType.text,
                 onSaved: (value) {},
                 validator: (value) {
                   var msg = value.isEmpty ? "Cannot be Empty" : null;

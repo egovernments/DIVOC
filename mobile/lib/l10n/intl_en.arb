@@ -9,7 +9,7 @@
   "labelNext": "Next",
   "vaccineLabel": "You are registering {vaccineName} for:",
   "register": "Register with {name}",
-  "selectPayment": "Please select payment mode",
+  "selectPayment": "Payment Mode",
   "invalidMobile": "Invalid Mobile Number",
   "invalidOTP": "Invalid OTP",
   "msgNoInternet": "No Internet connection",

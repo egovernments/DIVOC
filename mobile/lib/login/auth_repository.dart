@@ -17,6 +17,10 @@ abstract class AuthRepository {
   Future<bool> logout();
 
   User get currentUser;
+
+  set setPin(String pin);
+
+  String get getPin;
 }
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -66,5 +70,19 @@ class AuthRepositoryImpl implements AuthRepository {
     } on Exception catch (e) {
       throw handleNetworkError(e);
     }
+  }
+
+  @override
+  String get getPin {
+    final userPin = keyValueStore.getString(USER_PIN);
+    if (userPin == null) {
+      return "";
+    }
+    return userPin;
+  }
+
+  @override
+  set setPin(String pin) {
+    keyValueStore.setString(USER_PIN, pin);
   }
 }

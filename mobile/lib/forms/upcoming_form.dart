@@ -23,7 +23,7 @@ class UpComingForm extends StatelessWidget {
     var homeRepository = context.watch<HomeRepository>();
     var localizations = DivocLocalizations.of(context);
     final ValueNotifier<UpcomingInfo> upcomingValueNotifier =
-    ValueNotifier(UpcomingInfo());
+        ValueNotifier(UpcomingInfo());
 
     return ChangeNotifierProvider(
       create: (_) => UpcomingPatientModel(homeRepository),
@@ -135,10 +135,6 @@ class UpComingForm extends StatelessWidget {
         "NAME",
         style: headerTextTheme,
       ),
-      trailing: Text(
-        "STATUS",
-        style: headerTextTheme,
-      ),
     );
   }
 }
@@ -196,9 +192,7 @@ class UpcomingPatientListWidget extends StatelessWidget {
           title: Text(patient.name),
           subtitle: Text("${patient.gender}: ${patient.age}"),
           trailing: CircleAvatar(
-            child: Image.asset(patient.status == "vaccinated"
-                ? ImageAssetPath.VACCINE_ACTIVE
-                : ImageAssetPath.VACCINE_DE_ACTIVE),
+            child: Image.asset(ImageAssetPath.VACCINE_DE_ACTIVE),
           ),
           onTap: () {
             if (onScanClicked != null) {
@@ -226,8 +220,8 @@ class VaccineInfo extends StatelessWidget {
           child: Text(
             number.toString(),
             style: Theme.of(context).textTheme.caption.copyWith(
-              color: Colors.white,
-            ),
+                  color: Colors.white,
+                ),
           ),
           radius: 15,
         ),
@@ -242,7 +236,7 @@ class VaccineInfo extends StatelessWidget {
 
 class UpcomingPatientModel extends ChangeNotifier {
   Resource<UpcomingPatients> _resourcePatients =
-  Resource.idle(data: UpcomingPatients([], UpcomingInfo()));
+      Resource.idle(data: UpcomingPatients([], UpcomingInfo()));
 
   Resource<UpcomingPatients> get resourcePatients => _resourcePatients;
 
