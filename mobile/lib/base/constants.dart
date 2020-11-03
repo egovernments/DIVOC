@@ -8,4 +8,5 @@ class ImageAssetPath {
   static const String BARCODE_SAMPLE = "assets/barcode_sample.png";
   static const String CLOSE_ICON = "assets/close.png";
   static const String ARROW_ICON = "assets/arrow.png";
+  static const String USER_PROFILE = "assets/user_profile.png";
 }
