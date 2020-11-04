@@ -34,5 +34,6 @@
   "labelMobile": "Mobile",
   "labelNationality": "Nationality",
   "labelDone": "DONE",
-  "msgCannotBeEmpty": "Cannot be Empty"
+  "msgCannotBeEmpty": "Cannot be Empty",
+  "titleChangeLanguage": "Change Language"
 }

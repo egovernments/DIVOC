@@ -394,6 +394,16 @@ class DivocLocalizations {
       args: [],
     );
   }
+
+  /// `Change Language`
+  String get titleChangeLanguage {
+    return Intl.message(
+      'Change Language',
+      name: 'titleChangeLanguage',
+      desc: '',
+      args: [],
+    );
+  }
 }
 
 class AppLocalizationDelegate extends LocalizationsDelegate<DivocLocalizations> {

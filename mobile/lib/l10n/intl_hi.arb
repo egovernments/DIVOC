@@ -34,5 +34,6 @@
   "labelMobile": "मोबाइल",
   "labelNationality": "राष्ट्रीयता",
   "labelDone": "आगे",
-  "msgCannotBeEmpty": "खाली की अनुमति नहीं है"
+  "msgCannotBeEmpty": "खाली की अनुमति नहीं है",
+  "titleChangeLanguage": "भाषा बदलो"
 }

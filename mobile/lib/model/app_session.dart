@@ -6,7 +6,7 @@ import 'package:flutter/cupertino.dart';
 final UnmodifiableListView<LanguageSupport> languageSupport =
     new UnmodifiableListView([
   LanguageSupport("English", "en"),
-  LanguageSupport("Hindi", "hi"),
+  LanguageSupport("हिंदी", "hi"),
 ]);
 
 class AppSession extends ChangeNotifier {

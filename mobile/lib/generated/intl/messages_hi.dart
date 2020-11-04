@@ -52,6 +52,7 @@ class MessageLookup extends MessageLookupByLibrary {
     "selectProgram" : MessageLookupByLibrary.simpleMessage("कृपया वैक्सीन प्रोग्राम चुनें"),
     "tAndC" : MessageLookupByLibrary.simpleMessage("TERMS OF USE. PRIVACY POLICY"),
     "title" : MessageLookupByLibrary.simpleMessage("DIVOC"),
+    "titleChangeLanguage" : MessageLookupByLibrary.simpleMessage("भाषा बदलो"),
     "titleDetailsRecipient" : MessageLookupByLibrary.simpleMessage("टीकाकरण प्राप्तकर्ता का विवरण जोड़ें"),
     "titleEnterVaccineManually" : MessageLookupByLibrary.simpleMessage("वैक्सीन विवरण मैन्युअल रूप से दर्ज करें"),
     "titlePayment" : MessageLookupByLibrary.simpleMessage("भुगतान"),
