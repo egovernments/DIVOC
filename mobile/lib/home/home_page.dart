@@ -5,7 +5,6 @@ import 'package:divoc/forms/placeholder_text_form.dart';
 import 'package:divoc/forms/select_payment_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
-import 'package:divoc/forms/voucher_verfication_form.dart';
 import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/flow_screen.dart';
@@ -116,18 +115,19 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return SelectPaymentForm(routeInfo);
 
     case 'voucher':
-      return VoucherVerificationForm(routeInfo);
+      return UpComingForm(
+        showNextButton: true,
+      );
 
     case 'upcoming':
       return UpComingForm(
         showNextButton: true,
       );
 
-    case 'govt':
-      return MessageForm(routeInfo, "Verify Government Payment");
-
     case 'direct':
-      return MessageForm(routeInfo, "Verify Direct Payment");
+      return UpComingForm(
+        showNextButton: true,
+      );
 
     case 'verifyVoucher':
       return MessageForm(routeInfo, "Voucher Payment Verified");
@@ -137,9 +137,6 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
 
     case 'direct':
       return MessageForm(routeInfo, "Verify Direct Payment");
-
-    case 'verifyVoucher':
-      return MessageForm(routeInfo, "Voucher Payment Verified");
 
     default:
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
@@ -164,10 +161,8 @@ const List<String> _flows = [
   '/vaccineProgram/newEnroll',
   '/vaccineProgram/newEnroll/payment',
   '/vaccineProgram/newEnroll/payment/govt/upcoming',
-  '/vaccineProgram/newEnroll/payment/voucher',
-  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher',
-  '/vaccineProgram/newEnroll/payment/voucher/verifyVoucher/upcoming',
-  '/vaccineProgram/newEnroll/payment/upcoming',
+  '/vaccineProgram/newEnroll/payment/voucher/upcoming',
+  '/vaccineProgram/newEnroll/payment/direct/upcoming',
 
   //Recipient Queue
   '/vaccineProgram/upcoming',
