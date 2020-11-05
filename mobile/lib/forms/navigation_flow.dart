@@ -1,9 +1,11 @@
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class NavigationFormFlow extends StatelessWidget {
   final GlobalKey<NavigatorState> _navigationState = GlobalKey();
   final WidgetFunction builder;
   final List<String> routes;
+  final FlowTree flowTree = null;
 
   NavigationFormFlow({Key key, this.routes, @required this.builder})
       : super(key: key);
