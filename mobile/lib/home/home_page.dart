@@ -14,6 +14,7 @@ import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/vaccination_program_form.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +47,7 @@ class HomePage extends StatelessWidget {
               child: DivocHeader(this.openDrawer),
             ),
             body: NavigationFormFlow(
-             // routes: _flows,
+              flowTree: FlowTree.fromJson(staffFlow),
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(routeInfo, arguments);
               },

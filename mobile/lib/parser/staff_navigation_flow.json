@@ -1,0 +1,139 @@
+{
+  "routeKey": "root",
+  "metadata": {
+    "label": "root",
+    "formKey": "root"
+  },
+  "nextRoutes": [
+    {
+      "routeKey": "vaccineProgram",
+      "metadata": {
+        "label": "Vaccine Program",
+        "formKey": "vaccineProgram"
+      },
+      "nextRoutes": [
+        {
+          "routeKey": "preEnroll",
+          "metadata": {
+            "label": "Pre enrollment",
+            "formKey": "preEnroll"
+          },
+          "nextRoutes": [
+            {
+              "routeKey": "verifyUserDetails",
+              "metadata": {
+                "label": "Verify User Details",
+                "formKey": "verifyUserDetails"
+              },
+              "nextRoutes": [
+                {
+                  "routeKey": "aadharManually",
+                  "metadata": {
+                    "label": "Aadhaar Manually",
+                    "formKey": "aadharManually"
+                  },
+                  "nextRoutes": [
+                    {
+                      "routeKey": "aadharOtp",
+                      "metadata": {
+                        "label": "Verify OTP",
+                        "formKey": "aadharOtp"
+                      },
+                      "nextRoutes": [
+                        {
+                          "routeKey": "upcoming",
+                          "metadata": {
+                            "label": "Upcoming Recipient",
+                            "formKey": "upcoming"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "routeKey": "scanQR",
+                  "metadata": {
+                    "label": "Scan QR",
+                    "formKey": "scanQR"
+                  },
+                  "nextRoutes": [
+                    {
+                      "routeKey": "aadharOtp",
+                      "metadata": {
+                        "label": "Verify OTP",
+                        "formKey": "aadharOtp"
+                      },
+                      "nextRoutes": [
+                        {
+                          "routeKey": "upcoming",
+                          "metadata": {
+                            "label": "Upcoming Recipient",
+                            "formKey": "upcoming"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeKey": "newEnroll",
+          "metadata": {
+            "label": "Enroll Form",
+            "formKey": "newEnrollForm"
+          },
+          "nextRoutes": [
+            {
+              "routeKey": "payment",
+              "metadata": {
+                "label": "Payment",
+                "formKey": "payment"
+              },
+              "nextRoutes": [
+                {
+                  "routeKey": "govt",
+                  "metadata": {
+                    "label": "Government",
+                    "formKey": "govt"
+                  }
+                },
+                {
+                  "routeKey": "voucher",
+                  "metadata": {
+                    "label": "Voucher",
+                    "formKey": "voucher"
+                  }
+                },
+                {
+                  "routeKey": "direct",
+                  "metadata": {
+                    "label": "Direct",
+                    "formKey": "govt"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeKey": "upcoming",
+          "metadata": {
+            "label": "Upcoming",
+            "formKey": "upcomingForm"
+          }
+        },
+        {
+          "routeKey": "generateCertificate",
+          "metadata": {
+            "label": "Generate Certificate",
+            "formKey": "generateCertificate"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -27,7 +27,7 @@ class NavigationFormFlow extends StatelessWidget {
       child: Navigator(
         key: _navigationState,
         onGenerateRoute: (RouteSettings settings) {
-          print(settings.name);
+          print("Route Name: " + settings.name);
           print(settings.arguments);
           var routeInfo = _buildRouteInfo(settings.name);
           return PageRouteBuilder(
@@ -50,36 +50,11 @@ class NavigationFormFlow extends StatelessWidget {
     );
   }
 
-/*  RouteInfo _buildRouteInfo(String routePath) {
-    final possibleRoutes = _findPossibleRoutes(routes, routePath);
-    var dilimeter = "";
-    var currentRoute = "/";
-
-    if (routePath.length > 1) {
-      dilimeter = "/";
-      var split = routePath.split("/");
-      currentRoute = split.last;
-    }
-
-    var routeMeta = possibleRoutes
-        .map((item) => RouteMeta(item, routePath + dilimeter + item))
-        .toList();
-    return RouteInfo(routeMeta, routePath, currentRoute);
-  }*/
-
   RouteInfo _buildRouteInfo(String routeKey) {
-    var findNode = flowTree.findNode(
+    final findNode = flowTree.findNode(
         flowTree, routeKey == '/' ? 'root' : routeKey.replaceAll("/", ""));
     final possibleRoutes =
         findNode == null ? flowTree.nextRoutes : findNode.nextRoutes ?? [];
-    var dilimeter = "";
-    var currentRoute = "/";
-
-    if (routeKey.length > 1) {
-      dilimeter = "/";
-      var split = routeKey.split("/");
-      currentRoute = split.last;
-    }
 
     var routeMeta = possibleRoutes
         .map((item) => RouteMeta(item.routeKey, item.routeKey))

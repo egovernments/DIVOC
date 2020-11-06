@@ -45,8 +45,8 @@ class FlowTree {
   FlowTree findNode(FlowTree node, String value) {
     if (node.routeKey == value) {
       return node;
-    } else {
-      for(FlowTree element in node.nextRoutes){
+    } else if (node.nextRoutes != null) {
+      for (FlowTree element in node.nextRoutes) {
         final flowTree = findNode(element, value);
         if (flowTree != null) {
           return flowTree;
@@ -75,8 +75,8 @@ final mapList = {
   "metadata": {"label": "root", "formKey": "root"},
   "nextRoutes": [
     {
-      "routeKey": "upcomingRecipients",
-      "metadata": {"label": "Upcoming", "formKey": "upcoming"},
+      "routeKey": "vaccineProgram",
+      "metadata": {"label": "Vaccine Program", "formKey": "vaccineProgram"},
       "nextRoutes": [
         {
           "routeKey": "vaccineManually",
@@ -88,12 +88,6 @@ final mapList = {
             {
               "routeKey": "certifyDetails",
               "metadata": {"label": "Certify", "formKey": "certifyDetails"},
-            /*  "nextRoutes": [
-                {
-                  "routeKey": "home",
-                  "metadata": {"label": "home", "formKey": "home"}
-                }
-              ]*/
             }
           ]
         },
@@ -104,12 +98,6 @@ final mapList = {
             {
               "routeKey": "certifyDetails",
               "metadata": {"label": "Certify", "formKey": "certifyDetails"},
-           /*   "nextRoutes": [
-                {
-                  "routeKey": "home",
-                  "metadata": {"label": "Home", "formKey": "home"},
-                }
-              ]*/
             }
           ]
         }
@@ -117,3 +105,139 @@ final mapList = {
     }
   ]
 };
+
+final staffFlow = {
+  "routeKey": "root",
+  "metadata": {"label": "root", "formKey": "root"},
+  "nextRoutes": [
+    {
+      "routeKey": "vaccineProgram",
+      "metadata": {"label": "Vaccine Program", "formKey": "vaccineProgram"},
+      "nextRoutes": [
+        {
+          "routeKey": "preEnroll",
+          "metadata": {"label": "Pre enrollment", "formKey": "preEnroll"},
+          "nextRoutes": [
+            {
+              "routeKey": "verifyUserDetails",
+              "metadata": {
+                "label": "Verify User Details",
+                "formKey": "verifyUserDetails"
+              },
+              "nextRoutes": [
+                {
+                  "routeKey": "aadharManually",
+                  "metadata": {
+                    "label": "Aadhaar Manually",
+                    "formKey": "aadharManually"
+                  },
+                  "nextRoutes": [
+                    {
+                      "routeKey": "aadharOtp",
+                      "metadata": {
+                        "label": "Verify OTP",
+                        "formKey": "aadharOtp"
+                      },
+                      "nextRoutes": [
+                        {
+                          "routeKey": "upcoming",
+                          "metadata": {
+                            "label": "Upcoming Recipient",
+                            "formKey": "upcoming"
+                          },
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "routeKey": "scanQR",
+                  "metadata": {"label": "Scan QR", "formKey": "scanQR"},
+                  "nextRoutes": [
+                    {
+                      "routeKey": "aadharOtp",
+                      "metadata": {
+                        "label": "Verify OTP",
+                        "formKey": "aadharOtp"
+                      },
+                      "nextRoutes": [
+                        {
+                          "routeKey": "upcoming",
+                          "metadata": {
+                            "label": "Upcoming Recipient",
+                            "formKey": "upcoming"
+                          },
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeKey": "newEnroll",
+          "metadata": {"label": "Enroll Form", "formKey": "newEnrollForm"},
+          "nextRoutes": [
+            {
+              "routeKey": "payment",
+              "metadata": {"label": "Payment", "formKey": "payment"},
+              "nextRoutes": [
+                {
+                  "routeKey": "govt",
+                  "metadata": {"label": "Government", "formKey": "govt"},
+                },
+                {
+                  "routeKey": "voucher",
+                  "metadata": {"label": "Voucher", "formKey": "voucher"},
+                },
+                {
+                  "routeKey": "direct",
+                  "metadata": {"label": "Direct", "formKey": "govt"},
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "routeKey": "upcoming",
+          "metadata": {"label": "Upcoming", "formKey": "upcomingForm"},
+        },
+        {
+          "routeKey": "generateCertificate",
+          "metadata": {
+            "label": "Generate Certificate",
+            "formKey": "generateCertificate"
+          },
+        }
+      ]
+    }
+  ]
+};
+
+const List<String> _flows = [
+  '/vaccineProgram',
+
+  //Verify Recipient Flow
+  '/vaccineProgram',
+  '/vaccineProgram/preEnroll',
+  '/vaccineProgram/preEnroll/verifyUserDetails',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp',
+  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp/upcoming',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp',
+  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
+
+  //EnrollFlow
+  '/vaccineProgram/newEnroll',
+  '/vaccineProgram/newEnroll/payment',
+  '/vaccineProgram/newEnroll/payment/govt/upcoming',
+  '/vaccineProgram/newEnroll/payment/voucher/upcoming',
+  '/vaccineProgram/newEnroll/payment/direct/upcoming',
+
+  //Recipient Queue
+  '/vaccineProgram/upcoming',
+  '/vaccineProgram/generateCert',
+];
