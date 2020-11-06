@@ -8,7 +8,7 @@ void main() {
     expect(flowTree, null);
   });
 
-  test('Find Route Routes', () async {
+  test('Find Route', () async {
     final navigationFlowParser = NavigationFlowParser();
     final flowTree = navigationFlowParser.buildFlowTree(mapList);
     final searchRouteKey = "vaccineManually";

@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
               child: DivocHeader(this.openDrawer),
             ),
             body: NavigationFormFlow(
-              routes: _flows,
+             // routes: _flows,
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(routeInfo, arguments);
               },
@@ -116,16 +116,19 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
 
     case 'voucher':
       return UpComingForm(
+        routeInfo,
         showNextButton: true,
       );
 
     case 'upcoming':
       return UpComingForm(
+        routeInfo,
         showNextButton: true,
       );
 
     case 'direct':
       return UpComingForm(
+        routeInfo,
         showNextButton: true,
       );
 

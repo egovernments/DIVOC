@@ -5,7 +5,6 @@ import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/forms/operator_upcoming_form.dart';
 import 'package:divoc/forms/select_vaccine_form.dart';
 import 'package:divoc/forms/single_field_form.dart';
-import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/home/flow_screen.dart';
@@ -13,6 +12,7 @@ import 'package:divoc/home/home_model.dart';
 import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/login/auth_repository.dart';
 import 'package:divoc/model/patients.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +46,7 @@ class OperatorHomePage extends StatelessWidget {
               child: DivocHeader(this.openDrawer),
             ),
             body: NavigationFormFlow(
-              routes: _flows,
+              flowTree: FlowTree.fromJson(mapList),
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(
                     authRepository, routeInfo, arguments);
@@ -67,7 +67,9 @@ Widget getWidgetByRouteName(
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyAadhaar,
         child: SingleFieldForm(
-          title: userPin != null && userPin.isNotEmpty? "Enter PIN" : "Set unique PIN",
+          title: userPin != null && userPin.isNotEmpty
+              ? "Enter PIN"
+              : "Set unique PIN",
           btnText: "Confirm",
           onNext: (context, value) {
             authRepository.setPin = value;
@@ -96,14 +98,3 @@ Widget getWidgetByRouteName(
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
   }
 }
-
-const List<String> _flows = [
-  //Verify Recipient Flow
-  '/upcomingRecipients',
-  '/upcomingRecipients/vaccineManually',
-  '/upcomingRecipients/vaccineManually/certifyDetails',
-  '/upcomingRecipients/vaccineManually/certifyDetails/upcomingRecipients',
-  '/upcomingRecipients/scanQR',
-  '/upcomingRecipients/scanQR/certify',
-  '/upcomingRecipients/scanQR/certify/upcomingRecipients',
-];

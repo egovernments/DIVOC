@@ -60,9 +60,13 @@ class CertifyDetailsForm extends StatelessWidget {
           FormButton(
             text: "Certify",
             onPressed: () {
-              Navigator.of(context).pushNamedAndRemoveUntil(
-                  "/upcomingRecipients",
-                  (route) => route.settings.name == "/upcomingRecipients");
+              if (routeInfo.nextRoutesMeta.length == 0) {
+                NavigationFormFlow.pushAndReplaceRoot(context);
+              } else {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                    "/upcomingRecipients",
+                    (route) => route.settings.name == "/upcomingRecipients");
+              }
             },
           )
         ],

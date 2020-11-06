@@ -4,14 +4,20 @@ import 'package:flutter/material.dart';
 class NavigationFormFlow extends StatelessWidget {
   final GlobalKey<NavigatorState> _navigationState = GlobalKey();
   final WidgetFunction builder;
-  final List<String> routes;
-  final FlowTree flowTree = null;
 
-  NavigationFormFlow({Key key, this.routes, @required this.builder})
+  // final List<String> routes;
+  final FlowTree flowTree;
+
+  NavigationFormFlow({Key key, @required this.builder, this.flowTree})
       : super(key: key);
 
   static push(BuildContext context, routePath) {
     Navigator.of(context).pushNamed(routePath);
+  }
+
+  static pushAndReplaceRoot(BuildContext context) {
+    Navigator.of(context)
+        .pushNamedAndRemoveUntil("/", (route) => route.settings.name == "/");
   }
 
   @override
@@ -44,7 +50,7 @@ class NavigationFormFlow extends StatelessWidget {
     );
   }
 
-  RouteInfo _buildRouteInfo(String routePath) {
+/*  RouteInfo _buildRouteInfo(String routePath) {
     final possibleRoutes = _findPossibleRoutes(routes, routePath);
     var dilimeter = "";
     var currentRoute = "/";
@@ -59,6 +65,26 @@ class NavigationFormFlow extends StatelessWidget {
         .map((item) => RouteMeta(item, routePath + dilimeter + item))
         .toList();
     return RouteInfo(routeMeta, routePath, currentRoute);
+  }*/
+
+  RouteInfo _buildRouteInfo(String routeKey) {
+    var findNode = flowTree.findNode(
+        flowTree, routeKey == '/' ? 'root' : routeKey.replaceAll("/", ""));
+    final possibleRoutes =
+        findNode == null ? flowTree.nextRoutes : findNode.nextRoutes ?? [];
+    var dilimeter = "";
+    var currentRoute = "/";
+
+    if (routeKey.length > 1) {
+      dilimeter = "/";
+      var split = routeKey.split("/");
+      currentRoute = split.last;
+    }
+
+    var routeMeta = possibleRoutes
+        .map((item) => RouteMeta(item.routeKey, item.routeKey))
+        .toList();
+    return RouteInfo(routeMeta, routeKey, routeKey);
   }
 }
 

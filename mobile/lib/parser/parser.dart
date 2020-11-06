@@ -52,14 +52,6 @@ class FlowTree {
           return flowTree;
         }
       }
-     /*
-      node.nextRoutes.forEach((element) {
-        final flowTree = findNode(element, value);
-        if (flowTree != null) {
-          break;
-          return flowTree;
-        }
-      });*/
     }
     return null;
   }
@@ -77,3 +69,51 @@ class FlowMeta {
 
   Map<String, dynamic> toJson() => _$FlowMetaToJson(this);
 }
+
+final mapList = {
+  "routeKey": "root",
+  "metadata": {"label": "root", "formKey": "root"},
+  "nextRoutes": [
+    {
+      "routeKey": "upcomingRecipients",
+      "metadata": {"label": "Upcoming", "formKey": "upcoming"},
+      "nextRoutes": [
+        {
+          "routeKey": "vaccineManually",
+          "metadata": {
+            "label": "Vaccine Manually",
+            "formKey": "vaccineManually"
+          },
+          "nextRoutes": [
+            {
+              "routeKey": "certifyDetails",
+              "metadata": {"label": "Certify", "formKey": "certifyDetails"},
+            /*  "nextRoutes": [
+                {
+                  "routeKey": "home",
+                  "metadata": {"label": "home", "formKey": "home"}
+                }
+              ]*/
+            }
+          ]
+        },
+        {
+          "routeKey": "scanQR",
+          "metadata": {"label": "Scan QR", "formKey": "scanQR"},
+          "nextRoutes": [
+            {
+              "routeKey": "certifyDetails",
+              "metadata": {"label": "Certify", "formKey": "certifyDetails"},
+           /*   "nextRoutes": [
+                {
+                  "routeKey": "home",
+                  "metadata": {"label": "Home", "formKey": "home"},
+                }
+              ]*/
+            }
+          ]
+        }
+      ]
+    }
+  ]
+};
