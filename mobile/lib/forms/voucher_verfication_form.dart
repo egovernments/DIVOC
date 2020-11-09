@@ -1,12 +1,13 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 import 'navigation_flow.dart';
 
 class VoucherVerificationForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   VoucherVerificationForm(this.routeInfo);
 
@@ -55,7 +56,7 @@ class VoucherVerificationForm extends StatelessWidget {
               text: DivocLocalizations.of(context).labelNext,
               onPressed: () {
                 NavigationFormFlow.push(
-                    context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                    context, routeInfo.nextRoutes[0].routeKey);
               },
             )
           ],

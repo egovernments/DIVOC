@@ -4,9 +4,9 @@ import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/utils.dart';
 import 'package:divoc/forms/enrollment_model.dart';
-import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/home_repository.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_portal/flutter_portal.dart';
 import 'package:provider/provider.dart';
@@ -71,7 +71,7 @@ class SingleFieldForm extends StatelessWidget {
 }
 
 class PreEnrollmentForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   PreEnrollmentForm(this.routeInfo);
 
@@ -87,7 +87,7 @@ class PreEnrollmentForm extends StatelessWidget {
             switch (status) {
               case Status.COMPLETED:
                 Navigator.of(context).pushNamed(
-                    routeInfo.nextRoutesMeta[0].fullNextRoutePath,
+                    routeInfo.nextRoutes[0].routeKey,
                     arguments: enrollModel.enrollUser.data);
                 break;
               case Status.ERROR:

@@ -1,9 +1,10 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class MessageForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
   final String message;
 
   MessageForm(this.routeInfo, this.message);
@@ -29,7 +30,7 @@ class MessageForm extends StatelessWidget {
                 text: "Next",
                 onPressed: () {
                   NavigationFormFlow.push(
-                      context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                      context, routeInfo.nextRoutes[0].routeKey);
                 },
               ),
             )

@@ -59,9 +59,9 @@ class HomePage extends StatelessWidget {
   }
 }
 
-Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
-  switch (routeInfo.currentRouteName) {
-    case '/':
+Widget getWidgetByRouteName(FlowTree routeInfo, Object arguments) {
+  switch (routeInfo.routeKey) {
+    case 'root':
       return SelectProgramScreen(routeInfo);
     case 'vaccineProgram':
       return VaccinationProgramForm(routeInfo, arguments);
@@ -75,10 +75,9 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Enter Aadhar Number",
-          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
+          btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -88,10 +87,9 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Your Aadhaar Number",
-          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
+          btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -101,10 +99,9 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Enter OTP",
-          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
+          btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -143,6 +140,6 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return MessageForm(routeInfo, "Verify Direct Payment");
 
     default:
-      return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
+      return FlowScreen(routeInfo);
   }
 }

@@ -1,12 +1,13 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 import 'navigation_flow.dart';
 
 class NewUserEnrollForm extends StatefulWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   NewUserEnrollForm(this.routeInfo);
 
@@ -124,10 +125,10 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FormButton(
-                text: widget.routeInfo.nextRoutesMeta[0].flowMeta.label,
+                text: widget.routeInfo.nextRoutes[0].flowMeta.label,
                 onPressed: () {
                   NavigationFormFlow.push(context,
-                      widget.routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                      widget.routeInfo.nextRoutes[0].routeKey);
                 },
               ),
             )

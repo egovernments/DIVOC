@@ -1,12 +1,13 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 import 'navigation_flow.dart';
 
 class SelectPaymentForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   SelectPaymentForm(this.routeInfo);
 
@@ -32,7 +33,7 @@ class SelectPaymentForm extends StatelessWidget {
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.max,
-            children: routeInfo.nextRoutesMeta
+            children: routeInfo.nextRoutes
                 .asMap()
                 .map(
                   (index, item) => MapEntry(
@@ -48,7 +49,7 @@ class SelectPaymentForm extends StatelessWidget {
     );
   }
 
-  Padding buildPaymentButtons(BuildContext context, RouteMeta item, int index) {
+  Padding buildPaymentButtons(BuildContext context, FlowTree item, int index) {
     return Padding(
       padding: const EdgeInsets.only(
         left: PaddingSize.LARGE,
@@ -68,7 +69,7 @@ class SelectPaymentForm extends StatelessWidget {
           title: Text(item.flowMeta.label),
           trailing: Icon(Icons.navigate_next),
           onTap: () {
-            final nextRoutePath = item.fullNextRoutePath;
+            final nextRoutePath = item.routeKey;
             NavigationFormFlow.push(context, nextRoutePath);
           },
         ),

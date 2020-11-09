@@ -2,16 +2,15 @@ import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/base/utils.dart';
 import 'package:divoc/generated/l10n.dart';
-import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/model/vaccine_programs.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../base/common_extension.dart';
 
 import '../home/home_model.dart';
 
 class SelectProgramScreen extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   SelectProgramScreen(this.routeInfo);
 
@@ -53,7 +52,7 @@ class SelectProgramScreen extends StatelessWidget {
                   programs: vaccinePrograms,
                   onTap: (index) {
                     final nextRoutePath =
-                        routeInfo.nextRoutesMeta[0].fullNextRoutePath;
+                        routeInfo.nextRoutes[0].routeKey;
                     Navigator.of(context).pushNamed(nextRoutePath,
                         arguments: vaccinePrograms[index]);
                   },

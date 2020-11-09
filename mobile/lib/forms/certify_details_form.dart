@@ -3,10 +3,11 @@ import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/forms/user_details_form.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class CertifyDetailsForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
   final ValueNotifier<bool> valueNotifierConfirmed = ValueNotifier(false);
 
   CertifyDetailsForm(this.routeInfo);
@@ -27,10 +28,7 @@ class CertifyDetailsForm extends StatelessWidget {
             padding: const EdgeInsets.all(PaddingSize.LARGE),
             child: Text(
               "Administering the C-19 Vaccination to",
-              style: Theme
-                  .of(context)
-                  .textTheme
-                  .headline6,
+              style: Theme.of(context).textTheme.headline6,
               textAlign: TextAlign.center,
             ),
           ),
@@ -39,8 +37,7 @@ class CertifyDetailsForm extends StatelessWidget {
           ),
           FieldDetailsWidget(
             "Vivek Singh",
-            "${localizations.labelGender}: Male | ${localizations
-                .labelDOB}: 42",
+            "${localizations.labelGender}: Male | ${localizations.labelDOB}: 42",
           ),
           SizedBox(
             height: 36,
@@ -64,11 +61,12 @@ class CertifyDetailsForm extends StatelessWidget {
           FormButton(
             text: "Certify",
             onPressed: () {
-              if (routeInfo.nextRoutesMeta.length == 0) {
+              if (routeInfo.nextRoutes == null ||
+                  routeInfo.nextRoutes.length == 0) {
                 NavigationFormFlow.pushAndReplaceRoot(context);
               } else {
                 NavigationFormFlow.push(
-                    context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                    context, routeInfo.nextRoutes[0].routeKey);
               }
             },
           )

@@ -1,6 +1,6 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
-import 'package:divoc/forms/cerfify_details_form.dart';
+import 'package:divoc/forms/certify_details_form.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/forms/operator_upcoming_form.dart';
 import 'package:divoc/forms/select_vaccine_form.dart';
@@ -60,9 +60,9 @@ class OperatorHomePage extends StatelessWidget {
 }
 
 Widget getWidgetByRouteName(
-    AuthRepository authRepository, RouteInfo routeInfo, Object arguments) {
-  switch (routeInfo.currentRouteName) {
-    case '/':
+    AuthRepository authRepository, FlowTree routeInfo, Object arguments) {
+  switch (routeInfo.routeKey) {
+    case 'root':
       var userPin = authRepository.getPin;
       return DivocForm(
         title: DivocLocalizations.current.titleVerifyAadhaar,
@@ -70,11 +70,10 @@ Widget getWidgetByRouteName(
           title: userPin != null && userPin.isNotEmpty
               ? "Enter PIN"
               : "Set unique PIN",
-          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
+          btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
             authRepository.setPin = value;
-            NavigationFormFlow.push(
-                context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -82,8 +81,7 @@ Widget getWidgetByRouteName(
     case 'upcomingRecipients':
       return OperatorUpComingForm(
         onScanClicked: (context, PatientDetails patientDetails) {
-          Navigator.of(context).pushNamed(
-              routeInfo.nextRoutesMeta[0].fullNextRoutePath,
+          Navigator.of(context).pushNamed(routeInfo.nextRoutes[0].routeKey,
               arguments: patientDetails);
         },
       );
@@ -95,6 +93,6 @@ Widget getWidgetByRouteName(
       return CertifyDetailsForm(routeInfo);
 
     default:
-      return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
+      return FlowScreen(routeInfo);
   }
 }

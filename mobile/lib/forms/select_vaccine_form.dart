@@ -1,12 +1,12 @@
 import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
-import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class SelectVaccineManuallyForm extends StatelessWidget {
-  final RouteInfo _routeInfo;
+  final FlowTree _routeInfo;
   final List<ApproveVaccines> approvedVaccines = [
     ApproveVaccines("C-19 MAEIWXZ", "C191500"),
     ApproveVaccines("N-23 EWNJCEJ", "N231502"),
@@ -87,13 +87,13 @@ class SelectVaccineManuallyForm extends StatelessWidget {
             ),
             Center(
               child: FormButton(
-                text: _routeInfo.nextRoutesMeta[0].flowMeta.label,
+                text: _routeInfo.nextRoutes[0].flowMeta.label,
                 onPressed: () {
                   if (valueNotifier.value == null) {
                     context.showSnackbarMessage("Please select vaccine");
                   } else {
                     Navigator.of(context).pushNamed(
-                        _routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                        _routeInfo.nextRoutes[0].routeKey);
                   }
                 },
               ),

@@ -3,10 +3,11 @@ import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/model/user.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class UserDetailsForm extends StatelessWidget {
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
   final EnrollUser enrollUser;
 
   UserDetailsForm(this.routeInfo, this.enrollUser);
@@ -52,7 +53,7 @@ class UserDetailsForm extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.max,
-              children: routeInfo.nextRoutesMeta
+              children: routeInfo.nextRoutes
                   .asMap()
                   .map(
                     (index, program) => MapEntry(
@@ -69,14 +70,14 @@ class UserDetailsForm extends StatelessWidget {
     );
   }
 
-  Widget buildButton(BuildContext context, RouteMeta routeMeta) {
+  Widget buildButton(BuildContext context, FlowTree routeMeta) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(PaddingSize.NORMAL),
         child: FormButton(
           text: routeMeta.flowMeta.label,
           onPressed: () {
-            final nextRoutePath = routeMeta.fullNextRoutePath;
+            final nextRoutePath = routeMeta.routeKey;
             NavigationFormFlow.push(context, nextRoutePath);
           },
         ),

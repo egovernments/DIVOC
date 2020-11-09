@@ -1,12 +1,12 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/forms/navigation_flow.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class FlowScreen extends StatelessWidget {
-  final List<RouteMeta> routes;
-  final String currentPath;
+  final FlowTree routes;
 
-  FlowScreen(this.routes, this.currentPath);
+  FlowScreen(this.routes);
 
   @override
   Widget build(BuildContext context) {
@@ -15,13 +15,13 @@ class FlowScreen extends StatelessWidget {
       child: Card(
         child: Container(
           child: ListView.builder(
-            itemCount: routes.length,
+            itemCount: routes.nextRoutes.length,
             itemBuilder: (context, index) {
               return FormButton(
-                text: routes[index].nextRouteName,
+                text: routes.nextRoutes[index].flowMeta.label,
                 onPressed: () {
                   NavigationFormFlow.push(
-                      context, routes[index].fullNextRoutePath);
+                      context, routes.nextRoutes[index].routeKey);
                 },
               );
             },

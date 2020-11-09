@@ -7,6 +7,7 @@ import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/model/patients.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -16,7 +17,7 @@ typedef OnScanClicked = Function(
 class UpComingForm extends StatelessWidget {
   final OnScanClicked onScanClicked;
   final bool showNextButton;
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   UpComingForm(this.routeInfo,
       {this.onScanClicked, this.showNextButton = false});
@@ -80,11 +81,12 @@ class UpComingForm extends StatelessWidget {
               child: FormButton(
                 text: "Next Recipient",
                 onPressed: () {
-                  if (routeInfo.nextRoutesMeta.length == 0) {
+                  if (routeInfo.nextRoutes == null ||
+                      routeInfo.nextRoutes.length == 0) {
                     NavigationFormFlow.pushAndReplaceRoot(context);
                   } else {
                     NavigationFormFlow.push(
-                        context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                        context, routeInfo.nextRoutes[0].routeKey);
                   }
                 },
               ),

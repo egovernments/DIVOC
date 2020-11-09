@@ -2,11 +2,12 @@ import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/model/vaccine_programs.dart';
+import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
 class VaccinationProgramForm extends StatelessWidget {
   final VaccineProgram vaccineProgram;
-  final RouteInfo routeInfo;
+  final FlowTree routeInfo;
 
   VaccinationProgramForm(this.routeInfo, this.vaccineProgram);
 
@@ -32,12 +33,12 @@ class VaccinationProgramForm extends StatelessWidget {
               ),
             ),
             Column(
-              children: routeInfo.nextRoutesMeta
+              children: routeInfo.nextRoutes
                   .asMap()
                   .map(
                     (index, program) => MapEntry(
                       index,
-                      buildButton(context, program.flowMeta.label, index),
+                      buildButton(context, program),
                     ),
                   )
                   .values
@@ -49,16 +50,15 @@ class VaccinationProgramForm extends StatelessWidget {
     );
   }
 
-  Widget buildButton(BuildContext context, String program, int index) {
+  Widget buildButton(BuildContext context, FlowTree flowTree) {
     return Padding(
       padding: const EdgeInsets.all(PaddingSize.TINY),
       child: SizedBox(
         width: double.infinity,
         child: FormButton(
-          text: program,
+          text: flowTree.flowMeta.label,
           onPressed: () {
-            final nextRoutePath =
-                routeInfo.nextRoutesMeta[index].fullNextRoutePath;
+            final nextRoutePath = flowTree.routeKey;
             NavigationFormFlow.push(context, nextRoutePath);
           },
         ),
