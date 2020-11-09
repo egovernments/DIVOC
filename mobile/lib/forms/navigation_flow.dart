@@ -1,36 +1,37 @@
 import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
 
-class NavigationFormFlow extends StatelessWidget {
-  final GlobalKey<NavigatorState> _navigationState = GlobalKey();
+class FormNavigator extends StatefulWidget {
   final WidgetFunction builder;
   final FlowTree flowTree;
+  final GlobalKey<NavigatorState> _navigationState = GlobalKey();
 
-  NavigationFormFlow({Key key, @required this.builder, this.flowTree})
+  FormNavigator({Key key, @required this.builder, this.flowTree})
       : super(key: key);
 
-  static push(BuildContext context, routePath) {
-    Navigator.of(context).pushNamed(routePath);
-  }
-
-  static pushAndReplaceRoot(BuildContext context) {
-    Navigator.of(context)
-        .pushNamedAndRemoveUntil("/", (route) => route.settings.name == "/");
+  static FormNavigatorState of(BuildContext context) {
+    return context.findAncestorStateOfType<FormNavigatorState>();
   }
 
   @override
+  FormNavigatorState createState() => FormNavigatorState();
+}
+
+class FormNavigatorState extends State<FormNavigator> {
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: () async => !await _navigationState.currentState.maybePop(),
+      onWillPop: () async =>
+          !await widget._navigationState.currentState.maybePop(),
       child: Navigator(
-        key: _navigationState,
+        key: widget._navigationState,
         onGenerateRoute: (RouteSettings settings) {
           print("Route Name: 2" + settings.name);
           print(settings.arguments);
           final routeInfo = _buildFlowTree(settings.name);
           return PageRouteBuilder(
             pageBuilder: (context, animation, secondaryAnimation) {
-              return builder(routeInfo, settings.arguments);
+              return widget.builder(routeInfo, settings.arguments);
             },
             transitionsBuilder:
                 (context, animation, secondaryAnimation, child) {
@@ -49,9 +50,18 @@ class NavigationFormFlow extends StatelessWidget {
   }
 
   FlowTree _buildFlowTree(String routeKey) {
-    final findNode = flowTree.findNode(
-        flowTree, routeKey == '/' ? 'root' : routeKey.replaceAll("/", ""));
+    final findNode = widget.flowTree.findNode(widget.flowTree,
+        routeKey == '/' ? 'root' : routeKey.replaceAll("/", ""));
     return findNode;
+  }
+
+  push(String routePath) {
+    widget._navigationState.currentState.pushNamed(routePath);
+  }
+
+  pushAndReplaceRoot() {
+    widget._navigationState.currentState
+        .pushNamedAndRemoveUntil("/", (route) => route.settings.name == "/");
   }
 }
 

@@ -55,8 +55,7 @@ class VoucherVerificationForm extends StatelessWidget {
             FormButton(
               text: DivocLocalizations.of(context).labelNext,
               onPressed: () {
-                NavigationFormFlow.push(
-                    context, routeInfo.nextRoutes[0].routeKey);
+                FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
               },
             )
           ],

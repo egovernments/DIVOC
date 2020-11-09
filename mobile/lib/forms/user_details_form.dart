@@ -78,7 +78,7 @@ class UserDetailsForm extends StatelessWidget {
           text: routeMeta.flowMeta.label,
           onPressed: () {
             final nextRoutePath = routeMeta.routeKey;
-            NavigationFormFlow.push(context, nextRoutePath);
+            FormNavigator.of(context).push(nextRoutePath);
           },
         ),
       ),

@@ -59,7 +59,7 @@ class VaccinationProgramForm extends StatelessWidget {
           text: flowTree.flowMeta.label,
           onPressed: () {
             final nextRoutePath = routeInfo.routeKey;
-            NavigationFormFlow.push(context, nextRoutePath);
+            FormNavigator.of(context).push(nextRoutePath);
           },
         ),
       ),

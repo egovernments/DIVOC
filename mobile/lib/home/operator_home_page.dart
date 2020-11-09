@@ -45,7 +45,7 @@ class OperatorHomePage extends StatelessWidget {
               preferredSize: Size.fromHeight(kToolbarHeight),
               child: DivocHeader(this.openDrawer),
             ),
-            body: NavigationFormFlow(
+            body: FormNavigator(
               flowTree: FlowTree.fromJson(mapList),
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(
@@ -73,7 +73,7 @@ Widget getWidgetByRouteName(
           btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
             authRepository.setPin = value;
-            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
+            FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );

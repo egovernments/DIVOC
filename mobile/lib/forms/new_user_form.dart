@@ -127,8 +127,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
               child: FormButton(
                 text: widget.routeInfo.nextRoutes[0].flowMeta.label,
                 onPressed: () {
-                  NavigationFormFlow.push(context,
-                      widget.routeInfo.nextRoutes[0].routeKey);
+                     FormNavigator.of(context).push(widget.routeInfo.nextRoutes[0].routeKey);
                 },
               ),
             )

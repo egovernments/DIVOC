@@ -63,10 +63,9 @@ class CertifyDetailsForm extends StatelessWidget {
             onPressed: () {
               if (routeInfo.nextRoutes == null ||
                   routeInfo.nextRoutes.length == 0) {
-                NavigationFormFlow.pushAndReplaceRoot(context);
+                FormNavigator.of(context).pushAndReplaceRoot();
               } else {
-                NavigationFormFlow.push(
-                    context, routeInfo.nextRoutes[0].routeKey);
+                FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
               }
             },
           )

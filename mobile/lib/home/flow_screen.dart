@@ -15,13 +15,13 @@ class FlowScreen extends StatelessWidget {
       child: Card(
         child: Container(
           child: ListView.builder(
-            itemCount: routes.nextRoutes.length,
+            itemCount: routes.nextRoutes == null ? 0 : routes.nextRoutes.length,
             itemBuilder: (context, index) {
               return FormButton(
                 text: routes.nextRoutes[index].flowMeta.label,
                 onPressed: () {
-                  NavigationFormFlow.push(
-                      context, routes.nextRoutes[index].routeKey);
+                  FormNavigator.of(context)
+                      .push(routes.nextRoutes[index].routeKey);
                 },
               );
             },

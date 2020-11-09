@@ -29,8 +29,7 @@ class MessageForm extends StatelessWidget {
               child: FormButton(
                 text: "Next",
                 onPressed: () {
-                  NavigationFormFlow.push(
-                      context, routeInfo.nextRoutes[0].routeKey);
+                  FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
                 },
               ),
             )

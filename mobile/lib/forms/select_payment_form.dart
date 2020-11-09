@@ -70,7 +70,7 @@ class SelectPaymentForm extends StatelessWidget {
           trailing: Icon(Icons.navigate_next),
           onTap: () {
             final nextRoutePath = item.routeKey;
-            NavigationFormFlow.push(context, nextRoutePath);
+            FormNavigator.of(context).push(nextRoutePath);
           },
         ),
       ),

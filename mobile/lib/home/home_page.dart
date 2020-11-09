@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
               preferredSize: Size.fromHeight(kToolbarHeight),
               child: DivocHeader(this.openDrawer),
             ),
-            body: NavigationFormFlow(
+            body: FormNavigator(
               flowTree: FlowTree.fromJson(staffFlow),
               builder: (routeInfo, arguments) {
                 return getWidgetByRouteName(routeInfo, arguments);
@@ -77,7 +77,7 @@ Widget getWidgetByRouteName(FlowTree routeInfo, Object arguments) {
           title: "Enter Aadhar Number",
           btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
+            FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -89,7 +89,7 @@ Widget getWidgetByRouteName(FlowTree routeInfo, Object arguments) {
           title: "Your Aadhaar Number",
           btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
+            FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
@@ -101,7 +101,7 @@ Widget getWidgetByRouteName(FlowTree routeInfo, Object arguments) {
           title: "Enter OTP",
           btnText: routeInfo.nextRoutes[0].flowMeta.label,
           onNext: (context, value) {
-            NavigationFormFlow.push(context, routeInfo.nextRoutes[0].routeKey);
+            FormNavigator.of(context).push(routeInfo.nextRoutes[0].routeKey);
           },
         ),
       );
