@@ -1,7 +1,7 @@
+import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/forms/navigation_flow.dart';
-import 'package:divoc/base/common_extension.dart';
 import 'package:divoc/generated/l10n.dart';
 import 'package:flutter/material.dart';
 
@@ -87,7 +87,7 @@ class SelectVaccineManuallyForm extends StatelessWidget {
             ),
             Center(
               child: FormButton(
-                text: "Done",
+                text: _routeInfo.nextRoutesMeta[0].flowMeta.label,
                 onPressed: () {
                   if (valueNotifier.value == null) {
                     context.showSnackbarMessage("Please select vaccine");

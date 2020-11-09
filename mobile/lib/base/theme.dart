@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 class DivocTheme {
   static ThemeData get appTheme {
     final themeData = ThemeData.light();
-    final textTheme = themeData.textTheme;
     final foreColor = 0xff88C6A9;
     return ThemeData(
       primaryColor: Color(foreColor),

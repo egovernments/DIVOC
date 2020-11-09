@@ -70,7 +70,7 @@ Widget getWidgetByRouteName(
           title: userPin != null && userPin.isNotEmpty
               ? "Enter PIN"
               : "Set unique PIN",
-          btnText: "Confirm",
+          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
           onNext: (context, value) {
             authRepository.setPin = value;
             NavigationFormFlow.push(

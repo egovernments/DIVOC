@@ -124,7 +124,7 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: FormButton(
-                text: localizations.labelDone,
+                text: widget.routeInfo.nextRoutesMeta[0].flowMeta.label,
                 onPressed: () {
                   NavigationFormFlow.push(context,
                       widget.routeInfo.nextRoutesMeta[0].fullNextRoutePath);
@@ -138,18 +138,6 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
   }
 
   Future<DateTime> _selectTime(BuildContext context) async {
-    /*TimeOfDay selectedTime = TimeOfDay.now();
-    final TimeOfDay datePicked = await showTimePicker(
-        context: context,
-        initialTime: selectedTime,
-        builder: (BuildContext context, Widget child) {
-          return MediaQuery(
-            data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-            child: child,
-          );
-        });
-
-    return datePicked;*/
 
     final datePicker = await showDatePicker(
         context: context,
@@ -159,10 +147,5 @@ class _NewUserEnrollFormState extends State<NewUserEnrollForm> {
         //what will be the previous supported year in picker
         lastDate: DateTime.now());
     return datePicker;
-
-    /* if (datePicked != null && datePicked != selectedTime )
-      setState(() {
-        selectedTime = datePicked;
-      });*/
   }
 }

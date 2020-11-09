@@ -1,18 +1,18 @@
 import 'package:divoc/base/common_widget.dart';
 import 'package:divoc/base/theme.dart';
+import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/forms/new_user_form.dart';
 import 'package:divoc/forms/placeholder_text_form.dart';
+import 'package:divoc/forms/program_selection.dart';
 import 'package:divoc/forms/select_payment_form.dart';
+import 'package:divoc/forms/single_field_form.dart';
 import 'package:divoc/forms/upcoming_form.dart';
 import 'package:divoc/forms/user_details_form.dart';
-import 'package:divoc/home/custom_drawer.dart';
+import 'package:divoc/forms/vaccination_program_form.dart';
 import 'package:divoc/generated/l10n.dart';
+import 'package:divoc/home/custom_drawer.dart';
 import 'package:divoc/home/flow_screen.dart';
 import 'package:divoc/home/home_model.dart';
-import 'package:divoc/forms/program_selection.dart';
-import 'package:divoc/forms/single_field_form.dart';
-import 'package:divoc/forms/vaccination_program_form.dart';
-import 'package:divoc/forms/navigation_flow.dart';
 import 'package:divoc/home/home_repository.dart';
 import 'package:divoc/parser/parser.dart';
 import 'package:flutter/material.dart';
@@ -75,7 +75,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Enter Aadhar Number",
-          btnText: "Generate OTP",
+          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
           onNext: (context, value) {
             NavigationFormFlow.push(
                 context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
@@ -88,7 +88,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Your Aadhaar Number",
-          btnText: "Generate OTP",
+          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
           onNext: (context, value) {
             NavigationFormFlow.push(
                 context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
@@ -101,7 +101,7 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
         title: DivocLocalizations.current.titleVerifyRecipient,
         child: SingleFieldForm(
           title: "Enter OTP",
-          btnText: "Verify",
+          btnText: routeInfo.nextRoutesMeta[0].flowMeta.label,
           onNext: (context, value) {
             NavigationFormFlow.push(
                 context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
@@ -146,29 +146,3 @@ Widget getWidgetByRouteName(RouteInfo routeInfo, Object arguments) {
       return FlowScreen(routeInfo.nextRoutesMeta, routeInfo.currentRoutePath);
   }
 }
-
-const List<String> _flows = [
-  '/vaccineProgram',
-
-  //Verify Recipient Flow
-  '/vaccineProgram',
-  '/vaccineProgram/preEnroll',
-  '/vaccineProgram/preEnroll/verifyUserDetails',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp/upcoming',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
-
-  //EnrollFlow
-  '/vaccineProgram/newEnroll',
-  '/vaccineProgram/newEnroll/payment',
-  '/vaccineProgram/newEnroll/payment/govt/upcoming',
-  '/vaccineProgram/newEnroll/payment/voucher/upcoming',
-  '/vaccineProgram/newEnroll/payment/direct/upcoming',
-
-  //Recipient Queue
-  '/vaccineProgram/upcoming',
-  '/vaccineProgram/generateCert',
-];

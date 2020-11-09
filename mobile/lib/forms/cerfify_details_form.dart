@@ -27,7 +27,10 @@ class CertifyDetailsForm extends StatelessWidget {
             padding: const EdgeInsets.all(PaddingSize.LARGE),
             child: Text(
               "Administering the C-19 Vaccination to",
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme
+                  .of(context)
+                  .textTheme
+                  .headline6,
               textAlign: TextAlign.center,
             ),
           ),
@@ -36,7 +39,8 @@ class CertifyDetailsForm extends StatelessWidget {
           ),
           FieldDetailsWidget(
             "Vivek Singh",
-            "${localizations.labelGender}: Male | ${localizations.labelDOB}: 42",
+            "${localizations.labelGender}: Male | ${localizations
+                .labelDOB}: 42",
           ),
           SizedBox(
             height: 36,
@@ -63,9 +67,8 @@ class CertifyDetailsForm extends StatelessWidget {
               if (routeInfo.nextRoutesMeta.length == 0) {
                 NavigationFormFlow.pushAndReplaceRoot(context);
               } else {
-                Navigator.of(context).pushNamedAndRemoveUntil(
-                    "/upcomingRecipients",
-                    (route) => route.settings.name == "/upcomingRecipients");
+                NavigationFormFlow.push(
+                    context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
               }
             },
           )

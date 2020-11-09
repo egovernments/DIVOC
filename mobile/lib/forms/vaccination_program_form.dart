@@ -8,13 +8,6 @@ class VaccinationProgramForm extends StatelessWidget {
   final VaccineProgram vaccineProgram;
   final RouteInfo routeInfo;
 
-  final programFlow = [
-    "Verify recipient",
-    "Enroll Recipient",
-    "Recipient Queue",
-    "Generate Certificates"
-  ];
-
   VaccinationProgramForm(this.routeInfo, this.vaccineProgram);
 
   @override
@@ -39,12 +32,12 @@ class VaccinationProgramForm extends StatelessWidget {
               ),
             ),
             Column(
-              children: programFlow
+              children: routeInfo.nextRoutesMeta
                   .asMap()
                   .map(
                     (index, program) => MapEntry(
                       index,
-                      buildButton(context, program, index),
+                      buildButton(context, program.flowMeta.label, index),
                     ),
                   )
                   .values

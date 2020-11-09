@@ -18,7 +18,8 @@ class UpComingForm extends StatelessWidget {
   final bool showNextButton;
   final RouteInfo routeInfo;
 
-  UpComingForm(this.routeInfo,{this.onScanClicked, this.showNextButton = false});
+  UpComingForm(this.routeInfo,
+      {this.onScanClicked, this.showNextButton = false});
 
   @override
   Widget build(BuildContext context) {
@@ -79,13 +80,12 @@ class UpComingForm extends StatelessWidget {
               child: FormButton(
                 text: "Next Recipient",
                 onPressed: () {
-                  if(routeInfo.nextRoutesMeta.length==0){
+                  if (routeInfo.nextRoutesMeta.length == 0) {
                     NavigationFormFlow.pushAndReplaceRoot(context);
-                  }else{
-                    NavigationFormFlow.push(context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
-                  } /*
-                  Navigator.of(context).pushNamedAndRemoveUntil(
-                      "/", (route) => route.settings.name == "/");*/
+                  } else {
+                    NavigationFormFlow.push(
+                        context, routeInfo.nextRoutesMeta[0].fullNextRoutePath);
+                  }
                 },
               ),
             ),

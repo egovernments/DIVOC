@@ -1,6 +1,5 @@
 import 'package:divoc/base/constants.dart';
 import 'package:divoc/generated/l10n.dart';
-import 'package:divoc/home/home_page.dart';
 import 'package:flutter/material.dart';
 
 class LoadingOverlay extends StatelessWidget {

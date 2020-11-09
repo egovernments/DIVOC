@@ -7,7 +7,6 @@ import 'navigation_flow.dart';
 
 class SelectPaymentForm extends StatelessWidget {
   final RouteInfo routeInfo;
-  final buttonNames = ["Government", "Voucher", "Direct"];
 
   SelectPaymentForm(this.routeInfo);
 
@@ -66,7 +65,7 @@ class SelectPaymentForm extends StatelessWidget {
         ),
         child: ListTile(
           enabled: index != 0,
-          title: Text(buttonNames[index]),
+          title: Text(item.flowMeta.label),
           trailing: Icon(Icons.navigate_next),
           onTap: () {
             final nextRoutePath = item.fullNextRoutePath;

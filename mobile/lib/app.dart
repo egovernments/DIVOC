@@ -24,8 +24,6 @@ class ProviderApp extends StatelessWidget {
     @required this.apiClient,
   });
 
-  final ValueNotifier<int> restartValueNotifier = ValueNotifier(0);
-
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -47,9 +45,9 @@ class ProviderApp extends StatelessWidget {
             ],
             supportedLocales: [Locale('en', ''), Locale('hi', '')],
             locale: Locale(value.selectedLanguage.code, ''),
-            home: getInitialPage(),
+            home: buildInitialPage(),
             routes: {
-              DivocRoutes.home: (context) => getInitialPage(),
+              DivocRoutes.home: (context) => buildInitialPage(),
               DivocRoutes.login: (context) => LoginPage(),
             },
           ),
@@ -58,7 +56,7 @@ class ProviderApp extends StatelessWidget {
     );
   }
 
-  Widget getInitialPage() {
+  Widget buildInitialPage() {
     final user = authRepository.currentUser;
     if (user != null) {
       return user.role == 'admin' ? OperatorHomePage() : HomePage();

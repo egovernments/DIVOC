@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 class UserDetailsForm extends StatelessWidget {
   final RouteInfo routeInfo;
   final EnrollUser enrollUser;
-  final List<String> buttonTitle = ["Enter Manually", "Scan QR"];
 
   UserDetailsForm(this.routeInfo, this.enrollUser);
 
@@ -58,7 +57,7 @@ class UserDetailsForm extends StatelessWidget {
                   .map(
                     (index, program) => MapEntry(
                       index,
-                      buildButton(context, index),
+                      buildButton(context, program),
                     ),
                   )
                   .values
@@ -70,15 +69,14 @@ class UserDetailsForm extends StatelessWidget {
     );
   }
 
-  Widget buildButton(BuildContext context, int index) {
+  Widget buildButton(BuildContext context, RouteMeta routeMeta) {
     return Expanded(
       child: Padding(
         padding: const EdgeInsets.all(PaddingSize.NORMAL),
         child: FormButton(
-          text: buttonTitle[index],
+          text: routeMeta.flowMeta.label,
           onPressed: () {
-            final nextRoutePath =
-                routeInfo.nextRoutesMeta[index].fullNextRoutePath;
+            final nextRoutePath = routeMeta.fullNextRoutePath;
             NavigationFormFlow.push(context, nextRoutePath);
           },
         ),

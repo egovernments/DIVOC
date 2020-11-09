@@ -3,21 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 part 'parser.g.dart';
 
 class NavigationFlowParser {
-/*  FlowTree buildFlowTree(Map<String, dynamic> jsonMap) {
-    FlowTree flowTree;
-    jsonMap.forEach((key, value) {
-      final metadata = FlowMeta.fromJson(value["metadata"]);
-      final nextRoute = value["nextRoutes"];
-      if (nextRoute == null) {
-        flowTree = FlowTree(metadata, []);
-      } else {
-        //TODO: nextRoute not populated
-        final tree = buildFlowTree(nextRoute);
-        flowTree = FlowTree(metadata, tree.nextRoutes);
-      }
-    });
-    return flowTree;
-  }*/
 
   FlowTree buildFlowTree(Map<String, dynamic> jsonMap) {
     return FlowTree.fromJson(jsonMap);
@@ -75,8 +60,8 @@ final mapList = {
   "metadata": {"label": "root", "formKey": "root"},
   "nextRoutes": [
     {
-      "routeKey": "vaccineProgram",
-      "metadata": {"label": "Vaccine Program", "formKey": "vaccineProgram"},
+      "routeKey": "upcomingRecipients",
+      "metadata": {"label": "Upcoming Recipients", "formKey": "upcomingRecipients"},
       "nextRoutes": [
         {
           "routeKey": "vaccineManually",
@@ -142,7 +127,7 @@ final staffFlow = {
                         {
                           "routeKey": "upcoming",
                           "metadata": {
-                            "label": "Upcoming Recipient",
+                            "label": "Done",
                             "formKey": "upcoming"
                           },
                         }
@@ -164,7 +149,7 @@ final staffFlow = {
                         {
                           "routeKey": "upcoming",
                           "metadata": {
-                            "label": "Upcoming Recipient",
+                            "label": "Done",
                             "formKey": "upcoming"
                           },
                         }
@@ -215,29 +200,3 @@ final staffFlow = {
     }
   ]
 };
-
-const List<String> _flows = [
-  '/vaccineProgram',
-
-  //Verify Recipient Flow
-  '/vaccineProgram',
-  '/vaccineProgram/preEnroll',
-  '/vaccineProgram/preEnroll/verifyUserDetails',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/aadharManually/aadharOtp/upcoming',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp',
-  '/vaccineProgram/preEnroll/verifyUserDetails/scanQR/aadharOtp/upcoming',
-
-  //EnrollFlow
-  '/vaccineProgram/newEnroll',
-  '/vaccineProgram/newEnroll/payment',
-  '/vaccineProgram/newEnroll/payment/govt/upcoming',
-  '/vaccineProgram/newEnroll/payment/voucher/upcoming',
-  '/vaccineProgram/newEnroll/payment/direct/upcoming',
-
-  //Recipient Queue
-  '/vaccineProgram/upcoming',
-  '/vaccineProgram/generateCert',
-];

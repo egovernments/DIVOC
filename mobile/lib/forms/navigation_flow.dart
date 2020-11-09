@@ -57,7 +57,7 @@ class NavigationFormFlow extends StatelessWidget {
         findNode == null ? flowTree.nextRoutes : findNode.nextRoutes ?? [];
 
     var routeMeta = possibleRoutes
-        .map((item) => RouteMeta(item.routeKey, item.routeKey))
+        .map((item) => RouteMeta(item.flowMeta, item.routeKey, item.routeKey))
         .toList();
     return RouteInfo(routeMeta, routeKey, routeKey);
   }
@@ -78,8 +78,9 @@ class RouteInfo {
 class RouteMeta {
   final String nextRouteName;
   final String fullNextRoutePath;
+  final FlowMeta flowMeta;
 
-  RouteMeta(this.nextRouteName, this.fullNextRoutePath);
+  RouteMeta(this.flowMeta, this.nextRouteName, this.fullNextRoutePath);
 }
 
 List<String> _findPossibleRoutes(List<String> flows, String route) {
