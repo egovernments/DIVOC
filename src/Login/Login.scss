@@ -1,0 +1,28 @@
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+
+  .phone-container {
+    .input-phone {
+      margin: 8px;
+      padding: 8px;
+
+      .control {
+        font-size: 16px;
+      }
+    }
+  }
+
+  .title {
+    margin: 8px;
+    padding: 8px;
+  }
+
+
+  .button {
+    margin: 8px;
+    padding: 8px;
+  }
+}
