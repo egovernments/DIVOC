@@ -1,0 +1,343 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  accessCode:
+    type: oauth2
+    tokenUrl: 'http://example.com/oauth/token'
+    authorizationUrl: 'http://example.com/oauth/auth'
+    flow: accessCode
+    scopes:
+      write: allows modifying resources
+      read: allows reading resources
+security:
+  - accessCode:
+      - read
+      - write
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /authorize:
+    post:
+      tags:
+        - login
+      summary: Establish token
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        '401':
+            description: Unauthorized
+
+  /divoc/configuration:
+    get:
+      tags:
+        - configuration
+      summary: Get Meta information about the application flow
+      operationId: getConfiguration
+      parameters:
+        - name: lastKnownVersion
+          in: query
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationConfiguration'
+  /users/me:
+    get:
+      tags:
+        - vaccination
+      summary: Get User information
+      operationId: getLoggedInUserInfo
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UserInfo'
+  '/preEnrollments/{preEnrollmentCode}':
+    get:
+      tags:
+        - vaccination
+      summary: Get pre enrollment information
+      description: Get pre enrollment data from api for vaccination
+      operationId: getPreEnrollment
+      parameters:
+        - name: preEnrollmentCode
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PreEnrollment'
+  '/preEnrollments/facility/{facilityCode}':
+    get:
+      tags:
+        - vaccination
+      summary: Get all pre enrollments applicable to assigned facility
+      operationId: getPreEnrollmentsForFacility
+      parameters:
+        - name: facilityCode
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PreEnrollment'
+  /recipients:
+    post:
+      tags:
+        - vaccination
+      summary: >-
+        Vaccination recipient registration can be based on pre enrollment or
+        ad-hoc
+      description: >-
+        Vaccination registration captures information like name, dob,
+        nationality etc for the vaccination certificate.
+      operationId: registerRecipient
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Recipient'
+      responses:
+        '200':
+          description: OK
+    get:
+      tags:
+        - vaccination
+      summary: Fetch waiting recipients
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Recipient'
+  /certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        athorization and vaccinator should be trained for the vaccination that
+        is being certified.
+      operationId: certify
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequest'
+      responses:
+        '200':
+          description: OK
+  /programs/current:
+    get:
+      tags:
+        - configuration
+      summary: Get active vaccination programs
+      operationId: getCurrentPrograms
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
+  /identity/verify:
+    post:
+      tags:
+        - identity
+      summary: Validate identity if the person
+      consumes:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/IdentityVerificationRequest'
+      responses:
+        '200':
+          description: OK
+        '206':
+          description: Need OTP
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK
+definitions:
+  LoginRequest:
+    type: object
+    properties:
+      mobile:
+        type: string
+        format: ''
+      token2fa:
+        type: string
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      refreshToken:
+        type: string
+  PreEnrollment:
+    type: object
+    properties:
+      code:
+        type: string
+      name:
+        type: string
+      phone:
+        type: string
+      meta:
+        type: object
+  CertificationRequest:
+    type: object
+    properties:
+      preEnrollmentCode:
+        type: string
+      recipient:
+        type: object
+        properties:
+          name:
+            type: string
+          dob:
+            type: string
+            format: date
+          gender:
+            type: string
+          natinoality:
+            type: string
+          identity:
+            type: string
+      vaccination:
+        type: object
+        properties:
+          name:
+            type: string
+          batch:
+            type: string
+          manufacturer:
+            type: string
+          date:
+            type: string
+            format: date-time
+          effectiveStart:
+            type: string
+            format: date
+          effectiveUntil:
+            type: string
+            format: date
+      vaccinator:
+        type: object
+        properties:
+          name:
+            type: string
+      facility:
+        type: object
+        properties:
+          name:
+            type: string
+          address:
+            type: string
+  Recipient:
+    type: object
+    properties:
+      name:
+        type: string
+      dob:
+        type: string
+        format: date
+      gender:
+        type: string
+      natinoality:
+        type: string
+      identity:
+        type: string
+      verified:
+        type: boolean
+      preEnrollmentCode:
+        type: string
+      vaccinationProgramCode:
+        type: string
+  Program:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      medicines:
+        type: array
+        items:
+          type: string
+  IdentityVerificationRequest:
+    type: object
+    properties:
+      id:
+        type: string
+      token:
+        type: string
+  ApplicationConfiguration:
+    type: object
+    properties:
+      navigation:
+        type: object
+      validation:
+        type: object
+      styles:
+        type: object
+  UserInfo:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      mobile:
+        type: string
+      roles:
+        type: array
+        items:
+          type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /divoc/api/v1
