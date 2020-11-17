@@ -38,7 +38,9 @@ func configureAPI(api *operations.DivocAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.BearerAuth = utils.ValidateHeader // attached as middleware
+	api.IsUserAuth = utils.UserAuthorizer
+	api.IsAdminAuth = utils.AdminAuthorizer
+	api.IsFacilityAdminAuth = utils.FacilityAdminAuthorizer
 
 	pkg.SetupHandlers(api)
 	api.APIAuthorizer = security.Authorized()

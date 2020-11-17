@@ -102,6 +102,11 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
+        "security": [
+          {
+            "isAdmin": []
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -194,6 +199,11 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
+        "security": [
+          {
+            "isFacilityAdmin": []
+          }
+        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -509,7 +519,17 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "Bearer": {
+    "isAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isFacilityAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isUser": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"
@@ -517,7 +537,7 @@ func init() {
   },
   "security": [
     {
-      "Bearer": []
+      "isUser": []
     }
   ]
 }`))
@@ -606,6 +626,11 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
+        "security": [
+          {
+            "isAdmin": []
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -698,6 +723,11 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
+        "security": [
+          {
+            "isFacilityAdmin": []
+          }
+        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -1079,7 +1109,17 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "Bearer": {
+    "isAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isFacilityAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isUser": {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"
@@ -1087,7 +1127,7 @@ func init() {
   },
   "security": [
     {
-      "Bearer": []
+      "isUser": []
     }
   ]
 }`))

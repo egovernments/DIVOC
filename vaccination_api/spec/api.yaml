@@ -4,12 +4,20 @@ info:
   title: Divoc
   description: Digital infra for vaccination certificates
 securityDefinitions:
-  Bearer:
+  isUser:
+    type: apiKey
+    name: Authorization
+    in: header
+  isAdmin:
+    type: apiKey
+    name: Authorization
+    in: header
+  isFacilityAdmin:
     type: apiKey
     name: Authorization
     in: header
 security:
-  - Bearer: []
+  - isUser: []
 consumes:
   - application/json
 produces:
@@ -37,7 +45,7 @@ paths:
           schema:
             $ref: '#/definitions/LoginResponse'
         '401':
-            description: Unauthorized
+          description: Unauthorized
 
   /divoc/configuration:
     get:
@@ -45,6 +53,8 @@ paths:
         - configuration
       summary: Get Meta information about the application flow
       operationId: getConfiguration
+      security:
+        - isAdmin: []
       parameters:
         - name: lastKnownVersion
           in: query
@@ -73,6 +83,8 @@ paths:
       summary: Get pre enrollment information
       description: Get pre enrollment data from api for vaccination
       operationId: getPreEnrollment
+      security:
+        - isFacilityAdmin: []
       parameters:
         - name: preEnrollmentCode
           in: path

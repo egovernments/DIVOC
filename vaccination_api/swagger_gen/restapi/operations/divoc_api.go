@@ -83,8 +83,16 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 
 		// Applies when the "Authorization" header is set
-		BearerAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (Bearer) Authorization from header param [Authorization] has not yet been implemented")
+		IsAdminAuth: func(token string) (interface{}, error) {
+			return nil, errors.NotImplemented("api key auth (isAdmin) Authorization from header param [Authorization] has not yet been implemented")
+		},
+		// Applies when the "Authorization" header is set
+		IsFacilityAdminAuth: func(token string) (interface{}, error) {
+			return nil, errors.NotImplemented("api key auth (isFacilityAdmin) Authorization from header param [Authorization] has not yet been implemented")
+		},
+		// Applies when the "Authorization" header is set
+		IsUserAuth: func(token string) (interface{}, error) {
+			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
 		APIAuthorizer: security.Authorized(),
@@ -122,9 +130,17 @@ type DivocAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
-	// BearerAuth registers a function that takes a token and returns a principal
+	// IsAdminAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Authorization provided in the header
-	BearerAuth func(string) (interface{}, error)
+	IsAdminAuth func(string) (interface{}, error)
+
+	// IsFacilityAdminAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	IsFacilityAdminAuth func(string) (interface{}, error)
+
+	// IsUserAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	IsUserAuth func(string) (interface{}, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -227,7 +243,13 @@ func (o *DivocAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.BearerAuth == nil {
+	if o.IsAdminAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
+	}
+	if o.IsFacilityAdminAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
+	}
+	if o.IsUserAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
@@ -282,9 +304,17 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
-		case "Bearer":
+		case "isAdmin":
 			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.BearerAuth)
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsAdminAuth)
+
+		case "isFacilityAdmin":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsFacilityAdminAuth)
+
+		case "isUser":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsUserAuth)
 
 		}
 	}
