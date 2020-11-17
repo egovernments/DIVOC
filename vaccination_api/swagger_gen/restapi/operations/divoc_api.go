@@ -82,8 +82,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 			return middleware.NotImplemented("operation vaccination.RegisterRecipient has not yet been implemented")
 		}),
 
-		AccessCodeAuth: func(token string, scopes []string) (interface{}, error) {
-			return nil, errors.NotImplemented("oauth2 bearer auth (accessCode) has not yet been implemented")
+		// Applies when the "Authorization" header is set
+		BearerAuth: func(token string) (interface{}, error) {
+			return nil, errors.NotImplemented("api key auth (Bearer) Authorization from header param [Authorization] has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
 		APIAuthorizer: security.Authorized(),
@@ -121,9 +122,9 @@ type DivocAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
-	// AccessCodeAuth registers a function that takes an access token and a collection of required scopes and returns a principal
-	// it performs authentication based on an oauth2 bearer token provided in the request
-	AccessCodeAuth func(string, []string) (interface{}, error)
+	// BearerAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	BearerAuth func(string) (interface{}, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -226,8 +227,8 @@ func (o *DivocAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.AccessCodeAuth == nil {
-		unregistered = append(unregistered, "AccessCodeAuth")
+	if o.BearerAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
 	if o.GetPingHandler == nil {
@@ -281,8 +282,9 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
-		case "accessCode":
-			result[name] = o.BearerAuthenticator(name, o.AccessCodeAuth)
+		case "Bearer":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.BearerAuth)
 
 		}
 	}

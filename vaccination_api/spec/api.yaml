@@ -4,18 +4,12 @@ info:
   title: Divoc
   description: Digital infra for vaccination certificates
 securityDefinitions:
-  accessCode:
-    type: oauth2
-    tokenUrl: 'http://example.com/oauth/token'
-    authorizationUrl: 'http://example.com/oauth/auth'
-    flow: accessCode
-    scopes:
-      write: allows modifying resources
-      read: allows reading resources
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 security:
-  - accessCode:
-      - read
-      - write
+  - Bearer: []
 consumes:
   - application/json
 produces:

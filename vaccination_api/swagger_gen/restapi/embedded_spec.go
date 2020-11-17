@@ -509,23 +509,15 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "accessCode": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "authorizationUrl": "http://example.com/oauth/auth",
-      "tokenUrl": "http://example.com/oauth/token",
-      "scopes": {
-        "read": "allows reading resources",
-        "write": "allows modifying resources"
-      }
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   },
   "security": [
     {
-      "accessCode": [
-        "read",
-        "write"
-      ]
+      "Bearer": []
     }
   ]
 }`))
@@ -1087,23 +1079,15 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "accessCode": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "authorizationUrl": "http://example.com/oauth/auth",
-      "tokenUrl": "http://example.com/oauth/token",
-      "scopes": {
-        "read": "allows reading resources",
-        "write": "allows modifying resources"
-      }
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   },
   "security": [
     {
-      "accessCode": [
-        "read",
-        "write"
-      ]
+      "Bearer": []
     }
   ]
 }`))
