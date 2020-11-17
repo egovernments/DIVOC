@@ -17,3 +17,12 @@ export const DivocFooter = () => {
         </div>
     );
 };
+
+export const Loader = () => {
+    return (
+        <div className={"loader"}>
+            Loading..
+        </div>
+    );
+};
+

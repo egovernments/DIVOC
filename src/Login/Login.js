@@ -3,13 +3,16 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import "./Login.scss"
 import Col from "react-bootstrap/Col";
-import {DivocFooter, DivocHeader} from "../Base/Base";
+import {DivocFooter, DivocHeader, Loader} from "../Base/Base";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useHistory} from "react-router";
 import Home from "../Home/Home";
+import {ApiServices} from "../Services/apiServices";
 
 function PhoneNumberComponent() {
-    const {state, verifyOtp} = useLogin();
+    const {state, requestOtp} = useLogin();
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState()
     const [phoneNumber, setPhoneNumber] = useState(state.mobileNumber)
 
     const handlePhoneNumberOnChange = (e) => {
@@ -22,14 +25,28 @@ function PhoneNumberComponent() {
             <Form.Control className="control" type="phone" placeholder="+91-9876543210" value={phoneNumber}
                           onChange={handlePhoneNumberOnChange}/>
         </Form>
-        <Button className="button" onClick={() => {
-            verifyOtp(phoneNumber)
-        }}>Get OTP</Button>
+        <Button className="button" disabled={loading} onClick={() => {
+            if (!phoneNumber) {
+                setError("Invalid phone number")
+                return;
+            }
+            setLoading(true)
+            ApiServices.requestOtp(phoneNumber).then(r => {
+                setLoading(false)
+                requestOtp(phoneNumber)
+            }).catch((e) => {
+                setLoading(false)
+                setError(e.message)
+            });
+        }}>{loading ? "Loading..." : "Get OTP"}</Button>
+        {!loading && error && <p>{error}</p>}
     </Col>;
 }
 
 function OTPVerifyComponent() {
     const {state, login} = useLogin();
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState()
     const [otpNumber, setOtpNumber] = useState(state.otp)
 
     const handlePhoneNumberOnChange = (e) => {
@@ -42,24 +59,39 @@ function OTPVerifyComponent() {
             <Form.Control className="control" type="mobile" value={otpNumber}
                           onChange={handlePhoneNumberOnChange}/>
         </Form>
-        <Button className="button" onClick={() => {
-            login(otpNumber);
-        }}>Login</Button>
+        <Button className="button" disabled={loading} onClick={() => {
+            if (!otpNumber) {
+                setError("Invalid otp")
+                return;
+            }
+            setLoading(true)
+            ApiServices.login(state.mobileNumber, otpNumber).then(value => {
+                setLoading(false)
+                login(otpNumber);
+            }).catch((e) => {
+                setLoading(false)
+                setError(e.message)
+            });
+        }}>{loading ? "Loading..." : "Login"}</Button>
+        {!loading && error && <p>{error}</p>}
     </Col>;
 }
 
-const initialState = {mobileNumber: 0, otp: 0};
+const initialState = {mobileNumber: "", otp: ""};
 
 function loginReducer(state, action) {
     switch (action.type) {
-        case 'login':
+        case ACTION_LOGIN:
             return {otp: action.payload.otp, ...state};
-        case 'otp':
+        case ACTION_OTP:
             return {mobileNumber: action.payload.mobileNumber};
         default:
             throw new Error();
     }
 }
+
+export const ACTION_LOGIN = 'login';
+export const ACTION_OTP = 'otp';
 
 const LoginContext = createContext(null);
 
@@ -71,20 +103,20 @@ export function useLogin() {
     }
     const [state, dispatch] = context
 
-    const verifyOtp = function (mobileNumber) {
-        dispatch({type: 'otp', payload: {mobileNumber: mobileNumber, otp: 0}})
+    const requestOtp = function (mobileNumber) {
+        dispatch({type: ACTION_OTP, payload: {mobileNumber: mobileNumber, otp: 0}})
         history.push(`/otp`)
     }
 
     const login = function (otp) {
-        dispatch({type: 'login', payload: {otp: otp}})
+        dispatch({type: ACTION_OTP, payload: {otp: otp}})
         history.push(`/home`)
     }
 
     return {
         state,
         dispatch,
-        verifyOtp,
+        requestOtp,
         login
     }
 
