@@ -37,7 +37,7 @@ export function useAuthorizedUser() {
     }
     const [state, dispatch] = context
 
-    const saveUser = function (user) {
+    const saveUserToken = function (user) {
         dispatch({type: ACTION_LOGGED_IN, payload: user});
     }
 
@@ -48,7 +48,7 @@ export function useAuthorizedUser() {
     return {
         state,
         dispatch,
-        saveUser,
+        saveUserToken,
         logout
     }
 }

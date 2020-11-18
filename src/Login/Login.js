@@ -45,7 +45,7 @@ function PhoneNumberComponent() {
 
 function OTPVerifyComponent() {
     const {state, login} = useLogin();
-    const {stateAuth, saveUser} = useAuthorizedUser();
+    const {saveUserToken} = useAuthorizedUser();
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
     const [otpNumber, setOtpNumber] = useState(state.otp)
@@ -69,7 +69,7 @@ function OTPVerifyComponent() {
             ApiServices.login(state.mobileNumber, otpNumber).then(value => {
                 setLoading(false)
                 login(otpNumber);
-                saveUser({name: "Burhanuddin Rashid"})
+                saveUserToken(value)
             }).catch((e) => {
                 setLoading(false)
                 setError(e.message)
