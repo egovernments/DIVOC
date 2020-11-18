@@ -6,8 +6,8 @@ import Col from "react-bootstrap/Col";
 import {DivocFooter, DivocHeader, Loader} from "../Base/Base";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useHistory} from "react-router";
-import Home from "../Home/Home";
 import {ApiServices} from "../Services/apiServices";
+import {useAuthorizedUser} from "../authentication";
 
 function PhoneNumberComponent() {
     const {state, requestOtp} = useLogin();
@@ -45,6 +45,7 @@ function PhoneNumberComponent() {
 
 function OTPVerifyComponent() {
     const {state, login} = useLogin();
+    const {stateAuth, saveUser} = useAuthorizedUser();
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState()
     const [otpNumber, setOtpNumber] = useState(state.otp)
@@ -68,6 +69,7 @@ function OTPVerifyComponent() {
             ApiServices.login(state.mobileNumber, otpNumber).then(value => {
                 setLoading(false)
                 login(otpNumber);
+                saveUser({name: "Burhanuddin Rashid"})
             }).catch((e) => {
                 setLoading(false)
                 setError(e.message)
@@ -110,7 +112,7 @@ export function useLogin() {
 
     const login = function (otp) {
         dispatch({type: ACTION_OTP, payload: {otp: otp}})
-        history.push(`/home`)
+        history.replace(`/`)
     }
 
     return {
@@ -130,7 +132,6 @@ export function LoginComponent() {
                 <Switch>
                     <Route path="/" exact component={PhoneNumberComponent}/>
                     <Route path="/otp" exact component={OTPVerifyComponent}/>
-                    <Route path="/home" exact component={Home}/>
                 </Switch>
             </Router>
         </LoginProvider>
