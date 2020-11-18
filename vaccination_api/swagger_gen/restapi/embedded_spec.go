@@ -102,6 +102,11 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
+        "security": [
+          {
+            "isAdmin": []
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -194,6 +199,11 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
+        "security": [
+          {
+            "isFacilityAdmin": []
+          }
+        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -509,23 +519,25 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "accessCode": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "authorizationUrl": "http://example.com/oauth/auth",
-      "tokenUrl": "http://example.com/oauth/token",
-      "scopes": {
-        "read": "allows reading resources",
-        "write": "allows modifying resources"
-      }
+    "isAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isFacilityAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isUser": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   },
   "security": [
     {
-      "accessCode": [
-        "read",
-        "write"
-      ]
+      "isUser": []
     }
   ]
 }`))
@@ -614,6 +626,11 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
+        "security": [
+          {
+            "isAdmin": []
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -706,6 +723,11 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
+        "security": [
+          {
+            "isFacilityAdmin": []
+          }
+        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -1087,23 +1109,25 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "accessCode": {
-      "type": "oauth2",
-      "flow": "accessCode",
-      "authorizationUrl": "http://example.com/oauth/auth",
-      "tokenUrl": "http://example.com/oauth/token",
-      "scopes": {
-        "read": "allows reading resources",
-        "write": "allows modifying resources"
-      }
+    "isAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isFacilityAdmin": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    },
+    "isUser": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   },
   "security": [
     {
-      "accessCode": [
-        "read",
-        "write"
-      ]
+      "isUser": []
     }
   ]
 }`))

@@ -5,6 +5,7 @@ package restapi
 import (
 	"crypto/tls"
 	"github.com/divoc/api/pkg"
+	"github.com/divoc/api/swagger_gen/utils"
 	"github.com/go-openapi/runtime/security"
 	"net/http"
 
@@ -37,10 +38,9 @@ func configureAPI(api *operations.DivocAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.AccessCodeAuth = func(token string, scopes []string) (interface{}, error) {
-		return "user", nil
-		//return nil, errors.NotImplemented("oauth2 bearer auth (accessCode) has not yet been implemented")
-	}
+	api.IsUserAuth = utils.UserAuthorizer
+	api.IsAdminAuth = utils.AdminAuthorizer
+	api.IsFacilityAdminAuth = utils.FacilityAdminAuthorizer
 
 	pkg.SetupHandlers(api)
 	api.APIAuthorizer = security.Authorized()
