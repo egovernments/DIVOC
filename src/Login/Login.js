@@ -1,82 +1,24 @@
-import React, {createContext, useContext, useMemo, useReducer, useState} from "react";
-import Form from "react-bootstrap/Form";
-import Button from "react-bootstrap/Button";
+import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./Login.scss"
-import Col from "react-bootstrap/Col";
-import {DivocFooter, DivocHeader, Loader} from "../Base/Base";
+import {DivocFooter, DivocHeader} from "../Base/Base";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useHistory} from "react-router";
-import {ApiServices} from "../Services/apiServices";
-import {useAuthorizedUser} from "../authentication";
+import {VerifyOTPComponent} from "./VerifyOTPComponent";
+import {EnterPhoneNumberComponent} from "./EnterPhoneNumberComponent";
 
-function PhoneNumberComponent() {
-    const {state, requestOtp} = useLogin();
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState()
-    const [phoneNumber, setPhoneNumber] = useState(state.mobileNumber)
-
-    const handlePhoneNumberOnChange = (e) => {
-        setPhoneNumber(e.target.value)
-    }
-
-    return <Col className="phone-container">
-        <h2 className="title">Enter Mobile Number</h2>
-        <Form className="input-phone">
-            <Form.Control className="control" type="phone" placeholder="+91-9876543210" value={phoneNumber}
-                          onChange={handlePhoneNumberOnChange}/>
-        </Form>
-        <Button className="button" disabled={loading} onClick={() => {
-            if (!phoneNumber) {
-                setError("Invalid phone number")
-                return;
-            }
-            setLoading(true)
-            ApiServices.requestOtp(phoneNumber).then(r => {
-                setLoading(false)
-                requestOtp(phoneNumber)
-            }).catch((e) => {
-                setLoading(false)
-                setError(e.message)
-            });
-        }}>{loading ? "Loading..." : "Get OTP"}</Button>
-        {!loading && error && <p>{error}</p>}
-    </Col>;
-}
-
-function OTPVerifyComponent() {
-    const {state, login} = useLogin();
-    const {saveUserToken} = useAuthorizedUser();
-    const [loading, setLoading] = useState(false)
-    const [error, setError] = useState()
-    const [otpNumber, setOtpNumber] = useState(state.otp)
-
-    const handlePhoneNumberOnChange = (e) => {
-        setOtpNumber(e.target.value)
-    }
-
-    return <Col className="phone-container">
-        <h2 className="title">Enter OTP</h2>
-        <Form className="input-phone">
-            <Form.Control className="control" type="mobile" value={otpNumber}
-                          onChange={handlePhoneNumberOnChange}/>
-        </Form>
-        <Button className="button" disabled={loading} onClick={() => {
-            if (!otpNumber) {
-                setError("Invalid otp")
-                return;
-            }
-            setLoading(true)
-            ApiServices.login(state.mobileNumber, otpNumber).then(value => {
-                setLoading(false)
-                login(otpNumber);
-                saveUserToken(value)
-            }).catch((e) => {
-                setLoading(false)
-                setError(e.message)
-            });
-        }}>{loading ? "Loading..." : "Login"}</Button>
-        {!loading && error && <p>{error}</p>}
-    </Col>;
+export function LoginComponent() {
+    return <div className={"login-container"}>
+        <DivocHeader/>
+        <LoginProvider>
+            <Router>
+                <Switch>
+                    <Route path="/" exact component={EnterPhoneNumberComponent}/>
+                    <Route path="/otp" exact component={VerifyOTPComponent}/>
+                </Switch>
+            </Router>
+        </LoginProvider>
+        <DivocFooter/>
+    </div>
 }
 
 const initialState = {mobileNumber: "", otp: ""};
@@ -105,12 +47,12 @@ export function useLogin() {
     }
     const [state, dispatch] = context
 
-    const requestOtp = function (mobileNumber) {
-        dispatch({type: ACTION_OTP, payload: {mobileNumber: mobileNumber, otp: 0}})
+    const goToVerifyOtp = function (mobileNumber) {
+        dispatch({type: ACTION_OTP, payload: {mobileNumber: mobileNumber, otp: ""}})
         history.push(`/otp`)
     }
 
-    const login = function (otp) {
+    const goToHome = function (otp) {
         dispatch({type: ACTION_OTP, payload: {otp: otp}})
         history.replace(`/`)
     }
@@ -118,25 +60,10 @@ export function useLogin() {
     return {
         state,
         dispatch,
-        requestOtp,
-        login
+        goToVerifyOtp,
+        goToHome
     }
 
-}
-
-export function LoginComponent() {
-    return <div className={"login-container"}>
-        <DivocHeader/>
-        <LoginProvider>
-            <Router>
-                <Switch>
-                    <Route path="/" exact component={PhoneNumberComponent}/>
-                    <Route path="/otp" exact component={OTPVerifyComponent}/>
-                </Switch>
-            </Router>
-        </LoginProvider>
-        <DivocFooter/>
-    </div>
 }
 
 function LoginProvider(props) {
