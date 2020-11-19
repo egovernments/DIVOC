@@ -6,8 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // ProgramRequest program request
@@ -15,12 +19,119 @@ import (
 // swagger:model ProgramRequest
 type ProgramRequest struct {
 
+	// description
+	Description string `json:"description,omitempty"`
+
+	// end date
+	// Format: date
+	EndDate strfmt.Date `json:"endDate,omitempty"`
+
+	// logo URL
+	LogoURL string `json:"logoURL,omitempty"`
+
+	// medicine ids
+	MedicineIds []string `json:"medicineIds"`
+
 	// name
 	Name string `json:"name,omitempty"`
+
+	// start date
+	// Format: date
+	StartDate strfmt.Date `json:"startDate,omitempty"`
+
+	// status
+	// Enum: [Active Inactive]
+	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this program request
 func (m *ProgramRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateEndDate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStartDate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ProgramRequest) validateEndDate(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.EndDate) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("endDate", "body", "date", m.EndDate.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *ProgramRequest) validateStartDate(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.StartDate) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("startDate", "body", "date", m.StartDate.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var programRequestTypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["Active","Inactive"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		programRequestTypeStatusPropEnum = append(programRequestTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// ProgramRequestStatusActive captures enum value "Active"
+	ProgramRequestStatusActive string = "Active"
+
+	// ProgramRequestStatusInactive captures enum value "Inactive"
+	ProgramRequestStatusInactive string = "Inactive"
+)
+
+// prop value enum
+func (m *ProgramRequest) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, programRequestTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *ProgramRequest) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
+		return err
+	}
+
 	return nil
 }
 
