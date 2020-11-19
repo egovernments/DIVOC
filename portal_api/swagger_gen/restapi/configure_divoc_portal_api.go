@@ -5,7 +5,7 @@ package restapi
 import (
 	"crypto/tls"
 	"net/http"
-
+	"github.com/divoc/portal-api/pkg"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
@@ -13,7 +13,7 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal interface{}
+//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal interface{} --exclude-main
 
 func configureFlags(api *operations.DivocPortalAPIAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -45,6 +45,7 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 		}
 	}
 
+	pkg.SetupHandlers(api)
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer
 	//
