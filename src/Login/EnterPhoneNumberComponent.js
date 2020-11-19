@@ -5,13 +5,14 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../Services/apiServices";
 import {useLogin} from "./Login";
+import {LoginLabels} from "../Base/Constants";
 
 const PHONE_NUMBER_MAX = 10
 
 export function EnterPhoneNumberComponent() {
     const {state, goToVerifyOtp} = useLogin();
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState()
+    const [error, setError] = useState(null)
     const [phoneNumber, setPhoneNumber] = useState(state.mobileNumber)
 
     const handlePhoneNumberOnChange = (e) => {
@@ -21,9 +22,9 @@ export function EnterPhoneNumberComponent() {
     }
 
     return <Col className="phone-container">
-        <h2 className="title">Enter Mobile Number</h2>
-        <Form className="input-phone">
-
+        <h5 className="title">{LoginLabels.WELCOME}</h5>
+        <p className="subtitle">{LoginLabels.LOGIN_MSG}</p>
+        <Form className="input">
             <InputGroup>
                 <InputGroup.Prepend>
                     <InputGroup.Text>+91</InputGroup.Text>
@@ -36,9 +37,9 @@ export function EnterPhoneNumberComponent() {
                               onChange={handlePhoneNumberOnChange}/>
             </InputGroup>
         </Form>
-        <Button className="button" disabled={loading} onClick={() => {
+        <Button className="button" variant={"success"} disabled={loading} onClick={() => {
             if (!phoneNumber || phoneNumber.length !== PHONE_NUMBER_MAX) {
-                setError("Invalid phone number")
+                setError(LoginLabels.ERROR_MSG_INVALID_PHONE_NUMBER)
                 return;
             }
             setLoading(true)
@@ -49,7 +50,7 @@ export function EnterPhoneNumberComponent() {
                 setLoading(false)
                 setError(e.message)
             });
-        }}>{loading ? "Loading..." : "Get OTP"}</Button>
+        }}>{loading ? LoginLabels.LABEL_LOADING : LoginLabels.BTN_GET_OTP}</Button>
         {!loading && error && <p>{error}</p>}
     </Col>;
 }

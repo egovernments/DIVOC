@@ -9,9 +9,8 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: 100vh;
 
-    .input-phone {
+    .input {
       margin: 8px;
       padding: 8px;
 
@@ -26,9 +25,16 @@
     padding: 8px;
   }
 
+  .subtitle {
+    font-weight: 150;
+    font-size: small;
+    padding-bottom: 16px;
+  }
 
   .button {
-    margin: 8px;
-    padding: 8px;
+    margin: 8%;
+    font-size: small;
+    font-weight: bold;
+    padding: 8px 24px 8px 24px;
   }
 }

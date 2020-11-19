@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../Services/apiServices";
 import {useLogin} from "./Login";
+import {LoginLabels} from "../Base/Constants";
 
 const OTP_NUMBER_MAX = 4
 
@@ -12,7 +13,7 @@ export function VerifyOTPComponent() {
     const {state, goToHome} = useLogin();
     const {saveUserToken} = useAuthorizedUser();
     const [loading, setLoading] = useState(false)
-    const [error, setError] = useState()
+    const [error, setError] = useState(null)
     const [otpNumber, setOtpNumber] = useState(state.otp)
 
     const handlePhoneNumberOnChange = (e) => {
@@ -22,14 +23,15 @@ export function VerifyOTPComponent() {
     }
 
     return <Col className="phone-container">
-        <h2 className="title">Enter OTP</h2>
-        <Form className="input-phone">
+        <h5 className="title">{LoginLabels.WELCOME}</h5>
+        <p className="subtitle">{LoginLabels.LOGIN_MSG}</p>
+        <Form className="input">
             <Form.Control className="control" type="number" value={otpNumber}
                           onChange={handlePhoneNumberOnChange}/>
         </Form>
-        <Button className="button" disabled={loading} onClick={() => {
+        <Button className="button" variant={"success"} disabled={loading} onClick={() => {
             if (!otpNumber || otpNumber.length !== OTP_NUMBER_MAX) {
-                setError("Invalid otp")
+                setError(LoginLabels.ERROR_MSG_INVALID_OTP)
                 return;
             }
             setLoading(true)
@@ -41,7 +43,7 @@ export function VerifyOTPComponent() {
                 setLoading(false)
                 setError(e.message)
             });
-        }}>{loading ? "Loading..." : "Login"}</Button>
+        }}>{loading ? LoginLabels.LABEL_LOADING : LoginLabels.BTN_LOGIN}</Button>
         {!loading && error && <p>{error}</p>}
     </Col>;
 }
