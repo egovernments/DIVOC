@@ -38,12 +38,18 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	// Applies when the "Authorization" header is set
-	if api.IsUserAuth == nil {
-		api.IsUserAuth = func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
-		}
+	api.HasRoleAuth = func(jwtToken string, expectedRole []string) (interface{}, error) {
+		//todo: enforce jwt role/scope check
+		return "user", nil
 	}
+
+
+	//// Applies when the "Authorization" header is set
+	//if api.IsUserAuth == nil {
+	//	api.IsUserAuth = func(token string) (interface{}, error) {
+	//		return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
+	//	}
+	//}
 
 	pkg.SetupHandlers(api)
 	// Set your custom authorizer if needed. Default one is security.Authorized()

@@ -65,6 +65,13 @@ func init() {
     },
     "/medicine": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
         "summary": "Create Medicine",
         "operationId": "createMedicine",
         "parameters": [
@@ -223,6 +230,16 @@ func init() {
     }
   },
   "securityDefinitions": {
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://dummy.oauth.net/auth",
+      "tokenUrl": "https://dumy.oauth.net/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facilityAdmin": "scope of facility admin"
+      }
+    },
     "isAdmin": {
       "type": "apiKey",
       "name": "Authorization",
@@ -241,7 +258,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "admin"
+      ]
     }
   ]
 }`))
@@ -293,6 +312,13 @@ func init() {
     },
     "/medicine": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
         "summary": "Create Medicine",
         "operationId": "createMedicine",
         "parameters": [
@@ -464,6 +490,16 @@ func init() {
     }
   },
   "securityDefinitions": {
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://dummy.oauth.net/auth",
+      "tokenUrl": "https://dumy.oauth.net/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facilityAdmin": "scope of facility admin"
+      }
+    },
     "isAdmin": {
       "type": "apiKey",
       "name": "Authorization",
@@ -482,7 +518,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "admin"
+      ]
     }
   ]
 }`))
