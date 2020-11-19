@@ -4,15 +4,9 @@ info:
   title: Digital Vaccination certification verification API
   description: Digital Vaccination certification verification API
 
-# Under securityDefinitions we declare which security schemes can be used.
-# These definitions do not affect to the operations, but can be applied
-# using the 'security' key at the global level or the operation level.
-# In this sample, we'll see how to apply the security definition globally,
-# and override it at the operation level.
-#
-# Note that for Access Code Flow, you must provide the Token URL.
-securityDefinitions: #TODO check security for provider
-  accessCode:
+securityDefinitions:
+# This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
+  hasRole:
     type: oauth2
     # This should be updated to the Token URL of your OAuth provider.
     tokenUrl: http://example.com/oauth/token
@@ -20,16 +14,14 @@ securityDefinitions: #TODO check security for provider
     authorizationUrl: http://example.com/oauth/auth
     flow: accessCode
     scopes:
-      write: allows modifying resources
-      read: allows reading resources
+      verifier: allows verification of the vaccination certificates
 
 # Here we apply the security flow called 'accessCode' globally to all the operations in the spec.
 # This security scheme is defined above in the 'securityDefinitions' section.
 # Global security can be overridden an operation level as seen in the example below
 security:
-  - accessCode:
-      - read
-      - write
+  - hasRole:
+      - verifier
 paths:
   /verify:
     # In this operation we do not apply the security, because it was applied globally above.
@@ -59,4 +51,7 @@ definitions:
     properties:
       certificate:
         type: object
+
 basePath: /divoc/api/v1
+schemes:
+  - https
