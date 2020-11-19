@@ -20,7 +20,7 @@ api_docs:
 build: divoc-portal-api-server
 
 divoc-portal-api-server: swagger_gen/restapi/server.go
-	@echo "Building Server to $(PWD)/divoc-server ..."
+	@echo "Building Server to $(PWD)/divoc-portal-api-server ..."
 	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/portal-api/cmd/divoc-portal-api-server
 
 clean:
