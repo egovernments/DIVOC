@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "$comment": "Signature schema definition",
+  "properties": {
+    "signatures": {
+      "$ref": "#/definitions/Signature"
+    }
+  },
+  "title":"signatures",
+  "definitions": {
+    "Signature": {
+      "$id": "#/properties/Signature",
+      "type": "object",
+      "title": "The Signature Schema for the registry",
+      "required": [
+        "@type",
+        "signatureFor",
+        "creator",
+        "created",
+        "signatureValue"
+      ],
+      "properties": {
+        "@type": {
+          "$id": "#/properties/@type",
+          "type": "string",
+          "default": "sc:RsaSignature2018",
+          "enum": [
+            "sc:LinkedDataSignature2015",
+            "sc:GraphSignature2012",
+            "sc:RsaSignature2018"
+          ]
+        },
+        "signatureFor": {
+          "$id": "#/properties/signatureFor",
+          "type": "string",
+          "$comment": "The attribute name or entity id you for which this is the signature",
+          "examples": [
+            "http://localhost:8080/serialNum",
+            "http://localhost:8080/9cba6ddd-330c-4a0d-929a-771bb12cb0d3"
+          ]
+        },
+        "creator": {
+          "$id": "#/properties/creator",
+          "type": "string",
+          "format": "uri",
+          "$comment": "IRI where the public key associated could be retrieved",
+          "examples": [
+            "https://example.com/i/pat/keys/"
+          ]
+        },
+        "created": {
+          "$id": "#/properties/created",
+          "type": "string",
+          "format": "date-time",
+          "$comment": "Timestamp",
+          "default": "",
+          "examples": [
+            "2017-09-23T20:21:34Z"
+          ]
+        },
+        "nonce": {
+          "$id": "#/properties/nonce",
+          "type": "string",
+          "$comment": "Some unique value for tracking",
+          "examples": [
+            "guid"
+          ]
+        },
+        "signatureValue": {
+          "$id": "#/properties/signatureValue",
+          "type": "string",
+          "$comment": "Hash or signed value",
+          "examples": [
+            "eyiOiJKJeXAasddOEjgFWFXk"
+          ]
+        }
+      }
+    }
+  },
+  "_osConfig": {
+         "osComment": "Refer to _osconfig $comment section of Teacher.json",
+         "privateFields": [],
+         "signedFields": []
+  }
+}

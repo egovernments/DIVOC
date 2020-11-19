@@ -1,0 +1,62 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Digital Vaccination certification verification API
+  description: Digital Vaccination certification verification API
+
+# Under securityDefinitions we declare which security schemes can be used.
+# These definitions do not affect to the operations, but can be applied
+# using the 'security' key at the global level or the operation level.
+# In this sample, we'll see how to apply the security definition globally,
+# and override it at the operation level.
+#
+# Note that for Access Code Flow, you must provide the Token URL.
+securityDefinitions: #TODO check security for provider
+  accessCode:
+    type: oauth2
+    # This should be updated to the Token URL of your OAuth provider.
+    tokenUrl: http://example.com/oauth/token
+    # This should be updated to the Authorization URL of your OAuth provider.
+    authorizationUrl: http://example.com/oauth/auth
+    flow: accessCode
+    scopes:
+      write: allows modifying resources
+      read: allows reading resources
+
+# Here we apply the security flow called 'accessCode' globally to all the operations in the spec.
+# This security scheme is defined above in the 'securityDefinitions' section.
+# Global security can be overridden an operation level as seen in the example below
+security:
+  - accessCode:
+      - read
+      - write
+paths:
+  /verify:
+    # In this operation we do not apply the security, because it was applied globally above.
+    # The security will be applied to this operation for that reason.
+    post:
+      tags:
+        - certification
+      summary: Verify digitally signed vaccination certificate
+      description: Verify digitally signed vaccination certificate accepts signed certificate and verifies the claim.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/VerificationRequest'
+      responses:
+        200:
+          description: OK
+        206:
+          description: partial content, need additional information or action for identity assertion.
+        401:
+          description: Invalid identity assertion.
+        400:
+          description: Invalid format of the claim or identity
+definitions:
+  VerificationRequest:
+    type: object
+    properties:
+      certificate:
+        type: object
+basePath: /divoc/api/v1
