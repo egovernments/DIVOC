@@ -97,12 +97,55 @@ definitions:
     properties:
       name:
         type: string
-      #todo add other
+      description:
+        type: string
+      logoURL:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
   CreateMedicineRequest:
     type: object
     properties:
       name:
         type: string
+      provider:
+        type: string
+      schedule:
+        type: object
+        properties:
+          repeatTimes:
+            type: number
+            description: How many times vaccination should be taken
+          repeatInterval:
+            type: number
+            description: Number of times the vaccination should be taken.
+      effectiveUntil:
+        type: number
+        description: Effective until n months after the full vaccination schedule is completed
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      price:
+        type: number
+        description: Indicative price if fixed or max price available.
+
+
 host: divoc.xiv.in
 schemes:
   - https
