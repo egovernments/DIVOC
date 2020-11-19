@@ -37,7 +37,7 @@ export function EnterPhoneNumberComponent() {
                               onChange={handlePhoneNumberOnChange}/>
             </InputGroup>
         </Form>
-        <Button className="button" variant={"success"} disabled={loading} onClick={() => {
+        <Button className="button" variant={"primary"} disabled={loading} onClick={() => {
             if (!phoneNumber || phoneNumber.length !== PHONE_NUMBER_MAX) {
                 setError(LoginLabels.ERROR_MSG_INVALID_PHONE_NUMBER)
                 return;

@@ -26,3 +26,14 @@ export const Loader = () => {
     );
 };
 
+
+export function AppLogo(props) {
+    return (
+        <div className={"logo-container"}>
+            <h1>
+                <span className={"first"}>LO</span>
+                <span className={"second"}>GO</span>
+            </h1>
+        </div>
+    );
+}

@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./Login.scss"
-import {DivocFooter, DivocHeader} from "../Base/Base";
+import {AppLogo, DivocFooter, DivocHeader} from "../Base/Base";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useHistory} from "react-router";
 import {VerifyOTPComponent} from "./VerifyOTPComponent";
@@ -8,7 +8,7 @@ import {EnterPhoneNumberComponent} from "./EnterPhoneNumberComponent";
 
 export function LoginComponent() {
     return <div className={"login-container"}>
-        <DivocHeader/>
+        <AppLogo/>
         <LoginProvider>
             <Router>
                 <Switch>
@@ -17,7 +17,6 @@ export function LoginComponent() {
                 </Switch>
             </Router>
         </LoginProvider>
-        <DivocFooter/>
     </div>
 }
 

@@ -1,3 +1,5 @@
+@import "styles/colors.scss";
+
 .header {
   background: #61dafb;
   height: 80px;
@@ -18,4 +20,18 @@
   background-color: #282c34;
   overflow-x: hidden;
   transition: 0.5s;
+}
+
+.logo-container {
+  text-align: center;
+  margin-top: 8%;
+  letter-spacing: 2px;
+
+  .first {
+    color: $primaryThemeColor;
+  }
+
+  .second {
+    color: $textColor;
+  }
 }

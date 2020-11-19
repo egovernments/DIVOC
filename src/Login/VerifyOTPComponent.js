@@ -29,7 +29,7 @@ export function VerifyOTPComponent() {
             <Form.Control className="control" type="number" value={otpNumber}
                           onChange={handlePhoneNumberOnChange}/>
         </Form>
-        <Button className="button" variant={"success"} disabled={loading} onClick={() => {
+        <Button className="button" variant={"primary"} disabled={loading} onClick={() => {
             if (!otpNumber || otpNumber.length !== OTP_NUMBER_MAX) {
                 setError(LoginLabels.ERROR_MSG_INVALID_OTP)
                 return;

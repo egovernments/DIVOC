@@ -1,8 +1,14 @@
+@import "styles/common-mixins.scss";
+@import "styles/colors.scss";
+
 .login-container {
   display: flex;
+  @include card-box-shadow();
+  background-color: white;
   flex-direction: column;
+  margin: 16px;
   justify-content: space-between;
-  height: 100vh;
+  height: 100%;
 
   .phone-container {
     display: flex;
@@ -23,6 +29,7 @@
   .title {
     margin: 8px;
     padding: 8px;
+    text-align: center;
   }
 
   .subtitle {
@@ -35,6 +42,7 @@
     margin: 8%;
     font-size: small;
     font-weight: bold;
+    color: $textWhiteColor;
     padding: 8px 24px 8px 24px;
   }
 }
