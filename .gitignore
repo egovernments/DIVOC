@@ -10,3 +10,4 @@ build
 .env.production.local
 coverage
 */.gitignore
+portal_api/divoc-portal-api-server

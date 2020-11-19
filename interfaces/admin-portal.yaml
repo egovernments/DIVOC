@@ -1,0 +1,109 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc Portal API
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  isUser:
+    type: apiKey
+    name: Authorization
+    in: header
+  isAdmin:
+    type: apiKey
+    name: Authorization
+    in: header
+  isFacilityAdmin:
+    type: apiKey
+    name: Authorization
+    in: header
+security:
+  - isUser: []
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /facilities:
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /vaccinators:
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /program:
+    post:
+      summary: Create program
+      operationId: createProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramRequest'
+          description: Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /medicine:
+    post:
+      summary: Create Medicine
+      operationId: createMedicine
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/CreateMedicineRequest'
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+definitions:
+  ProgramRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      #todo add other
+  CreateMedicineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /divoc/admin/api/v1
