@@ -2,6 +2,7 @@ import React from 'react';
 import {useAuthorizedUser} from "../authentication";
 import Button from 'react-bootstrap/Button'
 import './Home.scss'
+import Card from "react-bootstrap/Card";
 
 Home.propTypes = {};
 
@@ -10,9 +11,11 @@ function Home(props) {
     console.log(state);
     return (
         <div className={"home-container"}>
-            <Button variant="success" onClick={() => {
-                logout();
-            }}>Logout</Button>{' '}
+            <Card>
+                <Button variant="success" onClick={() => {
+                    logout();
+                }}>Logout</Button>{' '}
+            </Card>
         </div>
     );
 }

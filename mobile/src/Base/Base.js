@@ -39,14 +39,12 @@ export function AppLogo(props) {
     );
 }
 
-export function AlertComponent(props) {
-    const [show, setShow] = useState(true);
+export function ErrorAlert({message, onClose}) {
 
-    if (show) {
+    if (message) {
         return (
-            <Alert variant="danger" onClose={() => setShow(false)} dismissible>
-                <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
-                <p>{props.message}</p>
+            <Alert variant="danger" onClose={onClose} dismissible>
+                <p>{message}</p>
             </Alert>
         );
     }
