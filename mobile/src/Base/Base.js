@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useState} from 'react';
 import './Base.scss'
+import Alert from "react-bootstrap/Alert";
 
 export const DivocHeader = () => {
     return (
@@ -36,4 +37,18 @@ export function AppLogo(props) {
             </h1>
         </div>
     );
+}
+
+export function AlertComponent(props) {
+    const [show, setShow] = useState(true);
+
+    if (show) {
+        return (
+            <Alert variant="danger" onClose={() => setShow(false)} dismissible>
+                <Alert.Heading>Oh snap! You got an error!</Alert.Heading>
+                <p>{props.message}</p>
+            </Alert>
+        );
+    }
+    return <div/>
 }

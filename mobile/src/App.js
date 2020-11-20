@@ -1,8 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.scss';
 import {LoginComponent} from "./Login/Login";
-import {AuthProvider, useAuthorizedUser} from "./authentication";
+import {useAuthorizedUser} from "./authentication";
 import Home from "./Home/Home";
 
 function App() {
