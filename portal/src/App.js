@@ -10,7 +10,7 @@ import Home from './components/Home'
 import About from './components/About'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
-import AdminView from './components/AdminView/AdminVIew';
+import VaccineRegistration from './components/VaccineRegistration/VaccineRegistration';
 
 export default function App() {
     return (
@@ -41,7 +41,7 @@ export default function App() {
                         <Route path="/login"><Login/></Route>
                         <Route path="/dashboard"><Dashboard/></Route>
                         <Route path="/about"><About/></Route>
-                        <Route path="/admin"><AdminView/></Route>
+                        <Route path="/admin"><VaccineRegistration/></Route>
                     </Switch>
                 </div>
             </Router>

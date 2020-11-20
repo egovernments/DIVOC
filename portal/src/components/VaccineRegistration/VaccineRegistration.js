@@ -1,8 +1,8 @@
 import React from 'react';
 import RegistrationForm from '../RegistrationForm/RegistrationForm';
-import styles from './AdminView.module.css';
+import styles from './VaccineRegistration.module.css';
 
-function AdminView() {
+function VaccineRegistration() {
     return(
         <div className={styles['container']}>
             <div className={styles['registration-form']}>
@@ -15,4 +15,4 @@ function AdminView() {
     );
 }
 
-export default AdminView;
+export default VaccineRegistration;

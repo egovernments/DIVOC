@@ -5,7 +5,8 @@
 }
 .input{
     width: 80%;
-    
+    border: 1px solid #E8E9EC;
+    margin-bottom: 10px;
 }
 
 .box{
@@ -20,6 +21,15 @@
     border-bottom: 1px solid #5C9EF8 ;
 }
 
+.upload-button{
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    background-color:#5C9EF8;
+    margin-left: 5px;
+    color: white;
+    font-size: 10px;
+}
+
 .button {
     border: 2px solid #5C9EF8;
     border-radius: 6px;
@@ -32,5 +42,11 @@
 
 .title{
     color: #4D4F5C;
+    font-size: 12px;
+}
+
+.placeholder{
+    border: 1px solid #E8E9EC;
+    border-radius: 4px;
     font-size: 12px;
 }

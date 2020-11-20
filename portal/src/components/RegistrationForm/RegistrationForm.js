@@ -3,37 +3,46 @@ import styles from "./RegistrationForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import DropDown from "../DropDown/DropDown";
 
 function RegistrationForm() {
-    const [formInput, setFormInput] = useState({
+    const [formData, setFormInput] = useState({
         name: "",
         id: "",
-        date: new Date(),
+        effectiveUntil: new Date(),
         program: "",
         manf: "",
-        supplier: "",
+        provider: "",
         details: "",
         price: "",
+        file: "",
+        status: "active",
     });
 
+
     const handleSubmit = (event) => {
-        alert("You are submitting " + formInput.name + formInput.id);
+        console.log("form data", formData);
     };
     const handleFormInputChange = (e) => {
         let value = e.target.value;
-        setFormInput({ ...formInput, [e.target.name]: value });
+        setFormInput({ ...formData, [e.target.name]: value });
     };
+
 
     return (
         <div className={styles["form-container"]}>
-            <form className={styles["form"]} onSubmit={handleSubmit}>
+            <form
+                className={styles["form"]}
+                onSubmit={handleSubmit}
+                method="post"
+            >
                 <h1 className={styles["heading"]}>Register New Vaccine</h1>
 
                 <p className={styles["title"]}>Name of Vaccine / Medicine</p>
                 <input
                     type="text"
                     name="name"
-                    value={formInput.name}
+                    value={formData.name}
                     onChange={handleFormInputChange}
                     className={styles["input"]}
                     required
@@ -43,18 +52,19 @@ function RegistrationForm() {
                 <input
                     type="text"
                     name="id"
-                    value={formInput.id}
+                    value={formData.id}
                     onChange={handleFormInputChange}
                     className={styles["input"]}
                 />
 
                 <p className={styles["title"]}>Select Program</p>
+                <DropDown formData={formData} setFormData={setFormInput} />
 
                 <p className={styles["title"]}>Manufacturer</p>
                 <input
                     type="text"
                     name="manf"
-                    value={formInput.manf}
+                    value={formData.manf}
                     onChange={handleFormInputChange}
                     className={styles["input"]}
                     required
@@ -63,8 +73,8 @@ function RegistrationForm() {
                 <p className={styles["title"]}>Supplier / Distributor</p>
                 <input
                     type="text"
-                    name="supplier"
-                    value={formInput.supplier}
+                    name="provider"
+                    value={formData.provider}
                     onChange={handleFormInputChange}
                     className={styles["input"]}
                     required
@@ -76,7 +86,7 @@ function RegistrationForm() {
                         <input
                             type="text"
                             name="details"
-                            value={formInput.details}
+                            value={formData.details}
                             onChange={handleFormInputChange}
                             className={styles["input"]}
                             required
@@ -85,9 +95,9 @@ function RegistrationForm() {
                     <div>
                         <p className={styles["title"]}>Effective Until</p>
                         <DatePicker
-                            selected={formInput.date}
+                            selected={formData.effectiveUntil}
                             onChange={(date) =>
-                                setFormInput({ ...formInput, date: date })
+                                setFormInput({ ...formData, effectiveUntil: date })
                             }
                         />
                     </div>
@@ -98,7 +108,7 @@ function RegistrationForm() {
                         <input
                             type="number"
                             name="price"
-                            value={formInput.price}
+                            value={formData.price}
                             onChange={handleFormInputChange}
                             className={styles["input"]}
                             required
@@ -108,8 +118,27 @@ function RegistrationForm() {
                         <p className={styles["title"]}>
                             Vaccine Administering Details
                         </p>
-                        
-                        <input type="file" id="myfile" name="myfile" required/>
+                        <div className={styles["box"]}>
+                            <input
+                                type="file"
+                                id="actual-btn"
+                                onChange={(evt) =>
+                                    setFormInput({
+                                        ...formData,
+                                        file: evt.target.files[0],
+                                    })
+                                }
+                                hidden
+                                required
+                            />
+                            <label
+                                for="actual-btn"
+                                className={styles["upload-button"]}
+                                
+                            >
+                                Upload
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <button onClick={handleSubmit} className={styles["button"]}>
