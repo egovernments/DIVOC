@@ -1,3 +1,14 @@
 .DS_Store
 .idea
 target
+node_modules
+*.log
+vaccination_api/divoc-server
+build
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+coverage
+*/.gitignore
+portal_api/divoc-portal-api-server
