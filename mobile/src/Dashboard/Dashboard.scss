@@ -4,12 +4,15 @@
 .home-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   height: 100%;
 
-  .card {
-    height: 95%;
-    margin: 5%;
+  .host-container {
+    height: 100%;
+  }
+
+  .bottom-bar {
+    background-color: white;
   }
 
   .logout {
