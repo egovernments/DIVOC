@@ -5,10 +5,12 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  @include card-box-shadow();
-  background-color: white;
-  margin: 16px;
   height: 100%;
+
+  .card {
+    height: 95%;
+    margin: 5%;
+  }
 
   .logout {
     width: 50%;
