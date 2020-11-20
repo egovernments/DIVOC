@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import './Base.scss'
 import Alert from "react-bootstrap/Alert";
+import {Card} from "react-bootstrap";
 
 export const DivocHeader = () => {
     return (
@@ -50,3 +51,13 @@ export function ErrorAlert({message, onClose}) {
     }
     return <div/>
 }
+
+
+export function BaseCard({children}) {
+    return (
+        <Card>
+            <div>{children}</div>
+        </Card>
+    );
+}
+
