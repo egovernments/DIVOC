@@ -1,4 +1,4 @@
-module github.com/divoc/api
+module github.com/divoc/portal-api
 
 go 1.15
 

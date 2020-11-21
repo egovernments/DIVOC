@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Medicine": {
+      "$ref": "#/definitions/Medicine"
+    }
+  },
+  "required": [
+    "Medicine"
+  ],
+  "title": "Medicine",
+  "definitions": {
+    "Medicine": {
+      "$id": "#properties/Medicine",
+      "type": "object",
+      "title": "Medicine",
+      "required": [
+
+      ],
+      "properties": {
+        "name": {
+          "$id": "#/properties/name",
+          "type": "string",
+          "title": "Name"
+        },
+        "provider": {
+          "title": "Provider",
+          "type": "string",
+          "$id": "#/properties/provider"
+        },
+        "schedule": {
+          "title": "Schedule",
+          "type": "object",
+          "description": "How many times and how often vaccination should be repeated",
+          "properties": {
+            "repeatTimes": {
+              "type": "number",
+              "title": "Repeat times",
+              "description": "How many times vaccination should be taken"
+            },
+            "repeatInterval": {
+              "title": "Repeat interval",
+              "type": "number",
+              "description": "Number of times the vaccination should be taken."
+            }
+          }
+        },
+        "effectiveUntil": {
+          "type": "number",
+          "description": "Effective until n months after the full vaccination schedule is completed",
+          "title": "Effective until (months)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Active", "Inactive", "Blocked"],
+          "title": "Status"
+        },
+        "price": {
+          "title": "Price (if fixed)",
+          "type": "number"
+        }
+      }
+    }
+  }
+}

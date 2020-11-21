@@ -1,0 +1,170 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc Portal API
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  isUser:
+    type: apiKey
+    name: Authorization
+    in: header
+  isAdmin:
+    type: apiKey
+    name: Authorization
+    in: header
+  isFacilityAdmin:
+    type: apiKey
+    name: Authorization
+    in: header
+  hasRole:
+    # This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
+    # Alternatively, the query param: "access_token" may be used.
+    #
+    # In our scenario, we must use the query param version in order to avoid
+    # passing several headers with key 'Authorization'
+    type: oauth2
+    # The flow and URLs in spec are for documentary purpose: go-swagger does not implement OAuth workflows
+    flow: accessCode
+    authorizationUrl: 'https://dummy.oauth.net/auth'
+    tokenUrl: 'https://dumy.oauth.net/token'
+    # Required scopes are passed by the runtime to the authorizer
+    scopes:
+      admin: scope of super admin
+      facilityAdmin: scope of facility admin
+
+security:
+  - hasRole: ['admin']
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /facilities:
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /vaccinators:
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /program:
+    post:
+      summary: Create program
+      operationId: createProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramRequest'
+          description: Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /medicine:
+    post:
+      summary: Create Medicine
+      operationId: createMedicine
+      security:
+        - hasRole: ['admin']
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/CreateMedicineRequest'
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+definitions:
+  ProgramRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      logoURL:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
+  CreateMedicineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      provider:
+        type: string
+      schedule:
+        type: object
+        properties:
+          repeatTimes:
+            type: number
+            description: How many times vaccination should be taken
+          repeatInterval:
+            type: number
+            description: Number of times the vaccination should be taken.
+      effectiveUntil:
+        type: number
+        description: Effective until n months after the full vaccination schedule is completed
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      price:
+        type: number
+        description: Indicative price if fixed or max price available.
+
+
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /divoc/admin/api/v1
