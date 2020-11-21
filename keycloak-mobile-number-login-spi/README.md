@@ -6,9 +6,8 @@ Setup:
 * Add the jar to the Keycloak server:
   * `$ cp target/keycloak-mobile-number-login-spi-1.0-SNAPSHOT.jar _KEYCLOAK_HOME_/providers/`
 
-* Add two templates to the Keycloak server:
-  * `$ cp mobile-login.ftl _KEYCLOAK_HOME_/themes/base/login/`
-  * `$ cp verify-otp.ftl _KEYCLOAK_HOME_/themes/base/login/`
+* Add custom theme to the Keycloak server:
+  * `$ cp themes/divoc _KEYCLOAK_HOME_/themes/divoc`
 
 Configure your REALM to use the provider.
 First create a new REALM (or select a previously created REALM).

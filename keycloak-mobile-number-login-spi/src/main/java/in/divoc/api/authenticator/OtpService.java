@@ -5,7 +5,7 @@ import org.jboss.logging.Logger;
 import java.util.Random;
 
 class OtpService {
-    private static final Logger logger = Logger.getLogger(MobileNumberAuthenticator.class);
+    private static final Logger logger = Logger.getLogger(OtpService.class);
 
     String sendOtp(String mobileNumber) {
         Random rand = new Random();
