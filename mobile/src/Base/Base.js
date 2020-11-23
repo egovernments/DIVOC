@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './Base.scss'
 import Alert from "react-bootstrap/Alert";
 import {Card} from "react-bootstrap";
+import PropTypes from "prop-types";
+import Nav from "react-bootstrap/Nav";
 
 export const DivocHeader = () => {
     return (
@@ -55,9 +57,24 @@ export function ErrorAlert({message, onClose}) {
 
 export function BaseCard({children}) {
     return (
-        <Card>
-            <div>{children}</div>
-        </Card>
+        <Card className={"my-card"}>{children}</Card>
     );
 }
 
+
+BottomItem.propTypes = {
+    src: PropTypes.string.isRequired,
+    href: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired
+};
+
+export function BottomItem({src, href, title}) {
+    return <Nav.Item>
+        <Nav.Link eventKey={title} href={href}>
+            <div className={'bottom-item'}>
+                <img className={'icon'} src={src} alt={""}/>
+                <h6 className={'title'}>{title}</h6>
+            </div>
+        </Nav.Link>
+    </Nav.Item>;
+}

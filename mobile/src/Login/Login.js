@@ -1,15 +1,14 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./Login.scss"
-import {AppLogo, DivocFooter, DivocHeader} from "../Base/Base";
+import {AppLogo, BaseCard, DivocFooter, DivocHeader} from "../Base/Base";
 import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
 import {useHistory} from "react-router";
 import {VerifyOTPComponent} from "./VerifyOTPComponent";
 import {EnterPhoneNumberComponent} from "./EnterPhoneNumberComponent";
-import Card from "react-bootstrap/Card";
 
 export function LoginComponent() {
     return <div className={"login-container"}>
-        <Card>
+        <BaseCard>
             <AppLogo/>
             <LoginProvider>
                 <Router>
@@ -19,7 +18,7 @@ export function LoginComponent() {
                     </Switch>
                 </Router>
             </LoginProvider>
-        </Card>
+        </BaseCard>
     </div>
 }
 

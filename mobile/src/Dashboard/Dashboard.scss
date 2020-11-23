@@ -1,13 +1,15 @@
 @import "styles/common-mixins.scss";
 @import "styles/colors.scss";
 
-.home-container {
+.dashboard-container {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
 
   .host-container {
+    display: flex;
+    flex-direction: column;
     height: 100%;
   }
 
