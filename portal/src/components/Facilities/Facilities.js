@@ -22,20 +22,16 @@ function Facilities(){
             }
           }
         
-        setUploadPercentage( 100)
+        const config = {
+            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json"}
+        };
+        axios.post("divoc/admin/api/v1/facilities", data, config ,options).then(res => { 
+            console.log(res)
+            setUploadPercentage( 100)
             setTimeout(() => {
             setUploadPercentage(0)
-        }, 500);
-      
-        //   axios.post("https://www.mocky.io/v2/5cc8019d300000980a055e76", data, options).then(res => { 
-        //       console.log(res)
-        //       setUploadPercentage( 100)
-        //       setTimeout(() => {
-        //         setUploadPercentage(0)
-        //       }, 500);
-              
-              
-        //   })
+            }, 500);
+        })
     }
     return(
         <div className={styles['container']}>
@@ -46,6 +42,7 @@ function Facilities(){
                     onChange={(evt) =>
                         uploadFile(evt)
                     }
+                    accept=".csv"
                     hidden
                     required
                 />

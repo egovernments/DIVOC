@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios';
 import styles from "./RegistrationForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -8,20 +9,24 @@ import DropDown from "../DropDown/DropDown";
 function RegistrationForm() {
     const [formData, setFormInput] = useState({
         name: "",
-        id: "",
-        effectiveUntil: new Date(),
-        program: "",
-        manf: "",
         provider: "",
-        details: "",
-        price: "",
-        file: "",
-        status: "active",
+        schedule: {
+            repeatTimes: 0,
+            repeatInterval: 0
+        },
+        effectiveUntil: 0,
+        status: "Active",
+        price: 0,
     });
-
 
     const handleSubmit = (event) => {
         console.log("form data", formData);
+        const config = {
+            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json"}
+        };
+        axios.post("/divoc/admin/api/v1/medicine", formData ,config).then(res => {
+              console.log(res)
+          })
     };
     const handleFormInputChange = (e) => {
         let value = e.target.value;
@@ -79,20 +84,44 @@ function RegistrationForm() {
                     className={styles["input"]}
                     required
                 />
-
+                <p className={styles["title"]}>Schedule Details</p>
                 <div className={styles["box"]}>
                     <div>
-                        <p className={styles["title"]}>Schedule Details</p>
+                        <p className={styles["title"]}>Repeat Times</p>
                         <input
-                            type="text"
-                            name="details"
-                            value={formData.details}
-                            onChange={handleFormInputChange}
+                            type="number"
+                            onChange={(evt) =>
+                                setFormInput({
+                                    ...formData,
+                                    schedule: {
+                                        ...formData.schedule,
+                                        repeatTimes: parseInt(evt.target.value)
+                                    },
+                                })
+                            }
                             className={styles["input"]}
                             required
                         />
                     </div>
                     <div>
+                        <p className={styles["title"]}>Repeat Interval</p>
+                        <input
+                            type="number"
+                            onChange={(evt) =>
+                                setFormInput({
+                                    ...formData,
+                                    schedule: {
+                                        ...formData.schedule,
+                                        repeatInterval: parseInt(evt.target.value)
+                                    },
+                                })
+                            }
+                            className={styles["input"]}
+                            required
+                        />
+                    </div>
+                </div>
+                <div>
                         <p className={styles["title"]}>Effective Until</p>
                         <DatePicker
                             selected={formData.effectiveUntil}
@@ -100,7 +129,6 @@ function RegistrationForm() {
                                 setFormInput({ ...formData, effectiveUntil: date })
                             }
                         />
-                    </div>
                 </div>
                 <div className={styles["box"]}>
                     <div>
@@ -128,20 +156,12 @@ function RegistrationForm() {
                                         file: evt.target.files[0],
                                     })
                                 }
-                                hidden
                                 required
                             />
-                            <label
-                                for="actual-btn"
-                                className={styles["upload-button"]}
-                                
-                            >
-                                Upload
-                            </label>
                         </div>
                     </div>
                 </div>
-                <button onClick={handleSubmit} className={styles["button"]}>
+                <button type="button" onClick={handleSubmit} className={styles["button"]}>
                     SAVE
                 </button>
             </form>
