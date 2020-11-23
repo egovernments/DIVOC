@@ -47,14 +47,14 @@ function Facilities(){
                     required
                 />
                 <label
-                    for='actual-btn'
+                    htmlFor='actual-btn'
                     className={styles['button']}
                 >
                     UPLOAD CSV
                 </label>
             </div>
             <div className={styles['progress-bar-container']}>
-                <div className={styles['progress-bar']}>{uploadPercentage>0 && `${uploadPercentage}%`}</div>
+                <div className={styles['progress-bar']}>{uploadPercentage>0 &&`${uploadPercentage}%`}</div>
                 <div>{uploadPercentage>0 && <ProgressBar now={uploadPercentage} active/>}</div>
             </div>
             

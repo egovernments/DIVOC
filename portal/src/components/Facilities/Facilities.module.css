@@ -2,7 +2,7 @@
     background: #ffffff;
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px;
-    padding-left: 30px;
+    margin-left: 30px;
     display: flex;
     width: 50%;
 }
@@ -12,17 +12,18 @@
     border-radius: 6px;
     letter-spacing: 1.5px;
     color: #5C9EF8;
-    padding-left: 1.5em;
-    padding-right: 1.5em;
-    width: 100%;
+    padding-left: 1em;
+    padding-right: 1em;
     white-space: nowrap;
+    margin: 15px;
 }
 
 .progress-bar-container{
-    padding-left: 1em;
+    padding: 1em;
     width: 100%;
 }
 
 .progress-bar{
     color: #5C9EF8;
+    text-align: right;
 }
