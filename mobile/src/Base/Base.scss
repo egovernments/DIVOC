@@ -37,7 +37,20 @@
   }
 }
 
-.card {
+.my-card {
   height: 95%;
   margin: 5%;
+}
+
+.bottom-item {
+
+
+  .icon {
+    height: 30px;
+    width: 30px;
+  }
+
+  .title {
+    padding-top: 8px;
+  }
 }
