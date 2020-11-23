@@ -4,18 +4,6 @@ info:
   title: Divoc Portal API
   description: Digital infra for vaccination certificates
 securityDefinitions:
-  isUser:
-    type: apiKey
-    name: Authorization
-    in: header
-  isAdmin:
-    type: apiKey
-    name: Authorization
-    in: header
-  isFacilityAdmin:
-    type: apiKey
-    name: Authorization
-    in: header
   hasRole:
     # This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
     # Alternatively, the query param: "access_token" may be used.

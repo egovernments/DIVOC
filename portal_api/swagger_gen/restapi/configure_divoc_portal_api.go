@@ -4,11 +4,12 @@ package restapi
 
 import (
 	"crypto/tls"
-	"net/http"
 	"github.com/divoc/portal-api/pkg"
+	"github.com/divoc/portal-api/swagger_gen/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"net/http"
 
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 )
@@ -38,11 +39,7 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.HasRoleAuth = func(jwtToken string, expectedRole []string) (interface{}, error) {
-		//todo: enforce jwt role/scope check
-		return "user", nil
-	}
-
+	api.HasRoleAuth = utils.RoleAuthorizer
 
 	//// Applies when the "Authorization" header is set
 	//if api.IsUserAuth == nil {
