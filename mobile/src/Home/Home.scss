@@ -1,0 +1,16 @@
+@import "styles/common-mixins.scss";
+@import "styles/colors.scss";
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  @include card-box-shadow();
+  background-color: white;
+  margin: 16px;
+  height: 100%;
+
+  .logout {
+    width: 50%;
+  }
+}
