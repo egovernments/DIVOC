@@ -1,5 +1,6 @@
 @import "styles/common-mixins.scss";
 @import "styles/colors.scss";
+@import "styles/media-mixins.scss";
 
 .dashboard-container {
   display: flex;
@@ -11,6 +12,18 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+    width: 100%;
+  }
+
+  .nav {
+    flex-direction: row;
+  }
+
+  @include for-desktop() {
+    .nav {
+      flex-direction: column;
+    }
+    flex-direction: row-reverse;
   }
 
   .bottom-bar {
