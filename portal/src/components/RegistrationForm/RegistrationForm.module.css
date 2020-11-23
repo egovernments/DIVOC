@@ -50,3 +50,14 @@
     border-radius: 4px;
     font-size: 12px;
 }
+
+
+input[type="file"]
+{
+  display: none;
+}
+
+.upload-pdf{
+    color: #4D4F5C;
+    font-size: 10px;
+}

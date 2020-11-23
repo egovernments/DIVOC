@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 import styles from "./RegistrationForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -20,13 +20,14 @@ function RegistrationForm() {
     });
 
     const handleSubmit = (event) => {
-        console.log("form data", formData);
         const config = {
-            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json"}
+            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json" }
         };
-        axios.post("/divoc/admin/api/v1/medicine", formData ,config).then(res => {
-              console.log(res)
-          })
+        axios
+            .post("/divoc/admin/api/v1/medicine", formData, config)
+            .then((res) => {
+                console.log(res);
+            });
     };
     const handleFormInputChange = (e) => {
         let value = e.target.value;
@@ -95,7 +96,7 @@ function RegistrationForm() {
                                     ...formData,
                                     schedule: {
                                         ...formData.schedule,
-                                        repeatTimes: parseInt(evt.target.value)
+                                        repeatTimes: parseInt(evt.target.value),
                                     },
                                 })
                             }
@@ -112,7 +113,7 @@ function RegistrationForm() {
                                     ...formData,
                                     schedule: {
                                         ...formData.schedule,
-                                        repeatInterval: parseInt(evt.target.value)
+                                        repeatInterval: parseInt(evt.target.value),
                                     },
                                 })
                             }
@@ -122,13 +123,14 @@ function RegistrationForm() {
                     </div>
                 </div>
                 <div>
-                        <p className={styles["title"]}>Effective Until</p>
-                        <DatePicker
-                            selected={formData.effectiveUntil}
-                            onChange={(date) =>
-                                setFormInput({ ...formData, effectiveUntil: date })
-                            }
-                        />
+                    <p className={styles["title"]}>Effective Until</p>
+                    <DatePicker
+                        className={styles["input"]}
+                        selected={formData.effectiveUntil}
+                        onChange={(date) =>
+                            setFormInput({ ...formData, effectiveUntil: date })
+                        }
+                    />
                 </div>
                 <div className={styles["box"]}>
                     <div>
@@ -149,19 +151,36 @@ function RegistrationForm() {
                         <div className={styles["box"]}>
                             <input
                                 type="file"
-                                id="actual-btn"
-                                onChange={(evt) =>
+                                accept=".pdf"
+                                id="file"
+                                onChange={(evt) => {
                                     setFormInput({
                                         ...formData,
                                         file: evt.target.files[0],
-                                    })
-                                }
+                                    });
+                                }}
                                 required
                             />
+                            <label className={styles['upload-pdf']} htmlFor="file">
+                                {formData.file
+                                    ? formData.file.name
+                                    : " Upload PDF"}
+                            </label>
+                            <button
+                                type="button"
+                                onClick={handleSubmit}
+                                className={styles["upload-button"]}
+                            >
+                                Upload
+                            </button>
                         </div>
                     </div>
                 </div>
-                <button type="button" onClick={handleSubmit} className={styles["button"]}>
+                <button
+                    type="button"
+                    onClick={handleSubmit}
+                    className={styles["button"]}
+                >
                     SAVE
                 </button>
             </form>
