@@ -1,17 +1,28 @@
-export default function Login() {
+import * as React from 'react'
+import {useEffect} from 'react'
+import {Redirect, useLocation} from 'react-router-dom'
 
+import {useKeycloak} from '@react-keycloak/web'
 
-    function login() {
-        console.log('logging in');
-    }
+const Login = () => {
+  const location = useLocation();
+  const currentLocationState = location.state || {
+    from: {pathname: '/'},
+  };
+  const {keycloak} = useKeycloak();
 
-    return (
-        <div>
-            <div>
-                <label>Mobile</label><input type="text"/>
-                <label>OTP</label> <input type="number"/>
-                <button onClick={login}>Login</button>
-            </div>
-        </div>
-    );
-}
+  useEffect(() => {
+    keycloak.login()
+  }, []);
+
+  if (keycloak.authenticated) {
+    return <Redirect to={currentLocationState}/>;
+  }
+  return (
+    <div>
+      Login
+    </div>
+  )
+};
+
+export default Login
