@@ -9,7 +9,7 @@ function DropDown({ formData, setFormData}) {
     const options = ['C-19 Program'];
     
     const handleChange = (selectedItemFromDropdown) => {
-        setFormData({ ...formData, program: selectedItemFromDropdown });
+        setFormData({ ...formData, program: selectedItemFromDropdown.value });
     };
     return(
         <div style={{width: '80%'}}>
@@ -17,7 +17,6 @@ function DropDown({ formData, setFormData}) {
                 options={options}
                 onChange={handleChange}
                 placeholder='Please select vaccine program'
-                // value={options[0]}
                 className={styles['dropdown']}
                 placeholderClassName={styles['place-holder']}
                 menuClassName={styles['menu-items']}

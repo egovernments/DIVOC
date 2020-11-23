@@ -11,6 +11,7 @@ import About from './components/About'
 import Login from './components/Login'
 import Dashboard from './components/Dashboard'
 import VaccineRegistration from './components/VaccineRegistration/VaccineRegistration';
+import Facilities from './components/Facilities/Facilities';
 
 export default function App() {
     return (
@@ -42,6 +43,7 @@ export default function App() {
                         <Route path="/dashboard"><Dashboard/></Route>
                         <Route path="/about"><About/></Route>
                         <Route path="/admin"><VaccineRegistration/></Route>
+                        <Route path="/facilities"><Facilities/></Route>
                     </Switch>
                 </div>
             </Router>
