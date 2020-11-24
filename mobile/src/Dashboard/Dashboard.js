@@ -11,34 +11,39 @@ import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
 import {SelectLanguage} from "../Language/Language";
 import {Logout} from "../Logout/Logout";
+import {PrivateRoute} from "../utils/PrivateRoute";
+import {LoginComponent} from "../Login/Login";
 
 Dashboard.propTypes = {};
 
 function Dashboard(props) {
     const {selectedKey, setSelectedKey} = useState("home")
     return (
-        <div className={"dashboard-container"}>
-            <div className={"host-container"}>
-                <Router>
+        <Router>
+            <div className={"dashboard-container"}>
+                <div className={"host-container"}>
+
                     <Switch>
-                        <Route path="/" exact component={Home}/>
-                        <Route path="/language" exact component={SelectLanguage}/>
-                        <Route path="/queue" exact component={Queue}/>
-                        <Route path="/logout" exact component={Logout}/>
+                        <PrivateRoute path="/" exact component={Home}/>
+                        <PrivateRoute path="/language" exact component={SelectLanguage}/>
+                        <PrivateRoute path="/queue" exact component={Queue}/>
+                        <PrivateRoute path="/logout" exact component={Logout}/>
+                        <Route path="/login" exact component={LoginComponent}/>
                     </Switch>
-                </Router>
+
+                </div>
+                <div className={"bottom-bar"}>
+                    <Nav justify variant="tabs" defaultActiveKey="/"
+                         activeKey={selectedKey}
+                         onSelect={(k) => setSelectedKey(k)}>
+                        <BottomItem src={home} href={"/"} title={"Home"}/>
+                        <BottomItem src={language} href={"/language"} title={"Language"}/>
+                        <BottomItem src={queue} href={"/queue"} title={"Queue"}/>
+                        <BottomItem src={logout} href={"/logout"} title={"Logout"}/>
+                    </Nav>
+                </div>
             </div>
-            <div className={"bottom-bar"}>
-                <Nav justify variant="tabs" defaultActiveKey="/"
-                     activeKey={selectedKey}
-                     onSelect={(k) => setSelectedKey(k)}>
-                    <BottomItem src={home} href={"/"} title={"Home"}/>
-                    <BottomItem src={language} href={"/language"} title={"Language"}/>
-                    <BottomItem src={queue} href={"/queue"} title={"Queue"}/>
-                    <BottomItem src={logout} href={"/logout"} title={"Logout"}/>
-                </Nav>
-            </div>
-        </div>
+        </Router>
     );
 }
 

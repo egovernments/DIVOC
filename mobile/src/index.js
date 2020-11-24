@@ -4,13 +4,16 @@ import './index.scss';
 import App from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import {AuthProvider} from "./authentication";
+import {ReactKeycloakProvider} from '@react-keycloak/web'
+import keycloak from "./utils/keycloak";
 
 ReactDOM.render(
     <React.StrictMode>
-        <AuthProvider>
+        <ReactKeycloakProvider
+            authClient={keycloak}
+        >
             <App/>
-        </AuthProvider>
+        </ReactKeycloakProvider>
     </React.StrictMode>,
     document.getElementById('root')
 );
