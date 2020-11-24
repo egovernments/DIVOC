@@ -41,11 +41,6 @@
           "type": "string",
           "$comment": "Code"
         },
-        "nationalIdentifier": {
-          "$id": "#/properties/nationalIdentifier",
-          "type": "string",
-          "$comment": "Nationality"
-        },
         "facilityName": {
           "$id": "#/properties/facilityName",
           "type": "string",
