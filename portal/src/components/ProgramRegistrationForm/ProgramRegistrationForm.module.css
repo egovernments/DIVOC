@@ -1,0 +1,63 @@
+.form-container{
+    box-shadow: 0px 6px 20px #C1CFD933;
+    vertical-align: middle;
+    padding: 10px;
+}
+.input{
+    width: 80%;
+    border: 1px solid #E8E9EC;
+    margin-bottom: 10px;
+}
+
+.box{
+    display: flex;
+}
+
+.heading{
+    color: #5C9EF8;
+    font-size: 20px;
+    font-weight: 500;
+    border: 15px;
+    border-bottom: 1px solid #5C9EF8 ;
+}
+
+.upload-button{
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    background-color:#5C9EF8;
+    margin-left: 5px;
+    color: white;
+    font-size: 10px;
+}
+
+.button {
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    background-color:white;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #5C9EF8;
+    margin-top: 15px;
+}
+
+.title{
+    color: #4D4F5C;
+    font-size: 12px;
+}
+
+.placeholder{
+    border: 1px solid #E8E9EC;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+
+input[type="file"]
+{
+  display: none;
+}
+
+.upload-pdf{
+    color: #4D4F5C;
+    font-size: 10px;
+}
