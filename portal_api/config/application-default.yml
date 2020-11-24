@@ -1,0 +1,5 @@
+registry:
+  url: http://localhost:8081
+  addOperationId: add
+  searchOperationId: search
+  readOperationId: read
