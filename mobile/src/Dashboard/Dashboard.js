@@ -13,6 +13,7 @@ import {SelectLanguage} from "../Language/Language";
 import {Logout} from "../Logout/Logout";
 import {PrivateRoute} from "../utils/PrivateRoute";
 import {LoginComponent} from "../Login/Login";
+import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";
 
 Dashboard.propTypes = {};
 
@@ -28,6 +29,7 @@ function Dashboard(props) {
                         <PrivateRoute path="/language" exact component={SelectLanguage}/>
                         <PrivateRoute path="/queue" exact component={Queue}/>
                         <PrivateRoute path="/logout" exact component={Logout}/>
+                        <PrivateRoute path="/preEnroll/:pageName" component={PreEnrollmentFlow}/>
                         <Route path="/login" exact component={LoginComponent}/>
                     </Switch>
 

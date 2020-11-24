@@ -1,10 +1,39 @@
 .home-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+  overflow: auto;
+  display: grid;
   height: 100%;
 
-  .title {
-    text-align: center;
+
+  .program-header {
+    display: flex;
+    flex-direction: column;
+
+    .banner {
+      width: 500px;
+    }
+  }
+
+  .title-container {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      margin-left: 5%;
+    }
+
+    .content {
+      width: 100%;
+    }
+  }
+
+  .enroll-container {
+    display: grid;
+    grid-template-columns: repeat(3,1fr)/repeat(3,1fr);
+    height: 50%;
+
+    .verify-card {
+      height: 100%;
+      grid-row: 1/3;
+    }
   }
 }

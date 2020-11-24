@@ -1,13 +1,195 @@
 import {BaseCard} from "../Base/Base";
-import React from "react";
+import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./Home.scss"
+import {Button} from "react-bootstrap";
+import {useHistory} from "react-router";
+import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
+
+function ProgramHeader() {
+    return <div className={"program-header"}>
+        <BaseCard>
+            COVID-19
+            {/*<img className={"banner"} src={vaccineBanner} alt={""}/>*/}
+        </BaseCard>
+    </div>;
+}
+
+function Title({text, content}) {
+    return <div className={"title-container"}>
+        <div className={"title"}>{text}</div>
+        {content}
+    </div>;
+}
+
+export default Home;
+
+function EnrollmentTypes() {
+    const {goNext, goToQueue} = useHome()
+    return <>
+        <div className={"enroll-container"}>
+            <div className={"verify-card"}>
+                <BaseCard>
+                    <Button onClick={() => {
+                        goNext('/preEnroll/' + FORM_PRE_ENROLL_CODE)
+                    }}>Verify Recipient</Button>
+                </BaseCard>
+            </div>
+            <div className={"verify-card"}>
+                <BaseCard>
+                    <Button onClick={() => {
+                    }}>Enroll Recipient</Button>
+                </BaseCard>
+            </div>
+            <div className={"verify-card"}>
+                <BaseCard>
+                    <Button onClick={() => {
+                        goToQueue();
+                    }}>Recipient Queue</Button>
+                </BaseCard>
+            </div>
+        </div>
+    </>;
+}
+
+function Statistics() {
+    return <>
+        <div className={"details-card"}>
+            <BaseCard>Recipient Waiting</BaseCard>
+        </div>
+        <div className={"details-card"}>
+            <BaseCard>Certified Issued</BaseCard>
+        </div>
+    </>;
+}
+
+export function VaccineProgram() {
+    return <div className={"home-container"}>
+        <ProgramHeader/>
+        <Title text={"Actions"} content={<EnrollmentTypes/>}/>
+        <Title text={"Recipient Numbers"} content={<Statistics/>}/>
+    </div>;
+}
 
 export function Home(props) {
     return (
-        <BaseCard>
-            <div className={"home-container"}>
-                <h1 className={"title"}>Home</h1>
-            </div>
-        </BaseCard>
+        <HomeProvider>
+            <VaccineProgram/>
+        </HomeProvider>
     );
+}
+
+
+const initialState = {pageNo: 0};
+
+function homeReducer(state, action) {
+    switch (action.type) {
+        case ACTION_VERIFY_RECIPIENT: {
+            const payload = action.payload
+            if (payload.pageNo === 0) {
+                return {pageNo: 1, ...state};
+            }
+            return {pageNo: 0, ...state};
+        }
+        case ACTION_PRE_ENROLLMENT_CODE: {
+            const payload = action.payload
+            if (payload.pageNo === 1) {
+                return {pageNo: 2, ...state};
+            }
+            return {pageNo: 0, ...state};
+        }
+        case ACTION_PRE_ENROLLMENT_DETAILS: {
+            const payload = action.payload
+            if (payload.pageNo === 2) {
+                return {pageNo: 3, ...state};
+            }
+            return {pageNo: 0, ...state};
+        }
+        case ACTION_VERIFY_AADHAR_NUMBER: {
+            const payload = action.payload
+            if (payload.pageNo === 3) {
+                return {pageNo: 4, ...state};
+            }
+            return {pageNo: 0, ...state};
+        }
+        case ACTION_VERIFY_AADHAR_OTP: {
+
+            const payload = action.payload
+            if (payload.pageNo === 4) {
+                return {pageNo: 5, ...state};
+            }
+            return {pageNo: 0, ...state};
+        }
+        case ACTION_GO_NEXT: {
+            const payload = action.payload
+            if (payload.pageNo === 6) {
+                return {pageNo: 0};
+            }
+            return {pageNo: payload.pageNo++};
+        }
+
+        case ACTION_GO_BACK: {
+            const payload = action.payload
+            if (payload.pageNo === 0) {
+                return {pageNo: 0};
+            }
+            return {pageNo: payload.pageNo--};
+        }
+        default:
+            throw new Error();
+    }
+}
+
+export const ACTION_VERIFY_RECIPIENT = 'verifyRecipient';
+export const ACTION_PRE_ENROLLMENT_CODE = 'preEnrollmentCode';
+export const ACTION_PRE_ENROLLMENT_DETAILS = 'preEnrollmentDetails';
+export const ACTION_VERIFY_AADHAR_NUMBER = 'verifyAadharNumber';
+export const ACTION_VERIFY_AADHAR_OTP = 'verifyAadharOTP';
+export const ACTION_GO_NEXT = 'goNext';
+export const ACTION_GO_BACK = 'goBack';
+
+const HomeContext = createContext(null);
+
+export function useHome() {
+    const context = useContext(HomeContext)
+    const history = useHistory();
+    if (!context) {
+        throw new Error(`useHome must be used within a HomeProvider`)
+    }
+    const [state, dispatch] = context
+
+    const goToVerifyRecipient = function () {
+        dispatch({type: ACTION_VERIFY_RECIPIENT, payload: {pageNo: 0}})
+        //history.push(`/verifyRecipient`)
+    }
+
+    const goToQueue = function () {
+        history.push(`/queue`)
+    }
+
+    const goNext = function (path) {
+        dispatch({type: ACTION_GO_NEXT, payload: {pageNo: state.pageNo}})
+        if (path) {
+            history.push(path)
+        }
+    }
+
+    const goBack = function () {
+        history.goBack()
+        dispatch({type: ACTION_GO_BACK, payload: {pageNo: state.pageNo}})
+    }
+
+    return {
+        state,
+        dispatch,
+        goToVerifyRecipient,
+        goNext,
+        goBack,
+        goToQueue
+    }
+}
+
+export function HomeProvider(props) {
+    const [state, dispatch] = useReducer(homeReducer, initialState)
+    const value = useMemo(() => [state, dispatch], [state])
+    return <HomeContext.Provider value={value} {...props} />
 }
