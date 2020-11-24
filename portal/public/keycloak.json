@@ -1,6 +1,6 @@
 {
   "realm": "divoc",
-  "auth-server-url": "http://localhost:8080/auth/",
+  "auth-server-url": "https://divoc.xiv.in/keycloak/auth/",
   "ssl-required": "external",
   "resource": "vaccination_api",
   "public-client": true,
