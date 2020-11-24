@@ -6,8 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
+
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // CreateMedicineRequest create medicine request
@@ -15,12 +19,105 @@ import (
 // swagger:model CreateMedicineRequest
 type CreateMedicineRequest struct {
 
+	// Effective until n months after the full vaccination schedule is completed
+	EffectiveUntil float64 `json:"effectiveUntil,omitempty"`
+
 	// name
 	Name string `json:"name,omitempty"`
+
+	// Indicative price if fixed or max price available.
+	Price float64 `json:"price,omitempty"`
+
+	// provider
+	Provider string `json:"provider,omitempty"`
+
+	// schedule
+	Schedule *CreateMedicineRequestSchedule `json:"schedule,omitempty"`
+
+	// status
+	// Enum: [Active Inactive Blocked]
+	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this create medicine request
 func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateSchedule(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CreateMedicineRequest) validateSchedule(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Schedule) { // not required
+		return nil
+	}
+
+	if m.Schedule != nil {
+		if err := m.Schedule.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("schedule")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+var createMedicineRequestTypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["Active","Inactive","Blocked"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createMedicineRequestTypeStatusPropEnum = append(createMedicineRequestTypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// CreateMedicineRequestStatusActive captures enum value "Active"
+	CreateMedicineRequestStatusActive string = "Active"
+
+	// CreateMedicineRequestStatusInactive captures enum value "Inactive"
+	CreateMedicineRequestStatusInactive string = "Inactive"
+
+	// CreateMedicineRequestStatusBlocked captures enum value "Blocked"
+	CreateMedicineRequestStatusBlocked string = "Blocked"
+)
+
+// prop value enum
+func (m *CreateMedicineRequest) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createMedicineRequestTypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CreateMedicineRequest) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -35,6 +132,41 @@ func (m *CreateMedicineRequest) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *CreateMedicineRequest) UnmarshalBinary(b []byte) error {
 	var res CreateMedicineRequest
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// CreateMedicineRequestSchedule create medicine request schedule
+//
+// swagger:model CreateMedicineRequestSchedule
+type CreateMedicineRequestSchedule struct {
+
+	// Number of times the vaccination should be taken.
+	RepeatInterval float64 `json:"repeatInterval,omitempty"`
+
+	// How many times vaccination should be taken
+	RepeatTimes float64 `json:"repeatTimes,omitempty"`
+}
+
+// Validate validates this create medicine request schedule
+func (m *CreateMedicineRequestSchedule) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *CreateMedicineRequestSchedule) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *CreateMedicineRequestSchedule) UnmarshalBinary(b []byte) error {
+	var res CreateMedicineRequestSchedule
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

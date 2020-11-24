@@ -65,6 +65,13 @@ func init() {
     },
     "/medicine": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
         "summary": "Create Medicine",
         "operationId": "createMedicine",
         "parameters": [
@@ -149,21 +156,90 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "effectiveUntil": {
+          "description": "Effective until n months after the full vaccination schedule is completed",
+          "type": "number"
+        },
         "name": {
           "type": "string"
+        },
+        "price": {
+          "description": "Indicative price if fixed or max price available.",
+          "type": "number"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "repeatInterval": {
+              "description": "Number of times the vaccination should be taken.",
+              "type": "number"
+            },
+            "repeatTimes": {
+              "description": "How many times vaccination should be taken",
+              "type": "number"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
         }
       }
     },
     "ProgramRequest": {
       "type": "object",
       "properties": {
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "logoURL": {
+          "type": "string"
+        },
+        "medicineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "name": {
           "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     }
   },
   "securityDefinitions": {
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://dummy.oauth.net/auth",
+      "tokenUrl": "https://dumy.oauth.net/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facilityAdmin": "scope of facility admin"
+      }
+    },
     "isAdmin": {
       "type": "apiKey",
       "name": "Authorization",
@@ -182,7 +258,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "admin"
+      ]
     }
   ]
 }`))
@@ -234,6 +312,13 @@ func init() {
     },
     "/medicine": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
         "summary": "Create Medicine",
         "operationId": "createMedicine",
         "parameters": [
@@ -318,21 +403,103 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "effectiveUntil": {
+          "description": "Effective until n months after the full vaccination schedule is completed",
+          "type": "number"
+        },
         "name": {
           "type": "string"
+        },
+        "price": {
+          "description": "Indicative price if fixed or max price available.",
+          "type": "number"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "repeatInterval": {
+              "description": "Number of times the vaccination should be taken.",
+              "type": "number"
+            },
+            "repeatTimes": {
+              "description": "How many times vaccination should be taken",
+              "type": "number"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        }
+      }
+    },
+    "CreateMedicineRequestSchedule": {
+      "type": "object",
+      "properties": {
+        "repeatInterval": {
+          "description": "Number of times the vaccination should be taken.",
+          "type": "number"
+        },
+        "repeatTimes": {
+          "description": "How many times vaccination should be taken",
+          "type": "number"
         }
       }
     },
     "ProgramRequest": {
       "type": "object",
       "properties": {
+        "description": {
+          "type": "string"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "logoURL": {
+          "type": "string"
+        },
+        "medicineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "name": {
           "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     }
   },
   "securityDefinitions": {
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://dummy.oauth.net/auth",
+      "tokenUrl": "https://dumy.oauth.net/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facilityAdmin": "scope of facility admin"
+      }
+    },
     "isAdmin": {
       "type": "apiKey",
       "name": "Authorization",
@@ -351,7 +518,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "admin"
+      ]
     }
   ]
 }`))

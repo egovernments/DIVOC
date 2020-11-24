@@ -56,9 +56,8 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
 
-		// Applies when the "Authorization" header is set
-		IsUserAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
+		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
+			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
 		APIAuthorizer: security.Authorized(),
@@ -99,9 +98,9 @@ type DivocPortalAPIAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
-	// IsUserAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key Authorization provided in the header
-	IsUserAuth func(string) (interface{}, error)
+	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
+	// it performs authentication based on an oauth2 bearer token provided in the request
+	HasRoleAuth func(string, []string) (interface{}, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -193,8 +192,8 @@ func (o *DivocPortalAPIAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.IsUserAuth == nil {
-		unregistered = append(unregistered, "AuthorizationAuth")
+	if o.HasRoleAuth == nil {
+		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
 	if o.PostFacilitiesHandler == nil {
@@ -227,9 +226,8 @@ func (o *DivocPortalAPIAPI) AuthenticatorsFor(schemes map[string]spec.SecuritySc
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
-		case "isUser":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsUserAuth)
+		case "hasRole":
+			result[name] = o.BearerAuthenticator(name, o.HasRoleAuth)
 
 		}
 	}

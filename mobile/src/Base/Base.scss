@@ -1,0 +1,37 @@
+@import "styles/colors.scss";
+
+.header {
+  background: #61dafb;
+  height: 80px;
+}
+
+.footer {
+  background: greenyellow;
+  height: 80px;
+}
+
+.loader {
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  background-color: #282c34;
+  overflow-x: hidden;
+  transition: 0.5s;
+}
+
+.logo-container {
+  text-align: center;
+  margin-top: 8%;
+  letter-spacing: 2px;
+
+  .first {
+    color: $primaryThemeColor;
+  }
+
+  .second {
+    color: $textColor;
+  }
+}

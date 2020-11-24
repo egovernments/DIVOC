@@ -4,16 +4,17 @@ package restapi
 
 import (
 	"crypto/tls"
-	"net/http"
-
+	"github.com/divoc/portal-api/pkg"
+	"github.com/divoc/portal-api/swagger_gen/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"net/http"
 
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal interface{}
+//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal interface{} --exclude-main
 
 func configureFlags(api *operations.DivocPortalAPIAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -38,13 +39,16 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	// Applies when the "Authorization" header is set
-	if api.IsUserAuth == nil {
-		api.IsUserAuth = func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
-		}
-	}
+	api.HasRoleAuth = utils.RoleAuthorizer
 
+	//// Applies when the "Authorization" header is set
+	//if api.IsUserAuth == nil {
+	//	api.IsUserAuth = func(token string) (interface{}, error) {
+	//		return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
+	//	}
+	//}
+
+	pkg.SetupHandlers(api)
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer
 	//
