@@ -7,7 +7,7 @@ Setup:
   * `$ cp target/keycloak-mobile-number-login-spi-1.0-SNAPSHOT.jar _KEYCLOAK_HOME_/providers/`
 
 * Add custom theme to the Keycloak server:
-  * `$ cp themes/divoc _KEYCLOAK_HOME_/themes/divoc`
+  * `$ cp themes/* _KEYCLOAK_HOME_/themes/divoc`
 
 Configure your REALM to use the provider.
 First create a new REALM (or select a previously created REALM).
