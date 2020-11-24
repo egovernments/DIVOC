@@ -44,7 +44,7 @@ type RegistryResponse struct {
 }
 
 
-func makeRegistryCreateRequest(requestMap map[string]interface{}, objectId string) middleware.Responder {
+func makeRegistryCreateRequest(requestMap interface{}, objectId string) middleware.Responder {
 	requestJson := CreateMedicineRegistryRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -58,6 +58,7 @@ func makeRegistryCreateRequest(requestMap map[string]interface{}, objectId strin
 	}
 	url := registryUrl(config.Config.Registry.AddOperationId)
 	log.Info("Using registry url ", url)
+	log.Infof("Request >> %+v", requestJson)
 	resp, err := req.Post(url, req.BodyJSON(requestJson))
 
 	if resp == nil || err != nil {
