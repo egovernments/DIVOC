@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import {ApiServices} from "../Services/apiServices";
 import {useLogin} from "./Login";
 import {LoginLabels} from "../Base/Constants";
+import {ErrorAlert} from "../Base/Base";
 
 const PHONE_NUMBER_MAX = 10
 
@@ -51,6 +52,6 @@ export function EnterPhoneNumberComponent() {
                 setError(e.message)
             });
         }}>{loading ? LoginLabels.LABEL_LOADING : LoginLabels.BTN_GET_OTP}</Button>
-        {!loading && error && <p>{error}</p>}
+        {!loading && error && <ErrorAlert message={error} onClose={() => setError(null)}/>}
     </Col>;
 }

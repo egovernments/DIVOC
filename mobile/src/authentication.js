@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
+import {useHistory} from "react-router";
 
 export const ACTION_LOGGED_IN = 'login';
 export const ACTION_LOGGED_OUT = 'logout';
@@ -31,6 +32,7 @@ export function AuthProvider(props) {
 
 export function useAuthorizedUser() {
     const context = useContext(AuthContext)
+    const history = useHistory();
 
     if (!context) {
         throw new Error(`useAuthorizedUser must be used within a AuthProvider`)
@@ -43,6 +45,7 @@ export function useAuthorizedUser() {
 
     const logout = function () {
         dispatch({type: ACTION_LOGGED_OUT});
+        history.replace(`/`)
     }
 
     return {

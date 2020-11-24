@@ -1,20 +1,13 @@
-import React from 'react';
-import {useAuthorizedUser} from "../authentication";
-import Button from 'react-bootstrap/Button'
-import './Home.scss'
+import {BaseCard} from "../Base/Base";
+import React from "react";
+import "./Home.scss"
 
-Home.propTypes = {};
-
-function Home(props) {
-    const {state, logout} = useAuthorizedUser();
-    console.log(state);
+export function Home(props) {
     return (
-        <div className={"home-container"}>
-            <Button variant="success" onClick={() => {
-                logout();
-            }}>Logout</Button>{' '}
-        </div>
+        <BaseCard>
+            <div className={"home-container"}>
+                <h1 className={"title"}>Home</h1>
+            </div>
+        </BaseCard>
     );
 }
-
-export default Home;

@@ -1,4 +1,5 @@
 @import "styles/colors.scss";
+@import "styles/common-mixins.scss";
 
 .header {
   background: #61dafb;
@@ -33,5 +34,23 @@
 
   .second {
     color: $textColor;
+  }
+}
+
+.my-card {
+  height: 95%;
+  margin: 5%;
+}
+
+.bottom-item {
+
+
+  .icon {
+    height: 30px;
+    width: 30px;
+  }
+
+  .title {
+    padding-top: 8px;
   }
 }

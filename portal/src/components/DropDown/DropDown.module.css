@@ -1,0 +1,20 @@
+dropdown{
+    background: #FFFFFF;
+}
+.control-class{
+    box-shadow: 0px 6px 20px #FFFFFF;
+    background: #FFFFFF;
+    border-radius: 4px;
+}
+.place-holder{
+    color: #4D4F5C;
+    font-size: 0.9rem;
+    font-weight: normal;
+    text-align: left;
+}
+.menu-items{
+    color: #737783;
+    font-size: 0.9rem;
+    text-align: left;
+    white-space: nowrap;
+}
