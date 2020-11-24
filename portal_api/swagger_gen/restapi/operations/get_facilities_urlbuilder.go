@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// CreateProgramURL generates an URL for the create program operation
-type CreateProgramURL struct {
+// GetFacilitiesURL generates an URL for the get facilities operation
+type GetFacilitiesURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *CreateProgramURL) WithBasePath(bp string) *CreateProgramURL {
+func (o *GetFacilitiesURL) WithBasePath(bp string) *GetFacilitiesURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *CreateProgramURL) WithBasePath(bp string) *CreateProgramURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *CreateProgramURL) SetBasePath(bp string) {
+func (o *GetFacilitiesURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *CreateProgramURL) Build() (*url.URL, error) {
+func (o *GetFacilitiesURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/programs"
+	var _path = "/facilities"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -47,7 +47,7 @@ func (o *CreateProgramURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *CreateProgramURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetFacilitiesURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *CreateProgramURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *CreateProgramURL) String() string {
+func (o *GetFacilitiesURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *CreateProgramURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetFacilitiesURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on CreateProgramURL")
+		return nil, errors.New("scheme is required for a full url on GetFacilitiesURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on CreateProgramURL")
+		return nil, errors.New("host is required for a full url on GetFacilitiesURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *CreateProgramURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *CreateProgramURL) StringFull(scheme, host string) string {
+func (o *GetFacilitiesURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }
