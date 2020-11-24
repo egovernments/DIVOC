@@ -40,6 +40,18 @@ produces:
   - application/json
 paths:
   /facilities:
+    get:
+      summary: get facilities
+      operationId: getFacilities
+      parameters:
+        - query
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Facility'
     post:
       summary: Upload facility csv for bulk ingestion
       consumes:
@@ -74,6 +86,20 @@ paths:
         '401':
           description: Unauthorized
   /program:
+    get:
+      summary: get program list
+      operationId: getProgram
+      security:
+        - hasRole:
+            - admin
+            - user
+      responses:
+        '200':
+            description: OK
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/ProgramRequest'
     post:
       summary: Create program
       operationId: createProgram
@@ -91,11 +117,24 @@ paths:
         '401':
           description: Unauthorized
   /medicine:
+    get:
+      summary: Get medicines
+      operationId: getMedicine
+      security:
+        - hasRole: ["user", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/CreateMedicineRequest'
     post:
       summary: Create Medicine
       operationId: createMedicine
       security:
-        - hasRole: ['admin']
+        - hasRole: ["admin"]
       parameters:
         - in: body
           name: body
@@ -162,7 +201,7 @@ definitions:
       price:
         type: number
         description: Indicative price if fixed or max price available.
-
+  Facility:
 
 host: divoc.xiv.in
 schemes:

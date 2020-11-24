@@ -71,7 +71,7 @@ func makeRegistryCreateRequest(requestMap map[string]interface{}, objectId strin
 		return NewGenericServerError()
 	}
 	respStr, _ := resp.ToString()
-	log.Debugf("Response from registry %+v", respStr)
+	log.Infof("Response from registry %+v", respStr)
 	var registryResponse = RegistryResponse{}
 	err = json.Unmarshal(resp.Bytes(), &registryResponse)
 	if err != nil {

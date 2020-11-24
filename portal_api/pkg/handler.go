@@ -22,9 +22,7 @@ type GenericResponse struct {
 }
 
 func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
-
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(o.statusCode)
 }
 
@@ -35,7 +33,6 @@ func NewGenericStatusOk() middleware.Responder {
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
 }
-
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal interface{}) middleware.Responder {
 	log.Infof("Create medicine %+v", params.Body)
@@ -53,13 +50,20 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal int
 	return makeRegistryCreateRequest(requestMap, objectId)
 }
 
-
-func registryUrl(operationId string) string {
-	url := config.Config.Registry.Url + "/" + operationId
-	return url
-}
 func createProgramHandler(params operations.CreateProgramParams, principal interface{}) middleware.Responder {
-	return operations.NewCreateProgramOK()
+	log.Infof("Create Program %+v", params.Body)
+	objectId:="Program"
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		return operations.NewCreateProgramBadRequest()
+	}
+	requestMap := make(map[string]interface{})
+	err = json.Unmarshal(requestBody, &requestMap)
+	if err != nil {
+		log.Info(err)
+		return NewGenericServerError()
+	}
+	return makeRegistryCreateRequest(requestMap, objectId)
 }
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal interface{}) middleware.Responder {
 	return operations.NewPostFacilitiesOK()
@@ -69,3 +73,8 @@ func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal i
 	return operations.NewPostVaccinatorsOK()
 }
 
+
+func registryUrl(operationId string) string {
+	url := config.Config.Registry.Url + "/" + operationId
+	return url
+}

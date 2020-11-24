@@ -39,8 +39,6 @@ paths:
       responses:
         200:
           description: OK
-        206:
-          description: partial content, need additional information or action for identity assertion.
         401:
           description: Invalid identity assertion.
         400:
