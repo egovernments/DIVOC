@@ -1,7 +1,8 @@
 PWD := $(shell pwd)
 GOPATH := $(shell go env GOPATH)
+source := $(wildcard *.go **/*.go */*/*.go)
 
-all: build run
+all: divoc-portal-api-server run
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
@@ -19,8 +20,7 @@ api_docs:
 
 build: divoc-portal-api-server
 	@echo "building $(source)"
-
-source := $(wildcard *.go)
+	@echo $(source)
 
 divoc-portal-api-server: $(source) swagger_gen/restapi/server.go
 	@echo "Building Server to $(PWD)/divoc-portal-api-server ..."
