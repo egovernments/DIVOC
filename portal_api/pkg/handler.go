@@ -17,11 +17,11 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(postVaccinatorsHandler)
 }
 
-type GenericRequestError struct {
+type GenericResponse struct {
 	statusCode int
 }
 
-func (o *GenericRequestError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
@@ -29,11 +29,11 @@ func (o *GenericRequestError) WriteResponse(rw http.ResponseWriter, producer run
 }
 
 func NewGenericStatusOk() middleware.Responder {
-	return &GenericRequestError{statusCode:200}
+	return &GenericResponse{statusCode: 200}
 }
 
 func NewGenericServerError() middleware.Responder {
-	return &GenericRequestError{statusCode:200}
+	return &GenericResponse{statusCode: 500}
 }
 
 
@@ -48,7 +48,7 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal int
 	err = json.Unmarshal(requestBody, &requestMap)
 	if err != nil {
 		log.Info(err)
-		return &GenericRequestError{statusCode:500}
+		return NewGenericServerError()
 	}
 	return makeRegistryCreateRequest(requestMap, objectId)
 }
