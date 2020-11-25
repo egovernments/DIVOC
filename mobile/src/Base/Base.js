@@ -4,6 +4,7 @@ import Alert from "react-bootstrap/Alert";
 import {Card} from "react-bootstrap";
 import PropTypes from "prop-types";
 import Nav from "react-bootstrap/Nav";
+import {Link} from "react-router-dom";
 
 export const DivocHeader = () => {
     return (
@@ -70,11 +71,11 @@ BottomItem.propTypes = {
 
 export function BottomItem({src, href, title}) {
     return <Nav.Item>
-        <Nav.Link eventKey={title} href={href}>
+        <Link eventKey={title} to={href}>
             <div className={'bottom-item'}>
                 <img className={'icon'} src={src} alt={""}/>
                 <h6 className={'title'}>{title}</h6>
             </div>
-        </Nav.Link>
+        </Link>
     </Nav.Item>;
 }
