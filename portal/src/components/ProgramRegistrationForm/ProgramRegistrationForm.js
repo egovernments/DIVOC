@@ -23,6 +23,7 @@ function ProgramRegistration() {
         axios
             .post("/divoc/admin/api/v1/program", formData, config)
             .then((res) => {
+                alert("Status code is",res.status);
                 console.log(res);
             });
     };

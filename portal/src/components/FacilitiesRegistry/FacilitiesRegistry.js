@@ -28,6 +28,7 @@ function Facilities(){
             headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"}
         };
         axios.post("divoc/admin/api/v1/facilities", dataToSend, config ,options).then(res => { 
+            alert("Status code is",res.status)
             console.log(res)
             setUploadPercentage( 100)
             setTimeout(() => {

@@ -28,6 +28,7 @@ function RegistrationForm() {
         axios
             .post("/divoc/admin/api/v1/medicine", formData, config)
             .then((res) => {
+                alert("Status code is",res.status)
                 console.log(res);
             });
     };
