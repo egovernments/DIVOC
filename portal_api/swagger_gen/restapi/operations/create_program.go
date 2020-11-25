@@ -29,7 +29,7 @@ func NewCreateProgram(ctx *middleware.Context, handler CreateProgramHandler) *Cr
 	return &CreateProgram{Context: ctx, Handler: handler}
 }
 
-/*CreateProgram swagger:route POST /program createProgram
+/*CreateProgram swagger:route POST /programs createProgram
 
 Create program
 

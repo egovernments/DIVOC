@@ -11,40 +11,40 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-// CreateMedicineHandlerFunc turns a function with the right signature into a create medicine handler
-type CreateMedicineHandlerFunc func(CreateMedicineParams, interface{}) middleware.Responder
+// GetVaccinatorsHandlerFunc turns a function with the right signature into a get vaccinators handler
+type GetVaccinatorsHandlerFunc func(GetVaccinatorsParams, interface{}) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn CreateMedicineHandlerFunc) Handle(params CreateMedicineParams, principal interface{}) middleware.Responder {
+func (fn GetVaccinatorsHandlerFunc) Handle(params GetVaccinatorsParams, principal interface{}) middleware.Responder {
 	return fn(params, principal)
 }
 
-// CreateMedicineHandler interface for that can handle valid create medicine params
-type CreateMedicineHandler interface {
-	Handle(CreateMedicineParams, interface{}) middleware.Responder
+// GetVaccinatorsHandler interface for that can handle valid get vaccinators params
+type GetVaccinatorsHandler interface {
+	Handle(GetVaccinatorsParams, interface{}) middleware.Responder
 }
 
-// NewCreateMedicine creates a new http.Handler for the create medicine operation
-func NewCreateMedicine(ctx *middleware.Context, handler CreateMedicineHandler) *CreateMedicine {
-	return &CreateMedicine{Context: ctx, Handler: handler}
+// NewGetVaccinators creates a new http.Handler for the get vaccinators operation
+func NewGetVaccinators(ctx *middleware.Context, handler GetVaccinatorsHandler) *GetVaccinators {
+	return &GetVaccinators{Context: ctx, Handler: handler}
 }
 
-/*CreateMedicine swagger:route POST /medicines createMedicine
+/*GetVaccinators swagger:route GET /vaccinators getVaccinators
 
-Create Medicine
+Get vaccinators
 
 */
-type CreateMedicine struct {
+type GetVaccinators struct {
 	Context *middleware.Context
-	Handler CreateMedicineHandler
+	Handler GetVaccinatorsHandler
 }
 
-func (o *CreateMedicine) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *GetVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewCreateMedicineParams()
+	var Params = NewGetVaccinatorsParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

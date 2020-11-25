@@ -11,40 +11,40 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-// CreateMedicineHandlerFunc turns a function with the right signature into a create medicine handler
-type CreateMedicineHandlerFunc func(CreateMedicineParams, interface{}) middleware.Responder
+// GetMedicinesHandlerFunc turns a function with the right signature into a get medicines handler
+type GetMedicinesHandlerFunc func(GetMedicinesParams, interface{}) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn CreateMedicineHandlerFunc) Handle(params CreateMedicineParams, principal interface{}) middleware.Responder {
+func (fn GetMedicinesHandlerFunc) Handle(params GetMedicinesParams, principal interface{}) middleware.Responder {
 	return fn(params, principal)
 }
 
-// CreateMedicineHandler interface for that can handle valid create medicine params
-type CreateMedicineHandler interface {
-	Handle(CreateMedicineParams, interface{}) middleware.Responder
+// GetMedicinesHandler interface for that can handle valid get medicines params
+type GetMedicinesHandler interface {
+	Handle(GetMedicinesParams, interface{}) middleware.Responder
 }
 
-// NewCreateMedicine creates a new http.Handler for the create medicine operation
-func NewCreateMedicine(ctx *middleware.Context, handler CreateMedicineHandler) *CreateMedicine {
-	return &CreateMedicine{Context: ctx, Handler: handler}
+// NewGetMedicines creates a new http.Handler for the get medicines operation
+func NewGetMedicines(ctx *middleware.Context, handler GetMedicinesHandler) *GetMedicines {
+	return &GetMedicines{Context: ctx, Handler: handler}
 }
 
-/*CreateMedicine swagger:route POST /medicines createMedicine
+/*GetMedicines swagger:route GET /medicines getMedicines
 
-Create Medicine
+Get medicines
 
 */
-type CreateMedicine struct {
+type GetMedicines struct {
 	Context *middleware.Context
-	Handler CreateMedicineHandler
+	Handler GetMedicinesHandler
 }
 
-func (o *CreateMedicine) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *GetMedicines) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewCreateMedicineParams()
+	var Params = NewGetMedicinesParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

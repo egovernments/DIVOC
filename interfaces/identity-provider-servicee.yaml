@@ -3,7 +3,7 @@ info:
   version: '1.0.0'
   title: Identity provider interface for DIVOC
   description: Identity provider service can be abstracted with this interface so that DIVOC can integrate seemlessly.
-
+#https://app.swaggerhub.com/apis/divoc/Identity-Provider/1.0.0
 # Under securityDefinitions we declare which security schemes can be used.
 # These definitions do not affect to the operations, but can be applied
 # using the 'security' key at the global level or the operation level.
@@ -54,21 +54,6 @@ paths:
         400:
           description: Invalid format of the claim or identity
 
-  /notification:
-    post:
-      tags:
-        - notification
-      summary: Notify the intended person using different channels
-      description: >-
-      Common notification service for different channels like eSMS, email etc. Target address can depict specifics about mode and channel
-      parameters:
-        - in: body
-          name: body
-          schema:
-            $ref: '#/definitions/NotificationRequest'
-      responses:
-        200:
-          description: OK
 definitions:
   IdentityRequest:
     type: object
@@ -77,17 +62,3 @@ definitions:
         type: string
       credential:
         type: string
-  NotificationRequest:
-    type: object
-    required:
-      - recepient
-      - message
-    properties:
-      recepient:
-        type: string
-      message:
-        type: string
-      subject:
-        type: string
-      #attachment:
-      #  type:
