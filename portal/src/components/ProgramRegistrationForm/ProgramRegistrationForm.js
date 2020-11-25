@@ -4,8 +4,10 @@ import styles from "./ProgramRegistrationForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
+import {useKeycloak} from "@react-keycloak/web";
 
 function ProgramRegistration() {
+    const { keycloak } = useKeycloak();
     const [formData, setFormInput] = useState({
         name: "",
         description: "",
@@ -17,12 +19,7 @@ function ProgramRegistration() {
     });
 
     const handleSubmit = (event) => {
-        const config = {
-            headers: {
-                Authorization: "Bearer abcd",
-                "Content-Type": "application/json",
-            },
-        };
+        const config = {headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"}};
         axios
             .post("/divoc/admin/api/v1/program", formData, config)
             .then((res) => {

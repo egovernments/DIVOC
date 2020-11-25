@@ -5,8 +5,10 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DropDown from "../DropDown/DropDown";
+import {useKeycloak} from "@react-keycloak/web";
 
 function RegistrationForm() {
+    const { keycloak } = useKeycloak();
     const [formData, setFormInput] = useState({
         name: "",
         provider: "",
@@ -21,7 +23,7 @@ function RegistrationForm() {
 
     const handleSubmit = (event) => {
         const config = {
-            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json" }
+            headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json" }
         };
         axios
             .post("/divoc/admin/api/v1/medicine", formData, config)
