@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import {ProgressBar} from 'react-bootstrap';
 import axios from 'axios'
 import styles from './Facilities.module.css';
+import {useKeycloak} from "@react-keycloak/web";
+
 function Facilities(){
     const [uploadPercentage,setUploadPercentage] = useState(0);
+    const { keycloak } = useKeycloak();
 
     const uploadFile = (evt) => {
         const fileData = evt.target.files[0]
@@ -23,7 +26,7 @@ function Facilities(){
           }
         
         const config = {
-            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json"}
+            headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"}
         };
         axios.post("divoc/admin/api/v1/facilities", data, config ,options).then(res => { 
             console.log(res)
