@@ -547,21 +547,6 @@ func init() {
         "admin": "scope of super admin",
         "facilityAdmin": "scope of facility admin"
       }
-    },
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     }
   },
   "security": [
@@ -1182,21 +1167,6 @@ func init() {
         "admin": "scope of super admin",
         "facilityAdmin": "scope of facility admin"
       }
-    },
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     }
   },
   "security": [
