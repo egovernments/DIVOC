@@ -16,6 +16,7 @@
     padding-right: 1em;
     white-space: nowrap;
     margin: 15px;
+    cursor: pointer;
 }
 
 .progress-bar-container{

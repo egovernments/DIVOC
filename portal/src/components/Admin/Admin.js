@@ -4,8 +4,9 @@ import Tab from "@material-ui/core/Tab";
 import Box from "@material-ui/core/Box";
 import Paper from '@material-ui/core/Paper';
 import VaccineRegistration from "../VaccineRegistration/VaccineRegistration";
-import Facilities from "../Facilities/Facilities";
+import FacilitiesRegistry from "../FacilitiesRegistry/FacilitiesRegistry";
 import ProgramRegistration from "../ProgramRegistration/ProgramRegistration";
+import VaccinatorsRegistry from "../VaccinatorsRegistry/VaccinatorsRegistry";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -36,10 +37,10 @@ export default function Admin() {
                 </Tabs>
             </Paper>
             <TabPanel value={value} index={0}>
-                <Facilities />
+                <FacilitiesRegistry />
             </TabPanel>
             <TabPanel value={value} index={1}>
-                Item one
+                <VaccinatorsRegistry />
             </TabPanel>
             <TabPanel value={value} index={2}>
                 <ProgramRegistration />
