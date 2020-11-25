@@ -13,12 +13,15 @@ function ProgramRegistration() {
         startDate: "",
         endDate: "",
         status: "Active",
-        medicineIds: [""]
+        medicineIds: [""],
     });
 
     const handleSubmit = (event) => {
         const config = {
-            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json" }
+            headers: {
+                Authorization: "Bearer abcd",
+                "Content-Type": "application/json",
+            },
         };
         axios
             .post("/divoc/admin/api/v1/program", formData, config)
@@ -39,11 +42,13 @@ function ProgramRegistration() {
                 onSubmit={handleSubmit}
                 method="post"
             >
-                <h1 className={styles["heading"]}>Register New Vaccine Program</h1>
+                <h1 className={styles["heading"]}>
+                    Register New Vaccine Program
+                </h1>
 
                 <p className={styles["title"]}>Internal Program UID</p>
                 <input
-                    type="number"
+                    type="text"
                     name="id"
                     value={formData.id}
                     onChange={handleFormInputChange}
@@ -60,18 +65,31 @@ function ProgramRegistration() {
                     className={styles["input"]}
                 />
 
-                <p className={styles["title"]}>Program Description</p>
-                <input
-                    type="text"
+                <p htmlFor="description" className={styles["title"]}>
+                    Program Description
+                </p>
+                <textarea
+                    id="description"
                     name="description"
+                    rows="4"
+                    cols="50"
                     value={formData.description}
                     onChange={handleFormInputChange}
                     className={styles["input"]}
-                    required
-                />
-                
-               
-        
+                ></textarea>
+                <div className={styles["box"]}>
+                    <input
+                        type="file"
+                        className={styles["input"]}
+                        onChange={(evt) => {
+                            setFormInput({
+                                ...formData,
+                                logoURL: evt.target.files[0],
+                            });
+                        }}
+                        required
+                    />
+                </div>
                 <div className={styles["box"]}>
                     <div>
                         <p className={styles["title"]}>Start Date</p>
@@ -94,14 +112,40 @@ function ProgramRegistration() {
                         />
                     </div>
                 </div>
-                <div className={styles["box"]} >
-                    <p className={styles["title"]}>Status</p>
-                        <input type="radio" id="active" name="status" value="active" onClick={handleFormInputChange}/>Active
-                        <input type="radio" id="inactive" name="status" value="inactive" onClick={handleFormInputChange}/>Inactive
-                        <input type="radio" id="blocked" name="status" value="blocked" onClick={handleFormInputChange}/>Blocked
-                    
+                <p className={styles["title"]}>Status</p>
+                <div className={styles["box"]}>
+                    <input
+                        type="radio"
+                        id="active"
+                        name="status"
+                        value="active"
+                        onClick={handleFormInputChange}
+                    />
+                    <label className={styles["radio-label"]} htmlFor="acive">
+                        Active
+                    </label>
+                    <input
+                        type="radio"
+                        id="inactive"
+                        name="status"
+                        value="inactive"
+                        onClick={handleFormInputChange}
+                    />
+                    <label className={styles["radio-label"]} htmlFor="inactive">
+                        Inactive
+                    </label>
+                    <input
+                        type="radio"
+                        id="blocked"
+                        name="status"
+                        value="blocked"
+                        onClick={handleFormInputChange}
+                    />
+                    <label className={styles["radio-label"]} htmlFor="blocked">
+                        Blocked
+                    </label>
                 </div>
-                <button 
+                <button
                     type="button"
                     onClick={handleSubmit}
                     className={styles["button"]}

@@ -52,11 +52,6 @@
 }
 
 
-input[type="file"]
-{
-  display: none;
-}
-
 .upload-pdf{
     color: #4D4F5C;
     font-size: 10px;

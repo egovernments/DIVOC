@@ -161,18 +161,6 @@ function RegistrationForm() {
                                 }}
                                 required
                             />
-                            <label className={styles['upload-pdf']} htmlFor="file">
-                                {formData.file
-                                    ? formData.file.name
-                                    : " Upload PDF"}
-                            </label>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className={styles["upload-button"]}
-                            >
-                                Upload
-                            </button>
                         </div>
                     </div>
                 </div>
