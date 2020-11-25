@@ -1,0 +1,72 @@
+package pkg
+
+import (
+	"github.com/divoc/portal-api/swagger_gen/models"
+	"strconv"
+	"strings"
+)
+
+func createVaccinator(data *Scanner) error {
+	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
+	if err != nil {
+		return err
+	}
+	mobileNumber := data.Text("mobileNumber")
+	nationalIdentifier := data.Text("nationalIdentifier")
+	operatorCode := data.Text("operatorCode")
+	operatorName := data.Text("operatorName")
+	status := data.Text("status")
+	facilityIds := strings.Split(data.Text("facilityIds"), ",")
+	averageRating := 0.0
+	trainingCertificate := ""
+	vaccinator := models.Operator{
+		SerialNum:          &serialNum,
+		MobileNumber:       &mobileNumber,
+		NationalIdentifier: &nationalIdentifier,
+		OperatorCode:       &operatorCode,
+		OperatorName:       &operatorName,
+		Status:             &status,
+		FacilityIds:        facilityIds,
+		AverageRating: &averageRating,
+		Signatures: []*models.Signature{},
+		TrainingCertificate: &trainingCertificate,
+	}
+	makeRegistryCreateRequest(vaccinator, "Operator")
+	return nil
+}
+
+func createFacility(data *Scanner) error {
+	//todo: pass it to queue and then process.
+	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
+	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
+	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
+	if err != nil {
+		return err
+	}
+	addressline1 := data.Text("addressLine1")
+	addressline2 := data.Text("addressLine2")
+	district := data.Text("district")
+	state := data.Text("state")
+	pincode := data.int64("pincode")
+	facility := models.Facility{
+		SerialNum: serialNum,
+		FacilityCode: data.Text("facilityCode"),
+		FacilityName: data.Text("facilityName"),
+		Contact: data.Text("contact"),
+		OperatingHourStart: data.int64("operatingHourStart"),
+		OperatingHourEnd: data.int64("operatingHourEnd"),
+		Category: data.Text("category"),
+		Type: data.Text("type"),
+		Status: data.Text("status"),
+		Admins: strings.Split(data.Text("admins"), ","),
+		Address: &models.Address{
+			AddressLine1: &addressline1,
+			AddressLine2: &addressline2,
+			District: &district,
+			State: &state,
+			Pincode: &pincode,
+		},
+	}
+	makeRegistryCreateRequest(facility, "Facility")
+	return nil
+}

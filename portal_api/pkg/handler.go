@@ -3,14 +3,11 @@ package pkg
 import (
 	"encoding/json"
 	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"strconv"
-	"strings"
 )
 
 type GenericResponse struct {
@@ -93,49 +90,18 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal int
 		createFacility(&data)
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
-
 	return operations.NewPostFacilitiesOK()
 }
 
-func createFacility(data *Scanner) error {
-	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
-	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
-	addressline1 := data.Text("addressLine1")
-	addressline2 := data.Text("addressLine2")
-	district := data.Text("district")
-	state := data.Text("state")
-	pincode := data.int64("pincode")
-	facility := models.Facility{
-		SerialNum: serialNum,
-		FacilityCode: data.Text("facilityCode"),
-		FacilityName: data.Text("facilityName"),
-		Contact: data.Text("contact"),
-		OperatingHourStart: data.int64("operatingHourStart"),
-		OperatingHourEnd: data.int64("operatingHourEnd"),
-		Category: data.Text("category"),
-		Type: data.Text("type"),
-		Status: data.Text("status"),
-		Admins: strings.Split(data.Text("admins"), ","),
-		Address: &models.Address{
-			AddressLine1: &addressline1,
-			AddressLine2: &addressline2,
-			District: &district,
-			State: &state,
-			Pincode: &pincode,
-		},
-	}
-	makeRegistryCreateRequest(facility, "Facility")
-	return nil
-}
-
 func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal interface{}) middleware.Responder {
-	return operations.NewPostVaccinatorsOK()
+	data := NewScanner(params.File)
+	defer params.File.Close()
+	for data.Scan() {
+		createVaccinator(&data)
+		log.Info("Created ", data.Text("serialNum"), data.Text("facilityName"))
+	}
+	return operations.NewPostFacilitiesOK()
 }
-
 
 func registryUrl(operationId string) string {
 	url := config.Config.Registry.Url + "/" + operationId

@@ -19,9 +19,6 @@ type CreateMedicineRegistryRequest struct {
 		Msgid string `json:"msgid"`
 	} `json:"params"`
 	Request map[string]interface{} `json:"request"`
-	//Request struct {
-	//	Medicine *models.CreateMedicineRequest `json:"Medicine"`
-	//} `json:"request"`
 }
 
 type RegistryResponse struct {
@@ -67,7 +64,6 @@ func makeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 	}
 	if resp.Response().StatusCode != 200 {
 		log.Error("Registry response is ", resp.Response().StatusCode, url)
-		//todo handle error
 		println(resp.Response().Status)
 		return NewGenericServerError()
 	}
