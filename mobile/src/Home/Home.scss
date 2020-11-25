@@ -1,15 +1,17 @@
+@import "styles/colors.scss";
+@import "styles/common-mixins.scss";
+
 .home-container {
   overflow: auto;
-  display: grid;
-  height: 100%;
-
+  height: 96%;
+  margin: 4%;
 
   .program-header {
     display: flex;
     flex-direction: column;
 
     .banner {
-      width: 500px;
+      width: 100%;
     }
   }
 
@@ -18,7 +20,9 @@
     flex-direction: column;
 
     .title {
-      margin-left: 5%;
+      color: $textColor;
+      font-weight: bold;
+      margin-top: 5%;
     }
 
     .content {
@@ -33,7 +37,40 @@
 
     .verify-card {
       height: 100%;
+      margin: 4%;
       grid-row: 1/3;
+      text-align: center;
+
+      .icon {
+        width: 100%;
+        padding: 20%;
+      }
+    }
+  }
+
+  .recipient-container {
+    .recipient-row {
+      margin-top: 4%;
+
+      .value {
+        border-radius: 50%;
+        text-align: center;
+        width: 100%;
+        margin: 4%;
+        padding: 25%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #f0f0f7;
+        font-size: 24px;
+        border: 2px solid $textWhiteColor;
+        font-weight: bold;
+        background-color: #5C9EF8;
+      }
+
+      .title {
+        text-align: start;
+      }
     }
   }
 }

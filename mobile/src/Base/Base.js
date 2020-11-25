@@ -88,16 +88,18 @@ FormCard.propTypes = {
 
 export function FormCard({title, content, onBack}) {
     return (
-        <BaseCard>
-            <Col>
-                <Row>
-                    <Button onClick={onBack}>Back</Button>
-                    <p>{title}</p>
-                </Row>
-                <div className={"line"}/>
-                {content}
-            </Col>
-        </BaseCard>
+        <div className={"form-card"}>
+            <BaseCard>
+                <Col>
+                    <Row>
+                        <Button onClick={onBack}>Back</Button>
+                        <p>{title}</p>
+                    </Row>
+                    <div className={"line"}/>
+                    {content}
+                </Col>
+            </BaseCard>
+        </div>
     );
 }
 

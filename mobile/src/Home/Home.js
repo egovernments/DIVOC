@@ -1,15 +1,20 @@
 import {BaseCard} from "../Base/Base";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./Home.scss"
-import {Button} from "react-bootstrap";
+import {Button, Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
+import vaccineBanner from "./vaccine_banner.png"
+import enrollRecipient from "./enroll_recipient.png"
+import recipientQueue from "./recipent_queue.png"
+import verifyRecipient from "./verify_recpient.png"
+import * as ProtoType from "prop-types";
+import Row from "react-bootstrap/Row";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
         <BaseCard>
-            COVID-19
-            {/*<img className={"banner"} src={vaccineBanner} alt={""}/>*/}
+            <img className={"banner"} src={vaccineBanner} alt={""}/>
         </BaseCard>
     </div>;
 }
@@ -27,39 +32,61 @@ function EnrollmentTypes() {
     const {goNext, goToQueue} = useHome()
     return <>
         <div className={"enroll-container"}>
-            <div className={"verify-card"}>
-                <BaseCard>
-                    <Button onClick={() => {
-                        goNext('/preEnroll/' + FORM_PRE_ENROLL_CODE)
-                    }}>Verify Recipient</Button>
-                </BaseCard>
-            </div>
-            <div className={"verify-card"}>
-                <BaseCard>
-                    <Button onClick={() => {
-                    }}>Enroll Recipient</Button>
-                </BaseCard>
-            </div>
-            <div className={"verify-card"}>
-                <BaseCard>
-                    <Button onClick={() => {
-                        goToQueue();
-                    }}>Recipient Queue</Button>
-                </BaseCard>
-            </div>
+            <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
+                goNext('/preEnroll/' + FORM_PRE_ENROLL_CODE)
+            }}/>
+            <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient}/>
+            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue}/>
         </div>
     </>;
 }
 
+EnrolmentItems.propTypes = {
+    icon: ProtoType.object.isRequired,
+    title: ProtoType.string.isRequired,
+    onClick: ProtoType.func
+};
+
+function EnrolmentItems({icon, title, onClick}) {
+    return (
+        <div className={"verify-card"} onClick={onClick}>
+            <BaseCard>
+                <Col>
+                    <img className={"icon"} src={icon} alt={""}/>
+                    <h6>{title}</h6>
+                </Col>
+            </BaseCard>
+        </div>
+    );
+}
+
+
+StatisticsItem.propTypes = {
+    value: ProtoType.string.isRequired,
+    title: ProtoType.string.isRequired
+};
+
+function StatisticsItem({title, value}) {
+    return (
+        <div className={"recipient-row"}>
+            <BaseCard>
+                <Row>
+                    <Col xs={3}>
+                        <div className={"value"}>{value}</div>
+                    </Col>
+                    <Col xs={7} className={"title"}>{title}</Col>
+                </Row>
+            </BaseCard>
+        </div>
+    );
+}
+
+
 function Statistics() {
-    return <>
-        <div className={"details-card"}>
-            <BaseCard>Recipient Waiting</BaseCard>
-        </div>
-        <div className={"details-card"}>
-            <BaseCard>Certified Issued</BaseCard>
-        </div>
-    </>;
+    return <div className={"recipient-container"}>
+        <StatisticsItem title={"Recipient Waiting"} value={32}/>
+        <StatisticsItem title={"Certified Issued"} value={16}/>
+    </div>;
 }
 
 export function VaccineProgram() {
