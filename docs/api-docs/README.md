@@ -1,3 +1,0 @@
-# DIVOC API Documentation
-
-

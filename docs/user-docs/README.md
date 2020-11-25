@@ -1,3 +1,0 @@
-# DIVOC User Documentation
-
-
