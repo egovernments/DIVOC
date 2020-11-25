@@ -1,12 +1,13 @@
 PWD := $(shell pwd)
 GOPATH := $(shell go env GOPATH)
+source := $(wildcard *.go **/*.go */*/*.go)
 
-all: build run
+all: divoc-portal-api-server run
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
-	@gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
-	@gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
+	@$(GOPATH)/bin/gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
+	@$(GOPATH)/bin/gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
 
 swagger_gen/restapi/server.go: ../interfaces/admin-portal.yaml
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
@@ -18,8 +19,10 @@ api_docs:
 	@swagger-merger -i $(PWD)/../interfaces/admin-portal.yaml -o $(PWD)/docs/api_docs/bundle.yaml
 
 build: divoc-portal-api-server
+	@echo "building $(source)"
+	@echo $(source)
 
-divoc-portal-api-server: swagger_gen/restapi/server.go
+divoc-portal-api-server: $(source) swagger_gen/restapi/server.go
 	@echo "Building Server to $(PWD)/divoc-portal-api-server ..."
 	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/portal-api/cmd/divoc-portal-api-server
 

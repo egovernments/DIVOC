@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import axios from "axios";
-import styles from "./RegistrationForm.module.css";
+import styles from "./VaccineRegistrationForm.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import DropDown from "../DropDown/DropDown";
+import {useKeycloak} from "@react-keycloak/web";
 
 function RegistrationForm() {
+    const { keycloak } = useKeycloak();
     const [formData, setFormInput] = useState({
         name: "",
         provider: "",
@@ -14,18 +16,19 @@ function RegistrationForm() {
             repeatTimes: 0,
             repeatInterval: 0
         },
-        effectiveUntil: 0,
+        effectiveUntil: 1,
         status: "Active",
         price: 0,
     });
 
     const handleSubmit = (event) => {
         const config = {
-            headers: { "Authorization": "Bearer abcd", "Content-Type": "application/json" }
+            headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json" }
         };
         axios
-            .post("/divoc/admin/api/v1/medicine", formData, config)
+            .post("/divoc/admin/api/v1/medicines", formData, config)
             .then((res) => {
+                alert("Status code is",res.status)
                 console.log(res);
             });
     };
@@ -124,13 +127,13 @@ function RegistrationForm() {
                 </div>
                 <div>
                     <p className={styles["title"]}>Effective Until</p>
-                    <DatePicker
+                    {/* <DatePicker
                         className={styles["input"]}
                         selected={formData.effectiveUntil}
                         onChange={(date) =>
                             setFormInput({ ...formData, effectiveUntil: date })
                         }
-                    />
+                    /> */}
                 </div>
                 <div className={styles["box"]}>
                     <div>
@@ -139,7 +142,7 @@ function RegistrationForm() {
                             type="number"
                             name="price"
                             value={formData.price}
-                            onChange={handleFormInputChange}
+                            onChange={(evt) => { setFormInput({ ...formData,price: parseInt(evt.target.value)})}}
                             className={styles["input"]}
                             required
                         />
@@ -161,18 +164,6 @@ function RegistrationForm() {
                                 }}
                                 required
                             />
-                            <label className={styles['upload-pdf']} htmlFor="file">
-                                {formData.file
-                                    ? formData.file.name
-                                    : " Upload PDF"}
-                            </label>
-                            <button
-                                type="button"
-                                onClick={handleSubmit}
-                                className={styles["upload-button"]}
-                            >
-                                Upload
-                            </button>
                         </div>
                     </div>
                 </div>

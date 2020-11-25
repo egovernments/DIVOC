@@ -8,6 +8,7 @@ import Dashboard from './components/Dashboard'
 import {PrivateRoute} from "./utils/PrivateRoute";
 import {useKeycloak} from "@react-keycloak/web";
 import React from "react";
+import Admin from '../src/components/Admin/Admin';
 
 export default function App() {
   const {initialized, keycloak} = useKeycloak();
@@ -24,6 +25,7 @@ export default function App() {
             <li><Link to="/dashboard">Dashboard</Link></li>
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/about">What is DIVOC?</Link></li>
+            <li><Link to="/admin">Admin</Link></li>
             <li><button onClick={() => {keycloak.logout()}}>LOGOUT</button></li>
           </ul>
 
@@ -41,6 +43,7 @@ export default function App() {
             <Route exact path="/login" component={Login}/>
             <PrivateRoute exact path="/dashboard" component={Dashboard}/>
             <PrivateRoute exact path="/about" component={About}/>
+            <PrivateRoute exact path="/admin" component={Admin}/>
           </Switch>
         </div>
       </Router>
