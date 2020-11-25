@@ -18,11 +18,16 @@ function ProgramRegistration() {
         medicineIds: [""],
     });
 
+    const [startDate,setStartDate] = useState("")
+    const [endDate,setEndDate] = useState("")
+
     const handleSubmit = (event) => {
+        
         const config = {headers: { "Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"}};
         axios
-            .post("/divoc/admin/api/v1/program", formData, config)
+            .post("/divoc/admin/api/v1/programs", formData, config)
             .then((res) => {
+                alert("Status code is",res);
                 console.log(res);
             });
     };
@@ -92,9 +97,12 @@ function ProgramRegistration() {
                         <p className={styles["title"]}>Start Date</p>
                         <DatePicker
                             className={styles["input"]}
-                            selected={formData.startDate}
-                            onChange={(date) =>
-                                setFormInput({ ...formData, startDate: date })
+                            dateFormat="yyyy-MM-dd"
+                            selected={startDate}
+                            onChange={(date) => {
+                                setFormInput({ ...formData, startDate: date.toISOString().slice(0,10)})
+                                setStartDate(date)
+                            }   
                             }
                         />
                     </div>
@@ -102,10 +110,12 @@ function ProgramRegistration() {
                         <p className={styles["title"]}>End Date</p>
                         <DatePicker
                             className={styles["input"]}
-                            selected={formData.endDate}
-                            onChange={(date) =>
-                                setFormInput({ ...formData, endDate: date })
-                            }
+                            dateFormat="yyyy-MM-dd"
+                            selected={endDate}  
+                            onChange={(date) =>{
+                                setFormInput({ ...formData, endDate: date.toISOString().slice(0,10) })   
+                                setEndDate(date)                             
+                            }}
                         />
                     </div>
                 </div>
@@ -115,7 +125,7 @@ function ProgramRegistration() {
                         type="radio"
                         id="active"
                         name="status"
-                        value="active"
+                        value="Active"
                         onClick={handleFormInputChange}
                     />
                     <label className={styles["radio-label"]} htmlFor="acive">
@@ -125,7 +135,7 @@ function ProgramRegistration() {
                         type="radio"
                         id="inactive"
                         name="status"
-                        value="inactive"
+                        value="Inactive"
                         onClick={handleFormInputChange}
                     />
                     <label className={styles["radio-label"]} htmlFor="inactive">
@@ -135,7 +145,7 @@ function ProgramRegistration() {
                         type="radio"
                         id="blocked"
                         name="status"
-                        value="blocked"
+                        value="Blocked"
                         onClick={handleFormInputChange}
                     />
                     <label className={styles["radio-label"]} htmlFor="blocked">
