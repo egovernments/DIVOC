@@ -7,6 +7,7 @@ import VaccineRegistration from "../VaccineRegistration/VaccineRegistration";
 import FacilitiesRegistry from "../FacilitiesRegistry/FacilitiesRegistry";
 import ProgramRegistration from "../ProgramRegistration/ProgramRegistration";
 import VaccinatorsRegistry from "../VaccinatorsRegistry/VaccinatorsRegistry";
+import PreEnrollment from "../PreEnrollment/PreEnrollment";
 
 function TabPanel(props) {
     const { children, value, index, ...other } = props;
@@ -34,6 +35,7 @@ export default function Admin() {
                     <Tab label="Vaccinators" />
                     <Tab label="Vaccine Programs" />
                     <Tab label="Vaccines" />
+                    <Tab label="Enrollment" />
                 </Tabs>
             </Paper>
             <TabPanel value={value} index={0}>
@@ -47,6 +49,9 @@ export default function Admin() {
             </TabPanel>
             <TabPanel value={value} index={3}>
                 <VaccineRegistration />
+            </TabPanel>
+            <TabPanel value={value} index={4}>
+                <PreEnrollment />
             </TabPanel>
         </>
     );
