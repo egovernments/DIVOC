@@ -8,7 +8,9 @@ services:
       - POSTGRES_USER=keycloak
       - POSTGRES_PASSWORD=keycloak
   keycloak:
-    image: jboss/keycloak
+    image: dockerhub/keycloak
+#    build:
+#      .
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
