@@ -1,7 +1,7 @@
 import React from 'react';
 import './Base.scss'
 import Alert from "react-bootstrap/Alert";
-import {Card} from "react-bootstrap";
+import {Button, Card, Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import Nav from "react-bootstrap/Nav";
 import {Link} from "react-router-dom";
@@ -79,3 +79,27 @@ export function BottomItem({src, href, title}) {
         </Link>
     </Nav.Item>;
 }
+
+FormCard.propTypes = {
+    title: PropTypes.string.isRequired,
+    content: PropTypes.object.isRequired,
+    onBack: PropTypes.func.isRequired
+};
+
+export function FormCard({title, content, onBack}) {
+    return (
+        <div className={"form-card"}>
+            <BaseCard>
+                <Col>
+                    <Row>
+                        <Button onClick={onBack}>Back</Button>
+                        <p>{title}</p>
+                    </Row>
+                    <div className={"line"}/>
+                    {content}
+                </Col>
+            </BaseCard>
+        </div>
+    );
+}
+

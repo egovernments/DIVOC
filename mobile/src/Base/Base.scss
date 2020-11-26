@@ -38,12 +38,10 @@
 }
 
 .my-card {
-  height: 95%;
-  margin: 5%;
+  height: 100%;
 }
 
 .bottom-item {
-
 
   .icon {
     height: 30px;
@@ -53,4 +51,9 @@
   .title {
     padding-top: 8px;
   }
+}
+
+.form-card {
+  height: 100%;
+  margin: 5%;
 }
