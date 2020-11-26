@@ -15,6 +15,8 @@ export default function App() {
   if (!initialized) {
     return <div>Loading...</div>
   }
+  const checkIFRoleIsAdmin = keycloak.hasResourceRole('admin', 'vaccination_api');
+
   return (
     <div>
       <div><img src={logo}></img></div>
@@ -25,7 +27,7 @@ export default function App() {
             <li><Link to="/dashboard">Dashboard</Link></li>
             <li><Link to="/login">Login</Link></li>
             <li><Link to="/about">What is DIVOC?</Link></li>
-            <li><Link to="/admin">Admin</Link></li>
+            {checkIFRoleIsAdmin ? <li><Link to="/admin">Admin</Link></li> : ''}
             <li><button onClick={() => {keycloak.logout()}}>LOGOUT</button></li>
           </ul>
 
@@ -43,7 +45,7 @@ export default function App() {
             <Route exact path="/login" component={Login}/>
             <PrivateRoute exact path="/dashboard" component={Dashboard}/>
             <PrivateRoute exact path="/about" component={About}/>
-            <PrivateRoute exact path="/admin" component={Admin}/>
+            {checkIFRoleIsAdmin ? <PrivateRoute exact path="/admin" component={Admin}/> : ''}
           </Switch>
         </div>
       </Router>
