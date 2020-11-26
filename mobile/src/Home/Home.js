@@ -1,5 +1,6 @@
 import {BaseCard} from "../Base/Base";
-import React, {createContext, useContext, useMemo, useReducer} from "react";
+import {AppDatabase, indexDb} from "../AppDatabase";
+import React, {createContext, useContext, useMemo, useReducer, useState} from "react";
 import "./Home.scss"
 import {Button, Col} from "react-bootstrap";
 import {useHistory} from "react-router";
@@ -35,14 +36,16 @@ function EnrollmentTypes() {
             <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
                 goNext('/preEnroll/' + FORM_PRE_ENROLL_CODE)
             }}/>
-            <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient}/>
-            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue}/>
+            <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient} onClick={() => {
+            }}/>
+            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={() => {
+            }}/>
         </div>
     </>;
 }
 
 EnrolmentItems.propTypes = {
-    icon: ProtoType.object.isRequired,
+    icon: ProtoType.string.isRequired,
     title: ProtoType.string.isRequired,
     onClick: ProtoType.func
 };
@@ -83,9 +86,10 @@ function StatisticsItem({title, value}) {
 
 
 function Statistics() {
+    const [result, setResults] = useState([])
+    indexDb.recipientDetails().then((result) => setResults(result))
     return <div className={"recipient-container"}>
-        <StatisticsItem title={"Recipient Waiting"} value={32}/>
-        <StatisticsItem title={"Certified Issued"} value={16}/>
+        {result.map((item) => <StatisticsItem key={item.title} title={item.title} value={"" + item.value}/>)}
     </div>;
 }
 
