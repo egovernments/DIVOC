@@ -9,7 +9,6 @@ function VaccineRegistration() {
     const [formData, setFormData] = useState(null);
 
     const schema = {
-        title: "Register New Vaccine",
         type: "object",
         properties: {
             name: {
@@ -23,27 +22,19 @@ function VaccineRegistration() {
             schedule: {
                 title: "Schedule",
                 type: "object",
-                description:
-                    "How many times and how often vaccination should be repeated",
                 properties: {
                     repeatTimes: {
                         type: "number",
                         title: "Repeat times",
-                        description:
-                            "How many times vaccination should be taken",
                     },
                     repeatInterval: {
                         title: "Repeat interval",
                         type: "number",
-                        description:
-                            "Number of times the vaccination should be taken.",
                     },
                 },
             },
             effectiveUntil: {
                 type: "number",
-                description:
-                    "Effective until n months after the full vaccination schedule is completed",
                 title: "Effective until (months)",
             },
             status: {
@@ -73,12 +64,18 @@ function VaccineRegistration() {
             });
     };
 
-    const uiSchema = {};
+    const uiSchema = {
+        classNames: styles["form-conatiner"],
+        title: {
+            classNames: styles["form-title"],
+        },
+    };
 
 
     return (
         <div className={styles["container"]}>
             <div className={styles["registration-form"]}>
+                <h4 className={styles['heading']}>Register New Vaccine</h4>
                 <Form
                     schema={schema}
                     uiSchema={uiSchema}
