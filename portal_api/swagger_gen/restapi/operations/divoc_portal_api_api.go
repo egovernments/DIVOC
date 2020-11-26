@@ -43,6 +43,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		PostEnrollmentsHandler: PostEnrollmentsHandlerFunc(func(params PostEnrollmentsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation PostEnrollments has not yet been implemented")
+		}),
 		PostFacilitiesHandler: PostFacilitiesHandlerFunc(func(params PostFacilitiesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation PostFacilities has not yet been implemented")
 		}),
@@ -117,6 +120,8 @@ type DivocPortalAPIAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// PostEnrollmentsHandler sets the operation handler for the post enrollments operation
+	PostEnrollmentsHandler PostEnrollmentsHandler
 	// PostFacilitiesHandler sets the operation handler for the post facilities operation
 	PostFacilitiesHandler PostFacilitiesHandler
 	// PostVaccinatorsHandler sets the operation handler for the post vaccinators operation
@@ -216,6 +221,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
+	if o.PostEnrollmentsHandler == nil {
+		unregistered = append(unregistered, "PostEnrollmentsHandler")
+	}
 	if o.PostFacilitiesHandler == nil {
 		unregistered = append(unregistered, "PostFacilitiesHandler")
 	}
@@ -338,6 +346,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/enrollments"] = NewPostEnrollments(o.context, o.PostEnrollmentsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

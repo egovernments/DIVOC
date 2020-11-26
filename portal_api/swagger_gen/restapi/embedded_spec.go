@@ -36,6 +36,33 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/enrollments": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "summary": "Upload facility csv for bulk ingestion of pre enrollment",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Facility data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facilities": {
       "get": {
         "summary": "get facilities",
@@ -576,6 +603,33 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/enrollments": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "summary": "Upload facility csv for bulk ingestion of pre enrollment",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Facility data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facilities": {
       "get": {
         "summary": "get facilities",

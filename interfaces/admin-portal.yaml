@@ -54,6 +54,23 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /enrollments:
+    post:
+      summary: Upload facility csv for bulk ingestion of pre enrollment
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /vaccinators:
     get:
       summary: Get vaccinators
