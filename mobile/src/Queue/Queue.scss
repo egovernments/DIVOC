@@ -1,10 +1,65 @@
-.queue-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  height: 100%;
+.App {
+  background: linear-gradient(0deg, #F3F6F9 70%, #4E67D1 30%);
+}
 
-  .title {
+.queue-container {
+  height: 100%;
+  margin: 2rem 1rem 0.2rem;
+  overflow: scroll;
+
+  .card {
+    height: 90%;
+    border-radius: 1rem;
+    border: none;
+
+    .card-header {
+      background: white;
+      text-align: center;
+      border-bottom-color: #4E67D1;
+      border-radius: 1rem 1rem 0 0;
+      color: #646D82;
+      padding: 1.25rem;
+
+      span {
+        font-weight: 500;
+      }
+    }
+
+    .card-body {
+      padding: 0 1rem;
+      margin-bottom: 1rem;
+      overflow: scroll;
+      height: 1px;
+
+      .table {
+        font-size: 14px;
+
+        thead {
+          tr {
+            th {
+              border: none !important;
+              color: #646D82;
+            }
+          }
+        }
+
+        tbody {
+          color: #646D82;
+        }
+      }
+
+    }
+  }
+
+  .verify-btn {
+    width: 100%;
+    background: #4CA07A;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 14px;
+    font-weight: 500;
     text-align: center;
   }
 }
