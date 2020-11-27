@@ -1,13 +1,21 @@
 import React from "react";
-import {BaseCard} from "../Base/Base";
 import "./Queue.scss"
+import {RecipientQueueTable} from "../components/RecipientQueueTable";
+import {InfoCard} from "../components/InfoCard";
+import {Link} from "react-router-dom";
 
 export function Queue(props) {
+
     return (
-        <BaseCard>
-            <div className={"queue-container"}>
-                <h1 className={"title"}>Queue</h1>
+        <div className="queue-container">
+            <RecipientQueueTable/>
+            <div className="d-flex justify-content-between mt-2">
+                <InfoCard metric={52} title={"Recipient Waiting"}/>
+                <InfoCard metric={52} title={"Certificates Issued"}/>
             </div>
-        </BaseCard>
+            <Link className="mt-2 d-block verify-btn">{"VERIFY NEXT RECIPIENT"}</Link>
+        </div>
     );
 }
+
+

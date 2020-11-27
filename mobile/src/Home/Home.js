@@ -1,6 +1,6 @@
 import {BaseCard} from "../Base/Base";
 import {AppDatabase, indexDb} from "../AppDatabase";
-import React, {createContext, useContext, useMemo, useReducer, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useReducer, useState} from "react";
 import "./Home.scss"
 import {Button, Col} from "react-bootstrap";
 import {useHistory} from "react-router";
@@ -30,7 +30,7 @@ function Title({text, content}) {
 export default Home;
 
 function EnrollmentTypes() {
-    const {goNext, goToQueue} = useHome()
+    const {goNext, goToQueue} = useHome();
     return <>
         <div className={"enroll-container"}>
             <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
@@ -38,8 +38,7 @@ function EnrollmentTypes() {
             }}/>
             <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient} onClick={() => {
             }}/>
-            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={() => {
-            }}/>
+            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={goToQueue}/>
         </div>
     </>;
 }
@@ -86,8 +85,10 @@ function StatisticsItem({title, value}) {
 
 
 function Statistics() {
-    const [result, setResults] = useState([])
-    indexDb.recipientDetails().then((result) => setResults(result))
+    const [result, setResults] = useState([]);
+    useEffect(() => {
+        indexDb.recipientDetails().then((result) => setResults(result));
+    }, []);
     return <div className={"recipient-container"}>
         {result.map((item) => <StatisticsItem key={item.title} title={item.title} value={"" + item.value}/>)}
     </div>;
@@ -115,28 +116,28 @@ const initialState = {pageNo: 0};
 function homeReducer(state, action) {
     switch (action.type) {
         case ACTION_VERIFY_RECIPIENT: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 0) {
                 return {pageNo: 1, ...state};
             }
             return {pageNo: 0, ...state};
         }
         case ACTION_PRE_ENROLLMENT_CODE: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 1) {
                 return {pageNo: 2, ...state};
             }
             return {pageNo: 0, ...state};
         }
         case ACTION_PRE_ENROLLMENT_DETAILS: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 2) {
                 return {pageNo: 3, ...state};
             }
             return {pageNo: 0, ...state};
         }
         case ACTION_VERIFY_AADHAR_NUMBER: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 3) {
                 return {pageNo: 4, ...state};
             }
@@ -144,14 +145,14 @@ function homeReducer(state, action) {
         }
         case ACTION_VERIFY_AADHAR_OTP: {
 
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 4) {
                 return {pageNo: 5, ...state};
             }
             return {pageNo: 0, ...state};
         }
         case ACTION_GO_NEXT: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 6) {
                 return {pageNo: 0};
             }
@@ -159,7 +160,7 @@ function homeReducer(state, action) {
         }
 
         case ACTION_GO_BACK: {
-            const payload = action.payload
+            const payload = action.payload;
             if (payload.pageNo === 0) {
                 return {pageNo: 0};
             }
@@ -181,33 +182,33 @@ export const ACTION_GO_BACK = 'goBack';
 const HomeContext = createContext(null);
 
 export function useHome() {
-    const context = useContext(HomeContext)
+    const context = useContext(HomeContext);
     const history = useHistory();
     if (!context) {
         throw new Error(`useHome must be used within a HomeProvider`)
     }
-    const [state, dispatch] = context
+    const [state, dispatch] = context;
 
     const goToVerifyRecipient = function () {
         dispatch({type: ACTION_VERIFY_RECIPIENT, payload: {pageNo: 0}})
         //history.push(`/verifyRecipient`)
-    }
+    };
 
     const goToQueue = function () {
         history.push(`/queue`)
-    }
+    };
 
     const goNext = function (path) {
-        dispatch({type: ACTION_GO_NEXT, payload: {pageNo: state.pageNo}})
+        dispatch({type: ACTION_GO_NEXT, payload: {pageNo: state.pageNo}});
         if (path) {
             history.push(path)
         }
-    }
+    };
 
     const goBack = function () {
-        history.goBack()
+        history.goBack();
         dispatch({type: ACTION_GO_BACK, payload: {pageNo: state.pageNo}})
-    }
+    };
 
     return {
         state,
@@ -220,7 +221,7 @@ export function useHome() {
 }
 
 export function HomeProvider(props) {
-    const [state, dispatch] = useReducer(homeReducer, initialState)
-    const value = useMemo(() => [state, dispatch], [state])
+    const [state, dispatch] = useReducer(homeReducer, initialState);
+    const value = useMemo(() => [state, dispatch], [state]);
     return <HomeContext.Provider value={value} {...props} />
 }
