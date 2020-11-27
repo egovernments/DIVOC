@@ -66,7 +66,7 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal interfa
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal interface{}) middleware.Responder {
-	return getEntityType("Operator")
+	return getEntityType("Vaccinator")
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal interface{}) middleware.Responder {
@@ -109,9 +109,7 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal i
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
-		//createPreEnrollment(&data)
-		//Name, Mobile, National Identifier, DOB, facilityId
-		//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
+		createEnrollment(&data)
 		log.Info(data.Text("mobile"), data.Text("name"))
 	}
 	return operations.NewPostEnrollmentsOK()
@@ -121,7 +119,7 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal int
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
-		createFacility(&data)
+		createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
 	return operations.NewPostFacilitiesOK()

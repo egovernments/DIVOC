@@ -223,7 +223,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Operator"
+                "$ref": "#/definitions/Vaccinator"
               }
             }
           }
@@ -421,66 +421,6 @@ func init() {
         }
       }
     },
-    "Operator": {
-      "type": "object",
-      "title": "The Operator Schema",
-      "required": [
-        "serialNum",
-        "operatorCode",
-        "nationalIdentifier",
-        "operatorName",
-        "facilityIds",
-        "mobileNumber",
-        "averageRating",
-        "trainingCertificate",
-        "status"
-      ],
-      "properties": {
-        "averageRating": {
-          "type": "number"
-        },
-        "facilityIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "mobileNumber": {
-          "type": "string",
-          "maxLength": 10,
-          "minLength": 10
-        },
-        "nationalIdentifier": {
-          "type": "string"
-        },
-        "operatorCode": {
-          "type": "string"
-        },
-        "operatorName": {
-          "type": "string",
-          "title": "Full name"
-        },
-        "serialNum": {
-          "type": "integer"
-        },
-        "signatures": {
-          "type": "array",
-          "items": {
-            "$ref": "Signature.json#/definitions/Signature"
-          }
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Active",
-            "Inactive"
-          ]
-        },
-        "trainingCertificate": {
-          "type": "string"
-        }
-      }
-    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -560,6 +500,66 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "Vaccinator": {
+      "type": "object",
+      "title": "The Operator Schema",
+      "required": [
+        "serialNum",
+        "code",
+        "nationalIdentifier",
+        "name",
+        "facilityIds",
+        "mobileNumber",
+        "averageRating",
+        "trainingCertificate",
+        "status"
+      ],
+      "properties": {
+        "averageRating": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name"
+        },
+        "nationalIdentifier": {
+          "type": "string"
+        },
+        "serialNum": {
+          "type": "integer"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "Signature.json#/definitions/Signature"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
         }
       }
     }
@@ -790,7 +790,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Operator"
+                "$ref": "#/definitions/Vaccinator"
               }
             }
           }
@@ -1001,66 +1001,6 @@ func init() {
         }
       }
     },
-    "Operator": {
-      "type": "object",
-      "title": "The Operator Schema",
-      "required": [
-        "serialNum",
-        "operatorCode",
-        "nationalIdentifier",
-        "operatorName",
-        "facilityIds",
-        "mobileNumber",
-        "averageRating",
-        "trainingCertificate",
-        "status"
-      ],
-      "properties": {
-        "averageRating": {
-          "type": "number"
-        },
-        "facilityIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "mobileNumber": {
-          "type": "string",
-          "maxLength": 10,
-          "minLength": 10
-        },
-        "nationalIdentifier": {
-          "type": "string"
-        },
-        "operatorCode": {
-          "type": "string"
-        },
-        "operatorName": {
-          "type": "string",
-          "title": "Full name"
-        },
-        "serialNum": {
-          "type": "integer"
-        },
-        "signatures": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/signature"
-          }
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Active",
-            "Inactive"
-          ]
-        },
-        "trainingCertificate": {
-          "type": "string"
-        }
-      }
-    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -1140,6 +1080,66 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "Vaccinator": {
+      "type": "object",
+      "title": "The Operator Schema",
+      "required": [
+        "serialNum",
+        "code",
+        "nationalIdentifier",
+        "name",
+        "facilityIds",
+        "mobileNumber",
+        "averageRating",
+        "trainingCertificate",
+        "status"
+      ],
+      "properties": {
+        "averageRating": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name"
+        },
+        "nationalIdentifier": {
+          "type": "string"
+        },
+        "serialNum": {
+          "type": "integer"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signature"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
         }
       }
     },

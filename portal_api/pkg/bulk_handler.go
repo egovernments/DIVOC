@@ -34,11 +34,11 @@ func createVaccinator(data *Scanner) error {
 		Signatures: []*models.Signature{},
 		TrainingCertificate: &trainingCertificate,
 	}
-	makeRegistryCreateRequest(vaccinator, "Operator")
+	makeRegistryCreateRequest(vaccinator, "Vaccinator")
 	return nil
 }
 
-func createFacility(data *Scanner) error {
+func createFacility(data *Scanner, authHeader string) error {
 	//todo: pass it to queue and then process.
 	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
@@ -74,7 +74,7 @@ func createFacility(data *Scanner) error {
 	for _, mobile := range facility.Admins {
 		//create keycloak user for
 		log.Info("Creating administrative login for the facility ", facility.FacilityName, mobile)
-		resp, err := req.Post(config.Config.Keycloak.Url, struct {
+		resp, err := req.Post(config.Config.Keycloak.Url, req.BodyJSON(struct {
 			Username string `json:"username"`
 			Enabled string `json:"enabled"`
 			Attributes struct{
@@ -88,7 +88,10 @@ func createFacility(data *Scanner) error {
 			}{
 				MobileNumber: mobile,
 			},
-		})
+		}),
+			req.Header{"Authorization":authHeader},
+		)
+		log.Info("Created keycloak user" , resp.String());
 		if err != nil || resp.Response().StatusCode != 200 {
 			log.Fatal("Error while creating keycloak admin user : ", mobile)
 		}
