@@ -14,6 +14,21 @@ type GenericResponse struct {
 	statusCode int
 }
 
+type GenericJsonResponse struct {
+	body interface{}
+}
+
+func (o *GenericJsonResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	bytes, err := json.Marshal(o.body)
+	if err != nil {
+		rw.WriteHeader(500)
+		rw.Write([]byte("JSON Marshalling error"))
+	}
+	rw.WriteHeader(200)
+	rw.Write(bytes)
+}
+
 func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 	rw.WriteHeader(o.statusCode)
@@ -21,6 +36,10 @@ func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime
 
 func NewGenericStatusOk() middleware.Responder {
 	return &GenericResponse{statusCode: 200}
+}
+
+func NewGenericJSONResponse(body interface{}) middleware.Responder {
+	return &GenericJsonResponse{body: body}
 }
 
 func NewGenericServerError() middleware.Responder {
@@ -35,21 +54,23 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetVaccinatorsHandler = operations.GetVaccinatorsHandlerFunc(getVaccinatorsHandler)
 	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
+	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
-	return NewGenericStatusOk()
+	return getEntityType("Program")
 }
+
 func getMedicinesHandler(params operations.GetMedicinesParams, principal interface{}) middleware.Responder {
-	return NewGenericStatusOk()
+	return getEntityType("Medicine")
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal interface{}) middleware.Responder {
-	return NewGenericStatusOk()
+	return getEntityType("Operator")
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal interface{}) middleware.Responder {
-	return NewGenericStatusOk()
+	return getEntityType("Facility")
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal interface{}) middleware.Responder {
@@ -83,6 +104,19 @@ func createProgramHandler(params operations.CreateProgramParams, principal inter
 	}
 	return makeRegistryCreateRequest(requestMap, objectId)
 }
+
+func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal interface{}) middleware.Responder {
+	data := NewScanner(params.File)
+	defer params.File.Close()
+	for data.Scan() {
+		//createPreEnrollment(&data)
+		//Name, Mobile, National Identifier, DOB, facilityId
+		//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
+		log.Info(data.Text("mobile"), data.Text("name"))
+	}
+	return operations.NewPostEnrollmentsOK()
+}
+
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal interface{}) middleware.Responder {
 	data := NewScanner(params.File)
 	defer params.File.Close()

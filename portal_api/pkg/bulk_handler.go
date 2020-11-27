@@ -1,7 +1,10 @@
 package pkg
 
 import (
+	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/models"
+	"github.com/imroc/req"
+	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 )
@@ -68,5 +71,27 @@ func createFacility(data *Scanner) error {
 		},
 	}
 	makeRegistryCreateRequest(facility, "Facility")
+	for _, mobile := range facility.Admins {
+		//create keycloak user for
+		log.Info("Creating administrative login for the facility ", facility.FacilityName, mobile)
+		resp, err := req.Post(config.Config.Keycloak.Url, struct {
+			Username string `json:"username"`
+			Enabled string `json:"enabled"`
+			Attributes struct{
+				MobileNumber string `json:"mobile_number"`
+			}
+		}{
+			Username: mobile,
+			Enabled: "true",
+			Attributes: struct {
+				MobileNumber string `json:"mobile_number"`
+			}{
+				MobileNumber: mobile,
+			},
+		})
+		if err != nil || resp.Response().StatusCode != 200 {
+			log.Fatal("Error while creating keycloak admin user : ", mobile)
+		}
+	}
 	return nil
 }

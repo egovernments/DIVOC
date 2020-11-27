@@ -3,3 +3,5 @@ registry:
   addOperationId: add
   searchOperationId: search
   readOperationId: read
+keycloak:
+  url: http://localhost:8080
