@@ -1,15 +1,16 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.scss';
-import {LoginComponent} from "./Login/Login";
-import {AuthProvider, useAuthorizedUser} from "./authentication";
-import Home from "./Home/Home";
+import Dashboard from "./Dashboard/Dashboard";
+import {useKeycloak} from "@react-keycloak/web";
 
 function App() {
-    const {state} = useAuthorizedUser();
+    const {initialized} = useKeycloak();
+    if (!initialized) {
+        return <div>Loading...</div>
+    }
     return (
         <div className="App">
-            {state.isLoggedIn ? <Home/> : <LoginComponent/>}
+            <Dashboard/>
         </div>
     );
 }

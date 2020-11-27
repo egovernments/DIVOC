@@ -35,7 +35,7 @@ func (o *CreateProgramURL) SetBasePath(bp string) {
 func (o *CreateProgramURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/program"
+	var _path = "/programs"
 
 	_basePath := o._basePath
 	if _basePath == "" {

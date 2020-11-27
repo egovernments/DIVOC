@@ -28,8 +28,35 @@ produces:
   - application/json
 paths:
   /facilities:
+    get:
+      summary: get facilities
+      operationId: getFacilities
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Facility'
     post:
       summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /enrollments:
+    post:
+      summary: Upload facility csv for bulk ingestion of pre enrollment
       consumes:
         - multipart/form-data
       parameters:
@@ -45,6 +72,16 @@ paths:
         '401':
           description: Unauthorized
   /vaccinators:
+    get:
+      summary: Get vaccinators
+      operationId: getVaccinators
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Operator'
     post:
       summary: Upload facility csv for bulk ingestion
       consumes:
@@ -61,7 +98,21 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
-  /program:
+  /programs:
+    get:
+      summary: get program list
+      operationId: getPrograms
+      security:
+        - hasRole:
+            - admin
+            - user
+      responses:
+        '200':
+            description: OK
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Program'
     post:
       summary: Create program
       operationId: createProgram
@@ -78,12 +129,25 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
-  /medicine:
+  /medicines:
+    get:
+      summary: Get medicines
+      operationId: getMedicines
+      security:
+        - hasRole: ["user", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/CreateMedicineRequest'
     post:
       summary: Create Medicine
       operationId: createMedicine
       security:
-        - hasRole: ['admin']
+        - hasRole: ["admin"]
       parameters:
         - in: body
           name: body
@@ -150,8 +214,176 @@ definitions:
       price:
         type: number
         description: Indicative price if fixed or max price available.
-
-
+  Facility:
+    properties:
+      serialNum:
+        type: integer
+        title: Serial Number
+      facilityCode:
+        type: string
+        title: Facility Code
+      facilityName:
+        type: string
+        title: Facility Name
+      address:
+        "$ref": "#/definitions/Address"
+        title: Address
+      geoLocation:
+        type: string
+        title: Geo Location
+      websiteUrl:
+        type: string
+        title: Website URL
+      contact:
+        type: string
+        title: Contact number
+      operatingHourStart:
+        type: integer
+        title: Operating hours start of day
+      operatingHourEnd:
+        type: integer
+        title: Operating hours end of day
+      category:
+        type: string
+        title: Category
+        enum:
+          - GOVT
+          - PRIVATE
+      type:
+        type: string
+        title: Type of Facility
+        enum:
+          - Fixed location
+          - Mobile
+          - Both
+      averageRating:
+        type: number
+        title: Average Rating
+        description: Average Rating of Facility 0 to 5, 0 for no rating.
+        default: 0
+      status:
+        type: string
+        title: Status of Facility
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      admins:
+        type: array
+        items:
+          type: string
+      stamp:
+        type: string
+  Address:
+    type: object
+    title: Address
+    description: Indian address format
+    example:
+      - addressLine1: no. 23, some lane, some road
+        addressLine2: some nagar
+        district: bangalore south
+        state: Karnataka
+        pincode: 560000
+    required:
+      - addressLine1
+      - addressLine2
+      - district
+      - state
+      - pincode
+    properties:
+      addressLine1:
+        type: string
+      addressLine2:
+        type: string
+      district:
+        type: string
+      pincode:
+        type: integer
+      state:
+        type: string
+        title: The state schema
+        description: State of address
+        example:
+          - Karnataka
+  Operator:
+    type: object
+    title: The Operator Schema
+    required:
+      - serialNum
+      - operatorCode
+      - nationalIdentifier
+      - operatorName
+      - facilityIds
+      - mobileNumber
+      - averageRating
+      - trainingCertificate
+      - status
+    properties:
+      signatures:
+        type: array
+        items:
+          "$ref": Signature.json#/definitions/Signature
+      serialNum:
+        type: integer
+      operatorCode:
+        type: string
+      nationalIdentifier:
+        type: string
+      operatorName:
+        type: string
+        title: Full name
+      facilityIds:
+        type: array
+        items:
+          type: string
+      mobileNumber:
+        type: string
+        maxLength: 10
+        minLength: 10
+      averageRating:
+        type: number
+      trainingCertificate:
+        type: string
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+  Program:
+    type: object
+    title: Program
+    required:
+      - name
+      - description
+      - startDate
+    properties:
+      name:
+        type: string
+        title: Name
+      description:
+        type: string
+        title: Description
+      logoURL:
+        type: string
+        title: Logo URL
+      startDate:
+        type: string
+        title: Start Date
+        format: date
+      endDate:
+        type: string
+        title: End Date
+        format: date
+      status:
+        type: string
+        title: Status
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
 host: divoc.xiv.in
 schemes:
   - https

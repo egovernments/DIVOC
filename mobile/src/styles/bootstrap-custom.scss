@@ -1,9 +1,9 @@
 @import "styles/colors.scss";
 
 $theme-colors: (
-  "primary": $primaryThemeColor,
-  "secondary": $secondaryThemeColor,
+        "primary": $primaryThemeColor,
+        "secondary": $secondaryThemeColor,
 );
 
 /* import bootstrap to set changes */
-@import "../../../node_modules/bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";

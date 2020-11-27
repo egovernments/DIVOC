@@ -1,16 +1,76 @@
-@import "styles/common-mixins.scss";
 @import "styles/colors.scss";
+@import "styles/common-mixins.scss";
 
 .home-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  @include card-box-shadow();
-  background-color: white;
-  margin: 16px;
-  height: 100%;
+  overflow: auto;
+  height: 96%;
+  margin: 4%;
 
-  .logout {
-    width: 50%;
+  .program-header {
+    display: flex;
+    flex-direction: column;
+
+    .banner {
+      width: 100%;
+    }
+  }
+
+  .title-container {
+    display: flex;
+    flex-direction: column;
+
+    .title {
+      color: $textColor;
+      font-weight: bold;
+      margin-top: 5%;
+    }
+
+    .content {
+      width: 100%;
+    }
+  }
+
+  .enroll-container {
+    display: grid;
+    grid-template-columns: repeat(3,1fr)/repeat(3,1fr);
+    height: 50%;
+
+    .verify-card {
+      height: 100%;
+      margin: 4%;
+      grid-row: 1/3;
+      text-align: center;
+
+      .icon {
+        width: 100%;
+        padding: 20%;
+      }
+    }
+  }
+
+  .recipient-container {
+    .recipient-row {
+      margin-top: 4%;
+
+      .value {
+        border-radius: 50%;
+        text-align: center;
+        width: 100%;
+        margin: 4%;
+        padding: 25%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        color: #f0f0f7;
+        font-size: 24px;
+        border: 2px solid $textWhiteColor;
+        font-weight: bold;
+        background-color: #5C9EF8;
+      }
+
+      .title {
+        text-align: start;
+      }
+    }
   }
 }

@@ -6,6 +6,7 @@ import Button from "react-bootstrap/Button";
 import {ApiServices} from "../Services/apiServices";
 import {useLogin} from "./Login";
 import {LoginLabels} from "../Base/Constants";
+import {ErrorAlert} from "../Base/Base";
 
 const OTP_NUMBER_MAX = 4
 
@@ -44,6 +45,6 @@ export function VerifyOTPComponent() {
                 setError(e.message)
             });
         }}>{loading ? LoginLabels.LABEL_LOADING : LoginLabels.BTN_LOGIN}</Button>
-        {!loading && error && <p>{error}</p>}
+        {!loading && error && <ErrorAlert message={error} onClose={() => setError(null)}/>}
     </Col>;
 }
