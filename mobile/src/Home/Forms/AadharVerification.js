@@ -10,7 +10,7 @@ export function AadharNumber(props) {
         <FormCard onBack={() => {
             goBack()
         }} content={<Button onClick={() => {
-            goNext(FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, {aadharNumber: "56789"})
+            goNext(FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, {aadharNumber: "123456789"})
         }}>AadharNumber</Button>} title={"Verify Recipient"}/>
     );
 }
@@ -21,7 +21,7 @@ export function AadharOTP(props) {
         <FormCard onBack={() => {
             goBack()
         }} content={<Button onClick={() => {
-            goNext(FORM_AADHAR_OTP, "/", {aadharOtp: "56789"})
+            goNext(FORM_AADHAR_OTP, "/", {aadharOtp: "1234"})
         }}>AadharOTP</Button>} title={"Verify Recipient"}/>
     );
 }

@@ -45,31 +45,29 @@ const initialState = {};
 function preEnrollmentReducer(state, action) {
     switch (action.type) {
         case FORM_PRE_ENROLL_CODE: {
-            return {
-                enrollCode: action.payload.enrollCode,
-                previousForm: action.payload.currentForm
-                , ...state
-            };
+            const newState = {...state}
+            newState.enrollCode = action.payload.enrollCode;
+            newState.mobileNumber = action.payload.mobileNumber;
+            newState.previousForm = action.payload.currentForm;
+            return newState
         }
         case FORM_PRE_ENROLL_DETAILS: {
-            return {
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.previousForm = action.payload.currentForm ?? null
+            return newState
+
         }
         case FORM_AADHAR_NUMBER: {
-            return {
-                aadharNumber: action.payload.aadharNumber,
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.aadharNumber = action.payload.aadharNumber;
+            newState.previousForm = action.payload.currentForm ?? null;
+            return state
         }
         case FORM_AADHAR_OTP: {
-            return {
-                aadharOtp: action.payload.aadharOtp,
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.aadharOtp = action.payload.aadharOtp;
+            newState.previousForm = action.payload.currentForm ?? null;
+            return newState
         }
         default:
             throw new Error();
@@ -86,6 +84,8 @@ export function usePreEnrollment() {
     const [state, dispatch] = context;
 
     const goNext = function (current, next, payload) {
+        payload.currentForm = current;
+        console.log("Next: " + JSON.stringify(payload));
         dispatch({type: current, payload: payload})
         if (next) {
             history.push('/preEnroll/' + next)

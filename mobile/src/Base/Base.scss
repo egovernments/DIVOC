@@ -56,4 +56,24 @@
 .form-card {
   height: 100%;
   margin: 5%;
+
+  .line {
+    margin: 0;
+    background-color: $primaryThemeColor;;
+  }
+
+
+  .appBar {
+    padding: 4%;
+
+    .back {
+      height: 25px;
+      width: 25px;
+    }
+
+    .title {
+      text-align: center;
+    }
+  }
+
 }

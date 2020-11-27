@@ -35,6 +35,6 @@ export class AppDatabase {
 
 }
 
-export const indexDb = new AppDatabase()
+//export const indexDb = new AppDatabase()
 
 

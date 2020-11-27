@@ -1,0 +1,47 @@
+.enroll-code-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  place-items: center;
+
+  .title {
+    margin-top: 20%;
+  }
+
+  .input-container {
+    margin-top: 20%;
+    display: grid;
+    place-items: center;
+
+    .divOuter {
+      width: 100%;
+
+      .divInner {
+        left: 0;
+        position: sticky;
+
+        .otp {
+          width: 100%;
+          padding-left: 10px;
+          letter-spacing: 38px;
+          border: none;
+          background-image: linear-gradient(to left, #88C6A9 70%, rgba(255, 255, 255, 0) 0%);
+          background-position: bottom;
+          background-size: 70px 1px;
+          background-repeat: repeat-x;
+          background-position-x: 35px;
+          font-size: 42px;
+        }
+      }
+    }
+
+    .mobile {
+      margin-top: 20%;
+    }
+  }
+
+  .next {
+    margin-top: 15%;
+    color: white;
+  }
+}
