@@ -13,7 +13,7 @@ export function Queue(props) {
                 <InfoCard metric={52} title={"Recipient Waiting"}/>
                 <InfoCard metric={52} title={"Certificates Issued"}/>
             </div>
-            <Link className="mt-2 d-block verify-btn">{"VERIFY NEXT RECIPIENT"}</Link>
+            <Link className="mt-2 d-block verify-btn" to={"/"}>{"VERIFY NEXT RECIPIENT"}</Link>
         </div>
     );
 }
