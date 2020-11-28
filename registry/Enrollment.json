@@ -13,6 +13,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
+      "required": ["mobile", "enrollmentScopeId", "nationalId", "dob", "code"],
       "properties": {
         "mobile" : {
           "type": "string"
@@ -29,7 +30,7 @@
         },
         "gender": {
           "type": "string",
-          "enum": ["Male", "Female", "Other"],
+          "enum": ["Male", "Female", "Other"]
         },
         "name": {
           "type": "string"
