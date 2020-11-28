@@ -5,6 +5,7 @@ import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
 import Button from "react-bootstrap/Button";
+import {BatchCodeForm} from "../components/BatchCodeForm";
 
 export function ConfirmVaccination(props) {
     const history = useHistory();
@@ -15,7 +16,7 @@ export function ConfirmVaccination(props) {
             case CONSTANT.SELECT_VACCINATOR:
                 return <SelectVaccinator/>;
             case CONSTANT.BATCH_CODE:
-                return <span>1</span>;
+                return <BatchCodeForm/>;
             default:
                 return <Redirect to="/queue"/>
         }
