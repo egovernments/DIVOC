@@ -40,7 +40,7 @@ func configureAPI(api *operations.DivocAPI) http.Handler {
 
 	api.IsUserAuth = auth.UserAuthorizer
 	api.IsAdminAuth = auth.AdminAuthorizer
-	api.IsFacilityAdminAuth = auth.FacilityAdminAuthorizer
+	//api.IsFacilityAdminAuth = auth.FacilityAdminAuthorizer
 
 	pkg.SetupHandlers(api)
 	api.APIAuthorizer = security.Authorized()

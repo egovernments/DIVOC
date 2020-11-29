@@ -201,7 +201,7 @@ func init() {
       "get": {
         "security": [
           {
-            "isFacilityAdmin": []
+            "isUser": []
           }
         ],
         "description": "Get pre enrollment data from api for vaccination",
@@ -671,7 +671,7 @@ func init() {
       "get": {
         "security": [
           {
-            "isFacilityAdmin": []
+            "isUser": []
           }
         ],
         "description": "Get pre enrollment data from api for vaccination",

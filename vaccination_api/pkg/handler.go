@@ -1,8 +1,6 @@
 package pkg
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -13,7 +11,6 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -42,6 +39,7 @@ func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 	rw.WriteHeader(o.statusCode)
 }
+
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
 }
@@ -99,56 +97,15 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, pricipal inte
 
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interface{}) middleware.Responder {
 	code := params.PreEnrollmentCode
-	scopeId := getUserAssociatedFacility()
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
 	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code); err == nil {
 		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
 	return NewGenericServerError()
 }
 
-func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollment, error) {
-	payload := &models.PreEnrollment{
-		Code:  "123",
-		Meta:  nil,
-		Name:  "Vivek Singh",
-		Phone: "9342342343",
-	}
-	return payload, nil
-}
-
-func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, error) {
-	typeId := "Enrollment"
-	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
-		"enrollmentScopeId": map[string]interface{}{
-			"eq": facilityCode,
-		},
-	}
-	if enrollmentsJson, err := queryRegistry(typeId, filter); err == nil {
-		log.Info("Response ", enrollmentsJson)
-		enrollmentsJsonArray := enrollmentsJson["Enrollment"]
-		if jsonArray, err := json.Marshal(enrollmentsJsonArray); err == nil {
-			var listOfEnrollments  []*models.PreEnrollment //todo: we can rename preEnrollment to Enrollment
-			err := json.Unmarshal(jsonArray, &listOfEnrollments)
-			if err != nil {
-				log.Errorf("JSON marshalling error for enrollment list %+v", jsonArray)
-				return nil, errors.New("Marshalling error for enrollment list response")
-			}
-			log.Infof("Number of enrollments %v", len(listOfEnrollments))
-			return listOfEnrollments, nil
-		}
-	}
-	return nil, nil
-}
-
-func getUserAssociatedFacility() string {
-	return "FACILITY001"
-}
-
 func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, pricipal interface{}) middleware.Responder {
-	scopeId := getUserAssociatedFacility()
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
 	if enrollments, err := findEnrollmentsForScope(scopeId); err == nil {
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}

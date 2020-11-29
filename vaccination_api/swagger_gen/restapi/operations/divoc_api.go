@@ -81,10 +81,6 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 			return nil, errors.NotImplemented("api key auth (isAdmin) Authorization from header param [Authorization] has not yet been implemented")
 		},
 		// Applies when the "Authorization" header is set
-		IsFacilityAdminAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isFacilityAdmin) Authorization from header param [Authorization] has not yet been implemented")
-		},
-		// Applies when the "Authorization" header is set
 		IsUserAuth: func(token string) (interface{}, error) {
 			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
 		},
@@ -127,10 +123,6 @@ type DivocAPI struct {
 	// IsAdminAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Authorization provided in the header
 	IsAdminAuth func(string) (interface{}, error)
-
-	// IsFacilityAdminAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key Authorization provided in the header
-	IsFacilityAdminAuth func(string) (interface{}, error)
 
 	// IsUserAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Authorization provided in the header
@@ -236,9 +228,6 @@ func (o *DivocAPI) Validate() error {
 	if o.IsAdminAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
-	if o.IsFacilityAdminAuth == nil {
-		unregistered = append(unregistered, "AuthorizationAuth")
-	}
 	if o.IsUserAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
@@ -291,10 +280,6 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 		case "isAdmin":
 			scheme := schemes[name]
 			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsAdminAuth)
-
-		case "isFacilityAdmin":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsFacilityAdminAuth)
 
 		case "isUser":
 			scheme := schemes[name]
