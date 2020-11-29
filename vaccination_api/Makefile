@@ -1,24 +1,26 @@
 PWD := $(shell pwd)
 GOPATH := $(shell go env GOPATH)
+source := $(wildcard *.go **/*.go */*/*.go)
 
-all: build run
+all: divoc-api-server run
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
-	@gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
-	@gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
+	@$(GOPATH)/bin/gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
+	@$(GOPATH)/bin/gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
 
 swagger_gen/restapi/server.go: spec/api.yaml
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
-	@swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/spec/api.yaml
+	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/spec/api.yaml
 
 api_docs:
 	@echo "Installing swagger-merger" && npm install swagger-merger -g
 	@swagger-merger -i $(PWD)/spec/api.yaml -o $(PWD)/docs/api_docs/bundle.yaml
 
 build: divoc-api-server
+	@echo building $source
 
-divoc-api-server: swagger_gen/restapi/server.go
+divoc-api-server: $(source) swagger_gen/restapi/server.go
 	@echo "Building Server to $(PWD)/divoc-server ..."
 	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/api/cmd/divoc-server
 

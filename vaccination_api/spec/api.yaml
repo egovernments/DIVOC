@@ -113,39 +113,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/PreEnrollment'
-  /recipients:
-    post:
-      tags:
-        - vaccination
-      summary: >-
-        Vaccination recipient registration can be based on pre enrollment or
-        ad-hoc
-      description: >-
-        Vaccination registration captures information like name, dob,
-        nationality etc for the vaccination certificate.
-      operationId: registerRecipient
-      parameters:
-        - in: body
-          name: body
-          required: true
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Recipient'
-      responses:
-        '200':
-          description: OK
-    get:
-      tags:
-        - vaccination
-      summary: Fetch waiting recipients
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Recipient'
   /certify:
     post:
       tags:
@@ -228,9 +195,21 @@ definitions:
     properties:
       code:
         type: string
-      name:
+      enrollmentScopeId:
         type: string
       phone:
+        type: string
+      nationalId:
+        type: string
+      dob:
+        type: string
+        format: date
+      gender:
+        type: string
+        enum: ["Male", "Female", "Other"]
+      name:
+        type: string
+      email:
         type: string
       meta:
         type: object
@@ -283,26 +262,6 @@ definitions:
             type: string
           address:
             type: string
-  Recipient:
-    type: object
-    properties:
-      name:
-        type: string
-      dob:
-        type: string
-        format: date
-      gender:
-        type: string
-      natinoality:
-        type: string
-      identity:
-        type: string
-      verified:
-        type: boolean
-      preEnrollmentCode:
-        type: string
-      vaccinationProgramCode:
-        type: string
   Program:
     type: object
     properties:
