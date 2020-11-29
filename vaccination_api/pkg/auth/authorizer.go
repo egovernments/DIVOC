@@ -1,17 +1,17 @@
-package utils
+package auth
 
 import (
 	"crypto/rsa"
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
+	"github.com/divoc/api/config"
+	"github.com/gospotcheck/jwt-go"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
-	"log"
 	"strings"
 )
 
 const (
-	pubKeyPath    = "swagger_gen/resources/local_rsa.pub"
 	clientId      = "vaccination_api"
 	admin         = "admin"
 	facilityAdmin = "facility_admin"
@@ -21,8 +21,9 @@ var (
 	verifyKey *rsa.PublicKey
 )
 
-func init() {
-	verifyBytes, err := ioutil.ReadFile(pubKeyPath)
+func Init() {
+	log.Infof("Using the public from %s", config.Config.Keycloak.PubkeyPath)
+	verifyBytes, err := ioutil.ReadFile(config.Config.Keycloak.PubkeyPath)
 	if err != nil {
 		log.Print(err)
 	}

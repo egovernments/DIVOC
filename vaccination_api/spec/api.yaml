@@ -84,7 +84,7 @@ paths:
       description: Get pre enrollment data from api for vaccination
       operationId: getPreEnrollment
       security:
-        - isFacilityAdmin: []
+        - isUser: []
       parameters:
         - name: preEnrollmentCode
           in: path

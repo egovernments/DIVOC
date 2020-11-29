@@ -9,7 +9,9 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"net/http"
 	"strings"
 )
 
@@ -27,6 +29,19 @@ func SetupHandlers(api *operations.DivocAPI) {
 
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
+}
+
+type GenericResponse struct {
+	statusCode int
+}
+
+func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+	rw.WriteHeader(o.statusCode)
+}
+
+func NewGenericServerError() middleware.Responder {
+	return &GenericResponse{statusCode: 500}
 }
 
 func pingResponder(params operations.GetPingParams) middleware.Responder {
@@ -55,7 +70,7 @@ func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
 }
 
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
-	payload := []*models.Program{};
+	payload := []*models.Program{}
 	payload = append(payload, &models.Program{
 		ID:        "Covid19",
 		Medicines: []string{"BNT162b2"},
@@ -69,7 +84,7 @@ func getConfigurationResponder(params configuration.GetConfigurationParams, prin
 		Navigation: nil,
 		Styles:     map[string]string{"a": "a"},
 		Validation: []string{"a", "b", "c", "d", "e"},
-	};
+	}
 	return configuration.NewGetConfigurationOK().WithPayload(payload)
 }
 
@@ -81,31 +96,20 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, pricipal inte
 }
 
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interface{}) middleware.Responder {
-	payload := &models.PreEnrollment{
-		Code:  "123",
-		Meta:  nil,
-		Name:  "Vivek Singh",
-		Phone: "9342342343",
+	code := params.PreEnrollmentCode
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code); err == nil {
+		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
-	return vaccination.NewGetPreEnrollmentOK().WithPayload(payload)
+	return NewGenericServerError()
 }
 
 func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, pricipal interface{}) middleware.Responder {
-	payload := []*models.PreEnrollment{
-		&models.PreEnrollment{
-			Code:  "123",
-			Meta:  nil,
-			Name:  "Vivek Singh",
-			Phone: "9342342343",
-		},
-		&models.PreEnrollment{
-			Code:  "124",
-			Meta:  nil,
-			Name:  "Raj Roshan",
-			Phone: "9842342344",
-		},
-	};
-	return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(payload)
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if enrollments, err := findEnrollmentsForScope(scopeId); err == nil {
+		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
+	}
+	return NewGenericServerError()
 }
 
 func certify(params certification.CertifyParams, pricipal interface{}) middleware.Responder {
