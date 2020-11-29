@@ -248,51 +248,6 @@ func init() {
         }
       }
     },
-    "/recipients": {
-      "get": {
-        "tags": [
-          "vaccination"
-        ],
-        "summary": "Fetch waiting recipients",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Recipient"
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Vaccination registration captures information like name, dob, nationality etc for the vaccination certificate.",
-        "tags": [
-          "vaccination"
-        ],
-        "summary": "Vaccination recipient registration can be based on pre enrollment or ad-hoc",
-        "operationId": "registerRecipient",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Recipient"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/users/me": {
       "get": {
         "tags": [
@@ -439,10 +394,31 @@ func init() {
         "code": {
           "type": "string"
         },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
         "meta": {
           "type": "object"
         },
         "name": {
+          "type": "string"
+        },
+        "nationalId": {
           "type": "string"
         },
         "phone": {
@@ -464,36 +440,6 @@ func init() {
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "Recipient": {
-      "type": "object",
-      "properties": {
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "gender": {
-          "type": "string"
-        },
-        "identity": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "natinoality": {
-          "type": "string"
-        },
-        "preEnrollmentCode": {
-          "type": "string"
-        },
-        "vaccinationProgramCode": {
-          "type": "string"
-        },
-        "verified": {
-          "type": "boolean"
         }
       }
     },
@@ -772,51 +718,6 @@ func init() {
         }
       }
     },
-    "/recipients": {
-      "get": {
-        "tags": [
-          "vaccination"
-        ],
-        "summary": "Fetch waiting recipients",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Recipient"
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "description": "Vaccination registration captures information like name, dob, nationality etc for the vaccination certificate.",
-        "tags": [
-          "vaccination"
-        ],
-        "summary": "Vaccination recipient registration can be based on pre enrollment or ad-hoc",
-        "operationId": "registerRecipient",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/Recipient"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/users/me": {
       "get": {
         "tags": [
@@ -1029,10 +930,31 @@ func init() {
         "code": {
           "type": "string"
         },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
         "meta": {
           "type": "object"
         },
         "name": {
+          "type": "string"
+        },
+        "nationalId": {
           "type": "string"
         },
         "phone": {
@@ -1054,36 +976,6 @@ func init() {
         },
         "name": {
           "type": "string"
-        }
-      }
-    },
-    "Recipient": {
-      "type": "object",
-      "properties": {
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "gender": {
-          "type": "string"
-        },
-        "identity": {
-          "type": "string"
-        },
-        "name": {
-          "type": "string"
-        },
-        "natinoality": {
-          "type": "string"
-        },
-        "preEnrollmentCode": {
-          "type": "string"
-        },
-        "vaccinationProgramCode": {
-          "type": "string"
-        },
-        "verified": {
-          "type": "boolean"
         }
       }
     },

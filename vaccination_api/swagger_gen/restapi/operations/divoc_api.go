@@ -51,9 +51,6 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPing has not yet been implemented")
 		}),
-		VaccinationGetRecipientsHandler: vaccination.GetRecipientsHandlerFunc(func(params vaccination.GetRecipientsParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation vaccination.GetRecipients has not yet been implemented")
-		}),
 		LoginPostAuthorizeHandler: login.PostAuthorizeHandlerFunc(func(params login.PostAuthorizeParams) middleware.Responder {
 			return middleware.NotImplemented("operation login.PostAuthorize has not yet been implemented")
 		}),
@@ -77,9 +74,6 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
-		}),
-		VaccinationRegisterRecipientHandler: vaccination.RegisterRecipientHandlerFunc(func(params vaccination.RegisterRecipientParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation vaccination.RegisterRecipient has not yet been implemented")
 		}),
 
 		// Applies when the "Authorization" header is set
@@ -147,8 +141,6 @@ type DivocAPI struct {
 
 	// GetPingHandler sets the operation handler for the get ping operation
 	GetPingHandler GetPingHandler
-	// VaccinationGetRecipientsHandler sets the operation handler for the get recipients operation
-	VaccinationGetRecipientsHandler vaccination.GetRecipientsHandler
 	// LoginPostAuthorizeHandler sets the operation handler for the post authorize operation
 	LoginPostAuthorizeHandler login.PostAuthorizeHandler
 	// IdentityPostIdentityVerifyHandler sets the operation handler for the post identity verify operation
@@ -165,8 +157,6 @@ type DivocAPI struct {
 	VaccinationGetPreEnrollmentHandler vaccination.GetPreEnrollmentHandler
 	// VaccinationGetPreEnrollmentsForFacilityHandler sets the operation handler for the get pre enrollments for facility operation
 	VaccinationGetPreEnrollmentsForFacilityHandler vaccination.GetPreEnrollmentsForFacilityHandler
-	// VaccinationRegisterRecipientHandler sets the operation handler for the register recipient operation
-	VaccinationRegisterRecipientHandler vaccination.RegisterRecipientHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -256,9 +246,6 @@ func (o *DivocAPI) Validate() error {
 	if o.GetPingHandler == nil {
 		unregistered = append(unregistered, "GetPingHandler")
 	}
-	if o.VaccinationGetRecipientsHandler == nil {
-		unregistered = append(unregistered, "vaccination.GetRecipientsHandler")
-	}
 	if o.LoginPostAuthorizeHandler == nil {
 		unregistered = append(unregistered, "login.PostAuthorizeHandler")
 	}
@@ -282,9 +269,6 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.VaccinationGetPreEnrollmentsForFacilityHandler == nil {
 		unregistered = append(unregistered, "vaccination.GetPreEnrollmentsForFacilityHandler")
-	}
-	if o.VaccinationRegisterRecipientHandler == nil {
-		unregistered = append(unregistered, "vaccination.RegisterRecipientHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -395,10 +379,6 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/recipients"] = vaccination.NewGetRecipients(o.context, o.VaccinationGetRecipientsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -431,10 +411,6 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/preEnrollments/facility/{facilityCode}"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
-	o.handlers["POST"]["/recipients"] = vaccination.NewRegisterRecipient(o.context, o.VaccinationRegisterRecipientHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP
