@@ -8,4 +8,7 @@ var Config = struct {
 		ReadOperationId string `default:"read"`
 		ApiVersion string `default:"1"`
 	}
+	Keycloak struct{
+		Url string `default:"localhost:8080" env:"KEYCLOAK_URL"`
+	}
 }{}
