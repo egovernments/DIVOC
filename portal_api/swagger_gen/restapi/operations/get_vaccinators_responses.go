@@ -25,7 +25,7 @@ type GetVaccinatorsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.Operator `json:"body,omitempty"`
+	Payload []*models.Vaccinator `json:"body,omitempty"`
 }
 
 // NewGetVaccinatorsOK creates GetVaccinatorsOK with default headers values
@@ -35,13 +35,13 @@ func NewGetVaccinatorsOK() *GetVaccinatorsOK {
 }
 
 // WithPayload adds the payload to the get vaccinators o k response
-func (o *GetVaccinatorsOK) WithPayload(payload []*models.Operator) *GetVaccinatorsOK {
+func (o *GetVaccinatorsOK) WithPayload(payload []*models.Vaccinator) *GetVaccinatorsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get vaccinators o k response
-func (o *GetVaccinatorsOK) SetPayload(payload []*models.Operator) {
+func (o *GetVaccinatorsOK) SetPayload(payload []*models.Vaccinator) {
 	o.Payload = payload
 }
 
@@ -52,7 +52,7 @@ func (o *GetVaccinatorsOK) WriteResponse(rw http.ResponseWriter, producer runtim
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*models.Operator, 0, 50)
+		payload = make([]*models.Vaccinator, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

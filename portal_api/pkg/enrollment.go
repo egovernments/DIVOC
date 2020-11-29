@@ -4,7 +4,7 @@ import log "github.com/sirupsen/logrus"
 
 //mobile,enrollmentScopeId,nationalId,dob,gender,name,email
 type Enrollment struct {
-	Mobile string `json:"mobile"`
+	Phone string `json:"phone"`
 	EnrollmentScopeId string `json:"enrollmentScopeId"`
 	NationalId string `json:"nationalId"`
 	Dob string `json:"dob"`
@@ -19,7 +19,7 @@ func createEnrollment(data *Scanner) error {
 	//Name, Mobile, National Identifier, DOB, facilityId
 	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
 	enrollment := Enrollment{
-		Mobile:            data.Text("category"),
+		Phone:            data.Text("phone"),
 		EnrollmentScopeId: data.Text("enrollmentScopeId"),
 		NationalId:        data.Text("nationalId"),
 		Dob:               data.Text("dob"),
@@ -29,18 +29,19 @@ func createEnrollment(data *Scanner) error {
 		Code: 			   generateEnrollmentCode(),
 	}
 	makeRegistryCreateRequest(enrollment, "Enrollment")
-	notifyRecipient(enrollment)
-	return nil
+	err := notifyRecipient(enrollment)
+	return err
 }
 
 func generateEnrollmentCode() string {
 	return "12345"
 }
 
-func notifyRecipient(enrollment Enrollment) {
+func notifyRecipient(enrollment Enrollment) error {
 	//todo on successful enrollment send text message   call notification service?
-	recepient := "sms:" + enrollment.Mobile
+	recepient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
-	log.Info("Sending SMS ", recepient, message)
+	log.Infof("Sending SMS %s %s", recepient, message)
 	//notificationService.SendNotification(recepient, message) //TODO: wire it up with actual notification service.
+	return nil
 }

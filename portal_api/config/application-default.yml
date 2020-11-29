@@ -1,7 +1,11 @@
 registry:
   url: http://localhost:8081
-  addOperationId: add
-  searchOperationId: search
-  readOperationId: read
+  addoperationid: add
+  searchoperationid: search
+  readoperationid: read
 keycloak:
-  url: http://localhost:8080
+  url: https://divoc.xiv.in/keycloak/auth
+  facilityAdmin:
+    roleName: facillity-admin
+    roleId: 9da3a031-0c76-4077-9176-facfe70b12bc
+    clientId: f806ea15-8a99-48f9-9c5d-a4602ae7b9db

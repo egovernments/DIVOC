@@ -7,6 +7,7 @@ import (
 	"github.com/imroc/req"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"strconv"
 )
 
 type CreateEntityRegistryRequest struct {
@@ -34,14 +35,16 @@ type RegistryResponse struct {
 	} `json:"params"`
 	ResponseCode string `json:"responseCode"`
 	Result map[string]interface{} `json:"result"`
-	//Result1       struct {
-	//	Facility struct {
-	//		Osid string `json:"osid"`
-	//	} `json:"Facility"`
-	//} `json:"result"`
 }
 
-func makeRegistryCreateRequest(requestMap interface{}, objectId string) middleware.Responder {
+type RegistryRequest struct {
+	ID      string `json:"id"`
+	Ver     string `json:"ver"`
+	Request map[string]interface{} `json:"request"`
+}
+
+
+func makeRegistryCreateRequest(requestMap interface{}, objectId string) middleware.Responder { //todo: change signature to return non http specific type
 	requestJson := CreateEntityRegistryRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -81,12 +84,6 @@ func makeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 	return NewGenericStatusOk()
 }
 
-type RegistryRequest struct {
-	ID      string `json:"id"`
-	Ver     string `json:"ver"`
-	Request map[string]interface{} `json:"request"`
-}
-
 func queryRegistry(typeId string) (map[string]interface{}, error) {
 	queryRequest := RegistryRequest{
 		"open-saber.registry.search",
@@ -106,7 +103,7 @@ func queryRegistry(typeId string) (map[string]interface{}, error) {
 		return nil, errors.Errorf("Error while querying registry", err)
 	}
 	if response.Response().StatusCode != 200 {
-		return nil, errors.New("Query failed, registry response " + string(response.Response().StatusCode))
+		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
 	}
 	responseObject := RegistryResponse{}
 	err = response.ToJSON(&responseObject)
