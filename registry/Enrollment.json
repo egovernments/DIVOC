@@ -13,9 +13,9 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["mobile", "enrollmentScopeId", "nationalId", "dob", "code"],
+      "required": ["phone", "enrollmentScopeId", "nationalId", "dob", "code"],
       "properties": {
-        "mobile" : {
+        "phone" : {
           "type": "string"
         },
         "enrollmentScopeId": {
