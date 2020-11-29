@@ -5,3 +5,6 @@ registry:
   readoperationid: read
 keycloak:
   url: https://divoc.xiv.in/keycloak/auth
+kafka:
+  bootstrapServers: localhost
+  certifyTopic: certify

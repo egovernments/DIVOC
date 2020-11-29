@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -113,7 +114,13 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 }
 
 func certify(params certification.CertifyParams, pricipal interface{}) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
 	fmt.Printf("%+v\n", params.Body[0])
-	fmt.Printf("%+v\n", pricipal)
+	for _, request := range(params.Body) {
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			publishCertifyMessage(jsonRequestString)
+		}
+	}
 	return certification.NewCertifyOK()
 }

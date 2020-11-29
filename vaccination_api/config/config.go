@@ -13,4 +13,8 @@ var Config = struct {
 		PubkeyPath string `default:"config/local_rsa.pub""`
 
 	}
+	Kafka struct {
+		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
+		CertifyTopic string `default:"certify" yaml:"certifyTopic"`
+	}
 }{}
