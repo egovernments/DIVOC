@@ -33,7 +33,10 @@ func (o *Scanner) Scan() bool {
 }
 
 func (o Scanner) Text(s string) string {
-	return o.Row[o.Head[s]]
+	if key, ok := o.Head[s]; ok {
+		return o.Row[key]
+	}
+	return ""
 }
 
 func (o Scanner) int64(s string) int64 {
