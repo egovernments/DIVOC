@@ -1,7 +1,7 @@
 import {PreEnrollmentCode, PreEnrollmentDetails} from "./EnterPreEnrollment";
 import {VerifyAadharNumber, VerifyAadharOTP} from "./EnterAadharNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
-import {useHistory} from "react-router";
+import {Redirect, useHistory} from "react-router";
 import {appIndexDb} from "../../AppDatabase";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode"
@@ -10,26 +10,41 @@ export const FORM_AADHAR_NUMBER = "verifyAadharNumber"
 export const FORM_AADHAR_OTP = "verifyAadharOTP"
 
 export function PreEnrollmentFlow(props) {
-
-    function buildForm(pageName) {
-        switch (pageName) {
-            case FORM_PRE_ENROLL_CODE :
-                return <PreEnrollmentCode/>
-            case FORM_PRE_ENROLL_DETAILS :
-                return <PreEnrollmentDetails/>
-            case FORM_AADHAR_NUMBER :
-                return <VerifyAadharNumber/>
-            case FORM_AADHAR_OTP :
-                return <VerifyAadharOTP/>
-        }
-        return <PreEnrollmentCode/>
-    }
-
     return (
         <PreEnrollmentProvider>
-            {buildForm(props.match.params.pageName)}
+            <PreEnrollmentRouteCheck pageName={props.match.params.pageName}/>
         </PreEnrollmentProvider>
     );
+}
+
+function PreEnrollmentRouteCheck({pageName}) {
+    const {state} = usePreEnrollment()
+    switch (pageName) {
+        case FORM_PRE_ENROLL_CODE :
+            return <PreEnrollmentCode/>
+        case FORM_PRE_ENROLL_DETAILS : {
+            if (state.mobileNumber) {
+                return <PreEnrollmentDetails/>
+            }
+            break;
+        }
+        case FORM_AADHAR_NUMBER : {
+            if (state.name) {
+                return <VerifyAadharNumber/>
+            }
+            break;
+        }
+        case FORM_AADHAR_OTP :
+            if (state.aadharNumber) {
+                return <VerifyAadharOTP/>
+            }
+            break;
+    }
+    return <Redirect
+        to={{
+            pathname: '/preEnroll/' + FORM_PRE_ENROLL_CODE,
+        }}
+    />
 }
 
 
