@@ -29,7 +29,7 @@
           "type": "string",
           "$id": "#/properties/provider"
         },
-        "administrationType": {
+        "vaccinationMode": {
           "type": "string",
           "enum": ["muscular injection", "oral", "nasal"],
           "default": "muscular injection"
