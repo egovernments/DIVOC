@@ -3,10 +3,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Swagger UI</title>
+    <title>DIVOC Swagger UI</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/3.37.2/swagger-ui.css" integrity="sha512-tKlTmmIcJ/LXt94SNEbo3ZXMHhaa9quOeqk+sfMKYvTadSD2xSzmN95EOeITw7rmAQOuHStvbqA1W7fCU6RQZQ==" crossorigin="anonymous" />
-    <link rel="icon" type="image/png" href="dist/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="dist/favicon-16x16.png" sizes="16x16" />
     <style>
         html
         {
@@ -39,7 +37,7 @@
     window.onload = function() {
         // Begin Swagger UI call region
         const ui = SwaggerUIBundle({
-            url: "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/admin-portal.yaml",
+            url: "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/" + document.location.hash.substring(1),
             dom_id: '#swagger-ui',
             deepLinking: true,
             presets: [
