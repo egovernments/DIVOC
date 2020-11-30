@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/restapi"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -21,6 +22,7 @@ func main() {
 	}
 
 	auth.Init()
+	pkg.InitializeKafka()
 
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
