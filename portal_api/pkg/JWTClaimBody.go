@@ -1,4 +1,4 @@
-package utils
+package pkg
 
 import "github.com/gospotcheck/jwt-go"
 
@@ -8,6 +8,7 @@ type JWTClaimBody struct {
 	ResourceAccess    map[string]Group `json:"resource_access"`
 	Scope             string           `json:"scope"`
 	PreferredUsername string           `json:"preferred_username"`
+	FacilityCode      string           `json:"facility_code"`
 }
 
 type Group struct {

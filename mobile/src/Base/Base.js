@@ -5,6 +5,7 @@ import {Button, Card, Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import Nav from "react-bootstrap/Nav";
 import {Link} from "react-router-dom";
+import back from "./back.png"
 
 export const DivocHeader = () => {
     return (
@@ -90,12 +91,16 @@ export function FormCard({title, content, onBack}) {
     return (
         <div className={"form-card"}>
             <BaseCard>
-                <Col>
-                    <Row>
-                        <Button onClick={onBack}>Back</Button>
-                        <p>{title}</p>
+                <Col className={"column"}>
+                    <Row className={"appBar"}>
+                        <Col xs={1}>
+                            <img className={"back"} src={back} onClick={onBack} alt={""}/>
+                        </Col>
+                        <Col xs={9}>
+                            <h5 className={"title"}>{title}</h5>
+                        </Col>
                     </Row>
-                    <div className={"line"}/>
+                    <hr className={"line"}/>
                     {content}
                 </Col>
             </BaseCard>

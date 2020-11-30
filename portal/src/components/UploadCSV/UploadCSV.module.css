@@ -2,7 +2,6 @@
     background: #ffffff;
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px;
-    margin-left: 30px;
     display: flex;
     width: 50%;
 }
@@ -12,8 +11,8 @@
     border-radius: 6px;
     letter-spacing: 1.5px;
     color: #5C9EF8;
-    padding-left: 1em;
-    padding-right: 1em;
+    padding-left: 2em;
+    padding-right: 2em;
     white-space: nowrap;
     margin: 15px;
     cursor: pointer;

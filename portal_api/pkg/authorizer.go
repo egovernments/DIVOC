@@ -1,4 +1,4 @@
-package utils
+package pkg
 
 import (
 	"crypto/rsa"
@@ -11,10 +11,11 @@ import (
 )
 
 const (
-	pubKeyPath    = "swagger_gen/resources/local_rsa.pub"
-	clientId      = "vaccination_api"
-	admin         = "admin"
-	facilityAdmin = "facility_admin"
+	pubKeyPath     = "config/local_rsa.pub"
+	clientId       = "vaccination_api"
+	portalClientId = "facility-admin-portal"
+	admin          = "admin"
+	facilityAdmin  = "facility_admin"
 )
 
 var (
@@ -42,6 +43,9 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (interface{}, err
 	}
 	for _, role := range expectedRole {
 		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
+			return claimBody, err
+		}
+		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
 			return claimBody, err
 		}
 	}

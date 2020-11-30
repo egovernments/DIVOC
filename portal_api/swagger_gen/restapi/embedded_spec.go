@@ -105,6 +105,63 @@ func init() {
         }
       }
     },
+    "/facility/staffs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Get staffs of a facility",
+        "operationId": "getFacilityStaffs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityStaff"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Create Facility Staff",
+        "operationId": "createFacilityStaffs",
+        "parameters": [
+          {
+            "description": "Create facility staff data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityStaff"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -421,6 +478,26 @@ func init() {
         }
       }
     },
+    "FacilityStaff": {
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "Facility Staff Id"
+        },
+        "mobileNumber": {
+          "type": "string",
+          "title": "Facility Staff Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Staff Name"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "Facility Staff Role ID"
+        }
+      }
+    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -572,7 +649,7 @@ func init() {
       "tokenUrl": "https://dumy.oauth.net/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facilityAdmin": "scope of facility admin"
+        "facillity-admin": "scope of facility admin"
       }
     }
   },
@@ -657,6 +734,63 @@ func init() {
             "description": "Facility data in the form of csv",
             "name": "file",
             "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/staffs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Get staffs of a facility",
+        "operationId": "getFacilityStaffs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityStaff"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Create Facility Staff",
+        "operationId": "createFacilityStaffs",
+        "parameters": [
+          {
+            "description": "Create facility staff data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityStaff"
+            }
           }
         ],
         "responses": {
@@ -1001,6 +1135,26 @@ func init() {
         }
       }
     },
+    "FacilityStaff": {
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "Facility Staff Id"
+        },
+        "mobileNumber": {
+          "type": "string",
+          "title": "Facility Staff Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Staff Name"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "Facility Staff Role ID"
+        }
+      }
+    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -1219,7 +1373,7 @@ func init() {
       "tokenUrl": "https://dumy.oauth.net/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facilityAdmin": "scope of facility admin"
+        "facillity-admin": "scope of facility admin"
       }
     }
   },
