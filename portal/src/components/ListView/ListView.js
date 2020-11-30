@@ -1,5 +1,4 @@
 import React from 'react';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
 import styles from './ListView.module.css';
 
 function ListView({ listData }) {
@@ -16,10 +15,6 @@ function ListView({ listData }) {
                         <div className={styles['card-details']}>
                             <div className={styles['name']}>{data.name}</div>
                             <div className={styles['details']}>{data.provider}</div>
-                        </div>
-                        <div>
-                            More Details
-                            <ArrowForwardIcon/>
                         </div>
                     </div>
                     )

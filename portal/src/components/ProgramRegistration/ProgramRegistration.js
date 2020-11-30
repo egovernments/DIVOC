@@ -4,6 +4,7 @@ import axios from "axios";
 import { useKeycloak } from "@react-keycloak/web";
 import Form from "@rjsf/core";
 import ListView from '../ListView/ListView';
+import schema from '../../jsonSchema/programSchema.json';
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
@@ -20,50 +21,6 @@ function VaccineRegistration() {
             "Content-Type": "application/json",
         },
     };
-
-    const schema = {
-        type: "object",
-        required: ["name", "description", "startDate"],
-        properties: {
-            programId: {
-                type: "number",
-                title: "Internal Program UID",
-            },
-            name: {
-                type: "string",
-                title: "Program Name",
-            },
-            description: {
-                type: "string",
-                title: "Program Description",
-            },
-            logoURL: {
-                type: "string",
-                title: "Program Logo",
-                format: "file",
-            },
-            startDate: {
-                type: "string",
-                title: "Start Date",
-                format: "date",
-            },
-            endDate: {
-                type: "string",
-                title: "End Date",
-                format: "date",
-            },
-            status: {
-                type: "string",
-                title: "Status",
-                enum: [
-                    "Active", 
-                    "Inactive"
-                ],
-            },
-        },
-    };
-
-    
 
     const uiSchema = {
         classNames: styles["form"],
@@ -83,7 +40,7 @@ function VaccineRegistration() {
         axios
             .post("/divoc/admin/api/v1/programs", datatoSend, config)
             .then((res) => {
-                alert("Status code is", res);
+                alert("Successfully Registered");
                 console.log(res);
             });
     };
