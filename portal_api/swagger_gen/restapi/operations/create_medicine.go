@@ -29,7 +29,7 @@ func NewCreateMedicine(ctx *middleware.Context, handler CreateMedicineHandler) *
 	return &CreateMedicine{Context: ctx, Handler: handler}
 }
 
-/*CreateMedicine swagger:route POST /medicine createMedicine
+/*CreateMedicine swagger:route POST /medicines createMedicine
 
 Create Medicine
 

@@ -35,7 +35,7 @@ func (o *CreateMedicineURL) SetBasePath(bp string) {
 func (o *CreateMedicineURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/medicine"
+	var _path = "/medicines"
 
 	_basePath := o._basePath
 	if _basePath == "" {

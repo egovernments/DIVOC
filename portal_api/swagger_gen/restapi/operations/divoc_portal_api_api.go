@@ -43,6 +43,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		PostEnrollmentsHandler: PostEnrollmentsHandlerFunc(func(params PostEnrollmentsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation PostEnrollments has not yet been implemented")
+		}),
 		PostFacilitiesHandler: PostFacilitiesHandlerFunc(func(params PostFacilitiesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation PostFacilities has not yet been implemented")
 		}),
@@ -54,6 +57,18 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		}),
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
+		}),
+		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
+		}),
+		GetMedicinesHandler: GetMedicinesHandlerFunc(func(params GetMedicinesParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetMedicines has not yet been implemented")
+		}),
+		GetProgramsHandler: GetProgramsHandlerFunc(func(params GetProgramsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetPrograms has not yet been implemented")
+		}),
+		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
 		}),
 
 		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
@@ -105,6 +120,8 @@ type DivocPortalAPIAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// PostEnrollmentsHandler sets the operation handler for the post enrollments operation
+	PostEnrollmentsHandler PostEnrollmentsHandler
 	// PostFacilitiesHandler sets the operation handler for the post facilities operation
 	PostFacilitiesHandler PostFacilitiesHandler
 	// PostVaccinatorsHandler sets the operation handler for the post vaccinators operation
@@ -113,6 +130,14 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// GetFacilitiesHandler sets the operation handler for the get facilities operation
+	GetFacilitiesHandler GetFacilitiesHandler
+	// GetMedicinesHandler sets the operation handler for the get medicines operation
+	GetMedicinesHandler GetMedicinesHandler
+	// GetProgramsHandler sets the operation handler for the get programs operation
+	GetProgramsHandler GetProgramsHandler
+	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
+	GetVaccinatorsHandler GetVaccinatorsHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -196,6 +221,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
+	if o.PostEnrollmentsHandler == nil {
+		unregistered = append(unregistered, "PostEnrollmentsHandler")
+	}
 	if o.PostFacilitiesHandler == nil {
 		unregistered = append(unregistered, "PostFacilitiesHandler")
 	}
@@ -207,6 +235,18 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
+	}
+	if o.GetFacilitiesHandler == nil {
+		unregistered = append(unregistered, "GetFacilitiesHandler")
+	}
+	if o.GetMedicinesHandler == nil {
+		unregistered = append(unregistered, "GetMedicinesHandler")
+	}
+	if o.GetProgramsHandler == nil {
+		unregistered = append(unregistered, "GetProgramsHandler")
+	}
+	if o.GetVaccinatorsHandler == nil {
+		unregistered = append(unregistered, "GetVaccinatorsHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -309,6 +349,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/enrollments"] = NewPostEnrollments(o.context, o.PostEnrollmentsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/facilities"] = NewPostFacilities(o.context, o.PostFacilitiesHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -317,11 +361,27 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/medicine"] = NewCreateMedicine(o.context, o.CreateMedicineHandler)
+	o.handlers["POST"]["/medicines"] = NewCreateMedicine(o.context, o.CreateMedicineHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/program"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facilities"] = NewGetFacilities(o.context, o.GetFacilitiesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/medicines"] = NewGetMedicines(o.context, o.GetMedicinesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/programs"] = NewGetPrograms(o.context, o.GetProgramsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/vaccinators"] = NewGetVaccinators(o.context, o.GetVaccinatorsHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

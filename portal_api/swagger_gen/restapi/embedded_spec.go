@@ -36,7 +36,49 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/enrollments": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "summary": "Upload facility csv for bulk ingestion of pre enrollment",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Facility data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facilities": {
+      "get": {
+        "summary": "get facilities",
+        "operationId": "getFacilities",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Facility"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -63,7 +105,31 @@ func init() {
         }
       }
     },
-    "/medicine": {
+    "/medicines": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "user",
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get medicines",
+        "operationId": "getMedicines",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/CreateMedicineRequest"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -97,7 +163,30 @@ func init() {
         }
       }
     },
-    "/program": {
+    "/programs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "user"
+            ]
+          }
+        ],
+        "summary": "get program list",
+        "operationId": "getPrograms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "summary": "Create program",
         "operationId": "createProgram",
@@ -125,6 +214,21 @@ func init() {
       }
     },
     "/vaccinators": {
+      "get": {
+        "summary": "Get vaccinators",
+        "operationId": "getVaccinators",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Operator"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -153,6 +257,49 @@ func init() {
     }
   },
   "definitions": {
+    "Address": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "addressLine2",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "example": [
+            "Karnataka"
+          ]
+        }
+      },
+      "example": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": 560000,
+          "state": "Karnataka"
+        }
+      ]
+    },
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
@@ -189,6 +336,194 @@ func init() {
             "Active",
             "Inactive",
             "Blocked"
+          ]
+        }
+      }
+    },
+    "Facility": {
+      "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "admins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "averageRating": {
+          "description": "Average Rating of Facility 0 to 5, 0 for no rating.",
+          "type": "number",
+          "title": "Average Rating",
+          "default": 0
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "enum": [
+            "GOVT",
+            "PRIVATE"
+          ]
+        },
+        "contact": {
+          "type": "string",
+          "title": "Contact number"
+        },
+        "facilityCode": {
+          "type": "string",
+          "title": "Facility Code"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "integer",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "integer",
+          "title": "Operating hours start of day"
+        },
+        "serialNum": {
+          "type": "integer",
+          "title": "Serial Number"
+        },
+        "stamp": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of Facility",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of Facility",
+          "enum": [
+            "Fixed location",
+            "Mobile",
+            "Both"
+          ]
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
+        }
+      }
+    },
+    "Operator": {
+      "type": "object",
+      "title": "The Operator Schema",
+      "required": [
+        "serialNum",
+        "operatorCode",
+        "nationalIdentifier",
+        "operatorName",
+        "facilityIds",
+        "mobileNumber",
+        "averageRating",
+        "trainingCertificate",
+        "status"
+      ],
+      "properties": {
+        "averageRating": {
+          "type": "number"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "nationalIdentifier": {
+          "type": "string"
+        },
+        "operatorCode": {
+          "type": "string"
+        },
+        "operatorName": {
+          "type": "string",
+          "title": "Full name"
+        },
+        "serialNum": {
+          "type": "integer"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "Signature.json#/definitions/Signature"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
+        }
+      }
+    },
+    "Program": {
+      "type": "object",
+      "title": "Program",
+      "required": [
+        "name",
+        "description",
+        "startDate"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "title": "End Date"
+        },
+        "logoURL": {
+          "type": "string",
+          "title": "Logo URL"
+        },
+        "medicineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Start Date"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status",
+          "enum": [
+            "Active",
+            "Inactive"
           ]
         }
       }
@@ -239,21 +574,6 @@ func init() {
         "admin": "scope of super admin",
         "facilityAdmin": "scope of facility admin"
       }
-    },
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     }
   },
   "security": [
@@ -283,7 +603,49 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/enrollments": {
+      "post": {
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "summary": "Upload facility csv for bulk ingestion of pre enrollment",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Facility data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facilities": {
+      "get": {
+        "summary": "get facilities",
+        "operationId": "getFacilities",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Facility"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -310,7 +672,31 @@ func init() {
         }
       }
     },
-    "/medicine": {
+    "/medicines": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "user"
+            ]
+          }
+        ],
+        "summary": "Get medicines",
+        "operationId": "getMedicines",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/CreateMedicineRequest"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -344,7 +730,30 @@ func init() {
         }
       }
     },
-    "/program": {
+    "/programs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "user"
+            ]
+          }
+        ],
+        "summary": "get program list",
+        "operationId": "getPrograms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "summary": "Create program",
         "operationId": "createProgram",
@@ -372,6 +781,21 @@ func init() {
       }
     },
     "/vaccinators": {
+      "get": {
+        "summary": "Get vaccinators",
+        "operationId": "getVaccinators",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Operator"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -400,6 +824,49 @@ func init() {
     }
   },
   "definitions": {
+    "Address": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "addressLine2",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "example": [
+            "Karnataka"
+          ]
+        }
+      },
+      "example": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": 560000,
+          "state": "Karnataka"
+        }
+      ]
+    },
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
@@ -453,6 +920,194 @@ func init() {
         }
       }
     },
+    "Facility": {
+      "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "admins": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "averageRating": {
+          "description": "Average Rating of Facility 0 to 5, 0 for no rating.",
+          "type": "number",
+          "title": "Average Rating",
+          "default": 0
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "enum": [
+            "GOVT",
+            "PRIVATE"
+          ]
+        },
+        "contact": {
+          "type": "string",
+          "title": "Contact number"
+        },
+        "facilityCode": {
+          "type": "string",
+          "title": "Facility Code"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "integer",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "integer",
+          "title": "Operating hours start of day"
+        },
+        "serialNum": {
+          "type": "integer",
+          "title": "Serial Number"
+        },
+        "stamp": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of Facility",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of Facility",
+          "enum": [
+            "Fixed location",
+            "Mobile",
+            "Both"
+          ]
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
+        }
+      }
+    },
+    "Operator": {
+      "type": "object",
+      "title": "The Operator Schema",
+      "required": [
+        "serialNum",
+        "operatorCode",
+        "nationalIdentifier",
+        "operatorName",
+        "facilityIds",
+        "mobileNumber",
+        "averageRating",
+        "trainingCertificate",
+        "status"
+      ],
+      "properties": {
+        "averageRating": {
+          "type": "number"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "nationalIdentifier": {
+          "type": "string"
+        },
+        "operatorCode": {
+          "type": "string"
+        },
+        "operatorName": {
+          "type": "string",
+          "title": "Full name"
+        },
+        "serialNum": {
+          "type": "integer"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signature"
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
+        }
+      }
+    },
+    "Program": {
+      "type": "object",
+      "title": "Program",
+      "required": [
+        "name",
+        "description",
+        "startDate"
+      ],
+      "properties": {
+        "description": {
+          "type": "string",
+          "title": "Description"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date",
+          "title": "End Date"
+        },
+        "logoURL": {
+          "type": "string",
+          "title": "Logo URL"
+        },
+        "medicineIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "name": {
+          "type": "string",
+          "title": "Name"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date",
+          "title": "Start Date"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        }
+      }
+    },
     "ProgramRequest": {
       "type": "object",
       "properties": {
@@ -487,6 +1142,73 @@ func init() {
           ]
         }
       }
+    },
+    "signature": {
+      "type": "object",
+      "title": "The Signature Schema for the registry",
+      "required": [
+        "@type",
+        "signatureFor",
+        "creator",
+        "created",
+        "signatureValue"
+      ],
+      "properties": {
+        "@type": {
+          "type": "string",
+          "default": "sc:RsaSignature2018",
+          "enum": [
+            "sc:LinkedDataSignature2015",
+            "sc:GraphSignature2012",
+            "sc:RsaSignature2018"
+          ],
+          "$id": "#/properties/@type"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "$comment": "Timestamp",
+          "$id": "#/properties/created",
+          "examples": [
+            "2017-09-23T20:21:34Z"
+          ]
+        },
+        "creator": {
+          "type": "string",
+          "format": "uri",
+          "$comment": "IRI where the public key associated could be retrieved",
+          "$id": "#/properties/creator",
+          "examples": [
+            "https://example.com/i/pat/keys/"
+          ]
+        },
+        "nonce": {
+          "type": "string",
+          "$comment": "Some unique value for tracking",
+          "$id": "#/properties/nonce",
+          "examples": [
+            "guid"
+          ]
+        },
+        "signatureFor": {
+          "type": "string",
+          "$comment": "The attribute name or entity id you for which this is the signature",
+          "$id": "#/properties/signatureFor",
+          "examples": [
+            "http://localhost:8080/serialNum",
+            "http://localhost:8080/9cba6ddd-330c-4a0d-929a-771bb12cb0d3"
+          ]
+        },
+        "signatureValue": {
+          "type": "string",
+          "$comment": "Hash or signed value",
+          "$id": "#/properties/signatureValue",
+          "examples": [
+            "eyiOiJKJeXAasddOEjgFWFXk"
+          ]
+        }
+      },
+      "$id": "#/properties/Signature"
     }
   },
   "securityDefinitions": {
@@ -499,21 +1221,6 @@ func init() {
         "admin": "scope of super admin",
         "facilityAdmin": "scope of facility admin"
       }
-    },
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
     }
   },
   "security": [
