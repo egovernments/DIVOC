@@ -7,9 +7,10 @@ import Dashboard from './components/Dashboard'
 import {PrivateRoute} from "./utils/PrivateRoute";
 import {useKeycloak} from "@react-keycloak/web";
 import React from "react";
-import Admin from '../src/components/Admin/Admin';
 import {Header} from "./components/Header";
 import {CONSTANTS} from "./utils/constants";
+import FacilityAdmin from "./components/FacilityAdmin/FacilityAdmin";
+import Admin from "./components/Admin/Admin";
 
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -29,6 +30,7 @@ export default function App() {
                         <PrivateRoute exact path="/dashboard" component={Dashboard}/>
                         <PrivateRoute exact path="/about" component={About}/>
                         <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.VACCINATION_CLIENT}/>
+                        <PrivateRoute exact path="/facility_admin" component={FacilityAdmin} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
                     </Switch>
                 </div>
             </Router>
