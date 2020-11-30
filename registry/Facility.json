@@ -119,7 +119,7 @@
           "$id": "#/properties/admins",
           "type": "array",
           "items": {
-            "$ref": "Operator.json#/definitions/Operator"
+            "$ref": "Vaccinator.json#/definitions/Vaccinator"
           }
         },
         "___encryptedFields": {

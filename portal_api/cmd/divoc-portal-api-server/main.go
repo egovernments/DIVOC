@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/divoc/portal-api/config"
 	"github.com/jinzhu/configor"
-	"log"
+	log "github.com/sirupsen/logrus"
 	"os"
 
 	"github.com/divoc/portal-api/swagger_gen/restapi"

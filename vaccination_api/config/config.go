@@ -10,10 +10,11 @@ var Config = struct {
 	}
 	Keycloak struct {
 		Url           string `env:"KEYCLOAK_URL"`
-		FacilityAdmin struct {
-			RoleName string `yaml:"roleName"`
-			RoleId   string `yaml:"roleId"`
-			ClientId string `yaml:"clientId"`
-		} `yaml:"facilityAdmin"`
+		PubkeyPath string `default:"config/local_rsa.pub""`
+
+	}
+	Kafka struct {
+		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
+		CertifyTopic string `default:"certify" yaml:"certifyTopic"`
 	}
 }{}

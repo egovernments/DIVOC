@@ -51,9 +51,6 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPing has not yet been implemented")
 		}),
-		VaccinationGetRecipientsHandler: vaccination.GetRecipientsHandlerFunc(func(params vaccination.GetRecipientsParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation vaccination.GetRecipients has not yet been implemented")
-		}),
 		LoginPostAuthorizeHandler: login.PostAuthorizeHandlerFunc(func(params login.PostAuthorizeParams) middleware.Responder {
 			return middleware.NotImplemented("operation login.PostAuthorize has not yet been implemented")
 		}),
@@ -78,17 +75,10 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
 		}),
-		VaccinationRegisterRecipientHandler: vaccination.RegisterRecipientHandlerFunc(func(params vaccination.RegisterRecipientParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation vaccination.RegisterRecipient has not yet been implemented")
-		}),
 
 		// Applies when the "Authorization" header is set
 		IsAdminAuth: func(token string) (interface{}, error) {
 			return nil, errors.NotImplemented("api key auth (isAdmin) Authorization from header param [Authorization] has not yet been implemented")
-		},
-		// Applies when the "Authorization" header is set
-		IsFacilityAdminAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isFacilityAdmin) Authorization from header param [Authorization] has not yet been implemented")
 		},
 		// Applies when the "Authorization" header is set
 		IsUserAuth: func(token string) (interface{}, error) {
@@ -134,10 +124,6 @@ type DivocAPI struct {
 	// it performs authentication based on an api key Authorization provided in the header
 	IsAdminAuth func(string) (interface{}, error)
 
-	// IsFacilityAdminAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key Authorization provided in the header
-	IsFacilityAdminAuth func(string) (interface{}, error)
-
 	// IsUserAuth registers a function that takes a token and returns a principal
 	// it performs authentication based on an api key Authorization provided in the header
 	IsUserAuth func(string) (interface{}, error)
@@ -147,8 +133,6 @@ type DivocAPI struct {
 
 	// GetPingHandler sets the operation handler for the get ping operation
 	GetPingHandler GetPingHandler
-	// VaccinationGetRecipientsHandler sets the operation handler for the get recipients operation
-	VaccinationGetRecipientsHandler vaccination.GetRecipientsHandler
 	// LoginPostAuthorizeHandler sets the operation handler for the post authorize operation
 	LoginPostAuthorizeHandler login.PostAuthorizeHandler
 	// IdentityPostIdentityVerifyHandler sets the operation handler for the post identity verify operation
@@ -165,8 +149,6 @@ type DivocAPI struct {
 	VaccinationGetPreEnrollmentHandler vaccination.GetPreEnrollmentHandler
 	// VaccinationGetPreEnrollmentsForFacilityHandler sets the operation handler for the get pre enrollments for facility operation
 	VaccinationGetPreEnrollmentsForFacilityHandler vaccination.GetPreEnrollmentsForFacilityHandler
-	// VaccinationRegisterRecipientHandler sets the operation handler for the register recipient operation
-	VaccinationRegisterRecipientHandler vaccination.RegisterRecipientHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -246,18 +228,12 @@ func (o *DivocAPI) Validate() error {
 	if o.IsAdminAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
-	if o.IsFacilityAdminAuth == nil {
-		unregistered = append(unregistered, "AuthorizationAuth")
-	}
 	if o.IsUserAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
 	if o.GetPingHandler == nil {
 		unregistered = append(unregistered, "GetPingHandler")
-	}
-	if o.VaccinationGetRecipientsHandler == nil {
-		unregistered = append(unregistered, "vaccination.GetRecipientsHandler")
 	}
 	if o.LoginPostAuthorizeHandler == nil {
 		unregistered = append(unregistered, "login.PostAuthorizeHandler")
@@ -283,9 +259,6 @@ func (o *DivocAPI) Validate() error {
 	if o.VaccinationGetPreEnrollmentsForFacilityHandler == nil {
 		unregistered = append(unregistered, "vaccination.GetPreEnrollmentsForFacilityHandler")
 	}
-	if o.VaccinationRegisterRecipientHandler == nil {
-		unregistered = append(unregistered, "vaccination.RegisterRecipientHandler")
-	}
 
 	if len(unregistered) > 0 {
 		return fmt.Errorf("missing registration: %s", strings.Join(unregistered, ", "))
@@ -307,10 +280,6 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 		case "isAdmin":
 			scheme := schemes[name]
 			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsAdminAuth)
-
-		case "isFacilityAdmin":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsFacilityAdminAuth)
 
 		case "isUser":
 			scheme := schemes[name]
@@ -395,10 +364,6 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/recipients"] = vaccination.NewGetRecipients(o.context, o.VaccinationGetRecipientsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -431,10 +396,6 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/preEnrollments/facility/{facilityCode}"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
-	if o.handlers["POST"] == nil {
-		o.handlers["POST"] = make(map[string]http.Handler)
-	}
-	o.handlers["POST"]["/recipients"] = vaccination.NewRegisterRecipient(o.context, o.VaccinationRegisterRecipientHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP
