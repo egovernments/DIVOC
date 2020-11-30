@@ -1,12 +1,25 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./ProgramRegistration.module.css";
 import axios from "axios";
 import { useKeycloak } from "@react-keycloak/web";
 import Form from "@rjsf/core";
+import ListView from '../ListView/ListView';
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
+    const [programList, setProgramList] = useState([])
+
+    useEffect(() => {
+        getListOfRegisteredPrograms();
+    },[]);
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${keycloak.token} `,
+            "Content-Type": "application/json",
+        },
+    };
 
     const schema = {
         type: "object",
@@ -67,12 +80,6 @@ function VaccineRegistration() {
     };
 
     const handleSubmit = () => {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${keycloak.token} `,
-                "Content-Type": "application/json",
-            },
-        };
         axios
             .post("/divoc/admin/api/v1/programs", formData, config)
             .then((res) => {
@@ -80,6 +87,15 @@ function VaccineRegistration() {
                 console.log(res);
             });
     };
+
+    const getListOfRegisteredPrograms = async () => {
+        const res = await axios
+            .get("/divoc/admin/api/v1/programs", config)
+            .then( (res) => {
+                return res.data
+            })
+        setProgramList(res)
+    }
 
     return (
         <div className={styles["container"]}>
@@ -97,7 +113,7 @@ function VaccineRegistration() {
                 </Form>
             </div>
             <div className={styles["sub-container"]}>
-                <p>List of Registered Program</p>
+                <ListView listData={programList} />
             </div>
         </div>
     );

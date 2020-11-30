@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./VaccineRegistration.module.css";
 import { useKeycloak } from "@react-keycloak/web";
 import axios from "axios";
+import ListView from '../ListView/ListView';
 import Form from "@rjsf/core";
+
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
+    const [medicineList, setMedicineList] = useState([])
+
+    useEffect(() => {
+        getListOfRegisteredVaccines();
+    },[]);
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${keycloak.token} `,
+            "Content-Type": "application/json",
+        },
+    };
 
     const schema = {
         type: "object",
@@ -75,13 +89,14 @@ function VaccineRegistration() {
         },
     };
 
+    const uiSchema = {
+        classNames: styles["form-conatiner"],
+        title: {
+            classNames: styles["form-title"],
+        },
+    };
+
     const handleSubmit = (dataToSend) => {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${keycloak.token} `,
-                "Content-Type": "application/json",
-            },
-        };
         axios
             .post("/divoc/admin/api/v1/medicines", dataToSend, config)
             .then((res) => {
@@ -90,12 +105,16 @@ function VaccineRegistration() {
             });
     };
 
-    const uiSchema = {
-        classNames: styles["form-conatiner"],
-        title: {
-            classNames: styles["form-title"],
-        },
-    };
+    
+
+    const getListOfRegisteredVaccines = async () => {
+        const res = await axios
+            .get("/divoc/admin/api/v1/medicines", config)
+            .then( (res) => {
+                return res.data
+            })
+        setMedicineList(res)
+    }
 
 
     return (
@@ -114,7 +133,7 @@ function VaccineRegistration() {
                 </Form>
             </div>
             <div className={styles["sub-container"]}>
-                <p>List of Registered Vaccines</p>
+                <ListView listData={medicineList} />
             </div>
         </div>
     );
