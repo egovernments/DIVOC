@@ -105,6 +105,63 @@ func init() {
         }
       }
     },
+    "/facility/staffs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facilityAdmin"
+            ]
+          }
+        ],
+        "summary": "Get staffs of a facility",
+        "operationId": "getFacilityStaffs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityStaff"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facilityAdmin"
+            ]
+          }
+        ],
+        "summary": "Create Facility Stagg",
+        "operationId": "createFacilityStaffs",
+        "parameters": [
+          {
+            "description": "Create facility staff data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityStaff"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -421,6 +478,26 @@ func init() {
         }
       }
     },
+    "FacilityStaff": {
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "Facility Staff Id"
+        },
+        "mobileNumber": {
+          "type": "string",
+          "title": "Facility Staff Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Staff Name"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "Facility Staff Role ID"
+        }
+      }
+    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -657,6 +734,63 @@ func init() {
             "description": "Facility data in the form of csv",
             "name": "file",
             "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/staffs": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facilityAdmin"
+            ]
+          }
+        ],
+        "summary": "Get staffs of a facility",
+        "operationId": "getFacilityStaffs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityStaff"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facilityAdmin"
+            ]
+          }
+        ],
+        "summary": "Create Facility Stagg",
+        "operationId": "createFacilityStaffs",
+        "parameters": [
+          {
+            "description": "Create facility staff data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityStaff"
+            }
           }
         ],
         "responses": {
@@ -998,6 +1132,26 @@ func init() {
         "websiteUrl": {
           "type": "string",
           "title": "Website URL"
+        }
+      }
+    },
+    "FacilityStaff": {
+      "properties": {
+        "employeeId": {
+          "type": "string",
+          "title": "Facility Staff Id"
+        },
+        "mobileNumber": {
+          "type": "string",
+          "title": "Facility Staff Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Staff Name"
+        },
+        "roleId": {
+          "type": "string",
+          "title": "Facility Staff Role ID"
         }
       }
     },

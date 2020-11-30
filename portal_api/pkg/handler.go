@@ -55,6 +55,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
 	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
+	api.CreateFacilityStaffsHandler = operations.CreateFacilityStaffsHandlerFunc(createFacilityStaffHandler)
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
@@ -75,7 +76,7 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal inter
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal interface{}) middleware.Responder {
 	log.Infof("Create medicine %+v", params.Body)
-	objectId:="Medicine"
+	objectId := "Medicine"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
 		return operations.NewCreateMedicineBadRequest()
@@ -91,7 +92,7 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal int
 
 func createProgramHandler(params operations.CreateProgramParams, principal interface{}) middleware.Responder {
 	log.Infof("Create Program %+v", params.Body)
-	objectId:="Program"
+	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
 		return operations.NewCreateProgramBadRequest()
@@ -138,4 +139,9 @@ func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal i
 func registryUrl(operationId string) string {
 	url := config.Config.Registry.Url + "/" + operationId
 	return url
+}
+
+func createFacilityStaffHandler(params operations.CreateFacilityStaffsParams, principal interface{}) middleware.Responder {
+	CreateFacilityStaff(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	return operations.NewCreateFacilityStaffsOK()
 }

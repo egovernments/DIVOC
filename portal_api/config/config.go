@@ -10,10 +10,12 @@ var Config = struct {
 	}
 	Keycloak struct {
 		Url           string `env:"KEYCLOAK_URL"`
+		Realm         string `env:"KEYCLOAK_REALM"`
 		FacilityAdmin struct {
 			RoleName string `yaml:"roleName"`
 			RoleId   string `yaml:"roleId"`
 			ClientId string `yaml:"clientId"`
+			GroupId  string `yaml:"groupId"`
 		} `yaml:"facilityAdmin"`
 	}
 }{}

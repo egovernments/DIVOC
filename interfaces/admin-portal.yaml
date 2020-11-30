@@ -161,6 +161,38 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /facility/staffs:
+    get:
+      summary: Get staffs of a facility
+      operationId: getFacilityStaffs
+      security:
+        - hasRole: ["facilityAdmin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/FacilityStaff'
+    post:
+      summary: Create Facility Staff
+      operationId: createFacilityStaffs
+      security:
+        - hasRole: ["facilityAdmin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityStaff'
+          description: Create facility staff data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
 definitions:
   ProgramRequest:
     type: object
@@ -384,6 +416,20 @@ definitions:
         type: array
         items:
           type: string
+  FacilityStaff:
+    properties:
+      roleId:
+        type: string
+        title: Facility Staff Role ID
+      name:
+        type: string
+        title: Facility Staff Name
+      mobileNumber:
+        type: string
+        title: Facility Staff Mobile Number
+      employeeId:
+        type: string
+        title: Facility Staff Id
 host: divoc.xiv.in
 schemes:
   - https
