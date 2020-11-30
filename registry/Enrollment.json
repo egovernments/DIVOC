@@ -1,0 +1,47 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Facility": {
+      "$ref": "#/definitions/Enrollment"
+    }
+  },
+  "required": [
+    "Enrollment"
+  ],
+  "title":"Enrollment",
+  "definitions": {
+    "Enrollment": {
+      "type": "object",
+      "required": ["phone", "enrollmentScopeId", "nationalId", "dob", "code"],
+      "properties": {
+        "phone" : {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["Male", "Female", "Other"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

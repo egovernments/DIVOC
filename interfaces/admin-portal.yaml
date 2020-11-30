@@ -81,7 +81,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Operator'
+              $ref: '#/definitions/Vaccinator'
     post:
       summary: Upload facility csv for bulk ingestion
       consumes:
@@ -305,14 +305,14 @@ definitions:
         description: State of address
         example:
           - Karnataka
-  Operator:
+  Vaccinator:
     type: object
     title: The Operator Schema
     required:
       - serialNum
-      - operatorCode
+      - code
       - nationalIdentifier
-      - operatorName
+      - name
       - facilityIds
       - mobileNumber
       - averageRating
@@ -325,11 +325,11 @@ definitions:
           "$ref": Signature.json#/definitions/Signature
       serialNum:
         type: integer
-      operatorCode:
+      code:
         type: string
       nationalIdentifier:
         type: string
-      operatorName:
+      name:
         type: string
         title: Full name
       facilityIds:

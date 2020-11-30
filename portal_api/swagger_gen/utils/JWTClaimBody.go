@@ -1,6 +1,6 @@
 package utils
 
-import "github.com/dgrijalva/jwt-go"
+import "github.com/gospotcheck/jwt-go"
 
 type JWTClaimBody struct {
 	*jwt.StandardClaims

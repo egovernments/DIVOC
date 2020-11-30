@@ -1,7 +1,8 @@
 import {BaseCard} from "../Base/Base";
+import {appIndexDb} from "../AppDatabase";
 import React, {createContext, useContext, useEffect, useMemo, useReducer, useState} from "react";
 import "./Home.scss"
-import {Button, Col} from "react-bootstrap";
+import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
 import vaccineBanner from "./vaccine_banner.png"
@@ -10,7 +11,6 @@ import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
 import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
-import {appIndexDb} from "../AppDatabase";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -30,7 +30,7 @@ function Title({text, content}) {
 export default Home;
 
 function EnrollmentTypes() {
-    const {goToVerifyRecipient} = useHome()
+    const {goToVerifyRecipient, goToQueue} = useHome();
     return <>
         <div className={"enroll-container"}>
             <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
@@ -38,8 +38,7 @@ function EnrollmentTypes() {
             }}/>
             <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient} onClick={() => {
             }}/>
-            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={() => {
-            }}/>
+            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={goToQueue}/>
         </div>
     </>;
 }
@@ -128,12 +127,12 @@ export const ACTION_VERIFY_RECIPIENT = 'verifyRecipient';
 const HomeContext = createContext(null);
 
 export function useHome() {
-    const context = useContext(HomeContext)
+    const context = useContext(HomeContext);
     const history = useHistory();
     if (!context) {
         throw new Error(`useHome must be used within a HomeProvider`)
     }
-    const [state, dispatch] = context
+    const [state, dispatch] = context;
 
     const goToVerifyRecipient = function () {
         history.push('preEnroll/' + FORM_PRE_ENROLL_CODE)
@@ -141,7 +140,7 @@ export function useHome() {
 
     const goToQueue = function () {
         history.push(`/queue`)
-    }
+    };
 
     return {
         state,
@@ -152,7 +151,7 @@ export function useHome() {
 }
 
 export function HomeProvider(props) {
-    const [state, dispatch] = useReducer(homeReducer, initialState)
-    const value = useMemo(() => [state, dispatch], [state])
+    const [state, dispatch] = useReducer(homeReducer, initialState);
+    const value = useMemo(() => [state, dispatch], [state]);
     return <HomeContext.Provider value={value} {...props} />
 }

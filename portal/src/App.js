@@ -9,12 +9,15 @@ import {useKeycloak} from "@react-keycloak/web";
 import React from "react";
 import Admin from '../src/components/Admin/Admin';
 import {Header} from "./components/Header";
+import {CONSTANTS} from "./utils/constants";
 
 export default function App() {
-    const {initialized} = useKeycloak();
+    const {initialized, keycloak} = useKeycloak();
     if (!initialized) {
         return <div>Loading...</div>
     }
+
+
     return (
         <div>
             <Router>
@@ -25,7 +28,7 @@ export default function App() {
                         <Route exact path="/login" component={Login}/>
                         <PrivateRoute exact path="/dashboard" component={Dashboard}/>
                         <PrivateRoute exact path="/about" component={About}/>
-                        <PrivateRoute exact path="/admin" component={Admin}/>
+                        <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.VACCINATION_CLIENT}/>
                     </Switch>
                 </div>
             </Router>

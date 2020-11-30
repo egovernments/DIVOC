@@ -14,12 +14,14 @@ require (
 	github.com/go-openapi/validate v0.19.12
 	github.com/google/go-dap v0.3.0 // indirect
 	github.com/google/uuid v1.1.2
+	github.com/gospotcheck/jwt-go v4.0.0+incompatible
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/mattn/go-colorable v0.1.8 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/peterh/liner v1.2.0 // indirect
+	github.com/pkg/errors v0.9.1
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sirupsen/logrus v1.7.0
 	github.com/spf13/cobra v1.1.1 // indirect

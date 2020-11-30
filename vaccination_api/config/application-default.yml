@@ -1,0 +1,10 @@
+registry:
+  url: http://localhost:8081
+  addoperationid: add
+  searchoperationid: search
+  readoperationid: read
+keycloak:
+  url: https://divoc.xiv.in/keycloak/auth
+kafka:
+  bootstrapServers: localhost
+  certifyTopic: certify
