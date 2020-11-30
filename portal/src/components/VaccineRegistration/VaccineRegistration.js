@@ -13,10 +13,31 @@ function VaccineRegistration() {
         properties: {
             name: {
                 type: "string",
-                title: "Name",
+                title: "Name of Vaccine / Medicine",
+            },
+            medicineId: {
+                type: "number",
+                title: "Medicine ID (if applicable)",
+            },
+            program: {
+                title: "Select Program",
+                type: "object",
+                properties: {
+                  "Please select vaccine program": {
+                    "type": "string",
+                    "enum": [
+                      "C-19 Program",
+                    ],
+                    "default": "C-10 Program"
+                  }
+            },
+        },
+            manufacturer: {
+                type: "string",
+                title: "Manufacturer",
             },
             provider: {
-                title: "Provider",
+                title: "Supplier / Distributor",
                 type: "string",
             },
             schedule: {
@@ -43,8 +64,13 @@ function VaccineRegistration() {
                 title: "Status",
             },
             price: {
-                title: "Price (if fixed)",
+                title: "Price Range",
                 type: "number",
+            },
+            logoURL: {
+                type: "string",
+                title: "Vaccine Administering Details",
+                format: "file",
             },
         },
     };
@@ -74,7 +100,7 @@ function VaccineRegistration() {
 
     return (
         <div className={styles["container"]}>
-            <div className={styles["registration-form"]}>
+            <div className={styles["form-container"]}>
                 <h4 className={styles['heading']}>Register New Vaccine</h4>
                 <Form
                     schema={schema}
@@ -83,9 +109,11 @@ function VaccineRegistration() {
                         // setFormData(e.formData);
                         handleSubmit(e.formData);
                     }}
-                />
+                >
+                    <button type="submit" className={styles['button']}>SAVE</button>
+                </Form>
             </div>
-            <div className={styles["registration-form"]}>
+            <div className={styles["sub-container"]}>
                 <p>List of Registered Vaccines</p>
             </div>
         </div>

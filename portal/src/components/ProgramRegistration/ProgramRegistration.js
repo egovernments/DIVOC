@@ -12,13 +12,17 @@ function VaccineRegistration() {
         type: "object",
         required: ["name", "description", "startDate"],
         properties: {
+            programId: {
+                type: "number",
+                title: "Internal Program UID",
+            },
             name: {
                 type: "string",
-                title: "Name",
+                title: "Program Name",
             },
             description: {
                 type: "string",
-                title: "Description",
+                title: "Program Description",
             },
             logoURL: {
                 type: "string",
@@ -38,8 +42,10 @@ function VaccineRegistration() {
             status: {
                 type: "string",
                 title: "Status",
-                format: "radio",
-                enum: ["Active", "Inactive"],
+                enum: [
+                    "Active", 
+                    "Inactive"
+                ],
             },
         },
     };
@@ -47,11 +53,17 @@ function VaccineRegistration() {
     
 
     const uiSchema = {
-        classNames: styles["form-conatiner"],
+        classNames: styles["form"],
         title: {
             classNames: styles["form-title"],
         },
-
+        status: {
+            classNames: styles["form-radio-buttons"],
+            "ui:widget": "radio",
+            "ui:options": {
+                "inline": true,
+            }
+        }
     };
 
     const handleSubmit = () => {
@@ -71,7 +83,7 @@ function VaccineRegistration() {
 
     return (
         <div className={styles["container"]}>
-            <div className={styles["registration-form"]}>
+            <div className={styles["form-container"]}>
             <h4 className={styles['heading']}>Register New Vaccine</h4>
                 <Form
                     schema={schema}
@@ -84,7 +96,7 @@ function VaccineRegistration() {
                     <button type="submit" className={styles['button']}>SAVE</button>
                 </Form>
             </div>
-            <div className={styles["registration-form"]}>
+            <div className={styles["sub-container"]}>
                 <p>List of Registered Program</p>
             </div>
         </div>
