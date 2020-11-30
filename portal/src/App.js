@@ -9,6 +9,7 @@ import {useKeycloak} from "@react-keycloak/web";
 import React from "react";
 import Admin from '../src/components/Admin/Admin';
 import {Header} from "./components/Header";
+import {CONSTANTS} from "./utils/constants";
 
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -16,7 +17,7 @@ export default function App() {
         return <div>Loading...</div>
     }
 
-    const checkIfRoleIsAdmin = keycloak.hasResourceRole('admin', 'vaccination_api');
+
     return (
         <div>
             <Router>
@@ -27,7 +28,7 @@ export default function App() {
                         <Route exact path="/login" component={Login}/>
                         <PrivateRoute exact path="/dashboard" component={Dashboard}/>
                         <PrivateRoute exact path="/about" component={About}/>
-                        {checkIfRoleIsAdmin ? <PrivateRoute exact path="/admin" component={Admin}/> : ''}
+                        <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.VACCINATION_CLIENT}/>
                     </Switch>
                 </div>
             </Router>

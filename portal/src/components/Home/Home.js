@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import './Home.css';
 import WelcomeBGImg from '../../assets/img/welcome-bg.png'
 import FacilitiesApproveImg from '../../assets/img/facilities-approve.svg'
@@ -14,9 +14,26 @@ import DIImg from '../../assets/img/di.png'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from 'pure-react-carousel';
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import {LatestUpdateCard} from "../LatestUpdateCard";
-import {Link} from "react-router-dom";
+import {Link, useHistory} from "react-router-dom";
+import {useKeycloak} from "@react-keycloak/web";
+import {CONSTANTS} from "../../utils/constants";
 
 export default function Home() {
+    const {keycloak} = useKeycloak();
+    const history = useHistory();
+
+    useEffect(() => {
+        if (keycloak.authenticated) {
+            let redirectUrl = "/";
+            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+                redirectUrl = "/admin";
+                history.push(redirectUrl)
+            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+                redirectUrl = "/facility_admin";
+                history.push(redirectUrl)
+            }
+        }
+    }, [keycloak]);
     return (
         <div className="home-section">
             <div className="section ">
@@ -42,7 +59,7 @@ export default function Home() {
                                     </div>
                                 </div>
                             </div>
-                            <Link className="login-button mt-5 d-inline-block" to={"/login"}>Login</Link >
+                            <Link className="login-button mt-5 d-inline-block" to={"/login"}>Login</Link>
                         </div>
                         <div className="welcome-image-wrapper d-flex justify-content-end">
                             <img alt={""} src={WelcomeBGImg}/>
@@ -76,7 +93,8 @@ export default function Home() {
             <div className="updates-section ">
                 <div className="d-flex justify-content-between align-items-center">
                     <span className="font-weight-bold">Latest Updates</span>
-                    <span className="d-flex align-items-center" style={{cursor: "pointer"}}>View All Updates <span className="latest-update-nav-btn ml-2 pl-1 pr-1">{">"}</span></span>
+                    <span className="d-flex align-items-center" style={{cursor: "pointer"}}>View All Updates <span
+                        className="latest-update-nav-btn ml-2 pl-1 pr-1">{">"}</span></span>
                 </div>
                 <CarouselProvider
                     naturalSlideWidth={100}
