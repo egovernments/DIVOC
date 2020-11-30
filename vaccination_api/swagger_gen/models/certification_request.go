@@ -155,7 +155,7 @@ func (m *CertificationRequest) UnmarshalBinary(b []byte) error {
 type CertificationRequestFacility struct {
 
 	// address
-	Address string `json:"address,omitempty"`
+	Address *CertificationRequestFacilityAddress `json:"address,omitempty"`
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -163,6 +163,33 @@ type CertificationRequestFacility struct {
 
 // Validate validates this certification request facility
 func (m *CertificationRequestFacility) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestFacility) validateAddress(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Address) { // not required
+		return nil
+	}
+
+	if m.Address != nil {
+		if err := m.Address.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("facility" + "." + "address")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -184,10 +211,57 @@ func (m *CertificationRequestFacility) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
+// CertificationRequestFacilityAddress certification request facility address
+//
+// swagger:model CertificationRequestFacilityAddress
+type CertificationRequestFacilityAddress struct {
+
+	// address line1
+	AddressLine1 string `json:"addressLine1,omitempty"`
+
+	// address line2
+	AddressLine2 string `json:"addressLine2,omitempty"`
+
+	// district
+	District string `json:"district,omitempty"`
+
+	// pincode
+	Pincode int64 `json:"pincode,omitempty"`
+
+	// state
+	State string `json:"state,omitempty"`
+}
+
+// Validate validates this certification request facility address
+func (m *CertificationRequestFacilityAddress) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *CertificationRequestFacilityAddress) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *CertificationRequestFacilityAddress) UnmarshalBinary(b []byte) error {
+	var res CertificationRequestFacilityAddress
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
 // CertificationRequestRecipient certification request recipient
 //
 // swagger:model CertificationRequestRecipient
 type CertificationRequestRecipient struct {
+
+	// contact
+	Contact []string `json:"contact"`
 
 	// dob
 	// Format: date
@@ -202,8 +276,8 @@ type CertificationRequestRecipient struct {
 	// name
 	Name string `json:"name,omitempty"`
 
-	// natinoality
-	Natinoality string `json:"natinoality,omitempty"`
+	// nationality
+	Nationality string `json:"nationality,omitempty"`
 }
 
 // Validate validates this certification request recipient

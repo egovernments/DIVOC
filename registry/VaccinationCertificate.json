@@ -59,8 +59,8 @@
 
   "privateFields": ["nationalIdentifier", "code"],
   "signedFields": ["serialNum"],
-  "indexFields": ["(serialNum, code)","name"],
-  "uniqueIndexFields": ["serialNum", "code"],
+  "indexFields": ["contact"],
+  "uniqueIndexFields": ["certificateId"],
   "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
 }
 }
