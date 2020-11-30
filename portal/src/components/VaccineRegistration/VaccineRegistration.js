@@ -1,67 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./VaccineRegistration.module.css";
 import { useKeycloak } from "@react-keycloak/web";
 import axios from "axios";
+import ListView from '../ListView/ListView';
 import Form from "@rjsf/core";
+import schema from '../../jsonSchema/vaccineSchema.json';
+
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
+    const [medicineList, setMedicineList] = useState([])
 
-    const schema = {
-        type: "object",
-        properties: {
-            name: {
-                type: "string",
-                title: "Name",
-            },
-            provider: {
-                title: "Provider",
-                type: "string",
-            },
-            schedule: {
-                title: "Schedule",
-                type: "object",
-                properties: {
-                    repeatTimes: {
-                        type: "number",
-                        title: "Repeat times",
-                    },
-                    repeatInterval: {
-                        title: "Repeat interval",
-                        type: "number",
-                    },
-                },
-            },
-            effectiveUntil: {
-                type: "number",
-                title: "Effective until (months)",
-            },
-            status: {
-                type: "string",
-                enum: ["Active", "Inactive", "Blocked"],
-                title: "Status",
-            },
-            price: {
-                title: "Price (if fixed)",
-                type: "number",
-            },
+    useEffect(() => {
+        getListOfRegisteredVaccines();
+    },[]);
+
+    const config = {
+        headers: {
+            Authorization: `Bearer ${keycloak.token} `,
+            "Content-Type": "application/json",
         },
-    };
-
-    const handleSubmit = (dataToSend) => {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${keycloak.token} `,
-                "Content-Type": "application/json",
-            },
-        };
-        axios
-            .post("/divoc/admin/api/v1/medicines", dataToSend, config)
-            .then((res) => {
-                alert("Status code is", res);
-                console.log(res);
-            });
     };
 
     const uiSchema = {
@@ -71,10 +30,30 @@ function VaccineRegistration() {
         },
     };
 
+    const handleSubmit = (dataToSend) => {
+        axios
+            .post("/divoc/admin/api/v1/medicines", dataToSend, config)
+            .then((res) => {
+                alert("Successfully Registered");
+                console.log(res);
+            });
+    };
+
+    
+
+    const getListOfRegisteredVaccines = async () => {
+        const res = await axios
+            .get("/divoc/admin/api/v1/medicines", config)
+            .then( (res) => {
+                return res.data
+            })
+        setMedicineList(res)
+    }
+
 
     return (
         <div className={styles["container"]}>
-            <div className={styles["registration-form"]}>
+            <div className={styles["form-container"]}>
                 <h4 className={styles['heading']}>Register New Vaccine</h4>
                 <Form
                     schema={schema}
@@ -83,10 +62,13 @@ function VaccineRegistration() {
                         // setFormData(e.formData);
                         handleSubmit(e.formData);
                     }}
-                />
+                >
+                    <button type="submit" className={styles['button']}>SAVE</button>
+                </Form>
             </div>
-            <div className={styles["registration-form"]}>
-                <p>List of Registered Vaccines</p>
+            <div className={styles["sub-container"]}>
+                <p className={styles['list-title']}>List of Registered Medicines / Vaccines</p>
+                <ListView listData={medicineList} />
             </div>
         </div>
     );
