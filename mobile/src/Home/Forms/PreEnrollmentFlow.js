@@ -1,7 +1,8 @@
 import {PreEnrollmentCode, PreEnrollmentDetails} from "./EnterPreEnrollment";
-import {AadharNumber, AadharOTP} from "./AadharVerification";
+import {VerifyAadharNumber, VerifyAadharOTP} from "./EnterAadharNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
+import {appIndexDb} from "../../AppDatabase";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode"
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails"
@@ -17,9 +18,9 @@ export function PreEnrollmentFlow(props) {
             case FORM_PRE_ENROLL_DETAILS :
                 return <PreEnrollmentDetails/>
             case FORM_AADHAR_NUMBER :
-                return <AadharNumber/>
+                return <VerifyAadharNumber/>
             case FORM_AADHAR_OTP :
-                return <AadharOTP/>
+                return <VerifyAadharOTP/>
         }
         return <PreEnrollmentCode/>
     }
@@ -45,31 +46,32 @@ const initialState = {};
 function preEnrollmentReducer(state, action) {
     switch (action.type) {
         case FORM_PRE_ENROLL_CODE: {
-            return {
-                enrollCode: action.payload.enrollCode,
-                previousForm: action.payload.currentForm
-                , ...state
-            };
+            const newState = {...state}
+            newState.enrollCode = action.payload.enrollCode;
+            newState.mobileNumber = action.payload.mobileNumber;
+            newState.previousForm = action.payload.currentForm;
+            return newState
         }
         case FORM_PRE_ENROLL_DETAILS: {
-            return {
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.name = action.payload.name;
+            newState.dob = action.payload.dob;
+            newState.gender = action.payload.gender
+            newState.previousForm = action.payload.currentForm ?? null
+            return newState
+
         }
         case FORM_AADHAR_NUMBER: {
-            return {
-                aadharNumber: action.payload.aadharNumber,
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.aadharNumber = action.payload.aadharNumber;
+            newState.previousForm = action.payload.currentForm ?? null;
+            return newState
         }
         case FORM_AADHAR_OTP: {
-            return {
-                aadharOtp: action.payload.aadharOtp,
-                previousForm: action.payload.currentForm ?? null
-                , ...state
-            };
+            const newState = {...state}
+            newState.aadharOtp = action.payload.aadharOtp;
+            newState.previousForm = action.payload.currentForm ?? null;
+            return newState
         }
         default:
             throw new Error();
@@ -86,14 +88,28 @@ export function usePreEnrollment() {
     const [state, dispatch] = context;
 
     const goNext = function (current, next, payload) {
+        payload.currentForm = current;
         dispatch({type: current, payload: payload})
         if (next) {
-            history.push('/preEnroll/' + next)
+            if (next === '/') {
+                history.replace("/", null)
+            } else {
+                history.push('/preEnroll/' + next)
+            }
         }
+    }
+
+    const addToQueue = function () {
+        const [state] = context;
+        return appIndexDb.addToQueue(state)
     }
 
     const goBack = function () {
         history.goBack()
+    }
+
+    const getUserDetails = function (enrollCode) {
+        return appIndexDb.getPatientDetails(enrollCode)
     }
 
     return {
@@ -101,6 +117,8 @@ export function usePreEnrollment() {
         dispatch,
         goNext,
         goBack,
+        getUserDetails,
+        addToQueue
     }
 }
 

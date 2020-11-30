@@ -8,7 +8,7 @@ import {useLogin} from "./Login";
 import {LoginLabels} from "../Base/Constants";
 import {ErrorAlert} from "../Base/Base";
 
-const PHONE_NUMBER_MAX = 10
+export const PHONE_NUMBER_MAX = 10
 
 export function EnterPhoneNumberComponent() {
     const {state, goToVerifyOtp} = useLogin();
