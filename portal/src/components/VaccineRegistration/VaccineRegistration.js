@@ -42,7 +42,7 @@ function VaccineRegistration() {
                     "enum": [
                       "C-19 Program",
                     ],
-                    "default": "C-10 Program"
+                    "default": "C-19 Program"
                   }
             },
         },

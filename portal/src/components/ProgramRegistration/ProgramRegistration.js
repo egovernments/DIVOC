@@ -76,12 +76,12 @@ function VaccineRegistration() {
             "ui:options": {
                 "inline": true,
             }
-        }
+        },
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = (datatoSend) => {
         axios
-            .post("/divoc/admin/api/v1/programs", formData, config)
+            .post("/divoc/admin/api/v1/programs", datatoSend, config)
             .then((res) => {
                 alert("Status code is", res);
                 console.log(res);
@@ -105,7 +105,9 @@ function VaccineRegistration() {
                     schema={schema}
                     uiSchema={uiSchema}
                     onSubmit={(e) => {
-                        // setFormData(e.formData)
+                        setFormData(e.formData)
+                        const newField = {medicineIds: [""]}
+                        Object.assign(e.formData, newField)
                         handleSubmit(e.formData);
                     }}
                 >
