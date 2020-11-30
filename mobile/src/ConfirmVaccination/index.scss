@@ -1,0 +1,45 @@
+.App {
+  background: linear-gradient(0deg, #F3F6F9 70%, #4E67D1 30%);
+}
+
+.confirm-vaccination-container {
+  height: 100%;
+  margin: 2rem 1rem 0.2rem;
+
+  .form-wrapper {
+    height: 90%;
+    overflow: scroll;
+  }
+  .card {
+    .card-body {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      .table {
+
+        tbody {
+          color: #646D82;
+
+          td {
+            border-top: none;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 0;
+          }
+        }
+      }
+
+    }
+  }
+
+  .action-btn {
+    color: #5C9EF8;
+    border-color: #5C9EF8;
+    font-size: 14px;
+    padding: 0.5rem 2rem;
+    &:hover , &:active{
+      background-color: #fff !important;
+      border-color: #5C9EF8 !important;
+      box-shadow: none !important;
+    }
+  }
+}

@@ -1,28 +1,40 @@
 import * as React from 'react'
 import {useEffect} from 'react'
-import {Redirect, useLocation} from 'react-router-dom'
+import {useHistory} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
+import {CONSTANTS} from "../utils/constants";
 
 const Login = () => {
-  const location = useLocation();
-  const currentLocationState = location.state || {
-    from: {pathname: '/'},
-  };
-  const {keycloak} = useKeycloak();
+    const {keycloak} = useKeycloak();
+    const history = useHistory();
 
-  useEffect(() => {
-    keycloak.login()
-  }, []);
+    useEffect(() => {
+        if (!keycloak.authenticated) {
+            keycloak.login()
+        }
+    }, []);
 
-  if (keycloak.authenticated) {
-    return <Redirect to={currentLocationState}/>;
-  }
-  return (
-    <div>
-      Login
-    </div>
-  )
+    useEffect(() => {
+        if (keycloak.authenticated) {
+            let redirectUrl = "/";
+            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+                redirectUrl = "/admin"
+            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+                redirectUrl = "/facility_admin"
+            } else {
+                alert("Unauthorized access. Contact ADMIN");
+                keycloak.logout({redirectUri: window.location.origin + "/"});
+            }
+            history.push(redirectUrl)
+        }
+    }, [keycloak]);
+
+    return (
+        <div>
+            Login
+        </div>
+    )
 };
 
 export default Login
