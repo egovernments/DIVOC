@@ -12,5 +12,6 @@ build
 coverage
 */.gitignore
 portal_api/divoc-portal-api-server
+vaccination_api/certificate_processor
 keycloak/divoc-realm.json
 *.jar
