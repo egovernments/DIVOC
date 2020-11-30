@@ -16,7 +16,7 @@
       "type": "object",
       "title": "Medicine",
       "required": [
-
+        "name", "status", "provider"
       ],
       "properties": {
         "name": {
@@ -28,6 +28,11 @@
           "title": "Provider",
           "type": "string",
           "$id": "#/properties/provider"
+        },
+        "administrationType": {
+          "type": "string",
+          "enum": ["muscular injection", "oral", "nasal"],
+          "default": "muscular injection"
         },
         "schedule": {
           "title": "Schedule",
