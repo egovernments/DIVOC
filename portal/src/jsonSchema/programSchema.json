@@ -1,0 +1,40 @@
+{
+    "$id": "#properties/Program",
+    "type": "object",
+    "required": ["name", "description", "startDate"],
+    "properties": {
+      "name": {
+        "$id": "#/properties/name",
+        "type": "string",
+        "title": "Name"
+      },
+      "description": {
+        "$id": "#/properties/description",
+        "type": "string",
+        "title": "Description"
+      },
+      "logoURL": {
+        "$id": "#/properties/logoURL",
+        "type": "string",
+        "title": "Logo URL"
+      },
+      "startDate": {
+        "$id": "#/properties/startDate",
+        "type": "string",
+        "title": "Start Date",
+        "format": "date"
+      },
+      "endDate": {
+        "$id": "#/properties/endDate",
+        "type": "string",
+        "title": "End Date",
+        "format": "date"
+      },
+      "status": {
+        "$id": "#properties/status",
+        "type": "string",
+        "title": "Status",
+        "enum": ["Active", "Inactive"]
+      }
+    }
+}

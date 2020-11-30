@@ -1,18 +1,5 @@
 {
-  "$schema": "http://json-schema.org/draft-07/schema",
-  "type": "object",
-  "properties": {
-    "Medicine": {
-      "$ref": "#/definitions/Medicine"
-    }
-  },
-  "required": [
-    "Medicine"
-  ],
-  "title": "Medicine",
-  "definitions": {
-    "Medicine": {
-      "$id": "#properties/Medicine",
+    "$id": "#properties/Medicine",
       "type": "object",
       "title": "Medicine",
       "required": [
@@ -30,6 +17,7 @@
           "$id": "#/properties/provider"
         },
         "administrationType": {
+          "title": "Administration Type",
           "type": "string",
           "enum": ["muscular injection", "oral", "nasal"],
           "default": "muscular injection"
@@ -37,23 +25,19 @@
         "schedule": {
           "title": "Schedule",
           "type": "object",
-          "description": "How many times and how often vaccination should be repeated",
           "properties": {
             "repeatTimes": {
               "type": "number",
-              "title": "Repeat times",
-              "description": "How many times vaccination should be taken"
+              "title": "Repeat times"
             },
             "repeatInterval": {
               "title": "Repeat interval",
-              "type": "number",
-              "description": "Number of times the vaccination should be taken."
+              "type": "number"
             }
           }
         },
         "effectiveUntil": {
           "type": "number",
-          "description": "Effective until n months after the full vaccination schedule is completed",
           "title": "Effective until (months)"
         },
         "status": {
@@ -67,5 +51,3 @@
         }
       }
     }
-  }
-}
