@@ -1,5 +1,5 @@
 import {BaseCard} from "../Base/Base";
-import React, {createContext, useContext, useMemo, useReducer, useState} from "react";
+import React, {createContext, useContext, useEffect, useMemo, useReducer, useState} from "react";
 import "./Home.scss"
 import {Button, Col} from "react-bootstrap";
 import {useHistory} from "react-router";
@@ -10,6 +10,7 @@ import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
 import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
+import {appIndexDb} from "../AppDatabase";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -29,11 +30,11 @@ function Title({text, content}) {
 export default Home;
 
 function EnrollmentTypes() {
-    const {goNext} = useHome()
+    const {goToVerifyRecipient} = useHome()
     return <>
         <div className={"enroll-container"}>
             <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
-                goNext('/preEnroll/' + FORM_PRE_ENROLL_CODE)
+                goToVerifyRecipient()
             }}/>
             <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient} onClick={() => {
             }}/>
@@ -86,7 +87,9 @@ function StatisticsItem({title, value}) {
 
 function Statistics() {
     const [result, setResults] = useState([])
-    //  indexDb.recipientDetails().then((result) => setResults(result))
+    useEffect(() => {
+        appIndexDb.recipientDetails().then((result) => setResults(result))
+    }, [])
     return <div className={"recipient-container"}>
         {result.map((item) => <StatisticsItem key={item.title} title={item.title} value={"" + item.value}/>)}
     </div>;
@@ -133,8 +136,7 @@ export function useHome() {
     const [state, dispatch] = context
 
     const goToVerifyRecipient = function () {
-        dispatch({type: ACTION_VERIFY_RECIPIENT, payload: {pageNo: 0}})
-        //history.push(`/verifyRecipient`)
+        history.push('preEnroll/' + FORM_PRE_ENROLL_CODE)
     }
 
     const goToQueue = function () {

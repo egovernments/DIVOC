@@ -1,7 +1,8 @@
 import {PreEnrollmentCode, PreEnrollmentDetails} from "./EnterPreEnrollment";
-import {AadharNumber, AadharOTP} from "./AadharVerification";
+import {VerifyAadharNumber, VerifyAadharOTP} from "./EnterAadharNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
+import {appIndexDb} from "../../AppDatabase";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode"
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails"
@@ -17,9 +18,9 @@ export function PreEnrollmentFlow(props) {
             case FORM_PRE_ENROLL_DETAILS :
                 return <PreEnrollmentDetails/>
             case FORM_AADHAR_NUMBER :
-                return <AadharNumber/>
+                return <VerifyAadharNumber/>
             case FORM_AADHAR_OTP :
-                return <AadharOTP/>
+                return <VerifyAadharOTP/>
         }
         return <PreEnrollmentCode/>
     }
@@ -53,6 +54,9 @@ function preEnrollmentReducer(state, action) {
         }
         case FORM_PRE_ENROLL_DETAILS: {
             const newState = {...state}
+            newState.name = action.payload.name;
+            newState.dob = action.payload.dob;
+            newState.gender = action.payload.gender
             newState.previousForm = action.payload.currentForm ?? null
             return newState
 
@@ -61,7 +65,7 @@ function preEnrollmentReducer(state, action) {
             const newState = {...state}
             newState.aadharNumber = action.payload.aadharNumber;
             newState.previousForm = action.payload.currentForm ?? null;
-            return state
+            return newState
         }
         case FORM_AADHAR_OTP: {
             const newState = {...state}
@@ -85,15 +89,27 @@ export function usePreEnrollment() {
 
     const goNext = function (current, next, payload) {
         payload.currentForm = current;
-        console.log("Next: " + JSON.stringify(payload));
         dispatch({type: current, payload: payload})
         if (next) {
-            history.push('/preEnroll/' + next)
+            if (next === '/') {
+                history.replace("/", null)
+            } else {
+                history.push('/preEnroll/' + next)
+            }
         }
+    }
+
+    const addToQueue = function () {
+        const [state] = context;
+        return appIndexDb.addToQueue(state)
     }
 
     const goBack = function () {
         history.goBack()
+    }
+
+    const getUserDetails = function (enrollCode) {
+        return appIndexDb.getPatientDetails(enrollCode)
     }
 
     return {
@@ -101,6 +117,8 @@ export function usePreEnrollment() {
         dispatch,
         goNext,
         goBack,
+        getUserDetails,
+        addToQueue
     }
 }
 

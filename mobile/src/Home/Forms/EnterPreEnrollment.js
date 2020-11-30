@@ -1,6 +1,6 @@
 import {FormCard} from "../../Base/Base";
 import {Button, Col} from "react-bootstrap";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {FORM_AADHAR_NUMBER, FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from "./PreEnrollmentFlow";
 import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
@@ -15,9 +15,6 @@ export function PreEnrollmentCode(props) {
         }} content={<EnterPreEnrollmentContent/>} title={"Verify Recipient"}/>
     );
 }
-
-
-EnterPreEnrollmentContent.propTypes = {};
 
 function EnterPreEnrollmentContent(props) {
     const {state, goNext} = usePreEnrollment()
@@ -72,13 +69,34 @@ function EnterPreEnrollmentContent(props) {
 }
 
 export function PreEnrollmentDetails(props) {
-    const {goNext, goBack} = usePreEnrollment()
-
+    const {goBack} = usePreEnrollment()
     return (
         <FormCard onBack={() => {
             goBack();
-        }} content={<Button onClick={() => {
-            goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, {})
-        }}>Pre Enrollment Details</Button>} title={"Verify Recipient"}/>
+        }} content={<PatientDetails/>} title={"Verify Recipient"}/>
     );
 }
+
+function PatientDetails(props) {
+    const {state, goNext, getUserDetails} = usePreEnrollment()
+    const [patientDetails, setPatientDetails] = useState()
+    useEffect(() => {
+        getUserDetails(state.enrollCode)
+            .then((patient) => {
+                setPatientDetails(patient)
+            })
+    }, state.enrollCode)
+    if (!patientDetails) {
+        return <di>No Patient Details Found</di>
+    }
+    return (
+        <div>
+            <h5>{patientDetails.name}</h5>
+            <h5>{patientDetails.gender}</h5>
+            <h5>{patientDetails.dob}</h5>
+            <Button onClick={() => {
+                goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, patientDetails)
+            }}>Verify Aadhar</Button>
+                </div>
+                );
+                }
