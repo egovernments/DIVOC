@@ -3,3 +3,4 @@
 
 ### Developer Documentation
 
+#### [Admin API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html)
