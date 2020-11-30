@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -11,6 +12,9 @@ func GetFacilityStaffs(authHeader string) ([]*models.FacilityStaff, error) {
 	if err != nil {
 		log.Errorf("Error while parsing token : %s", bearerToken)
 		return nil, err
+	}
+	if claimBody.FacilityCode == "" {
+		return nil, errors.New("unauthorized")
 	}
 	users, err := getFacilityUsers(claimBody.FacilityCode, authHeader)
 

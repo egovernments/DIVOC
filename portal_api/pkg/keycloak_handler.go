@@ -122,13 +122,13 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 		for _, user := range responseObject {
 			var employeeId, fullName, mobileNumber string
 			if v, ok := user.Attributes["employee_id"]; ok {
-				employeeId = v.(string)
+				employeeId = v.([]interface{})[0].(string)
 			}
 			if v, ok := user.Attributes["mobile_number"]; ok {
 				mobileNumber = v.([]interface{})[0].(string)
 			}
 			if v, ok := user.Attributes["full_name"]; ok {
-				fullName = v.(string)
+				fullName = v.([]interface{})[0].(string)
 			}
 			facilityUsers = append(facilityUsers, &models.FacilityStaff{
 				EmployeeID:   employeeId,
