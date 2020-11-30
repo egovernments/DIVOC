@@ -56,6 +56,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
 	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
 	api.CreateFacilityStaffsHandler = operations.CreateFacilityStaffsHandlerFunc(createFacilityStaffHandler)
+	api.GetFacilityStaffsHandler = operations.GetFacilityStaffsHandlerFunc(getFacilityStaffHandler)
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
@@ -142,6 +143,19 @@ func registryUrl(operationId string) string {
 }
 
 func createFacilityStaffHandler(params operations.CreateFacilityStaffsParams, principal interface{}) middleware.Responder {
-	CreateFacilityStaff(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	err := CreateFacilityStaff(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewCreateFacilityStaffsBadRequest()
+	}
+	return operations.NewCreateFacilityStaffsOK()
+}
+
+func getFacilityStaffHandler(params operations.GetFacilityStaffsParams, principal interface{}) middleware.Responder {
+	err := GetFacilityStaffs(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewCreateFacilityStaffsBadRequest()
+	}
 	return operations.NewCreateFacilityStaffsOK()
 }

@@ -78,6 +78,7 @@ func createFacility(data *Scanner, authHeader string) error {
 			Enabled:  "true",
 			Attributes: KeycloakUserAttributes{
 				MobileNumber: []string{mobile},
+				FacilityCode: facility.FacilityCode,
 			},
 		}
 		resp, err := CreateKeycloakUser(userRequest, authHeader)

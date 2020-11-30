@@ -17,5 +17,11 @@ var Config = struct {
 			ClientId string `yaml:"clientId"`
 			GroupId  string `yaml:"groupId"`
 		} `yaml:"facilityAdmin"`
+		FacilityStaff struct {
+			RoleName string `yaml:"roleName"`
+			RoleId   string `yaml:"roleId"`
+			ClientId string `yaml:"clientId"`
+			GroupId  string `yaml:"groupId"`
+		} `yaml:"facilityStaff"`
 	}
 }{}

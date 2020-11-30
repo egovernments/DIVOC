@@ -31,7 +31,7 @@ func NewCreateFacilityStaffs(ctx *middleware.Context, handler CreateFacilityStaf
 
 /*CreateFacilityStaffs swagger:route POST /facility/staffs createFacilityStaffs
 
-Create Facility Stagg
+Create Facility Staff
 
 */
 type CreateFacilityStaffs struct {

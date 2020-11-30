@@ -5,7 +5,6 @@ package restapi
 import (
 	"crypto/tls"
 	"github.com/divoc/portal-api/pkg"
-	"github.com/divoc/portal-api/swagger_gen/utils"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
@@ -39,7 +38,7 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.HasRoleAuth = utils.RoleAuthorizer
+	api.HasRoleAuth = pkg.RoleAuthorizer
 
 	//// Applies when the "Authorization" header is set
 	//if api.IsUserAuth == nil {

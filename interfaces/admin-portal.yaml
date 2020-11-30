@@ -18,7 +18,7 @@ securityDefinitions:
     # Required scopes are passed by the runtime to the authorizer
     scopes:
       admin: scope of super admin
-      facilityAdmin: scope of facility admin
+      facillity-admin: scope of facility admin
 
 security:
   - hasRole: ['admin']
@@ -166,7 +166,7 @@ paths:
       summary: Get staffs of a facility
       operationId: getFacilityStaffs
       security:
-        - hasRole: ["facilityAdmin"]
+        - hasRole: ["facillity-admin"]
       responses:
         '200':
           description: OK
@@ -179,7 +179,7 @@ paths:
       summary: Create Facility Staff
       operationId: createFacilityStaffs
       security:
-        - hasRole: ["facilityAdmin"]
+        - hasRole: ["facillity-admin"]
       parameters:
         - in: body
           name: body

@@ -110,7 +110,7 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facilityAdmin"
+              "facillity-admin"
             ]
           }
         ],
@@ -133,11 +133,11 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facilityAdmin"
+              "facillity-admin"
             ]
           }
         ],
-        "summary": "Create Facility Stagg",
+        "summary": "Create Facility Staff",
         "operationId": "createFacilityStaffs",
         "parameters": [
           {
@@ -649,7 +649,7 @@ func init() {
       "tokenUrl": "https://dumy.oauth.net/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facilityAdmin": "scope of facility admin"
+        "facillity-admin": "scope of facility admin"
       }
     }
   },
@@ -754,7 +754,7 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facilityAdmin"
+              "facillity-admin"
             ]
           }
         ],
@@ -777,11 +777,11 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facilityAdmin"
+              "facillity-admin"
             ]
           }
         ],
-        "summary": "Create Facility Stagg",
+        "summary": "Create Facility Staff",
         "operationId": "createFacilityStaffs",
         "parameters": [
           {
@@ -1373,7 +1373,7 @@ func init() {
       "tokenUrl": "https://dumy.oauth.net/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facilityAdmin": "scope of facility admin"
+        "facillity-admin": "scope of facility admin"
       }
     }
   },
