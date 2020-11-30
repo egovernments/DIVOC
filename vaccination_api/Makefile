@@ -2,20 +2,20 @@ PWD := $(shell pwd)
 GOPATH := $(shell go env GOPATH)
 source := $(wildcard *.go **/*.go */*/*.go)
 
-all: divoc-api-server run
+all: divoc-api-server certificate_processor
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
 	@$(GOPATH)/bin/gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
 	@$(GOPATH)/bin/gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
 
-swagger_gen/restapi/server.go: spec/api.yaml
+swagger_gen/restapi/server.go: ../interfaces/vaccination-api.yaml
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
-	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/spec/api.yaml
+	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/../interfaces/vaccination-api.yaml
 
 api_docs:
 	@echo "Installing swagger-merger" && npm install swagger-merger -g
-	@swagger-merger -i $(PWD)/spec/api.yaml -o $(PWD)/docs/api_docs/bundle.yaml
+	@swagger-merger -i $(PWD)/../interfaces/vaccination-api.yaml -o $(PWD)/bundle.yaml
 
 build: divoc-api-server
 	@echo building $source
@@ -23,6 +23,10 @@ build: divoc-api-server
 divoc-api-server: $(source) swagger_gen/restapi/server.go
 	@echo "Building Server to $(PWD)/divoc-server ..."
 	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/api/cmd/divoc-server
+
+certificate_processor: $(source)
+	@echo "Building certificate processor"
+	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/api/cmd/certificate_processor
 
 clean:
 	@echo "Cleaning up all the generated files"

@@ -13,3 +13,4 @@ coverage
 */.gitignore
 portal_api/divoc-portal-api-server
 keycloak/divoc-realm.json
+*.jar
