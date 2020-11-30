@@ -44,3 +44,8 @@
 .box{
     width: 50%;
 }
+
+.list-title{
+    color: #1D1D1D;
+    font-weight: 600;
+}

@@ -9,7 +9,6 @@ function ListView({ listData }) {
         <div>
             {
                 listData.map( data => {
-                    // console.log(data)
                     var random_color = colors[Math.floor( Math.random() * colors.length)]; 
                     return (
                        

@@ -113,6 +113,7 @@ function VaccineRegistration() {
                 </Form>
             </div>
             <div className={styles["sub-container"]}>
+                <p className={styles['list-title']}>List of Registered Vaccine Programs</p>
                 <ListView listData={programList} />
             </div>
         </div>
