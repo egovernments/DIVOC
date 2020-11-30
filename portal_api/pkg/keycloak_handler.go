@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -101,4 +102,42 @@ func addUserToGroup(userId string, groupId string, authHeader string) error {
 		return errors.New("Error while adding user to group for " + userId + "" + groupId)
 	}
 	return nil
+}
+
+func getFacilityUsers(facilityCode string, authHeader string) ([]*models.FacilityStaff, error) {
+	url := config.Config.Keycloak.Url + "/realms/divoc/facility/" + facilityCode + "/users"
+	log.Info("Checking with keycloak for facility code mapping ", facilityCode)
+	resp, err := req.Get(url, req.Header{"Authorization": authHeader})
+	if err != nil {
+		return nil, err
+	}
+	log.Infof("Got response %+v", resp.String())
+	type FacilityStaff struct {
+		UserName   string                 `json:"userName"`
+		Attributes map[string]interface{} `json:"attributes"`
+	}
+	var responseObject []FacilityStaff
+	if err := resp.ToJSON(&responseObject); err == nil {
+		var facilityUsers []*models.FacilityStaff
+		for _, user := range responseObject {
+			var employeeId, fullName, mobileNumber string
+			if v, ok := user.Attributes["employee_id"]; ok {
+				employeeId = v.(string)
+			}
+			if v, ok := user.Attributes["mobile_number"]; ok {
+				mobileNumber = v.([]interface{})[0].(string)
+			}
+			if v, ok := user.Attributes["full_name"]; ok {
+				fullName = v.(string)
+			}
+			facilityUsers = append(facilityUsers, &models.FacilityStaff{
+				EmployeeID:   employeeId,
+				MobileNumber: mobileNumber,
+				Name:         fullName,
+				RoleID:       "",
+			})
+		}
+		return facilityUsers, nil
+	}
+	return nil, errors.New("Unable to get userid from keycloak")
 }

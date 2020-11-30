@@ -152,10 +152,10 @@ func createFacilityStaffHandler(params operations.CreateFacilityStaffsParams, pr
 }
 
 func getFacilityStaffHandler(params operations.GetFacilityStaffsParams, principal interface{}) middleware.Responder {
-	err := GetFacilityStaffs(params.HTTPRequest.Header.Get("Authorization"))
+	users, err := GetFacilityStaffs(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
 		return operations.NewCreateFacilityStaffsBadRequest()
 	}
-	return operations.NewCreateFacilityStaffsOK()
+	return &operations.GetFacilityStaffsOK{Payload: users}
 }

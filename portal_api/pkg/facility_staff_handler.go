@@ -5,14 +5,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func GetFacilityStaffs(authHeader string) error {
+func GetFacilityStaffs(authHeader string) ([]*models.FacilityStaff, error) {
 	bearerToken, err := getToken(authHeader)
-	_, err = getClaimBody(bearerToken)
+	claimBody, err := getClaimBody(bearerToken)
 	if err != nil {
 		log.Errorf("Error while parsing token : %s", bearerToken)
-		return err
+		return nil, err
 	}
-	return nil
+	users, err := getFacilityUsers(claimBody.FacilityCode, authHeader)
+
+	return users, err
 }
 
 func CreateFacilityStaff(staff *models.FacilityStaff, authHeader string) error {

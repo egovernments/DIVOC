@@ -11,7 +11,7 @@ import (
 )
 
 const (
-	pubKeyPath     = "swagger_gen/resources/local_rsa.pub"
+	pubKeyPath     = "config/local_rsa.pub"
 	clientId       = "vaccination_api"
 	portalClientId = "facility-admin-portal"
 	admin          = "admin"
