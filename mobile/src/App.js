@@ -5,15 +5,14 @@ import {useKeycloak} from "@react-keycloak/web";
 import {appIndexDb} from "./AppDatabase";
 
 function App() {
-//const {initialized} = useKeycloak();
-    const [isDBInit, setDBInit] = useState(false)
+    const {initialized} = useKeycloak();
+    const [isDBInit, setDBInit] = useState(false);
     useEffect(() => {
         appIndexDb.initDb().then(() => {
             setDBInit(true)
         })
     }, [])
-
-    if (/*!initialized*/ !isDBInit) {
+    if (!initialized || !isDBInit) {
         return <div>Loading...</div>
     }
 

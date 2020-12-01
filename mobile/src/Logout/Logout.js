@@ -11,7 +11,7 @@ export function Logout(props) {
         <BaseCard>
             <div className={"logout-container"}>
                 <Button variant="success" onClick={() => {
-                    keycloak.logout()
+                    keycloak.logout();
                 }}>Logout</Button>{' '}
             </div>
         </BaseCard>

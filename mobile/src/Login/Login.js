@@ -1,17 +1,23 @@
 import React, {createContext, useContext, useEffect, useMemo, useReducer} from "react";
 import "./Login.scss"
-import {Redirect, useHistory} from "react-router";
+import {useHistory} from "react-router";
 import {useKeycloak} from "@react-keycloak/web";
 
 export function LoginComponent() {
     const {keycloak} = useKeycloak();
-
+    const history = useHistory();
     useEffect(() => {
-        keycloak.login()
+        if (!keycloak.authenticated) {
+            keycloak.login()
+        }
     }, []);
-    if (keycloak.authenticated) {
-        return <Redirect to={'/'}/>;
-    }
+    useEffect(() => {
+        if (keycloak.authenticated) {
+            let redirectUrl = "/";
+            history.push(redirectUrl)
+        }
+    }, [keycloak]);
+   
     return (
         <div>
             Login
