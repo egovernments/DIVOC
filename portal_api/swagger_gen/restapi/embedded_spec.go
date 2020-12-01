@@ -105,6 +105,37 @@ func init() {
         }
       }
     },
+    "/facility/groups": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Get facility groups",
+        "operationId": "getFacilityGroups",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/UserGroup"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facility/users": {
       "get": {
         "security": [
@@ -757,6 +788,37 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/groups": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facillity-admin"
+            ]
+          }
+        ],
+        "summary": "Get facility groups",
+        "operationId": "getFacilityGroups",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/UserGroup"
+              }
+            }
           },
           "400": {
             "description": "Invalid input"

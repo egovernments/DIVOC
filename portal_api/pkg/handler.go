@@ -57,6 +57,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
 	api.CreateFacilityUsersHandler = operations.CreateFacilityUsersHandlerFunc(createFacilityUserHandler)
 	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
+	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
@@ -158,4 +159,13 @@ func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal 
 		return operations.NewCreateFacilityUsersBadRequest()
 	}
 	return &operations.GetFacilityUsersOK{Payload: users}
+}
+
+func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principal interface{}) middleware.Responder {
+	groups, err := GetFacilityGroups(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewGetFacilityGroupsBadRequest()
+	}
+	return &operations.GetFacilityGroupsOK{Payload: groups}
 }

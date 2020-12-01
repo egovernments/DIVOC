@@ -193,6 +193,24 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /facility/groups:
+    get:
+      summary: Get facility groups
+      operationId: getFacilityGroups
+      security:
+        - hasRole: ["facillity-admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/UserGroup'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
 definitions:
   ProgramRequest:
     type: object

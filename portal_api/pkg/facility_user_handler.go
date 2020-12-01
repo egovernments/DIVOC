@@ -54,3 +54,7 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	}
 	return nil
 }
+
+func GetFacilityGroups(authHeader string) ([]*models.UserGroup, error) {
+	return getUserGroups("facility", authHeader)
+}

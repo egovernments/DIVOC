@@ -64,6 +64,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
+		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
+		}),
 		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
 		}),
@@ -140,6 +143,8 @@ type DivocPortalAPIAPI struct {
 	CreateProgramHandler CreateProgramHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
+	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
+	GetFacilityGroupsHandler GetFacilityGroupsHandler
 	// GetFacilityUsersHandler sets the operation handler for the get facility users operation
 	GetFacilityUsersHandler GetFacilityUsersHandler
 	// GetMedicinesHandler sets the operation handler for the get medicines operation
@@ -251,6 +256,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
+	}
+	if o.GetFacilityGroupsHandler == nil {
+		unregistered = append(unregistered, "GetFacilityGroupsHandler")
 	}
 	if o.GetFacilityUsersHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUsersHandler")
@@ -390,6 +398,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/facilities"] = NewGetFacilities(o.context, o.GetFacilitiesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/groups"] = NewGetFacilityGroups(o.context, o.GetFacilityGroupsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -143,3 +143,23 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 	}
 	return nil, errors.New("Unable to get userid from keycloak")
 }
+
+func getUserGroups(groupSearchKey string, authHeader string) ([]*models.UserGroup, error) {
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/divoc/groups?search=" + groupSearchKey
+	log.Info("GET ", addUserToGroupURL)
+	resp, err := req.Get(addUserToGroupURL, req.Header{"Authorization": authHeader})
+	if err != nil {
+		log.Errorf("Error while fetching user groups %s", groupSearchKey)
+		return nil, err
+	}
+	if resp.Response().StatusCode != 200 {
+		log.Errorf("Error while fetching user groups, status code %s", resp.Response().StatusCode)
+		return nil, err
+	}
+	var userGroups []*models.UserGroup
+	err = resp.ToJSON(&userGroups)
+	if err == nil {
+		return userGroups, nil
+	}
+	return nil, err
+}
