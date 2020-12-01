@@ -2,6 +2,7 @@
   "name": "certificate_app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://divoc.xiv.in/certificate/",
   "dependencies": {
     "@testing-library/jest-dom": "^5.11.6",
     "@testing-library/react": "^11.2.2",
