@@ -1,8 +1,9 @@
-import {PreEnrollmentCode, PreEnrollmentDetails} from "./EnterPreEnrollment";
+import {PreEnrollmentCode} from "./EnterPreEnrollment";
 import {VerifyAadharNumber, VerifyAadharOTP} from "./EnterAadharNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {Redirect, useHistory} from "react-router";
 import {appIndexDb} from "../../AppDatabase";
+import {PreEnrollmentDetails} from "../../components/PreEnrollmentDetail";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode"
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails"
