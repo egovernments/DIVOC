@@ -1,19 +1,14 @@
 import React from "react";
-import VaccineRegistration from "../VaccineRegistration/VaccineRegistration";
-import {TabPanels, useStyles} from "../TabPanel/TabPanel";
-import VaccinatorsRegistry from "../VaccinatorsRegistry/VaccinatorsRegistry";
+import {TabPanels} from "../TabPanel/TabPanel";
+import {RoleSetup} from "../RoleSetup";
 
 
 export default function FacilityAdmin() {
-    const [value, setValue] = React.useState(0);
-    const classes = useStyles();
-    const handleChange = (event, newValue) => {
-        setValue(newValue);
-    };
     return (
         <TabPanels tabs={[
-            {title: "Vaccinators", component: <VaccinatorsRegistry/>},
-            {title: "Enrollment", component: <VaccineRegistration/>}
+            {title: "Role Setup", component: <RoleSetup/>},
+            {title: "Program Overview", component: <span>Program Overview</span>},
+            {title: "Vaccinator Details", component: <span>vaccinator details</span>},
 
         ]}/>
     );
