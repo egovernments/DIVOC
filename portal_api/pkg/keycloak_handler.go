@@ -113,6 +113,7 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 	}
 	log.Infof("Got response %+v", resp.String())
 	type FacilityUser struct {
+		ID         string                 `json:"id"`
 		UserName   string                 `json:"userName"`
 		Attributes map[string]interface{} `json:"attributes"`
 		Groups     []*models.UserGroup    `json:"groups"`
@@ -132,6 +133,7 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 				fullName = v.([]interface{})[0].(string)
 			}
 			facilityUsers = append(facilityUsers, &models.FacilityUser{
+				ID:           user.ID,
 				EmployeeID:   employeeId,
 				MobileNumber: mobileNumber,
 				Name:         fullName,

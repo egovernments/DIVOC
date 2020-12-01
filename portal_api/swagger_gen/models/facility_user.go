@@ -24,14 +24,14 @@ type FacilityUser struct {
 	// groups
 	Groups []*UserGroup `json:"groups"`
 
+	// Facility User Id
+	ID string `json:"id,omitempty"`
+
 	// Facility User Mobile Number
 	MobileNumber string `json:"mobileNumber,omitempty"`
 
 	// Facility User Name
 	Name string `json:"name,omitempty"`
-
-	// Facility User Role ID
-	RoleID string `json:"roleId,omitempty"`
 }
 
 // Validate validates this facility user

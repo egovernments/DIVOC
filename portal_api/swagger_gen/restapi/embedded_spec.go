@@ -521,6 +521,10 @@ func init() {
             "$ref": "#/definitions/UserGroup"
           }
         },
+        "id": {
+          "type": "string",
+          "title": "Facility User Id"
+        },
         "mobileNumber": {
           "type": "string",
           "title": "Facility User Mobile Number"
@@ -528,10 +532,6 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
-        },
-        "roleId": {
-          "type": "string",
-          "title": "Facility User Role ID"
         }
       }
     },
@@ -1227,6 +1227,10 @@ func init() {
             "$ref": "#/definitions/UserGroup"
           }
         },
+        "id": {
+          "type": "string",
+          "title": "Facility User Id"
+        },
         "mobileNumber": {
           "type": "string",
           "title": "Facility User Mobile Number"
@@ -1234,10 +1238,6 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
-        },
-        "roleId": {
-          "type": "string",
-          "title": "Facility User Role ID"
         }
       }
     },
