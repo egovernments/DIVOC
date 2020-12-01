@@ -1,6 +1,6 @@
 import {FORM_AADHAR_NUMBER, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from "../../Home/Forms/PreEnrollmentFlow";
 import React, {useEffect, useState} from "react";
-import {Button, Col, Row} from "react-bootstrap";
+import {Button, Col} from "react-bootstrap";
 import {FormCard} from "../../Base/Base";
 import "./index.scss"
 import * as PropTypes from "prop-types";
@@ -32,7 +32,7 @@ function PatientDetails(props) {
             .then((patient) => {
                 setPatientDetails(patient)
             })
-    }, state.enrollCode)
+    }, [state.enrollCode])
     if (!patientDetails) {
         return <div className={"no-details"}>No Patient Details Found</div>
     }

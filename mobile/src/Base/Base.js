@@ -1,7 +1,7 @@
 import React from 'react';
 import './Base.scss'
 import Alert from "react-bootstrap/Alert";
-import {Button, Card, Col, Row} from "react-bootstrap";
+import {Card, Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
 import Nav from "react-bootstrap/Nav";
 import {Link} from "react-router-dom";

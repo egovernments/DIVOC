@@ -40,6 +40,7 @@ function PreEnrollmentRouteCheck({pageName}) {
                 return <VerifyAadharOTP/>
             }
             break;
+        default:
     }
     return <Redirect
         to={{
