@@ -303,7 +303,24 @@ func init() {
           "type": "object",
           "properties": {
             "address": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
             },
             "name": {
               "type": "string"
@@ -316,6 +333,12 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "dob": {
               "type": "string",
               "format": "date"
@@ -329,7 +352,7 @@ func init() {
             "name": {
               "type": "string"
             },
-            "natinoality": {
+            "nationality": {
               "type": "string"
             }
           }
@@ -784,7 +807,24 @@ func init() {
           "type": "object",
           "properties": {
             "address": {
-              "type": "string"
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
             },
             "name": {
               "type": "string"
@@ -797,6 +837,12 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
             "dob": {
               "type": "string",
               "format": "date"
@@ -810,7 +856,7 @@ func init() {
             "name": {
               "type": "string"
             },
-            "natinoality": {
+            "nationality": {
               "type": "string"
             }
           }
@@ -855,9 +901,46 @@ func init() {
       "type": "object",
       "properties": {
         "address": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
         },
         "name": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestFacilityAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
           "type": "string"
         }
       }
@@ -865,6 +948,12 @@ func init() {
     "CertificationRequestRecipient": {
       "type": "object",
       "properties": {
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dob": {
           "type": "string",
           "format": "date"
@@ -878,7 +967,7 @@ func init() {
         "name": {
           "type": "string"
         },
-        "natinoality": {
+        "nationality": {
           "type": "string"
         }
       }

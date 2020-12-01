@@ -8,19 +8,12 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/loads"
 	"github.com/jessevdk/go-flags"
-	"github.com/jinzhu/configor"
 	"log"
 	"os"
 )
 
 func main() {
-	err := configor.Load(&config.Config, "./config/application-default.yml",
-		//"config/application.yml"
-	)
-	if err != nil {
-		panic("Unable to read configurations")
-	}
-
+	config.Initialize()
 	auth.Init()
 	pkg.InitializeKafka()
 

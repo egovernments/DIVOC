@@ -30,6 +30,7 @@ function Title({text, content}) {
 export default Home;
 
 function EnrollmentTypes() {
+
     const {goToVerifyRecipient, goToQueue} = useHome();
     return <>
         <div className={"enroll-container"}>

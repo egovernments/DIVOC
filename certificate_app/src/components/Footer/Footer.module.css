@@ -1,0 +1,16 @@
+.navbar {
+    border-top: 1px solid #C1CFD933;
+    padding: 30px !important;
+}
+
+.nav-link {
+    color: #646D82 !important;
+    font-size: 12px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.footer{
+    border-top: 1px solid #C1CFD933;
+    padding: 30px !important;
+}

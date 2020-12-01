@@ -243,6 +243,9 @@ definitions:
         type: string
       provider:
         type: string
+      vaccinationMode:
+        type: string
+        enum: ["muscular injection", "oral", "nasal"]
       schedule:
         type: object
         properties:

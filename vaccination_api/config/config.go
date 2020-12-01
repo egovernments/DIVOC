@@ -1,5 +1,17 @@
 package config
 
+import "github.com/jinzhu/configor"
+
+func Initialize() {
+	err := configor.Load(&Config, "./config/application-default.yml",
+		//"config/application.yml"
+	)
+	if err != nil {
+		panic("Unable to read configurations")
+	}
+
+}
+
 var Config = struct {
 	Registry struct {
 		Url               string `default:"localhost:8081" env:"REGISTRY_URL"`

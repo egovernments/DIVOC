@@ -226,10 +226,14 @@ definitions:
             format: date
           gender:
             type: string
-          natinoality:
+          nationality:
             type: string
           identity:
             type: string
+          contact:
+            type: array
+            items:
+              type: string
       vaccination:
         type: object
         properties:
@@ -259,7 +263,18 @@ definitions:
           name:
             type: string
           address:
-            type: string
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: integer
   Program:
     type: object
     properties:

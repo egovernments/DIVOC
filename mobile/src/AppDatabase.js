@@ -4,6 +4,9 @@ const DATABASE_NAME = "DivocDB"
 const DATABASE_VERSION = 3
 const PATIENTS = "patients";
 const QUEUE = "queue";
+const STATUS = "status";
+
+const QUEUE_STATUS = Object.freeze({"IN_QUEUE": "in_queue", "COMPLETED": "completed"})
 
 const dummyPatient = [
     {name: "Vivek Sign", gender: "Male", dob: "01-Jan-2000", enrollCode: "12341"},
@@ -19,14 +22,6 @@ const dummyPatient = [
 
 export class AppDatabase {
 
-    constructor() {
-        this.initDb().then((value) => {
-            this.db = value
-        }).catch(e => {
-            console.log("Error: " + e.message);
-        });
-    }
-
     async initDb() {
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
             upgrade(db) {
@@ -40,14 +35,15 @@ export class AppDatabase {
 
             }
         });
+        this.db = db;
+        //TODO: Need to remove after API intigrations. Seeding data for testing
         try {
             const allPatients = dummyPatient.map((value => db.put(PATIENTS, value)))
-            const result = await Promise.all(allPatients)
+            await Promise.all(allPatients)
         } catch (e) {
             console.log("Error Add: " + e);
             return db;
         }
-
         return db;
     }
 
@@ -61,11 +57,21 @@ export class AppDatabase {
     }
 
     async recipientDetails() {
-        const result = [
-            {title: "Recipient Waiting", value: 42},
-            {title: "Certificate Issued", value: 12},
+        let waiting = 0;
+        let issue = 0;
+        const result = await this.db.getAll(QUEUE)
+        result.forEach((item) => {
+            if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
+                waiting++;
+            } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
+                issue++;
+            }
+        })
+
+        return [
+            {title: "Recipient Waiting", value: waiting},
+            {title: "Certificate Issued", value: issue},
         ];
-        return Promise.resolve(result)
     }
 }
 
