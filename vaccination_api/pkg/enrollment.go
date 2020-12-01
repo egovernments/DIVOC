@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -70,6 +71,15 @@ func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, erro
 	return nil, nil
 }
 
-func getUserAssociatedFacility(authHeader string) string {
-	return "FACILITY001" //todo: featch from token
+func getUserAssociatedFacility(authHeader string) (string, error) {
+	bearerToken, err := auth.GetToken(authHeader)
+	claimBody, err := auth.GetClaimBody(bearerToken)
+	if err != nil {
+		log.Errorf("Error while parsing token : %s", bearerToken)
+		return "", err
+	}
+	if claimBody.FacilityCode == "" {
+		return "", errors.New("unauthorized")
+	}
+	return claimBody.FacilityCode, nil
 }

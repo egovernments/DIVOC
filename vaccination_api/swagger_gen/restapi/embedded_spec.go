@@ -74,6 +74,13 @@ func init() {
     },
     "/certify": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
@@ -169,21 +176,20 @@ func init() {
         }
       }
     },
-    "/preEnrollments/facility/{facilityCode}": {
+    "/preEnrollments/facility": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "tags": [
           "vaccination"
         ],
         "summary": "Get all pre enrollments applicable to assigned facility",
         "operationId": "getPreEnrollmentsForFacility",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "facilityCode",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -201,7 +207,9 @@ func init() {
       "get": {
         "security": [
           {
-            "isUser": []
+            "hasRole": [
+              "facility-staff"
+            ]
           }
         ],
         "description": "Get pre enrollment data from api for vaccination",
@@ -230,6 +238,13 @@ func init() {
     },
     "/programs/current": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -465,20 +480,16 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facility-staff": "scope of facility staff",
+        "facillity-admin": "scope of facility admin"
+      }
     }
   },
   "security": [
@@ -544,6 +555,13 @@ func init() {
     },
     "/certify": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
@@ -639,21 +657,20 @@ func init() {
         }
       }
     },
-    "/preEnrollments/facility/{facilityCode}": {
+    "/preEnrollments/facility": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "tags": [
           "vaccination"
         ],
         "summary": "Get all pre enrollments applicable to assigned facility",
         "operationId": "getPreEnrollmentsForFacility",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "facilityCode",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -671,7 +688,9 @@ func init() {
       "get": {
         "security": [
           {
-            "isUser": []
+            "hasRole": [
+              "facility-staff"
+            ]
           }
         ],
         "description": "Get pre enrollment data from api for vaccination",
@@ -700,6 +719,13 @@ func init() {
     },
     "/programs/current": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-staff"
+            ]
+          }
+        ],
         "tags": [
           "configuration"
         ],
@@ -1001,20 +1027,16 @@ func init() {
     }
   },
   "securityDefinitions": {
-    "isAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isFacilityAdmin": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
-    },
-    "isUser": {
-      "type": "apiKey",
-      "name": "Authorization",
-      "in": "header"
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "scopes": {
+        "admin": "scope of super admin",
+        "facility-staff": "scope of facility staff",
+        "facillity-admin": "scope of facility admin"
+      }
     }
   },
   "security": [
