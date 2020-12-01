@@ -15,40 +15,40 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
-// NewCreateFacilityStaffsParams creates a new CreateFacilityStaffsParams object
+// NewCreateFacilityUsersParams creates a new CreateFacilityUsersParams object
 // no default values defined in spec.
-func NewCreateFacilityStaffsParams() CreateFacilityStaffsParams {
+func NewCreateFacilityUsersParams() CreateFacilityUsersParams {
 
-	return CreateFacilityStaffsParams{}
+	return CreateFacilityUsersParams{}
 }
 
-// CreateFacilityStaffsParams contains all the bound params for the create facility staffs operation
+// CreateFacilityUsersParams contains all the bound params for the create facility users operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters createFacilityStaffs
-type CreateFacilityStaffsParams struct {
+// swagger:parameters createFacilityUsers
+type CreateFacilityUsersParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Create facility staff data
+	/*Create facility user data
 	  In: body
 	*/
-	Body *models.FacilityStaff
+	Body *models.FacilityUser
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewCreateFacilityStaffsParams() beforehand.
-func (o *CreateFacilityStaffsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewCreateFacilityUsersParams() beforehand.
+func (o *CreateFacilityUsersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.FacilityStaff
+		var body models.FacilityUser
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

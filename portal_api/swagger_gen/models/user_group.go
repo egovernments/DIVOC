@@ -10,10 +10,10 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// StaffGroup staff group
+// UserGroup user group
 //
-// swagger:model StaffGroup
-type StaffGroup struct {
+// swagger:model UserGroup
+type UserGroup struct {
 
 	// group id
 	ID string `json:"id,omitempty"`
@@ -22,13 +22,13 @@ type StaffGroup struct {
 	Name string `json:"name,omitempty"`
 }
 
-// Validate validates this staff group
-func (m *StaffGroup) Validate(formats strfmt.Registry) error {
+// Validate validates this user group
+func (m *UserGroup) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *StaffGroup) MarshalBinary() ([]byte, error) {
+func (m *UserGroup) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -36,8 +36,8 @@ func (m *StaffGroup) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *StaffGroup) UnmarshalBinary(b []byte) error {
-	var res StaffGroup
+func (m *UserGroup) UnmarshalBinary(b []byte) error {
+	var res UserGroup
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

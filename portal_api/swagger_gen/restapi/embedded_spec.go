@@ -105,7 +105,7 @@ func init() {
         }
       }
     },
-    "/facility/staffs": {
+    "/facility/users": {
       "get": {
         "security": [
           {
@@ -114,8 +114,8 @@ func init() {
             ]
           }
         ],
-        "summary": "Get staffs of a facility",
-        "operationId": "getFacilityStaffs",
+        "summary": "Get users of a facility",
+        "operationId": "getFacilityUsers",
         "responses": {
           "200": {
             "description": "OK",
@@ -123,7 +123,7 @@ func init() {
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/FacilityStaff"
+                "$ref": "#/definitions/FacilityUser"
               }
             }
           }
@@ -137,15 +137,15 @@ func init() {
             ]
           }
         ],
-        "summary": "Create Facility Staff",
-        "operationId": "createFacilityStaffs",
+        "summary": "Create Facility User",
+        "operationId": "createFacilityUsers",
         "parameters": [
           {
-            "description": "Create facility staff data",
+            "description": "Create facility user data",
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityStaff"
+              "$ref": "#/definitions/FacilityUser"
             }
           }
         ],
@@ -478,29 +478,29 @@ func init() {
         }
       }
     },
-    "FacilityStaff": {
+    "FacilityUser": {
       "properties": {
         "employeeId": {
           "type": "string",
-          "title": "Facility Staff Id"
+          "title": "Facility User Id"
         },
         "groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/StaffGroup"
+            "$ref": "#/definitions/UserGroup"
           }
         },
         "mobileNumber": {
           "type": "string",
-          "title": "Facility Staff Mobile Number"
+          "title": "Facility User Mobile Number"
         },
         "name": {
           "type": "string",
-          "title": "Facility Staff Name"
+          "title": "Facility User Name"
         },
         "roleId": {
           "type": "string",
-          "title": "Facility Staff Role ID"
+          "title": "Facility User Role ID"
         }
       }
     },
@@ -586,7 +586,7 @@ func init() {
         }
       }
     },
-    "StaffGroup": {
+    "UserGroup": {
       "properties": {
         "id": {
           "type": "string",
@@ -767,7 +767,7 @@ func init() {
         }
       }
     },
-    "/facility/staffs": {
+    "/facility/users": {
       "get": {
         "security": [
           {
@@ -776,8 +776,8 @@ func init() {
             ]
           }
         ],
-        "summary": "Get staffs of a facility",
-        "operationId": "getFacilityStaffs",
+        "summary": "Get users of a facility",
+        "operationId": "getFacilityUsers",
         "responses": {
           "200": {
             "description": "OK",
@@ -785,7 +785,7 @@ func init() {
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/FacilityStaff"
+                "$ref": "#/definitions/FacilityUser"
               }
             }
           }
@@ -799,15 +799,15 @@ func init() {
             ]
           }
         ],
-        "summary": "Create Facility Staff",
-        "operationId": "createFacilityStaffs",
+        "summary": "Create Facility User",
+        "operationId": "createFacilityUsers",
         "parameters": [
           {
-            "description": "Create facility staff data",
+            "description": "Create facility user data",
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityStaff"
+              "$ref": "#/definitions/FacilityUser"
             }
           }
         ],
@@ -1153,29 +1153,29 @@ func init() {
         }
       }
     },
-    "FacilityStaff": {
+    "FacilityUser": {
       "properties": {
         "employeeId": {
           "type": "string",
-          "title": "Facility Staff Id"
+          "title": "Facility User Id"
         },
         "groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/StaffGroup"
+            "$ref": "#/definitions/UserGroup"
           }
         },
         "mobileNumber": {
           "type": "string",
-          "title": "Facility Staff Mobile Number"
+          "title": "Facility User Mobile Number"
         },
         "name": {
           "type": "string",
-          "title": "Facility Staff Name"
+          "title": "Facility User Name"
         },
         "roleId": {
           "type": "string",
-          "title": "Facility Staff Role ID"
+          "title": "Facility User Role ID"
         }
       }
     },
@@ -1261,7 +1261,7 @@ func init() {
         }
       }
     },
-    "StaffGroup": {
+    "UserGroup": {
       "properties": {
         "id": {
           "type": "string",

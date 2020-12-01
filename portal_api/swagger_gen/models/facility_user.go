@@ -13,29 +13,29 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// FacilityStaff facility staff
+// FacilityUser facility user
 //
-// swagger:model FacilityStaff
-type FacilityStaff struct {
+// swagger:model FacilityUser
+type FacilityUser struct {
 
-	// Facility Staff Id
+	// Facility User Id
 	EmployeeID string `json:"employeeId,omitempty"`
 
 	// groups
-	Groups []*StaffGroup `json:"groups"`
+	Groups []*UserGroup `json:"groups"`
 
-	// Facility Staff Mobile Number
+	// Facility User Mobile Number
 	MobileNumber string `json:"mobileNumber,omitempty"`
 
-	// Facility Staff Name
+	// Facility User Name
 	Name string `json:"name,omitempty"`
 
-	// Facility Staff Role ID
+	// Facility User Role ID
 	RoleID string `json:"roleId,omitempty"`
 }
 
-// Validate validates this facility staff
-func (m *FacilityStaff) Validate(formats strfmt.Registry) error {
+// Validate validates this facility user
+func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateGroups(formats); err != nil {
@@ -48,7 +48,7 @@ func (m *FacilityStaff) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *FacilityStaff) validateGroups(formats strfmt.Registry) error {
+func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Groups) { // not required
 		return nil
@@ -74,7 +74,7 @@ func (m *FacilityStaff) validateGroups(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *FacilityStaff) MarshalBinary() ([]byte, error) {
+func (m *FacilityUser) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -82,8 +82,8 @@ func (m *FacilityStaff) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *FacilityStaff) UnmarshalBinary(b []byte) error {
-	var res FacilityStaff
+func (m *FacilityUser) UnmarshalBinary(b []byte) error {
+	var res FacilityUser
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

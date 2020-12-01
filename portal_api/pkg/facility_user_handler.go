@@ -6,7 +6,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func GetFacilityStaffs(authHeader string) ([]*models.FacilityStaff, error) {
+func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
 	bearerToken, err := getToken(authHeader)
 	claimBody, err := getClaimBody(bearerToken)
 	if err != nil {
@@ -21,7 +21,7 @@ func GetFacilityStaffs(authHeader string) ([]*models.FacilityStaff, error) {
 	return users, err
 }
 
-func CreateFacilityStaff(staff *models.FacilityStaff, authHeader string) error {
+func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	bearerToken, err := getToken(authHeader)
 	claimBody, err := getClaimBody(bearerToken)
 	if err != nil {
@@ -29,27 +29,27 @@ func CreateFacilityStaff(staff *models.FacilityStaff, authHeader string) error {
 		return err
 	}
 	userRequest := KeyCloakUserRequest{
-		Username: staff.MobileNumber,
+		Username: user.MobileNumber,
 		Enabled:  "true",
 		Attributes: KeycloakUserAttributes{
-			MobileNumber: []string{staff.MobileNumber},
-			EmployeeID:   staff.EmployeeID,
-			FullName:     staff.Name,
+			MobileNumber: []string{user.MobileNumber},
+			EmployeeID:   user.EmployeeID,
+			FullName:     user.Name,
 			FacilityCode: claimBody.FacilityCode,
 		},
 	}
 	resp, err := CreateKeycloakUser(userRequest, authHeader)
 	log.Info("Created keycloak user ", resp.Response().StatusCode, " ", resp.String())
 	if err != nil || !isUserCreatedOrAlreadyExists(resp) {
-		log.Errorf("Error while creating keycloak user : %s", staff.MobileNumber)
+		log.Errorf("Error while creating keycloak user : %s", user.MobileNumber)
 		return err
 	} else {
-		log.Info("Setting up roles for the user ", staff.MobileNumber)
+		log.Info("Setting up roles for the user ", user.MobileNumber)
 		keycloakUserId := getKeycloakUserId(resp, userRequest, authHeader)
 		if keycloakUserId != "" {
-			_ = addUserToGroup(keycloakUserId, staff.RoleID, authHeader)
+			_ = addUserToGroup(keycloakUserId, user.RoleID, authHeader)
 		} else {
-			log.Error("Unable to map keycloak user id for ", staff.MobileNumber)
+			log.Error("Unable to map keycloak user id for ", user.MobileNumber)
 		}
 	}
 	return nil

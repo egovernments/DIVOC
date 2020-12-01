@@ -52,8 +52,8 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		PostVaccinatorsHandler: PostVaccinatorsHandlerFunc(func(params PostVaccinatorsParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation PostVaccinators has not yet been implemented")
 		}),
-		CreateFacilityStaffsHandler: CreateFacilityStaffsHandlerFunc(func(params CreateFacilityStaffsParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation CreateFacilityStaffs has not yet been implemented")
+		CreateFacilityUsersHandler: CreateFacilityUsersHandlerFunc(func(params CreateFacilityUsersParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation CreateFacilityUsers has not yet been implemented")
 		}),
 		CreateMedicineHandler: CreateMedicineHandlerFunc(func(params CreateMedicineParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation CreateMedicine has not yet been implemented")
@@ -64,8 +64,8 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
-		GetFacilityStaffsHandler: GetFacilityStaffsHandlerFunc(func(params GetFacilityStaffsParams, principal interface{}) middleware.Responder {
-			return middleware.NotImplemented("operation GetFacilityStaffs has not yet been implemented")
+		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
 		}),
 		GetMedicinesHandler: GetMedicinesHandlerFunc(func(params GetMedicinesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetMedicines has not yet been implemented")
@@ -132,16 +132,16 @@ type DivocPortalAPIAPI struct {
 	PostFacilitiesHandler PostFacilitiesHandler
 	// PostVaccinatorsHandler sets the operation handler for the post vaccinators operation
 	PostVaccinatorsHandler PostVaccinatorsHandler
-	// CreateFacilityStaffsHandler sets the operation handler for the create facility staffs operation
-	CreateFacilityStaffsHandler CreateFacilityStaffsHandler
+	// CreateFacilityUsersHandler sets the operation handler for the create facility users operation
+	CreateFacilityUsersHandler CreateFacilityUsersHandler
 	// CreateMedicineHandler sets the operation handler for the create medicine operation
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
-	// GetFacilityStaffsHandler sets the operation handler for the get facility staffs operation
-	GetFacilityStaffsHandler GetFacilityStaffsHandler
+	// GetFacilityUsersHandler sets the operation handler for the get facility users operation
+	GetFacilityUsersHandler GetFacilityUsersHandler
 	// GetMedicinesHandler sets the operation handler for the get medicines operation
 	GetMedicinesHandler GetMedicinesHandler
 	// GetProgramsHandler sets the operation handler for the get programs operation
@@ -240,8 +240,8 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.PostVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "PostVaccinatorsHandler")
 	}
-	if o.CreateFacilityStaffsHandler == nil {
-		unregistered = append(unregistered, "CreateFacilityStaffsHandler")
+	if o.CreateFacilityUsersHandler == nil {
+		unregistered = append(unregistered, "CreateFacilityUsersHandler")
 	}
 	if o.CreateMedicineHandler == nil {
 		unregistered = append(unregistered, "CreateMedicineHandler")
@@ -252,8 +252,8 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
 	}
-	if o.GetFacilityStaffsHandler == nil {
-		unregistered = append(unregistered, "GetFacilityStaffsHandler")
+	if o.GetFacilityUsersHandler == nil {
+		unregistered = append(unregistered, "GetFacilityUsersHandler")
 	}
 	if o.GetMedicinesHandler == nil {
 		unregistered = append(unregistered, "GetMedicinesHandler")
@@ -377,7 +377,7 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/facility/staffs"] = NewCreateFacilityStaffs(o.context, o.CreateFacilityStaffsHandler)
+	o.handlers["POST"]["/facility/users"] = NewCreateFacilityUsers(o.context, o.CreateFacilityUsersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -393,7 +393,7 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/facility/staffs"] = NewGetFacilityStaffs(o.context, o.GetFacilityStaffsHandler)
+	o.handlers["GET"]["/facility/users"] = NewGetFacilityUsers(o.context, o.GetFacilityUsersHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// CreateFacilityStaffsURL generates an URL for the create facility staffs operation
-type CreateFacilityStaffsURL struct {
+// CreateFacilityUsersURL generates an URL for the create facility users operation
+type CreateFacilityUsersURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *CreateFacilityStaffsURL) WithBasePath(bp string) *CreateFacilityStaffsURL {
+func (o *CreateFacilityUsersURL) WithBasePath(bp string) *CreateFacilityUsersURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *CreateFacilityStaffsURL) WithBasePath(bp string) *CreateFacilityStaffsU
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *CreateFacilityStaffsURL) SetBasePath(bp string) {
+func (o *CreateFacilityUsersURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *CreateFacilityStaffsURL) Build() (*url.URL, error) {
+func (o *CreateFacilityUsersURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/facility/staffs"
+	var _path = "/facility/users"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -47,7 +47,7 @@ func (o *CreateFacilityStaffsURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *CreateFacilityStaffsURL) Must(u *url.URL, err error) *url.URL {
+func (o *CreateFacilityUsersURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *CreateFacilityStaffsURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *CreateFacilityStaffsURL) String() string {
+func (o *CreateFacilityUsersURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *CreateFacilityStaffsURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *CreateFacilityUsersURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on CreateFacilityStaffsURL")
+		return nil, errors.New("scheme is required for a full url on CreateFacilityUsersURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on CreateFacilityStaffsURL")
+		return nil, errors.New("host is required for a full url on CreateFacilityUsersURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *CreateFacilityStaffsURL) BuildFull(scheme, host string) (*url.URL, erro
 }
 
 // StringFull returns the string representation of a complete url
-func (o *CreateFacilityStaffsURL) StringFull(scheme, host string) string {
+func (o *CreateFacilityUsersURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

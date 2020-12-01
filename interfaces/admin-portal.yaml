@@ -161,10 +161,10 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
-  /facility/staffs:
+  /facility/users:
     get:
-      summary: Get staffs of a facility
-      operationId: getFacilityStaffs
+      summary: Get users of a facility
+      operationId: getFacilityUsers
       security:
         - hasRole: ["facillity-admin"]
       responses:
@@ -174,18 +174,18 @@ paths:
             type: array
             items:
               type: object
-              $ref: '#/definitions/FacilityStaff'
+              $ref: '#/definitions/FacilityUser'
     post:
-      summary: Create Facility Staff
-      operationId: createFacilityStaffs
+      summary: Create Facility User
+      operationId: createFacilityUsers
       security:
         - hasRole: ["facillity-admin"]
       parameters:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/FacilityStaff'
-          description: Create facility staff data
+            $ref: '#/definitions/FacilityUser'
+          description: Create facility user data
       responses:
         '200':
           description: OK
@@ -416,25 +416,25 @@ definitions:
         type: array
         items:
           type: string
-  FacilityStaff:
+  FacilityUser:
     properties:
       roleId:
         type: string
-        title: Facility Staff Role ID
+        title: Facility User Role ID
       name:
         type: string
-        title: Facility Staff Name
+        title: Facility User Name
       mobileNumber:
         type: string
-        title: Facility Staff Mobile Number
+        title: Facility User Mobile Number
       employeeId:
         type: string
-        title: Facility Staff Id
+        title: Facility User Id
       groups:
         type: array
         items:
-          "$ref": "#/definitions/StaffGroup"
-  StaffGroup:
+          "$ref": "#/definitions/UserGroup"
+  UserGroup:
     properties:
       id:
         type: string

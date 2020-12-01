@@ -42,7 +42,7 @@ export const RoleSetup = () => {
     const axiosInstance = useAxios('');
     useEffect(() => {
         !!axiosInstance.current &&
-        axiosInstance.current.get('/divoc/admin/api/v1/facility/staffs')
+        axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
             .then(res => {
                 setStaffs(res.data)
             })
