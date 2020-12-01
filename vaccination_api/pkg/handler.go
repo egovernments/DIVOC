@@ -98,7 +98,10 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, pricipal inte
 
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interface{}) middleware.Responder {
 	code := params.PreEnrollmentCode
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		return NewGenericServerError()
+	}
 	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code); err == nil {
 		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
@@ -106,7 +109,10 @@ func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interf
 }
 
 func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, pricipal interface{}) middleware.Responder {
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		return NewGenericServerError()
+	}
 	if enrollments, err := findEnrollmentsForScope(scopeId); err == nil {
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
@@ -117,7 +123,7 @@ func certify(params certification.CertifyParams, pricipal interface{}) middlewar
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
 	fmt.Printf("%+v\n", params.Body[0])
-	for _, request := range(params.Body) {
+	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			publishCertifyMessage(jsonRequestString)
 		}

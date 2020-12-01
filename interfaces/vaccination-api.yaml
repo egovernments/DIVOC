@@ -4,18 +4,15 @@ info:
   title: Divoc
   description: Digital infra for vaccination certificates
 securityDefinitions:
-  isUser:
-    type: apiKey
-    name: Authorization
-    in: header
-  isAdmin:
-    type: apiKey
-    name: Authorization
-    in: header
-  isFacilityAdmin:
-    type: apiKey
-    name: Authorization
-    in: header
+  hasRole:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth'
+    tokenUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token'
+    scopes:
+      admin: scope of super admin
+      facillity-admin: scope of facility admin
+      facility-staff: scope of facility staff
 security:
   - isUser: []
 consumes:
@@ -84,7 +81,7 @@ paths:
       description: Get pre enrollment data from api for vaccination
       operationId: getPreEnrollment
       security:
-        - isUser: []
+        - hasRole: ['facility-staff']
       parameters:
         - name: preEnrollmentCode
           in: path
@@ -95,17 +92,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/PreEnrollment'
-  '/preEnrollments/facility/{facilityCode}':
+  '/preEnrollments/facility':
     get:
       tags:
         - vaccination
       summary: Get all pre enrollments applicable to assigned facility
       operationId: getPreEnrollmentsForFacility
-      parameters:
-        - name: facilityCode
-          in: path
-          required: true
-          type: string
+      security:
+        - hasRole: ['facility-staff']
       responses:
         '200':
           description: OK
@@ -122,6 +116,8 @@ paths:
         Certification happens asynchronously, this requires vaccinator
         athorization and vaccinator should be trained for the vaccination that
         is being certified.
+      security:
+        - hasRole: ['facility-staff']
       operationId: certify
       parameters:
         - in: body
@@ -140,6 +136,8 @@ paths:
         - configuration
       summary: Get active vaccination programs
       operationId: getCurrentPrograms
+      security:
+        - hasRole: ['facility-staff']
       responses:
         '200':
           description: OK
