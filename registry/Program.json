@@ -18,17 +18,17 @@
         "name": {
           "$id": "#/properties/name",
           "type": "string",
-          "title": "Name"
+          "title": "Program Name"
         },
         "description": {
           "$id": "#/properties/description",
           "type": "string",
-          "title": "Description"
+          "title": "Program Description"
         },
         "logoURL": {
           "$id": "#/properties/logoURL",
           "type": "string",
-          "title": "Logo URL"
+          "title": "Program Logo"
         },
         "startDate": {
           "$id": "#/properties/startDate",
