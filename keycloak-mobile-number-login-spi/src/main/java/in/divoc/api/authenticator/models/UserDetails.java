@@ -1,19 +1,22 @@
-package in.divoc.api.authenticator;
+package in.divoc.api.authenticator.models;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class UserDetails {
     private String userName;
     private String firstName;
     private String lastName;
     private Map<String, List<String>> attributes;
+    private List<UserGroup> groups;
 
-    public UserDetails(String userName, String firstName, String lastName, Map<String, List<String>> attributes) {
+    public UserDetails(String userName, String firstName, String lastName, Map<String, List<String>> attributes, List<UserGroup> groups) {
         this.userName = userName;
         this.firstName = firstName;
         this.lastName = lastName;
         this.attributes = attributes;
+        this.groups = groups;
     }
 
     public String getFirstName() {
@@ -30,5 +33,9 @@ public class UserDetails {
 
     public Map<String, List<String>> getAttributes() {
         return attributes;
+    }
+
+    public List<UserGroup> getGroups() {
+        return groups;
     }
 }

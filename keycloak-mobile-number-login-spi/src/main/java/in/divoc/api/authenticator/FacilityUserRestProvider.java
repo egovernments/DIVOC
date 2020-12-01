@@ -1,6 +1,9 @@
 package in.divoc.api.authenticator;
 
+import in.divoc.api.authenticator.models.UserDetails;
+import in.divoc.api.authenticator.models.UserGroup;
 import org.jboss.resteasy.annotations.cache.NoCache;
+import org.keycloak.models.GroupModel;
 import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.UserModel;
 import org.keycloak.services.managers.AppAuthManager;
@@ -42,8 +45,11 @@ public class FacilityUserRestProvider implements RealmResourceProvider {
         return userModels.stream().map(this::toUserDetail).collect(Collectors.toList());
     }
     private UserDetails toUserDetail(UserModel um) {
-        return new UserDetails(um.getUsername(), um.getFirstName(), um.getLastName(), um.getAttributes());
-
+        List<UserGroup> userGroups = um.getGroups().stream().map(this::toUserGroup).collect(Collectors.toList());
+        return new UserDetails(um.getUsername(), um.getFirstName(), um.getLastName(), um.getAttributes(), userGroups);
+    }
+    private UserGroup toUserGroup(GroupModel groupModel) {
+        return new UserGroup(groupModel.getId(), groupModel.getName());
     }
     private void verifyToken() {
         final AuthenticationManager.AuthResult auth = new AppAuthManager().authenticateBearerToken(session);
