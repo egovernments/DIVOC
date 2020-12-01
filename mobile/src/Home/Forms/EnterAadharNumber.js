@@ -4,6 +4,7 @@ import React, {useState} from "react";
 import {useHome} from "../Home";
 import {FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, usePreEnrollment} from "./PreEnrollmentFlow";
 import Form from "react-bootstrap/Form";
+import "./EnterAadharNumber.scss"
 
 export function VerifyAadharNumber(props) {
     const {goBack} = usePreEnrollment()
@@ -23,7 +24,7 @@ function EnterAadharNumber(props) {
     }
 
     return (
-        <div>
+        <div className={"aadhar-container"}>
             <h5>Enter your aadhar number</h5>
             <Form.Control className="control"
                           placeholder="1234 5678 9101"
@@ -39,7 +40,7 @@ function EnterAadharNumber(props) {
 }
 
 export function VerifyAadharOTP(props) {
-    const {state, goBack} = usePreEnrollment()
+    const {goBack} = usePreEnrollment()
     return (
         <FormCard onBack={() => {
             goBack()
@@ -56,7 +57,7 @@ function EnterAadharOTP(props) {
     }
 
     return (
-        <div>
+        <div className={"aadhar-container"}>
             <h5>Enter your aadhar otp</h5>
             <Form.Control className="control"
                           placeholder="1234"
