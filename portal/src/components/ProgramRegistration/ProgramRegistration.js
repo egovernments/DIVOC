@@ -57,7 +57,7 @@ function VaccineRegistration() {
     return (
         <div className={styles["container"]}>
             <div className={styles["form-container"]}>
-            <h4 className={styles['heading']}>Register New Vaccine</h4>
+            <h4 className={styles['heading']}>Register New Vaccine Program</h4>
                 <Form
                     schema={schema}
                     uiSchema={uiSchema}
