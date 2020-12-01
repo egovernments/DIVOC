@@ -79,13 +79,8 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
 		}),
 
-		// Applies when the "Authorization" header is set
-		IsAdminAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isAdmin) Authorization from header param [Authorization] has not yet been implemented")
-		},
-		// Applies when the "Authorization" header is set
-		IsUserAuth: func(token string) (interface{}, error) {
-			return nil, errors.NotImplemented("api key auth (isUser) Authorization from header param [Authorization] has not yet been implemented")
+		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
+			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
 		APIAuthorizer: security.Authorized(),
@@ -123,13 +118,9 @@ type DivocAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
-	// IsAdminAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key Authorization provided in the header
-	IsAdminAuth func(string) (interface{}, error)
-
-	// IsUserAuth registers a function that takes a token and returns a principal
-	// it performs authentication based on an api key Authorization provided in the header
-	IsUserAuth func(string) (interface{}, error)
+	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
+	// it performs authentication based on an oauth2 bearer token provided in the request
+	HasRoleAuth func(string, []string) (interface{}, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -230,11 +221,8 @@ func (o *DivocAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.IsAdminAuth == nil {
-		unregistered = append(unregistered, "AuthorizationAuth")
-	}
-	if o.IsUserAuth == nil {
-		unregistered = append(unregistered, "AuthorizationAuth")
+	if o.HasRoleAuth == nil {
+		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
 	if o.GetPingHandler == nil {
@@ -285,13 +273,8 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 	result := make(map[string]runtime.Authenticator)
 	for name := range schemes {
 		switch name {
-		case "isAdmin":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsAdminAuth)
-
-		case "isUser":
-			scheme := schemes[name]
-			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, o.IsUserAuth)
+		case "hasRole":
+			result[name] = o.BearerAuthenticator(name, o.HasRoleAuth)
 
 		}
 	}
@@ -403,7 +386,7 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/preEnrollments/facility/{facilityCode}"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
+	o.handlers["GET"]["/preEnrollments/facility"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

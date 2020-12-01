@@ -12,9 +12,10 @@ import (
 )
 
 const (
-	clientId      = "vaccination_api"
-	admin         = "admin"
-	facilityAdmin = "facility_admin"
+	clientId       = "vaccination_api"
+	admin          = "admin"
+	facilityAdmin  = "facility_admin"
+	portalClientId = "facility-admin-portal"
 )
 
 var (
@@ -36,12 +37,28 @@ func Init() {
 	//fatal(err)
 }
 
-func UserAuthorizer(bearerHeader string) (interface{}, error) {
-	bearerToken, err := getToken(bearerHeader)
+func RoleAuthorizer(bearerToken string, expectedRole []string) (interface{}, error) {
+	claimBody, err := GetClaimBody(bearerToken)
 	if err != nil {
 		return nil, err
 	}
-	claimBody, err := getClaimBody(bearerToken)
+	for _, role := range expectedRole {
+		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
+			return claimBody, err
+		}
+		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
+			return claimBody, err
+		}
+	}
+	return nil, errors.New("unauthorized")
+}
+
+func UserAuthorizer(bearerHeader string) (interface{}, error) {
+	bearerToken, err := GetToken(bearerHeader)
+	if err != nil {
+		return nil, err
+	}
+	claimBody, err := GetClaimBody(bearerToken)
 	if err != nil {
 		return nil, err
 	}
@@ -49,11 +66,11 @@ func UserAuthorizer(bearerHeader string) (interface{}, error) {
 }
 
 func AdminAuthorizer(bearerHeader string) (interface{}, error) {
-	bearerToken, err := getToken(bearerHeader)
+	bearerToken, err := GetToken(bearerHeader)
 	if err != nil {
 		return nil, err
 	}
-	claimBody, err := getClaimBody(bearerToken)
+	claimBody, err := GetClaimBody(bearerToken)
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +82,11 @@ func AdminAuthorizer(bearerHeader string) (interface{}, error) {
 }
 
 func FacilityAdminAuthorizer(bearerHeader string) (interface{}, error) {
-	bearerToken, err := getToken(bearerHeader)
+	bearerToken, err := GetToken(bearerHeader)
 	if err != nil {
 		return nil, err
 	}
-	claimBody, err := getClaimBody(bearerToken)
+	claimBody, err := GetClaimBody(bearerToken)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +106,7 @@ func contains(arr []string, str string) bool {
 	return false
 }
 
-func getClaimBody(bearerToken string) (*JWTClaimBody, error) {
+func GetClaimBody(bearerToken string) (*JWTClaimBody, error) {
 	token, err := jwt.ParseWithClaims(bearerToken, &JWTClaimBody{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("error decoding token")
@@ -107,7 +124,7 @@ func getClaimBody(bearerToken string) (*JWTClaimBody, error) {
 	return nil, errors.New("invalid token")
 }
 
-func getToken(bearerHeader string) (string, error) {
+func GetToken(bearerHeader string) (string, error) {
 	bearerTokenArr := strings.Split(bearerHeader, " ")
 	if len(bearerTokenArr) <= 1 {
 		return "", errors.New("invalid token")

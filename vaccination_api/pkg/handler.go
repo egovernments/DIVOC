@@ -12,6 +12,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -90,15 +91,23 @@ func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
 }
 
 func getVaccinators(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
-	vaccinators := getVaccinatorsForFacility(scopeId)
-	return NewGenericJSONResponse(vaccinators)
+	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+		log.Errorf("Error while getting vaccinators %+v", err)
+		return NewGenericServerError()
+	} else {
+		vaccinators := getVaccinatorsForFacility(scopeId)
+		return NewGenericJSONResponse(vaccinators)
+	}
 }
 
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
-	programsFor := findProgramsForFacility(scopeId)
-	return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+		log.Errorf("Error while getting vaccinators %+v", err)
+		return NewGenericServerError()
+	} else {
+		programsFor := findProgramsForFacility(scopeId)
+		return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+	}
 }
 
 func getConfigurationResponder(params configuration.GetConfigurationParams, principal interface{}) middleware.Responder {
@@ -119,7 +128,10 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, pricipal inte
 
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interface{}) middleware.Responder {
 	code := params.PreEnrollmentCode
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		return NewGenericServerError()
+	}
 	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code); err == nil {
 		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
@@ -127,7 +139,10 @@ func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interf
 }
 
 func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, pricipal interface{}) middleware.Responder {
-	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		return NewGenericServerError()
+	}
 	if enrollments, err := findEnrollmentsForScope(scopeId); err == nil {
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
