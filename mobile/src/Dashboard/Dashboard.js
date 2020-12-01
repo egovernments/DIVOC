@@ -14,7 +14,7 @@ import {Logout} from "../Logout/Logout";
 import {PrivateRoute} from "../utils/PrivateRoute";
 import {LoginComponent} from "../Login/Login";
 import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";
-import {ConfirmVaccination} from "../ConfirmVaccination";
+import {ConfirmFlow, ConfirmVaccination} from "../ConfirmVaccination";
 
 Dashboard.propTypes = {};
 
@@ -31,7 +31,7 @@ function Dashboard(props) {
                         <PrivateRoute path="/queue" exact component={Queue}/>
                         <PrivateRoute path="/logout" exact component={Logout}/>
                         <PrivateRoute path="/preEnroll/:pageName" component={PreEnrollmentFlow}/>
-                        <PrivateRoute path="/confirm/vaccination/:recipient_id/:pageName" component={ConfirmVaccination}/>
+                        <PrivateRoute path="/confirm/vaccination/:recipient_id/:pageName" component={ConfirmFlow}/>
                         <Route path="/login" exact component={LoginComponent}/>
                     </Switch>
 

@@ -1,12 +1,13 @@
 import {openDB} from "idb";
 
 const DATABASE_NAME = "DivocDB"
-const DATABASE_VERSION = 3
+const DATABASE_VERSION = 4
 const PATIENTS = "patients";
 const QUEUE = "queue";
+const EVENTS = "events";
 const STATUS = "status";
 
-const QUEUE_STATUS = Object.freeze({"IN_QUEUE": "in_queue", "COMPLETED": "completed"})
+export const QUEUE_STATUS = Object.freeze({"IN_QUEUE": "in_queue", "COMPLETED": "completed"})
 
 const dummyPatient = [
     {name: "Vivek Sign", gender: "Male", dob: "01-Jan-2000", enrollCode: "12341"},
@@ -18,6 +19,21 @@ const dummyPatient = [
     {name: "Ishani Sinha", gender: "Female", dob: "15-Aug-1978", enrollCode: "12347"},
     {name: "Madhur Khalsa", gender: "Male", dob: "01-Jan-1999", enrollCode: "12348"},
     {name: "Navin Kannan", gender: "Male", dob: "12-May-1996", enrollCode: "12349"}
+]
+
+const vaccinators = [
+    {vaccinator: "Dr. Vivek Sign", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. Gregory House", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+    {vaccinator: "Dr. AR Rahman", signatureImg: ""},
+
 ]
 
 export class AppDatabase {
@@ -32,6 +48,9 @@ export class AppDatabase {
 
                 db.createObjectStore(QUEUE,
                     {keyPath: "enrollCode"});
+
+                db.createObjectStore(EVENTS,
+                    {keyPath: "id", autoIncrement: true});
 
             }
         });
@@ -48,7 +67,7 @@ export class AppDatabase {
     }
 
     async addToQueue(patients) {
-        patients.status = "in_queue"
+        patients.status = QUEUE_STATUS.IN_QUEUE
         return this.db.add(QUEUE, patients);
     }
 
@@ -72,6 +91,30 @@ export class AppDatabase {
             {title: "Recipient Waiting", value: waiting},
             {title: "Certificate Issued", value: issue},
         ];
+    }
+
+    async getQueue(status) {
+        if (status) {
+            const result = await this.db.getAll(QUEUE)
+            const filter = result.filter((item) => item[STATUS] === status)
+            return Promise.resolve(filter)
+        } else {
+            return this.db.getAll(QUEUE)
+        }
+    }
+
+    async getVaccinators() {
+        return Promise.resolve(vaccinators)
+    }
+
+    async markPatientAsComplete(enrollCode) {
+        const patient = await this.db.get(QUEUE, enrollCode)
+        patient.status = QUEUE_STATUS.COMPLETED
+        return this.db.put(QUEUE, patient)
+    }
+
+    async saveEvent(event) {
+        return this.db.add(EVENTS, event)
     }
 }
 
