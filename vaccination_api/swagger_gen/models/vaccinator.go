@@ -15,14 +15,20 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Operator The Operator Schema
+// Vaccinator The Vaccinator Schema
 //
-// swagger:model Operator
-type Operator struct {
+// swagger:model vaccinator
+type Vaccinator struct {
+
+	// encrypted fields
+	EncryptedFields interface{} `json:"___encryptedFields,omitempty"`
 
 	// average rating
+	AverageRating float64 `json:"averageRating,omitempty"`
+
+	// code
 	// Required: true
-	AverageRating *float64 `json:"averageRating"`
+	Code *string `json:"code"`
 
 	// facility ids
 	// Required: true
@@ -34,17 +40,13 @@ type Operator struct {
 	// Min Length: 10
 	MobileNumber *string `json:"mobileNumber"`
 
+	// Full name
+	// Required: true
+	Name *string `json:"name"`
+
 	// national identifier
 	// Required: true
 	NationalIdentifier *string `json:"nationalIdentifier"`
-
-	// operator code
-	// Required: true
-	OperatorCode *string `json:"operatorCode"`
-
-	// Full name
-	// Required: true
-	OperatorName *string `json:"operatorName"`
 
 	// serial num
 	// Required: true
@@ -59,15 +61,14 @@ type Operator struct {
 	Status *string `json:"status"`
 
 	// training certificate
-	// Required: true
-	TrainingCertificate *string `json:"trainingCertificate"`
+	TrainingCertificate string `json:"trainingCertificate,omitempty"`
 }
 
-// Validate validates this operator
-func (m *Operator) Validate(formats strfmt.Registry) error {
+// Validate validates this vaccinator
+func (m *Vaccinator) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateAverageRating(formats); err != nil {
+	if err := m.validateCode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -79,15 +80,11 @@ func (m *Operator) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateNationalIdentifier(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOperatorCode(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateOperatorName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -103,26 +100,22 @@ func (m *Operator) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateTrainingCertificate(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
 	return nil
 }
 
-func (m *Operator) validateAverageRating(formats strfmt.Registry) error {
+func (m *Vaccinator) validateCode(formats strfmt.Registry) error {
 
-	if err := validate.Required("averageRating", "body", m.AverageRating); err != nil {
+	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *Operator) validateFacilityIds(formats strfmt.Registry) error {
+func (m *Vaccinator) validateFacilityIds(formats strfmt.Registry) error {
 
 	if err := validate.Required("facilityIds", "body", m.FacilityIds); err != nil {
 		return err
@@ -131,7 +124,7 @@ func (m *Operator) validateFacilityIds(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Operator) validateMobileNumber(formats strfmt.Registry) error {
+func (m *Vaccinator) validateMobileNumber(formats strfmt.Registry) error {
 
 	if err := validate.Required("mobileNumber", "body", m.MobileNumber); err != nil {
 		return err
@@ -148,7 +141,16 @@ func (m *Operator) validateMobileNumber(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Operator) validateNationalIdentifier(formats strfmt.Registry) error {
+func (m *Vaccinator) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *Vaccinator) validateNationalIdentifier(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalIdentifier", "body", m.NationalIdentifier); err != nil {
 		return err
@@ -157,25 +159,7 @@ func (m *Operator) validateNationalIdentifier(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Operator) validateOperatorCode(formats strfmt.Registry) error {
-
-	if err := validate.Required("operatorCode", "body", m.OperatorCode); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Operator) validateOperatorName(formats strfmt.Registry) error {
-
-	if err := validate.Required("operatorName", "body", m.OperatorName); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Operator) validateSerialNum(formats strfmt.Registry) error {
+func (m *Vaccinator) validateSerialNum(formats strfmt.Registry) error {
 
 	if err := validate.Required("serialNum", "body", m.SerialNum); err != nil {
 		return err
@@ -184,7 +168,7 @@ func (m *Operator) validateSerialNum(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Operator) validateSignatures(formats strfmt.Registry) error {
+func (m *Vaccinator) validateSignatures(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Signatures) { // not required
 		return nil
@@ -209,7 +193,7 @@ func (m *Operator) validateSignatures(formats strfmt.Registry) error {
 	return nil
 }
 
-var operatorTypeStatusPropEnum []interface{}
+var vaccinatorTypeStatusPropEnum []interface{}
 
 func init() {
 	var res []string
@@ -217,28 +201,28 @@ func init() {
 		panic(err)
 	}
 	for _, v := range res {
-		operatorTypeStatusPropEnum = append(operatorTypeStatusPropEnum, v)
+		vaccinatorTypeStatusPropEnum = append(vaccinatorTypeStatusPropEnum, v)
 	}
 }
 
 const (
 
-	// OperatorStatusActive captures enum value "Active"
-	OperatorStatusActive string = "Active"
+	// VaccinatorStatusActive captures enum value "Active"
+	VaccinatorStatusActive string = "Active"
 
-	// OperatorStatusInactive captures enum value "Inactive"
-	OperatorStatusInactive string = "Inactive"
+	// VaccinatorStatusInactive captures enum value "Inactive"
+	VaccinatorStatusInactive string = "Inactive"
 )
 
 // prop value enum
-func (m *Operator) validateStatusEnum(path, location string, value string) error {
-	if err := validate.EnumCase(path, location, value, operatorTypeStatusPropEnum, true); err != nil {
+func (m *Vaccinator) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, vaccinatorTypeStatusPropEnum, true); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (m *Operator) validateStatus(formats strfmt.Registry) error {
+func (m *Vaccinator) validateStatus(formats strfmt.Registry) error {
 
 	if err := validate.Required("status", "body", m.Status); err != nil {
 		return err
@@ -252,17 +236,8 @@ func (m *Operator) validateStatus(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Operator) validateTrainingCertificate(formats strfmt.Registry) error {
-
-	if err := validate.Required("trainingCertificate", "body", m.TrainingCertificate); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // MarshalBinary interface implementation
-func (m *Operator) MarshalBinary() ([]byte, error) {
+func (m *Vaccinator) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -270,8 +245,8 @@ func (m *Operator) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Operator) UnmarshalBinary(b []byte) error {
-	var res Operator
+func (m *Vaccinator) UnmarshalBinary(b []byte) error {
+	var res Vaccinator
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

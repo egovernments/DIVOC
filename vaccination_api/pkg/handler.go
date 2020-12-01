@@ -30,15 +30,34 @@ func SetupHandlers(api *operations.DivocAPI) {
 
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
+	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 }
 
 type GenericResponse struct {
 	statusCode int
 }
 
+type GenericJsonResponse struct {
+	body interface{}
+}
 func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 	rw.WriteHeader(o.statusCode)
+}
+
+func NewGenericJSONResponse(body interface{}) middleware.Responder {
+	return &GenericJsonResponse{body: body}
+}
+
+func (o *GenericJsonResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	bytes, err := json.Marshal(o.body)
+	if err != nil {
+		rw.WriteHeader(500)
+		rw.Write([]byte("JSON Marshalling error"))
+	}
+	rw.WriteHeader(200)
+	rw.Write(bytes)
 }
 
 func NewGenericServerError() middleware.Responder {
@@ -70,14 +89,16 @@ func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
 	return login.NewPostAuthorizeUnauthorized()
 }
 
+func getVaccinators(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	vaccinators := getVaccinatorsForFacility(scopeId)
+	return NewGenericJSONResponse(vaccinators)
+}
+
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
-	payload := []*models.Program{}
-	payload = append(payload, &models.Program{
-		ID:        "Covid19",
-		Medicines: []string{"BNT162b2"},
-		Name:      "SARS-CoV-2",
-	})
-	return configuration.NewGetCurrentProgramsOK().WithPayload(payload)
+	scopeId := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
+	programsFor := findProgramsForFacility(scopeId)
+	return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
 }
 
 func getConfigurationResponder(params configuration.GetConfigurationParams, principal interface{}) middleware.Responder {
@@ -117,7 +138,7 @@ func certify(params certification.CertifyParams, pricipal interface{}) middlewar
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
 	fmt.Printf("%+v\n", params.Body[0])
-	for _, request := range(params.Body) {
+	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			publishCertifyMessage(jsonRequestString)
 		}

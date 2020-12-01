@@ -15,7 +15,7 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Vaccinator The Operator Schema
+// Vaccinator The Vaccinator Schema
 //
 // swagger:model Vaccinator
 type Vaccinator struct {

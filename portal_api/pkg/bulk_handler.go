@@ -15,18 +15,18 @@ func createVaccinator(data *Scanner) error {
 	}
 	mobileNumber := data.Text("mobileNumber")
 	nationalIdentifier := data.Text("nationalIdentifier")
-	operatorCode := data.Text("operatorCode")
-	operatorName := data.Text("operatorName")
+	code := data.Text("code")
+	name := data.Text("name")
 	status := data.Text("status")
 	facilityIds := strings.Split(data.Text("facilityIds"), ",")
 	averageRating := 0.0
 	trainingCertificate := ""
-	vaccinator := models.Operator{
+	vaccinator := models.Vaccinator{
 		SerialNum:           &serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
-		OperatorCode:        &operatorCode,
-		OperatorName:        &operatorName,
+		Code:        &code,
+		Name:        &name,
 		Status:              &status,
 		FacilityIds:         facilityIds,
 		AverageRating:       &averageRating,

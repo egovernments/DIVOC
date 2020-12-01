@@ -147,6 +147,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Program'
+  /vaccinators:
+    get:
+      tags:
+        - configuration
+      summary: Get active vaccinators mapped for the facility
+      operationId: getVaccinators
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "../registry/Vaccinator.json#/definitions/Vaccinator"
   /identity/verify:
     post:
       tags:
@@ -284,10 +297,38 @@ definitions:
         type: string
       name:
         type: string
+      description:
+        type: string
+      logoURL:
+        type: string
       medicines:
         type: array
         items:
-          type: string
+          type: object
+          title: "medicine"
+          properties:
+            name:
+              type: string
+            provider:
+              type: string
+            vaccinationMode:
+              type: string
+              enum: ["muscular injection", "oral", "nasal"]
+            schedule:
+              type: object
+              properties:
+                repeatTimes:
+                  type: integer
+                repeatInterval:
+                  type: integer
+            effectiveUntil:
+              type: integer
+              description: Number of months the vaccination is effective
+            status:
+              type: string
+              enum: ["Active", "Inactive", "Blocked"]
+            price:
+              type: number
   IdentityVerificationRequest:
     type: object
     properties:

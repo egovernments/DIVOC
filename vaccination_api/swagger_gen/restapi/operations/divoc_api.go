@@ -75,6 +75,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
 		}),
+		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
+		}),
 
 		// Applies when the "Authorization" header is set
 		IsAdminAuth: func(token string) (interface{}, error) {
@@ -149,6 +152,8 @@ type DivocAPI struct {
 	VaccinationGetPreEnrollmentHandler vaccination.GetPreEnrollmentHandler
 	// VaccinationGetPreEnrollmentsForFacilityHandler sets the operation handler for the get pre enrollments for facility operation
 	VaccinationGetPreEnrollmentsForFacilityHandler vaccination.GetPreEnrollmentsForFacilityHandler
+	// ConfigurationGetVaccinatorsHandler sets the operation handler for the get vaccinators operation
+	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -258,6 +263,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.VaccinationGetPreEnrollmentsForFacilityHandler == nil {
 		unregistered = append(unregistered, "vaccination.GetPreEnrollmentsForFacilityHandler")
+	}
+	if o.ConfigurationGetVaccinatorsHandler == nil {
+		unregistered = append(unregistered, "configuration.GetVaccinatorsHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -396,6 +404,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/preEnrollments/facility/{facilityCode}"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/vaccinators"] = configuration.NewGetVaccinators(o.context, o.ConfigurationGetVaccinatorsHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP
