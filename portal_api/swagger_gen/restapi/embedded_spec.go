@@ -484,6 +484,12 @@ func init() {
           "type": "string",
           "title": "Facility Staff Id"
         },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StaffGroup"
+          }
+        },
         "mobileNumber": {
           "type": "string",
           "title": "Facility Staff Mobile Number"
@@ -577,6 +583,18 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "StaffGroup": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "group id"
+        },
+        "name": {
+          "type": "string",
+          "title": "group name"
         }
       }
     },
@@ -1141,6 +1159,12 @@ func init() {
           "type": "string",
           "title": "Facility Staff Id"
         },
+        "groups": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/StaffGroup"
+          }
+        },
         "mobileNumber": {
           "type": "string",
           "title": "Facility Staff Mobile Number"
@@ -1234,6 +1258,18 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "StaffGroup": {
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "group id"
+        },
+        "name": {
+          "type": "string",
+          "title": "group name"
         }
       }
     },

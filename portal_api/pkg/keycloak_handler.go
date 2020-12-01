@@ -115,6 +115,7 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 	type FacilityStaff struct {
 		UserName   string                 `json:"userName"`
 		Attributes map[string]interface{} `json:"attributes"`
+		Groups     []*models.StaffGroup    `json:"groups"`
 	}
 	var responseObject []FacilityStaff
 	if err := resp.ToJSON(&responseObject); err == nil {
@@ -135,6 +136,7 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 				MobileNumber: mobileNumber,
 				Name:         fullName,
 				RoleID:       "",
+				Groups:       user.Groups,
 			})
 		}
 		return facilityUsers, nil

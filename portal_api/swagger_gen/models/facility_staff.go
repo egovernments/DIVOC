@@ -6,6 +6,9 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -17,6 +20,9 @@ type FacilityStaff struct {
 
 	// Facility Staff Id
 	EmployeeID string `json:"employeeId,omitempty"`
+
+	// groups
+	Groups []*StaffGroup `json:"groups"`
 
 	// Facility Staff Mobile Number
 	MobileNumber string `json:"mobileNumber,omitempty"`
@@ -30,6 +36,40 @@ type FacilityStaff struct {
 
 // Validate validates this facility staff
 func (m *FacilityStaff) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateGroups(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityStaff) validateGroups(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Groups) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Groups); i++ {
+		if swag.IsZero(m.Groups[i]) { // not required
+			continue
+		}
+
+		if m.Groups[i] != nil {
+			if err := m.Groups[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("groups" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 

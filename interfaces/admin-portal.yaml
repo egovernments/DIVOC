@@ -430,6 +430,18 @@ definitions:
       employeeId:
         type: string
         title: Facility Staff Id
+      groups:
+        type: array
+        items:
+          "$ref": "#/definitions/StaffGroup"
+  StaffGroup:
+    properties:
+      id:
+        type: string
+        title: group id
+      name:
+        type: string
+        title: group name
 host: divoc.xiv.in
 schemes:
   - https
