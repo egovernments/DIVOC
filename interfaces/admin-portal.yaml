@@ -436,9 +436,6 @@ definitions:
           type: string
   FacilityUser:
     properties:
-      roleId:
-        type: string
-        title: Facility User Role ID
       name:
         type: string
         title: Facility User Name

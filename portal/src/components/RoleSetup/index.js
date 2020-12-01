@@ -14,6 +14,8 @@ import MenuItem from '@material-ui/core/MenuItem';
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {useAxios} from "../../utils/useAxios";
+import AddUserImg from "../../assets/img/add-user.svg";
+import "./index.css"
 
 const useStyles = makeStyles({
     table: {
@@ -36,17 +38,24 @@ const BorderLessTableCell = withStyles({
 })(TableCell);
 
 
+const OLD_USER = "old";
+const NEW_USER = "new";
 export const RoleSetup = () => {
     const [staffs, setStaffs] = useState([]);
     const [groups, setGroups] = useState([]);
     const classes = useStyles();
     const axiosInstance = useAxios('');
+
+    function fetchUsers() {
+        axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
+            .then(res => {
+                setStaffs(res.data.map(d => ({...d, type: OLD_USER})))
+            });
+    }
+
     useEffect(() => {
         if (axiosInstance.current) {
-            axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
-                .then(res => {
-                    setStaffs(res.data)
-                });
+            fetchUsers();
 
             axiosInstance.current.get('/divoc/admin/api/v1/facility/groups')
                 .then(res => {
@@ -56,6 +65,30 @@ export const RoleSetup = () => {
 
 
     }, [axiosInstance]);
+
+    function addNewUser() {
+        setStaffs(staffs.concat({
+            groups: [],
+            name: "",
+            mobileNumber: "",
+            employeeId: "",
+            type: NEW_USER
+        }))
+    }
+
+    function updateStaff(index, staff) {
+        const data = [...staffs];
+        data[index] = staff;
+        setStaffs(data);
+    }
+
+    function saveStaff(index) {
+        axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staffs[index])
+            .then(res => {
+                fetchUsers()
+            });
+    }
+
     return (
         <div>
             <TableContainer component={CustomPaper}>
@@ -63,16 +96,36 @@ export const RoleSetup = () => {
                        aria-label="facility staffs">
                     <TableBody>
                         {staffs.map((staff, index) => (
-                            <StaffRow key={index} staff={staff} groups={groups}/>
+                            <StaffRow
+                                key={index}
+                                staff={staff}
+                                groups={groups}
+                                updateStaff={(staff) => updateStaff(index, staff)}
+                                saveStaff={() => saveStaff(index)}
+                            />
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
+            <img src={AddUserImg} alt={""} className="add-user-btn mt-3" onClick={addNewUser}/>
         </div>
     );
 };
 
-const StaffRow = ({key, staff, groups}) => {
+const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
+    function onRoleChange(evt) {
+        if (staff.groups.length > 0) {
+            staff.groups[0].id = evt.target.value
+        } else {
+            staff.groups = [{id: evt.target.value}]
+        }
+        updateStaff(staff)
+    }
+
+    function onValueChange(evt, field) {
+        staff[field] = evt.target.value;
+        updateStaff(staff)
+    }
 
     return (
         <TableRow key={key}>
@@ -83,16 +136,15 @@ const StaffRow = ({key, staff, groups}) => {
                         labelId="demo-simple-select-outlined-label"
                         id="demo-simple-select-outlined"
                         value={staff.groups.length > 0 ? staff.groups[0].id : ""}
-                        onChange={() => {
-                        }}
+                        onChange={onRoleChange}
                         label="Role Type"
                     >
-                        {/*<MenuItem value="">*/}
-                        {/*    <em>None</em>*/}
-                        {/*</MenuItem>*/}
+                        <MenuItem value="">
+                            <em>Please select</em>
+                        </MenuItem>
                         {
                             groups.map((group, index) => (
-                                <MenuItem value={group.id}>{group.name}</MenuItem>
+                                <MenuItem value={group.id} name={group.name}>{group.name}</MenuItem>
 
                             ))
                         }
@@ -101,24 +153,33 @@ const StaffRow = ({key, staff, groups}) => {
                 </FormControl>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.name} label="Name" variant="outlined"/>
+                <TextField value={staff.name} onChange={(evt) => onValueChange(evt, "name")} label="Name"
+                           variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.mobileNumber} type="tel" label="Mobile Number" variant="outlined"/>
+                <TextField value={staff.mobileNumber} onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
+                           label="Mobile Number" variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.employeeId} label="Employee ID" variant="outlined"/>
+                <TextField value={staff.employeeId} onChange={(evt) => onValueChange(evt, "employeeId")}
+                           label="Employee ID" variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <Button variant="outlined" color="primary">
+                {staff.type === NEW_USER &&
+                <Button variant="outlined" color="primary" onClick={saveStaff}>
                     SAVE
                 </Button>
-                <Button variant="outlined" disabled>
-                    EDIT
-                </Button>
-                <Button variant="outlined" disabled>
-                    DELETE
-                </Button>
+                }
+                {staff.type === OLD_USER &&
+                <>
+                    <Button variant="outlined" disabled>
+                        EDIT
+                    </Button>
+                    <Button variant="outlined" disabled>
+                        DELETE
+                    </Button>
+                </>
+                }
             </BorderLessTableCell>
         </TableRow>
     )

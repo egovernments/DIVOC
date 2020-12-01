@@ -135,7 +135,6 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 				EmployeeID:   employeeId,
 				MobileNumber: mobileNumber,
 				Name:         fullName,
-				RoleID:       "",
 				Groups:       user.Groups,
 			})
 		}

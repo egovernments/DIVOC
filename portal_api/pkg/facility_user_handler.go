@@ -47,7 +47,7 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 		log.Info("Setting up roles for the user ", user.MobileNumber)
 		keycloakUserId := getKeycloakUserId(resp, userRequest, authHeader)
 		if keycloakUserId != "" {
-			_ = addUserToGroup(keycloakUserId, user.RoleID, authHeader)
+			_ = addUserToGroup(keycloakUserId, user.Groups[0].ID, authHeader)
 		} else {
 			log.Error("Unable to map keycloak user id for ", user.MobileNumber)
 		}
