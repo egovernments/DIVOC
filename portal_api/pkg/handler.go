@@ -55,8 +55,9 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
 	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
-	api.CreateFacilityStaffsHandler = operations.CreateFacilityStaffsHandlerFunc(createFacilityStaffHandler)
-	api.GetFacilityStaffsHandler = operations.GetFacilityStaffsHandlerFunc(getFacilityStaffHandler)
+	api.CreateFacilityUsersHandler = operations.CreateFacilityUsersHandlerFunc(createFacilityUserHandler)
+	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
+	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
@@ -142,20 +143,29 @@ func registryUrl(operationId string) string {
 	return url
 }
 
-func createFacilityStaffHandler(params operations.CreateFacilityStaffsParams, principal interface{}) middleware.Responder {
-	err := CreateFacilityStaff(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+func createFacilityUserHandler(params operations.CreateFacilityUsersParams, principal interface{}) middleware.Responder {
+	err := CreateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
-		return operations.NewCreateFacilityStaffsBadRequest()
+		return operations.NewCreateFacilityUsersBadRequest()
 	}
-	return operations.NewCreateFacilityStaffsOK()
+	return operations.NewCreateFacilityUsersOK()
 }
 
-func getFacilityStaffHandler(params operations.GetFacilityStaffsParams, principal interface{}) middleware.Responder {
-	users, err := GetFacilityStaffs(params.HTTPRequest.Header.Get("Authorization"))
+func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal interface{}) middleware.Responder {
+	users, err := GetFacilityUsers(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
-		return operations.NewCreateFacilityStaffsBadRequest()
+		return operations.NewCreateFacilityUsersBadRequest()
 	}
-	return &operations.GetFacilityStaffsOK{Payload: users}
+	return &operations.GetFacilityUsersOK{Payload: users}
+}
+
+func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principal interface{}) middleware.Responder {
+	groups, err := GetFacilityGroups(params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewGetFacilityGroupsBadRequest()
+	}
+	return &operations.GetFacilityGroupsOK{Payload: groups}
 }

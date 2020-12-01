@@ -104,7 +104,14 @@ func addUserToGroup(userId string, groupId string, authHeader string) error {
 	return nil
 }
 
-func getFacilityUsers(facilityCode string, authHeader string) ([]*models.FacilityStaff, error) {
+type FacilityUserResponse struct {
+	ID         string                 `json:"id"`
+	UserName   string                 `json:"userName"`
+	Attributes map[string]interface{} `json:"attributes"`
+	Groups     []*models.UserGroup    `json:"groups"`
+}
+
+func getFacilityUsers(facilityCode string, authHeader string) ([]*models.FacilityUser, error) {
 	url := config.Config.Keycloak.Url + "/realms/divoc/facility/" + facilityCode + "/users"
 	log.Info("Checking with keycloak for facility code mapping ", facilityCode)
 	resp, err := req.Get(url, req.Header{"Authorization": authHeader})
@@ -112,32 +119,62 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 		return nil, err
 	}
 	log.Infof("Got response %+v", resp.String())
-	type FacilityStaff struct {
-		UserName   string                 `json:"userName"`
-		Attributes map[string]interface{} `json:"attributes"`
-	}
-	var responseObject []FacilityStaff
+
+	var responseObject []FacilityUserResponse
 	if err := resp.ToJSON(&responseObject); err == nil {
-		var facilityUsers []*models.FacilityStaff
+		var facilityUsers []*models.FacilityUser
 		for _, user := range responseObject {
-			var employeeId, fullName, mobileNumber string
-			if v, ok := user.Attributes["employee_id"]; ok {
-				employeeId = v.([]interface{})[0].(string)
+			if !isFacilityAdmin(user) {
+				var employeeId, fullName, mobileNumber string
+				if v, ok := user.Attributes["employee_id"]; ok {
+					employeeId = v.([]interface{})[0].(string)
+				}
+				if v, ok := user.Attributes["mobile_number"]; ok {
+					mobileNumber = v.([]interface{})[0].(string)
+				}
+				if v, ok := user.Attributes["full_name"]; ok {
+					fullName = v.([]interface{})[0].(string)
+				}
+				facilityUsers = append(facilityUsers, &models.FacilityUser{
+					ID:           user.ID,
+					EmployeeID:   employeeId,
+					MobileNumber: mobileNumber,
+					Name:         fullName,
+					Groups:       user.Groups,
+				})
 			}
-			if v, ok := user.Attributes["mobile_number"]; ok {
-				mobileNumber = v.([]interface{})[0].(string)
-			}
-			if v, ok := user.Attributes["full_name"]; ok {
-				fullName = v.([]interface{})[0].(string)
-			}
-			facilityUsers = append(facilityUsers, &models.FacilityStaff{
-				EmployeeID:   employeeId,
-				MobileNumber: mobileNumber,
-				Name:         fullName,
-				RoleID:       "",
-			})
 		}
 		return facilityUsers, nil
 	}
 	return nil, errors.New("Unable to get userid from keycloak")
+}
+
+func isFacilityAdmin(user FacilityUserResponse) bool {
+	if len(user.Groups) > 0 {
+		for _, group := range user.Groups {
+			if group.Name == "facillity admin" {
+				return true
+			}
+		}
+	}
+	return false
+}
+func getUserGroups(groupSearchKey string, authHeader string) ([]*models.UserGroup, error) {
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/divoc/groups?search=" + groupSearchKey
+	log.Info("GET ", addUserToGroupURL)
+	resp, err := req.Get(addUserToGroupURL, req.Header{"Authorization": authHeader})
+	if err != nil {
+		log.Errorf("Error while fetching user groups %s", groupSearchKey)
+		return nil, err
+	}
+	if resp.Response().StatusCode != 200 {
+		log.Errorf("Error while fetching user groups, status code %s", resp.Response().StatusCode)
+		return nil, err
+	}
+	var userGroups []*models.UserGroup
+	err = resp.ToJSON(&userGroups)
+	if err == nil {
+		return userGroups, nil
+	}
+	return nil, err
 }
