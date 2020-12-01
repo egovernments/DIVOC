@@ -22,15 +22,15 @@
         "name": {
           "$id": "#/properties/name",
           "type": "string",
-          "title": "Name"
+          "title": "Name of Vaccine / Medicine"
         },
         "provider": {
-          "title": "Provider",
+          "title": "Manufacturer",
           "type": "string",
           "$id": "#/properties/provider"
         },
         "schedule": {
-          "title": "Schedule",
+          "title": "Schedule Details",
           "type": "object",
           "description": "How many times and how often vaccination should be repeated",
           "properties": {
@@ -57,7 +57,7 @@
           "title": "Status"
         },
         "price": {
-          "title": "Price (if fixed)",
+          "title": "Price Range",
           "type": "number"
         }
       }
