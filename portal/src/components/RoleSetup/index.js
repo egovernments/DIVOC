@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -38,14 +38,23 @@ const BorderLessTableCell = withStyles({
 
 export const RoleSetup = () => {
     const [staffs, setStaffs] = useState([]);
+    const [groups, setGroups] = useState([]);
     const classes = useStyles();
     const axiosInstance = useAxios('');
     useEffect(() => {
-        !!axiosInstance.current &&
-        axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
-            .then(res => {
-                setStaffs(res.data)
-            })
+        if (axiosInstance.current) {
+            axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
+                .then(res => {
+                    setStaffs(res.data)
+                });
+
+            axiosInstance.current.get('/divoc/admin/api/v1/facility/groups')
+                .then(res => {
+                    setGroups(res.data)
+                });
+        }
+
+
     }, [axiosInstance]);
     return (
         <div>
@@ -54,7 +63,7 @@ export const RoleSetup = () => {
                        aria-label="facility staffs">
                     <TableBody>
                         {staffs.map((staff, index) => (
-                            <StaffRow key={index} staff={staff}/>
+                            <StaffRow key={index} staff={staff} groups={groups}/>
                         ))}
                     </TableBody>
                 </Table>
@@ -63,7 +72,7 @@ export const RoleSetup = () => {
     );
 };
 
-const StaffRow = ({key, staff}) => {
+const StaffRow = ({key, staff, groups}) => {
 
     return (
         <TableRow key={key}>
@@ -73,17 +82,21 @@ const StaffRow = ({key, staff}) => {
                     <Select
                         labelId="demo-simple-select-outlined-label"
                         id="demo-simple-select-outlined"
-                        value={staff.groups > 0 && staff.groups[0].name}
+                        value={staff.groups.length > 0 ? staff.groups[0].id : ""}
                         onChange={() => {
                         }}
                         label="Role Type"
                     >
-                        <MenuItem value="">
-                            <em>None</em>
-                        </MenuItem>
-                        <MenuItem value={10}>Ten</MenuItem>
-                        <MenuItem value={20}>Twenty</MenuItem>
-                        <MenuItem value={30}>Thirty</MenuItem>
+                        {/*<MenuItem value="">*/}
+                        {/*    <em>None</em>*/}
+                        {/*</MenuItem>*/}
+                        {
+                            groups.map((group, index) => (
+                                <MenuItem value={group.id}>{group.name}</MenuItem>
+
+                            ))
+                        }
+
                     </Select>
                 </FormControl>
             </BorderLessTableCell>
