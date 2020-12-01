@@ -175,6 +175,23 @@ paths:
           description: OK
         '206':
           description: Need OTP
+  /certificates/{phone}:
+    get:
+      summary: Get certificate json
+      security: []
+#        - hasRole: ["recipient"]
+      operationId: getCertificate
+      parameters:
+        - name: phone
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+
   /ping:
     get:
       summary: Server heartbeat operation

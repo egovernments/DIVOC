@@ -32,6 +32,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
+	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 }
 
 type GenericResponse struct {
@@ -63,6 +64,24 @@ func (o *GenericJsonResponse) WriteResponse(rw http.ResponseWriter, producer run
 
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
+}
+
+func getCertificate(params operations.GetCertificateParams) middleware.Responder {
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+		"@type": map[string]interface{}{
+			"eq": typeId,
+		},
+		"contact": map[string]interface{}{
+			"contains": "tel:" + params.Phone,
+		},
+	}
+	if response, err := queryRegistry(typeId, filter); err != nil {
+		log.Infof("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		return NewGenericJSONResponse(response)
+	}
 }
 
 func pingResponder(params operations.GetPingParams) middleware.Responder {
