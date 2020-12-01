@@ -82,11 +82,20 @@ export const RoleSetup = () => {
         setStaffs(data);
     }
 
+    function isStaffValid(staff) {
+        return staff.groups.length > 0 && staff.name.length > 0 && staff.mobileNumber.length > 0 && staff.employeeId.length > 0
+    }
+
     function saveStaff(index) {
-        axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staffs[index])
-            .then(res => {
-                fetchUsers()
-            });
+        const staff = staffs[index];
+        if(isStaffValid(staff)) {
+            axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
+                .then(res => {
+                    fetchUsers()
+                });
+        } else {
+            alert("Please fill all the values!")
+        }
     }
 
     return (
