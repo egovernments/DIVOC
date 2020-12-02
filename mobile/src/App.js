@@ -7,7 +7,7 @@ import {ApiServices} from "./Services/apiServices";
 
 function App() {
     const {keycloak, initialized} = useKeycloak();
-    const [isDBInit, setDBInit] = useState(false)
+    const [isDBInit, setDBInit] = useState(false);
     useEffect(() => {
         if (initialized) {
             appIndexDb.initDb().then((value => {
@@ -25,7 +25,6 @@ function App() {
             });
         }
     }, [initialized])
-
     if (!initialized || !isDBInit) {
         return <div>Loading...</div>
     }
