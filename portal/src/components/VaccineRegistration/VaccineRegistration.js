@@ -35,7 +35,7 @@ function VaccineRegistration() {
             .post("/divoc/admin/api/v1/medicines", dataToSend, config)
             .then((res) => {
                 alert("Successfully Registered");
-                console.log(res);
+                getListOfRegisteredVaccines()
             });
     };
 
