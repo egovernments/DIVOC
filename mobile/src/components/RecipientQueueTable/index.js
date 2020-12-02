@@ -3,7 +3,7 @@ import {Table} from "react-bootstrap";
 import VaccinationActiveImg from "../../assets/img/vaccination-active-status.svg";
 import VaccinationInActiveImg from "../../assets/img/vacconation-inactive-status.svg";
 import {useHistory} from "react-router";
-import {BaseRecipientQueueCard} from "../BaseRecipientQueueCard";
+import {BaseFormCard} from "../BaseFormCard";
 import {CONSTANT} from "../../utils/constants";
 import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
 
@@ -15,7 +15,7 @@ export const RecipientQueueTable = () => {
     })
     const history = useHistory();
     return (
-        <BaseRecipientQueueCard title={"Recipient Queue"}>
+        <BaseFormCard title={"Recipient Queue"}>
             <Table responsive>
                 <thead>
                 <tr>
@@ -45,6 +45,6 @@ export const RecipientQueueTable = () => {
                 }
                 </tbody>
             </Table>
-        </BaseRecipientQueueCard>
+        </BaseFormCard>
     )
 };

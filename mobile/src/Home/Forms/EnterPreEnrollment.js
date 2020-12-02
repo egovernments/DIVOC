@@ -6,14 +6,21 @@ import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import {PHONE_NUMBER_MAX} from "../../Login/EnterPhoneNumberComponent";
 import "./EnterPreEnrollment.scss"
+import {BaseFormCard} from "../../components/BaseFormCard";
 
 export function PreEnrollmentCode(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack()
+    //     }} content={<EnterPreEnrollmentContent/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack()
-        }} content={<EnterPreEnrollmentContent/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Recipient"}>
+            <EnterPreEnrollmentContent/>
+        </BaseFormCard>
+    )
 }
 
 function EnterPreEnrollmentContent(props) {

@@ -4,14 +4,21 @@ import React, {useState} from "react";
 import {FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, usePreEnrollment} from "./PreEnrollmentFlow";
 import Form from "react-bootstrap/Form";
 import "./EnterAadharNumber.scss"
+import {BaseFormCard} from "../../components/BaseFormCard";
 
 export function VerifyAadharNumber(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack()
+    //     }} content={<EnterAadharNumber/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack()
-        }} content={<EnterAadharNumber/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Vaccination Recipient"}>
+            <EnterAadharNumber/>
+        </BaseFormCard>
+    )
 }
 
 function EnterAadharNumber(props) {
@@ -40,11 +47,17 @@ function EnterAadharNumber(props) {
 
 export function VerifyAadharOTP(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack()
+    //     }} content={<EnterAadharOTP/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack()
-        }} content={<EnterAadharOTP/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Vaccination Recipient"}>
+            <EnterAadharOTP/>
+        </BaseFormCard>
+    )
 }
 
 function EnterAadharOTP(props) {

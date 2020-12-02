@@ -4,14 +4,21 @@ import {Button, Col} from "react-bootstrap";
 import {FormCard} from "../../Base/Base";
 import "./index.scss"
 import * as PropTypes from "prop-types";
+import {BaseFormCard} from "../BaseFormCard";
 
 export function PreEnrollmentDetails(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack();
+    //     }} content={<PatientDetails/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack();
-        }} content={<PatientDetails/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Vaccination Recipient"}>
+            <PatientDetails/>
+        </BaseFormCard>
+    )
 }
 
 PatientInfo.propTypes = {patientDetails: PropTypes.func};

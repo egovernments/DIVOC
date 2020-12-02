@@ -6,7 +6,7 @@ import "./index.scss"
 import * as PropTypes from "prop-types";
 import {useHistory} from "react-router";
 
-export const BaseRecipientQueueCard = ({title, children}) => {
+export const BaseFormCard = ({title, children}) => {
     const history = useHistory();
     return (
         <div className="base-queue-card">
@@ -26,7 +26,7 @@ export const BaseRecipientQueueCard = ({title, children}) => {
     );
 }
 
-BaseRecipientQueueCard.propTypes = {
+BaseFormCard.propTypes = {
     title: PropTypes.string,
     children: PropTypes.element.isRequired
 };

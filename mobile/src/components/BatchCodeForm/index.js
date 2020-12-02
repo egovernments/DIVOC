@@ -4,7 +4,7 @@ import {Form} from "react-bootstrap";
 import SampleSignatureImg from "../../assets/img/sample-signature.png";
 import Button from "react-bootstrap/Button";
 import {CONSTANT} from "../../utils/constants";
-import {BaseRecipientQueueCard} from "../BaseRecipientQueueCard";
+import {BaseFormCard} from "../BaseFormCard";
 import {ACTION_PATIENT_COMPLETED, useConfirmVaccine} from "../../ConfirmVaccination";
 
 export const BatchCodeForm = () => {

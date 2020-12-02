@@ -5,7 +5,7 @@ import SampleSignatureImg from "../../assets/img/sample-signature.png";
 import {appIndexDb} from "../../AppDatabase";
 import Button from "react-bootstrap/Button";
 import {CONSTANT} from "../../utils/constants";
-import {BaseRecipientQueueCard} from "../BaseRecipientQueueCard";
+import {BaseFormCard} from "../BaseFormCard";
 import {Redirect} from "react-router";
 import {ACTION_SELECT_BATCH, useConfirmVaccine} from "../../ConfirmVaccination";
 

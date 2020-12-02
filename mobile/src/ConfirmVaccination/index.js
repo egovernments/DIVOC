@@ -1,6 +1,6 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import "./index.scss"
-import {BaseRecipientQueueCard} from "../components/BaseRecipientQueueCard";
+import {BaseFormCard} from "../components/BaseFormCard";
 import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
@@ -33,7 +33,7 @@ export function ConfirmVaccination(props) {
 
     return (
         <div className="confirm-vaccination-container">
-            <BaseRecipientQueueCard title={"Confirm Vaccinator and Batch"}>
+            <BaseFormCard title={"Confirm Vaccinator and Batch"}>
                 <div className="pt-3 form-wrapper">
                     {
                         getForm()
@@ -42,7 +42,7 @@ export function ConfirmVaccination(props) {
                 {
 
                 }
-            </BaseRecipientQueueCard>
+            </BaseFormCard>
         </div>
     );
 }
