@@ -9,9 +9,10 @@ import CertificateView from './components/CertificateView/CertificateView';
 
 function App() {
   const {initialized, keycloak} = useKeycloak();
-    if (!initialized) {
-        return <div>Loading...</div>
-    }
+
+  if (!initialized) {
+      return <div>Loading...</div>
+  }
 
   return (
     <div>
@@ -19,8 +20,8 @@ function App() {
         <Header/>
         <div>
           <Switch>
-            <Route exact path="/" component={CertificateView}/>
-            <Route exact path="/login" component={Login}/> 
+            <Route exact path="/login" component={Login}/>
+            <PrivateRoute exact path="/" component={CertificateView}/>
           </Switch>
         </div>
         <Footer />

@@ -1,8 +1,8 @@
 {
     "realm": "divoc",
-    "auth-server-url": "http://127.0.0.1:8080/auth/",
+    "auth-server-url": "https://divoc.xiv.in/keycloak/auth/",
     "ssl-required": "external",
     "resource": "certificate-login",
     "public-client": true,
     "confidential-port": 0
-  }
+}

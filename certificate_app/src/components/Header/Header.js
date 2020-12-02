@@ -4,8 +4,10 @@ import NavbarLogo from "../../assets/img/nav-logo.png";
 import "./Header.css";
 import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
+import {useKeycloak} from "@react-keycloak/web";
 
 function Header() {
+    const {initialized, keycloak} = useKeycloak();
     return(
         <Navbar fixed="top" bg="white">
             <Navbar.Brand>
@@ -24,7 +26,7 @@ function Header() {
                     <NavDropdown title="ENG" id="basic-nav-dropdown">
                         <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>
                     </NavDropdown>
-                    <Nav.Link href="#link">HELP</Nav.Link>
+                    {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin + "/"});}}>LOGOUT</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

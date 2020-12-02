@@ -1,5 +1,5 @@
 .container{
-    padding: 150px;
+    padding: 15px;
     color: #1D1D1D;
     
 }
@@ -17,10 +17,41 @@
     float: right;
 }
 
-.details{
-    width: 50%;
-}
-
 .radio{
     margin: 5px;
+}
+.certificate{
+    margin: 1em;
+    width: 400px;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+}
+.certificate td {
+    padding: 0;
+}
+.footer{
+    width: 400px;
+}
+.logo {
+    width: 48px;
+}
+.top-pad {
+    padding-top: 20px!important;
+}
+.certificate-container{
+    border: 1px solid gray;
+    width: 440px;
+}
+.spacer-height{
+    height: 2em;
+}
+.b500{
+    font-weight: 500!important;
+}
+@media print
+{
+    .no-print, .no-print *
+    {
+        display: none !important;
+    }
 }

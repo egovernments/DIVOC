@@ -1,6 +1,7 @@
 .navbar {
     border-top: 1px solid #C1CFD933;
-    padding: 30px !important;
+    padding-left: 5px !important;
+    padding-right: 5px !important;
 }
 
 .nav-link {

@@ -11,3 +11,7 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+.nav-pad {
+ padding-top: 50px;
+  min-height: 600px;
+}
