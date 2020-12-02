@@ -4,14 +4,21 @@ import React, {useState} from "react";
 import {FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, usePreEnrollment} from "./PreEnrollmentFlow";
 import Form from "react-bootstrap/Form";
 import "./EnterAadharNumber.scss"
+import {BaseFormCard} from "../../components/BaseFormCard";
 
 export function VerifyAadharNumber(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack()
+    //     }} content={<EnterAadharNumber/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack()
-        }} content={<EnterAadharNumber/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Vaccination Recipient"}>
+            <EnterAadharNumber/>
+        </BaseFormCard>
+    )
 }
 
 function EnterAadharNumber(props) {
@@ -23,28 +30,34 @@ function EnterAadharNumber(props) {
     }
 
     return (
-        <div className={"aadhar-container"}>
-            <h5>Enter your aadhar number</h5>
+        <div className="aadhar-container">
+            <h5>Enter Aadhar Number</h5>
             <Form.Control className="control"
-                          placeholder="1234 5678 9101"
+                          placeholder="XXXX XXXX XXXX"
                           value={aadharNumber}
                           name="mobile"
                           type="number"
                           onChange={handleAadharNumberOnChange}/>
-            <Button onClick={() => {
+            <Button variant="outline-primary" className="action-btn" onClick={() => {
                 goNext(FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, {aadharNumber: aadharNumber})
-            }}>Verify Aadhar</Button>
+            }}>GENERATE OTP</Button>
         </div>
     );
 }
 
 export function VerifyAadharOTP(props) {
     const {goBack} = usePreEnrollment()
+    // return (
+    //     <FormCard onBack={() => {
+    //         goBack()
+    //     }} content={<EnterAadharOTP/>} title={"Verify Recipient"}/>
+    // );
     return (
-        <FormCard onBack={() => {
-            goBack()
-        }} content={<EnterAadharOTP/>} title={"Verify Recipient"}/>
-    );
+
+        <BaseFormCard title={"Verify Vaccination Recipient"}>
+            <EnterAadharOTP/>
+        </BaseFormCard>
+    )
 }
 
 function EnterAadharOTP(props) {
@@ -57,20 +70,20 @@ function EnterAadharOTP(props) {
 
     return (
         <div className={"aadhar-container"}>
-            <h5>Enter your aadhar otp</h5>
+            <h5>Enter OTP</h5>
             <Form.Control className="control"
-                          placeholder="1234"
+                          placeholder="XXXX"
                           value={aadharOTP}
                           name="mobile"
                           type="number"
                           onChange={handleAadharOTPOnChange}/>
-            <Button onClick={() => {
+            <Button variant="outline-primary" className="action-btn" onClick={() => {
                 addToQueue().then((value) => {
                     goNext(FORM_AADHAR_OTP, "/", {aadharOtp: aadharOTP})
                 }).catch((e) => {
                     console.log("Queue: " + e);
                 })
-            }}>Verify OTP</Button>
+            }}>VERIFY</Button>
         </div>
     );
 }

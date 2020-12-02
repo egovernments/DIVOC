@@ -12,7 +12,7 @@
   }
 
   .input-container {
-    margin-top: 20%;
+    margin-bottom: 20%;
     display: grid;
     place-items: center;
 
@@ -24,9 +24,6 @@
         position: sticky;
 
         .otp {
-          width: 100%;
-          padding-left: 10px;
-          letter-spacing: 38px;
           border: none;
           background-image: linear-gradient(to left, #88C6A9 70%, rgba(255, 255, 255, 0) 0%);
           background-position: bottom;
@@ -34,7 +31,12 @@
           background-repeat: repeat-x;
           background-position-x: 35px;
           font-size: 42px;
+          width: 320px;
+          padding-left: 0;
+          letter-spacing: 45px;
+          outline: none;
         }
+
       }
     }
 

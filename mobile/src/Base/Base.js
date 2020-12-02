@@ -3,7 +3,6 @@ import './Base.scss'
 import Alert from "react-bootstrap/Alert";
 import {Card, Col, Row} from "react-bootstrap";
 import PropTypes from "prop-types";
-import Nav from "react-bootstrap/Nav";
 import {Link} from "react-router-dom";
 import back from "./back.png"
 
@@ -70,15 +69,12 @@ BottomItem.propTypes = {
     title: PropTypes.string.isRequired
 };
 
-export function BottomItem({src, href, title}) {
-    return <Nav.Item>
-        <Link eventKey={title} to={href}>
-            <div className={'bottom-item'}>
-                <img className={'icon'} src={src} alt={""}/>
-                <h6 className={'title'}>{title}</h6>
-            </div>
-        </Link>
-    </Nav.Item>;
+export function BottomItem({src, href, title, currentLocation}) {
+    return (
+        <Link eventKey={title} to={href} className={`bottom-item ${currentLocation === href ? "active" : ""}`}>
+            <img className={'icon'} src={src} alt={""}/>
+            <span className={'title'}>{title}</span>
+        </Link>);
 }
 
 FormCard.propTypes = {
