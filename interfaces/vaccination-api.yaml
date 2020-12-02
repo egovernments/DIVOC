@@ -14,7 +14,7 @@ securityDefinitions:
       facillity-admin: scope of facility admin
       facility-staff: scope of facility staff
 security:
-  - isUser: []
+  - hasRole: ['facility-staff']
 consumes:
   - application/json
 produces:
@@ -50,8 +50,6 @@ paths:
         - configuration
       summary: Get Meta information about the application flow
       operationId: getConfiguration
-      security:
-        - isAdmin: []
       parameters:
         - name: lastKnownVersion
           in: query
@@ -80,8 +78,6 @@ paths:
       summary: Get pre enrollment information
       description: Get pre enrollment data from api for vaccination
       operationId: getPreEnrollment
-      security:
-        - hasRole: ['facility-staff']
       parameters:
         - name: preEnrollmentCode
           in: path
@@ -92,14 +88,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/PreEnrollment'
-  '/preEnrollments/facility':
+  '/preEnrollments':
     get:
       tags:
         - vaccination
       summary: Get all pre enrollments applicable to assigned facility
       operationId: getPreEnrollmentsForFacility
-      security:
-        - hasRole: ['facility-staff']
       responses:
         '200':
           description: OK
@@ -116,8 +110,6 @@ paths:
         Certification happens asynchronously, this requires vaccinator
         athorization and vaccinator should be trained for the vaccination that
         is being certified.
-      security:
-        - hasRole: ['facility-staff']
       operationId: certify
       parameters:
         - in: body
@@ -136,8 +128,6 @@ paths:
         - configuration
       summary: Get active vaccination programs
       operationId: getCurrentPrograms
-      security:
-        - hasRole: ['facility-staff']
       responses:
         '200':
           description: OK
