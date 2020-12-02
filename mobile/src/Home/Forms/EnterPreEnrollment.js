@@ -40,37 +40,30 @@ function EnterPreEnrollmentContent(props) {
         }
     }
     return (
-        <div className={"enroll-code-container"}>
-            <h4 className={"title"}>Enter Pre Enrolment Code</h4>
+        <div className="enroll-code-container">
+            <h4 className="title text-center">Enter Mobile Number & Pre Enrolment Code</h4>
             <div className={"input-container"}>
                 <div className="divOuter">
                     <div className="divInner">
-                        <input id="otp" type="text" className="otp" tabIndex="1" maxLength="5"
-                               value={enrollCode}
-                               onChange={handleEnrollCodeOnChange}
-                               placeholder=""/>
+
+                        <Form.Group>
+                            <Form.Control type="text" placeholder="+91-XXXXXXXXX" tabIndex="1" value={phoneNumber} onChange={handlePhoneNumberOnChange}/>
+                            <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode} onChange={handleEnrollCodeOnChange}/>
+                            {/*<input id="otp" type="text" className="otp" tabIndex="2" maxLength="5"*/}
+                            {/*       value={enrollCode}*/}
+                            {/*       onChange={handleEnrollCodeOnChange}*/}
+                            {/*       placeholder=""/>*/}
+                        </Form.Group>
+
                     </div>
                 </div>
-                <Form className="mobile">
-                    <InputGroup>
-                        <InputGroup.Prepend>
-                            <InputGroup.Text>+91</InputGroup.Text>
-                        </InputGroup.Prepend>
-                        <Form.Control className="control"
-                                      placeholder="9876543210"
-                                      value={phoneNumber}
-                                      name="mobile"
-                                      type="number"
-                                      onChange={handlePhoneNumberOnChange}/>
-                    </InputGroup>
-                </Form>
             </div>
-            <Button className={"next"} onClick={() => {
+            <Button variant="outline-primary" className="action-btn" onClick={() => {
                 goNext(FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, {
                     mobileNumber: phoneNumber,
                     enrollCode: enrollCode
                 })
-            }}>Next</Button>
+            }}>CONFIRM</Button>
         </div>
     );
 }
