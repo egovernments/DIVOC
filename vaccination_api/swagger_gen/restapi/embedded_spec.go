@@ -72,15 +72,31 @@ func init() {
         }
       }
     },
-    "/certify": {
-      "post": {
-        "security": [
+    "/certificates/{phone}": {
+      "get": {
+        "security": [],
+        "summary": "Get certificate json",
+        "operationId": "getCertificate",
+        "parameters": [
           {
-            "hasRole": [
-              "facility-staff"
-            ]
+            "type": "string",
+            "name": "phone",
+            "in": "path",
+            "required": true
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/certify": {
+      "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
@@ -109,11 +125,6 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
-        "security": [
-          {
-            "isAdmin": []
-          }
-        ],
         "tags": [
           "configuration"
         ],
@@ -176,15 +187,8 @@ func init() {
         }
       }
     },
-    "/preEnrollments/facility": {
+    "/preEnrollments": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "tags": [
           "vaccination"
         ],
@@ -205,13 +209,6 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -238,13 +235,6 @@ func init() {
     },
     "/programs/current": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "tags": [
           "configuration"
         ],
@@ -586,7 +576,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "facility-staff"
+      ]
     }
   ]
 }`))
@@ -645,15 +637,31 @@ func init() {
         }
       }
     },
-    "/certify": {
-      "post": {
-        "security": [
+    "/certificates/{phone}": {
+      "get": {
+        "security": [],
+        "summary": "Get certificate json",
+        "operationId": "getCertificate",
+        "parameters": [
           {
-            "hasRole": [
-              "facility-staff"
-            ]
+            "type": "string",
+            "name": "phone",
+            "in": "path",
+            "required": true
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/certify": {
+      "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
@@ -682,11 +690,6 @@ func init() {
     },
     "/divoc/configuration": {
       "get": {
-        "security": [
-          {
-            "isAdmin": []
-          }
-        ],
         "tags": [
           "configuration"
         ],
@@ -749,15 +752,8 @@ func init() {
         }
       }
     },
-    "/preEnrollments/facility": {
+    "/preEnrollments": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "tags": [
           "vaccination"
         ],
@@ -778,13 +774,6 @@ func init() {
     },
     "/preEnrollments/{preEnrollmentCode}": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
           "vaccination"
@@ -811,13 +800,6 @@ func init() {
     },
     "/programs/current": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-staff"
-            ]
-          }
-        ],
         "tags": [
           "configuration"
         ],
@@ -1418,7 +1400,9 @@ func init() {
   },
   "security": [
     {
-      "isUser": []
+      "hasRole": [
+        "facility-staff"
+      ]
     }
   ]
 }`))
