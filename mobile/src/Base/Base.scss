@@ -39,19 +39,37 @@
 
 .my-card {
   height: 100%;
+  box-shadow: 0px 6px 20px #C1CFD933;
+  border-radius: 1rem;
+  border: none;
 }
 
 .bottom-item {
-
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem 0;
+  text-decoration: none !important;
   .icon {
     height: 30px;
     width: 30px;
   }
 
   .title {
+    font-size: 14px;
     padding-top: 8px;
+    color: $textColor;
+    outline: none;
+  }
+  &.active {
+    .title {
+      color: #2CD889
+    }
   }
 }
+
+
 
 .form-card {
   height: 100%;
