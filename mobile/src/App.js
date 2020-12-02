@@ -2,23 +2,15 @@ import React, {useEffect, useState} from 'react';
 import './App.scss';
 import Dashboard from "./Dashboard/Dashboard";
 import {useKeycloak} from "@react-keycloak/web";
-import {appIndexDb} from "./AppDatabase";
-import {ApiServices} from "./Services/apiServices";
+import {SyncFacade} from "./SyncFacade";
 
 function App() {
     const {keycloak, initialized} = useKeycloak();
     const [isDBInit, setDBInit] = useState(false);
     useEffect(() => {
         if (initialized) {
-            appIndexDb.initDb().then((value => {
-                return ApiServices.fetchVaccinators()
-            })).then((value => {
-                return appIndexDb.saveVaccinators(value)
-            })).then(() => {
-                return ApiServices.fetchPreEnrollments()
-            }).then((value => {
-                return appIndexDb.saveEnrollments(value)
-            })).then(value => {
+            localStorage.setItem("token", keycloak.token)
+            SyncFacade.pull().then(value => {
                 setDBInit(true)
             }).catch((e) => {
                 setDBInit(true)
@@ -29,7 +21,6 @@ function App() {
         return <div>Loading...</div>
     }
 
-    localStorage.setItem("token", keycloak.token)
 
     return (
         <div className="App">

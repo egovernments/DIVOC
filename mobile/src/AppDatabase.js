@@ -92,6 +92,38 @@ export class AppDatabase {
         return Promise.all(vaccinatorsDb)
     }
 
+    async getDataForCertification() {
+        const events = await this.db.getAll(EVENTS) || []
+        const certifyObjects = events.map((item, index) => this.getCertifyObject(item))
+        const result = await Promise.all(certifyObjects)
+        return result;
+    }
+
+    async getCertifyObject(event) {
+        const patient = await this.db.get(PATIENTS, event.enrollCode)
+        const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId)
+        const queue = await this.db.get(QUEUE, event.enrollCode)
+        return {
+            vaccinator: vaccinator,
+            patient: patient,
+            batchCode: event.batchCode,
+            enrollCode: event.enrollCode,
+            identify: queue.aadharNumber
+        }
+    }
+
+    async cleanUp() {
+        await this.db.clear(EVENTS)
+    }
+
+    async clearEverything() {
+        const deletePatients = this.db.clear(PATIENTS)
+        const deleteVaccinators = this.db.clear(VACCINATORS)
+        const deleteEvents = await this.db.clear(EVENTS)
+        const deleteQueue = await this.db.clear(QUEUE)
+        return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
+    }
+
 }
 
 export const appIndexDb = new AppDatabase()
