@@ -45,7 +45,7 @@
           "type": "string"
         },
         "certificate" : {
-          "type": "object"
+          "type": "string"
         }
       }
     }

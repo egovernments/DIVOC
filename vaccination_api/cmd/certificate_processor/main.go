@@ -32,7 +32,7 @@ type VaccinationCertificateRequest struct {
 			Identity      string                 `json:"identity"`
 			Contact       []string               `json:"contact"`
 			Name          string                 `json:"name"`
-			Certificate   map[string]interface{} `json:"certificate"`
+			Certificate   string `json:"certificate"`
 		} `json:"VaccinationCertificate"`
 	} `json:"request"`
 }
@@ -113,6 +113,7 @@ func processCertificateMessage(msg string) error {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
 	}
+	certifyMessageString := msg
 	certificate := VaccinationCertificateRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -129,7 +130,7 @@ func processCertificateMessage(msg string) error {
 				Contact       []string               `json:"contact"`
 				Name          string                 `json:"name"`
 				//Mobile          string                 `json:"mobile"`
-				Certificate   map[string]interface{} `json:"certificate"`
+				Certificate   string `json:"certificate"`
 			} `json:"VaccinationCertificate"`
 		}{
 			VaccinationCertificate: struct {
@@ -138,17 +139,14 @@ func processCertificateMessage(msg string) error {
 				Contact       []string               `json:"contact"`
 				Name          string                 `json:"name"`
 				//Mobile          string                 `json:"mobile"`
-				Certificate   map[string]interface{} `json:"certificate"`
+				Certificate   string `json:"certificate"`
 			}{
 				CertificateID: generateUniqueCertificateId(certifyMessage),
 				Identity:      certifyMessage.Recipient.Identity,
 				Contact:       certifyMessage.Recipient.Contact,
 				Name:          certifyMessage.Recipient.Name,
 				//Mobile: 	   certifyMessage.Recipient.Contact
-				Certificate:   map[string]interface{}{
-					"body" : certifyMessage,
-					"proof": map[string]interface{}{},
-				},
+				Certificate:   certifyMessageString,
 			},
 		},
 	}

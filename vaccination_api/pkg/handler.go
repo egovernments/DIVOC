@@ -80,8 +80,29 @@ func getCertificate(params operations.GetCertificateParams) middleware.Responder
 		log.Infof("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {
-		return NewGenericJSONResponse(response)
+		if listOfCerts, ok := response["VaccinationCertificate"].([]interface{}); ok {
+			log.Infof("list %+v", listOfCerts)
+			result := []interface{}{}
+			for _, v := range listOfCerts {
+				if body, ok := v.(map[string]interface{}); ok {
+					log.Infof("cert ", body)
+					if certString, ok := body["certificate"].(string); ok {
+						cert := map[string]interface{}{}
+						if err := json.Unmarshal([]byte(certString), &cert); err == nil {
+							body["certificate"] = cert
+						} else {
+							log.Errorf("Error in getting certificate %+v", err)
+						}
+					}
+				}
+				result = append(result, v)
+			}
+			return NewGenericJSONResponse(map[string]interface{}{
+				"VaccinationCertificate": result,
+			})
+		}
 	}
+	return NewGenericServerError()
 }
 
 func pingResponder(params operations.GetPingParams) middleware.Responder {
