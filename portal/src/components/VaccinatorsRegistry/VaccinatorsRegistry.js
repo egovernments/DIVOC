@@ -2,8 +2,11 @@ import React, {useEffect, useState} from 'react';
 import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
+import {useKeycloak} from "@react-keycloak/web";
+import {CONSTANTS} from "../../utils/constants";
 
 function VaccinatorsRegistry() {
+    const {keycloak} = useKeycloak();
     const [vaccinators, setVaccinators] = useState([]);
     const fileUploadAPI = 'divoc/admin/api/v1/vaccinators';
     const axiosInstance = useAxios('');
@@ -20,7 +23,7 @@ function VaccinatorsRegistry() {
 
     return (
         <div>
-            <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>
+            {keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) && <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>}
             <CustomTable data={vaccinators} fields={["serialNum", "name", "status"]}/>
         </div>
     );
