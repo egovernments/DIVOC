@@ -1,0 +1,26 @@
+.container{
+    padding: 150px;
+    color: #1D1D1D;
+    
+}
+.sub-container{
+    display: flex;
+}
+.button{
+    border: 1px solid #5C9EF8;
+    color: #5C9EF8;
+    background: none;
+    padding: 10px;
+}
+
+.img{
+    float: right;
+}
+
+.details{
+    width: 50%;
+}
+
+.radio{
+    margin: 5px;
+}
