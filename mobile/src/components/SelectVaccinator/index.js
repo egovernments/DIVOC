@@ -20,7 +20,6 @@ export const SelectVaccinator = (props) => {
             {enrollCode: props.enrollCode, vaccinatorId: vaccinatorIdx});
     }
 
-
     useEffect(() => {
         appIndexDb
             .getVaccinators()
@@ -33,11 +32,11 @@ export const SelectVaccinator = (props) => {
                 <tbody>
                 {
                     vaccinators.map((data, index) => (
-                        <tr className={vaccinatorIdx === index && "selected-vaccinator"} key={index} onClick={() => {
-                            setVaccinatorIdx(index)
+                        <tr className={vaccinatorIdx === data.osid && "selected-vaccinator"} key={index} onClick={() => {
+                            setVaccinatorIdx(data.osid)
                         }}>
                             <td>
-                                <span>{data.vaccinator}</span>
+                                <span>{data.name}</span>
                             </td>
                             <td>
                                 <img src={data.signatureImg || SampleSignatureImg} alt=""/>
