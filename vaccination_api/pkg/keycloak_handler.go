@@ -27,7 +27,7 @@ func CreateRecipientUserId(mobile string) error {
 			MobileNumber: []string{mobile},
 		},
 	}
-	authHeader := config.Config.Keycloak.AuthHeader
+	authHeader := "Bearer " + config.Config.Keycloak.AuthHeader
 	resp, err := CreateKeycloakUser(userRequest, authHeader)
 	log.Infof("Created keycloak user %d %s", resp.Response().StatusCode, resp.String())
 	if err != nil || !isUserCreatedOrAlreadyExists(resp) {
