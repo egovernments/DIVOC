@@ -5,20 +5,24 @@ import Footer from '../src/components/Footer/Footer';
 import {PrivateRoute} from "./utils/PrivateRoute";
 import {useKeycloak} from "@react-keycloak/web";
 import Login from './components/Login';
+import CertificateView from './components/CertificateView/CertificateView';
 
 function App() {
   const {initialized, keycloak} = useKeycloak();
     if (!initialized) {
         return <div>Loading...</div>
     }
- 
+
   return (
     <div>
       <Router>
-        <Header/> 
-        <Switch>
-          <Route exact path="/login" component={Login}/>
-        </Switch>
+        <Header/>
+        <div className='body'>
+          <Switch>
+            <Route exact path="/" component={CertificateView}/>
+            <Route exact path="/login" component={Login}/> 
+          </Switch>
+        </div>
         <Footer />
       </Router>     
     </div>
