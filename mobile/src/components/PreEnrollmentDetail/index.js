@@ -1,4 +1,9 @@
-import {FORM_AADHAR_NUMBER, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from "../../Home/Forms/PreEnrollmentFlow";
+import {
+    FORM_AADHAR_NUMBER,
+    FORM_PRE_ENROLL_CODE,
+    FORM_PRE_ENROLL_DETAILS,
+    usePreEnrollment
+} from "../../Home/Forms/PreEnrollmentFlow";
 import React, {useEffect, useState} from "react";
 import {Button, Col} from "react-bootstrap";
 import {FormCard} from "../../Base/Base";
@@ -48,17 +53,17 @@ function PatientDetails(props) {
             <h4>Confirm recipient details</h4>
             <PatientInfo patientDetails={patientDetails}/>
 
-            <Col className={"register-with-aadhar"}>
+            <Col className="register-with-aadhar">
                 <h4>Register with Aadhar</h4>
                 <div>
-                    <Button onClick={() => {
+                    <Button variant="outline-primary" className="action-btn mb-3" onClick={() => {
                         goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, patientDetails)
-                    }}>Enter Manually</Button>
+                    }}>ENTER MANUALLY</Button>
                 </div>
                 <div>
-                    <Button onClick={() => {
+                    <Button variant="outline-primary" className="action-btn" onClick={() => {
                         goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, patientDetails)
-                    }}>Scan with Aadhar</Button>
+                    }}>SCAN WITH AADHAR</Button>
                 </div>
             </Col>
         </div>
