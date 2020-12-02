@@ -2,9 +2,9 @@ package pkg
 
 import (
 	"github.com/divoc/api/config"
+	"github.com/imroc/req"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"github.com/imroc/req"
 	"strconv"
 )
 
@@ -27,6 +27,21 @@ type RegistryResponse struct {
 	} `json:"params"`
 	ResponseCode string                 `json:"responseCode"`
 	Result       map[string]interface{} `json:"result"`
+}
+func getVaccinatorsForFacility(facilityCode string) interface{} {
+	typeId := "Vaccinator"
+	filter := map[string]interface{}{
+		"@type": map[string]interface{}{
+			"eq": typeId,
+		},
+
+	}
+	response, err := queryRegistry(typeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return NewGenericServerError()
+	}
+	return response[typeId]
 }
 
 func queryRegistry(typeId string, filter map[string]interface{}) (map[string]interface{}, error) {

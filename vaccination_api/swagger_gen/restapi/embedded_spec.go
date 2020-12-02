@@ -279,6 +279,26 @@ func init() {
           }
         }
       }
+    },
+    "/vaccinators": {
+      "get": {
+        "tags": [
+          "configuration"
+        ],
+        "summary": "Get active vaccinators mapped for the facility",
+        "operationId": "getVaccinators",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "../registry/Vaccinator.json#/definitions/Vaccinator"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -467,13 +487,62 @@ func init() {
     "Program": {
       "type": "object",
       "properties": {
+        "description": {
+          "type": "string"
+        },
         "id": {
+          "type": "string"
+        },
+        "logoURL": {
           "type": "string"
         },
         "medicines": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "object",
+            "title": "medicine",
+            "properties": {
+              "effectiveUntil": {
+                "description": "Number of months the vaccination is effective",
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "price": {
+                "type": "number"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "repeatInterval": {
+                    "type": "integer"
+                  },
+                  "repeatTimes": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Active",
+                  "Inactive",
+                  "Blocked"
+                ]
+              },
+              "vaccinationMode": {
+                "type": "string",
+                "enum": [
+                  "muscular injection",
+                  "oral",
+                  "nasal"
+                ]
+              }
+            }
           }
         },
         "name": {
@@ -783,6 +852,26 @@ func init() {
           }
         }
       }
+    },
+    "/vaccinators": {
+      "get": {
+        "tags": [
+          "configuration"
+        ],
+        "summary": "Get active vaccinators mapped for the facility",
+        "operationId": "getVaccinators",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/vaccinator"
+              }
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1080,17 +1169,80 @@ func init() {
     "Program": {
       "type": "object",
       "properties": {
+        "description": {
+          "type": "string"
+        },
         "id": {
+          "type": "string"
+        },
+        "logoURL": {
           "type": "string"
         },
         "medicines": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/ProgramMedicinesItems0"
           }
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "ProgramMedicinesItems0": {
+      "type": "object",
+      "title": "medicine",
+      "properties": {
+        "effectiveUntil": {
+          "description": "Number of months the vaccination is effective",
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "provider": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "repeatInterval": {
+              "type": "integer"
+            },
+            "repeatTimes": {
+              "type": "integer"
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "vaccinationMode": {
+          "type": "string",
+          "enum": [
+            "muscular injection",
+            "oral",
+            "nasal"
+          ]
+        }
+      }
+    },
+    "ProgramMedicinesItems0Schedule": {
+      "type": "object",
+      "properties": {
+        "repeatInterval": {
+          "type": "integer"
+        },
+        "repeatTimes": {
+          "type": "integer"
         }
       }
     },
@@ -1113,6 +1265,142 @@ func init() {
           }
         }
       }
+    },
+    "signature": {
+      "type": "object",
+      "title": "The Signature Schema for the registry",
+      "required": [
+        "@type",
+        "signatureFor",
+        "creator",
+        "created",
+        "signatureValue"
+      ],
+      "properties": {
+        "@type": {
+          "type": "string",
+          "default": "sc:RsaSignature2018",
+          "enum": [
+            "sc:LinkedDataSignature2015",
+            "sc:GraphSignature2012",
+            "sc:RsaSignature2018"
+          ],
+          "$id": "#/properties/@type"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "$comment": "Timestamp",
+          "$id": "#/properties/created",
+          "examples": [
+            "2017-09-23T20:21:34Z"
+          ]
+        },
+        "creator": {
+          "type": "string",
+          "format": "uri",
+          "$comment": "IRI where the public key associated could be retrieved",
+          "$id": "#/properties/creator",
+          "examples": [
+            "https://example.com/i/pat/keys/"
+          ]
+        },
+        "nonce": {
+          "type": "string",
+          "$comment": "Some unique value for tracking",
+          "$id": "#/properties/nonce",
+          "examples": [
+            "guid"
+          ]
+        },
+        "signatureFor": {
+          "type": "string",
+          "$comment": "The attribute name or entity id you for which this is the signature",
+          "$id": "#/properties/signatureFor",
+          "examples": [
+            "http://localhost:8080/serialNum",
+            "http://localhost:8080/9cba6ddd-330c-4a0d-929a-771bb12cb0d3"
+          ]
+        },
+        "signatureValue": {
+          "type": "string",
+          "$comment": "Hash or signed value",
+          "$id": "#/properties/signatureValue",
+          "examples": [
+            "eyiOiJKJeXAasddOEjgFWFXk"
+          ]
+        }
+      },
+      "$id": "#/properties/Signature"
+    },
+    "vaccinator": {
+      "type": "object",
+      "title": "The Vaccinator Schema",
+      "required": [
+        "serialNum",
+        "code",
+        "nationalIdentifier",
+        "name",
+        "facilityIds",
+        "mobileNumber",
+        "status"
+      ],
+      "properties": {
+        "___encryptedFields": {},
+        "averageRating": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string",
+          "$comment": "Code",
+          "$id": "#/properties/code"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name",
+          "$id": "#/properties/name"
+        },
+        "nationalIdentifier": {
+          "type": "string",
+          "$comment": "Nationality",
+          "$id": "#/properties/nationalIdentifier"
+        },
+        "serialNum": {
+          "type": "integer",
+          "$comment": "Serial number",
+          "$id": "#/properties/serialNum"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/signature"
+          },
+          "$comment": "Placeholder for all verifiable claims",
+          "$id": "#/properties/signatures"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
+        }
+      },
+      "$id": "#/properties/Vaccinator"
     }
   },
   "securityDefinitions": {

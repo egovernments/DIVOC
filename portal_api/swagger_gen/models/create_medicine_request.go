@@ -37,6 +37,10 @@ type CreateMedicineRequest struct {
 	// status
 	// Enum: [Active Inactive Blocked]
 	Status string `json:"status,omitempty"`
+
+	// vaccination mode
+	// Enum: [muscular injection oral nasal]
+	VaccinationMode string `json:"vaccinationMode,omitempty"`
 }
 
 // Validate validates this create medicine request
@@ -48,6 +52,10 @@ func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVaccinationMode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -115,6 +123,52 @@ func (m *CreateMedicineRequest) validateStatus(formats strfmt.Registry) error {
 
 	// value enum
 	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var createMedicineRequestTypeVaccinationModePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["muscular injection","oral","nasal"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		createMedicineRequestTypeVaccinationModePropEnum = append(createMedicineRequestTypeVaccinationModePropEnum, v)
+	}
+}
+
+const (
+
+	// CreateMedicineRequestVaccinationModeMuscularInjection captures enum value "muscular injection"
+	CreateMedicineRequestVaccinationModeMuscularInjection string = "muscular injection"
+
+	// CreateMedicineRequestVaccinationModeOral captures enum value "oral"
+	CreateMedicineRequestVaccinationModeOral string = "oral"
+
+	// CreateMedicineRequestVaccinationModeNasal captures enum value "nasal"
+	CreateMedicineRequestVaccinationModeNasal string = "nasal"
+)
+
+// prop value enum
+func (m *CreateMedicineRequest) validateVaccinationModeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, createMedicineRequestTypeVaccinationModePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.VaccinationMode) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
 	}
 

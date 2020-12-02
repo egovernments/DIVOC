@@ -54,7 +54,6 @@
           "type": "string",
           "format": "date-time",
           "$comment": "Timestamp",
-          "default": "",
           "examples": [
             "2017-09-23T20:21:34Z"
           ]

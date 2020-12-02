@@ -360,7 +360,7 @@ definitions:
           - Karnataka
   Vaccinator:
     type: object
-    title: The Operator Schema
+    title: The Vaccinator Schema
     required:
       - serialNum
       - code

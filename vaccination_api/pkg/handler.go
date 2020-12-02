@@ -12,6 +12,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
 )
@@ -30,19 +31,57 @@ func SetupHandlers(api *operations.DivocAPI) {
 
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
+	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
+	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 }
 
 type GenericResponse struct {
 	statusCode int
 }
 
+type GenericJsonResponse struct {
+	body interface{}
+}
 func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 	rw.WriteHeader(o.statusCode)
 }
 
+func NewGenericJSONResponse(body interface{}) middleware.Responder {
+	return &GenericJsonResponse{body: body}
+}
+
+func (o *GenericJsonResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	bytes, err := json.Marshal(o.body)
+	if err != nil {
+		rw.WriteHeader(500)
+		rw.Write([]byte("JSON Marshalling error"))
+	}
+	rw.WriteHeader(200)
+	rw.Write(bytes)
+}
+
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
+}
+
+func getCertificate(params operations.GetCertificateParams) middleware.Responder {
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+		"@type": map[string]interface{}{
+			"eq": typeId,
+		},
+		"contact": map[string]interface{}{
+			"contains": "tel:" + params.Phone,
+		},
+	}
+	if response, err := queryRegistry(typeId, filter); err != nil {
+		log.Infof("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		return NewGenericJSONResponse(response)
+	}
 }
 
 func pingResponder(params operations.GetPingParams) middleware.Responder {
@@ -70,14 +109,24 @@ func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
 	return login.NewPostAuthorizeUnauthorized()
 }
 
+func getVaccinators(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
+	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+		log.Errorf("Error while getting vaccinators %+v", err)
+		return NewGenericServerError()
+	} else {
+		vaccinators := getVaccinatorsForFacility(scopeId)
+		return NewGenericJSONResponse(vaccinators)
+	}
+}
+
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
-	payload := []*models.Program{}
-	payload = append(payload, &models.Program{
-		ID:        "Covid19",
-		Medicines: []string{"BNT162b2"},
-		Name:      "SARS-CoV-2",
-	})
-	return configuration.NewGetCurrentProgramsOK().WithPayload(payload)
+	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+		log.Errorf("Error while getting vaccinators %+v", err)
+		return NewGenericServerError()
+	} else {
+		programsFor := findProgramsForFacility(scopeId)
+		return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+	}
 }
 
 func getConfigurationResponder(params configuration.GetConfigurationParams, principal interface{}) middleware.Responder {

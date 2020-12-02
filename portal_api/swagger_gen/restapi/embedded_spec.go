@@ -425,6 +425,14 @@ func init() {
             "Inactive",
             "Blocked"
           ]
+        },
+        "vaccinationMode": {
+          "type": "string",
+          "enum": [
+            "muscular injection",
+            "oral",
+            "nasal"
+          ]
         }
       }
     },
@@ -631,7 +639,7 @@ func init() {
     },
     "Vaccinator": {
       "type": "object",
-      "title": "The Operator Schema",
+      "title": "The Vaccinator Schema",
       "required": [
         "serialNum",
         "code",
@@ -1118,6 +1126,14 @@ func init() {
             "Inactive",
             "Blocked"
           ]
+        },
+        "vaccinationMode": {
+          "type": "string",
+          "enum": [
+            "muscular injection",
+            "oral",
+            "nasal"
+          ]
         }
       }
     },
@@ -1337,7 +1353,7 @@ func init() {
     },
     "Vaccinator": {
       "type": "object",
-      "title": "The Operator Schema",
+      "title": "The Vaccinator Schema",
       "required": [
         "serialNum",
         "code",
