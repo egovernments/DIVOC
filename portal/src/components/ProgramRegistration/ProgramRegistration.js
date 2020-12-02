@@ -9,10 +9,12 @@ import schema from '../../jsonSchema/programSchema.json';
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
-    const [programList, setProgramList] = useState([])
+    const [programList, setProgramList] = useState([]);
+    const [programSchema, setProgramSchema] = useState(schema);
 
     useEffect(() => {
         getListOfRegisteredPrograms();
+        getListOfRegisteredVaccines();
     },[]);
 
     const config = {
@@ -42,6 +44,7 @@ function VaccineRegistration() {
             .then((res) => {
                 alert("Successfully Registered");
                 console.log(res);
+                getListOfRegisteredPrograms()
             });
     };
 
@@ -50,21 +53,40 @@ function VaccineRegistration() {
             .get("/divoc/admin/api/v1/programs", config)
             .then( (res) => {
                 return res.data
-            })
+            });
         setProgramList(res)
-    }
+    };
+
+    const getListOfRegisteredVaccines = async () => {
+        const res = await axios
+            .get("/divoc/admin/api/v1/medicines", config)
+            .then( (res) => {
+                return res.data
+            })
+        let vaccineIds = [], vaccineNames = [];
+        res.forEach(r => {
+           vaccineIds.push(r.osid);
+           vaccineNames.push(r.name);
+        });
+        const updatedSchema = {...programSchema};
+        updatedSchema.properties.vaccine.enum = vaccineIds;
+        updatedSchema.properties.vaccine.enumNames = vaccineNames;
+        //TODO: setting schema as empty, to enable rendering of the form.
+        setProgramSchema({});
+        setProgramSchema(updatedSchema);
+    };
 
     return (
         <div className={styles["container"]}>
             <div className={styles["form-container"]}>
             <h4 className={styles['heading']}>Register New Vaccine Program</h4>
                 <Form
-                    schema={schema}
+                    schema={programSchema}
                     uiSchema={uiSchema}
                     onSubmit={(e) => {
-                        setFormData(e.formData)
-                        const newField = {medicineIds: [""]}
-                        Object.assign(e.formData, newField)
+                        setFormData(e.formData);
+                        const newField = {medicineIds: [e.formData.vaccine]};
+                        Object.assign(e.formData, newField);
                         handleSubmit(e.formData);
                     }}
                 >
