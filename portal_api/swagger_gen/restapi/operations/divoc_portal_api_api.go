@@ -61,6 +61,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
+		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation GetEnrollments has not yet been implemented")
+		}),
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
@@ -141,6 +144,8 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// GetEnrollmentsHandler sets the operation handler for the get enrollments operation
+	GetEnrollmentsHandler GetEnrollmentsHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
@@ -253,6 +258,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
+	}
+	if o.GetEnrollmentsHandler == nil {
+		unregistered = append(unregistered, "GetEnrollmentsHandler")
 	}
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
@@ -394,6 +402,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/enrollments"] = NewGetEnrollments(o.context, o.GetEnrollmentsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
