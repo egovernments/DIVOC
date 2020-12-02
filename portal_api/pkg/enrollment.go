@@ -1,6 +1,10 @@
 package pkg
 
-import log "github.com/sirupsen/logrus"
+import (
+	log "github.com/sirupsen/logrus"
+	"math/rand"
+	"strconv"
+)
 
 //mobile,enrollmentScopeId,nationalId,dob,gender,name,email
 type Enrollment struct {
@@ -34,7 +38,7 @@ func createEnrollment(data *Scanner) error {
 }
 
 func generateEnrollmentCode() string {
-	return "12345"
+	return strconv.Itoa(10000 + rand.Intn(90000)) //five digit random code
 }
 
 func notifyRecipient(enrollment Enrollment) error {
