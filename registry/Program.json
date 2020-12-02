@@ -66,10 +66,10 @@
     "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
     "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"],
 
-  "privateFields": ["nationalIdentifier", "OperatorCode"],
-  "signedFields": ["serialNum"],
-  "indexFields": ["(serialNum, OperatorCode)","OperatorName"],
-  "uniqueIndexFields": ["serialNum", "OperatorCode"],
+  "privateFields": [],
+  "signedFields": [],
+  "indexFields": ["(name, status)"],
+  "uniqueIndexFields": ["name"],
   "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
   }
 }
