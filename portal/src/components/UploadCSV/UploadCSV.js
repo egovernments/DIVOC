@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
 
-function UploadCSV({ fileUploadAPI }) {
+function UploadCSV({ fileUploadAPI, onUploadComplete }) {
     const [uploadPercentage,setUploadPercentage] = useState(0);
 
     const { keycloak } = useKeycloak();
@@ -36,6 +36,7 @@ function UploadCSV({ fileUploadAPI }) {
             setTimeout(() => {
             setUploadPercentage(0)
             }, 500);
+            onUploadComplete();
         })
     }
 
@@ -48,6 +49,7 @@ function UploadCSV({ fileUploadAPI }) {
                     onChange={(evt) =>
                         uploadFile(evt)
                     }
+                    value={""}
                     accept=".csv"
                     hidden
                     required

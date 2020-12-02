@@ -55,6 +55,16 @@ paths:
         '401':
           description: Unauthorized
   /enrollments:
+    get:
+      summary: get enrollments
+      operationId: getEnrollments
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
     post:
       summary: Upload facility csv for bulk ingestion of pre enrollment
       consumes:

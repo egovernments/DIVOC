@@ -18,6 +18,11 @@
         "type": "string",
         "title": "Program Logo"
       },
+      "vaccine": {
+        "title": "Vaccine",
+        "type": "string",
+        "enum": []
+      },
       "startDate": {
         "$id": "#/properties/startDate",
         "type": "string",
