@@ -97,9 +97,7 @@ func getCertificate(params operations.GetCertificateParams) middleware.Responder
 				}
 				result = append(result, v)
 			}
-			return NewGenericJSONResponse(map[string]interface{}{
-				"VaccinationCertificate": result,
-			})
+			return NewGenericJSONResponse(result)
 		}
 	}
 	return NewGenericServerError()
