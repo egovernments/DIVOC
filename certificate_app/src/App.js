@@ -17,7 +17,7 @@ function App() {
     <div>
       <Router>
         <Header/>
-        <div className='body'>
+        <div>
           <Switch>
             <Route exact path="/" component={CertificateView}/>
             <Route exact path="/login" component={Login}/> 
