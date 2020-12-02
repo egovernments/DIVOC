@@ -5,8 +5,6 @@ import SampleSignatureImg from "../../assets/img/sample-signature.png";
 import {appIndexDb} from "../../AppDatabase";
 import Button from "react-bootstrap/Button";
 import {CONSTANT} from "../../utils/constants";
-import {BaseFormCard} from "../BaseFormCard";
-import {Redirect} from "react-router";
 import {ACTION_SELECT_BATCH, useConfirmVaccine} from "../../ConfirmVaccination";
 
 export const SelectVaccinator = (props) => {
@@ -27,25 +25,28 @@ export const SelectVaccinator = (props) => {
     }, [])
     return (
         <div className="select-vaccinator-wrapper">
-            <span className="select-title">SELECT VACCINATOR</span>
-            <Table responsive>
-                <tbody>
-                {
-                    vaccinators.map((data, index) => (
-                        <tr className={vaccinatorIdx === data.osid && "selected-vaccinator"} key={index} onClick={() => {
-                            setVaccinatorIdx(data.osid)
-                        }}>
-                            <td>
-                                <span>{data.name}</span>
-                            </td>
-                            <td>
-                                <img src={data.signatureImg || SampleSignatureImg} alt=""/>
-                            </td>
-                        </tr>
-                    ))
-                }
-                </tbody>
-            </Table>
+            <div className="table-wrapper">
+                <span className="select-title">SELECT VACCINATOR</span>
+                <Table responsive>
+                    <tbody>
+                    {
+                        vaccinators.map((data, index) => (
+                            <tr className={vaccinatorIdx === data.osid && "selected-vaccinator"} key={index}
+                                onClick={() => {
+                                    setVaccinatorIdx(data.osid)
+                                }}>
+                                <td>
+                                    <span>{data.name}</span>
+                                </td>
+                                <td>
+                                    <img src={data.signatureImg || SampleSignatureImg} alt=""/>
+                                </td>
+                            </tr>
+                        ))
+                    }
+                    </tbody>
+                </Table>
+            </div>
             <Button variant="outline-primary" className="action-btn" onClick={(onActionBtnClick)}>{"NEXT"}</Button>
         </div>
     );
