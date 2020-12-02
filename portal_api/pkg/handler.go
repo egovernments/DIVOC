@@ -58,6 +58,12 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateFacilityUsersHandler = operations.CreateFacilityUsersHandlerFunc(createFacilityUserHandler)
 	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
 	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
+	api.GetEnrollmentsHandler = operations.GetEnrollmentsHandlerFunc(getEnrollmentsHandler)
+}
+
+
+func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal interface{}) middleware.Responder {
+	return getEntityType("Enrollment")
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {

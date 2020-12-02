@@ -37,6 +37,21 @@ func init() {
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/enrollments": {
+      "get": {
+        "summary": "get enrollments",
+        "operationId": "getEnrollments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -738,6 +753,21 @@ func init() {
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/enrollments": {
+      "get": {
+        "summary": "get enrollments",
+        "operationId": "getEnrollments",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
