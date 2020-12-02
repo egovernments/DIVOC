@@ -9,8 +9,13 @@ import (
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"math/rand"
+	"strconv"
+	"strings"
 	"time"
 )
+
+const mobilePhonePrefix = "tel:"
 
 type VaccinationCertificateRequest struct {
 	ID     string `json:"id"`
@@ -27,7 +32,7 @@ type VaccinationCertificateRequest struct {
 			Identity      string                 `json:"identity"`
 			Contact       []string               `json:"contact"`
 			Name          string                 `json:"name"`
-			Certificate   map[string]interface{} `json:"certificate"`
+			Certificate   string `json:"certificate"`
 		} `json:"VaccinationCertificate"`
 	} `json:"request"`
 }
@@ -91,11 +96,11 @@ func main() {
 			if err := processCertificateMessage(string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
-
+				log.Errorf("Error in processing the certificate %+v", err)
 			}
 		} else {
 			// The client will automatically try to recover from all errors.
-			fmt.Printf("Consumer error: %v (%v)\n", err, msg)
+			fmt.Printf("Consumer error: %v \n", err)
 		}
 	}
 
@@ -108,6 +113,7 @@ func processCertificateMessage(msg string) error {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
 	}
+	certifyMessageString := msg
 	certificate := VaccinationCertificateRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -123,7 +129,8 @@ func processCertificateMessage(msg string) error {
 				Identity      string                 `json:"identity"`
 				Contact       []string               `json:"contact"`
 				Name          string                 `json:"name"`
-				Certificate   map[string]interface{} `json:"certificate"`
+				//Mobile          string                 `json:"mobile"`
+				Certificate   string `json:"certificate"`
 			} `json:"VaccinationCertificate"`
 		}{
 			VaccinationCertificate: struct {
@@ -131,16 +138,23 @@ func processCertificateMessage(msg string) error {
 				Identity      string                 `json:"identity"`
 				Contact       []string               `json:"contact"`
 				Name          string                 `json:"name"`
-				Certificate   map[string]interface{} `json:"certificate"`
+				//Mobile          string                 `json:"mobile"`
+				Certificate   string `json:"certificate"`
 			}{
 				CertificateID: generateUniqueCertificateId(certifyMessage),
 				Identity:      certifyMessage.Recipient.Identity,
 				Contact:       certifyMessage.Recipient.Contact,
 				Name:          certifyMessage.Recipient.Name,
-				Certificate:   map[string]interface{}{},
+				//Mobile: 	   certifyMessage.Recipient.Contact
+				Certificate:   certifyMessageString,
 			},
 		},
 	}
+
+	if certString, err := json.Marshal(certificate); err == nil {
+		log.Infof("Creating certificate %+v", string(certString))
+	}
+
 	if response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.AddOperationId, req.BodyJSON(certificate)); err != nil {
 		log.Errorf("Error storing vacciantion certificate %+v", err)
 		return errors.New("error storing vacciantion certificate")
@@ -156,13 +170,20 @@ func processCertificateMessage(msg string) error {
 				errors.New("error while storing the certificate")
 			} else {
 				log.Infof("Created vaccination certificate")
+				for _, contact := range certificate.Request.VaccinationCertificate.Contact {
+					if strings.HasPrefix(contact, mobilePhonePrefix) {
+						if err := pkg.CreateRecipientUserId(strings.TrimPrefix(contact, mobilePhonePrefix)); err != nil {
+							log.Errorf("Error in setting up login for the recipient %s", contact)
+							//kafka.pushMessage({"type":"createContact", "contact":contact}) //todo: can relay message via queue to create contact itself
+						}
+					}
+				}
 			}
-
 		}
 	}
 	return nil
 }
 
 func generateUniqueCertificateId(message CertifyMessage) string {
-	return "123123123" //todo: create random id based on set of rules
+	return strconv.Itoa(rand.Intn(10000000)) //todo: create random id based on set of rules
 }

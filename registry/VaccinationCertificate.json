@@ -45,7 +45,7 @@
           "type": "string"
         },
         "certificate" : {
-          "type": "object"
+          "type": "string"
         }
       }
     }
@@ -59,7 +59,7 @@
 
   "privateFields": ["nationalIdentifier", "code"],
   "signedFields": ["serialNum"],
-  "indexFields": ["contact"],
+  "indexFields": ["contact", "mobile", "email"],
   "uniqueIndexFields": ["certificateId"],
   "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
 }

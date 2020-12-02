@@ -13,9 +13,9 @@
     * Yes, DIVOC provides an approved medicine registry which allows authorities to add/remove approved vaccination medicines along with their frequencies.
 5. **I want to use DIVOC to manage multiple vaccination programs across various parts of the country. Is that possible?**
     * Yes, DIVOC is designed to manage multiple vaccination programs concurrently. For each program, both facilities and medicines can be managed within DIVOC.
+6. More FAQs coming soon!
 
 * * *
-Back to [DIVOC Documentation Main Page](/index.md)
-
-Visit [DIVOC Repo](https://github.com/bharat-dpi/DIVOC){:target="github"} for access to the software and all these documentations as source.
+* Back to [DIVOC Documentation Main Page](/index.md)
+* Visit [DIVOC Repo](https://github.com/bharat-dpi/DIVOC){:target="github"} for access to the software and all these documentations as source.
 * * *
