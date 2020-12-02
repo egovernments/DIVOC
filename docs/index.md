@@ -39,6 +39,6 @@ Following video provides a good introduction to DIVOC.
 
 See [DIVOC FAQs](faqs.md) for getting answers to most asked questions.
 
-Visit https://github.com/bharat-dpi/DIVOC for access to the software and all these documentations as source.
+Visit [DIVOC Repo](https://github.com/bharat-dpi/DIVOC) for access to the software and all these documentations as source.
 
 
