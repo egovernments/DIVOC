@@ -1,2 +1,4 @@
 serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status, admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
-3,MOB2344,Mobile Vaccination Center,9879879879,8,18,GOVT,Mobile,Active,1112229996,,,Bengaluru,,5600001,,
+1,DEL001,Awesome Hospital,9809989981,9,18,GOVT,Fixed,Active,"9234323423,9234323424",No 23,Road,Delhi,Delhi,100001,28,77
+2,BLR342,Aolo Hospital,9876543210,10,17,PRIVATE,Fixed,Active,"8876543210,8876543211",,Some other road,Bengaluru,Karnataka,560001,13,75
+3,MOB2344,Mobile Vaccination Center,9879879879,8,18,GOVT,Mobile,Active,9879879879,,,Bengaluru,,5600001,,

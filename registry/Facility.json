@@ -135,7 +135,7 @@
                       "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
                       "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"], 
                                            
-         "privateFields": ["facilityCode"],
+         "privateFields": [],
          "signedFields": [],
          "indexFields": ["(serialNum, facilityCode)","facilityName"],
          "uniqueIndexFields": ["serialNum", "facilityCode"],
