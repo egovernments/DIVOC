@@ -1,7 +1,7 @@
 import * as React from 'react'
 import {useEffect} from 'react'
 import {useHistory} from 'react-router-dom'
-
+import config from "../config"
 import {useKeycloak} from '@react-keycloak/web'
 
 const Login = () => {
@@ -16,7 +16,7 @@ const Login = () => {
 
     useEffect(() => {
         if (keycloak.authenticated) {
-            let redirectUrl = "/";
+            let redirectUrl = config.urlPath;
             history.push(redirectUrl)
         }
     }, [keycloak]);

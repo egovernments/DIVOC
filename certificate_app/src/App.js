@@ -6,6 +6,7 @@ import {PrivateRoute} from "./utils/PrivateRoute";
 import {useKeycloak} from "@react-keycloak/web";
 import Login from './components/Login';
 import CertificateView from './components/CertificateView/CertificateView';
+import config from "./config"
 
 function App() {
   const {initialized, keycloak} = useKeycloak();
@@ -20,8 +21,10 @@ function App() {
         <Header/>
         <div>
           <Switch>
-            <Route exact path="/login" component={Login}/>
-            <PrivateRoute exact path="/" component={CertificateView}/>
+            <Route exact path={config.urlPath + "/login"} component={Login}/>
+            <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
+              role={"recipient"} clientId={"certificate-login"}
+            />
           </Switch>
         </div>
         <Footer />
