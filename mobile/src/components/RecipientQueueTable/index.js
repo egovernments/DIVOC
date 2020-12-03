@@ -6,6 +6,8 @@ import {useHistory} from "react-router";
 import {BaseFormCard} from "../BaseFormCard";
 import {CONSTANT} from "../../utils/constants";
 import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
+import Col from "react-bootstrap/Col";
+import "./index.scss"
 
 
 export const RecipientQueueTable = () => {
@@ -45,6 +47,8 @@ export const RecipientQueueTable = () => {
                 }
                 </tbody>
             </Table>
+            {queueData && queueData.length === 0 &&
+            <Col className={"center"}>No Patient in Queue</Col>}
         </BaseFormCard>
     )
 };

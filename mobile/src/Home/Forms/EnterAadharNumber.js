@@ -39,7 +39,9 @@ function EnterAadharNumber(props) {
                           type="number"
                           onChange={handleAadharNumberOnChange}/>
             <Button variant="outline-primary" className="action-btn" onClick={() => {
-                goNext(FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, {aadharNumber: aadharNumber})
+                if (aadharNumber) {
+                    goNext(FORM_AADHAR_NUMBER, FORM_AADHAR_OTP, {aadharNumber: aadharNumber})
+                }
             }}>GENERATE OTP</Button>
         </div>
     );
@@ -78,11 +80,13 @@ function EnterAadharOTP(props) {
                           type="number"
                           onChange={handleAadharOTPOnChange}/>
             <Button variant="outline-primary" className="action-btn" onClick={() => {
-                addToQueue().then((value) => {
-                    goNext(FORM_AADHAR_OTP, "/", {aadharOtp: aadharOTP})
-                }).catch((e) => {
-                    console.log("Queue: " + e);
-                })
+                if (aadharOTP) {
+                    addToQueue().then((value) => {
+                        goNext(FORM_AADHAR_OTP, "/", {aadharOtp: aadharOTP})
+                    }).catch((e) => {
+                        console.log("Queue: " + e);
+                    })
+                }
             }}>VERIFY</Button>
         </div>
     );
