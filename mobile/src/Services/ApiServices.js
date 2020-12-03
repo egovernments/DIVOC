@@ -5,6 +5,7 @@ const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
 const VACCINATORS = "/divoc/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
+const USER_INFO = "/divoc/api/v1/users/me"
 
 export class ApiServices {
 
@@ -51,17 +52,18 @@ export class ApiServices {
     }
 
     static async certify(certifyPatients) {
-
+        //TODO: get user info after login, added for demo purpose
+        const userDetails = await this.getUserDetails();
         const certifyBody = certifyPatients.map((item, index) => {
             return {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
                     contact: [
-                        item.patient.phone
+                        "tel:" + item.patient.phone
                     ],
                     dob: item.patient.dob,
                     gender: item.patient.gender,
-                    identify: item.identify,
+                    identify: "did:in.gov.uidai.aadhaar:" + item.identify,
                     name: item.patient.name,
                     nationality: item.patient.nationality
                 },
@@ -75,6 +77,10 @@ export class ApiServices {
                 },
                 vaccinator: {
                     name: item.vaccinator.name
+                },
+                facility: {
+                    name: userDetails.facility.facilityName,
+                    address: {}
                 }
             }
         })
@@ -96,6 +102,21 @@ export class ApiServices {
                 if (response.status === 200) {
                     return {}
                 }
+                return response.json()
+            })
+    }
+    
+    static async getUserDetails() {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+        };
+        return fetch(USER_INFO, requestOptions)
+            .then(response => {
                 return response.json()
             })
     }
