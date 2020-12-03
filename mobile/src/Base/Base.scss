@@ -12,15 +12,8 @@
 }
 
 .loader {
-  height: 100%;
-  width: 100%;
-  position: fixed;
-  z-index: 1;
-  top: 0;
-  left: 0;
-  background-color: #282c34;
-  overflow-x: hidden;
-  transition: 0.5s;
+  display: grid;
+  place-items: center;
 }
 
 .logo-container {
@@ -51,6 +44,7 @@
   align-items: center;
   padding: 0.5rem 0;
   text-decoration: none !important;
+
   .icon {
     height: 30px;
     width: 30px;
@@ -62,13 +56,13 @@
     color: $textColor;
     outline: none;
   }
+
   &.active {
     .title {
       color: #2CD889
     }
   }
 }
-
 
 
 .form-card {

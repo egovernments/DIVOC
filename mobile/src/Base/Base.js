@@ -26,7 +26,7 @@ export const DivocFooter = () => {
 export const Loader = () => {
     return (
         <div className={"loader"}>
-            Loading..
+            <h4>Loading..</h4>
         </div>
     );
 };

@@ -1,8 +1,10 @@
+import {appIndexDb} from "../AppDatabase";
+
 const BASE_URL = "https://divoc.xiv.in/divoc/api/v1"
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
 const VACCINATORS = "/divoc/api/v1/vaccinators"
-const CONFIGURATION = BASE_URL + "/divoc/configuration"
+const CERTIFY = "/divoc/api/v1/certify"
 
 export class ApiServices {
 
@@ -46,6 +48,56 @@ export class ApiServices {
         };
         return fetch(VACCINATORS, requestOptions)
             .then(response => response.json())
+    }
+
+    static async certify(certifyPatients) {
+
+        const certifyBody = certifyPatients.map((item, index) => {
+            return {
+                preEnrollmentCode: item.enrollCode,
+                recipient: {
+                    contact: [
+                        item.patient.phone
+                    ],
+                    dob: item.patient.dob,
+                    gender: item.patient.gender,
+                    identify: item.identify,
+                    name: item.patient.name,
+                    nationality: item.patient.nationality
+                },
+                vaccination: {
+                    batch: item.batchCode,
+                    date: "2020-12-02T09:44:03.802Z",
+                    effectiveStart: "2020-12-02",
+                    effectiveUntil: "2020-12-02",
+                    manufacturer: "string",
+                    name: "TOD0"
+                },
+                vaccinator: {
+                    name: item.vaccinator.name
+                }
+            }
+        })
+
+        const stringify = JSON.stringify(certifyBody);
+        console.log(stringify)
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+            body: stringify
+        };
+
+        return fetch(CERTIFY, requestOptions)
+            .then(response => {
+                if (response.status === 200) {
+                    return {}
+                }
+                return response.json()
+            })
     }
 }
 
