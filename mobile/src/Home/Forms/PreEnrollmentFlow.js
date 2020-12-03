@@ -128,8 +128,8 @@ export function usePreEnrollment() {
         history.goBack()
     };
 
-    const getUserDetails = function (enrollCode) {
-        return appIndexDb.getPatientDetails(enrollCode)
+    const getUserDetails = function (enrollCode, mobileNumber) {
+        return appIndexDb.getPatientDetails(enrollCode, mobileNumber)
     };
 
     return {

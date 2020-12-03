@@ -40,7 +40,7 @@ function PatientDetails(props) {
     const {state, goNext, getUserDetails} = usePreEnrollment()
     const [patientDetails, setPatientDetails] = useState()
     useEffect(() => {
-        getUserDetails(state.enrollCode)
+        getUserDetails(state.enrollCode, state.mobileNumber)
             .then((patient) => {
                 setPatientDetails(patient)
             })

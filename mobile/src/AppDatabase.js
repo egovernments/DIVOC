@@ -34,8 +34,16 @@ export class AppDatabase {
         return this.db.add(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode) {
-        return this.db.get(PATIENTS, enrollCode);
+    async getPatientDetails(enrollCode, mobileNumber) {
+        const patient = await this.db.get(PATIENTS, enrollCode);
+        if (patient) {
+            if (patient.phone === mobileNumber) {
+                return patient
+            } else {
+                return null;
+            }
+        }
+        return patient;
     }
 
     async recipientDetails() {
