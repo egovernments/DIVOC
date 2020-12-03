@@ -33,6 +33,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
+	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
 }
 
 type GenericResponse struct {
@@ -64,6 +65,16 @@ func (o *GenericJsonResponse) WriteResponse(rw http.ResponseWriter, producer run
 
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
+}
+
+func vaccinationGetLoggedInUserInfoHandler(params vaccination.GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
+	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+		log.Errorf("Error while getting vaccinators %+v", err)
+		return NewGenericServerError()
+	} else {
+		userInfo := getUserInfo(scopeId)
+		return NewGenericJSONResponse(userInfo)
+	}
 }
 
 func getCertificate(params operations.GetCertificateParams) middleware.Responder {
