@@ -10,7 +10,8 @@
     border: 1px solid #5C9EF8;
     color: #5C9EF8;
     background: none;
-    padding: 10px;
+    padding: 6px;
+    border-radius: .25rem;
 }
 
 .img{
@@ -33,7 +34,7 @@
     width: 400px;
 }
 .logo {
-    width: 48px;
+    width: 180px;
 }
 .top-pad {
     padding-top: 20px!important;
@@ -41,6 +42,7 @@
 .certificate-container{
     border: 1px solid gray;
     width: 440px;
+    background-color: white;
 }
 .spacer-height{
     height: 2em;

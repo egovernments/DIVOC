@@ -4,10 +4,12 @@ import {useEffect} from "react";
 import {useKeycloak} from "@react-keycloak/web";
 import {useState} from "react";
 import styles from "./CertificateView.module.css";
-import DownloadLogo from '../../assets/img/download-icon.svg';
-import footer from '../../assets/img/cert-footer.png'
-import ashok from '../../assets/img/ashok.png'
+import moh from '../../assets/img/moh.png'
 import QRCode from 'qrcode.react';
+import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
+import download from 'downloadjs'
+import {Dropdown} from "react-bootstrap"
+
 
 function CertificateView() {
     const {keycloak} = useKeycloak();
@@ -75,11 +77,11 @@ function CertificateView() {
                 <div></div>
                 <div className={"right"}></div>
             </div>
-            <div className={styles["certificate-container"]}>
+            <div id={"certificate"} className={styles["certificate-container"]}>
             <table borderless className={styles["certificate"]}>
                 <tbody>
                 <tr>
-                    <td valign={"top"}><img src={ashok} className={styles["logo"]}></img></td>
+                    <td valign={"top"}><img src={moh} className={styles["logo"]}></img></td>
                     {/*<td align={"right"}><img src={qrcode}></img></td>*/}
                     <td align={"right"}> <QRCode size={128} value={JSON.stringify(certificateData.certificate)} /></td>
                 </tr>
@@ -121,9 +123,9 @@ function CertificateView() {
                     <td><b>Facility Seal</b></td>
                     <td><b>Vaccinator Signature</b></td>
                 </tr>
-                <tr>
-                    <td colSpan={2}><img src={footer} className={styles["footer"]}></img></td>
-                </tr>
+                {/*<tr>*/}
+                {/*    <td colSpan={2}><img src={footer} className={styles["footer"]}></img></td>*/}
+                {/*</tr>*/}
                 </tbody>
             </table>
             </div>
@@ -136,9 +138,25 @@ function CertificateView() {
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(certificateData));
         var dlAnchorElem = document.createElement('a');
         dlAnchorElem.setAttribute("href",     dataStr     );
-        dlAnchorElem.setAttribute("download", "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + ".json");
+        dlAnchorElem.setAttribute("download", "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + ".id");
         dlAnchorElem.click();
     };
+
+    const downloadAsSvg = () => {
+        toSvg(document.getElementById('certificate'))
+            .then(function (dataUrl) {
+                console.log(dataUrl);
+                download(dataUrl, "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") +'.svg');
+            });
+    }
+
+    const downloadAsImage = () => {
+        toPng(document.getElementById('certificate'))
+            .then(function (dataUrl) {
+                console.log(dataUrl);
+                download(dataUrl, "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") +'.png');
+            });
+    }
 
     const singleCertificateView = () => {
         if (certificateList.length === 1) {
@@ -155,9 +173,23 @@ function CertificateView() {
             {showCertificatePreview(certificateData)}
             <div className={styles["top-pad"] +" " + styles["no-print"] + " row"}>
                 <div className={"col-6"}>
-                <button className={styles["button"]} onClick={handleClick}>
-                    Download Certificate <img src={DownloadLogo} alt="download"/>
-                </button>
+                {/*<button className={styles["button"]} onClick={handleClick}>*/}
+                {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
+                {/*</button>*/}
+                {/*<button className={styles["button"]} onClick={downloadAsImage}>*/}
+                {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
+                {/*</button>*/}
+                    <Dropdown className={styles["btn-success"]}>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic">
+                            Dropdown Button
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As PNG Image</Dropdown.Item>
+                            <Dropdown.Item href="#/svg"  onClick={downloadAsSvg}>As SVG</Dropdown.Item>
+                            <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </div>
                 <div className={"col-6"}>
                 <button className={styles["button"] + " float-right col-12"} onClick={()=>window.print()}>Print</button>
