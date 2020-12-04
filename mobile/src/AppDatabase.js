@@ -1,5 +1,5 @@
 import {openDB} from "idb";
-import {getMessageComponent} from "./lang/LocaleContext";
+import {getMessageComponent, LANGUAGE_KEYS} from "./lang/LocaleContext";
 
 const DATABASE_NAME = "DivocDB"
 const DATABASE_VERSION = 5
@@ -52,8 +52,8 @@ export class AppDatabase {
         })
 
         return [
-            {titleKey: "app.recipientWaiting", value: waiting},
-            {titleKey: "app.certificateIssued", value: issue},
+            {titleKey: LANGUAGE_KEYS.RECIPIENT_WAITING, value: waiting},
+            {titleKey: LANGUAGE_KEYS.CERTIFICATE_ISSUED, value: issue},
         ];
     }
 

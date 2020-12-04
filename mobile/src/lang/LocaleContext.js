@@ -59,3 +59,20 @@ export function getMessageComponent(id, defaultMessage) {
 export function getNumberComponent(number) {
     return <FormattedNumber value={number}/>
 }
+
+export const LANGUAGE_KEYS = Object.freeze({
+    HOME: "app.home",
+    QUEUE: "app.queue",
+    LANGUAGE: "app.language",
+    HELP: "app.help",
+    LOGOUT: "app.logout",
+    ACTIONS: "app.actionTitle",
+    RECIPIENT_NUMBERS: "app.recipientDetailsTitle",
+    SELECT_LANGUAGE: "app.selectLanguage",
+    VERIFY_RECIPIENT: "app.verifyRecipient",
+    ENROLL_RECIPIENT: "app.enrollRecipient",
+    RECIPIENT_QUEUE: "app.recipientQueue",
+    PROGRAM_NAME: "app.programName",
+    RECIPIENT_WAITING: "app.recipientWaiting",
+    CERTIFICATE_ISSUED: "app.certificateIssued"
+});
