@@ -1,0 +1,16 @@
+{
+  "app.home": "Home",
+  "app.queue": "Queue",
+  "app.language": "Language",
+  "app.help": "Help",
+  "app.logout": "Logout",
+  "app.actionTitle": "Actions",
+  "app.recipientDetailsTitle": "Recipient Numbers",
+  "app.selectLanguage": "Select Language",
+  "app.verifyRecipient": "Verify Recipient",
+  "app.enrollRecipient": "Enroll Recipient",
+  "app.recipientQueue": "Recipient Queue",
+  "app.programName": "Covid-19 Vaccine (C19)",
+  "app.recipientWaiting": "Recipient Waiting",
+  "app.certificateIssued": "Certificate Issued"
+}
