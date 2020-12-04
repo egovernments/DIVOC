@@ -11,6 +11,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
+	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
@@ -36,6 +37,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
 	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
+	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
 }
 
 type GenericResponse struct {
@@ -90,7 +92,7 @@ func getCertificate(params operations.GetCertificateParams) middleware.Responder
 			"contains": "tel:" + params.Phone,
 		},
 	}
-	if response, err := queryRegistry(typeId, filter); err != nil {
+	if response, err := services.QueryRegistry(typeId, filter); err != nil {
 		log.Infof("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {

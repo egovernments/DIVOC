@@ -1,0 +1,18 @@
+registry:
+  url: http://localhost:8081
+  addoperationid: add
+  searchoperationid: search
+  readoperationid: read
+keycloak:
+  url: https://divoc.xiv.in/keycloak/auth
+  realm: divoc
+  facilityAdmin:
+    roleName: facillity-admin
+    roleId: 9da3a031-0c76-4077-9176-facfe70b12bc
+    clientId: f806ea15-8a99-48f9-9c5d-a4602ae7b9db
+    groupId: 860560da-911e-4db1-92f2-0cbbaad8f7b3
+  facilityStaff:
+    roleName: facillity-staff
+    roleId: e5573b4d-2805-475b-8e59-d2c7c9de499e
+    clientId: f806ea15-8a99-48f9-9c5d-a4602ae7b9db
+    groupId: 84682840-4c21-428d-b2d5-06e6298be1cc

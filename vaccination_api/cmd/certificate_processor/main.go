@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
+	"github.com/divoc/kernel_library/services"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -28,11 +29,11 @@ type VaccinationCertificateRequest struct {
 	} `json:"params"`
 	Request struct {
 		VaccinationCertificate struct {
-			CertificateID string                 `json:"certificateId"`
-			Identity      string                 `json:"identity"`
-			Contact       []string               `json:"contact"`
-			Name          string                 `json:"name"`
-			Certificate   string `json:"certificate"`
+			CertificateID string   `json:"certificateId"`
+			Identity      string   `json:"identity"`
+			Contact       []string `json:"contact"`
+			Name          string   `json:"name"`
+			Certificate   string   `json:"certificate"`
 		} `json:"VaccinationCertificate"`
 	} `json:"request"`
 }
@@ -72,10 +73,10 @@ func main() {
 	config.Initialize()
 	log.Infof("Starting certificate processor")
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers": config.Config.Kafka.BootstrapServers,
-		"group.id":          "certificate_processor",
-		"auto.offset.reset": "earliest",
-		"enable.auto.commit":"false",
+		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
+		"group.id":           "certificate_processor",
+		"auto.offset.reset":  "earliest",
+		"enable.auto.commit": "false",
 	})
 
 	if err != nil {
@@ -125,28 +126,28 @@ func processCertificateMessage(msg string) error {
 		}{},
 		Request: struct {
 			VaccinationCertificate struct {
-				CertificateID string                 `json:"certificateId"`
-				Identity      string                 `json:"identity"`
-				Contact       []string               `json:"contact"`
-				Name          string                 `json:"name"`
+				CertificateID string   `json:"certificateId"`
+				Identity      string   `json:"identity"`
+				Contact       []string `json:"contact"`
+				Name          string   `json:"name"`
 				//Mobile          string                 `json:"mobile"`
-				Certificate   string `json:"certificate"`
+				Certificate string `json:"certificate"`
 			} `json:"VaccinationCertificate"`
 		}{
 			VaccinationCertificate: struct {
-				CertificateID string                 `json:"certificateId"`
-				Identity      string                 `json:"identity"`
-				Contact       []string               `json:"contact"`
-				Name          string                 `json:"name"`
+				CertificateID string   `json:"certificateId"`
+				Identity      string   `json:"identity"`
+				Contact       []string `json:"contact"`
+				Name          string   `json:"name"`
 				//Mobile          string                 `json:"mobile"`
-				Certificate   string `json:"certificate"`
+				Certificate string `json:"certificate"`
 			}{
 				CertificateID: generateUniqueCertificateId(certifyMessage),
 				Identity:      certifyMessage.Recipient.Identity,
 				Contact:       certifyMessage.Recipient.Contact,
 				Name:          certifyMessage.Recipient.Name,
 				//Mobile: 	   certifyMessage.Recipient.Contact
-				Certificate:   certifyMessageString,
+				Certificate: certifyMessageString,
 			},
 		},
 	}
@@ -160,7 +161,7 @@ func processCertificateMessage(msg string) error {
 		return errors.New("error storing vacciantion certificate")
 	} else {
 		log.Infof("Create vaccination certificate response %+v", response.String())
-		var registryResponse pkg.RegistryResponse
+		var registryResponse services.RegistryResponse
 		if err := response.ToJSON(&registryResponse); err != nil {
 			log.Errorf("Error in decoding json from registry after creating vaccination certificate")
 			return errors.New("error in decoding json from registry after creating vaccination certificate")

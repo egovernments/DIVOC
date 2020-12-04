@@ -187,8 +187,7 @@ paths:
         - symptoms
       summary: Get symptoms
       operationId: getSymptoms
-      security:
-        - hasRole: [""]
+      security: []
       responses:
         '200':
           description: OK
@@ -202,7 +201,7 @@ paths:
         - symptoms
       summary: Create symptoms
       operationId: createSymptoms
-      security:
+      security: []
         - hasRole: ["admin"]
       parameters:
         - in: body
@@ -220,6 +219,16 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /instructions:
+    get:
+      summary: Get symptoms instructions
+      security: []
+      operationId: getInstructions
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
   /ping:
     get:
       summary: Server heartbeat operation
