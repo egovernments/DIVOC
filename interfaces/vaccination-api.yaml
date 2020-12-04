@@ -201,7 +201,7 @@ paths:
         - symptoms
       summary: Create symptoms
       operationId: createSymptoms
-      security: []
+      security:
         - hasRole: ["admin"]
       parameters:
         - in: body
@@ -221,6 +221,8 @@ paths:
           description: Unauthorized
   /instructions:
     get:
+      tags:
+        - symptoms
       summary: Get symptoms instructions
       security: []
       operationId: getInstructions

@@ -175,6 +175,24 @@ func init() {
         }
       }
     },
+    "/instructions": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms instructions",
+        "operationId": "getInstructions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "security": [],
@@ -255,13 +273,7 @@ func init() {
     },
     "/symptoms": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
+        "security": [],
         "tags": [
           "symptoms"
         ],
@@ -838,6 +850,24 @@ func init() {
         }
       }
     },
+    "/instructions": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms instructions",
+        "operationId": "getInstructions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "security": [],
@@ -918,13 +948,7 @@ func init() {
     },
     "/symptoms": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
+        "security": [],
         "tags": [
           "symptoms"
         ],

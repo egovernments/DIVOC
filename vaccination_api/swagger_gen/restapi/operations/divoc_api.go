@@ -73,6 +73,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		ConfigurationGetCurrentProgramsHandler: configuration.GetCurrentProgramsHandlerFunc(func(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetCurrentPrograms has not yet been implemented")
 		}),
+		SymptomsGetInstructionsHandler: symptoms.GetInstructionsHandlerFunc(func(params symptoms.GetInstructionsParams) middleware.Responder {
+			return middleware.NotImplemented("operation symptoms.GetInstructions has not yet been implemented")
+		}),
 		VaccinationGetLoggedInUserInfoHandler: vaccination.GetLoggedInUserInfoHandlerFunc(func(params vaccination.GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetLoggedInUserInfo has not yet been implemented")
 		}),
@@ -82,7 +85,7 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
 		}),
-		SymptomsGetSymptomsHandler: symptoms.GetSymptomsHandlerFunc(func(params symptoms.GetSymptomsParams, principal interface{}) middleware.Responder {
+		SymptomsGetSymptomsHandler: symptoms.GetSymptomsHandlerFunc(func(params symptoms.GetSymptomsParams) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.GetSymptoms has not yet been implemented")
 		}),
 		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
@@ -151,6 +154,8 @@ type DivocAPI struct {
 	ConfigurationGetConfigurationHandler configuration.GetConfigurationHandler
 	// ConfigurationGetCurrentProgramsHandler sets the operation handler for the get current programs operation
 	ConfigurationGetCurrentProgramsHandler configuration.GetCurrentProgramsHandler
+	// SymptomsGetInstructionsHandler sets the operation handler for the get instructions operation
+	SymptomsGetInstructionsHandler symptoms.GetInstructionsHandler
 	// VaccinationGetLoggedInUserInfoHandler sets the operation handler for the get logged in user info operation
 	VaccinationGetLoggedInUserInfoHandler vaccination.GetLoggedInUserInfoHandler
 	// VaccinationGetPreEnrollmentHandler sets the operation handler for the get pre enrollment operation
@@ -264,6 +269,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.ConfigurationGetCurrentProgramsHandler == nil {
 		unregistered = append(unregistered, "configuration.GetCurrentProgramsHandler")
+	}
+	if o.SymptomsGetInstructionsHandler == nil {
+		unregistered = append(unregistered, "symptoms.GetInstructionsHandler")
 	}
 	if o.VaccinationGetLoggedInUserInfoHandler == nil {
 		unregistered = append(unregistered, "vaccination.GetLoggedInUserInfoHandler")
@@ -408,6 +416,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/programs/current"] = configuration.NewGetCurrentPrograms(o.context, o.ConfigurationGetCurrentProgramsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/instructions"] = symptoms.NewGetInstructions(o.context, o.SymptomsGetInstructionsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

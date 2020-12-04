@@ -38,6 +38,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
 	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
 	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
+	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
 }
 
 type GenericResponse struct {

@@ -14,8 +14,23 @@ func createSymptoms(params symptoms.CreateSymptomsParams, principle interface{})
 	return symptoms.NewCreateSymptomsOK()
 }
 
-func getSymptoms(params symptoms.GetSymptomsParams, principle interface{}) middleware.Responder {
+func getSymptoms(params symptoms.GetSymptomsParams) middleware.Responder {
 	typeId := "Symptom"
+	filter := map[string]interface{}{
+		"@type": map[string]interface{}{
+			"eq": typeId,
+		},
+	}
+	queryResults, err := services.QueryRegistry(typeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return NewGenericServerError()
+	}
+	return NewGenericJSONResponse(queryResults[typeId])
+}
+
+func getInstructions(params symptoms.GetInstructionsParams) middleware.Responder {
+	typeId := "instructions"
 	filter := map[string]interface{}{
 		"@type": map[string]interface{}{
 			"eq": typeId,
