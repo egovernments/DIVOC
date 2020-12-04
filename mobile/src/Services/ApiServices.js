@@ -52,8 +52,7 @@ export class ApiServices {
     }
 
     static async certify(certifyPatients) {
-        //TODO: get user info after login, added for demo purpose
-        const userDetails = await this.getUserDetails();
+        const userDetails = await appIndexDb.getUserDetails();
         const certifyBody = certifyPatients.map((item, index) => {
             return {
                 preEnrollmentCode: item.enrollCode,
