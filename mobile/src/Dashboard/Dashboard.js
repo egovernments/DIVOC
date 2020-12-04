@@ -9,7 +9,7 @@ import logout from '../Logout/logout.svg'
 import help from '../assets/img/help.svg'
 import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
-import {SelectLanguage} from "../Language/Language";
+import {SelectLanguage} from "../Language/LanguageSelection";
 import {Logout} from "../Logout/Logout";
 import {PrivateRoute} from "../utils/PrivateRoute";
 import {LoginComponent} from "../Login/Login";

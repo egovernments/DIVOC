@@ -6,7 +6,7 @@ import Arabic from '../lang/ar.json';
 
 const LocaleContext = React.createContext(null);
 
-const local = navigator.language;
+const local = localStorage.getItem("language") || navigator.language;
 
 let lang;
 if (local === 'hi') {
@@ -31,6 +31,7 @@ export function LocaleProvider(props) {
         } else {
             setMessages(English);
         }
+        localStorage.setItem("language", newLocale)
     }
 
     return (
@@ -46,8 +47,12 @@ export function LocaleProvider(props) {
 export function useLocale() {
     const context = useContext(LocaleContext);
     const {selectLanguage} = context;
+    const currentLocale = () => {
+        return localStorage.getItem("language") || navigator.language
+    }
     return {
-        selectLanguage
+        selectLanguage,
+        currentLocale
     }
 }
 

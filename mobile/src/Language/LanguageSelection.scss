@@ -1,0 +1,26 @@
+@import "styles/colors.scss";
+
+.language-container {
+  margin: 4%;
+  height: 100%;
+
+
+  .language-item {
+
+    .title {
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .card-header {
+      padding: 4%;
+      border-bottom-color: $textColorLight;
+    }
+
+    &.active {
+      .title {
+        color: $textSelectedColor;
+      }
+    }
+  }
+}
