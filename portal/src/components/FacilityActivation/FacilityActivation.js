@@ -82,7 +82,7 @@ function FacilityActivation() {
                     />
                 </div>
                 <p className={styles['highlight']}>{selectedState}</p>
-                <div className={`table-responsive ${styles["table"]}` }>
+                <div className={`table-responsive ${styles["district-table"]}` }>
                     <table className="table table-borderless">
                         <thead>
                             <tr >Please select District</tr>
@@ -177,8 +177,9 @@ function FacilityActivation() {
                     </div>
                 </div>
             </div>
-            <div className="col-sm-6 container">
-                <table className="table">
+            <div className={`col-sm-7 container ${styles['table']}`}>
+                <p className={styles['highlight']}>{selectedDistrict} facilties</p>
+                <table className={`table ${styles['table-data']}`}>
                 <thead>
                     <tr>
                         <th>CENTRE ID</th>
@@ -212,10 +213,10 @@ function FacilityActivation() {
                 </tbody>
                 </table>
             </div>
-            <div className="col-sm-3 container">
-                <div className="card">
+            <div className="col-sm-2 container">
+                <div className={`card ${styles['card-continer']}`}>
                     <div className="card-body text-center">
-                        <p>Make x facilities active for the x-program</p>
+                        <p>Make x facilities active for the {selectedProgram}</p>
                         <button onClick={handleClick} className={styles['button']}>MAKE ACTIVE</button>
                     </div>
                 </div>
