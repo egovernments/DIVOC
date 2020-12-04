@@ -1,6 +1,21 @@
+.container{
+    color: #4D4F5C;
+}
 .table {
-    height: 500px;
-    overflow: scroll; 
+    height: 350px;
+    overflow: scroll;
+    border: 1px solid #E8E9EC; 
+    margin-bottom: 20px;
+}
+
+.tbody{
+    color: #B1B1B1;
+    font-size: smaller;
+}
+
+.highlight{
+    color: #1D1D1D;
+    font-weight: bold;
 }
 
 .button {
@@ -10,4 +25,30 @@
     color: #FFFFFF;
     padding-left: 10px;
     padding-right: 10px;
+}
+
+input[type="checkbox"]:checked + .wrapper {
+}
+input[type="checkbox"] {
+    display: none;
+}
+
+input[type="radio"]:checked + .wrapper {
+}
+input[type="radio"] {
+    display: none;
+}
+
+.wrapper{
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 1em;
+    border: 1px solid lightgray; 
+    border-radius: 0.3em;
+}
+
+
+.radio{
+    border-radius: 0.5em;
 }

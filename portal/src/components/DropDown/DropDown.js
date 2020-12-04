@@ -17,7 +17,6 @@ function DropDown({ setSelectedOption, placeholder, options}) {
                 options={options}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className={styles['dropdown']}
                 placeholderClassName={styles['place-holder']}
                 menuClassName={styles['menu-items']}
                 controlClassName={styles['control-class']}

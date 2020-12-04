@@ -5,10 +5,11 @@ import styles from "./FacilityActivation.module.css";
 
 function FacilityActivation() {
     const [listOfStates, setListOfStates] = useState([]);
-    const [selectedProgram, setSelectedProgram] = useState([]);
-    const [selectedState, setSelectedState] = useState([]);
-    const [selectedDistrict, setSelectedDistrict] = useState([]);
-    const [FacilityType, setFacilityType] = useState([]);
+    const [selectedProgram, setSelectedProgram] = useState();
+    const [selectedState, setSelectedState] = useState("Karnataka");
+    const [selectedDistrict, setSelectedDistrict] = useState("Bagalkote");
+    const [facilityType, setFacilityType] = useState("Government");
+    const [status, setStatus] = useState("Active");
 
     useEffect(() => {
         normalizeStateNames();
@@ -34,14 +35,24 @@ function FacilityActivation() {
         return Object.keys(DISTRICT_NAMES).map((district) => {
             return (
                 <tr>
-                    <td>
-                        <input
-                            type="radio"
-                            onChange={(event) =>
-                                handleChange(district, setSelectedDistrict)
-                            }
-                        />
-                        {district}
+                    <td className={styles['highlight']}>
+                        <div className="form-check">
+                        <label className="form-check-label" htmlFor={district}>
+                            <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id={district}
+                                name={district}
+                                value={district}
+                                onChange={(event) =>
+                                    handleChange(district, setSelectedDistrict)
+                                }
+                                checked={selectedDistrict && district === selectedDistrict}
+                            />
+                            <div className={styles['wrapper']} style={{backgroundColor: selectedDistrict=== district ?'#DE9D00':''}}>&nbsp;</div>
+                             {district}
+                        </label>
+                    </div>
                     </td>
                     <td>{DISTRICT_NAMES[district]}</td>
                 </tr>
@@ -53,8 +64,8 @@ function FacilityActivation() {
         console.log("clicked me")
     }
     return (
-        <div class="row">
-            <div class="col-sm-3 container">
+        <div className={`row ${styles['container']}`} >
+            <div className="col-sm-3">
                 <div>
                     <DropDown
                         options={PROGRAMS}
@@ -63,28 +74,29 @@ function FacilityActivation() {
                     />
                 </div>
                 <div>
-                    <p>All of India</p>
+                    <p className={styles['highlight']}>All of India</p>
                     <DropDown
                         options={listOfStates}
                         placeholder="Please select State"
                         setSelectedOption={setSelectedState}
                     />
                 </div>
-                <div class="table-responsive" className={styles["table"]}>
-                    <table class="table table-borderless">
+                <p className={styles['highlight']}>{selectedState}</p>
+                <div className={`table-responsive ${styles["table"]}` }>
+                    <table className="table table-borderless">
                         <thead>
-                            <tr>Please select District</tr>
+                            <tr >Please select District</tr>
                         </thead>
-                        <tbody>{showDistrictList()}</tbody>
+                        <tbody className={styles['tbody']}>{showDistrictList()}</tbody>
                     </table>
                 </div>
                 <div>
-                    <h5>Type of Facility</h5>
-                    <div class="form-check">
-                        <label class="form-check-label" htmlFor="government">
+                    <p className={styles['highlight']}>Type of Facility</p>
+                    <div className="form-check">
+                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="government">
                             <input
                                 type="checkbox"
-                                class="form-check-input"
+                                className="form-check-input"
                                 id="government"
                                 name="Government"
                                 value="Government"
@@ -94,15 +106,17 @@ function FacilityActivation() {
                                         setFacilityType
                                     )
                                 }
+                                checked={facilityType === "Government"}
                             />
+                            <div className={styles['wrapper']} style={{backgroundColor:facilityType==="Government"?'#DE9D00':''}}>&nbsp;</div>
                             Government
                         </label>
                     </div>
-                    <div class="form-check">
-                        <label class="form-check-label" htmlFor="private">
+                    <div className="form-check">
+                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="private">
                             <input
                                 type="checkbox"
-                                class="form-check-input"
+                                className="form-check-input"
                                 id="private"
                                 name="Private"
                                 value="Private"
@@ -112,54 +126,59 @@ function FacilityActivation() {
                                         setFacilityType
                                     )
                                 }
+                                checked={facilityType === "Private"}
                             />
+                            <div className={styles['wrapper']} style={{backgroundColor:facilityType==="Private"?'#DE9D00':''}}>&nbsp;</div>
                             Private
                         </label>
                     </div>
                 </div>
                 <div>
-                    <h5>Status</h5>
-                    <div class="form-check">
-                        <label class="form-check-label" htmlFor="Active">
+                    <p className={styles['highlight']}>Status</p>
+                    <div className="form-check">
+                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Active">
                             <input
                                 type="radio"
-                                class="form-check-input"
+                                className="form-check-input"
                                 id="Active"
                                 name="Active"
                                 value="Active"
                                 onClick={(event) =>
                                     handleChange(
                                         event.target.name,
-                                        setFacilityType
+                                        setStatus
                                     )
                                 }
-                                checked
+                                checked={status === "Active"}
                             />
+                            <div className={`${styles['wrapper']} ${styles['radio']}`}  style={{backgroundColor:status==="Active"?'#DE9D00':''}}>&nbsp;</div>
                             Active
                         </label>
                     </div>
-                    <div class="form-check">
-                        <label class="form-check-label" for="Inactive">
+                    <div className="form-check">
+                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
                             <input
                                 type="radio"
-                                class="form-check-input"
+                                className="form-check-input"
                                 id="Inactive"
                                 name="Inactive"
                                 value="Inactive"
                                 onClick={(event) =>
                                     handleChange(
                                         event.target.name,
-                                        setFacilityType
+                                        setStatus
                                     )
                                 }
+                                checked={status === "Inactive"}
                             />
+                            <div className={`${styles['wrapper']} ${styles['radio']}`} style={{backgroundColor:status==="Inactive"?'#DE9D00':''}}>&nbsp;</div>
                             Inactive
                         </label>
                     </div>
                 </div>
             </div>
-            <div class="col-sm-6 container">
-                <table class="table">
+            <div className="col-sm-6 container">
+                <table className="table">
                 <thead>
                     <tr>
                         <th>CENTRE ID</th>
@@ -193,13 +212,13 @@ function FacilityActivation() {
                 </tbody>
                 </table>
             </div>
-            <div class="col-sm-3 container">
-            <div class="card">
-                <div class="card-body text-center">
-                    <p>Make x facilities active for the x-program</p>
-                    <button onClick={handleClick} className={styles['button']}>MAKE ACTIVE</button>
+            <div className="col-sm-3 container">
+                <div className="card">
+                    <div className="card-body text-center">
+                        <p>Make x facilities active for the x-program</p>
+                        <button onClick={handleClick} className={styles['button']}>MAKE ACTIVE</button>
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     );
