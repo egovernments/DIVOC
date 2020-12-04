@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "$id": "http://example.com/example.json",
+  "type": "object",
+  "default": {},
+  "title":"Symptoms",
+  "examples": [
+    {
+      "name": "symptom 1",
+      "instructions": [
+        {
+          "title": "instruction 1",
+          "messages": [
+            "message 1",
+            "message 2"
+          ],
+          "imageURL": [
+            "http://..."
+          ]
+        }
+      ]
+    }
+  ],
+  "required": [
+    "name",
+    "instructions"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "$comment": "Name of the symptom",
+      "default": "",
+      "examples": [
+        "symptom 1"
+      ]
+    },
+    "instructions": {
+      "$id": "#/properties/instructions",
+      "type": "array",
+      "default": [],
+      "examples": [
+        [
+          {
+            "title": "instruction 1",
+            "messages": [
+              "message 1",
+              "message 2"
+            ],
+            "imageURL": [
+              "http://..."
+            ]
+          }
+        ]
+      ],
+      "additionalItems": true,
+      "items": {
+        "$id": "#/properties/instructions/items",
+        "anyOf": [
+          {
+            "$id": "#/properties/instructions/items/anyOf/0",
+            "type": "object",
+            "default": {},
+            "examples": [
+              {
+                "title": "instruction 1",
+                "messages": [
+                  "message 1",
+                  "message 2"
+                ],
+                "imageURL": [
+                  "http://..."
+                ]
+              }
+            ],
+            "required": [
+              "title",
+              "messages",
+              "imageURL"
+            ],
+            "properties": {
+              "title": {
+                "$id": "#/properties/instructions/items/anyOf/0/properties/title",
+                "type": "string",
+                "default": "",
+                "examples": [
+                  "instruction 1"
+                ]
+              },
+              "messages": {
+                "$id": "#/properties/instructions/items/anyOf/0/properties/messages",
+                "type": "array",
+                "default": [],
+                "examples": [
+                  [
+                    "message 1",
+                    "message 2"
+                  ]
+                ],
+                "items": {"type": "string"}
+              },
+              "imageURL": {
+                "$id": "#/properties/instructions/items/anyOf/0/properties/imageURL",
+                "type": "array",
+                "default": [],
+                "examples": [
+                  [
+                    "http://..."
+                  ]
+                ],
+                "items": {"type": "string"}
+              }
+            },
+            "additionalProperties": true
+          }
+        ]
+      }
+    }
+  },
+  "additionalProperties": true,
+  "_osConfig": {
+    "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
+  }
+}

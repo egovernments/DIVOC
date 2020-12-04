@@ -253,6 +253,73 @@ func init() {
         }
       }
     },
+    "/symptoms": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              ""
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms",
+        "operationId": "getSymptoms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Create symptoms",
+        "operationId": "createSymptoms",
+        "parameters": [
+          {
+            "description": "Symptoms data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -540,6 +607,37 @@ func init() {
         }
       }
     },
+    "Symptoms": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "imageURL": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "UserInfo": {
       "type": "object",
       "properties": {
@@ -814,6 +912,73 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      }
+    },
+    "/symptoms": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              ""
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms",
+        "operationId": "getSymptoms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Create symptoms",
+        "operationId": "createSymptoms",
+        "parameters": [
+          {
+            "description": "Symptoms data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -1225,6 +1390,40 @@ func init() {
         },
         "repeatTimes": {
           "type": "integer"
+        }
+      }
+    },
+    "Symptoms": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SymptomsInstructionsItems0"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "SymptomsInstructionsItems0": {
+      "type": "object",
+      "properties": {
+        "imageURL": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "title": {
+          "type": "string"
         }
       }
     },

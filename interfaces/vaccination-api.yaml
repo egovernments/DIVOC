@@ -181,7 +181,45 @@ paths:
           description: OK
           schema:
             type: object
-
+  /symptoms:
+    get:
+      tags:
+        - symptoms
+      summary: Get symptoms
+      operationId: getSymptoms
+      security:
+        - hasRole: [""]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+    post:
+      tags:
+        - symptoms
+      summary: Create symptoms
+      operationId: createSymptoms
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+          description: Symptoms data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /ping:
     get:
       summary: Server heartbeat operation
@@ -193,6 +231,26 @@ paths:
         '200':
           description: OK
 definitions:
+  Symptoms:
+    type: object
+    properties:
+      name:
+        type: string
+      instructions:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+            messages:
+              type: array
+              items:
+                type: string
+            imageURL:
+              type: array
+              items:
+                type: string
   LoginRequest:
     type: object
     properties:
