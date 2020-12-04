@@ -2,3 +2,12 @@
     height: 500px;
     overflow: scroll; 
 }
+
+.button {
+    background: #4CA07A 0% 0% no-repeat padding-box;
+    border-radius: 6px;
+    border: none;
+    color: #FFFFFF;
+    padding-left: 10px;
+    padding-right: 10px;
+}
