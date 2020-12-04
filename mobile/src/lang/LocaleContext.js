@@ -1,5 +1,5 @@
 import React, {useContext, useState} from 'react';
-import {IntlProvider} from 'react-intl';
+import {FormattedMessage, FormattedNumber, IntlProvider} from 'react-intl';
 import Hindi from '../lang/hi.json';
 import English from '../lang/en.json';
 import Arabic from '../lang/ar.json';
@@ -49,4 +49,13 @@ export function useLocale() {
     return {
         selectLanguage
     }
+}
+
+
+export function getMessageComponent(id, defaultMessage) {
+    return <FormattedMessage id={id} defaultMessage={defaultMessage || ""}/>
+}
+
+export function getNumberComponent(number) {
+    return <FormattedNumber value={number}/>
 }

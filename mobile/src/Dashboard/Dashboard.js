@@ -16,6 +16,7 @@ import {LoginComponent} from "../Login/Login";
 import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";
 import {ConfirmFlow} from "../ConfirmVaccination";
 import {useLocation} from "react-router";
+import {getMessageComponent} from "../lang/LocaleContext";
 
 Dashboard.propTypes = {};
 
@@ -48,11 +49,16 @@ const Footer = () => {
     const location = useLocation();
     return (
         <div className="bottom-bar d-flex justify-content-around">
-            <BottomItem currentLocation={location.pathname} src={home} href={"/"} title={"Home"}/>
-            <BottomItem currentLocation={location.pathname} src={language} href={"/language"} title={"Language"}/>
-            <BottomItem currentLocation={location.pathname} src={queue} href={"/queue"} title={"Queue"}/>
-            <BottomItem currentLocation={location.pathname} src={help} href={"/logout"} title={"Help"}/>
-            <BottomItem currentLocation={location.pathname} src={logout} href={"/logout"} title={"Logout"}/>
+            <BottomItem currentLocation={location.pathname} src={home} href={"/"}
+                        title={getMessageComponent("app.home")}/>
+            <BottomItem currentLocation={location.pathname} src={language} href={"/language"}
+                        title={getMessageComponent("app.language")}/>
+            <BottomItem currentLocation={location.pathname} src={queue} href={"/queue"}
+                        title={getMessageComponent("app.queue")}/>
+            <BottomItem currentLocation={location.pathname} src={help} href={"/logout"}
+                        title={getMessageComponent("app.help")}/>
+            <BottomItem currentLocation={location.pathname} src={logout} href={"/logout"}
+                        title={getMessageComponent("app.logout")}/>
         </div>
     )
 }

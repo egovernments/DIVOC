@@ -11,6 +11,7 @@ import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
 import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
+import {getMessageComponent, getNumberComponent} from "../lang/LocaleContext";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -34,12 +35,13 @@ function EnrollmentTypes() {
     const {goToVerifyRecipient, goToQueue} = useHome();
     return <>
         <div className={"enroll-container"}>
-            <EnrolmentItems title={"Verify Recipient"} icon={verifyRecipient} onClick={() => {
+            <EnrolmentItems title={getMessageComponent("app.verifyRecipient")} icon={verifyRecipient} onClick={() => {
                 goToVerifyRecipient()
             }}/>
-            <EnrolmentItems title={"Enroll Recipient"} icon={enrollRecipient} onClick={() => {
+            <EnrolmentItems title={getMessageComponent("app.enrollRecipient")} icon={enrollRecipient} onClick={() => {
             }}/>
-            <EnrolmentItems title={"Recipient Queue"} icon={recipientQueue} onClick={goToQueue}/>
+            <EnrolmentItems title={getMessageComponent("app.recipientQueue")} icon={recipientQueue}
+                            onClick={goToQueue}/>
         </div>
     </>;
 }
@@ -91,15 +93,16 @@ function Statistics() {
         appIndexDb.recipientDetails().then((result) => setResults(result))
     }, [])
     return <div className={"recipient-container"}>
-        {result.map((item) => <StatisticsItem key={item.title} title={item.title} value={"" + item.value}/>)}
+        {result.map((item) => <StatisticsItem key={item.titleKey} title={getMessageComponent(item.titleKey)}
+                                              value={getNumberComponent(item.value)}/>)}
     </div>;
 }
 
 export function VaccineProgram() {
     return <div className={"home-container"}>
         <ProgramHeader/>
-        <Title text={"Actions"} content={<EnrollmentTypes/>}/>
-        <Title text={"Recipient Numbers"} content={<Statistics/>}/>
+        <Title text={getMessageComponent("app.actionTitle")} content={<EnrollmentTypes/>}/>
+        <Title text={getMessageComponent("app.recipientDetailsTitle")} content={<Statistics/>}/>
     </div>;
 }
 
