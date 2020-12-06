@@ -3,8 +3,12 @@
 
 ### Developer Documentation
 
-#### [Admin API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/admin-portal.yaml)
+1. [Admin API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/admin-portal.yaml)
+2. [Vaccination API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/vaccination-api.yaml)
+3. [Verification API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/divoc-verification.yaml)
 
-#### [Vaccination API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/vaccination-api.yaml)
+* * *
 
-#### [Verification API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/divoc-verification.yaml)
+* Back to [DIVOC Documentation Main Page](/index.md)
+
+* * *
