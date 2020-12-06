@@ -37,13 +37,10 @@ Following video provides a good introduction to DIVOC.
 
 [![DIVOC Introduction Video by Pramod Varma](/resources/intro-video-thumnail.png)](https://www.youtube.com/watch?v=tOuPDAy7r90){:target="_blank"}
 
-See [DIVOC FAQs](faqs.md) for getting answers to most asked questions. 
-
 More documentation will come up soon!
 
 * * *
 
 * Back to [DIVOC Documentation Main Page](/index.md)
-* Visit [DIVOC Repo](https://github.com/bharat-dpi/DIVOC){:target="github"} for access to the software and all these documentations as source.
 
 * * *
