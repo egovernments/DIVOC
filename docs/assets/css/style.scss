@@ -74,8 +74,8 @@ header li {
 }
 
 header li:hover {
-	background: #39bfb3;
-	background: -moz-linear-gradient(top, #39bfb3 0%, #037b70 100%);
+  background: #39bfb3;
+  background: -moz-linear-gradient(top, #39bfb3 0%, #037b70 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#f8f8f8), color-stop(100%,#dddddd));
   background: -webkit-linear-gradient(top, #39bfb3 0%,#037b70 100%);
   background: -o-linear-gradient(top, #39bfb3 0%,#037b70 100%);
@@ -83,3 +83,11 @@ header li:hover {
   background: linear-gradient(to top, #39bfb3 0%,#037b70 100%);
 }
 
+.divocmenu {
+  margin:0 0 0 0;
+  padding:5px 0px 0px 5px;
+  background-color:#39bfb3;
+  height:25px;
+  text-align:left;
+  vertical-align:middle;
+}
