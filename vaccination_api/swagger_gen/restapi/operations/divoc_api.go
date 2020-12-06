@@ -23,6 +23,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 )
@@ -61,6 +62,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
 		}),
+		SideEffectsCreateSideEffectsHandler: side_effects.CreateSideEffectsHandlerFunc(func(params side_effects.CreateSideEffectsParams) middleware.Responder {
+			return middleware.NotImplemented("operation side_effects.CreateSideEffects has not yet been implemented")
+		}),
 		SymptomsCreateSymptomsHandler: symptoms.CreateSymptomsHandlerFunc(func(params symptoms.CreateSymptomsParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.CreateSymptoms has not yet been implemented")
 		}),
@@ -84,6 +88,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
+		}),
+		SideEffectsGetSideEffectsHandler: side_effects.GetSideEffectsHandlerFunc(func(params side_effects.GetSideEffectsParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation side_effects.GetSideEffects has not yet been implemented")
 		}),
 		SymptomsGetSymptomsHandler: symptoms.GetSymptomsHandlerFunc(func(params symptoms.GetSymptomsParams) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.GetSymptoms has not yet been implemented")
@@ -146,6 +153,8 @@ type DivocAPI struct {
 	IdentityPostIdentityVerifyHandler identity.PostIdentityVerifyHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
+	// SideEffectsCreateSideEffectsHandler sets the operation handler for the create side effects operation
+	SideEffectsCreateSideEffectsHandler side_effects.CreateSideEffectsHandler
 	// SymptomsCreateSymptomsHandler sets the operation handler for the create symptoms operation
 	SymptomsCreateSymptomsHandler symptoms.CreateSymptomsHandler
 	// GetCertificateHandler sets the operation handler for the get certificate operation
@@ -162,6 +171,8 @@ type DivocAPI struct {
 	VaccinationGetPreEnrollmentHandler vaccination.GetPreEnrollmentHandler
 	// VaccinationGetPreEnrollmentsForFacilityHandler sets the operation handler for the get pre enrollments for facility operation
 	VaccinationGetPreEnrollmentsForFacilityHandler vaccination.GetPreEnrollmentsForFacilityHandler
+	// SideEffectsGetSideEffectsHandler sets the operation handler for the get side effects operation
+	SideEffectsGetSideEffectsHandler side_effects.GetSideEffectsHandler
 	// SymptomsGetSymptomsHandler sets the operation handler for the get symptoms operation
 	SymptomsGetSymptomsHandler symptoms.GetSymptomsHandler
 	// ConfigurationGetVaccinatorsHandler sets the operation handler for the get vaccinators operation
@@ -258,6 +269,9 @@ func (o *DivocAPI) Validate() error {
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
 	}
+	if o.SideEffectsCreateSideEffectsHandler == nil {
+		unregistered = append(unregistered, "side_effects.CreateSideEffectsHandler")
+	}
 	if o.SymptomsCreateSymptomsHandler == nil {
 		unregistered = append(unregistered, "symptoms.CreateSymptomsHandler")
 	}
@@ -281,6 +295,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.VaccinationGetPreEnrollmentsForFacilityHandler == nil {
 		unregistered = append(unregistered, "vaccination.GetPreEnrollmentsForFacilityHandler")
+	}
+	if o.SideEffectsGetSideEffectsHandler == nil {
+		unregistered = append(unregistered, "side_effects.GetSideEffectsHandler")
 	}
 	if o.SymptomsGetSymptomsHandler == nil {
 		unregistered = append(unregistered, "symptoms.GetSymptomsHandler")
@@ -403,6 +420,10 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/sideEffects"] = side_effects.NewCreateSideEffects(o.context, o.SideEffectsCreateSideEffectsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/symptoms"] = symptoms.NewCreateSymptoms(o.context, o.SymptomsCreateSymptomsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -432,6 +453,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/preEnrollments"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/sideEffects"] = side_effects.NewGetSideEffects(o.context, o.SideEffectsGetSideEffectsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

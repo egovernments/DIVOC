@@ -271,6 +271,64 @@ func init() {
         }
       }
     },
+    "/sideEffects": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Get Side Effects",
+        "operationId": "getSideEffects",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Post side effects",
+        "operationId": "createSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sideEffects": {
+                  "type": "object",
+                  "$ref": "#/definitions/SideEffects"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/symptoms": {
       "get": {
         "security": [],
@@ -619,6 +677,31 @@ func init() {
         }
       }
     },
+    "SideEffects": {
+      "type": "object",
+      "properties": {
+        "recipientIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "symptoms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "additionalDetails": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
     "Symptoms": {
       "type": "object",
       "properties": {
@@ -942,6 +1025,64 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      }
+    },
+    "/sideEffects": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Get Side Effects",
+        "operationId": "getSideEffects",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Post side effects",
+        "operationId": "createSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sideEffects": {
+                  "type": "object",
+                  "$ref": "#/definitions/SideEffects"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -1414,6 +1555,34 @@ func init() {
         },
         "repeatTimes": {
           "type": "integer"
+        }
+      }
+    },
+    "SideEffects": {
+      "type": "object",
+      "properties": {
+        "recipientIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "symptoms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SideEffectsSymptomsItems0"
+          }
+        }
+      }
+    },
+    "SideEffectsSymptomsItems0": {
+      "type": "object",
+      "properties": {
+        "additionalDetails": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
         }
       }
     },
