@@ -10,7 +10,7 @@ Coming soon ...
 
 ### Developer Documentation
 
-1. [API Documentation](/DIVOC/developer-docs/index.md)
+1. [API Documentation](/developer-docs/index.md)
 
 * * *
 
