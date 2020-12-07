@@ -58,7 +58,7 @@ export class ApiServices {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
                     contact: [
-                        "tel:" + item.patient.phone
+                        item.patient.phone
                     ],
                     dob: item.patient.dob,
                     gender: item.patient.gender,
@@ -72,7 +72,7 @@ export class ApiServices {
                     effectiveStart: "2020-12-02",
                     effectiveUntil: "2020-12-02",
                     manufacturer: "string",
-                    name: "TOD0"
+                    name: "COVID-19"
                 },
                 vaccinator: {
                     name: item.vaccinator.name
@@ -84,8 +84,6 @@ export class ApiServices {
             }
         })
 
-        const stringify = JSON.stringify(certifyBody);
-        console.log(stringify)
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -93,7 +91,7 @@ export class ApiServices {
                 'accept': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem("token")
             },
-            body: stringify
+            body: JSON.stringify(certifyBody)
         };
 
         return fetch(CERTIFY, requestOptions)
@@ -104,7 +102,7 @@ export class ApiServices {
                 return response.json()
             })
     }
-    
+
     static async getUserDetails() {
         const requestOptions = {
             method: 'GET',

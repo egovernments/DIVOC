@@ -11,6 +11,5 @@ export const InfoCard = (props) => (
 
 InfoCard.propTypes = {
     metric: PropTypes.number.isRequired,
-    title: PropTypes.string.isRequired,
 };
 
