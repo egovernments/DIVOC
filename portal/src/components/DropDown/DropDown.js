@@ -5,19 +5,18 @@ import 'react-dropdown/style.css';
 import styles from './DropDown.module.css';
 
 
-function DropDown({ formData, setFormData}) {
-    const options = ['C-19 Program'];
+function DropDown({ setSelectedOption, placeholder, options}) {
     
     const handleChange = (selectedItemFromDropdown) => {
-        setFormData({ ...formData, program: selectedItemFromDropdown.value });
+        setSelectedOption(selectedItemFromDropdown.label)
+        console.log("selected option is ", selectedItemFromDropdown.label)
     };
     return(
         <div style={{width: '80%'}}>
             <Dropdown
                 options={options}
                 onChange={handleChange}
-                placeholder='Please select vaccine program'
-                className={styles['dropdown']}
+                placeholder={placeholder}
                 placeholderClassName={styles['place-holder']}
                 menuClassName={styles['menu-items']}
                 controlClassName={styles['control-class']}
