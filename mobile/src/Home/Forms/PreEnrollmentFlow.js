@@ -1,5 +1,5 @@
 import {PreEnrollmentCode} from "./EnterPreEnrollment";
-import {VerifyAadharNumber, VerifyAadharOTP} from "./EnterAadharNumber";
+import {VerifyAadhaarNumber, VerifyAadhaarOTP} from "./EnterAadhaarNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {Redirect, useHistory} from "react-router";
 import {appIndexDb} from "../../AppDatabase";
@@ -8,8 +8,8 @@ import "./PreEnrollmentFlow.scss";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode";
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails";
-export const FORM_AADHAR_NUMBER = "verifyAadharNumber";
-export const FORM_AADHAR_OTP = "verifyAadharOTP";
+export const FORM_AADHAAR_NUMBER = "verifyAadhaarNumber";
+export const FORM_AADHAAR_OTP = "verifyAadhaarOTP";
 
 export function PreEnrollmentFlow(props) {
     return (
@@ -32,15 +32,15 @@ function PreEnrollmentRouteCheck({pageName}) {
             }
             break;
         }
-        case FORM_AADHAR_NUMBER : {
+        case FORM_AADHAAR_NUMBER : {
             if (state.name) {
-                return <VerifyAadharNumber/>
+                return <VerifyAadhaarNumber/>
             }
             break;
         }
-        case FORM_AADHAR_OTP :
-            if (state.aadharNumber) {
-                return <VerifyAadharOTP/>
+        case FORM_AADHAAR_OTP :
+            if (state.aadhaarNumber) {
+                return <VerifyAadhaarOTP/>
             }
             break;
         default:
@@ -81,15 +81,15 @@ function preEnrollmentReducer(state, action) {
             return newState
 
         }
-        case FORM_AADHAR_NUMBER: {
+        case FORM_AADHAAR_NUMBER: {
             const newState = {...state};
-            newState.aadharNumber = action.payload.aadharNumber;
+            newState.aadhaarNumber = action.payload.aadhaarNumber;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
         }
-        case FORM_AADHAR_OTP: {
+        case FORM_AADHAAR_OTP: {
             const newState = {...state};
-            newState.aadharOtp = action.payload.aadharOtp;
+            newState.aadhaarOtp = action.payload.aadhaarOtp;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
         }

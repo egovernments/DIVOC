@@ -132,7 +132,7 @@ export class AppDatabase {
             patient: patient,
             batchCode: event.batchCode,
             enrollCode: event.enrollCode,
-            identify: queue.aadharNumber
+            identify: queue.aadhaarNumber
         }
     }
 

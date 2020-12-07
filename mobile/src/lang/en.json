@@ -12,5 +12,8 @@
   "app.recipientQueue": "Recipient Queue",
   "app.programName": "Covid-19 Vaccine (C19)",
   "app.recipientWaiting": "Recipient Waiting",
-  "app.certificateIssued": "Certificate Issued"
+  "app.certificateIssued": "Certificate Issued",
+  "app.enterIdentityNumber": "Enter Aadhaar Number",
+  "app.registerIdentityNumber": "Register with Aadhaar",
+  "app.scanIdentityNumber": "SCAN WITH AADHAAR"
 }
