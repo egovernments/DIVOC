@@ -11,13 +11,21 @@ function FacilityAdjustingRate() {
     const [selectedDistrict, setSelectedDistrict] = useState("Bagalkote");
     const [facilityType, setFacilityType] = useState("Government");
     const [status, setStatus] = useState("Active");
+    const [allChecked, setAllChecked] = useState(false)
+    const [selectedRate, setSelectedRate] = useState({})
+    const [submit, setSubmit] = useState(false);
     const [faclitiesList, setFacilitiesList] = useState([
-        { id: 1, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
-        { id: 2, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
-        { id: 3, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
-        { id: 4 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
-        { id: 5 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+        { id: 1, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 2, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 3, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 4 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 5 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
     ]);
+
+    const [rates,setRates] = useState([
+        {id:"abc", noOfFacilties: 2, currentRate: 100, setRate: ''},
+        {id:"cde",noOfFacilties: 3, currentRate: 100, setRate: ''}
+    ])
 
     useEffect(() => {
         normalizeStateNames();
@@ -39,6 +47,67 @@ function FacilityAdjustingRate() {
         console.log(value);
     };
 
+
+    const getFaciltiyList = () => {
+        let tableRow = [];
+        let tableCells;
+        
+        faclitiesList.forEach(facility => {
+            tableCells = []
+            tableCells.push(<tr>
+                <td>{facility['id']}</td>
+                <td>{facility['name']}</td>
+                <td>{facility['stations']}</td>
+                <td>{facility['vaccinators']}</td>
+                <td>{facility['rate']}</td>
+                <td>{facility['last_adjusted_on']}</td>
+                <td>
+                <div className="form-check">
+                        <label
+                            className={`${"form-check-label"} ${
+                                styles["highlight"]
+                            }`}
+                            htmlFor={facility['id']}
+                        >
+                           <input
+                        type="checkbox"
+                        className="form-check-input"
+                        id={facility['id']}
+                    />
+                    <div
+                        className={styles["wrapper"]}
+                        style={{
+                            backgroundColor:
+                            facility['isChecked']
+                                    ? "#DE9D00"
+                                    : "",
+                        }}
+                    >
+                        &nbsp;
+                    </div>
+                        </label>
+                    </div>
+                    
+                </td>
+            </tr>)
+            tableRow.push(tableCells)
+        })
+        return tableRow;
+
+    }
+
+    const handleAllcheck = (e) => {
+        let list =  faclitiesList;
+        let rowCount = 0;
+        if(e.target.value === "checkAll"){
+            list.forEach(faciltiy => {
+                faciltiy.isChecked = e.target.checked;
+                rowCount = rowCount + 1;
+            });
+        setAllChecked(e.target.checked)
+        setFacilitiesList(list);
+        }
+    }
 
     const showDistrictList = () => {
         return Object.keys(DISTRICT_NAMES).map((district) => {
@@ -69,6 +138,44 @@ function FacilityAdjustingRate() {
         });
     };
 
+    const getRatesData = () => {
+        let tableRow = [];
+        let tableCells;
+        
+        rates.forEach(rate => {
+            console.log("rate",rate)
+            tableCells = []
+            tableCells.push(<tr>
+                 <td>
+                    <div className="form-check">
+                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor={rate.id}>
+                            <input
+                                type="radio"
+                                className="form-check-input"
+                                id={rate.id}
+                                onClick={(e) => {
+                                    const newRate = rate;
+                                    newRate.isChecked =  !rate.isChecked;
+                                    setSelectedRate(newRate);
+                                }}
+                                checked={selectedRate.id === rate.id}
+                            />
+                            <div className={`${styles['wrapper']} ${styles['radio']}`}  style={{backgroundColor: selectedRate.id === rate.id ?'#DE9D00':''}}>&nbsp;</div>
+                        </label>
+                    </div>
+                </td>
+                <td>{rate.noOfFacilties}</td>
+                <td>{rate.currentRate}</td>
+                <td><input type="input" size="4"/></td>
+            </tr>)
+            tableRow.push(tableCells)
+        })
+        return tableRow;
+    }
+
+    const handleClick = () => {
+        setAllChecked(false);
+    }
 
     return (
         <div className={`row ${styles['container']}`} >
@@ -182,6 +289,8 @@ function FacilityAdjustingRate() {
                             Month
                         </label>
                     </div>
+                    <input type="date"/> 
+                    <div></div>
                 </div>
             </div>
             <div className={`col-sm-6 container ${styles['table']}`}>
@@ -193,31 +302,44 @@ function FacilityAdjustingRate() {
                         <th>CENTRE NAME</th>
                         <th>VACCINATION STATIONS</th>
                         <th>CERTIFIED VACCINATORS</th>
-                        <th>C19 program STATUS</th>
+                        <th>CURRENT RATE</th>
+                        <th>LAST ADJUSTED</th>
+                        <th>
+                            <div className="form-check">
+                        <label
+                            className={`${"form-check-label"} ${
+                                styles["highlight"]
+                            }`}
+                            htmlFor="checkAll"
+                        >
+                           <input
+                                    type="checkbox"
+                                    className="form-check-input"
+                                    onClick={(e) =>
+                                        {
+                                            handleAllcheck(e)
+                                        }
+                                    }
+                                    id="checkAll"
+                                    value="checkAll"
+                                    checked={allChecked} 
+                                />
+                                <div
+                                    className={styles["wrapper"]}
+                                    style={{
+                                        backgroundColor:
+                                        allChecked ? "#DE9D00" : "",
+                                    }}
+                                >
+                                    &nbsp;
+                                </div>
+                        </label>
+                    </div>
+                                
+                    </th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr>
-                        <td>100</td>
-                        <td>This is a centre name</td>
-                        <td>100</td>
-                        <td>100</td>
-                        <td>Inactive</td>
-                    </tr>
-                    <tr>
-                        <td>100</td>
-                        <td>This is a centre name</td>
-                        <td>100</td>
-                        <td>100</td>
-                        <td>Inactive</td>
-                    </tr><tr>
-                        <td>100</td>
-                        <td>This is a centre name</td>
-                        <td>100</td>
-                        <td>100</td>
-                        <td>Inactive</td>
-                    </tr>
-                </tbody>
+                <tbody>{getFaciltiyList()}</tbody>
                 </table>
             </div>
             <div className="col-sm-3 container">
@@ -233,42 +355,12 @@ function FacilityAdjustingRate() {
                                     <td>Set New Rate</td>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td>
-                                    <div className="form-check-inline">
-                                    <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
-                                        <input
-                                            type="radio"
-                                            className="form-check-input"  
-                                            className="form-check-input"
-                                            id="row1"
-                                            name="row1"
-                                            value="row1"
-                                            onClick={(event) =>
-                                                handleChange(
-                                                    event.target.name,
-                                                    setStatus
-                                                )
-                                            }
-                                            checked={status === "Inactive"}
-                                        />
-                                        <div className={`${styles['wrapper']} ${styles['radio']}`} style={{backgroundColor:''}}>&nbsp;</div>
-                                    </label>      
-                                    </div>
-                                    </td>
-                                    <td>20</td>
-                                    <td>100</td>
-                                    <td>550</td>
-                                </tr> 
-                            </tbody>
+                            <tbody>{getRatesData()}</tbody>
                         </table>
                         
                     </div>
-                    
-                    <div>
-                        <button className={styles['button']}>SET RATES</button>
-                    </div>
+                    <button className={styles['button']} onClick={() => setSubmit(!submit)}>SET RATES</button>
+                    {submit ? <div>All rates set successfully</div> : ''}
                 </div>
             </div>
         </div>
