@@ -5,6 +5,7 @@ const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
 const VACCINATORS = "/divoc/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
+const USER_INFO = "/divoc/api/v1/users/me"
 
 export class ApiServices {
 
@@ -51,7 +52,7 @@ export class ApiServices {
     }
 
     static async certify(certifyPatients) {
-
+        const userDetails = await appIndexDb.getUserDetails();
         const certifyBody = certifyPatients.map((item, index) => {
             return {
                 preEnrollmentCode: item.enrollCode,
@@ -61,7 +62,7 @@ export class ApiServices {
                     ],
                     dob: item.patient.dob,
                     gender: item.patient.gender,
-                    identify: item.identify,
+                    identify: "did:in.gov.uidai.aadhaar:" + item.identify,
                     name: item.patient.name,
                     nationality: item.patient.nationality
                 },
@@ -71,16 +72,18 @@ export class ApiServices {
                     effectiveStart: "2020-12-02",
                     effectiveUntil: "2020-12-02",
                     manufacturer: "string",
-                    name: "TOD0"
+                    name: "COVID-19"
                 },
                 vaccinator: {
                     name: item.vaccinator.name
+                },
+                facility: {
+                    name: userDetails.facility.facilityName,
+                    address: {}
                 }
             }
         })
 
-        const stringify = JSON.stringify(certifyBody);
-        console.log(stringify)
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -88,7 +91,7 @@ export class ApiServices {
                 'accept': 'application/json',
                 'Authorization': 'Bearer ' + localStorage.getItem("token")
             },
-            body: stringify
+            body: JSON.stringify(certifyBody)
         };
 
         return fetch(CERTIFY, requestOptions)
@@ -96,6 +99,21 @@ export class ApiServices {
                 if (response.status === 200) {
                     return {}
                 }
+                return response.json()
+            })
+    }
+
+    static async getUserDetails() {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+        };
+        return fetch(USER_INFO, requestOptions)
+            .then(response => {
                 return response.json()
             })
     }
