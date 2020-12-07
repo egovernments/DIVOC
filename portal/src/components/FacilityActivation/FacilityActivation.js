@@ -11,6 +11,7 @@ function FacilityActivation() {
     const [facilityType, setFacilityType] = useState("Government");
     const [status, setStatus] = useState("Active");
     const [allChecked, setAllChecked] = useState(false)
+    const [rowCount, setRowCount] = useState(0);
     const [faclitiesList, setFacilitiesList] = useState([
         { id: 1, name: "This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
         { id: 2, name: "This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
@@ -36,7 +37,6 @@ function FacilityActivation() {
 
     const handleChange = (value, setValue) => {
         setValue(value);
-        console.log(value);
     };
 
     const showDistrictList = () => {
@@ -89,13 +89,16 @@ function FacilityActivation() {
 
     const handleAllcheck = (e) => {
         let list =  faclitiesList;
+        let rowCount = 0;
         if(e.target.value === "checkAll"){
             list.forEach(faciltiy => {
                 faciltiy.isChecked = e.target.checked;
+                rowCount = rowCount + 1;
             });
         setAllChecked(e.target.checked)
-        }
         setFacilitiesList(list);
+        setRowCount(rowCount);
+        }
     }
 
     const getFaciltiyList = () => {
@@ -147,7 +150,9 @@ function FacilityActivation() {
     }
 
     const handleClick = () => {
-        console.log("clicked me");
+        setFacilitiesList([]);
+        setAllChecked(false);
+        setRowCount(0);
     };
 
     return (
@@ -370,8 +375,9 @@ function FacilityActivation() {
             <div className="col-sm-2 container">
                 <div className={`card ${styles["card-continer"]}`}>
                     <div className="card-body text-center">
+                        {faclitiesList.length>0 ? '' : <p>Success</p>}
                         <p>
-                            Make x facilities active for the {selectedProgram}
+                            Make {rowCount} facilities active for the {selectedProgram}
                         </p>
                         <button
                             onClick={handleClick}
