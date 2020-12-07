@@ -23,7 +23,7 @@ function VaccinatorsRegistry() {
 
     return (
         <div>
-            {keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) && <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>}
+            {keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) && <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>}
             <CustomTable data={vaccinators} fields={["serialNum", "name", "status"]}/>
         </div>
     );
