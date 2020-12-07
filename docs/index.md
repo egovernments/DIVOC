@@ -41,8 +41,3 @@ Following video provides a good introduction to DIVOC.
 
 More documentation will come up soon!
 
-* * *
-
-* Back to [DIVOC Documentation Main Page](/index.md)
-
-* * *

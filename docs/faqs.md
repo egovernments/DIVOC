@@ -36,9 +36,3 @@
 16. **Unlike India, we don't have Digilocker and Aadhaar. What can we do for issuance of "digital vaccination certificates" to people?**
     * Yes, it is integrated within the system. Certificates are natively digital, machine readable, digitally signed, verifiable, and also printable with a QR code making it easy for people to keep it electronically or physically.
 
-
-* * *
-
-* Back to [DIVOC Documentation Main Page](/index.md)
-
-* * *

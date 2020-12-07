@@ -15,9 +15,3 @@ Coming soon ...
 
 Coming soon ...
 
-
-* * *
-
-* Back to [DIVOC Documentation Main Page](/index.md)
-
-* * *

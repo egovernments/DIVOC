@@ -12,8 +12,3 @@ Coming soon ...
 
 1. [API Documentation](/developer-docs/index.md)
 
-* * *
-
-* Back to [DIVOC Documentation Main Page](/index.md)
-
-* * *

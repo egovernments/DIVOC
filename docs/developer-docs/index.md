@@ -7,8 +7,3 @@
 2. [Vaccination API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/vaccination-api.yaml)
 3. [Verification API (swagger)](https://bharat-dpi.github.io/DIVOC/developer-docs/api/admin-api.html#/divoc-verification.yaml)
 
-* * *
-
-* Back to [DIVOC Documentation Main Page](/index.md)
-
-* * *
