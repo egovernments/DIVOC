@@ -16,6 +16,7 @@ var Config = struct {
 		Url               string `default:"localhost:8081" env:"REGISTRY_URL"`
 		AddOperationId    string
 		SearchOperationId string `default:"search"`
+		UpdateOperationId string `default:"update"`
 		ReadOperationId   string `default:"read"`
 		ApiVersion        string `default:"1"`
 	}
