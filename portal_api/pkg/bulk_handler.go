@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
@@ -25,15 +26,15 @@ func createVaccinator(data *Scanner) error {
 		SerialNum:           &serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
-		Code:        &code,
-		Name:        &name,
+		Code:                &code,
+		Name:                &name,
 		Status:              &status,
 		FacilityIds:         facilityIds,
 		AverageRating:       &averageRating,
 		Signatures:          []*models.Signature{},
 		TrainingCertificate: &trainingCertificate,
 	}
-	makeRegistryCreateRequest(vaccinator, "Vaccinator")
+	services.MakeRegistryCreateRequest(vaccinator, "Vaccinator")
 	return nil
 }
 
@@ -69,7 +70,7 @@ func createFacility(data *Scanner, authHeader string) error {
 			Pincode:      &pincode,
 		},
 	}
-	makeRegistryCreateRequest(facility, "Facility")
+	services.MakeRegistryCreateRequest(facility, "Facility")
 	for _, mobile := range facility.Admins {
 		//create keycloak user for
 		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)

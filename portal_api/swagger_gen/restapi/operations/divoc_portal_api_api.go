@@ -82,6 +82,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
 		}),
+		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateFacilities has not yet been implemented")
+		}),
 
 		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
@@ -158,6 +161,8 @@ type DivocPortalAPIAPI struct {
 	GetProgramsHandler GetProgramsHandler
 	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	GetVaccinatorsHandler GetVaccinatorsHandler
+	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
+	UpdateFacilitiesHandler UpdateFacilitiesHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -279,6 +284,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "GetVaccinatorsHandler")
+	}
+	if o.UpdateFacilitiesHandler == nil {
+		unregistered = append(unregistered, "UpdateFacilitiesHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -430,6 +438,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/vaccinators"] = NewGetVaccinators(o.context, o.GetVaccinatorsHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/facilities"] = NewUpdateFacilities(o.context, o.UpdateFacilitiesHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

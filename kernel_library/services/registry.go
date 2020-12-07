@@ -119,3 +119,47 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 	}
 	return responseObject.Result, nil
 }
+
+func GetEntityType(entityTypeId string) middleware.Responder {
+	filter := map[string]interface{}{
+		"@type": map[string]interface{}{
+			"eq": entityTypeId,
+		},
+	}
+	response, err := QueryRegistry(entityTypeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	return model.NewGenericJSONResponse(response[entityTypeId])
+}
+
+func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]interface{}, error) {
+
+	queryRequest := RegistryRequest{
+		"open-saber.registry.update",
+		"1.0",
+		map[string]interface{}{
+			typeId: update,
+		},
+	}
+	log.Info("Registry query ", queryRequest)
+	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.UpdateOperationId, req.BodyJSON(queryRequest))
+	if err != nil {
+		return nil, errors.Errorf("Error while updating registry", err)
+	}
+	if response.Response().StatusCode != 200 {
+		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
+	}
+	responseObject := RegistryResponse{}
+	err = response.ToJSON(&responseObject)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to parse response from registry.")
+	}
+	log.Infof("Response %+v", responseObject)
+	if responseObject.Params.Status != "SUCCESSFUL" {
+		log.Infof("Response from registry %+v", responseObject)
+		return nil, errors.New("Failed while querying from registry")
+	}
+	return responseObject.Result, nil
+}

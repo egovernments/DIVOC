@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
@@ -59,27 +60,27 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
 	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
 	api.GetEnrollmentsHandler = operations.GetEnrollmentsHandlerFunc(getEnrollmentsHandler)
+	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 }
 
-
 func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal interface{}) middleware.Responder {
-	return getEntityType("Enrollment")
+	return services.GetEntityType("Enrollment")
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal interface{}) middleware.Responder {
-	return getEntityType("Program")
+	return services.GetEntityType("Program")
 }
 
 func getMedicinesHandler(params operations.GetMedicinesParams, principal interface{}) middleware.Responder {
-	return getEntityType("Medicine")
+	return services.GetEntityType("Medicine")
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal interface{}) middleware.Responder {
-	return getEntityType("Vaccinator")
+	return services.GetEntityType("Vaccinator")
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal interface{}) middleware.Responder {
-	return getEntityType("Facility")
+	return services.GetEntityType("Facility")
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal interface{}) middleware.Responder {
@@ -95,7 +96,7 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal int
 		log.Info(err)
 		return NewGenericServerError()
 	}
-	return makeRegistryCreateRequest(requestMap, objectId)
+	return services.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
 func createProgramHandler(params operations.CreateProgramParams, principal interface{}) middleware.Responder {
@@ -111,7 +112,7 @@ func createProgramHandler(params operations.CreateProgramParams, principal inter
 		log.Info(err)
 		return NewGenericServerError()
 	}
-	return makeRegistryCreateRequest(requestMap, objectId)
+	return services.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal interface{}) middleware.Responder {
@@ -174,4 +175,22 @@ func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principa
 		return operations.NewGetFacilityGroupsBadRequest()
 	}
 	return &operations.GetFacilityGroupsOK{Payload: groups}
+}
+
+func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal interface{}) middleware.Responder {
+	for _, updateRequest := range params.Body {
+		requestBody, err := json.Marshal(updateRequest)
+		if err != nil {
+			return operations.NewUpdateFacilitiesBadRequest()
+		}
+		requestMap := make(map[string]interface{})
+		err = json.Unmarshal(requestBody, &requestMap)
+		resp, err := services.UpdateRegistry("Facility", requestMap)
+		if err != nil {
+			log.Error(err)
+		} else {
+			log.Print(resp)
+		}
+	}
+	return operations.NewUpdateFacilitiesOK()
 }

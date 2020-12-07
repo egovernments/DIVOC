@@ -94,6 +94,31 @@ func init() {
           }
         }
       },
+      "put": {
+        "summary": "Update facility",
+        "operationId": "updateFacilities",
+        "parameters": [
+          {
+            "description": "Facility Update Request",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
       "post": {
         "consumes": [
           "multipart/form-data"
@@ -540,6 +565,20 @@ func init() {
         }
       }
     },
+    "FacilityUpdateRequest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "osid": {
+            "type": "object"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      }
+    },
     "FacilityUser": {
       "properties": {
         "employeeId": {
@@ -815,6 +854,31 @@ func init() {
                 "$ref": "#/definitions/Facility"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update facility",
+        "operationId": "updateFacilities",
+        "parameters": [
+          {
+            "description": "Facility Update Request",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1274,6 +1338,23 @@ func init() {
         "websiteUrl": {
           "type": "string",
           "title": "Website URL"
+        }
+      }
+    },
+    "FacilityUpdateRequest": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/FacilityUpdateRequestItems0"
+      }
+    },
+    "FacilityUpdateRequestItems0": {
+      "type": "object",
+      "properties": {
+        "osid": {
+          "type": "object"
+        },
+        "status": {
+          "type": "string"
         }
       }
     },
