@@ -1,0 +1,489 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  hasRole:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth'
+    tokenUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token'
+    scopes:
+      admin: scope of super admin
+      facility-admin: scope of facility admin
+      facility-staff: scope of facility staff
+security:
+  - hasRole: ['facility-staff']
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /authorize:
+    post:
+      tags:
+        - login
+      summary: Establish token
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/LoginResponse'
+        '401':
+          description: Unauthorized
+
+  /divoc/configuration:
+    get:
+      tags:
+        - configuration
+      summary: Get Meta information about the application flow
+      operationId: getConfiguration
+      parameters:
+        - name: lastKnownVersion
+          in: query
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/ApplicationConfiguration'
+  /users/me:
+    get:
+      tags:
+        - vaccination
+      summary: Get User information
+      operationId: getLoggedInUserInfo
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UserInfo'
+  '/preEnrollments/{preEnrollmentCode}':
+    get:
+      tags:
+        - vaccination
+      summary: Get pre enrollment information
+      description: Get pre enrollment data from api for vaccination
+      operationId: getPreEnrollment
+      parameters:
+        - name: preEnrollmentCode
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/PreEnrollment'
+  '/preEnrollments':
+    get:
+      tags:
+        - vaccination
+      summary: Get all pre enrollments applicable to assigned facility
+      operationId: getPreEnrollmentsForFacility
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PreEnrollment'
+  /certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        athorization and vaccinator should be trained for the vaccination that
+        is being certified.
+      operationId: certify
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequest'
+      responses:
+        '200':
+          description: OK
+  /programs/current:
+    get:
+      tags:
+        - configuration
+      summary: Get active vaccination programs
+      operationId: getCurrentPrograms
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
+  /vaccinators:
+    get:
+      tags:
+        - configuration
+      summary: Get active vaccinators mapped for the facility
+      operationId: getVaccinators
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "../registry/Vaccinator.json#/definitions/Vaccinator"
+  /identity/verify:
+    post:
+      tags:
+        - identity
+      summary: Validate identity if the person
+      consumes:
+        - application/json
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/IdentityVerificationRequest'
+      responses:
+        '200':
+          description: OK
+        '206':
+          description: Need OTP
+  /certificates/{phone}:
+    get:
+      summary: Get certificate json
+      security: []
+#        - hasRole: ["recipient"]
+      operationId: getCertificate
+      parameters:
+        - name: phone
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /symptoms:
+    get:
+      tags:
+        - symptoms
+      summary: Get symptoms
+      operationId: getSymptoms
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+    post:
+      tags:
+        - symptoms
+      summary: Create symptoms
+      operationId: createSymptoms
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+          description: Symptoms data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /instructions:
+    get:
+      tags:
+        - symptoms
+      summary: Get symptoms instructions
+      security: []
+      operationId: getInstructions
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /sideEffects:
+    get:
+      tags:
+        - sideEffects
+      summary: Get Side Effects
+      security:
+        - hasRole: ["admin"]
+      operationId: getSideEffects
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+    post:
+      tags:
+        - sideEffects
+      summary: Post side effects
+      security: []
+      operationId: createSideEffects
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              sideEffects:
+                type: object
+                $ref: '#/definitions/SideEffects'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK
+definitions:
+  SideEffects:
+    type: object
+    properties:
+      symptoms:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            additionalDetails:
+              type: string
+      recipientIds:
+        type: array
+        items:
+          type: string
+  Symptoms:
+    type: object
+    properties:
+      name:
+        type: string
+      instructions:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+            messages:
+              type: array
+              items:
+                type: string
+            imageURL:
+              type: array
+              items:
+                type: string
+  LoginRequest:
+    type: object
+    properties:
+      mobile:
+        type: string
+        format: ''
+      token2fa:
+        type: string
+  LoginResponse:
+    type: object
+    properties:
+      token:
+        type: string
+      refreshToken:
+        type: string
+  PreEnrollment:
+    type: object
+    properties:
+      code:
+        type: string
+      enrollmentScopeId:
+        type: string
+      phone:
+        type: string
+      nationalId:
+        type: string
+      dob:
+        type: string
+        format: date
+      gender:
+        type: string
+        enum: ["Male", "Female", "Other"]
+      name:
+        type: string
+      email:
+        type: string
+      meta:
+        type: object
+  CertificationRequest:
+    type: object
+    properties:
+      preEnrollmentCode:
+        type: string
+      recipient:
+        type: object
+        properties:
+          name:
+            type: string
+          dob:
+            type: string
+            format: date
+          gender:
+            type: string
+          nationality:
+            type: string
+          identity:
+            type: string
+          contact:
+            type: array
+            items:
+              type: string
+      vaccination:
+        type: object
+        properties:
+          name:
+            type: string
+          batch:
+            type: string
+          manufacturer:
+            type: string
+          date:
+            type: string
+            format: date-time
+          effectiveStart:
+            type: string
+            format: date
+          effectiveUntil:
+            type: string
+            format: date
+      vaccinator:
+        type: object
+        properties:
+          name:
+            type: string
+      facility:
+        type: object
+        properties:
+          name:
+            type: string
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: integer
+  Program:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      description:
+        type: string
+      logoURL:
+        type: string
+      medicines:
+        type: array
+        items:
+          type: object
+          title: "medicine"
+          properties:
+            name:
+              type: string
+            provider:
+              type: string
+            vaccinationMode:
+              type: string
+              enum: ["muscular injection", "oral", "nasal"]
+            schedule:
+              type: object
+              properties:
+                repeatTimes:
+                  type: integer
+                repeatInterval:
+                  type: integer
+            effectiveUntil:
+              type: integer
+              description: Number of months the vaccination is effective
+            status:
+              type: string
+              enum: ["Active", "Inactive", "Blocked"]
+            price:
+              type: number
+  IdentityVerificationRequest:
+    type: object
+    properties:
+      id:
+        type: string
+      token:
+        type: string
+  ApplicationConfiguration:
+    type: object
+    properties:
+      navigation:
+        type: object
+      validation:
+        type: object
+      styles:
+        type: object
+  UserInfo:
+    type: object
+    properties:
+      firstName:
+        type: string
+      lastName:
+        type: string
+      mobile:
+        type: string
+      roles:
+        type: array
+        items:
+          type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /divoc/api/v1

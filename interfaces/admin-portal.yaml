@@ -1,0 +1,506 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc Portal API
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  hasRole:
+    # This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
+    # Alternatively, the query param: "access_token" may be used.
+    #
+    # In our scenario, we must use the query param version in order to avoid
+    # passing several headers with key 'Authorization'
+    type: oauth2
+    # The flow and URLs in spec are for documentary purpose: go-swagger does not implement OAuth workflows
+    flow: accessCode
+    authorizationUrl: 'https://dummy.oauth.net/auth'
+    tokenUrl: 'https://dumy.oauth.net/token'
+    # Required scopes are passed by the runtime to the authorizer
+    scopes:
+      admin: scope of super admin
+      facility-admin: scope of facility admin
+
+security:
+  - hasRole: ['admin']
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /facilities:
+    get:
+      summary: get facilities
+      operationId: getFacilities
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Facility'
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update facility
+      operationId: updateFacilities
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityUpdateRequest'
+          description: Facility Update Request
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /enrollments:
+    get:
+      summary: get enrollments
+      operationId: getEnrollments
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+    post:
+      summary: Upload facility csv for bulk ingestion of pre enrollment
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /vaccinators:
+    get:
+      summary: Get vaccinators
+      operationId: getVaccinators
+      security:
+        - hasRole: ["facility-admin", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Vaccinator'
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /programs:
+    get:
+      summary: get program list
+      operationId: getPrograms
+      security:
+        - hasRole:
+            - admin
+            - user
+      responses:
+        '200':
+            description: OK
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/Program'
+    post:
+      summary: Create program
+      operationId: createProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramRequest'
+          description: Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /medicines:
+    get:
+      summary: Get medicines
+      operationId: getMedicines
+      security:
+        - hasRole: ["user", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/CreateMedicineRequest'
+    post:
+      summary: Create Medicine
+      operationId: createMedicine
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/CreateMedicineRequest'
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facility/users:
+    get:
+      summary: Get users of a facility
+      operationId: getFacilityUsers
+      security:
+        - hasRole: ["facility-admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/FacilityUser'
+    post:
+      summary: Create Facility User
+      operationId: createFacilityUsers
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityUser'
+          description: Create facility user data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facility/groups:
+    get:
+      summary: Get facility groups
+      operationId: getFacilityGroups
+      security:
+        - hasRole: ["facility-admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/UserGroup'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+definitions:
+  FacilityUpdateRequest:
+    type: array
+    items:
+      type: object
+      properties:
+        osid:
+          type: object
+        status:
+          type: string
+  ProgramRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      logoURL:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
+  CreateMedicineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      provider:
+        type: string
+      vaccinationMode:
+        type: string
+        enum: ["muscular injection", "oral", "nasal"]
+      schedule:
+        type: object
+        properties:
+          repeatTimes:
+            type: number
+            description: How many times vaccination should be taken
+          repeatInterval:
+            type: number
+            description: Number of times the vaccination should be taken.
+      effectiveUntil:
+        type: number
+        description: Effective until n months after the full vaccination schedule is completed
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      price:
+        type: number
+        description: Indicative price if fixed or max price available.
+  Facility:
+    properties:
+      serialNum:
+        type: integer
+        title: Serial Number
+      facilityCode:
+        type: string
+        title: Facility Code
+      facilityName:
+        type: string
+        title: Facility Name
+      address:
+        "$ref": "#/definitions/Address"
+        title: Address
+      geoLocation:
+        type: string
+        title: Geo Location
+      websiteUrl:
+        type: string
+        title: Website URL
+      contact:
+        type: string
+        title: Contact number
+      operatingHourStart:
+        type: integer
+        title: Operating hours start of day
+      operatingHourEnd:
+        type: integer
+        title: Operating hours end of day
+      category:
+        type: string
+        title: Category
+        enum:
+          - GOVT
+          - PRIVATE
+      type:
+        type: string
+        title: Type of Facility
+        enum:
+          - Fixed location
+          - Mobile
+          - Both
+      averageRating:
+        type: number
+        title: Average Rating
+        description: Average Rating of Facility 0 to 5, 0 for no rating.
+        default: 0
+      status:
+        type: string
+        title: Status of Facility
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      admins:
+        type: array
+        items:
+          type: string
+      stamp:
+        type: string
+  Address:
+    type: object
+    title: Address
+    description: Indian address format
+    example:
+      - addressLine1: no. 23, some lane, some road
+        addressLine2: some nagar
+        district: bangalore south
+        state: Karnataka
+        pincode: 560000
+    required:
+      - addressLine1
+      - addressLine2
+      - district
+      - state
+      - pincode
+    properties:
+      addressLine1:
+        type: string
+      addressLine2:
+        type: string
+      district:
+        type: string
+      pincode:
+        type: integer
+      state:
+        type: string
+        title: The state schema
+        description: State of address
+        example:
+          - Karnataka
+  Vaccinator:
+    type: object
+    title: The Vaccinator Schema
+    required:
+      - serialNum
+      - code
+      - nationalIdentifier
+      - name
+      - facilityIds
+      - mobileNumber
+      - averageRating
+      - trainingCertificate
+      - status
+    properties:
+      signatures:
+        type: array
+        items:
+          "$ref": Signature.json#/definitions/Signature
+      serialNum:
+        type: integer
+      code:
+        type: string
+      nationalIdentifier:
+        type: string
+      name:
+        type: string
+        title: Full name
+      facilityIds:
+        type: array
+        items:
+          type: string
+      mobileNumber:
+        type: string
+        maxLength: 10
+        minLength: 10
+      averageRating:
+        type: number
+      trainingCertificate:
+        type: string
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+  Program:
+    type: object
+    title: Program
+    required:
+      - name
+      - description
+      - startDate
+    properties:
+      name:
+        type: string
+        title: Name
+      description:
+        type: string
+        title: Description
+      logoURL:
+        type: string
+        title: Logo URL
+      startDate:
+        type: string
+        title: Start Date
+        format: date
+      endDate:
+        type: string
+        title: End Date
+        format: date
+      status:
+        type: string
+        title: Status
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
+  FacilityUser:
+    properties:
+      id:
+        type: string
+        title: Facility User Id
+      name:
+        type: string
+        title: Facility User Name
+      mobileNumber:
+        type: string
+        title: Facility User Mobile Number
+      employeeId:
+        type: string
+        title: Facility User Id
+      groups:
+        type: array
+        items:
+          "$ref": "#/definitions/UserGroup"
+  UserGroup:
+    properties:
+      id:
+        type: string
+        title: group id
+      name:
+        type: string
+        title: group name
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /divoc/admin/api/v1

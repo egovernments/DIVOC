@@ -1,0 +1,7 @@
+phone,enrollmentScopeId,nationalId,dob,gender,name,email
+1111111300,BLR341,234234234234,1990-01-01,Male,Soorya A,soorya.a@example.com
+1111111301,DEL002,234234234343,1980-05-01,Female,Jaya P,jaya.p@example.com
+1111111302,DEL002,234234234342,1983-03-01,Male,Suresh P,suresh.p@example.com
+1111111303,DEL002,234234234341,1983-03-03,Male,Madhav P,madhav.p@example.com
+1111111304,DEL002,234234234335,1983-03-04,Female,Suma P,suma.p@example.com
+1111111305,DEL002,234234234332,1983-03-06,Male,Adi P,adi.p@example.com

@@ -1,0 +1,87 @@
+.navbar {
+    box-shadow: 0 6px 20px #C1CFD933;
+}
+
+.nav-link {
+    color: #646D82 !important;
+    font-size: 12px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.main-img-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 45%;
+}
+
+.main-img {
+    width: 85%;
+    height: 70%;
+}
+
+.footer-content {
+    height: 12vh;
+    border-top: 1px solid #d3d3d3;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+.footer-gov-logo {
+    width: 15%;
+    margin: 0 5px;
+}
+
+.footer-link {
+    color: #040E28;
+    margin: 0 5px;
+}
+
+.form-title {
+    font-size: 25px;
+}
+
+.form-subtitle {
+    font-size: 35px;
+}
+
+.form-content {
+    padding-left: 9rem;
+    padding-right: 18rem;
+}
+
+.input-field {
+    display: flex;
+    border: 1px solid #E9E9F0;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.input-field:focus-within {
+    border: 1px solid #2CD889;
+}
+
+.input-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mobile-prefix, .otp-prefix {
+    padding: 1px 2px;
+    margin: 0;
+}
+
+.mobile input {
+    width: 150px !important;
+}
+
+.login-arrow {
+    width: 9%;
+    margin-left: 2rem;
+}
+
+.otp-prefix {
+    color: #4E67D1;
+}

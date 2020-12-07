@@ -1,0 +1,51 @@
+.container{
+    display: flex;
+    padding: 20px;
+}
+.form-container{
+    width: 50%;
+    padding:  50px;
+    box-shadow: 0px 6px 20px #C1CFD933;
+}
+
+.sub-container{
+    width: 100%;
+    padding:  50px;
+    box-shadow: 0px 6px 20px #C1CFD933;
+}
+
+.form{
+    color: #4D4F5C;
+    font-size: small;
+}
+
+.heading{
+    color: #4E67D1;
+    border-bottom: 1px solid #5C9EF8 ;
+    padding-bottom: 15px;
+    margin-bottom: 10px;
+
+}
+
+.button {
+    border: 2px solid #4E67D1;
+    border-radius: 6px;
+    background-color:white;
+    padding-left: 20px;
+    padding-right: 20px;
+    color: #4E67D1;
+    margin-top: 15px;
+}
+
+.form-radio-buttons{
+    padding-left: 5px;
+}
+
+.box{
+    width: 50%;
+}
+
+.list-title{
+    color: #1D1D1D;
+    font-weight: 600;
+}

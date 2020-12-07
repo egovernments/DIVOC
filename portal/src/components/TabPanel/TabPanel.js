@@ -1,0 +1,68 @@
+import React from "react";
+import Tabs from "@material-ui/core/Tabs";
+import Tab from "@material-ui/core/Tab";
+import {makeStyles, withStyles} from '@material-ui/core/styles';
+
+
+export const StyledTabs = withStyles({
+    indicator: {
+        display: 'flex',
+        justifyContent: 'center',
+        backgroundColor: 'transparent',
+        color: '#040E28',
+        '& > span': {
+            maxWidth: 60,
+            width: '100%',
+            backgroundColor: '#5C9EF8',
+        },
+    },
+})((props) => <Tabs {...props} TabIndicatorProps={{children: <span/>}}/>);
+
+export const StyledTab = withStyles((theme) => ({
+    root: {
+        textTransform: 'none',
+        textAlign: 'left',
+        fontWeight: 'bold',
+        fontSize: theme.typography.pxToRem(16),
+        marginRight: theme.spacing(1),
+        '&:focus': {
+            opacity: 1,
+        },
+    },
+}))((props) => <Tab disableRipple {...props} />);
+
+export const useStyles = makeStyles((theme) => ({
+    root: {
+        flexGrow: 1,
+        paddingLeft: theme.spacing(10),
+        paddingRight: theme.spacing(10),
+        paddingTop: theme.spacing(3),
+    },
+}));
+
+export const TabPanels = ({tabs}) => {
+    const [value, setValue] = React.useState(0);
+    const classes = useStyles();
+    const handleChange = (event, newValue) => {
+        setValue(newValue);
+    };
+    return (
+        <div className={classes.root}>
+            <StyledTabs
+                value={value}
+                indicatorColor="secondary"
+                onChange={handleChange}
+                aria-label="styled tabs example"
+            >
+                {
+                    tabs.map((tab, index) => (
+                        <StyledTab label={tab.title}/>
+                    ))
+                }
+            </StyledTabs>
+            {
+                tabs[value].component
+            }
+        </div>
+    );
+};

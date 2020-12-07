@@ -1,0 +1,21 @@
+.info-card-wrapper {
+  background: white;
+  padding: 1rem 0.5rem;
+  border-radius: 10px;
+
+  .info-metric {
+    background: #DE9D00;
+    border-radius: 100px;
+    color: white;
+    border: 5px solid #FEF0CD;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .info-title {
+    color: #646D82;
+  }
+}

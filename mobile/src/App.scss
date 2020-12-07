@@ -1,0 +1,6 @@
+@import "styles/colors";
+
+.App {
+  height: 100vh;
+  background: linear-gradient($primaryThemeColor 20%, $textWhiteColor 20%);
+}

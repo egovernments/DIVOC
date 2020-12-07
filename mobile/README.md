@@ -1,1 +1,1 @@
-# Vaccination Mobile Application (flutter)
+# Vaccination React Application (PWA)

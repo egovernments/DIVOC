@@ -1,0 +1,52 @@
+@import "styles/colors.scss";
+@import "styles/common-mixins.scss";
+
+.enroll-code-container {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  place-items: center;
+
+  .title {
+    margin-top: 20%;
+  }
+
+  .input-container {
+    margin-bottom: 20%;
+    display: grid;
+    place-items: center;
+
+    .divOuter {
+      width: 100%;
+
+      .divInner {
+        left: 0;
+        position: sticky;
+
+        .otp {
+          border: none;
+          background-image: linear-gradient(to left, #88C6A9 70%, rgba(255, 255, 255, 0) 0%);
+          background-position: bottom;
+          background-size: 70px 1px;
+          background-repeat: repeat-x;
+          background-position-x: 35px;
+          font-size: 42px;
+          width: 320px;
+          padding-left: 0;
+          letter-spacing: 45px;
+          outline: none;
+        }
+
+      }
+    }
+
+    .mobile {
+      margin-top: 20%;
+    }
+  }
+
+  .next {
+    margin-top: 15%;
+    color: white;
+  }
+}

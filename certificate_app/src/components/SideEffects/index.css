@@ -1,0 +1,83 @@
+.side-effect-container {
+    padding: 3rem 5rem;
+}
+.symptom-wrapper {
+    padding-top: 1rem;
+    cursor: pointer;
+}
+.symptom-wrapper .custom-checkbox {
+    border: 2px solid #88C6A9;
+    border-radius: 4px;
+    width: 1rem;
+    height: 1rem;
+    display: inline-block;
+}
+.symptom-wrapper .active {
+    background: #88C6A9;
+}
+.symptom-wrapper .title {
+    color: #4E4E4E;
+    padding-left: 1rem;
+    user-select: none;
+    font-size: 14px;
+}
+.others-textarea {
+    resize: none;
+    font-size: 14px;
+    margin-top: 1rem;
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    width: 15rem;
+    height: 10rem;
+    padding: 1rem;
+}
+
+.confirm-symptoms-btn {
+    background: transparent linear-gradient(91deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;
+    color: #fff;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    outline: none;
+    margin-top: 1rem;
+}
+
+.instructions-container {
+    max-height: 30rem;
+    overflow: scroll;
+    overflow-x: hidden;
+    padding-right: 1rem;
+}
+.instructions-container .instruction-wrapper:nth-child(1){
+    background: #F2FAF6;
+}
+.instructions-container .instruction-wrapper:nth-child(2){
+    background: #EFF5FD;
+}
+.instructions-container .instruction-wrapper:nth-child(3){
+    background: #F7F8FF;
+}
+
+.instructions-container .instruction-wrapper:nth-child(1) .instruction-heading{
+    color: #4CA07A;
+}
+.instructions-container .instruction-wrapper:nth-child(2) .instruction-heading{
+    color: #5C9EF8;
+}
+.instructions-container .instruction-wrapper:nth-child(3) .instruction-heading{
+    color: #4E67D1;
+}
+
+.instructions-container .instruction-wrapper {
+    background-color: #F2FAF6;
+    border-radius: 10px;
+    opacity: 1;
+    padding: 2rem;
+    margin-top: 1rem;
+    font-size: 14px;
+}
+
+.instruction-wrapper .instruction-heading{
+    color: #4CA07A;
+    font-size: 12px;
+}

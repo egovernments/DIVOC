@@ -1,0 +1,52 @@
+{
+    "$id": "#properties/Medicine",
+      "type": "object",
+      "required": [
+        "name", "status", "provider"
+      ],
+      "properties": {
+        "name": {
+          "$id": "#/properties/name",
+          "type": "string",
+          "title": "Name of Vaccine / Medicine"
+        },
+        "provider": {
+          "title": "Manufacturer",
+          "type": "string",
+          "$id": "#/properties/provider"
+        },
+        "administrationType": {
+          "title": "Administration Type",
+          "type": "string",
+          "enum": ["muscular injection", "oral", "nasal"],
+          "default": "muscular injection"
+        },
+        "schedule": {
+          "title": "Schedule Details",
+          "type": "object",
+          "properties": {
+            "repeatTimes": {
+              "type": "number",
+              "title": "Repeat times"
+            },
+            "repeatInterval": {
+              "title": "Repeat interval",
+              "type": "number"
+            }
+          }
+        },
+        "effectiveUntil": {
+          "type": "number",
+          "title": "Effective until (months)"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Active", "Inactive", "Blocked"],
+          "title": "Status"
+        },
+        "price": {
+          "title": "Price Range",
+          "type": "number"
+        }
+      }
+    }

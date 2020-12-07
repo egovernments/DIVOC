@@ -1,0 +1,55 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Digital Vaccination certification verification API
+  description: Digital Vaccination certification verification API
+
+securityDefinitions:
+# This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
+  hasRole:
+    type: oauth2
+    # This should be updated to the Token URL of your OAuth provider.
+    tokenUrl: http://example.com/oauth/token
+    # This should be updated to the Authorization URL of your OAuth provider.
+    authorizationUrl: http://example.com/oauth/auth
+    flow: accessCode
+    scopes:
+      verifier: allows verification of the vaccination certificates
+
+# Here we apply the security flow called 'accessCode' globally to all the operations in the spec.
+# This security scheme is defined above in the 'securityDefinitions' section.
+# Global security can be overridden an operation level as seen in the example below
+security:
+  - hasRole:
+      - verifier
+paths:
+  /verify:
+    # In this operation we do not apply the security, because it was applied globally above.
+    # The security will be applied to this operation for that reason.
+    post:
+      tags:
+        - certification
+      summary: Verify digitally signed vaccination certificate
+      description: Verify digitally signed vaccination certificate accepts signed certificate and verifies the claim.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/VerificationRequest'
+      responses:
+        200:
+          description: OK
+        401:
+          description: Invalid identity assertion.
+        400:
+          description: Invalid format of the claim or identity
+definitions:
+  VerificationRequest:
+    type: object
+    properties:
+      certificate:
+        type: object
+
+basePath: /divoc/api/v1
+schemes:
+  - https

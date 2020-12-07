@@ -1,0 +1,35 @@
+@import "styles/colors.scss";
+@import "styles/common-mixins.scss";
+
+.pre-enrollment-details {
+  height: 100%;
+  text-align: center;
+  display: grid;
+
+  h4 {
+    padding-top: 8%;
+  }
+
+  .patient-info {
+    padding: 4%;
+
+    h5 {
+      padding: 1%;
+      color: $secondaryThemeColor;
+    }
+  }
+
+  .register-with-aadhaar {
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+.no-details {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+
