@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
 import DropDown from "../DropDown/DropDown";
 import { PROGRAMS, STATE_NAMES, DISTRICT_NAMES } from "../../utils/constants";
-import styles from "./FacilityActivation.module.css";
+import styles from "./FacilityAdjustingRate.module.css";
 
-function FacilityActivation() {
+
+function FacilityAdjustingRate() {
     const [listOfStates, setListOfStates] = useState([]);
     const [selectedProgram, setSelectedProgram] = useState();
     const [selectedState, setSelectedState] = useState("Karnataka");
@@ -30,6 +31,7 @@ function FacilityActivation() {
         setValue(value);
         console.log(value);
     };
+
 
     const showDistrictList = () => {
         return Object.keys(DISTRICT_NAMES).map((district) => {
@@ -60,9 +62,7 @@ function FacilityActivation() {
         });
     };
 
-    const handleClick = () => {
-        console.log("clicked me")
-    }
+
     return (
         <div className={`row ${styles['container']}`} >
             <div className="col-sm-3">
@@ -134,8 +134,8 @@ function FacilityActivation() {
                     </div>
                 </div>
                 <div>
-                    <p className={styles['highlight']}>Status</p>
-                    <div className="form-check">
+                    <p className={styles['highlight']}>Last Adjusted on</p>
+                    <div className="form-check-inline">
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Active">
                             <input
                                 type="radio"
@@ -152,10 +152,10 @@ function FacilityActivation() {
                                 checked={status === "Active"}
                             />
                             <div className={`${styles['wrapper']} ${styles['radio']}`}  style={{backgroundColor:status==="Active"?'#DE9D00':''}}>&nbsp;</div>
-                            Active
+                            Week
                         </label>
                     </div>
-                    <div className="form-check">
+                    <div className="form-check-inline">
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
                             <input
                                 type="radio"
@@ -172,12 +172,12 @@ function FacilityActivation() {
                                 checked={status === "Inactive"}
                             />
                             <div className={`${styles['wrapper']} ${styles['radio']}`} style={{backgroundColor:status==="Inactive"?'#DE9D00':''}}>&nbsp;</div>
-                            Inactive
+                            Month
                         </label>
                     </div>
                 </div>
             </div>
-            <div className={`col-sm-7 container ${styles['table']}`}>
+            <div className={`col-sm-6 container ${styles['table']}`}>
                 <p className={styles['highlight']}>{selectedDistrict} facilties</p>
                 <table className={`table table-hover ${styles['table-data']}`}>
                 <thead>
@@ -213,11 +213,54 @@ function FacilityActivation() {
                 </tbody>
                 </table>
             </div>
-            <div className="col-sm-2 container">
-                <div className={`card ${styles['card-continer']}`}>
-                    <div className="card-body text-center">
-                        <p>Make x facilities active for the {selectedProgram}</p>
-                        <button onClick={handleClick} className={styles['button']}>MAKE ACTIVE</button>
+            <div className="col-sm-3 container">
+                <div>
+                    <div className={styles['highlight']}>Set Rate</div>
+                    <div className={` text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}` }>
+                        <table className="table table-borderless table-hover">
+                            <thead>
+                                <tr>
+                                    <td></td>
+                                    <td>No. Of Facilities</td>
+                                    <td>Current Rate</td>
+                                    <td>Set New Rate</td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                    <div className="form-check-inline">
+                                    <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
+                                        <input
+                                            type="radio"
+                                            className="form-check-input"  
+                                            className="form-check-input"
+                                            id="row1"
+                                            name="row1"
+                                            value="row1"
+                                            onClick={(event) =>
+                                                handleChange(
+                                                    event.target.name,
+                                                    setStatus
+                                                )
+                                            }
+                                            checked={status === "Inactive"}
+                                        />
+                                        <div className={`${styles['wrapper']} ${styles['radio']}`} style={{backgroundColor:''}}>&nbsp;</div>
+                                    </label>      
+                                    </div>
+                                    </td>
+                                    <td>20</td>
+                                    <td>100</td>
+                                    <td>550</td>
+                                </tr> 
+                            </tbody>
+                        </table>
+                        
+                    </div>
+                    
+                    <div>
+                        <button className={styles['button']}>SET RATES</button>
                     </div>
                 </div>
             </div>
@@ -225,4 +268,4 @@ function FacilityActivation() {
     );
 }
 
-export default FacilityActivation;
+export default FacilityAdjustingRate;
