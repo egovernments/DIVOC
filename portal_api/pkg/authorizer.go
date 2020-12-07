@@ -37,6 +37,10 @@ func init() {
 	//fatal(err)
 }
 
+func HasResourceRole(clientId string, role string, principal *models.JWTClaimBody) bool {
+	return contains(principal.ResourceAccess[clientId].Roles, role)
+}
+
 func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaimBody, error) {
 	claimBody, err := getClaimBody(bearerToken)
 	if err != nil {

@@ -9,7 +9,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"strings"
 )
 
 type GenericResponse struct {
@@ -77,13 +76,15 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal  *model
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal  *models.JWTClaimBody) middleware.Responder {
-	authHeader := params.HTTPRequest.Header.Get("Authorization")
-	token := strings.TrimPrefix(authHeader, "Bearer ")
-	if claim, err := RoleAuthorizer(token, []string{"admin"}); err == nil && claim != nil {
+	if HasResourceRole(portalClientId, "admin", principal) {
 		return services.GetEntityType("Vaccinator")
 	}
-	facilityCode := ""
-	if vaccinators, err := services.GetVaccinatorsForThisFacility(facilityCode); err != nil {
+	facilityCode := principal.FacilityCode
+	if facilityCode == "" {
+		log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
+		return NewGenericServerError()
+	}
+	if vaccinators, err := services.GetVaccinatorsForTheFacility(facilityCode); err != nil {
 		log.Errorf("Error in getting vaccinators list")
 		return NewGenericServerError()
 	} else {
