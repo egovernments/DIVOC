@@ -105,8 +105,6 @@ function CertificateView() {
                 </tr>
                 <tr><td colSpan={2} className={styles["top-pad"]}><b>Centre of Vaccination:</b></td></tr>
                 <tr><td colSpan={2}>{certificateData.certificate.facility.name}</td></tr>
-                <tr><td colSpan={2}><b>Program Name:</b></td></tr>
-                <tr><td colSpan={2}>Covid 19 Vaccine 2020</td></tr>
                 <tr>
                     <td><b>Date of Vaccination</b></td>
                     <td><b>Valid Until:</b></td>
