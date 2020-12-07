@@ -26,7 +26,7 @@ export const DivocFooter = () => {
 export const Loader = () => {
     return (
         <div className={"loader"}>
-            Loading..
+            <h4>Loading..</h4>
         </div>
     );
 };
@@ -66,7 +66,6 @@ export function BaseCard({children}) {
 BottomItem.propTypes = {
     src: PropTypes.string.isRequired,
     href: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired
 };
 
 export function BottomItem({src, href, title, currentLocation}) {

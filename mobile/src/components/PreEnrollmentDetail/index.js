@@ -1,5 +1,5 @@
 import {
-    FORM_AADHAR_NUMBER,
+    FORM_AADHAAR_NUMBER,
     FORM_PRE_ENROLL_CODE,
     FORM_PRE_ENROLL_DETAILS,
     usePreEnrollment
@@ -10,6 +10,7 @@ import {FormCard} from "../../Base/Base";
 import "./index.scss"
 import * as PropTypes from "prop-types";
 import {BaseFormCard} from "../BaseFormCard";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 export function PreEnrollmentDetails(props) {
     const {goBack} = usePreEnrollment()
@@ -40,7 +41,7 @@ function PatientDetails(props) {
     const {state, goNext, getUserDetails} = usePreEnrollment()
     const [patientDetails, setPatientDetails] = useState()
     useEffect(() => {
-        getUserDetails(state.enrollCode)
+        getUserDetails(state.enrollCode, state.mobileNumber)
             .then((patient) => {
                 setPatientDetails(patient)
             })
@@ -53,17 +54,17 @@ function PatientDetails(props) {
             <h4>Confirm recipient details</h4>
             <PatientInfo patientDetails={patientDetails}/>
 
-            <Col className="register-with-aadhar">
-                <h4>Register with Aadhar</h4>
+            <Col className="register-with-aadhaar">
+                <h4>{getMessageComponent(LANGUAGE_KEYS.REGISTER_IDENTITY_NUMBER)}</h4>
                 <div>
                     <Button variant="outline-primary" className="action-btn mb-3" onClick={() => {
-                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, patientDetails)
+                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAAR_NUMBER, patientDetails)
                     }}>ENTER MANUALLY</Button>
                 </div>
                 <div>
                     <Button variant="outline-primary" className="action-btn" onClick={() => {
-                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAR_NUMBER, patientDetails)
-                    }}>SCAN WITH AADHAR</Button>
+                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAAR_NUMBER, patientDetails)
+                    }}>{getMessageComponent(LANGUAGE_KEYS.SCAN_IDENTITY_NUMBER)}</Button>
                 </div>
             </Col>
         </div>

@@ -569,8 +569,8 @@ func init() {
       "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facility-staff": "scope of facility staff",
-        "facillity-admin": "scope of facility admin"
+        "facility-admin": "scope of facility admin",
+        "facility-staff": "scope of facility staff"
       }
     }
   },
@@ -1393,8 +1393,8 @@ func init() {
       "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
-        "facility-staff": "scope of facility staff",
-        "facillity-admin": "scope of facility admin"
+        "facility-admin": "scope of facility admin",
+        "facility-staff": "scope of facility staff"
       }
     }
   },

@@ -6,13 +6,16 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {ReactKeycloakProvider} from '@react-keycloak/web'
 import keycloak from "./utils/keycloak";
+import {LocaleProvider} from "./lang/LocaleContext";
 
 ReactDOM.render(
     <React.StrictMode>
         <ReactKeycloakProvider
             authClient={keycloak}
         >
-            <App/>
+            <LocaleProvider>
+                <App/>
+            </LocaleProvider>
         </ReactKeycloakProvider>
     </React.StrictMode>,
     document.getElementById('root')

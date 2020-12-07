@@ -3,7 +3,7 @@ import Col from "react-bootstrap/Col";
 import Form from "react-bootstrap/Form";
 import InputGroup from "react-bootstrap/InputGroup";
 import Button from "react-bootstrap/Button";
-import {ApiServices} from "../Services/apiServices";
+import {ApiServices} from "../Services/ApiServices";
 import {useLogin} from "./Login";
 import {LoginLabels} from "../Base/Constants";
 import {ErrorAlert} from "../Base/Base";

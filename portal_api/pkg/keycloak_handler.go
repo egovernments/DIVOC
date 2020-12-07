@@ -152,9 +152,9 @@ func getFacilityUsers(facilityCode string, authHeader string) ([]*models.Facilit
 func isFacilityAdmin(user FacilityUserResponse) bool {
 	if len(user.Groups) > 0 {
 		for _, group := range user.Groups {
-			if group.Name == "facillity admin" {
+			if group.Name == "facility admin" {
 				return true
-			}
+			} // todo : check based on role
 		}
 	}
 	return false
