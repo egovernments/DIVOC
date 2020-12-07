@@ -1,0 +1,28 @@
+.table{
+    height:500px;
+    overflow:auto;  
+    margin-top:20px;
+    margin-left: 50px;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    display: flex;
+}
+.tr{
+    display: flex;
+    background: #F5FAFF;
+}
+
+.td{
+    color: #4E4E4E;
+    text-align: left;
+    font-size: 12px;
+    font-weight: normal;
+    padding: 10px;
+}
+
+.thead {
+    padding: 20px;
+    background: #479EFF;
+    color: #FFFFFF;
+    font-weight: bolder;
+    text-align: center;
+}
