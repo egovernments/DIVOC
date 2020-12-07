@@ -175,6 +175,24 @@ func init() {
         }
       }
     },
+    "/instructions": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms instructions",
+        "operationId": "getInstructions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "security": [],
@@ -249,6 +267,125 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      }
+    },
+    "/sideEffects": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Get Side Effects",
+        "operationId": "getSideEffects",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Post side effects",
+        "operationId": "createSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sideEffects": {
+                  "type": "object",
+                  "$ref": "#/definitions/SideEffects"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/symptoms": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms",
+        "operationId": "getSymptoms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Create symptoms",
+        "operationId": "createSymptoms",
+        "parameters": [
+          {
+            "description": "Symptoms data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -540,6 +677,62 @@ func init() {
         }
       }
     },
+    "SideEffects": {
+      "type": "object",
+      "properties": {
+        "recipientIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "symptoms": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "additionalDetails": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Symptoms": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "imageURL": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "messages": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
     "UserInfo": {
       "type": "object",
       "properties": {
@@ -740,6 +933,24 @@ func init() {
         }
       }
     },
+    "/instructions": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms instructions",
+        "operationId": "getInstructions",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/ping": {
       "get": {
         "security": [],
@@ -814,6 +1025,125 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      }
+    },
+    "/sideEffects": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Get Side Effects",
+        "operationId": "getSideEffects",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [],
+        "tags": [
+          "sideEffects"
+        ],
+        "summary": "Post side effects",
+        "operationId": "createSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "sideEffects": {
+                  "type": "object",
+                  "$ref": "#/definitions/SideEffects"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/symptoms": {
+      "get": {
+        "security": [],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Get symptoms",
+        "operationId": "getSymptoms",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "tags": [
+          "symptoms"
+        ],
+        "summary": "Create symptoms",
+        "operationId": "createSymptoms",
+        "parameters": [
+          {
+            "description": "Symptoms data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Symptoms"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -1225,6 +1555,68 @@ func init() {
         },
         "repeatTimes": {
           "type": "integer"
+        }
+      }
+    },
+    "SideEffects": {
+      "type": "object",
+      "properties": {
+        "recipientIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "symptoms": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SideEffectsSymptomsItems0"
+          }
+        }
+      }
+    },
+    "SideEffectsSymptomsItems0": {
+      "type": "object",
+      "properties": {
+        "additionalDetails": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
+    "Symptoms": {
+      "type": "object",
+      "properties": {
+        "instructions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/SymptomsInstructionsItems0"
+          }
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "SymptomsInstructionsItems0": {
+      "type": "object",
+      "properties": {
+        "imageURL": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "title": {
+          "type": "string"
         }
       }
     },

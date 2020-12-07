@@ -9,7 +9,10 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
+	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
+	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
@@ -34,6 +37,11 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
+	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
+	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
+	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
+	api.SideEffectsCreateSideEffectsHandler = side_effects.CreateSideEffectsHandlerFunc(createSideEffects)
+	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
 }
 
 type GenericResponse struct {
@@ -43,6 +51,7 @@ type GenericResponse struct {
 type GenericJsonResponse struct {
 	body interface{}
 }
+
 func (o *GenericResponse) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 	rw.WriteHeader(o.statusCode)
@@ -87,7 +96,7 @@ func getCertificate(params operations.GetCertificateParams) middleware.Responder
 			"contains": "tel:" + params.Phone,
 		},
 	}
-	if response, err := queryRegistry(typeId, filter); err != nil {
+	if response, err := services.QueryRegistry(typeId, filter); err != nil {
 		log.Infof("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {

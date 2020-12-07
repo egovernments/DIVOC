@@ -1,0 +1,68 @@
+.submit-symptoms-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 5rem;
+}
+
+.submit-symptoms-form .form-title{
+    text-align: center;
+}
+
+.submit-symptoms-form .form-subtitle{
+    margin-top: 1rem;
+    font-size: 14px;
+    text-align: center;
+}
+
+.submit-symptoms-form .input-text {
+    border: 1px solid #EFEFEF;
+    border-radius: 4px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.submit-symptoms-form .form-btn {
+    background: transparent linear-gradient(91deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    color: #fff;
+    padding: 0.5rem 1rem;
+    border: none;
+}
+
+.patient-details-table {
+    margin-left: 5rem;
+    width: 100%;
+}
+
+.patient-details-table .table-title{
+    color: #A3A3A3;
+    font-size: 14px;
+    width: 50%;
+    padding-bottom: 1rem;
+}
+
+.patient-details-table .table-value{
+    font-size: 14px;
+    width: 50%;
+    padding-bottom: 1rem;
+}
+
+.confirmation-wrapper {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: center;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.confirmation-wrapper .confirmation-checkbox{
+    margin-right: 1rem;
+}
+
+.confirmation-wrapper .confirmation-msg{
+    font-size: 14px;
+    color: #4E67D1;
+    margin: 0;
+}
