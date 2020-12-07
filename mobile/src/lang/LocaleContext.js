@@ -79,5 +79,8 @@ export const LANGUAGE_KEYS = Object.freeze({
     RECIPIENT_QUEUE: "app.recipientQueue",
     PROGRAM_NAME: "app.programName",
     RECIPIENT_WAITING: "app.recipientWaiting",
-    CERTIFICATE_ISSUED: "app.certificateIssued"
+    CERTIFICATE_ISSUED: "app.certificateIssued",
+    ENTER_IDENTITY_NUMBER: "app.enterIdentityNumber",
+    REGISTER_IDENTITY_NUMBER: "app.registerIdentityNumber",
+    SCAN_IDENTITY_NUMBER: "app.scanIdentityNumber"
 });
