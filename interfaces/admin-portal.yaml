@@ -86,7 +86,7 @@ paths:
       summary: Get vaccinators
       operationId: getVaccinators
       security:
-        - hasRole: ["facillity-admin", "admin"]
+        - hasRole: ["facility-admin", "admin"]
       responses:
         '200':
           description: OK
