@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // UpdateFacilitiesHandlerFunc turns a function with the right signature into a update facilities handler
-type UpdateFacilitiesHandlerFunc func(UpdateFacilitiesParams, interface{}) middleware.Responder
+type UpdateFacilitiesHandlerFunc func(UpdateFacilitiesParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn UpdateFacilitiesHandlerFunc) Handle(params UpdateFacilitiesParams, principal interface{}) middleware.Responder {
+func (fn UpdateFacilitiesHandlerFunc) Handle(params UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // UpdateFacilitiesHandler interface for that can handle valid update facilities params
 type UpdateFacilitiesHandler interface {
-	Handle(UpdateFacilitiesParams, interface{}) middleware.Responder
+	Handle(UpdateFacilitiesParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewUpdateFacilities creates a new http.Handler for the update facilities operation
@@ -54,9 +56,9 @@ func (o *UpdateFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

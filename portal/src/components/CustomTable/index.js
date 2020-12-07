@@ -34,15 +34,9 @@ function createData(name, calories, fat, carbs, protein) {
     return {name, calories, fat, carbs, protein};
 }
 
-const rows = [
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-];
+export const CustomTable = ({data, fields, canSelectColumn = true}) => {
 
-export const CustomTable = ({data, fields}) => {
+
     const [columns, setColumns] = useState([]);
     const classes = useStyles();
     const handleChangeMultiple = (event) => {
@@ -55,29 +49,10 @@ export const CustomTable = ({data, fields}) => {
         }
         setColumns(value);
     };
+
     return (
         <div>
 
-            {
-                data.length > 0 &&
-                <><span>Select the columns to be displayed (use CMD/CTRL to select multiple)</span>
-                    <br/>
-                <Select
-                    value={columns}
-                    onChange={handleChangeMultiple}
-                    multiple
-                    native
-                    inputProps={{
-                        id: 'select-multiple-native',
-                    }}
-                >
-                    {Object.keys(data[0]).filter((name) => !fields.includes(name)).map((name) => (
-                        <option key={name} value={name}>
-                            {name}
-                        </option>
-                    ))}
-                </Select></>
-            }
 
             <TableContainer component={CustomPaper}>
                 <Table className={classes.table}
@@ -106,6 +81,27 @@ export const CustomTable = ({data, fields}) => {
                     </TableBody>
                 </Table>
             </TableContainer>
+
+            {
+                data.length > 0 && canSelectColumn &&
+                <div className={"float-right"}><span>Select the columns to be displayed (use CMD/CTRL to select multiple)</span>
+                    <br/>
+                    <Select
+                        value={columns}
+                        onChange={handleChangeMultiple}
+                        multiple
+                        native
+                        inputProps={{
+                            id: 'select-multiple-native',
+                        }}
+                    >
+                        {Object.keys(data[0]).filter((name) => !fields.includes(name)).map((name) => (
+                            <option key={name} value={name}>
+                                {name}
+                            </option>
+                        ))}
+                    </Select></div>
+            }
         </div>
     );
 };

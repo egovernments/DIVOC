@@ -18,6 +18,8 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // NewDivocPortalAPIAPI creates a new DivocPortalAPI instance
@@ -43,50 +45,50 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		PostEnrollmentsHandler: PostEnrollmentsHandlerFunc(func(params PostEnrollmentsParams, principal interface{}) middleware.Responder {
+		PostEnrollmentsHandler: PostEnrollmentsHandlerFunc(func(params PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation PostEnrollments has not yet been implemented")
 		}),
-		PostFacilitiesHandler: PostFacilitiesHandlerFunc(func(params PostFacilitiesParams, principal interface{}) middleware.Responder {
+		PostFacilitiesHandler: PostFacilitiesHandlerFunc(func(params PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation PostFacilities has not yet been implemented")
 		}),
-		PostVaccinatorsHandler: PostVaccinatorsHandlerFunc(func(params PostVaccinatorsParams, principal interface{}) middleware.Responder {
+		PostVaccinatorsHandler: PostVaccinatorsHandlerFunc(func(params PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation PostVaccinators has not yet been implemented")
 		}),
-		CreateFacilityUsersHandler: CreateFacilityUsersHandlerFunc(func(params CreateFacilityUsersParams, principal interface{}) middleware.Responder {
+		CreateFacilityUsersHandler: CreateFacilityUsersHandlerFunc(func(params CreateFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateFacilityUsers has not yet been implemented")
 		}),
-		CreateMedicineHandler: CreateMedicineHandlerFunc(func(params CreateMedicineParams, principal interface{}) middleware.Responder {
+		CreateMedicineHandler: CreateMedicineHandlerFunc(func(params CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateMedicine has not yet been implemented")
 		}),
-		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal interface{}) middleware.Responder {
+		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
-		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal interface{}) middleware.Responder {
+		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetEnrollments has not yet been implemented")
 		}),
-		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal interface{}) middleware.Responder {
+		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
-		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal interface{}) middleware.Responder {
+		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
 		}),
-		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal interface{}) middleware.Responder {
+		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
 		}),
-		GetMedicinesHandler: GetMedicinesHandlerFunc(func(params GetMedicinesParams, principal interface{}) middleware.Responder {
+		GetMedicinesHandler: GetMedicinesHandlerFunc(func(params GetMedicinesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetMedicines has not yet been implemented")
 		}),
-		GetProgramsHandler: GetProgramsHandlerFunc(func(params GetProgramsParams, principal interface{}) middleware.Responder {
+		GetProgramsHandler: GetProgramsHandlerFunc(func(params GetProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetPrograms has not yet been implemented")
 		}),
-		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal interface{}) middleware.Responder {
+		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
 		}),
-		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal interface{}) middleware.Responder {
+		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilities has not yet been implemented")
 		}),
 
-		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
+		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
@@ -130,7 +132,7 @@ type DivocPortalAPIAPI struct {
 
 	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
 	// it performs authentication based on an oauth2 bearer token provided in the request
-	HasRoleAuth func(string, []string) (interface{}, error)
+	HasRoleAuth func(string, []string) (*models.JWTClaimBody, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -307,7 +309,9 @@ func (o *DivocPortalAPIAPI) AuthenticatorsFor(schemes map[string]spec.SecuritySc
 	for name := range schemes {
 		switch name {
 		case "hasRole":
-			result[name] = o.BearerAuthenticator(name, o.HasRoleAuth)
+			result[name] = o.BearerAuthenticator(name, func(token string, scopes []string) (interface{}, error) {
+				return o.HasRoleAuth(token, scopes)
+			})
 
 		}
 	}

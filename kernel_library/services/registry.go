@@ -163,3 +163,17 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 	}
 	return responseObject.Result, nil
 }
+
+func GetVaccinatorsForThisFacility(facilityCode string) ([]interface{}, error) {
+	filter := map[string]interface{}{
+		"facilityCode":facilityCode,
+	}
+	if resp, err := QueryRegistry("Vaccinator", filter); err!= nil {
+		log.Errorf("Error in getting vaccinator from registry for the facility %s", facilityCode)
+		return nil, err
+	} else {
+		result := []interface{}{}
+		log.Info(resp)
+		return result, nil
+	}
+}

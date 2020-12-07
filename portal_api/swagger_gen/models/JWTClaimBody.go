@@ -1,4 +1,4 @@
-package pkg
+package models
 
 import "github.com/gospotcheck/jwt-go"
 

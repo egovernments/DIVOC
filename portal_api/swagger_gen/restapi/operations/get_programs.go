@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // GetProgramsHandlerFunc turns a function with the right signature into a get programs handler
-type GetProgramsHandlerFunc func(GetProgramsParams, interface{}) middleware.Responder
+type GetProgramsHandlerFunc func(GetProgramsParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetProgramsHandlerFunc) Handle(params GetProgramsParams, principal interface{}) middleware.Responder {
+func (fn GetProgramsHandlerFunc) Handle(params GetProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetProgramsHandler interface for that can handle valid get programs params
 type GetProgramsHandler interface {
-	Handle(GetProgramsParams, interface{}) middleware.Responder
+	Handle(GetProgramsParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetPrograms creates a new http.Handler for the get programs operation
@@ -54,9 +56,9 @@ func (o *GetPrograms) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
