@@ -11,6 +11,13 @@ function FacilityAdjustingRate() {
     const [selectedDistrict, setSelectedDistrict] = useState("Bagalkote");
     const [facilityType, setFacilityType] = useState("Government");
     const [status, setStatus] = useState("Active");
+    const [faclitiesList, setFacilitiesList] = useState([
+        { id: 1, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+        { id: 2, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+        { id: 3, name: "This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+        { id: 4 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+        { id: 5 ,name:"This is a centre name",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY'},
+    ]);
 
     useEffect(() => {
         normalizeStateNames();
