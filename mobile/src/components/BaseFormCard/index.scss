@@ -1,3 +1,4 @@
+@import "styles/colors.scss";
 .base-queue-card {
   display: inline;
   .card {
@@ -8,7 +9,7 @@
     .card-header {
       background: white;
       text-align: center;
-      border-bottom-color: #4E67D1;
+      border-bottom-color: $primaryThemeColor;
       border-radius: 1rem 1rem 0 0;
       color: #646D82;
       padding: 1.25rem;

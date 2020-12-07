@@ -1,4 +1,5 @@
 import {openDB} from "idb";
+import {getMessageComponent, LANGUAGE_KEYS} from "./lang/LocaleContext";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 6;
@@ -41,8 +42,16 @@ export class AppDatabase {
         return this.db.add(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode) {
-        return this.db.get(PATIENTS, enrollCode);
+    async getPatientDetails(enrollCode, mobileNumber) {
+        const patient = await this.db.get(PATIENTS, enrollCode);
+        if (patient) {
+            if (patient.phone === mobileNumber) {
+                return patient
+            } else {
+                return null;
+            }
+        }
+        return patient;
     }
 
     async recipientDetails() {
@@ -58,8 +67,8 @@ export class AppDatabase {
         });
 
         return [
-            {title: "Recipient Waiting", value: waiting},
-            {title: "Certificate Issued", value: issue},
+            {titleKey: LANGUAGE_KEYS.RECIPIENT_WAITING, value: waiting},
+            {titleKey: LANGUAGE_KEYS.CERTIFICATE_ISSUED, value: issue},
         ];
     }
 
@@ -123,7 +132,7 @@ export class AppDatabase {
             patient: patient,
             batchCode: event.batchCode,
             enrollCode: event.enrollCode,
-            identify: queue.aadharNumber
+            identify: queue.aadhaarNumber
         }
     }
 

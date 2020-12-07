@@ -9,13 +9,14 @@ import logout from '../Logout/logout.svg'
 import help from '../assets/img/help.svg'
 import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
-import {SelectLanguage} from "../Language/Language";
+import {SelectLanguage} from "../Language/LanguageSelection";
 import {Logout} from "../Logout/Logout";
 import {PrivateRoute} from "../utils/PrivateRoute";
 import {LoginComponent} from "../Login/Login";
 import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";
 import {ConfirmFlow} from "../ConfirmVaccination";
 import {useLocation} from "react-router";
+import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 
 Dashboard.propTypes = {};
 
@@ -48,11 +49,16 @@ const Footer = () => {
     const location = useLocation();
     return (
         <div className="bottom-bar d-flex justify-content-around">
-            <BottomItem currentLocation={location.pathname} src={home} href={"/"} title={"Home"}/>
-            <BottomItem currentLocation={location.pathname} src={language} href={"/language"} title={"Language"}/>
-            <BottomItem currentLocation={location.pathname} src={queue} href={"/queue"} title={"Queue"}/>
-            <BottomItem currentLocation={location.pathname} src={help} href={"/logout"} title={"Help"}/>
-            <BottomItem currentLocation={location.pathname} src={logout} href={"/logout"} title={"Logout"}/>
+            <BottomItem currentLocation={location.pathname} src={home} href={"/"}
+                        title={getMessageComponent(LANGUAGE_KEYS.HOME)}/>
+            <BottomItem currentLocation={location.pathname} src={language} href={"/language"}
+                        title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
+            <BottomItem currentLocation={location.pathname} src={queue} href={"/queue"}
+                        title={getMessageComponent(LANGUAGE_KEYS.QUEUE)}/>
+            <BottomItem currentLocation={location.pathname} src={help} href={"/logout"}
+                        title={getMessageComponent(LANGUAGE_KEYS.HELP)}/>
+            <BottomItem currentLocation={location.pathname} src={logout} href={"/logout"}
+                        title={getMessageComponent(LANGUAGE_KEYS.LOGOUT)}/>
         </div>
     )
 }

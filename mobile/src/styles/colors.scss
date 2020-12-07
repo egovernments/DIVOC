@@ -4,6 +4,7 @@ $textColorLight: #707070;
 $primaryThemeColor: #4CA07A;
 $secondaryThemeColor: #399788;
 $textWhiteColor: #f0f0f7;
+$textSelectedColor: #5C9EF8;
 :export {
   backgroundColor: $backgroundColor;
   textColor: $textColor;
@@ -11,4 +12,5 @@ $textWhiteColor: #f0f0f7;
   primaryThemeColor: $primaryThemeColor;
   secondaryThemeColor: $secondaryThemeColor;
   textWhiteColor: $textWhiteColor;
+  textSelectedColor: $textSelectedColor;
 }

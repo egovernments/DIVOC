@@ -1,0 +1,19 @@
+{
+  "app.home": "घर",
+  "app.queue": "पंक्ति",
+  "app.language": "भाषा",
+  "app.help": "मदद",
+  "app.logout": "लॉग आउट",
+  "app.actionTitle": "क्रिया",
+  "app.recipientDetailsTitle": "प्राप्तकर्ता संख्या",
+  "app.selectLanguage": "भाषा का चयन करें",
+  "app.verifyRecipient": "प्राप्तकर्ता को सत्यापित करें",
+  "app.enrollRecipient": "प्राप्तकर्ता का नामांकन करें",
+  "app.recipientQueue": "प्राप्तकर्ता कतार",
+  "app.programName": "कोविद -19 वैक्सीन (C19)",
+  "app.recipientWaiting": "प्राप्तकर्ता प्रतीक्षा कर रहा है",
+  "app.certificateIssued": "प्रमाणपत्र जारी करना",
+  "app.enterIdentityNumber": "आधार नंबर दर्ज करें",
+  "app.registerIdentityNumber": "आधार के साथ रजिस्टर करें",
+  "app.scanIdentityNumber": "आधार के साथ स्कैन"
+}

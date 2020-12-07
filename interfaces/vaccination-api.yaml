@@ -11,7 +11,7 @@ securityDefinitions:
     tokenUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token'
     scopes:
       admin: scope of super admin
-      facillity-admin: scope of facility admin
+      facility-admin: scope of facility admin
       facility-staff: scope of facility staff
 security:
   - hasRole: ['facility-staff']
