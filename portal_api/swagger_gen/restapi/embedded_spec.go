@@ -318,6 +318,14 @@ func init() {
     },
     "/vaccinators": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin"
+            ]
+          }
+        ],
         "summary": "Get vaccinators",
         "operationId": "getVaccinators",
         "responses": {
@@ -1034,6 +1042,14 @@ func init() {
     },
     "/vaccinators": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "facility-admin"
+            ]
+          }
+        ],
         "summary": "Get vaccinators",
         "operationId": "getVaccinators",
         "responses": {
