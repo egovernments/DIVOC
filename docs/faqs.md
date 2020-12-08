@@ -1,7 +1,5 @@
-## DIVOC - Digital Infrastructure for Vaccination and Open Certification
 
-
-### Frequently Asked Questions (FAQs)
+## Frequently Asked Questions (FAQs)
 
 1. **Who is building DIVOC software and how is it licensed?** 
     * All software components within DIVOC are built as open source, funded using philanthropic capital, made available free of charge to anyone around the world. It is built using other open source components/libraries.
