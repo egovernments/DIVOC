@@ -32,7 +32,7 @@ export default function App() {
                         <PrivateRoute exact path="/about" component={About}/>
                         <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.VACCINATION_CLIENT}/>
                         <PrivateRoute exact path="/facility_admin" component={FacilityAdmin} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
-                        <PrivateRoute exact path="/facility_controller" component={FacilityController} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <PrivateRoute exact path="/facility_controller" component={FacilityController} role={CONSTANTS.ROLE_CONTROLLER} clientId={CONSTANTS.PORTAL_CLIENT}/>
                     </Switch>
                 </div>
             </Router>

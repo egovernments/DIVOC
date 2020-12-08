@@ -22,6 +22,8 @@ const Login = () => {
                 redirectUrl = "/admin"
             } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/facility_admin"
+            } else if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT)) {
+                redirectUrl = "/facility_controller"
             } else {
                 alert("Unauthorized access. Contact ADMIN");
                 keycloak.logout({redirectUri: window.location.origin + "/"});
