@@ -1,14 +1,14 @@
-## DIVOC - Digital Infrastructure for Vaccination and Open Certification
+## Software and Developer Documentation
 
 <p class="focus"> Currently DIVOC is in Beta mode. DIVOC team is constantly updating software documentation and will be made available through this page. </p>
 
 [Report issues, suggest features, and ask questions here](https://github.com/bharat-dpi/DIVOC/issues){:target="_blank"}
 
-### Software Documentation
+### Software Docs
 
 Coming soon ...
 
-### Developer Documentation
+### Developer Docs
 
 1. [API Documentation](/developer-docs/index.md)
 

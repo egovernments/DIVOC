@@ -1,4 +1,4 @@
-## DIVOC - Digital Infrastructure for Vaccination and Open Certification
+## Presentations and Videos
 
 Following presentations and videos are available currently to better understand DIVOC system. Videos are hosted on YouTube and clicking on the link opens a separate tab. Presentations are in PDF form.
 
