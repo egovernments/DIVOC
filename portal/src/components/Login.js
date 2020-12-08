@@ -20,6 +20,8 @@ const Login = () => {
             let redirectUrl = "/";
             if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
                 redirectUrl = "/admin"
+            } else if (keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT)) {
+                redirectUrl = "/analytics"
             } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/facility_admin"
             } else if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT)) {
