@@ -1,23 +1,22 @@
 import React, { useState, useEffect } from "react";
 import DropDown from "../DropDown/DropDown";
-import { PROGRAMS, STATE_NAMES, DISTRICT_NAMES } from "../../utils/constants";
 import styles from "./FacilityActivation.module.css";
 
-function FacilityActivation() {
+function FacilityActivation({ districtList,stateList,program }) {
     const [listOfStates, setListOfStates] = useState([]);
     const [selectedProgram, setSelectedProgram] = useState();
-    const [selectedState, setSelectedState] = useState("Karnataka");
-    const [selectedDistrict, setSelectedDistrict] = useState("Bagalkote");
+    const [selectedState, setSelectedState] = useState();
+    const [selectedDistrict, setSelectedDistrict] = useState();
     const [facilityType, setFacilityType] = useState("Government");
     const [status, setStatus] = useState("Active");
     const [allChecked, setAllChecked] = useState(false)
     const [rowCount, setRowCount] = useState(0);
     const [faclitiesList, setFacilitiesList] = useState([
-        { id: 1, name: "This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 2, name: "This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 3, name: "This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 4 ,name:"This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 5 ,name:"This is a centre name",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        { id: 1, name: "Centre 1",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        { id: 2, name: "Centre 2",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        { id: 3, name: "Centre 3",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        { id: 4 ,name:"Centre 4",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        { id: 5 ,name:"Centre 5",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
     ]);
 
     useEffect(() => {
@@ -26,10 +25,10 @@ function FacilityActivation() {
 
     const normalizeStateNames = () => {
         let data = [];
-        Object.keys(STATE_NAMES).map((state) => {
+        Object.keys(stateList).map((state) => {
             let newData = {};
             newData.value = state;
-            newData.label = STATE_NAMES[state];
+            newData.label = stateList[state];
             data.push(newData);
         });
         setListOfStates(data);
@@ -40,7 +39,7 @@ function FacilityActivation() {
     };
 
     const showDistrictList = () => {
-        return Object.keys(DISTRICT_NAMES).map((district) => {
+        return Object.keys(districtList).map((district) => {
             return (
                 <tr>
                     <td className={styles["highlight"]}>
@@ -81,7 +80,7 @@ function FacilityActivation() {
                             </label>
                         </div>
                     </td>
-                    <td>{DISTRICT_NAMES[district]}</td>
+                    <td>{districtList[district]}</td>
                 </tr>
             );
         });
@@ -160,7 +159,7 @@ function FacilityActivation() {
             <div className="col-sm-3">
                 <div>
                     <DropDown
-                        options={PROGRAMS}
+                        options={program}
                         placeholder="Select Program"
                         setSelectedOption={setSelectedProgram}
                     />
@@ -368,7 +367,7 @@ function FacilityActivation() {
                             </th>
                         </tr>
                     </thead>
-                    <tbody>{getFaciltiyList()}</tbody>
+                    <tbody>{selectedState && selectedDistrict ?  getFaciltiyList() : ''}</tbody>
                     
                 </table>
             </div>
