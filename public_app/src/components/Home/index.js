@@ -73,7 +73,7 @@ export const Home = () => (
                             <img alt={""} src={CertificateSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <h1 className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</h1>
-                            <Link to={"/side_effects"} className="outline-button ">View Numbers ></Link>
+                            <Link to={"/dashboard"} className="outline-button ">View Numbers ></Link>
                         </div>
                         <div className="col">
                             <img alt={""} src={DashboardBannerImg} width={"100%"} height={"100%"}/>
@@ -82,7 +82,7 @@ export const Home = () => (
                             <img alt={""} src={CenterSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <b className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</b>
-                            <Link to={"/side_effects"} className="outline-button yellow-outline">View Centre details ></Link>
+                            <Link to={"/dashboard"} className="outline-button yellow-outline">View Centre details ></Link>
                         </div>
                     </div>
                 </div>
