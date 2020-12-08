@@ -21,7 +21,7 @@ function App() {
     <div>
       <Router>
         <Header/>
-        <div>
+        <div style={{paddingBottom: "6rem"}}>
           <Switch>
             <Route exact path={"/"} component={Home}/>
             <Route exact path={config.urlPath + "/login"} component={Login}/>

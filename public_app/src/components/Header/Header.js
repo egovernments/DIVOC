@@ -27,7 +27,7 @@ function Header() {
                     <NavDropdown title="ENG" id="basic-nav-dropdown">
                         <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>
                     </NavDropdown>
-                    {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin + config.urlPath + "/"});}}>LOGOUT</Nav.Link>}
+                    {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin});}}>LOGOUT</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
