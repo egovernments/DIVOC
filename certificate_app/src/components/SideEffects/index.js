@@ -6,20 +6,40 @@ import {SubmitSymptomsForm} from "../SubmitSymptomsForm";
 export const SideEffects = () => {
     const [symptoms, setSymptoms] = useState([
         {
-            "name": "Fever or chills",
-            "instructions": ["You should wear a mask over your nose and mouth if you must be around other people or animals, including pets (even at home)."]
+            "name": "Loss of Smell / Taste",
+            "instructions": ["You should get Covid-19 test done."]
         },
         {
-            "name": "Cough",
-            "instructions": ["You should wear a mask over your nose and mouth if you must be around other people or animals, including pets (even at home)."]
+            "name": "Temporary loss of Vision ",
+            "instructions": ["You should consult a pulmonologist"]
         },
         {
-            "name": "Shortness of breath or difficulty breathing",
-            "instructions": ["You should wear a mask over your nose and mouth if you must be around other people or animals, including pets (even at home)."]
+            "name": "Palpitations",
+            "instructions": ["You should consult a cardiologist"]
         },
         {
-            "name": "Fatigue",
-            "instructions": ["You should wear a mask over your nose and mouth if you must be around other people or animals, including pets (even at home)."]
+            "name": "Memory loss",
+            "instructions": ["You should consult post-Covid support"]
+        },
+        {
+            "name": "Chronic Fatigue",
+            "instructions": ["You should consult a pulmonologist"]
+        },
+        {
+            "name": "Sudden black Out",
+            "instructions": ["You should consult a cardiologist"]
+        },
+        {
+            "name": "Bouts of Depression / Anxiety / Panic Attacks",
+            "instructions": ["You should consult a psychiatrist"]
+        },
+        {
+            "name": "Severe Headache",
+            "instructions": ["You should consult post-Covid support"]
+        },
+        {
+            "name": "Temporary Paralysis",
+            "instructions": ["You should consult a neurologist"]
         }
     ]);
     const [selectedSymptoms, setSelectedSymptoms] = useState([]);
@@ -43,6 +63,7 @@ export const SideEffects = () => {
     function onConfirmSymptomsClick() {
         setShowSubmitForm(true)
     }
+
     function onReset() {
         setShowSubmitForm(false)
         setSelectedSymptoms([])
@@ -58,36 +79,43 @@ export const SideEffects = () => {
                             <Row>
                                 <Col lg={6}>
                                     <h5>Select Symptoms</h5>
-                                    {
-                                        symptoms.map(({name}, index) => {
-                                            return (
-                                                <div key={index} className="symptom-wrapper d-flex align-items-center"
-                                                     onClick={() => {
-                                                         onSymptomSelected(index)
-                                                     }}>
+                                    <div className="symptoms-container">
+                                        {
+                                            symptoms.map(({name}, index) => {
+                                                return (
+                                                    <div key={index}
+                                                         className="symptom-wrapper d-flex align-items-center"
+                                                         onClick={() => {
+                                                             onSymptomSelected(index)
+                                                         }}>
                                                     <span
                                                         className={`custom-checkbox ${selectedSymptoms.includes(index) ? 'active' : ''}`}/>
-                                                    <span className="title">{name}</span>
-                                                </div>
-                                            )
-                                        })
-                                    }
-                                    {
-                                        <div className="symptom-wrapper d-flex align-items-center"
-                                             onClick={() => {
-                                                 onSymptomSelected("others")
-                                             }}>
+                                                        <span className="title">{name}</span>
+                                                    </div>
+                                                )
+                                            })
+                                        }
+
+                                        {
+                                            <div className="symptom-wrapper d-flex align-items-center"
+                                                 onClick={() => {
+                                                     onSymptomSelected("others")
+                                                 }}>
                                                     <span
                                                         className={`custom-checkbox ${selectedSymptoms.includes("others") ? 'active' : ''}`}/>
-                                            <span className="title">{"Others"}</span>
-                                        </div>
-                                    }
+                                                <span className="title">{"Others"}</span>
+                                            </div>
+                                        }
+                                        {
+                                            <textarea className="others-textarea" placeholder={"Please elaborate"}
+                                                      disabled={!selectedSymptoms.includes("others")}
+                                                      onChange={onOtherSymptomChange}/>
+                                        }
+                                    </div>
                                     {
-                                        <textarea className="others-textarea" placeholder={"Please elaborate"}
-                                                  disabled={!selectedSymptoms.includes("others")} onChange={onOtherSymptomChange}/>
-                                    }
-                                    {
-                                        <button className="confirm-symptoms-btn" disabled={selectedSymptoms.length === 0} onClick={onConfirmSymptomsClick}>Confirm Symptoms</button>
+                                        <button className="confirm-symptoms-btn"
+                                                disabled={selectedSymptoms.length === 0}
+                                                onClick={onConfirmSymptomsClick}>Confirm Symptoms</button>
                                     }
                                 </Col>
                                 <Col lg={6}>
@@ -96,11 +124,13 @@ export const SideEffects = () => {
                                         {
                                             selectedSymptoms.map((symptomIdx, idx) => {
                                                 if (symptomIdx in symptoms) {
-                                                    const {instructions} = symptoms[symptomIdx];
+                                                    const {name, instructions} = symptoms[symptomIdx];
                                                     return (
                                                         instructions.map((instruction, index) => (
                                                             <div className="instruction-wrapper">
-                                                                <span className="instruction-heading">Instructions</span><br/>
+                                                                <span className="instruction-title">{name}</span><br/>
+                                                                <span className="instruction-heading">Instructions</span>
+                                                                <br/>
                                                                 <span key={index}>{instruction}</span>
                                                             </div>
                                                         ))

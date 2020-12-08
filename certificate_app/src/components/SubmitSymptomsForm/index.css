@@ -65,4 +65,5 @@
     font-size: 14px;
     color: #4E67D1;
     margin: 0;
+    user-select: none;
 }
