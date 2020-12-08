@@ -83,11 +83,13 @@ export default function Home() {
             </div>
             <div className="half-section  d-flex">
                 <div className="divoc-video-wrapper d-flex justify-content-center align-items-center">
-                    <img alt={""} src={VideoPlayBtnImg} width={40}/>
+                    <iframe width="90%" height="90%" src="https://www.youtube.com/embed/tOuPDAy7r90" frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen></iframe>
                 </div>
                 <div className="divoc-info-wrapper">
                     <span className="font-weight-bold">What is divoc?</span><br/>
-                    <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+                    <span>DIVOC software specifically addresses the 3rd item above allowing countries to digitally orchestrate rollout across the country using dynamic policies, issuance of digital vaccination certificates that are compliant to international standards, manage post vaccination feedback, and use real time analytics to manage this entire process. DIVOC contains 3 core modules - certificate management, feedback management, and vaccination rollout management - each of which can be used independently or together depending on the need.</span>
                 </div>
             </div>
             <div className="updates-section ">
