@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // CreateMedicineHandlerFunc turns a function with the right signature into a create medicine handler
-type CreateMedicineHandlerFunc func(CreateMedicineParams, interface{}) middleware.Responder
+type CreateMedicineHandlerFunc func(CreateMedicineParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn CreateMedicineHandlerFunc) Handle(params CreateMedicineParams, principal interface{}) middleware.Responder {
+func (fn CreateMedicineHandlerFunc) Handle(params CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // CreateMedicineHandler interface for that can handle valid create medicine params
 type CreateMedicineHandler interface {
-	Handle(CreateMedicineParams, interface{}) middleware.Responder
+	Handle(CreateMedicineParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewCreateMedicine creates a new http.Handler for the create medicine operation
@@ -54,9 +56,9 @@ func (o *CreateMedicine) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

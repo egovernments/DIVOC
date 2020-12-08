@@ -5,6 +5,7 @@ package restapi
 import (
 	"crypto/tls"
 	"github.com/divoc/portal-api/pkg"
+	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
@@ -13,7 +14,7 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal interface{} --exclude-main
+//go:generate swagger generate server --target ../../swagger_gen --name DivocPortalAPI --spec ../../../interfaces/admin-portal.yaml --principal  *models.JWTClaimBody --exclude-main
 
 func configureFlags(api *operations.DivocPortalAPIAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -54,22 +55,22 @@ func configureAPI(api *operations.DivocPortalAPIAPI) http.Handler {
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
 	if api.PostFacilitiesHandler == nil {
-		api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(func(params operations.PostFacilitiesParams, principal interface{}) middleware.Responder {
+		api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(func(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.PostFacilities has not yet been implemented")
 		})
 	}
 	if api.PostVaccinatorsHandler == nil {
-		api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(func(params operations.PostVaccinatorsParams, principal interface{}) middleware.Responder {
+		api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(func(params operations.PostVaccinatorsParams, principal  *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.PostVaccinators has not yet been implemented")
 		})
 	}
 	if api.CreateMedicineHandler == nil {
-		api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(func(params operations.CreateMedicineParams, principal interface{}) middleware.Responder {
+		api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(func(params operations.CreateMedicineParams, principal  *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.CreateMedicine has not yet been implemented")
 		})
 	}
 	if api.CreateProgramHandler == nil {
-		api.CreateProgramHandler = operations.CreateProgramHandlerFunc(func(params operations.CreateProgramParams, principal interface{}) middleware.Responder {
+		api.CreateProgramHandler = operations.CreateProgramHandlerFunc(func(params operations.CreateProgramParams, principal  *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.CreateProgram has not yet been implemented")
 		})
 	}

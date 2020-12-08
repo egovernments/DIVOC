@@ -1,0 +1,13 @@
+.numbers{
+    /* color: #479EFF; */
+    font-weight: bold;
+}
+
+.texts {
+    color: #1D1D1D;
+    font-size: 10px;
+}
+
+.details{
+    padding-left: 10px;
+}

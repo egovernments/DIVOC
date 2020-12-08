@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // GetFacilityUsersHandlerFunc turns a function with the right signature into a get facility users handler
-type GetFacilityUsersHandlerFunc func(GetFacilityUsersParams, interface{}) middleware.Responder
+type GetFacilityUsersHandlerFunc func(GetFacilityUsersParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetFacilityUsersHandlerFunc) Handle(params GetFacilityUsersParams, principal interface{}) middleware.Responder {
+func (fn GetFacilityUsersHandlerFunc) Handle(params GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetFacilityUsersHandler interface for that can handle valid get facility users params
 type GetFacilityUsersHandler interface {
-	Handle(GetFacilityUsersParams, interface{}) middleware.Responder
+	Handle(GetFacilityUsersParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetFacilityUsers creates a new http.Handler for the get facility users operation
@@ -54,9 +56,9 @@ func (o *GetFacilityUsers) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

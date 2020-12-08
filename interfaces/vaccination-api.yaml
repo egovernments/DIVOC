@@ -181,7 +181,91 @@ paths:
           description: OK
           schema:
             type: object
-
+  /symptoms:
+    get:
+      tags:
+        - symptoms
+      summary: Get symptoms
+      operationId: getSymptoms
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+    post:
+      tags:
+        - symptoms
+      summary: Create symptoms
+      operationId: createSymptoms
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Symptoms'
+          description: Symptoms data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /instructions:
+    get:
+      tags:
+        - symptoms
+      summary: Get symptoms instructions
+      security: []
+      operationId: getInstructions
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /sideEffects:
+    get:
+      tags:
+        - sideEffects
+      summary: Get Side Effects
+      security:
+        - hasRole: ["admin"]
+      operationId: getSideEffects
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+    post:
+      tags:
+        - sideEffects
+      summary: Post side effects
+      security: []
+      operationId: createSideEffects
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              sideEffects:
+                type: object
+                $ref: '#/definitions/SideEffects'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /ping:
     get:
       summary: Server heartbeat operation
@@ -193,6 +277,42 @@ paths:
         '200':
           description: OK
 definitions:
+  SideEffects:
+    type: object
+    properties:
+      symptoms:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            additionalDetails:
+              type: string
+      recipientIds:
+        type: array
+        items:
+          type: string
+  Symptoms:
+    type: object
+    properties:
+      name:
+        type: string
+      instructions:
+        type: array
+        items:
+          type: object
+          properties:
+            title:
+              type: string
+            messages:
+              type: array
+              items:
+                type: string
+            imageURL:
+              type: array
+              items:
+                type: string
   LoginRequest:
     type: object
     properties:

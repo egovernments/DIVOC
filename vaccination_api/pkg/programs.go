@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/kernel_library/services"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 	"time"
@@ -22,7 +23,6 @@ type ProgramsRegistryResponse struct {
 	StartDate   string        `json:"startDate"`
 }
 
-
 func findProgramsForFacility(facilityCode string) []*models.Program {
 	typeId := "Program"
 	filter := map[string]interface{}{
@@ -30,7 +30,7 @@ func findProgramsForFacility(facilityCode string) []*models.Program {
 			"eq": typeId,
 		},
 		"startDate": map[string]interface{}{
-			"gt":"2020-12-12", //todo: temporary filter
+			"gt": "2020-12-12", //todo: temporary filter
 		},
 		//"enrollmentScopeId": map[string]interface{}{
 		//	"eq": scopeId,
@@ -39,15 +39,15 @@ func findProgramsForFacility(facilityCode string) []*models.Program {
 		//	"eq": code,
 		//},
 	}
-	if programs, err := queryRegistry(typeId, filter); err != nil {
+	if programs, err := services.QueryRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in getting programs for the facility")
 	} else {
 		log.Infof("Programs %+v", programs)
 		programsList := programs[typeId].([]interface{})
-		programsResult:= []*models.Program{}
+		programsResult := []*models.Program{}
 		for _, object := range programsList {
-			p:=object.(map[string]interface{})
-			medicines :=  []*models.ProgramMedicinesItems0{}
+			p := object.(map[string]interface{})
+			medicines := []*models.ProgramMedicinesItems0{}
 			for _, medicineId := range p["medicineIds"].([]interface{}) {
 				medicine, _ := getMedicine(medicineId.(string))
 				log.Info(medicine)
@@ -58,8 +58,8 @@ func findProgramsForFacility(facilityCode string) []*models.Program {
 					ID:          valueOf(p, "osid"),
 					Description: valueOf(p, "description"),
 					LogoURL:     valueOf(p, "logoURL"),
-					Medicines: medicines,
-					Name: valueOf(p, "name"),
+					Medicines:   medicines,
+					Name:        valueOf(p, "name"),
 				},
 			)
 		}
@@ -98,17 +98,17 @@ type ReadMedicineResponse struct {
 	ResponseCode string `json:"responseCode"`
 	Result       struct {
 		Medicine struct {
-			EffectiveUntil int    `json:"effectiveUntil"`
-			Provider       string `json:"provider"`
-			Price          float64    `json:"price"`
-			Name           string `json:"name"`
+			EffectiveUntil int     `json:"effectiveUntil"`
+			Provider       string  `json:"provider"`
+			Price          float64 `json:"price"`
+			Name           string  `json:"name"`
 			Schedule       struct {
 				Osid           string `json:"osid"`
-				RepeatTimes    int64    `json:"repeatTimes"`
-				RepeatInterval int64    `json:"repeatInterval"`
+				RepeatTimes    int64  `json:"repeatTimes"`
+				RepeatInterval int64  `json:"repeatInterval"`
 			} `json:"schedule"`
-			Osid   string `json:"osid"`
-			Status string `json:"status"`
+			Osid            string `json:"osid"`
+			Status          string `json:"status"`
 			VaccinationMode string `json:"vaccinationMode"`
 		} `json:"Medicine"`
 	} `json:"result"`
@@ -120,10 +120,10 @@ func getMedicine(id string) (*models.ProgramMedicinesItems0, error) {
 		Ver: config.Config.Registry.ApiVersion,
 		Ets: "",
 		Request: struct {
-    Medicine struct {
-        Osid string `json:"osid"`
-    } `json:"Medicine"`
-	}{
+			Medicine struct {
+				Osid string `json:"osid"`
+			} `json:"Medicine"`
+		}{
 			Medicine: struct {
 				Osid string `json:"osid"`
 			}{
@@ -131,7 +131,7 @@ func getMedicine(id string) (*models.ProgramMedicinesItems0, error) {
 			},
 		},
 	}
-	if resp, err := req.Post(config.Config.Registry.Url + "/" +config.Config.Registry.ReadOperationId, req.BodyJSON(readMedicineRequest)); err != nil {
+	if resp, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.ReadOperationId, req.BodyJSON(readMedicineRequest)); err != nil {
 		log.Errorf("Error in getting medicine info %+v", err)
 	} else {
 		log.Infof("Get medicine info %+v", resp.String())
@@ -141,13 +141,13 @@ func getMedicine(id string) (*models.ProgramMedicinesItems0, error) {
 			return nil, err
 		} else {
 			//return &readMedicineResponse, nil
-			m:=readMedicineResponse.Result.Medicine
+			m := readMedicineResponse.Result.Medicine
 			return &models.ProgramMedicinesItems0{
-				EffectiveUntil:  int64(m.EffectiveUntil),
-				Name:            m.Name,
-				Price:           m.Price,
-				Provider:        m.Provider,
-				Schedule:        &models.ProgramMedicinesItems0Schedule{
+				EffectiveUntil: int64(m.EffectiveUntil),
+				Name:           m.Name,
+				Price:          m.Price,
+				Provider:       m.Provider,
+				Schedule: &models.ProgramMedicinesItems0Schedule{
 					RepeatInterval: m.Schedule.RepeatInterval,
 					RepeatTimes:    m.Schedule.RepeatTimes,
 				},
@@ -159,7 +159,7 @@ func getMedicine(id string) (*models.ProgramMedicinesItems0, error) {
 	return nil, nil
 }
 
-func valueOf(p map[string]interface{}, key string) string{
+func valueOf(p map[string]interface{}, key string) string {
 	if v, ok := p[key]; ok {
 		return v.(string)
 	}

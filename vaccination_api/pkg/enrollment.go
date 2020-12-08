@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -21,7 +22,7 @@ func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollm
 			"eq": code,
 		},
 	}
-	if enrollmentsJson, err := queryRegistry(typeId, filter); err == nil {
+	if enrollmentsJson, err := services.QueryRegistry(typeId, filter); err == nil {
 		log.Infof("Enrollments %+v", enrollmentsJson)
 		enrollmentsJsonArray := enrollmentsJson["Enrollment"]
 		if jsonArray, err := json.Marshal(enrollmentsJsonArray); err == nil {
@@ -54,7 +55,7 @@ func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, erro
 			"eq": facilityCode,
 		},
 	}
-	if enrollmentsJson, err := queryRegistry(typeId, filter); err == nil {
+	if enrollmentsJson, err := services.QueryRegistry(typeId, filter); err == nil {
 		log.Info("Response ", enrollmentsJson)
 		enrollmentsJsonArray := enrollmentsJson["Enrollment"]
 		if jsonArray, err := json.Marshal(enrollmentsJsonArray); err == nil {

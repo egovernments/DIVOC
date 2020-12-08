@@ -1,14 +1,32 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {TabPanels} from "../TabPanel/TabPanel";
 import {RoleSetup} from "../RoleSetup";
-import VaccinatorsRegistry from "../VaccinatorsRegistry/VaccinatorsRegistry";
+import VaccinatorList from "../facility/VaccinatorList/VaccinatorList";
+import {useKeycloak} from "@react-keycloak/web";
+import {useAxios} from "../../utils/useAxios";
 
 
 export default function FacilityAdmin() {
+    const {keycloak} = useKeycloak();
+    const [vaccinators, setVaccinators] = useState([]);
+    const getVaccinatorPath = 'divoc/admin/api/v1/vaccinators';
+    const axiosInstance = useAxios('');
+
+    useEffect(() => {
+        fetchVaccinators()
+    }, []);
+
+    function fetchVaccinators() {
+        axiosInstance.current.get(getVaccinatorPath)
+            .then(res => {
+                setVaccinators(res.data)
+            });
+    }
+
     return (
         <TabPanels tabs={[
             {title: "Role Setup", component: <RoleSetup/>},
-            {title: "Vaccinator Details", component: <VaccinatorsRegistry/>},
+            {title: "Vaccinator Details", component: <VaccinatorList/>},
             {title: "Program Overview", component: <span>Program Overview</span>},
 
         ]}/>
