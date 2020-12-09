@@ -3,92 +3,105 @@ import {Col, Container, Row} from "react-bootstrap";
 import "./index.css";
 import {SubmitSymptomsForm} from "../SubmitSymptomsForm";
 
+const data = {
+    0: [{
+        "name": "Loss of Sense",
+        "types": [
+            {
+                "name": "Loss of Smell",
+                "instructions": ["You should get Covid-19 test done."]
+            },
+            {
+                "name": "Loss of Taste",
+                "instructions": ["You should get Covid-19 test done."]
+            },
+            {
+                "name": "Temporary loss of Vision ",
+                "instructions": ["You should consult a pulmonologist"]
+            },
+        ]
+    }],
+    1: [{
+        "name": "Mental Health",
+        "types": [
+            {
+                "name": "Memory loss",
+                "instructions": ["You should consult post-Covid support"]
+            },
+            {
+                "name": "Bouts of Depression / Anxiety / Panic Attacks",
+                "instructions": ["You should consult a psychiatrist"]
+            },
+            {
+                "name": "Severe Headache",
+                "instructions": ["You should consult post-Covid support"]
+            },
+        ]
+    }],
+    2: [{
+        "name": "Cardiovascular disease symptoms",
+        "types": [
+            {
+                "name": "Sudden black Out",
+                "instructions": ["You should consult a cardiologist"]
+            },
+            {
+                "name": "Palpitations",
+                "instructions": ["You should consult a cardiologist"]
+            },
+        ]
+    }],
+    3: [{
+        "name": "Paralysis",
+        "types": [
+            {
+                "name": "Temporary Paralysis",
+                "instructions": ["You should consult a neurologist"]
+            }, {
+                "name": "Permanent Paralysis",
+                "instructions": ["You should consult a neurologist"]
+            }
+        ]
+    }],
+};
 export const SideEffects = () => {
-    const [symptoms, setSymptoms] = useState([
-        {
-            "name": "Loss of Sense",
-            "types": [
-                {
-                    "name": "Loss of Smell",
-                    "instructions": ["You should get Covid-19 test done."]
-                },
-                {
-                    "name": "Loss of Taste",
-                    "instructions": ["You should get Covid-19 test done."]
-                },
-                {
-                    "name": "Temporary loss of Vision ",
-                    "instructions": ["You should consult a pulmonologist"]
-                },
-            ]
-        },
-        {
-            "name": "Mental Health",
-            "types": [
-                {
-                    "name": "Memory loss",
-                    "instructions": ["You should consult post-Covid support"]
-                },
-                {
-                    "name": "Bouts of Depression / Anxiety / Panic Attacks",
-                    "instructions": ["You should consult a psychiatrist"]
-                },
-                {
-                    "name": "Severe Headache",
-                    "instructions": ["You should consult post-Covid support"]
-                },
-            ]
-        },
-        {
-            "name": "Cardiovascular disease symptoms",
-            "types": [
-                {
-                    "name": "Sudden black Out",
-                    "instructions": ["You should consult a cardiologist"]
-                },
-                {
-                    "name": "Palpitations",
-                    "instructions": ["You should consult a cardiologist"]
-                },
-            ]
-        }, {
-            "name": "Paralysis",
-            "types": [
-                {
-                    "name": "Temporary Paralysis",
-                    "instructions": ["You should consult a neurologist"]
-                }, {
-                    "name": "Permanent Paralysis",
-                    "instructions": ["You should consult a neurologist"]
-                }
-            ]
-        },
-    ]);
-    const [selectedGroupSymptoms, setSelectedGroupSymptoms] = useState([0]);
-    const [selectedSymptoms, setSelectedSymptoms] = useState([]);
+    const [symptoms, setSymptoms] = useState(data);
+    const [nextSymptoms, setNextSymptoms] = useState({});
+    const [selectedSymptomIds, setSelectedSymptomIds] = useState([]);
+    const [instructions, setInstructions] = useState([]);
+    const [showOtherSection, setShowOtherSection] = useState(true);
     const [showSubmitForm, setShowSubmitForm] = useState(false);
+    const [showGroupHeader, setShowGroupHeader] = useState(false);
 
-    function onSymptomSelected(symptom) {
-        const data = [...selectedSymptoms];
-        const symptomIndex = data.indexOf(symptom);
-        if (symptomIndex >= 0) {
-            data.splice(symptomIndex, 1);
+    function addOrRemoveSelectedItem(itemIdx) {
+        if (selectedSymptomIds.includes(itemIdx)) {
+            setSelectedSymptomIds(selectedSymptomIds.filter(i => i !== itemIdx))
         } else {
-            data.push(symptom)
+            setSelectedSymptomIds(selectedSymptomIds.concat(itemIdx))
         }
-        setSelectedSymptoms(data)
     }
 
-    function onSymptomGroupSelected(symptom) {
-        const data = [...selectedGroupSymptoms];
-        const symptomIndex = data.indexOf(symptom);
-        if (symptomIndex >= 0) {
-            data.splice(symptomIndex, 1);
-        } else {
-            data.push(symptom)
+    function onSymptomSelected(symptom, groupIndex) {
+        const nextSymptomsData = {...nextSymptoms};
+        if ("types" in symptom) {
+            const id = symptom.name;
+            if (id in nextSymptomsData) {
+                delete nextSymptomsData[id];
+            } else {
+                nextSymptomsData[id] = symptom.types;
+            }
         }
-        setSelectedGroupSymptoms(data)
+        if ("instructions" in symptom) {
+            const updatedInstructions = instructions.filter(data => data.name !== symptom.name);
+            if (updatedInstructions.length === instructions.length) {
+                updatedInstructions.push({name: symptom.name, instructions: symptom.instructions})
+            }
+            setInstructions(updatedInstructions)
+        }
+        addOrRemoveSelectedItem(groupIndex);
+        setNextSymptoms(nextSymptomsData);
     }
+
 
     function onOtherSymptomChange(evt) {
 
@@ -98,12 +111,31 @@ export const SideEffects = () => {
         setShowSubmitForm(true)
     }
 
-    function onReset() {
-        setShowSubmitForm(false);
-        setSelectedSymptoms([]);
-        setSelectedGroupSymptoms([0]);
+    function onNextBtnClick() {
+        setSymptoms(nextSymptoms);
+        setNextSymptoms({});
+        setShowOtherSection(false);
+        setShowGroupHeader(true);
     }
 
+    function onReset() {
+        setShowSubmitForm(false);
+        setSymptoms(data);
+        setInstructions([]);
+        setShowOtherSection(true);
+        setNextSymptoms({});
+        setSelectedSymptomIds([]);
+        setShowGroupHeader(false);
+    }
+
+    let showNextButton = false;
+    Object.keys(symptoms).forEach((key, idx) => {
+        symptoms[key].forEach((d) => {
+            if ("types" in d) {
+                showNextButton = true;
+            }
+        });
+    });
     return (
         <div className="main-container">
             <Container fluid>
@@ -116,79 +148,78 @@ export const SideEffects = () => {
                                     <h5>Select Symptoms</h5>
                                     <div className="symptoms-container">
                                         {
-                                            symptoms.map(({name}, groupIndex) => {
+                                            Object.keys(symptoms).map((key, idx) => {
+
                                                 return (
                                                     <>
-                                                        <div key={groupIndex}
-                                                             className="symptom-wrapper d-flex align-items-center pt-1"
-                                                             onClick={() => {
-                                                                 onSymptomGroupSelected(groupIndex)
-                                                             }}>
-                                                    <span className="custom-group">
-                                                        {selectedGroupSymptoms.includes(groupIndex) ? "-" : "+"}
-                                                    </span>
-                                                            <span className="title">{name}</span>
-                                                        </div>
+                                                        {showGroupHeader && <span className="mt-1 group-header">{key}</span>}
                                                         {
-                                                            selectedGroupSymptoms.includes(groupIndex) && symptoms[groupIndex].types.map((type, index) => (
-                                                                <div key={index}
-                                                                     className="symptom-wrapper d-flex align-items-center ml-3"
+                                                            symptoms[key].map((symptom) => (
+                                                                <div key={idx}
+                                                                     className="symptom-wrapper d-flex align-items-center pb-2"
                                                                      onClick={() => {
-                                                                         onSymptomSelected(`${groupIndex}-${index}`)
+                                                                         onSymptomSelected(symptom, symptom.name)
                                                                      }}>
                                                     <span
-                                                        className={`custom-checkbox ${selectedSymptoms.includes(`${groupIndex}-${index}`) ? 'active' : ''}`}/>
-                                                                    <span className="title">{type.name}</span>
-                                                                </div>))
+                                                        className={`custom-checkbox ${selectedSymptomIds.includes(symptom.name) ? 'active' : ''}`}/>
+                                                                    <span className="title">{symptom.name}</span>
+                                                                </div>
+                                                            ))
                                                         }
-                                                    </>
-                                                )
+                                                    </>)
                                             })
                                         }
 
                                         {
-                                            <div className="symptom-wrapper d-flex align-items-center"
+                                            showOtherSection &&
+                                            <div className="symptom-wrapper d-flex align-items-center pt-3"
                                                  onClick={() => {
-                                                     onSymptomSelected("others")
+                                                     addOrRemoveSelectedItem("others")
                                                  }}>
-                                                    <span
-                                                        className={`custom-checkbox ${selectedSymptoms.includes("others") ? 'active' : ''}`}/>
+                                            <span
+                                                className={`custom-checkbox ${selectedSymptomIds.includes("others") ? 'active' : ''}`}/>
                                                 <span className="title">{"Others"}</span>
                                             </div>
                                         }
                                         {
+                                            showOtherSection &&
                                             <textarea className="others-textarea" placeholder={"Please elaborate"}
-                                                      disabled={!selectedSymptoms.includes("others")}
+                                                      disabled={!selectedSymptomIds.includes("others")}
                                                       onChange={onOtherSymptomChange}/>
                                         }
                                     </div>
                                     {
+                                        <button className="confirm-symptoms-btn mr-3" style={{background: "grey"}}
+                                                onClick={onReset}>Reset</button>
+                                    }
+                                    {
+                                        showNextButton &&
                                         <button className="confirm-symptoms-btn"
-                                                disabled={selectedSymptoms.length === 0}
-                                                onClick={onConfirmSymptomsClick}>Confirm Symptoms</button>
+                                                disabled={Object.keys(nextSymptoms).length === 0}
+                                                onClick={onNextBtnClick}>Next</button>
+                                    }
+                                    {
+                                        !showNextButton && <button className="confirm-symptoms-btn"
+                                                                   onClick={onConfirmSymptomsClick}>Confirm
+                                            Symptoms</button>
                                     }
                                 </Col>
                                 <Col lg={6}>
-                                    {selectedSymptoms.length > 0 && <h5>Follow Instructions</h5>}
+                                    {instructions.length > 0 && <h5>Follow Instructions</h5>}
                                     <div className="instructions-container">
                                         {
-                                            selectedSymptoms.map((symptomIdx, idx) => {
-                                                const [groupId, symptomId] = symptomIdx.split("-");
-                                                if (groupId in symptoms) {
-                                                    const {types} = symptoms[groupId];
-                                                    const {name, instructions} = types[symptomId];
-                                                    return (
-                                                        instructions.map((instruction, index) => (
-                                                            <div className="instruction-wrapper">
-                                                                <span className="instruction-title">{name}</span><br/>
-                                                                <span
-                                                                    className="instruction-heading">Instructions</span>
-                                                                <br/>
-                                                                <span key={index}>{instruction}</span>
-                                                            </div>
-                                                        ))
-                                                    )
-                                                }
+                                            instructions.map((data, idx) => {
+                                                return (
+                                                    data.instructions.map((instruction, index) => (
+                                                        <div className="instruction-wrapper" key={idx}>
+                                                            <span className="instruction-title">{data.name}</span><br/>
+                                                            <span
+                                                                className="instruction-heading">Instructions</span>
+                                                            <br/>
+                                                            <span key={index}>{instruction}</span>
+                                                        </div>
+                                                    ))
+                                                )
                                             })
                                         }
                                     </div>
