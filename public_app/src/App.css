@@ -38,7 +38,6 @@
 }
 
 .main-container {
-  padding-top: 50px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 9rem);
   /*100px 50px navbar + 50px padding top/*/
 }

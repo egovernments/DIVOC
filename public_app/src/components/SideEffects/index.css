@@ -12,7 +12,7 @@
     overflow-x: hidden;
 }
 .symptom-wrapper {
-    padding-top: 1rem;
+    padding-top: 0.5rem;
     cursor: pointer;
 }
 .symptom-wrapper .custom-checkbox {
@@ -21,6 +21,13 @@
     width: 1rem;
     height: 1rem;
     display: inline-block;
+}
+.symptom-wrapper .custom-group {
+    color: #88C6A9;
+    font-size: 24px;
+    font-weight: bold;
+    user-select: none;
+    width: 1rem;
 }
 .symptom-wrapper .active {
     background: #88C6A9;
