@@ -11,7 +11,7 @@ export const Header = (props) => {
     const {keycloak} = useKeycloak();
     return (
         <Navbar fixed="top" bg="white">
-            <Navbar.Brand>
+            <Navbar.Brand href="/">
                 <img
                     src={NavbarLogo}
                     width="200"
@@ -22,18 +22,17 @@ export const Header = (props) => {
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav className="">
-                    {!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}
+                    {/*{!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}*/}
                     {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
                     < Nav.Link href="/analytics">ANALYTICS</Nav.Link>}
-                    <Nav.Link href="/">HOME</Nav.Link>
                     {keycloak.authenticated && <Nav.Link onClick={() => {
                         keycloak.logout({redirectUri: window.location.origin + "/"});
                     }}>LOGOUT</Nav.Link>}
-                    {!keycloak.authenticated &&
-                    <NavDropdown title="ENG" id="basic-nav-dropdown">
-                        <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>
-                    </NavDropdown>}
-                    <Nav.Link href="#link">HELP</Nav.Link>
+                    {/*{!keycloak.authenticated &&*/}
+                    {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
+                    {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
+                    {/*</NavDropdown>}*/}
+                    <Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
