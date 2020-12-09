@@ -8,7 +8,7 @@ import MeitLogo from "../../assets/img/meit-logo.png";
 
 function Footer(){
     return(
-        <Navbar  bg="white" clasName="navbar-expand-lg" className={styles['navbar']}>
+        <Navbar  bg="white" className="navbar-expand-lg" className={styles['navbar']}>
             <Navbar.Brand>
                 <img
                     src={MeitLogo}
