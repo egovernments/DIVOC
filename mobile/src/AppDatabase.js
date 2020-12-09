@@ -1,5 +1,5 @@
 import {openDB} from "idb";
-import {getMessageComponent, LANGUAGE_KEYS} from "./lang/LocaleContext";
+import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 6;
@@ -9,8 +9,13 @@ const EVENTS = "events";
 const VACCINATORS = "vaccinators";
 const STATUS = "status";
 const USER_DETAILS = "user_details";
+const monthNames = [
+    "Jan", "Feb", "Mar", "Apr",
+    "May", "Jun", "Jul", "Aug",
+    "Sep", "Oct", "Nov", "Dec"
+];
 
-export const QUEUE_STATUS = Object.freeze({"IN_QUEUE": "in_queue", "COMPLETED": "completed"});
+export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
 
 export class AppDatabase {
 
@@ -21,13 +26,13 @@ export class AppDatabase {
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
             upgrade(db, oldVersion, newVersion) {
                 debugger
-                if(oldVersion === 0 || newVersion === 5) {
+                if (oldVersion === 0 || newVersion === 5) {
                     db.createObjectStore(PATIENTS, {keyPath: "code"});
                     db.createObjectStore(QUEUE, {keyPath: "code"});
                     db.createObjectStore(VACCINATORS, {keyPath: "osid"});
                     db.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
                 }
-                if(oldVersion === 0 || newVersion === 6) {
+                if (oldVersion === 0 || newVersion === 6) {
                     db.createObjectStore(USER_DETAILS);
                 }
             }
@@ -39,19 +44,29 @@ export class AppDatabase {
     async addToQueue(patients) {
         patients.status = QUEUE_STATUS.IN_QUEUE;
         patients.code = patients.enrollCode;
-        return this.db.add(QUEUE, patients);
+        return this.db.put(QUEUE, patients);
     }
 
     async getPatientDetails(enrollCode, mobileNumber) {
         const patient = await this.db.get(PATIENTS, enrollCode);
         if (patient) {
             if (patient.phone === mobileNumber) {
+                patient.dob = this.formatDate(patient.dob)
                 return patient
             } else {
                 return null;
             }
         }
         return patient;
+    }
+
+    formatDate(givenDate) {
+        const dob = new Date(givenDate)
+        let day = dob.getDate();
+        let monthName = monthNames[dob.getMonth()];
+        let year = dob.getFullYear();
+
+        return `${day}/${monthName}/${year}`;
     }
 
     async recipientDetails() {
