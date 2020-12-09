@@ -2,7 +2,7 @@
   "realm": "divoc",
   "auth-server-url": "https://divoc.xiv.in/keycloak/auth/",
   "ssl-required": "external",
-  "resource": "vaccination_api",
+  "resource": "facility-admin-portal",
   "public-client": true,
   "verify-token-audience": true,
   "use-resource-role-mappings": true,

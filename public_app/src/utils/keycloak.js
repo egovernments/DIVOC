@@ -1,5 +1,5 @@
 import Keycloak from 'keycloak-js';
 
-const keycloak = Keycloak('/certificate/keycloak.json');
+const keycloak = Keycloak('/keycloak.json');
 
 export default keycloak

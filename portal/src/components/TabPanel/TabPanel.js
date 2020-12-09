@@ -27,6 +27,7 @@ export const StyledTab = withStyles((theme) => ({
         marginRight: theme.spacing(1),
         '&:focus': {
             opacity: 1,
+            outline: "none",
         },
     },
 }))((props) => <Tab disableRipple {...props} />);
