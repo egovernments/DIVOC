@@ -68,7 +68,7 @@ function VaccineRegistration() {
             </div>
             <div className={styles["sub-container"]}>
                 <p className={styles['list-title']}>List of Registered Medicines / Vaccines</p>
-                <ListView listData={medicineList} />
+                <ListView listData={medicineList} fields={["provider", "price", "effectiveUntil"]}/>
             </div>
         </div>
     );
