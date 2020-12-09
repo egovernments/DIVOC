@@ -3,7 +3,6 @@ import Navbar from "react-bootstrap/Navbar";
 import styles from "./Footer.module.css";
 import Nav from "react-bootstrap/Nav";
 import DigitalIndiaLogo from "../../assets/img/digital-India-logo.png";
-import NhaLogo from "../../assets/img/nha-logo.png";
 import MeitLogo from "../../assets/img/meit-logo.png";
 
 function Footer(){
@@ -17,18 +16,12 @@ function Footer(){
                     alt="React Bootstrap logo"
                 />
                 <img
-                    src={NhaLogo}
-                    width="150"
-                    className="d-inline-block align-top"
-                    alt="React Bootstrap logo"
-                />
-                <img
                     src={DigitalIndiaLogo}
                     width="150"
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />
-                
+
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
