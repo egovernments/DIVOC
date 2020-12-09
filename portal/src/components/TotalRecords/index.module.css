@@ -1,0 +1,9 @@
+.container{
+    background: #ffffff;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    display: inline-flex;
+    width: calc(50% - 1rem);
+    padding: 0.5em 1em;
+    margin-left: 1rem;
+}

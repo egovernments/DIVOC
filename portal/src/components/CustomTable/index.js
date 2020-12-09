@@ -19,7 +19,8 @@ const CustomPaper = withStyles({
     root: {
         boxShadow: "0px 6px 20px #C1CFD933",
         borderRadius: "10px",
-        width: "100%"
+        width: "100%",
+        height: '60vh'
     }
 })(Paper);
 
@@ -51,9 +52,7 @@ export const CustomTable = ({data, fields, canSelectColumn = true}) => {
     };
 
     return (
-        <div>
-
-
+        <div className="mt-3">
             <TableContainer component={CustomPaper}>
                 <Table className={classes.table}
                        aria-label="facility staffs">
@@ -84,8 +83,7 @@ export const CustomTable = ({data, fields, canSelectColumn = true}) => {
 
             {
                 data.length > 0 && canSelectColumn &&
-                <div className={"float-right"}><span>Select the columns to be displayed (use CMD/CTRL to select multiple)</span>
-                    <br/>
+                <div className="d-flex flex-column align-items-end"><span>Select the columns to be displayed</span>
                     <Select
                         value={columns}
                         onChange={handleChangeMultiple}

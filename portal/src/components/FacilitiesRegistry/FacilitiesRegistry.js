@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
+import {TotalRecords} from "../TotalRecords";
 
 function Facilities() {
     const [facilities, setFacilities] = useState([]);
@@ -21,8 +22,14 @@ function Facilities() {
 
     return (
         <div>
-            <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchFacilities}/>
-            <CustomTable data={facilities} fields={[ "serialNum", "facilityName", "status", "admins"]}/>
+            <div className="d-flex mt-3">
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchFacilities}/>
+                <TotalRecords
+                    title={"Total # of Records in the\n DIVOC Facility Registry"}
+                    count={facilities.length}
+                />
+            </div>
+            <CustomTable data={facilities} fields={["serialNum", "facilityName", "admins", "status"]}/>
         </div>
     );
 }

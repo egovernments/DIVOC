@@ -25,10 +25,10 @@ export default function Home() {
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = "/";
-            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/admin";
                 history.push(redirectUrl)
-            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/facility_admin";
                 history.push(redirectUrl)
             }
