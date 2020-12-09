@@ -13,9 +13,11 @@ export const SelectVaccinator = (props) => {
     const [vaccinators, setVaccinators] = useState([])
 
     function onActionBtnClick() {
-        return goNext(ACTION_SELECT_BATCH,
-            `/confirm/vaccination/${props.enrollCode}/${CONSTANT.BATCH_CODE}`,
-            {enrollCode: props.enrollCode, vaccinatorId: vaccinatorIdx});
+        if (vaccinatorIdx !== -1) {
+            return goNext(ACTION_SELECT_BATCH,
+                `/confirm/vaccination/${props.enrollCode}/${CONSTANT.BATCH_CODE}`,
+                {enrollCode: props.enrollCode, vaccinatorId: vaccinatorIdx});
+        }
     }
 
     useEffect(() => {
