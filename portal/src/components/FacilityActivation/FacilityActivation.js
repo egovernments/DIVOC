@@ -8,7 +8,7 @@ function FacilityActivation({ districtList,stateList,program }) {
     const [selectedState, setSelectedState] = useState();
     const [selectedDistrict, setSelectedDistrict] = useState();
     const [facilityType, setFacilityType] = useState("Government");
-    const [status, setStatus] = useState("Active");
+    const [status, setStatus] = useState("Inactive");
     const [allChecked, setAllChecked] = useState(false)
     const [rowCount, setRowCount] = useState(0);
     const [faclitiesList, setFacilitiesList] = useState([
@@ -179,7 +179,7 @@ function FacilityActivation({ districtList,stateList,program }) {
                             <tr>Please select District</tr>
                         </thead>
                         <tbody className={styles["tbody"]}>
-                            {showDistrictList()}
+                            {selectedState ? showDistrictList() : ''}
                         </tbody>
                     </table>
                 </div>

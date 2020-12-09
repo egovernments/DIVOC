@@ -16,9 +16,9 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
     const [faclitiesList, setFacilitiesList] = useState([
         { id: 1, name: "Centre 1",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
         { id: 2, name: "Centre 2",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 3, name: "Centre 3",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 4 ,name:"Centre 4",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 5 ,name:"Centre 5",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 3, name: "Centre 3",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 4 ,name:"Centre 4",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        { id: 5 ,name:"Centre 5",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
     ]);
 
     const [rates,setRates] = useState([
@@ -200,7 +200,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                         <thead>
                             <tr >Please select District</tr>
                         </thead>
-                        <tbody className={styles['tbody']}>{showDistrictList()}</tbody>
+                        <tbody className={styles['tbody']}>{selectedState ? showDistrictList() : ''}</tbody>
                     </table>
                 </div>
                 <div>
