@@ -1,0 +1,13 @@
+
+.update-card {
+    border-radius: 19px;
+    background: white;
+}
+
+.card-date {
+    font-size: 35px;
+}
+
+.card-author {
+    color: #4CA07A;
+}

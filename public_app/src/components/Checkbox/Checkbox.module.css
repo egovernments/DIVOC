@@ -1,0 +1,19 @@
+.checkbox{
+    margin-right: 1em;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+.checkbox input[type="checkbox"]:checked + .wrapper {
+}
+.checkbox input[type="checkbox"] {
+    display: none;
+}
+.checkbox .wrapper{
+    width: 16px;
+    height: 16px;
+    display: inline-block;
+    margin-right: 3px;
+    border: 1px solid lightgray;
+    border-radius: 5px;
+}
