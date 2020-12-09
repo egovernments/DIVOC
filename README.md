@@ -3,6 +3,6 @@ Open source digital platform for large scale vaccination and certification progr
 
 ## [Documentation](https://bharat-dpi.github.io/DIVOC/)
 
-## [Installation Guide](https://bharat-dpi.github.io/DIVOC/user-docs)
+## [Discuss with community](https://github.com/bharat-dpi/DIVOC/discussions)
 
-## [API Documentation](https://bharat-dpi.github.io/DIVOC/developer-docs)
+## [Issue Reporting](https://github.com/bharat-dpi/DIVOC/issues)
