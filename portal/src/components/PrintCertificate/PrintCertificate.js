@@ -162,6 +162,14 @@ function PrintCertificate() {
     const receiptRef = React.useRef();
     const certificateRef = React.useRef();
 
+    const handleChange = (data,dataList,setDataList) => {
+        let newData=dataList;
+        if(dataList.some(item => item.osid===data.osid)){
+            newData = newData.filter( item => !item.osid.includes(data.osid)) 
+            setDataList(newData)
+        }
+        else setDataList(oldArray => [...oldArray,data])
+    }
 
     const getTableBody = () => {
         let tableRow = [];
@@ -183,7 +191,7 @@ function PrintCertificate() {
                                 type="checkbox"
                                 className="form-check-input"
                                 id={data.osid + "receipt"}
-                                onChange={() => setSelectedReceipt(oldArray => [...oldArray, data]) }
+                                onChange={() => handleChange(data,selectedReceipt,setSelectedReceipt) }
                             />
                             <div
                                 className={styles["wrapper"]}
@@ -210,7 +218,7 @@ function PrintCertificate() {
                                 type="checkbox"
                                 className="form-check-input"
                                 id={data.osid + "cert"}
-                                onChange={() => setSelectedCertificate(oldArray => [...oldArray, data]) }
+                                onChange={() => handleChange(data,selectedCertificate,setSelectedCertificate)}
                             />
                             <div
                                 className={styles["wrapper"]}
