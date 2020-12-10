@@ -73,7 +73,6 @@
 <#--            </#if>-->
             <div class="form-content">
                 <div class="title-content">
-                    <span class="form-title">System Admin Login</span>
                     <br/>
                     <span class="form-subtitle">Please Enter your Mobile Number and OTP</span>
                 </div>

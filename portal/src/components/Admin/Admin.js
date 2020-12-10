@@ -15,7 +15,7 @@ export default function Admin() {
             {title: 'Vaccinators', component: <VaccinatorsRegistry/>},
             {title: 'Vaccine Programs', component: <ProgramRegistration/>},
             {title: 'Vaccines', component: <VaccineRegistration/>},
-            {title: 'Enrollment', component: <PreEnrollment/>},
+            {title: 'Pre-Enrollment', component: <PreEnrollment/>},
 
         ]}/>
     );
