@@ -1,5 +1,4 @@
 import React from "react";
-import QRCode from 'qrcode.react';
 import styles from "./PrintCertificate.module.css";
 
 export default class ComponentToPrint extends React.Component {
@@ -15,7 +14,6 @@ export default class ComponentToPrint extends React.Component {
                     <td>Name: {this.props.dataToPrint.name}</td>
                 </tr>
                 <tr>
-                    {/* <td align={"right"}> <QRCode size={128} value={JSON.stringify(this.props.dataToPrint.certificate)} /></td> */}
                 </tr>
                 </tbody>
             </table>
