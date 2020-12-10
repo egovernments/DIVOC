@@ -42,5 +42,13 @@
     margin: 1em;
     width: 400px;
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
 
+.heading{
+    font-size: large;
+    font-weight: bold;
+}
+
+.table-wrapper>table>tbody>tr>td{
+    font-weight: bolder;
 }

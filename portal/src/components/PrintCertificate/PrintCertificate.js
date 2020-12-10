@@ -1,8 +1,8 @@
 import React from "react";
 import styles from "./PrintCertificate.module.css";
 import DropDown from "../DropDown/DropDown";
-import ReactToPrint from "react-to-print";
-import ComponentToPrint from "./ComponentToPrint";
+import CustomPrint from "./CustomPrint";
+import ReactToPrint from 'react-to-print';
 
 const dummyTableData = [
     {
@@ -17,6 +17,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T14:41:49.497Z",
         "name": "Chaya Mitra",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-4370f6c9-350a-4287-afed-9a1c57479d8c",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:41:49.497Z"
@@ -33,6 +34,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T14:40:18.971Z",
         "name": "Chaya Mitra",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-e41597a4-43bb-4de3-b1d0-55faf4c65849",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:40:18.971Z"
@@ -49,6 +51,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T14:42:22.571Z",
         "name": "Chaya Mitra",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-06380349-819b-468e-816a-e7994c6dad98",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:42:22.571Z"
@@ -65,6 +68,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T12:02:44.541Z",
         "name": "Bdya Mitra",
         "gender":"Male",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-5d012f81-122a-4271-ba32-f23b7edd204b",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T12:02:44.541Z"
@@ -81,6 +85,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T14:45:45.141Z",
         "name": "Chaya Mitra",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-b8cd331d-239d-4fbc-bba0-6595cbda7c33",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:45:45.141Z"
@@ -97,6 +102,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-02T15:20:59.712Z",
         "name": "Chaya Mitra",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-9381e683-45bb-424c-a5d9-26cb2bbbc0cc",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T15:20:59.712Z"
@@ -113,6 +119,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-03T07:44:41.179Z",
         "name": "Jaya P",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-463abb24-1c63-4cc3-b18e-f23c7b9efd13",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-03T07:44:41.179Z"
@@ -129,6 +136,7 @@ const dummyTableData = [
         "_osCreatedAt": "2020-12-03T07:46:34.187Z",
         "name": "Jaya P",
         "gender":"Female",
+        "date":"2020-12-02T19:21:18.6",
         "osid": "1-11979d36-1119-4123-b2bb-9784a87e994e",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-03T07:46:34.187Z"
@@ -139,8 +147,8 @@ const PROGRAMS = ["C-19 Program"];
 
 
 function PrintCertificate() {
-    const [selectedReceipt, setSelectedReceipt] = React.useState({});
-    const [selectedCertificate, setSelectedCertificate] = React.useState({});
+    const [selectedReceipt, setSelectedReceipt] = React.useState([]);
+    const [selectedCertificate, setSelectedCertificate] = React.useState([]);
     const [selectedProgram,setSelectedProgram] = React.useState()
     const [tableData,setTableData] = React.useState(dummyTableData);
     const componentRef = React.useRef();
@@ -166,14 +174,13 @@ function PrintCertificate() {
                                 type="checkbox"
                                 className="form-check-input"
                                 id={data.osid + "receipt"}
-                                onChange={(event) => setSelectedReceipt(data) }
-                                checked={selectedReceipt && selectedReceipt.osid === data.osid}
+                                onChange={() => setSelectedReceipt(oldArray => [...oldArray, data]) }
                             />
                             <div
                                 className={styles["wrapper"]}
                                 style={{
                                     backgroundColor:
-                                    selectedReceipt && selectedReceipt.osid === data.osid
+                                    selectedReceipt.some(receipt => receipt.osid===data.osid)
                                             ? "#5C9EF8"
                                             : "",
                                 }}
@@ -194,14 +201,13 @@ function PrintCertificate() {
                                 type="checkbox"
                                 className="form-check-input"
                                 id={data.osid + "cert"}
-                                onChange={(event) => setSelectedCertificate(data) }
-                                checked={selectedCertificate && selectedCertificate.osid === data.osid}
+                                onChange={() => setSelectedCertificate(oldArray => [...oldArray, data]) }
                             />
                             <div
                                 className={styles["wrapper"]}
                                 style={{
                                     backgroundColor:
-                                    selectedCertificate && selectedCertificate.osid === data.osid
+                                    selectedCertificate.some(certificate => certificate.osid===data.osid)
                                             ? "#5C9EF8"
                                             : "",
                                 }}
@@ -231,7 +237,6 @@ function PrintCertificate() {
         )
     }
 
-    
     return (
         <div className={`row ${styles['container']}`}>
             <div>
@@ -254,7 +259,7 @@ function PrintCertificate() {
                         {getTableBody()}
                     </tbody>
                 </table>
-            </div>
+            </div>     
             <div className="col-sm-3">
                 <div className="card">
                     <div className={`card-header ${styles['card-header']}`}>Certificate Count</div>
@@ -263,13 +268,11 @@ function PrintCertificate() {
                     </div>
                 </div>
                 <div>
-                <ReactToPrint
-                    trigger={() => <button className={styles['button']}>Print Receipt</button>}
-                    content={() => componentRef.current}
-                />
-                <div style={{ display: "none" }}>
-                    <ComponentToPrint ref={componentRef} dataToPrint={selectedReceipt}/>
-                </div>
+                    <ReactToPrint
+                        trigger={() => <button className={styles['button']}>Print Receipt</button> }
+                        content={() => componentRef.current}
+                    />
+                    <div style={{ display: "none" }}><CustomPrint ref={componentRef} dataToPrint={selectedReceipt}/></div>
                 </div>
                 
             </div>
