@@ -12,7 +12,6 @@ import StateDropDown from '../StateDropDown/StateDropDown';
 import {STATE_NAMES} from '../../constants';
 
 function Home() {
-    const [isActiveClicked, setActiveClicked] = useState(false);
     const [isCentresClicked, setCentresClicked] = useState(true);
     const [isCertificatesClicked, setCertificatesClicked] = useState(true);
     const [tableData, setTableData] = useState([]);
@@ -26,11 +25,6 @@ function Home() {
         newTableData.push({"Certificates": certificate_data})
         setTableData(newTableData)
     }, [])
-
-
-    const handleActiveCheckboxChange = () => {
-        setActiveClicked(!isActiveClicked);
-    }
 
     const handleCentresCheckboxChange = () => {
         var isClicked = !isCentresClicked;
@@ -74,8 +68,6 @@ function Home() {
                                setSelectedItem={setSelectedState}/>
             </div>
             <div className={styles['type-of-bubbles']}>
-                <Checkbox title={"Active"} color="#7C8289" handleCheckboxChange={handleActiveCheckboxChange}
-                          defaultValue={isActiveClicked}/>
                 <Checkbox title={"Centres"} color="#479EFF" handleCheckboxChange={handleCentresCheckboxChange}
                           defaultValue={isCentresClicked}/>
                 <Checkbox title={"Certificates"} color="#74C9A7" handleCheckboxChange={handleCertificatesCheckboxChange}
