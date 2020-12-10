@@ -18,7 +18,14 @@ Following presentations and videos are available currently to better understand 
 
 Coming soon ...
 
-### Articles
+### External Links
+
+#### Videos
+
+1. [Digital system crucial to vaccinate a billion Indians](https://www.youtube.com/watch?v=vJRgkhsVvmA){:target="_blank"}
+2. [Idea Exchange: Nandan Nilekani Explains his 3 phase Covid-19 Vaccination Process](https://www.youtube.com/watch?v=J86YuKJyaEU){:target="_blank"}
+
+#### Articles
 
 1. [The challenge is we don’t have adult vaccination system, must build it from scratch for Covid-19](https://indianexpress.com/article/india/nandan-nilekani-coronavirus-vaccine-tracker-health-sector-economy-6779867/){:target="_blank"}
 2. [Digital route to deliver Covid vaccine in India](https://economictimes.indiatimes.com/markets/expert-view/nandan-nilekani-on-digital-route-to-deliver-covid-vaccine-in-india/articleshow/79208481.cms?from=mdr){:target="_blank"}
