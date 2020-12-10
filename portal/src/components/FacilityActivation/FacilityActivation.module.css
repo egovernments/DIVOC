@@ -27,20 +27,10 @@
     padding-right: 10px;
 }
 
-.input-container > label > input[type="checkbox"]:checked + .wrapper {
-}
-.input-container > label > input[type="checkbox"] {
-    display: none;
+input[type="checkbox"]:checked + .wrapper {
 }
 
-.input-container > label> input[type="checkbox"] {
-    display: none;
-}
-
-.input-container > label > input[type="radio"]:checked + .wrapper {
-}
-.input-container > label > input[type="radio"] {
-    display: none;
+input[type="radio"]:checked + .wrapper {
 }
 
 .wrapper{

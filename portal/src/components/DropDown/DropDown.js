@@ -1,18 +1,16 @@
-
 import React from 'react';
 import Dropdown from 'react-dropdown';
 import 'react-dropdown/style.css';
 import styles from './DropDown.module.css';
 
 
-function DropDown({ setSelectedOption, placeholder, options}) {
-    
+function DropDown({setSelectedOption, placeholder, options}) {
+
     const handleChange = (selectedItemFromDropdown) => {
         setSelectedOption(selectedItemFromDropdown.label)
-        console.log("selected option is ", selectedItemFromDropdown.label)
     };
-    return(
-        <div style={{width: '80%'}}>
+    return (
+        <div className="m-3">
             <Dropdown
                 options={options}
                 onChange={handleChange}
@@ -24,4 +22,5 @@ function DropDown({ setSelectedOption, placeholder, options}) {
         </div>
     );
 }
+
 export default DropDown;

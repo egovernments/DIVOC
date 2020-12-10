@@ -1,59 +1,115 @@
-import React, { useState, useEffect } from "react";
-import DropDown from "../DropDown/DropDown";
+import React, {useEffect, useState} from "react";
 import styles from "./FacilityAdjustingRate.module.css";
+import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 
+const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-function FacilityAdjustingRate({ districtList,stateList,program }) {
-    const [listOfStates, setListOfStates] = useState([]);
-    const [selectedProgram, setSelectedProgram] = useState();
-    const [selectedState, setSelectedState] = useState();
+function FacilityAdjustingRate({districtList, stateList, program}) {
+    const [programs, setPrograms] = useState(program);
+    const [selectedProgram, setSelectedProgram] = useState("");
+    const [states, setStates] = useState([]);
+    const [selectedState, setSelectedState] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState();
     const [facilityType, setFacilityType] = useState("Government");
-    const [status, setStatus] = useState("Active");
-    const [allChecked, setAllChecked] = useState(false)
-    const [selectedRate, setSelectedRate] = useState({})
+
+
+    const [lastAdjustedOn, setLastAdjustedOn] = useState("Week");
+
+
+    const [allChecked, setAllChecked] = useState(false);
+    const [selectedRate, setSelectedRate] = useState({});
+
     const [submit, setSubmit] = useState(false);
     const [faclitiesList, setFacilitiesList] = useState([
-        { id: 1, name: "Centre 1",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 2, name: "Centre 2",stations: 100,vaccinators: 100,rate: 100,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 3, name: "Centre 3",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 4 ,name:"Centre 4",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
-        { id: 5 ,name:"Centre 5",stations: 100,vaccinators: 100,rate: 300,last_adjusted_on: 'DD/MMM/YYYY',isChecked:false},
+        {
+            id: 1,
+            name: "Centre 1",
+            stations: 100,
+            vaccinators: 100,
+            rate: 100,
+            last_adjusted_on: '01/DEC/2020',
+            isChecked: false
+        },
+        {
+            id: 2,
+            name: "Centre 2",
+            stations: 100,
+            vaccinators: 100,
+            rate: 100,
+            last_adjusted_on: '01/DEC/2020',
+            isChecked: false
+        },
+        {
+            id: 3,
+            name: "Centre 3",
+            stations: 100,
+            vaccinators: 100,
+            rate: 300,
+            last_adjusted_on: '01/DEC/2020',
+            isChecked: false
+        },
+        {
+            id: 4,
+            name: "Centre 4",
+            stations: 100,
+            vaccinators: 100,
+            rate: 300,
+            last_adjusted_on: '01/DEC/2020',
+            isChecked: false
+        },
+        {
+            id: 5,
+            name: "Centre 5",
+            stations: 100,
+            vaccinators: 100,
+            rate: 400,
+            last_adjusted_on: '01/DEC/2020',
+            isChecked: false
+        },
     ]);
 
-    const [rates,setRates] = useState([
-        {id:"abc", noOfFacilties: 2, currentRate: 100, setRate: ''},
-        {id:"cde",noOfFacilties: 3, currentRate: 200, setRate: ''}
-    ])
+    const [rateWiseFacility, setRateWiseFacility] = useState({});
 
     useEffect(() => {
-        normalizeStateNames();
+        normalize();
     }, []);
 
-    const normalizeStateNames = () => {
-        let data = [];
-        Object.keys(stateList).map((state) => {
-            let newData = {};
-            newData.value = state;
-            newData.label = stateList[state];
-            data.push(newData);
+    useEffect(() => {
+        const selectedFacilities = faclitiesList.map((fac, index) => ({
+            ...fac,
+            index
+        })).filter(facility => facility.isChecked);
+        const rateWiseFacilities = {};
+        selectedFacilities.forEach(facility => {
+            const rate = facility.rate;
+            if (rate in rateWiseFacilities) {
+                rateWiseFacilities[rate].facilities = [...rateWiseFacilities[rate].facilities, facility.index];
+            } else {
+                rateWiseFacilities[rate] = {facilities: [facility.index], currentRate: rate, newRate: rate};
+            }
         });
-        setListOfStates(data);
+        setRateWiseFacility(rateWiseFacilities);
+    }, [faclitiesList]);
+
+    const normalize = () => {
+        const statesList = Object.keys(stateList).map((state) => ({value: state, label: stateList[state]}));
+        setStates(statesList);
     };
 
     const handleChange = (value, setValue) => {
         setValue(value);
-        console.log(value);
+    };
+
+    const updateFacility = (index, key, value) => {
+        const facilityData = [...faclitiesList];
+        facilityData[index][key] = value;
+        setFacilitiesList(facilityData);
     };
 
 
-    const getFaciltiyList = () => {
-        let tableRow = [];
-        let tableCells;
-        
-        faclitiesList.forEach(facility => {
-            tableCells = []
-            tableCells.push(<tr>
+    const getFacilityList = () => {
+        return faclitiesList.map((facility, index) => (
+            <tr>
                 <td>{facility['id']}</td>
                 <td>{facility['name']}</td>
                 <td>{facility['stations']}</td>
@@ -61,241 +117,130 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                 <td>{facility['rate']}</td>
                 <td>{facility['last_adjusted_on']}</td>
                 <td>
-                <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor={facility['id']}
-                        >
-                           <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id={facility['id']}
-                    />
-                    <div
-                        className={styles["wrapper"]}
-                        style={{
-                            backgroundColor:
-                            facility['isChecked']
-                                    ? "#DE9D00"
-                                    : "",
+                    <CheckboxItem
+                        text={facility['id']}
+                        showText={false}
+                        checked={facility.isChecked}
+                        onSelect={() => {
+                            updateFacility(index, "isChecked", !facility.isChecked)
                         }}
-                    >
-                        &nbsp;
-                    </div>
-                        </label>
-                    </div>
-                    
+                    />
+
                 </td>
-            </tr>)
-            tableRow.push(tableCells)
-        })
-        return tableRow;
+            </tr>
+        ));
 
-    }
+    };
 
-    const handleAllcheck = (e) => {
-        let list =  faclitiesList;
-        let rowCount = 0;
-        if(e.target.value === "checkAll"){
-            list.forEach(faciltiy => {
-                faciltiy.isChecked = e.target.checked;
-                rowCount = rowCount + 1;
-            });
-        setAllChecked(e.target.checked)
+    const handleAllCheck = (e) => {
+        let list = [...faclitiesList];
+        setAllChecked(e.target.checked);
+        list = list.map((ele) => ({
+            ...ele,
+            isChecked: e.target.checked
+        }));
         setFacilitiesList(list);
-        }
+    };
+
+    const updateRateWiseFacility = (currentRate, newRate) => {
+        const rateWiseData = {...rateWiseFacility};
+        rateWiseData[currentRate].newRate = newRate;
+        setRateWiseFacility(rateWiseData);
     }
 
-    const showDistrictList = () => {
-        return Object.keys(districtList).map((district) => {
-            return (
-                <tr>
-                    <td className={styles['highlight']}>
-                        <div className={`form-check ${styles['input-container']}`}>
-                        <label className="form-check-label" htmlFor={district}>
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={district}
-                                name={district}
-                                value={district}
-                                onChange={(event) =>
-                                    handleChange(district, setSelectedDistrict)
-                                }
-                                checked={selectedDistrict && district === selectedDistrict}
-                            />
-                            <div className={styles['wrapper']} style={{backgroundColor: selectedDistrict=== district ?'#DE9D00':''}}>&nbsp;</div>
-                             {district}
-                        </label>
-                    </div>
-                    </td>
-                    <td>{districtList[district]}</td>
-                </tr>
-            );
+    const getRatesData = () => {
+        return Object.keys(rateWiseFacility).map((rate) => {
+            const rateWiseFacilityElement = rateWiseFacility[rate];
+            const facilityCount = rateWiseFacilityElement.facilities.length;
+            return (<tr>
+                <td className="p-1">
+                    <RadioItem
+                        text={rate}
+                        checked={true}
+                        onSelect={() => {
+                        }}
+                        showText={false}
+                    />
+                </td>
+                <td className="p-1">{facilityCount}</td>
+                <td className="p-1">{rate}</td>
+                <td className="p-1"><input type="number" style={{width: "60px"}} size="4"
+                                           value={rateWiseFacilityElement.newRate}
+                                           onChange={(evt) => updateRateWiseFacility(parseInt(rate), evt.target.value)}/>
+                </td>
+            </tr>);
         });
     };
 
-    const getRatesData = () => {
-        let tableRow = [];
-        let tableCells;
-        
-        rates.forEach(rate => {
-            console.log("rate",rate)
-            tableCells = []
-            tableCells.push(<tr>
-                 <td>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor={rate.id}>
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id={rate.id}
-                                onClick={(e) => {
-                                    const newRate = rate;
-                                    newRate.isChecked =  !rate.isChecked;
-                                    setSelectedRate(newRate);
-                                }}
-                                checked={selectedRate.id === rate.id}
-                            />
-                            <div className={`${styles['wrapper']} ${styles['radio']}`}  style={{backgroundColor: selectedRate.id === rate.id ?'#DE9D00':''}}>&nbsp;</div>
-                        </label>
-                    </div>
-                </td>
-                <td>{rate.noOfFacilties}</td>
-                <td>{rate.currentRate}</td>
-                <td><input type="input" size="4"/></td>
-            </tr>)
-            tableRow.push(tableCells)
-        })
-        return tableRow;
-    }
-
-    const handleClick = () => {
+    const onSubmitBtnClick = () => {
+        const today = new Date();
+        const todayDate = `${today.getDate()}/${MONTH_NAMES[today.getMonth()]}/${today.getFullYear()}`;
+        let facilityData = [...faclitiesList];
+        for (let rate in rateWiseFacility) {
+            const data = rateWiseFacility[rate];
+            data.facilities.forEach(facilityIndex => {
+                facilityData[facilityIndex].rate = data.newRate;
+                facilityData[facilityIndex].last_adjusted_on = todayDate;
+            })
+        }
+        facilityData = facilityData.map(fac => ({...fac, isChecked: false}));
+        setFacilitiesList(facilityData);
+        setRateWiseFacility({});
         setAllChecked(false);
-    }
+    };
 
     return (
-        <div className={`row ${styles['container']}`} >
+        <div className={`row ${styles['container']}`}>
             <div className="col-sm-3">
-                <div>
-                    <DropDown
-                        options={program}
-                        placeholder="Select Program"
-                        setSelectedOption={setSelectedProgram}
-                    />
-                </div>
-                <div>
-                    <p className={styles['highlight']}>All of India</p>
-                    <DropDown
-                        options={listOfStates}
-                        placeholder="Please select State"
-                        setSelectedOption={setSelectedState}
-                    />
-                </div>
-                <p className={styles['highlight']}>{selectedState}</p>
-                <div className={`table-responsive ${styles["district-table"]}` }>
-                    <table className="table table-borderless table-hover">
-                        <thead>
-                            <tr >Please select District</tr>
-                        </thead>
-                        <tbody className={styles['tbody']}>{selectedState ? showDistrictList() : ''}</tbody>
-                    </table>
-                </div>
-                <div>
-                    <p className={styles['highlight']}>Type of Facility</p>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="government">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id="government"
-                                name="Government"
-                                value="Government"
-                                onClick={(event) =>
+                <FacilityFilterTab
+                    programs={programs}
+                    setSelectedProgram={setSelectedProgram}
+                    states={states}
+                    setSelectedState={setSelectedState}
+                    selectedState={selectedState}
+                    districtList={districtList}
+                    selectedDistrict={selectedDistrict}
+                    setSelectedDistrict={setSelectedDistrict}
+                    facilityType={facilityType}
+                    setFacilityType={setFacilityType}
+                >
+                    <div>
+                        <span className={"filter-header"}>Last Adjusted on</span>
+                        <div className="m-3">
+                            <RadioItem
+                                text={"Week"}
+                                checked={lastAdjustedOn === "Week"}
+                                onSelect={(event) =>
                                     handleChange(
                                         event.target.name,
-                                        setFacilityType
+                                        setLastAdjustedOn
                                     )
                                 }
-                                checked={facilityType === "Government"}
                             />
-                            <div className={styles['wrapper']} style={{backgroundColor:facilityType==="Government"?'#DE9D00':''}}>&nbsp;</div>
-                            Government
-                        </label>
-                    </div>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="private">
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id="private"
-                                name="Private"
-                                value="Private"
-                                onClick={(event) =>
+                            <RadioItem
+                                text={"Month"}
+                                checked={lastAdjustedOn === "Month"}
+                                onSelect={(event) =>
                                     handleChange(
                                         event.target.name,
-                                        setFacilityType
+                                        setLastAdjustedOn
                                     )
                                 }
-                                checked={facilityType === "Private"}
                             />
-                            <div className={styles['wrapper']} style={{backgroundColor:facilityType==="Private"?'#DE9D00':''}}>&nbsp;</div>
-                            Private
-                        </label>
+                        </div>
+                        <div>
+                            <span className={"filter-header"}>Please select date range</span>
+                            <div className="m-3">
+                                <input className={styles["custom-date-range"]} type="date"/>
+                            </div>
+                        </div>
                     </div>
-                </div>
-                <div>
-                    <p className={styles['highlight']}>Last Adjusted on</p>
-                    <div className={`form-check-inline ${styles['input-container']}`}>
-                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Active">
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="Active"
-                                name="Active"
-                                value="Active"
-                                onClick={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setStatus
-                                    )
-                                }
-                                checked={status === "Active"}
-                            />
-                            <div className={`${styles['wrapper']} ${styles['radio']}`}  style={{backgroundColor:status==="Active"?'#DE9D00':''}}>&nbsp;</div>
-                            Week
-                        </label>
-                    </div>
-                    <div className={`form-check-inline ${styles['input-container']}`}>
-                        <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="Inactive"
-                                name="Inactive"
-                                value="Inactive"
-                                onClick={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setStatus
-                                    )
-                                }
-                                checked={status === "Inactive"}
-                            />
-                            <div className={`${styles['wrapper']} ${styles['radio']}`} style={{backgroundColor:status==="Inactive"?'#DE9D00':''}}>&nbsp;</div>
-                            Month
-                        </label>
-                    </div>
-                    <input type="date"/> 
-                    <div></div>
-                </div>
+                </FacilityFilterTab>
             </div>
             <div className={`col-sm-6 container ${styles['table']}`}>
                 <p className={styles['highlight']}>{selectedDistrict} facilties</p>
                 <table className={`table table-hover ${styles['table-data']}`}>
-                <thead>
+                    <thead>
                     <tr>
                         <th>CENTRE ID</th>
                         <th>CENTRE NAME</th>
@@ -304,63 +249,47 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                         <th>CURRENT RATE</th>
                         <th>LAST ADJUSTED</th>
                         <th>
-                            <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="checkAll"
-                        >
-                           <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    onClick={(e) =>
-                                        {
-                                            handleAllcheck(e)
-                                        }
-                                    }
-                                    id="checkAll"
-                                    value="checkAll"
-                                    checked={allChecked} 
-                                />
-                                <div
-                                    className={styles["wrapper"]}
-                                    style={{
-                                        backgroundColor:
-                                        allChecked ? "#DE9D00" : "",
-                                    }}
-                                >
-                                    &nbsp;
-                                </div>
-                        </label>
-                    </div>
-                                
-                    </th>
+                            <CheckboxItem
+                                text={"checkAll"}
+                                checked={allChecked}
+                                onSelect={(e) => {
+                                    handleAllCheck(e)
+                                }}
+                                showText={false}
+                            />
+
+
+                        </th>
                     </tr>
-                </thead>
-                <tbody>{selectedDistrict && selectedState ? getFaciltiyList() : ''}</tbody>
+                    </thead>
+                    <tbody>{selectedDistrict && selectedState ? getFacilityList() : ''}</tbody>
                 </table>
             </div>
             <div className="col-sm-3 container">
-            <div className={styles['highlight']}>Set Rate</div>
-                {allChecked ? <div>
-                    <div className={` text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}` }>
+                <div className={styles['highlight']}>Set Rate</div>
+                {Object.keys(rateWiseFacility).length > 0 && <div>
+                    <div
+                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}`}>
                         <table className="table table-borderless table-hover">
                             <thead>
-                                <tr>
-                                    <td></td>
-                                    <td>No. Of Facilities</td>
-                                    <td>Current Rate</td>
-                                    <td>Set New Rate</td>
-                                </tr>
+                            <tr>
+                                <td className="p-1"/>
+                                <td className="p-1">No. Of Facilities</td>
+                                <td className="p-1">Current Rate</td>
+                                <td className="p-1">Set New Rate</td>
+                            </tr>
                             </thead>
                             <tbody>{getRatesData()}</tbody>
                         </table>
-                        
+
                     </div>
-                    <button className={styles['button']} onClick={() => setSubmit(!submit)}>SET RATES</button>
+                    <div className="d-flex justify-content-center">
+                        <button className={`${styles['button']} p-2 pl-3 pr-3`} onClick={() => onSubmitBtnClick()}>SET
+                            RATES
+                        </button>
+                    </div>
                     {submit ? <div>All rates set successfully</div> : ''}
-                </div> : ''}
+                </div>}
             </div>
         </div>
     );
