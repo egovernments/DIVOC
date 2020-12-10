@@ -1,0 +1,65 @@
+.wrapper{
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 1em;
+    border: 2px solid #5C9EF8;
+    border-radius: 0.3em;
+}
+.container{
+    padding: 20px;
+}
+.table-container{
+    height: 100%;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 0px 0px 10px 10px;
+}
+.table-header{
+    background: #4CA07A 0% 0% no-repeat padding-box;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px 10px 0px 0px;
+    opacity: 1;
+}
+.card-header{
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px 10px 0px 0px;
+    background: #4E67D1 0% 0% no-repeat padding-box;
+    color: #FFFFFF;
+    text-align: center;
+}
+
+.button{
+    border: 2px solid #4CA07A;
+    border-radius: 6px;
+    letter-spacing: 1px;
+    color: #4CA07A;
+    background: none;
+    width: 50%;
+    white-space: nowrap;
+}
+
+.certificate-container{
+    width: 440px;
+    background-color: white;
+}
+
+.certificate{
+    margin: 1em;
+    width: 400px;
+    height: 500px;
+    border: 1px solid gray;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+.heading{
+    font-size: large;
+    font-weight: bold;
+}
+
+.table-wrapper>table>tbody>tr>td{
+    font-weight: bolder;
+}
+
+.certificate>tbody>tr{
+    padding: 5px;
+}
