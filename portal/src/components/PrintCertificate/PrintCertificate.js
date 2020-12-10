@@ -268,11 +268,13 @@ function PrintCertificate() {
                     </div>
                 </div>
                 <div>
-                    <ReactToPrint
+                    {selectedReceipt.length>0 ? <ReactToPrint
                         trigger={() => <button className={styles['button']}>Print Receipt</button> }
                         content={() => componentRef.current}
-                    />
-                    <div style={{ display: "none" }}><CustomPrint ref={componentRef} dataToPrint={selectedReceipt}/></div>
+                    /> : ''}
+                    <div style={{ display: "none" }}>
+                        <CustomPrint ref={componentRef} dataToPrint={selectedReceipt}/>
+                    </div>
                 </div>
                 
             </div>
