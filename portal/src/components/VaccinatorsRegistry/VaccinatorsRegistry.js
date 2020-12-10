@@ -4,6 +4,7 @@ import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
+import {TotalRecords} from "../TotalRecords";
 
 function VaccinatorsRegistry() {
     const {keycloak} = useKeycloak();
@@ -23,8 +24,16 @@ function VaccinatorsRegistry() {
 
     return (
         <div>
-            {keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) && <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>}
-            <CustomTable data={vaccinators} fields={["serialNum", "name", "status"]}/>
+            {keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) &&
+            <div className="d-flex mt-3">
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>
+                <TotalRecords
+                    title={"Total # of Records in the\nDIVOC Vaccinators Registry"}
+                    count={vaccinators.length}
+                />
+            </div>
+            }
+            <CustomTable data={vaccinators} fields={["serialNum", "name", "facilityIds", "status"]}/>
         </div>
     );
 }

@@ -1,0 +1,132 @@
+.home-section {
+}
+
+.home-section .section {
+    height: 94vh;
+}
+
+.welcome-wrapper {
+    height: 70%;
+}
+
+.welcome-title-wrapper {
+    width: 55%;
+    padding: 4rem 5rem;
+}
+
+.welcome-title {
+    font-size: 25px;
+}
+
+.welcome-subtitle {
+    font-size: 35px;
+}
+
+.welcome-image-wrapper {
+    width: 45%;
+}
+
+.welcome-image-wrapper img {
+    height: 80%;
+}
+
+.certificate-wrapper {
+    height: 30%;
+    background: #FFFBF0;
+    padding: 0rem 5rem;
+}
+
+.facilities-wrapper {
+}
+
+.login-button {
+    background: transparent linear-gradient(90deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 3rem;
+}
+
+.outline-button {
+    padding: 0.5rem 3rem;
+    border-radius: 4px;
+    border: 2px solid #4E67D1;
+    color: #4e67d1;
+}
+
+.yellow-outline {
+    border: 2px solid #DE9D00;
+    color: #DE9D00;
+}
+
+.download-certificate-button {
+    background: transparent linear-gradient(91deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.certificate-info-wrapper {
+    width: 60%;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.certificate-img-rapper {
+    width: 40%;
+}
+
+.half-section {
+    height: 50vh;
+}
+
+.divoc-video-wrapper {
+    width: 50%;
+    background: #040E28;
+}
+
+.divoc-info-wrapper {
+    width: 50%;
+    padding: 7rem;
+}
+
+.updates-section {
+    background: #F8FBFF;
+    padding: 5rem;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.latest-update-nav-btn {
+    background: white;
+    color: #2CD889;
+    border: none;
+    font-size: 20px;
+}
+
+.footer-section {
+    height: 12vh;
+    border-top: 1px solid #d3d3d3;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.footer-gov-logo {
+    width: 15%;
+    margin: 0 5px;
+}
+
+.footer-link {
+    color: #040E28;
+    margin: 0 5px;
+}
+
+.dashboard-section {
+    height: 70vh;
+}

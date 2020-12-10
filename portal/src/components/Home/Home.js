@@ -8,7 +8,6 @@ import CertificateSmImg from '../../assets/img/certificate-sm.svg'
 import CertificateBgImg from '../../assets/img/certificate-bg.svg'
 import VideoPlayBtnImg from '../../assets/img/video-play-btn.svg'
 import MHFWImg from '../../assets/img/mhfw.png'
-import NHAImg from '../../assets/img/nha.png'
 import MEITImg from '../../assets/img/meit.png'
 import DIImg from '../../assets/img/di.png'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from 'pure-react-carousel';
@@ -25,10 +24,10 @@ export default function Home() {
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = "/";
-            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/admin";
                 history.push(redirectUrl)
-            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.VACCINATION_CLIENT)) {
+            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
                 redirectUrl = "/facility_admin";
                 history.push(redirectUrl)
             }
@@ -127,7 +126,6 @@ export default function Home() {
             <div className="footer-section">
                 <div>
                     <img alt={""} src={MHFWImg} className="footer-gov-logo"/>
-                    <img alt={""} src={NHAImg} className="footer-gov-logo"/>
                     <img alt={""} src={MEITImg} className="footer-gov-logo"/>
                     <img alt={""} src={DIImg} className="footer-gov-logo"/>
                 </div>

@@ -73,7 +73,6 @@
 <#--            </#if>-->
             <div class="form-content">
                 <div class="title-content">
-                    <span class="form-title">System Admin Login</span>
                     <br/>
                     <span class="form-subtitle">Please Enter your Mobile Number and OTP</span>
                 </div>
@@ -88,7 +87,6 @@
     <div class="footer-content">
         <div>
             <img class="footer-gov-logo" src="${url.resourcesPath}/img/mhfw.png" alt="">
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/nha.png" alt="">
             <img class="footer-gov-logo" src="${url.resourcesPath}/img/meit.png" alt="">
             <img class="footer-gov-logo" src="${url.resourcesPath}/img/di.png" alt="">
         </div>
