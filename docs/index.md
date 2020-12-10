@@ -37,7 +37,7 @@ It is expected that COVID-19 vaccination will happen in 3 phases - vaccine short
 
 Following video provides a good introduction to DIVOC.
 
-[![DIVOC Introduction Video by Pramod Varma](/resources/intro-video-thumnail.png)](https://www.youtube.com/watch?v=tOuPDAy7r90){:target="_blank"}
+[![DIVOC Introduction Video by Pramod Varma](/resources/intro-video-thumnail.png)](https://youtu.be/vl_EP9fpzh0){:target="_blank"}
 
 More documentation will come up soon!
 
