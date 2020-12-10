@@ -58,7 +58,7 @@ export class ApiServices {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
                     contact: [
-                        item.patient.phone
+                        "tel:" + item.patient.phone
                     ],
                     dob: item.patient.dob,
                     gender: item.patient.gender,
