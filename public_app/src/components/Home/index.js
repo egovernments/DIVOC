@@ -54,7 +54,7 @@ export const Home = () => (
         </div>
         <div className="half-section  d-flex">
             <div className="divoc-video-wrapper d-flex justify-content-center align-items-center">
-                <iframe width="90%" height="90%" src="https://www.youtube.com/embed/tOuPDAy7r90" frameBorder="0"
+                <iframe width="90%" height="90%" src="https://www.youtube.com/embed/vl_EP9fpzh0" frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen></iframe>
             </div>
