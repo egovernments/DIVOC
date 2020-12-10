@@ -29,14 +29,8 @@
 
 input[type="checkbox"]:checked + .wrapper {
 }
-input[type="checkbox"] {
-    display: none;
-}
 
 input[type="radio"]:checked + .wrapper {
-}
-input[type="radio"] {
-    display: none;
 }
 
 .wrapper{
