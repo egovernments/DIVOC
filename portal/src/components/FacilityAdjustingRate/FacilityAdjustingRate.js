@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import styles from "./FacilityAdjustingRate.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 
+const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 function FacilityAdjustingRate({districtList, stateList, program}) {
     const [programs, setPrograms] = useState(program);
@@ -26,7 +27,7 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
             stations: 100,
             vaccinators: 100,
             rate: 100,
-            last_adjusted_on: 'DD/MMM/YYYY',
+            last_adjusted_on: '01/DEC/2020',
             isChecked: false
         },
         {
@@ -35,7 +36,7 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
             stations: 100,
             vaccinators: 100,
             rate: 100,
-            last_adjusted_on: 'DD/MMM/YYYY',
+            last_adjusted_on: '01/DEC/2020',
             isChecked: false
         },
         {
@@ -44,7 +45,7 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
             stations: 100,
             vaccinators: 100,
             rate: 300,
-            last_adjusted_on: 'DD/MMM/YYYY',
+            last_adjusted_on: '01/DEC/2020',
             isChecked: false
         },
         {
@@ -53,7 +54,7 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
             stations: 100,
             vaccinators: 100,
             rate: 300,
-            last_adjusted_on: 'DD/MMM/YYYY',
+            last_adjusted_on: '01/DEC/2020',
             isChecked: false
         },
         {
@@ -61,8 +62,8 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
             name: "Centre 5",
             stations: 100,
             vaccinators: 100,
-            rate: 300,
-            last_adjusted_on: 'DD/MMM/YYYY',
+            rate: 400,
+            last_adjusted_on: '01/DEC/2020',
             isChecked: false
         },
     ]);
@@ -172,11 +173,14 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
     };
 
     const onSubmitBtnClick = () => {
+        const today = new Date();
+        const todayDate = `${today.getDate()}/${MONTH_NAMES[today.getMonth()]}/${today.getFullYear()}`;
         let facilityData = [...faclitiesList];
         for (let rate in rateWiseFacility) {
             const data = rateWiseFacility[rate];
             data.facilities.forEach(facilityIndex => {
                 facilityData[facilityIndex].rate = data.newRate;
+                facilityData[facilityIndex].last_adjusted_on = todayDate;
             })
         }
         facilityData = facilityData.map(fac => ({...fac, isChecked: false}));
