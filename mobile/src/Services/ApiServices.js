@@ -58,11 +58,11 @@ export class ApiServices {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
                     contact: [
-                        item.patient.phone
+                        "tel:" + item.patient.phone
                     ],
                     dob: item.patient.dob,
                     gender: item.patient.gender,
-                    identify: "did:in.gov.uidai.aadhaar:" + item.identify,
+                    identity: "did:in.gov.uidai.aadhaar:" + item.identity,
                     name: item.patient.name,
                     nationality: item.patient.nationality
                 },
