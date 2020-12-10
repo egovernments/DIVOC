@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import './ListView.css';
 import ProgramActiveImg from "../../assets/img/program-active.svg";
+import Program from "../../assets/img/program.svg";
 import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
 
 function ListView({listData, fields}) {
@@ -15,13 +16,13 @@ function ListView({listData, fields}) {
                                 <div className="d-flex justify-content-between">
                                     <span className={'list-view-name'}>{data.name}</span>
                                     <span className={'list-view-logo-img'}>
-                                        LOGO
+                                        {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
                                         <img src={data.status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
                                              className={'list-view-program-status-img'} alt={data.status}
                                              title={data.status}/>
                                     </span>
                                 </div>
-                                <div className={'list-view-details'}
+                                <div className='list-view-details'
                                      onClick={() => setSelectedIndex(index)}>{"More Details ->"}</div>
                             </div>
                         </div>
@@ -35,7 +36,7 @@ function ListView({listData, fields}) {
                         <div className="d-flex justify-content-between align-items-center">
                             <span className={'list-view-name'}>{listData[selectedIndex].name}</span>
                             <span className={'list-view-logo-img'}>
-                                        LOGO
+                                        {"image" in listData[selectedIndex] ? <img alt="" src={listData[selectedIndex].image} width={"100%"}/> : "LOGO"}
                                         <img
                                             src={listData[selectedIndex].status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
                                             className={'list-view-program-status-img'}

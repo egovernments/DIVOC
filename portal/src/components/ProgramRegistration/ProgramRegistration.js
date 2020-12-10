@@ -5,6 +5,7 @@ import { useKeycloak } from "@react-keycloak/web";
 import Form from "@rjsf/core";
 import ListView from '../ListView/ListView';
 import schema from '../../jsonSchema/programSchema.json';
+import Program from "../../assets/img/program.svg";
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
@@ -49,11 +50,12 @@ function VaccineRegistration() {
     };
 
     const getListOfRegisteredPrograms = async () => {
-        const res = await axios
+        let res = await axios
             .get("/divoc/admin/api/v1/programs", config)
             .then( (res) => {
                 return res.data
             });
+        res = res.map(r => ({...r, image: Program}));
         setProgramList(res)
     };
 

@@ -54,6 +54,7 @@
     color: #040E28;
     font-size: small;
     cursor: pointer;
+    user-select: none;
 }
 
 .list-view-card-container:nth-child(4n+1) .list-view-details {
