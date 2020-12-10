@@ -9,7 +9,11 @@ import QRCode from 'qrcode.react';
 import { toPng, toJpeg, toBlob, toPixelData, toSvg } from 'html-to-image';
 import download from 'downloadjs'
 import {Dropdown} from "react-bootstrap"
-
+const monthNames = [
+    "Jan", "Feb", "Mar", "Apr",
+    "May", "Jun", "Jul", "Aug",
+    "Sep", "Oct", "Nov", "Dec"
+];
 
 function CertificateView() {
     const {keycloak} = useKeycloak();
@@ -29,6 +33,15 @@ function CertificateView() {
     useEffect(() => {
         getCertificate();
     }, []);
+
+    const formatDate = (givenDate) => {
+        const dob = new Date(givenDate);
+        let day = dob.getDate();
+        let monthName = monthNames[dob.getMonth()];
+        let year = dob.getFullYear();
+
+        return `${day}/${monthName}/${year}`;
+    };
 
     const getCertificate = async () => {
         const response = await axios
@@ -65,8 +78,12 @@ function CertificateView() {
     };
 
     const formatIdentity = (id) => {
-        let arr = id.split(":")
-        return arr[arr.length - 1];
+        try {
+            let arr = id.split(":")
+            return arr[arr.length - 1];
+        } catch (e) {
+            return "";
+        }
     }
 
     const showCertificatePreview = (certificateData) => {
@@ -89,8 +106,8 @@ function CertificateView() {
                 <td colSpan={2}><h5>{certificateData.certificate.vaccination.name} Vaccination Certificate</h5></td>
                 </tr>
                 <tr>
-                    <td><b>Certificate ID:</b> <b>234234234</b></td>
-                    <td><b>Issue Date:</b><b>22 Dec 2021</b></td>
+                    <td><b>Certificate ID:</b> <b>{certificateData.certificateId}</b></td>
+                    <td><b>Issue Date:</b> <b>{formatDate(certificateData.certificate.vaccination.date)}</b></td>
                 </tr>
                 <tr>
                     <td colSpan={2} className={styles["top-pad"]}><b>Recipient's details:</b></td>
@@ -101,7 +118,7 @@ function CertificateView() {
                 </tr>
                 <tr>
                     <td><b className={styles["b500"]}>Aadhaar:</b> <span>{formatIdentity(certificateData.certificate.recipient.identity)}</span></td>
-                    <td><b className={styles["b500"]}>DOB:</b><span> {certificateData.certificate.recipient.dob}</span></td>
+                    <td><b className={styles["b500"]}>DOB:</b><span> {formatDate(certificateData.certificate.recipient.dob)}</span></td>
                 </tr>
                 <tr><td colSpan={2} className={styles["top-pad"]}><b>Centre of Vaccination:</b></td></tr>
                 <tr><td colSpan={2}>{certificateData.certificate.facility.name}</td></tr>
@@ -110,8 +127,8 @@ function CertificateView() {
                     <td><b>Valid Until:</b></td>
                 </tr>
                 <tr>
-                    <td><span>{certificateData.certificate.vaccination.date.substring(0,10)}</span></td>
-                    <td><span>{certificateData.certificate.vaccination.effectiveUntil}</span></td>
+                    <td><span>{formatDate(certificateData.certificate.vaccination.date)}</span></td>
+                    <td><span>{formatDate(certificateData.certificate.vaccination.effectiveUntil)}</span></td>
                 </tr>
                 <tr>
                     <td className={styles["spacer-height"]}><span>&nbsp;<br/>&nbsp;</span></td>
@@ -218,7 +235,7 @@ function CertificateView() {
             <div className="col-12 d-flex justify-content-center">
         <div className={styles["container"]}>
             <div className={styles["no-print"]}>
-                <p>You are downloading C-19 Vaccination certificate</p>
+                <p>Vaccination certificate</p>
             </div>
             {(certificateList.length > 1) ? multiCertificateView() : singleCertificateView()}
         </div>
