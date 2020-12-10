@@ -61,7 +61,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                 <td>{facility['rate']}</td>
                 <td>{facility['last_adjusted_on']}</td>
                 <td>
-                <div className="form-check">
+                <div className={`form-check ${styles['input-container']}`}>
                         <label
                             className={`${"form-check-label"} ${
                                 styles["highlight"]
@@ -113,7 +113,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
             return (
                 <tr>
                     <td className={styles['highlight']}>
-                        <div className="form-check">
+                        <div className={`form-check ${styles['input-container']}`}>
                         <label className="form-check-label" htmlFor={district}>
                             <input
                                 type="checkbox"
@@ -146,7 +146,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
             tableCells = []
             tableCells.push(<tr>
                  <td>
-                    <div className="form-check">
+                    <div className={`form-check ${styles['input-container']}`}>
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor={rate.id}>
                             <input
                                 type="radio"
@@ -205,7 +205,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                 </div>
                 <div>
                     <p className={styles['highlight']}>Type of Facility</p>
-                    <div className="form-check">
+                    <div className={`form-check ${styles['input-container']}`}>
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="government">
                             <input
                                 type="checkbox"
@@ -225,7 +225,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                             Government
                         </label>
                     </div>
-                    <div className="form-check">
+                    <div className={`form-check ${styles['input-container']}`}>
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="private">
                             <input
                                 type="checkbox"
@@ -248,7 +248,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                 </div>
                 <div>
                     <p className={styles['highlight']}>Last Adjusted on</p>
-                    <div className="form-check-inline">
+                    <div className={`form-check-inline ${styles['input-container']}`}>
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Active">
                             <input
                                 type="radio"
@@ -268,7 +268,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                             Week
                         </label>
                     </div>
-                    <div className="form-check-inline">
+                    <div className={`form-check-inline ${styles['input-container']}`}>
                         <label className={`${'form-check-label'} ${styles['highlight']}`} htmlFor="Inactive">
                             <input
                                 type="radio"
@@ -304,7 +304,7 @@ function FacilityAdjustingRate({ districtList,stateList,program }) {
                         <th>CURRENT RATE</th>
                         <th>LAST ADJUSTED</th>
                         <th>
-                            <div className="form-check">
+                            <div className={`form-check ${styles['input-container']}`}>
                         <label
                             className={`${"form-check-label"} ${
                                 styles["highlight"]
