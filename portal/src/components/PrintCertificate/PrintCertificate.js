@@ -247,7 +247,7 @@ function PrintCertificate() {
             <div >
                 <label htmlFor="name">Name</label>
                 <input type="text" id="name" name="name" onChange={(evt) => {
-                    const newTableData = dummyTableData.filter( data => data.name.includes(evt.target.value)) 
+                    const newTableData = dummyTableData.filter( data => data.name.toLowerCase().includes(evt.target.value.toLowerCase())) 
                     setTableData(newTableData)
                 }}/>
             </div>
