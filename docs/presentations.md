@@ -9,7 +9,7 @@ Following presentations and videos are available currently to better understand 
 
 ### Presentations
 
-1. [Introduction to DIVOC - PDF](/DIVOC/blob/main/docs/resources/divoc-deck-v1.pdf){:target="_blank"}
+1. [Introduction to DIVOC - PDF](https://drive.google.com/file/d/1kBl-WCUX75qabvGrPSXWubU4p5o-38cV/view){:target="_blank"}
 
 ### Demo Videos
 
