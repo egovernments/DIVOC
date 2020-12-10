@@ -9,6 +9,9 @@
 .container{
     padding: 20px;
 }
+.card{
+    margin: 10px;
+}
 .table-container{
     height: 100%;
     box-shadow: 0px 6px 20px #C1CFD933;
@@ -34,7 +37,7 @@
     letter-spacing: 1px;
     color: #4CA07A;
     background: none;
-    width: 50%;
+    width: 100%;
     white-space: nowrap;
 }
 
@@ -62,4 +65,16 @@
 
 .certificate>tbody>tr{
     padding: 5px;
+}
+
+.input-container > label > input[type="checkbox"]:checked + .wrapper {
+}
+.input-container > label > input[type="checkbox"] {
+    display: none;
+}
+
+.input-container > label > input[type="radio"]:checked + .wrapper {
+}
+.input-container > label > input[type="radio"] {
+    display: none;
 }
