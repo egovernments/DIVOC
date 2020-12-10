@@ -12,10 +12,10 @@ export default class CustomPrint extends React.PureComponent {
                     <table className={`${styles['table-wrapper']} ${styles["certificate"]}`}>
                         <tbody>
                             <tr>
-                                <td className={styles['heading']}>C-19 Vaccination Receipt</td>
+                                <td className={styles['heading']}>C-19 Vaccination  {this.props.title}</td>
                             </tr>
                             <tr>
-                                <td><b>Receipt ID:</b>1234</td>
+                                <td><b>Receipt ID:</b>{certificate.receiptId}</td>
                             </tr>
                             <tr>
                                 <td><b>DATE:</b>2020-12-10</td>
