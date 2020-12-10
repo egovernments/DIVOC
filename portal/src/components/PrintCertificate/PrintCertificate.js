@@ -240,7 +240,7 @@ function PrintCertificate() {
     return (
         <div className={`row ${styles['container']}`}>
             <div>
-                <h3 >Vaccinated Recipients (Covid-19 Vaccine (C19) Program)</h3>
+                <h3 >Vaccinated Recipients</h3>
                 <DropDown setSelectedOption={setSelectedProgram} placeholder="Select a program"  options={PROGRAMS}/>
             </div>
             <div className="col-sm-12">{selectedProgram ? showFilterOptions() : ''}</div>
