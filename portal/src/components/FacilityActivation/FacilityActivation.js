@@ -1,384 +1,180 @@
-import React, { useState, useEffect } from "react";
-import DropDown from "../DropDown/DropDown";
+import React, {useEffect, useState} from "react";
 import styles from "./FacilityActivation.module.css";
+import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 
-function FacilityActivation({ districtList,stateList,program }) {
-    const [listOfStates, setListOfStates] = useState([]);
-    const [selectedProgram, setSelectedProgram] = useState();
-    const [selectedState, setSelectedState] = useState();
+function FacilityActivation({districtList, stateList, program}) {
+    const [programs, setPrograms] = useState(program);
+    const [selectedProgram, setSelectedProgram] = useState("");
+    const [states, setStates] = useState([]);
+    const [selectedState, setSelectedState] = useState("");
     const [selectedDistrict, setSelectedDistrict] = useState();
     const [facilityType, setFacilityType] = useState("Government");
+
+    const [listOfStates, setListOfStates] = useState([]);
     const [status, setStatus] = useState("Inactive");
     const [allChecked, setAllChecked] = useState(false)
     const [rowCount, setRowCount] = useState(0);
     const [faclitiesList, setFacilitiesList] = useState([
-        { id: 1, name: "Centre 1",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 2, name: "Centre 2",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 3, name: "Centre 3",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 4 ,name:"Centre 4",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
-        { id: 5 ,name:"Centre 5",stations: 100,vaccinators: 100,status: 'Inactive',isChecked:false},
+        {id: 1, name: "Centre 1", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
+        {id: 2, name: "Centre 2", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
+        {id: 3, name: "Centre 3", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
+        {id: 4, name: "Centre 4", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
+        {id: 5, name: "Centre 5", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
     ]);
 
+    const [inactiveFacilities, setInactiveFacilities] = useState([]);
+
     useEffect(() => {
-        normalizeStateNames();
+        normalize();
     }, []);
 
-    const normalizeStateNames = () => {
-        let data = [];
-        Object.keys(stateList).map((state) => {
-            let newData = {};
-            newData.value = state;
-            newData.label = stateList[state];
-            data.push(newData);
-        });
-        setListOfStates(data);
+    useEffect(() => {
+        const selectedFacilitiesIdx = faclitiesList.map((fac, index) => ({
+            ...fac,
+            index
+        })).filter(facility => facility.isChecked && facility.status === "Inactive").map(fac => fac.index);
+        setInactiveFacilities(selectedFacilitiesIdx);
+    }, [faclitiesList]);
+
+    const normalize = () => {
+        const statesList = Object.keys(stateList).map((state) => ({value: state, label: stateList[state]}));
+        setStates(statesList);
     };
 
     const handleChange = (value, setValue) => {
         setValue(value);
     };
 
-    const showDistrictList = () => {
-        return Object.keys(districtList).map((district) => {
-            return (
-                <tr>
-                    <td className={styles["highlight"]}>
-                        <div className={`form-check ${styles['input-container']}`}>
-                            <label
-                                className="form-check-label"
-                                htmlFor={district}
-                            >
-                                <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    id={district}
-                                    name={district}
-                                    value={district}
-                                    onChange={(event) =>
-                                        handleChange(
-                                            district,
-                                            setSelectedDistrict
-                                        )
-                                    }
-                                    checked={
-                                        selectedDistrict &&
-                                        district === selectedDistrict
-                                    }
-                                />
-                                <div
-                                    className={styles["wrapper"]}
-                                    style={{
-                                        backgroundColor:
-                                            selectedDistrict === district
-                                                ? "#DE9D00"
-                                                : "",
-                                    }}
-                                >
-                                    &nbsp;
-                                </div>
-                                {district}
-                            </label>
-                        </div>
-                    </td>
-                    <td>{districtList[district]}</td>
-                </tr>
-            );
-        });
+
+    const handleAllCheck = (e) => {
+        let list = [...faclitiesList];
+        setAllChecked(e.target.checked);
+        list = list.map((ele) => ({
+            ...ele,
+            isChecked: e.target.checked
+        }));
+        setFacilitiesList(list);
     };
 
-    const handleAllcheck = (e) => {
-        let list =  faclitiesList;
-        let rowCount = 0;
-        if(e.target.value === "checkAll"){
-            list.forEach(faciltiy => {
-                faciltiy.isChecked = e.target.checked;
-                rowCount = rowCount + 1;
-            });
-        setAllChecked(e.target.checked)
-        setFacilitiesList(list);
-        setRowCount(rowCount);
-        }
-    }
+    const updateFacility = (index, key, value) => {
+        const facilityData = [...faclitiesList];
+        facilityData[index][key] = value;
+        setFacilitiesList(facilityData);
+    };
 
-    const getFaciltiyList = () => {
-        let tableRow = [];
-        let tableCells;
-        
-        faclitiesList.forEach(facility => {
-            tableCells = []
-            tableCells.push(<tr>
+    const getFacilityList = () => {
+        return faclitiesList.filter(fac => fac.status === status).map((facility, index) => (
+            <tr>
                 <td>{facility['id']}</td>
                 <td>{facility['name']}</td>
                 <td>{facility['stations']}</td>
                 <td>{facility['vaccinators']}</td>
                 <td>{facility['status']}</td>
                 <td>
-                <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"] 
-                            }`}
-                            htmlFor={facility['id']}
-                        >
-                           <input
-                        type="checkbox"
-                        className="form-check-input"
-                        id={facility['id']}
-                    />
-                    <div
-                        className={styles["wrapper"]}
-                        style={{
-                            backgroundColor:
-                            facility['isChecked']
-                                    ? "#DE9D00"
-                                    : "",
+                    <CheckboxItem
+                        text={facility['id']}
+                        showText={false}
+                        checked={facility.isChecked}
+                        onSelect={() => {
+                            updateFacility(index, "isChecked", !facility.isChecked)
                         }}
-                    >
-                        &nbsp;
-                    </div>
-                        </label>
-                    </div>
-                    
+                    />
+
                 </td>
-            </tr>)
-            tableRow.push(tableCells)
-        })
-        return tableRow;
+            </tr>
+        ));
 
-    }
+    };
 
-    const handleClick = () => {
-        setFacilitiesList([]);
+    const handleActiveClick = () => {
+        let facilityData = [...faclitiesList];
+        facilityData = facilityData.map((facility, idx) => {
+            if(inactiveFacilities.includes(idx)) {
+                facility.status = "Active";
+            }
+            facility.isChecked = false;
+            return facility;
+        });
+        setFacilitiesList(facilityData);
         setAllChecked(false);
-        setRowCount(0);
+        setInactiveFacilities([]);
     };
 
     return (
         <div className={`row ${styles["container"]}`}>
             <div className="col-sm-3">
-                <div>
-                    <DropDown
-                        options={program}
-                        placeholder="Select Program"
-                        setSelectedOption={setSelectedProgram}
-                    />
-                </div>
-                <div>
-                    <p className={styles["highlight"]}>All of India</p>
-                    <DropDown
-                        options={listOfStates}
-                        placeholder="Please select State"
-                        setSelectedOption={setSelectedState}
-                    />
-                </div>
-                <p className={styles["highlight"]}>{selectedState}</p>
-                <div className={`table-responsive ${styles["district-table"]}`}>
-                    <table className="table table-borderless table-hover">
-                        <thead>
-                            <tr>Please select District</tr>
-                        </thead>
-                        <tbody className={styles["tbody"]}>
-                            {selectedState ? showDistrictList() : ''}
-                        </tbody>
-                    </table>
-                </div>
-                <div>
-                    <p className={styles["highlight"]}>Type of Facility</p>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="government"
-                        >
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id="government"
-                                name="Government"
-                                value="Government"
-                                onClick={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setFacilityType
-                                    )
-                                }
-                                checked={facilityType === "Government"}
-                            />
-                            <div
-                                className={styles["wrapper"]}
-                                style={{
-                                    backgroundColor:
-                                        facilityType === "Government"
-                                            ? "#DE9D00"
-                                            : "",
-                                }}
-                            >
-                                &nbsp;
-                            </div>
-                            Government
-                        </label>
-                    </div>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="private"
-                        >
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id="private"
-                                name="Private"
-                                value="Private"
-                                onClick={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setFacilityType
-                                    )
-                                }
-                                checked={facilityType === "Private"}
-                            />
-                            <div
-                                className={styles["wrapper"]}
-                                style={{
-                                    backgroundColor:
-                                        facilityType === "Private"
-                                            ? "#DE9D00"
-                                            : "",
-                                }}
-                            >
-                                &nbsp;
-                            </div>
-                            Private
-                        </label>
-                    </div>
-                </div>
-                <div>
-                    <p className={styles["highlight"]}>Status</p>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="Active"
-                        >
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="Active"
-                                name="Active"
-                                value="Active"
-                                onClick={(event) =>
-                                    handleChange(event.target.name, setStatus)
-                                }
+                <FacilityFilterTab
+                    programs={programs}
+                    setSelectedProgram={setSelectedProgram}
+                    states={states}
+                    setSelectedState={setSelectedState}
+                    selectedState={selectedState}
+                    districtList={districtList}
+                    selectedDistrict={selectedDistrict}
+                    setSelectedDistrict={setSelectedDistrict}
+                    facilityType={facilityType}
+                    setFacilityType={setFacilityType}
+                >
+                    <div>
+                        <span className={"filter-header"}>Status</span>
+                        <div className="m-3">
+                            <RadioItem
+                                text={"Active"}
                                 checked={status === "Active"}
-                            />
-                            <div
-                                className={`${styles["wrapper"]} ${styles["radio"]}`}
-                                style={{
-                                    backgroundColor:
-                                        status === "Active" ? "#DE9D00" : "",
-                                }}
-                            >
-                                &nbsp;
-                            </div>
-                            Active
-                        </label>
-                    </div>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="Inactive"
-                        >
-                            <input
-                                type="radio"
-                                className="form-check-input"
-                                id="Inactive"
-                                name="Inactive"
-                                value="Inactive"
-                                onClick={(event) =>
+                                onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
-                                checked={status === "Inactive"}
                             />
-                            <div
-                                className={`${styles["wrapper"]} ${styles["radio"]}`}
-                                style={{
-                                    backgroundColor:
-                                        status === "Inactive" ? "#DE9D00" : "",
-                                }}
-                            >
-                                &nbsp;
-                            </div>
-                            Inactive
-                        </label>
+                            <RadioItem
+                                text={"Inactive"}
+                                checked={status === "Inactive"}
+                                onSelect={(event) =>
+                                    handleChange(event.target.name, setStatus)
+                                }
+                            />
+                        </div>
+
                     </div>
-                </div>
+                </FacilityFilterTab>
             </div>
+
             <div className={`col-sm-7 container ${styles["table"]}`}>
                 <p className={styles["highlight"]}>
                     {selectedDistrict} facilties
                 </p>
                 <table className={`table table-hover ${styles["table-data"]}`}>
                     <thead>
-                        <tr>
-                            <th>CENTRE ID</th>
-                            <th>CENTRE NAME</th>
-                            <th>VACCINATION STATIONS</th>
-                            <th>CERTIFIED VACCINATORS</th>
-                            <th>C19 program STATUS</th>
-                            <th>
-                            <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className={`${"form-check-label"} ${
-                                styles["highlight"]
-                            }`}
-                            htmlFor="checkAll"
-                        >
-                           <input
-                                    type="checkbox"
-                                    className="form-check-input"
-                                    onClick={(e) =>
-                                        {
-                                            handleAllcheck(e)
-                                        }
-                                    }
-                                    id="checkAll"
-                                    value="checkAll"
-                                    checked={allChecked} 
-                                />
-                                <div
-                                    className={styles["wrapper"]}
-                                    style={{
-                                        backgroundColor:
-                                        allChecked ? "#DE9D00" : "",
-                                    }}
-                                >
-                                    &nbsp;
-                                </div>
-                        </label>
-                    </div>
-                                
-                            </th>
-                        </tr>
+                    <tr>
+                        <th>CENTRE ID</th>
+                        <th>CENTRE NAME</th>
+                        <th>VACCINATION STATIONS</th>
+                        <th>CERTIFIED VACCINATORS</th>
+                        <th>C19 program STATUS</th>
+                        <th>
+                            <CheckboxItem
+                                text={"checkAll"}
+                                checked={allChecked}
+                                onSelect={(e) => {
+                                    handleAllCheck(e)
+                                }}
+                                showText={false}
+                            />
+                        </th>
+                    </tr>
                     </thead>
-                    <tbody>{selectedState && selectedDistrict ?  getFaciltiyList() : ''}</tbody>
-                    
+                    <tbody>{selectedState && selectedDistrict ? getFacilityList() : ''}</tbody>
+
                 </table>
             </div>
             <div className="col-sm-2 container">
                 <div className={`card ${styles["card-continer"]}`}>
                     <div className="card-body text-center">
-                        {faclitiesList.length>0 ? '' : <p>Success</p>}
+                        {/*{faclitiesList.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
-                            Make {rowCount} facilities active for the {selectedProgram}
+                            Make {inactiveFacilities.length} facilities active for the {selectedProgram}
                         </p>
                         <button
-                            onClick={handleClick}
+                            onClick={handleActiveClick}
                             className={styles["button"]}
                         >
                             MAKE ACTIVE

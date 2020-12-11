@@ -1,0 +1,74 @@
+.filter-tab-container {
+  height: 100%;
+  display: inline-block;
+  width: 100%;
+  background: #FFFFFF;
+  box-shadow: 0 6px 20px #C1CFD933;
+  border-radius: 10px;
+  padding: 1rem 1rem;
+  color: black;
+
+  .select-program-wrapper {
+    .Dropdown-control {
+      border-color: #4E67D1;
+      color: #4E67D1;
+
+      .Dropdown-arrow {
+        border-color: #4E67D1 transparent transparent;
+      }
+    }
+  }
+
+  .filter-header {
+    font-size: 14px;
+    font-weight: bold;
+  }
+
+  .district-table {
+    height: 20vh;
+    overflow: auto;
+    border: 1px solid #E8E9EC;
+
+    td {
+      padding: 0.25rem;
+    }
+  }
+
+  .tbody {
+    color: black;
+    font-size: smaller;
+  }
+  .form-check {
+    padding-left: 1rem;
+  }
+}
+
+.custom-checkbox-item-wrapper {
+  padding-left: 1rem;
+  font-size: 14px;
+  font-weight: bold;
+  .wrapper {
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 1em;
+    border: 1px solid #DE9D00;
+    border-radius: 0.3em;
+  }
+}
+
+.custom-radio-wrapper {
+  display: inline;
+  border: 1px solid #DE9D00;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 10rem;
+  margin-right: 1em;
+
+  .custom-radio {
+    width: calc(1rem - 2px);
+    height: calc(1rem - 2px);
+    border: 1px solid white;
+    border-radius: 10rem;
+  }
+}

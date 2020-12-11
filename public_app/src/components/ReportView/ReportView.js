@@ -24,7 +24,7 @@ function Report() {
     const fetchData = async () => {
         let date = new Date();
         date = format(date.setDate(date.getDate()-1),'yyyy-MM-dd')
-        const data = await fetch(`${API_ROOT_URL}/data-2020-10-31.json`).then((response) => {
+        const data = await fetch(`${API_ROOT_URL}/data-2020-12-09.json`).then((response) => {
             return response.json();
           });
 

@@ -22,7 +22,6 @@ function Header() {
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav className="">
-                    <Nav.Link href="https://divoc-portal.xiv.in" target="_blank">PORTAL</Nav.Link>
                     {/*<Nav.Link href="/">HOME</Nav.Link>*/}
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}

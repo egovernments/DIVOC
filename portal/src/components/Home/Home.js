@@ -31,6 +31,8 @@ export default function Home() {
                 redirectUrl = "/facility_admin";
                 history.push(redirectUrl)
             }
+        } else {
+            history.push("/login");
         }
     }, [keycloak]);
     return (
