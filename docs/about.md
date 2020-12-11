@@ -4,7 +4,7 @@ DIVOC is an open source project created to help countries rapidly rollout vaccin
 
 ### Fund Sources
 
-1. Naya Nagrik Trust, financially supported by Nandan Nilekani
+1. **Naya Nagrik Trust**, financially supported by **Nandan Nilekani**
 
 ### Teams
 
