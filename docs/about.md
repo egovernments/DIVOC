@@ -4,7 +4,6 @@ DIVOC is an open source project created to help countries rapidly rollout vaccin
 
 ### Funders
 
-1. **Nandan Nilekani**: Co-founder and Chairman of Infosys Technologies, Co-founder and Chairman of EkStep Foundation, Former Chairman of the Unique Identification Authority of India (UIDAI).
 
 ### Teams
 
