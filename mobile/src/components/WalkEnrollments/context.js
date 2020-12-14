@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
 import {FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS} from "./index";
+import {appIndexDb} from "../../AppDatabase";
 
 export const WALK_IN_ROUTE = "walkInEnroll"
 
@@ -19,6 +20,11 @@ function walkInEnrollmentReducer(state, action) {
         case FORM_WALK_IN_ENROLL_FORM: {
             const newState = {...state}
             newState.name = action.payload.name;
+            newState.gender = action.payload.gender;
+            newState.nationalId = action.payload.nationalId;
+            newState.dob = action.payload.dob;
+            newState.email = action.payload.email;
+            newState.phone = action.payload.phone;
             return newState
         }
         case FORM_WALK_IN_ENROLL_PAYMENTS: {
@@ -55,10 +61,16 @@ export function useWalkInEnrollment() {
         history.goBack()
     }
 
+    const saveWalkInEnrollment = async function (paymentMode) {
+        state.paymentMode = paymentMode
+        return appIndexDb.saveWalkInEnrollments(state)
+    }
+
     return {
         state,
         dispatch,
         goNext,
         goBack,
+        saveWalkInEnrollment
     }
 }

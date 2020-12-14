@@ -1,4 +1,16 @@
 .new-enroll-container {
   height: 100%;
   margin: 2rem 1rem 0.2rem;
+  text-align: center;
+
+  .content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .payment-container {
+      width: 100%;
+    }
+  }
 }

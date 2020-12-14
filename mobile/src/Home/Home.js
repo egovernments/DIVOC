@@ -36,7 +36,7 @@ function EnrollmentTypes() {
 
     const {goToVerifyRecipient, goToQueue, goToNewEnroll} = useHome();
     return <>
-        <div className={"enroll-container"}>
+        <div className="enroll-container">
             <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)} icon={verifyRecipient}
                             onClick={() => {
                                 goToVerifyRecipient()
