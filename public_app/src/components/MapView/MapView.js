@@ -10,6 +10,7 @@ import TextBox from '../TextBox/TextBox';
 import IndiaMap from "../IndiaMap/IndiaMap";
 import StateDropDown from '../StateDropDown/StateDropDown';
 import {STATE_NAMES} from '../../constants';
+import LeafletMap from '../IndiaMap/LeafletMap';
 
 function Home() {
     const [isCentresClicked, setCentresClicked] = useState(true);
@@ -62,7 +63,7 @@ function Home() {
 
     return (
         <div className={styles['map-container']}>
-            <div className={styles['dropdown']}>
+            {/* <div className={styles['dropdown']}>
                 <div className={styles['select-state']}>Select State</div>
                 <StateDropDown dropdownList={STATE_NAMES} placeHolder="All of India"
                                setSelectedItem={setSelectedState}/>
@@ -113,7 +114,8 @@ function Home() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> */}
+            <LeafletMap data={tableData}/>
         </div>
     );
 }
