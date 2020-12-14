@@ -12,6 +12,8 @@ import verifyRecipient from "./verify_recpient.png"
 import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
 import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
+import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
+import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -32,7 +34,7 @@ export default Home;
 
 function EnrollmentTypes() {
 
-    const {goToVerifyRecipient, goToQueue} = useHome();
+    const {goToVerifyRecipient, goToQueue, goToNewEnroll} = useHome();
     return <>
         <div className={"enroll-container"}>
             <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)} icon={verifyRecipient}
@@ -41,6 +43,7 @@ function EnrollmentTypes() {
                             }}/>
             <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.ENROLL_RECIPIENT)} icon={enrollRecipient}
                             onClick={() => {
+                                goToNewEnroll()
                             }}/>
             <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} icon={recipientQueue}
                             onClick={goToQueue}/>
@@ -147,12 +150,16 @@ export function useHome() {
     const goToQueue = function () {
         history.push(`/queue`)
     };
+    const goToNewEnroll = function () {
+        history.push('/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM)
+    };
 
     return {
         state,
         dispatch,
         goToVerifyRecipient,
-        goToQueue
+        goToQueue,
+        goToNewEnroll
     }
 }
 
