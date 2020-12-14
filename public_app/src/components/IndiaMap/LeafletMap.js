@@ -14,9 +14,15 @@ export default function LeafletMap({data}){
         fillOpacity: 1,
     }
 
-    const onCountryClick = (event) => {
+    const onMouseIn = (event) => {
         event.target.setStyle({
             fillColor: "#4E67D1",
+        })
+    }
+
+    const onMouseOut = (event) => {
+        event.target.setStyle({
+            fillColor: "#CEE5FF",
         })
     }
     
@@ -24,7 +30,8 @@ export default function LeafletMap({data}){
         const countryName = country.properties.ADMIN;
         layer.bindPopup(`State : ${countryName} <br/> certificates Issued : 0`);
         layer.on({
-            click: onCountryClick,
+            mouseover: onMouseIn,
+            mouseout: onMouseOut,
         })
     }
 
