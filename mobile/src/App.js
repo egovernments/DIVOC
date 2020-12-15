@@ -13,6 +13,7 @@ function App() {
             SyncFacade.pull().then(value => {
                 setDBInit(true)
             }).catch((e) => {
+                console.log(e)
                 setDBInit(true)
             });
         }

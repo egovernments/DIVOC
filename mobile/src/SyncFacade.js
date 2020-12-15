@@ -16,7 +16,10 @@ export class SyncFacade {
 
     static async push() {
         const certifyPatients = await appIndexDb.getDataForCertification();
-        await ApiServices.certify(certifyPatients);
+        console.log(certifyPatients.length)
+        if (certifyPatients.length > 0) {
+            await ApiServices.certify(certifyPatients);
+        }
         await appIndexDb.cleanUp()
     }
 }
