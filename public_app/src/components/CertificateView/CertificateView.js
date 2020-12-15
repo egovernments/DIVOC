@@ -103,32 +103,32 @@ function CertificateView() {
                     <td align={"right"}> <QRCode size={128} value={JSON.stringify(certificateData.certificate)} /></td>
                 </tr>
                 <tr>
-                <td colSpan={2}><h5>{certificateData.certificate.vaccination.name} Vaccination Certificate</h5></td>
+                <td colSpan={2}><h5>{certificateData.certificate.certificateId} Vaccination Certificate</h5></td>
                 </tr>
                 <tr>
                     <td><b>Certificate ID:</b> <b>{certificateData.certificateId}</b></td>
-                    <td><b>Issue Date:</b> <b>{formatDate(certificateData.certificate.vaccination.date)}</b></td>
+                    <td><b>Issue Date:</b> <b>{formatDate(certificateData.certificate.issuanceDate)}</b></td>
                 </tr>
                 <tr>
                     <td colSpan={2} className={styles["top-pad"]}><b>Recipient's details:</b></td>
                 </tr>
                 <tr>
-                    <td><b className={styles["b500"]}>Name:</b> <span>{certificateData.name}</span></td>
-                    <td><b className={styles["b500"]}>Gender:</b> <span>{certificateData.certificate.recipient.gender}</span></td>
+                    <td><b className={styles["b500"]}>Name:</b> <span>{certificateData.certificate.credentialSubject.name}</span></td>
+                    <td><b className={styles["b500"]}>Gender:</b> <span>{certificateData.certificate.credentialSubject.gender}</span></td>
                 </tr>
                 <tr>
-                    <td><b className={styles["b500"]}>Aadhaar:</b> <span>{formatIdentity(certificateData.certificate.recipient.identity)}</span></td>
-                    <td><b className={styles["b500"]}>DOB:</b><span> {formatDate(certificateData.certificate.recipient.dob)}</span></td>
+                    <td><b className={styles["b500"]}>Aadhaar:</b> <span>{formatIdentity(certificateData.certificate.credentialSubject.id)}</span></td>
+                    {/*<td><b className={styles["b500"]}>DOB:</b><span> {formatDate(certificateData.certificate.recipient.dob)}</span></td>*/}
                 </tr>
                 <tr><td colSpan={2} className={styles["top-pad"]}><b>Centre of Vaccination:</b></td></tr>
-                <tr><td colSpan={2}>{certificateData.certificate.facility.name}</td></tr>
+                <tr><td colSpan={2}>{certificateData.certificate.evidence[0].facility.name}</td></tr>
                 <tr>
                     <td><b>Date of Vaccination</b></td>
                     <td><b>Valid Until:</b></td>
                 </tr>
                 <tr>
-                    <td><span>{formatDate(certificateData.certificate.vaccination.date)}</span></td>
-                    <td><span>{formatDate(certificateData.certificate.vaccination.effectiveUntil)}</span></td>
+                    <td><span>{formatDate(certificateData.certificate.evidence[0].date)}</span></td>
+                    <td><span>{formatDate(certificateData.certificate.evidence[0].effectiveUntil)}</span></td>
                 </tr>
                 <tr>
                     <td className={styles["spacer-height"]}><span>&nbsp;<br/>&nbsp;</span></td>
