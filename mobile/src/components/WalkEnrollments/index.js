@@ -2,20 +2,16 @@ import React, {useState} from "react";
 import {Redirect} from "react-router";
 import {BaseFormCard} from "../BaseFormCard";
 import "./index.scss"
-import {Button, Card, FormGroup} from "react-bootstrap";
+import {Button} from "react-bootstrap";
 import {useWalkInEnrollment, WALK_IN_ROUTE, WalkInEnrollmentProvider} from "./context";
 import Row from "react-bootstrap/Row";
 import PropTypes from 'prop-types';
-import Col from "react-bootstrap/Col";
-import {BaseCard} from "../../Base/Base";
-import tempIcon from "assets/img/vaccination-active-status.svg"
 import schema from '../../jsonSchema/walk_in_form.json';
 import Form from "@rjsf/core/lib/components/Form";
+import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
-
-const nationality = ["Indian", "Chinese", "Sri Lanka"]
 
 export function WalkEnrollmentFlow(props) {
     return (
@@ -48,8 +44,6 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 function WalkEnrollment(props) {
     const {state, goNext} = useWalkInEnrollment()
-    const [userDetails, setUserDetails] = useState(state);
-
 
     const customFormats = {
         'phone-in': /\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$/
@@ -57,9 +51,9 @@ function WalkEnrollment(props) {
 
     const uiSchema = {
         classNames: "form-container",
-       /* title: {
-            classNames: styles["form-title"],
-        },*/
+        phone: {
+            "ui:placeholder": "+91"
+        },
     };
     return (
         <div className="new-enroll-container">
@@ -69,11 +63,13 @@ function WalkEnrollment(props) {
                         schema={schema}
                         customFormats={customFormats}
                         uiSchema={uiSchema}
+                        formData={state}
                         onSubmit={(e) => {
-                            console.log(e.formData)
                             goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, e.formData)
                         }}
-                    />
+                    >
+                        <Button type={"submit"} variant="outline-primary" className="action-btn">Done</Button>
+                    </Form>
                 </div>
 
             </BaseFormCard>
@@ -84,17 +80,26 @@ function WalkEnrollment(props) {
 const paymentMode = [
     {
         name: "Government",
-        logo: tempIcon
+        logo: function (selected) {
+            return <ImgGovernment selected={selected}/>
+        }
+
     }
     ,
     {
         name: "Voucher",
-        logo: tempIcon
+        logo: function (selected) {
+            return <ImgVoucher selected={selected}/>
+        }
+
     }
     ,
     {
         name: "Direct",
-        logo: tempIcon
+        logo: function (selected) {
+            return <ImgDirect selected={selected}/>
+        }
+
     }
 ]
 
@@ -104,21 +109,24 @@ function WalkEnrollmentPayment(props) {
     const [selectPaymentMode, setSelectPaymentMode] = useState()
     return (
         <div className="new-enroll-container">
-            <BaseFormCard title={"Payment Mode"}>
+            <BaseFormCard title={"Enroll Recipient"}>
                 <div className="content">
-                    <h3 className="mt-5">
-                        Please select mode of payment
-                    </h3>
-                    <Row className="mt-5 d-flex flex-row justify-content-between">
+                    <h3>Please select mode of payment</h3>
+                    <Row className="payment-container">
                         {
                             paymentMode.map((item, index) => {
-                                return <PaymentItem title={item.name} logo={item.logo} onClick={(value) => {
-                                    setSelectPaymentMode(value)
-                                }}/>
+                                return <PaymentItem
+                                    title={item.name}
+                                    logo={item.logo}
+                                    selected={item.name === selectPaymentMode}
+                                    onClick={(value) => {
+                                        setSelectPaymentMode(value)
+                                    }}/>
                             })
                         }
                     </Row>
-                    <Button className="mt-5"
+                    <Button variant="outline-primary"
+                            className="action-btn"
                             onClick={() => {
                                 saveWalkInEnrollment(selectPaymentMode)
                                     .then(() => {
@@ -135,6 +143,7 @@ function WalkEnrollmentPayment(props) {
 PaymentItem.propTypes = {
     title: PropTypes.string.isRequired,
     logo: PropTypes.object.isRequired,
+    selected: PropTypes.bool,
     onClick: PropTypes.func
 };
 
@@ -145,12 +154,12 @@ function PaymentItem(props) {
                 props.onClick(props.title)
             }
         }}>
-            <BaseCard>
-                <Col className="payment-container">
-                    <img src={props.logo} alt={""}/>
-                    <h6>{props.title}</h6>
-                </Col>
-            </BaseCard>
+            <div className={`payment-item ${props.selected ? "active" : ""}`}>
+                <div className={"logo"}>
+                    {props.logo(props.selected)}
+                </div>
+                <h6 className="title">{props.title}</h6>
+            </div>
         </div>
     );
 }
