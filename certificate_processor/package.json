@@ -1,0 +1,16 @@
+{
+  "name": "certificate_processor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "GPL",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "kafkajs": "^1.15.0"
+  }
+}
