@@ -5,12 +5,16 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest"
   },
   "author": "",
   "license": "GPL",
   "dependencies": {
     "axios": "^0.21.0",
+    "jsonld-signatures": "^6.0.0",
     "kafkajs": "^1.15.0"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3"
   }
 }
