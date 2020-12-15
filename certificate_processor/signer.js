@@ -1,7 +1,7 @@
 const jsigs = require('jsonld-signatures');
 const config = require('./config/config');
 const registry = require('./registry');
-const {publicKey, privateKeyPem} = require('./config/keys');
+const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
 const {RsaSignature2018} = jsigs.suites;
 const {AssertionProofPurpose} = jsigs.purposes;
@@ -12,9 +12,19 @@ const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials');
 const {vaccinationv1} = require('./vaccinationv1');
 
+const publicKey = {
+  '@context': jsigs.SECURITY_CONTEXT_URL,
+  id: 'did:india',
+  type: 'RsaVerificationKey2018',
+  controller: 'https://example.com/i/india',
+  publicKeyPem
+};
+
 const customLoader = url => {
+  console.log("checking " + url);
   const c = {
     "did:india": publicKey,
+    "https://example.com/i/india": publicKey,
     "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
     'https://www.w3.org/2018/credentials#': credentialsv1,
     "https://www.w3.org/2018/credentials/v1": credentialsv1
@@ -39,14 +49,34 @@ const customLoader = url => {
 
 
 async function signJSON(certificate) {
+
+  const publicKey = {
+    '@context': jsigs.SECURITY_CONTEXT_URL,
+    id: 'did:india',
+    type: 'RsaVerificationKey2018',
+    controller: 'https://example.com/i/india',
+    publicKeyPem
+  };
+  const controller = {
+    '@context': jsigs.SECURITY_CONTEXT_URL,
+    id: 'https://example.com/i/india',
+    publicKey: [publicKey],
+    // this authorizes this key to be used for making assertions
+    assertionMethod: [publicKey.id]
+  };
+
   const key = new RSAKeyPair({...publicKey, privateKeyPem});
+
   const signed = await jsigs.sign(certificate, {
     documentLoader: customLoader,
     suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose(),
+    purpose: new AssertionProofPurpose({
+      controller: controller
+    }),
     compactProof: true
   });
-  console.info("Signed cert " + signed)
+
+  console.info("Signed cert " + JSON.stringify(signed));
   return signed;
 }
 
@@ -117,5 +147,6 @@ async function signAndSave(certificate) {
 module.exports = {
   signAndSave,
   signJSON,
-  transformW3
+  transformW3,
+  customLoader
 };

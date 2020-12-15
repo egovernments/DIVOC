@@ -1,4 +1,4 @@
-const {signJSON, transformW3} = require('../signer');
+const {signJSON, transformW3, customLoader} = require('../signer');
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
 const {RsaSignature2018} = jsigs.suites;
@@ -44,17 +44,34 @@ signJSON(transformW3(cert2))
 
 test('Sign the json', async () => {
   sign = await signJSON(transformW3(cert2));
+  console.log(JSON.stringify(sign))
   expect(sign).not.toBe(null);
 });
 
 test('Verify the signed json', async () => {
-  const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://www.who.int/2020/credentials/vaccination/v1\"],\"credentialSubject\":{\"gender\":\"Male\",\"id\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Bhaya Mitra\",\"nationality\":\"Indian\",\"type\":\"Person\"},\"evidence\":[{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"facility\":{\"address\":{\"addressCountry\":\"IN\",\"addressRegion\":\"Karnataka\",\"district\":\"Bengaluru South\",\"streetAddress\":\"123, Koramangala\"},\"name\":\"ABC Medical Center\"},\"id\":\"https://nha.gov.in/evidence/vaccine/1234\",\"manufacturer\":\"COVPharma\",\"type\":[\"Vaccination\"],\"verifier\":{\"name\":\"Sooraj Singh\"}}],\"issuanceDate\":\"2020-12-15t13:29:48.902z\",\"issuer\":\"https://nha.gov.in/\",\"nonTransferable\":\"true\",\"proof\":{\"http://purl.org/dc/terms/created\":{\"@value\":\"2020-12-15T13:29:48Z\",\"type\":\"http://www.w3.org/2001/XMLSchema#dateTime\"},\"https://w3id.org/security#jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..uM8rtWe9z5ewU2fZMVudVLO5Vzsx8AqiPaSRoMpA0kNjCwXyNGtaYu1dBow8eyPdTqOSICVXQhOHZ59anIqNg5sfuc7rUbBz0gQIFCDtHQu2xYntsicEVXohSGcYeZbd14yeOfVmu6htzWCDHxpf2uPTki3o4tHduNG1_UeoO_DpCnQJ1MKhIRtM7FSgNIOGLkCsBZPCarZBs8fsaPHxZuq6rCSCW_rYqG7-_N_SG_8oD5m74Bz91h2l7eyyrZlKf5r0e1E-qnfRrUg4Q9BR-m43vTh3fvlnJjlxGuyXs7B3Q-KDVazSt1_91IlEC14AoHSdCHd5jdXviiiaXryL3g\",\"https://w3id.org/security#proofPurpose\":{\"id\":\"https://w3id.org/security#assertionMethod\"},\"type\":\"RsaSignature2018\"},\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"]}";
-  const {publicKey} = require('../config/keys');
+  const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://www.who.int/2020/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:11111111111\",\"name\":\"Pramod K Varma\",\"gender\":\"Male\",\"age\":23,\"nationality\":\"Indian\"},\"evidence\":[{\"id\":\"https://nha.gov.in/evidence/vaccine/1234\",\"type\":[\"Vaccination\"],\"batch\":\"BXO2342JP\",\"manufacturer\":\"COVPharma\",\"date\":\"2021-01-01T12:23:24Z\",\"effectiveStart\":\"2021-01-01T12:23:24Z\",\"effectiveUntil\":\"2025-01-01T12:23:24Z\",\"verifier\":{\"id\":\"https://nha.gov.in/evidence/vaccinator/3223\",\"name\":\"John Doe\",\"sign-image\":\"...\"},\"facility\":{\"id\":\"https://nha.gov.in/evidence/facilities/4545\",\"name\":\"ABC Hospital\",\"address\":{\"streetAddress\":\"#12, Some Rd\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"Bengaluru\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\",\"postalCode\":\"560034\"},\"seal-image\":\"...\"}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"http://purl.org/dc/terms/created\":{\"type\":\"http://www.w3.org/2001/XMLSchema#dateTime\",\"@value\":\"2020-12-15T16:26:44Z\"},\"https://w3id.org/security#jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..GowGNYJk4KjBBEZjTU4I6-_qPAUbP2XDKORM5fyEk2onBi_6mMl8cgKnfsUMDzRJ9Z9nGR8JF6uP9YDsUypeeuDW_Mv70ky33v4Eatp17WRv7_I-pi59XdKthiwRqsc3x50-kqYF0e0p2ymFZwt3XcJnMXlxqa3GVkD-WkeuFdNpMwK_0cphEe41Y1kqBJ9rWN8R7QmDTOfgdR92t76RLRZcQMiltkZvtU_NYhZx0I-EOiY6fhsBoEDf0Yizri5w1-cO81oAFydsy9U5a32S_EMjk0U-PfzQJ8fcWNtTmYKgeqtmyJAjrndaYR1dEessF8S84liIoRqkoE87X3RCow\",\"https://w3id.org/security#proofPurpose\":{\"id\":\"https://w3id.org/security#assertionMethod\"},\"https://w3id.org/security#verificationMethod\":{\"id\":\"did:india\"}}}";
+  const {publicKeyPem} = require('../config/keys');
+  const publicKey = {
+    '@context': jsigs.SECURITY_CONTEXT_URL,
+    id: 'did:india',
+    type: 'RsaVerificationKey2018',
+    controller: 'https://example.com/i/india',
+    publicKeyPem
+  };
+  const controller = {
+    '@context': jsigs.SECURITY_CONTEXT_URL,
+    id: 'https://example.com/i/india',
+    publicKey: [publicKey],
+    // this authorizes this key to be used for making assertions
+    assertionMethod: [publicKey.id]
+  };
   const key = new RSAKeyPair({...publicKey});
   const {AssertionProofPurpose} = jsigs.purposes;
   const result = await jsigs.verify(signed, {
     suite: new RsaSignature2018({key}),
-    purpose: AssertionProofPurpose
+    purpose: new AssertionProofPurpose({controller}),
+    documentLoader: customLoader
   });
-  console.log(result)
+  console.log(result);
+  expect(result.verified).toBe(true)
 });
