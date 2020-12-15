@@ -80,22 +80,25 @@ export const CertificateStatus = ({data, goBack}) => {
         async function verifyData() {
             const publicKey = {
                 '@context': jsigs.SECURITY_CONTEXT_URL,
+                id: 'did:india',
                 type: 'RsaVerificationKey2018',
-                "id": "@id",
-                controller: 'https://example.com/i/alice',
+                controller: 'https://example.com/i/india',
                 publicKeyPem: config.certificatePublicKey
             };
-
-            const {RsaSignature2018} = jsigs.suites;
-            const {AssertionProofPurpose} = jsigs.purposes;
-
-
+            const controller = {
+                '@context': jsigs.SECURITY_CONTEXT_URL,
+                id: 'https://example.com/i/india',
+                publicKey: [publicKey],
+                // this authorizes this key to be used for making assertions
+                assertionMethod: [publicKey.id]
+            };
             const key = new RSAKeyPair({...publicKey});
+            const {AssertionProofPurpose} = jsigs.purposes;
+            const {RsaSignature2018} = jsigs.suites;
             const result = await jsigs.verify(data, {
-                documentLoader: customLoader,
                 suite: new RsaSignature2018({key}),
-                purpose: new AssertionProofPurpose(),
-                compactProof: true
+                purpose: new AssertionProofPurpose({controller}),
+                documentLoader: customLoader
             });
             if (result.verified) {
                 console.log('Signature verified.');
@@ -134,10 +137,10 @@ export const CertificateStatus = ({data, goBack}) => {
 
                 </table>
             }
-            <CustomButton className="blue-btn" onClick={goBack}>Verify Another Certificate</CustomButton>
+            <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
             <SmallInfoCards text={"Provide Feedback"} img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
             <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg} backgroundColor={"#EFF5FD"}/>
-            <CustomButton className="green-btn" onClick={goBack}>Message to You <img src={MessagePlayImg}
+            <CustomButton className="green-btn mb-5" onClick={goBack}>Message to You <img src={MessagePlayImg}
                                                                                      alt={""}/></CustomButton>
         </div>
     )
