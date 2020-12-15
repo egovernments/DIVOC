@@ -1,6 +1,8 @@
 DIVOC is an open source project from India towards digital orchestration of 
 vaccination programs. DIVOC is is built using contributions from 
-Nandan Nilekani and archietcted by Dr. Pramod K Varma.
+Nandan Nilekani and archietcted by Dr. Pramod K Varma. 
+DIVOC software is licensed under GPL V3.
+-----------------------------
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:
