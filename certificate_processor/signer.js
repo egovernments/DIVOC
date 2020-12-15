@@ -59,7 +59,7 @@ function transformW3(cert) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: 'did:in.gov.uidai.aadhaar:11111111111',
+      id: cert.recipient.identity,
       name: cert.recipient.name,
       gender: cert.recipient.gender,
       age: cert.recipient.age, //from dob
