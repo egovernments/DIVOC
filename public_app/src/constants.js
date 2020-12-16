@@ -1,3 +1,5 @@
+import {formatDate} from "./utils/CustomDate";
+
 export const API_ROOT_URL = 'https://api.covid19india.org/v4';
 
 export const STATE_NAMES = {
@@ -38,4 +40,36 @@ export const STATE_NAMES = {
   LD: 'Lakshadweep',
   PY: 'Puducherry',
   TT: 'All of India',
+};
+
+
+export const CertificateDetailsPaths = {
+  "Name": {
+    path: ["credentialSubject", "name"],
+    format: (data) => (data)
+  },
+  "Age": {
+    path: ["credentialSubject", "age"],
+    format: (data) => (data)
+  },
+  "Gender": {
+    path: ["credentialSubject", "gender"],
+    format: (data) => (data)
+  },
+  "Certificate ID": {
+    path: ["evidence", "0", "certificateId"],
+    format: (data) => (data)
+  },
+  "Date of Issue": {
+    path: ["evidence", "0", "effectiveStart"],
+    format: (data) => (formatDate(data))
+  },
+  "Valid Until": {
+    path: ["evidence", "0", "effectiveUntil"],
+    format: (data) => (formatDate(data))
+  },
+  "Vaccination Facility": {
+    path: ["evidence", "0", "facility", "name"],
+    format: (data) => (data)
+  }
 };

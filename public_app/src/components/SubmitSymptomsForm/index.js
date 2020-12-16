@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import "./index.css"
 import axios from "axios";
 import {pathOr} from "ramda";
+import {CertificateDetailsPaths} from "../../constants";
 
 const state = {
     GenerateOTP: "GenerateOTP",
@@ -26,14 +27,6 @@ const stateDetails = {
     [state.CompletedMessage]: {
         subTitle: ""
     }
-};
-const patientDetailsPaths = {
-    "Name": ["certificate", "recipient", "name"],
-    "Gender": ["certificate", "recipient", "gender"],
-    "ID Number": ["certificate", "recipient", "id"],
-    "DoB": ["certificate", "recipient", "dob"],
-    "Vaccination Centre": ["certificate", "facility", "name"],
-    "Date of Vaccination": ["certificate", "vaccination", "date"],
 };
 
 export const SubmitSymptomsForm = (props) => {
@@ -89,12 +82,18 @@ export const SubmitSymptomsForm = (props) => {
                     <h5>If the symptoms worsen, please visit the facility so that the doctors can attend to at the earliest.</h5>
                     <h6 className="mt-5" style={{color: "#5C9EF8"}}>If you need to contact the facility immediately</h6>
                     <span className="mt-3 d-inline-block" style={{fontSize: '14px'}}>
-                        {pathOr("NA", patientDetailsPaths["Vaccination Centre"], recipients[patientSelected])}
+                        {pathOr("NA", CertificateDetailsPaths["Vaccination Facility"].path, recipients[patientSelected].certificate)}
                         <br/>
-                        {pathOr("", ["certificate", "facility", "address", "0"], recipients[patientSelected])}
+                        {pathOr("", ["evidence", "0", "facility", "address", "streetAddress"], recipients[patientSelected].certificate)}
+                        {", "}
+                        {pathOr("", ["evidence", "0", "facility", "address", "district"], recipients[patientSelected].certificate)}
+                        {", "}
+                        {pathOr("", ["evidence", "0", "facility", "address", "addressRegion"], recipients[patientSelected].certificate)}
+                        {", "}
+                        {pathOr("", ["evidence", "0", "facility", "address", "addressCountry"], recipients[patientSelected].certificate)}
                     </span>
                     <br/>
-                    <span style={{fontSize: '14px'}}>{pathOr("NA", ["certificate", "facility", "contact"], recipients[patientSelected])}</span>
+                    {/*<span style={{fontSize: '14px'}}>{pathOr("NA", ["certificate", "facility", "contact"], recipients[patientSelected])}</span>*/}
                     <br/>
                     <button className="form-btn mt-5" onClick={moveToNextState}>Continue</button>
                 </div>
@@ -126,7 +125,7 @@ export const SubmitSymptomsForm = (props) => {
                     {
                         currentState === state.ChoosePatient && <div>
                             {
-                                recipients.map(({osid, certificate: {recipient: {name, gender, dob}}}, index) => (
+                                recipients.map(({osid, certificate: {credentialSubject: {name, gender, age}}}, index) => (
                                     <div key={index} className="mt-2 d-flex align-items-center">
                                         <input type="radio" id={index} name="choose-recipient" className="mr-3"
                                                checked={patientSelected === index} onChange={() => {
@@ -135,7 +134,7 @@ export const SubmitSymptomsForm = (props) => {
                                         <label for={index}>
                                             <span style={{fontSize: "14px"}}>{name}</span><br/>
                                             <span style={{fontSize: "12px"}}>{gender}</span>, <span
-                                            style={{fontSize: "12px"}}>{dob}</span>
+                                            style={{fontSize: "12px"}}>{age || "NA"}</span>
                                         </label>
                                     </div>
                                 ))
@@ -148,11 +147,11 @@ export const SubmitSymptomsForm = (props) => {
                         <>
                             <table className="patient-details-table">
                                 {
-                                    Object.keys(patientDetailsPaths).map((item, index) => {
+                                    Object.keys(CertificateDetailsPaths).map((item, index) => {
                                         return (
                                             <tr>
                                                 <td className="table-title">{item}</td>
-                                                <td className="table-value">{pathOr("NA", patientDetailsPaths[item], recipients[patientSelected])}</td>
+                                                <td className="table-value">{pathOr("NA", CertificateDetailsPaths[item].path, recipients[patientSelected].certificate)}</td>
                                             </tr>
                                         )
                                     })
