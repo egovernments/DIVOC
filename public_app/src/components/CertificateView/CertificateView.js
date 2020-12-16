@@ -9,38 +9,12 @@ import download from 'downloadjs'
 import {Dropdown} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
+import {CertificateDetailsPaths} from "../../constants";
 
 const certificateDetailsPaths = {
+    ...CertificateDetailsPaths,
     "Vaccination": {
         path: ["certificate", "evidence", "0", "type", "0"]
-    },
-    "Name": {
-        path: ["certificate", "credentialSubject", "name"],
-        format: (data) => (data)
-    },
-    "Age": {
-        path: ["certificate", "credentialSubject", "age"],
-        format: (data) => (data)
-    },
-    "Gender": {
-        path: ["certificate", "credentialSubject", "gender"],
-        format: (data) => (data)
-    },
-    "Certificate ID": {
-        path: ["certificateId"],
-        format: (data) => (data)
-    },
-    "Date of Issue": {
-        path: ["certificate", "evidence", "0", "effectiveStart"],
-        format: (data) => (formatDate(data))
-    },
-    "Valid Until": {
-        path: ["certificate", "evidence", "0", "effectiveUntil"],
-        format: (data) => (formatDate(data))
-    },
-    "Vaccination Facility": {
-        path: ["certificate", "evidence", "0", "facility", "name"],
-        format: (data) => (data)
     },
     "Identity": {
         path: ["certificate", "credentialSubject", "id"]
