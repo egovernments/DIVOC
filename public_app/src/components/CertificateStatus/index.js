@@ -33,7 +33,7 @@ const certificateDetailsPaths = {
         format: (data) => (data)
     },
     "Certificate ID": {
-        path: ["certificate", "id"],
+        path: ["credentialSubject", "id"],
         format: (data) => (data)
     },
     "Date of Issue": {
