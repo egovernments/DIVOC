@@ -46,7 +46,7 @@ export const VerifyCertificate = () => {
                 </>
             }
             {
-                result && <CertificateStatus data={JSON.parse(result)} goBack={() => {
+                result && <CertificateStatus data={result} goBack={() => {
                     setShowScanner(false);
                     setResult("");
                 }
