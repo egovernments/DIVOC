@@ -36,7 +36,7 @@ export const VerifyCertificate = () => {
                     <>
                         <QrReader
                             className="qr-camera"
-                            delay={300}
+                            delay={100}
                             onError={handleError}
                             onScan={handleScan}
                         />

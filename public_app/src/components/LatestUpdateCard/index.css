@@ -11,3 +11,12 @@
 .card-author {
     color: #4CA07A;
 }
+@media (max-width: 961px) {
+    .card-content {
+        width: 12rem;
+        max-height: 3rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}

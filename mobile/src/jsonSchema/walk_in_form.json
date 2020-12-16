@@ -1,0 +1,54 @@
+{
+  "$id": "#properties/WalkIn",
+  "type": "object",
+  "required": [
+    "name",
+    "gender",
+    "nationalId",
+    "dob",
+    "email",
+    "phone"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "Name"
+    },
+    "gender": {
+      "title": "Select Gender",
+      "type": "string",
+      "enum": [
+        "Male",
+        "Female"
+      ]
+    },
+    "nationalId": {
+      "title": "Nationality",
+      "type": "string",
+      "$id": "#/properties/nationalId",
+      "enum": [
+        "Indian"
+      ],
+      "default": "Indian"
+    },
+    "dob": {
+      "title": "Date of Birth",
+      "type": "string",
+      "$id": "#/properties/dob",
+      "format": "date"
+    },
+    "email": {
+      "title": "Email",
+      "type": "string",
+      "$id": "#/properties/email",
+      "format": "email"
+    },
+    "phone": {
+      "title": "Mobile No.",
+      "type": "string",
+      "$id": "#/properties/phone",
+      "format": "phone-in"
+    }
+  }
+}

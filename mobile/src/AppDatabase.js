@@ -2,7 +2,7 @@ import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 7;
+const DATABASE_VERSION = 9;
 const PATIENTS = "patients";
 const QUEUE = "queue";
 const EVENTS = "events";
@@ -126,6 +126,26 @@ export class AppDatabase {
         const enrollmentsList = enrollments || [];
         const patients = enrollmentsList.map((item, index) => this.db.put(PATIENTS, item));
         return Promise.all(patients)
+    }
+
+    async saveWalkInEnrollments(walkEnrollment) {
+        if (walkEnrollment) {
+            walkEnrollment.code = Date.now().toString()
+            await this.saveEnrollments([walkEnrollment])
+            const queue = {
+                enrollCode: walkEnrollment.code,
+                mobileNumber: walkEnrollment.phone,
+                previousForm: "Payment Mode",
+                name: walkEnrollment.name,
+                dob: walkEnrollment.dob,
+                gender: walkEnrollment.gender,
+                status: QUEUE_STATUS.IN_QUEUE,
+                code: walkEnrollment.code
+            }
+            await this.addToQueue(queue)
+        } else {
+            return Promise.reject(new Error("Failed to save"))
+        }
     }
 
     async saveVaccinators(vaccinators) {

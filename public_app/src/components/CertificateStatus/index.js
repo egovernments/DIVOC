@@ -10,6 +10,7 @@ import config from "../../config";
 import {pathOr} from "ramda";
 import {formatDate} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
+import {CertificateDetailsPaths} from "../../constants";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -19,36 +20,6 @@ const {contexts} = require('security-context');
 const {credentialsv1} = require('../../utils/credentials');
 const {vaccinationv1} = require('../../utils/vaccinationv1');
 
-const certificateDetailsPaths = {
-    "Name": {
-        path: ["credentialSubject", "name"],
-        format: (data) => (data)
-    },
-    "Age": {
-        path: ["credentialSubject", "age"],
-        format: (data) => (data)
-    },
-    "Gender": {
-        path: ["credentialSubject", "gender"],
-        format: (data) => (data)
-    },
-    "Certificate ID": {
-        path: ["evidence", "0", "certificateId"],
-        format: (data) => (data)
-    },
-    "Date of Issue": {
-        path: ["evidence", "0", "effectiveStart"],
-        format: (data) => (formatDate(data))
-    },
-    "Valid Until": {
-        path: ["evidence", "0", "effectiveUntil"],
-        format: (data) => (formatDate(data))
-    },
-    "Vaccination Facility": {
-        path: ["evidence", "0", "facility", "name"],
-        format: (data) => (data)
-    }
-};
 const customLoader = url => {
     const c = {
         "did:india": config.certificatePublicKey,
@@ -133,8 +104,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             {
                 isValid && <table className="mt-3">
                     {
-                        Object.keys(certificateDetailsPaths).map((key, index) => {
-                            const context = certificateDetailsPaths[key];
+                        Object.keys(CertificateDetailsPaths).map((key, index) => {
+                            const context = CertificateDetailsPaths[key];
                             return (
                                 <tr key={index}>
                                     <td className="pr-3">{key}</td>

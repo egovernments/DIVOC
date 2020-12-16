@@ -2,48 +2,22 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useKeycloak} from "@react-keycloak/web";
 import styles from "./CertificateView.module.css";
-import moh from '../../assets/img/moh.png'
 import QRCode from 'qrcode.react';
 import {toPng, toSvg} from 'html-to-image';
 import download from 'downloadjs'
 import {Dropdown} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
+import {CertificateDetailsPaths} from "../../constants";
+import {Certificate} from "../Certificate";
 
 const certificateDetailsPaths = {
+    ...CertificateDetailsPaths,
     "Vaccination": {
-        path: ["certificate", "evidence", "0", "type", "0"]
-    },
-    "Name": {
-        path: ["certificate", "credentialSubject", "name"],
-        format: (data) => (data)
-    },
-    "Age": {
-        path: ["certificate", "credentialSubject", "age"],
-        format: (data) => (data)
-    },
-    "Gender": {
-        path: ["certificate", "credentialSubject", "gender"],
-        format: (data) => (data)
-    },
-    "Certificate ID": {
-        path: ["certificateId"],
-        format: (data) => (data)
-    },
-    "Date of Issue": {
-        path: ["certificate", "evidence", "0", "effectiveStart"],
-        format: (data) => (formatDate(data))
-    },
-    "Valid Until": {
-        path: ["certificate", "evidence", "0", "effectiveUntil"],
-        format: (data) => (formatDate(data))
-    },
-    "Vaccination Facility": {
-        path: ["certificate", "evidence", "0", "facility", "name"],
-        format: (data) => (data)
+        path: ["evidence", "0", "manufacturer"]
     },
     "Identity": {
-        path: ["certificate", "credentialSubject", "id"]
+        path: ["credentialSubject", "id"]
     }
 };
 
@@ -94,7 +68,7 @@ function CertificateView() {
                         name={data}
                         checked={certificateData && certificateData.certificateId === data.certificateId}
                         onChange={(e) => handleChange(data)}
-                    ></input>
+                    />
                     <span className={styles["radio"]}>{data.name}</span>
                 </div>
             );
@@ -110,7 +84,7 @@ function CertificateView() {
         }
     };
     const extractData = (certificateData, key) => {
-        return pathOr("NA", certificateDetailsPaths[key].path, certificateData)
+        return pathOr("NA", certificateDetailsPaths[key].path, certificateData.certificate)
     };
 
     const showCertificatePreview = (certificateData) => {
@@ -118,61 +92,23 @@ function CertificateView() {
             <>
                 <div className={["card", "certificate"]}>
 
-                    <div></div>
-                    <div className={"right"}></div>
+                    <div/>
+                    <div className={"right"}/>
                 </div>
-                <div id={"certificate"} className={styles["certificate-container"]}>
-                    <table borderless className={styles["certificate"]}>
-                        <tbody>
-                        <tr>
-                            <td valign={"top"}><img src={moh} className={styles["logo"]}></img></td>
-                            {/*<td align={"right"}><img src={qrcode}></img></td>*/}
-                            <td align={"right"}><QRCode size={128} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colSpan={2}><h5>{extractData(certificateData, "Vaccination")} Vaccination
-                                Certificate</h5></td>
-                        </tr>
-                        <tr>
-                    <td><b>Certificate ID:</b> <b>{extractData(certificateData, "Certificate ID")}</b></td>
-                    <td><b>Issue Date:</b> <b>{formatDate(extractData(certificateData, "Date of Issue"))}</b></td>
-                </tr>
-                <tr>
-                    <td colSpan={2} className={styles["top-pad"]}><b>Recipient's details:</b></td>
-                </tr>
-                        <tr>
-                    <td><b className={styles["b500"]}>Name:</b> <span>{extractData(certificateData, "Name")}</span></td>
-                    <td><b className={styles["b500"]}>Gender:</b> <span>{extractData(certificateData, "Gender")}</span></td>
-                </tr>
-                <tr>
-                    <td><b className={styles["b500"]}>Aadhaar:</b> <span>{formatIdentity(extractData(certificateData, "Identity"))}</span></td>
-                    <td><b className={styles["b500"]}>Age:</b><span> {(extractData(certificateData, "Age"))}</span></td>
-                </tr>
-                <tr><td colSpan={2} className={styles["top-pad"]}><b>Centre of Vaccination:</b></td></tr>
-                <tr><td colSpan={2}>{extractData(certificateData, "Vaccination Facility")}</td></tr>
-                <tr>
-                    <td><b>Date of Vaccination</b></td>
-                    <td><b>Valid Until:</b></td>
-                </tr>
-                <tr>
-                    <td><span>{formatDate(extractData(certificateData, "Date of Issue"))}</span></td>
-                    <td><span>{formatDate(extractData(certificateData, "Valid Until"))}</span></td>
-                </tr>
-                <tr>
-                    <td className={styles["spacer-height"]}><span>&nbsp;<br/>&nbsp;</span></td>
-                    <td><span></span></td>
-                </tr>
-                <tr>
-                    <td><b>Facility Seal</b></td>
-                    <td><b>Vaccinator Signature</b></td>
-                </tr>
-                        {/*<tr>*/}
-                        {/*    <td colSpan={2}><img src={footer} className={styles["footer"]}></img></td>*/}
-                        {/*</tr>*/}
-                        </tbody>
-                    </table>
-                </div>
+                <Certificate
+                    qrCode={<QRCode size={128} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
+                    vaccination={extractData(certificateData, "Vaccination")}
+                    certificateId={extractData(certificateData, "Certificate ID")}
+                    issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
+                    name={extractData(certificateData, "Name")}
+                    gender={extractData(certificateData, "Gender")}
+                    identityType={"Aadhaar"}
+                    identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
+                    age={extractData(certificateData, "Age")}
+                    vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
+                    dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
+                    vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
+                />
             </>
         );
     };
