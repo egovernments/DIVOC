@@ -36,7 +36,7 @@ export const VerifyCertificate = () => {
                     <>
                         <QrReader
                             className="qr-camera"
-                            delay={1000}
+                            delay={300}
                             onError={handleError}
                             onScan={handleScan}
                         />
@@ -46,7 +46,7 @@ export const VerifyCertificate = () => {
                 </>
             }
             {
-                result && <CertificateStatus data={result} goBack={() => {
+                result && <CertificateStatus certificateData={result} goBack={() => {
                     setShowScanner(false);
                     setResult("");
                 }

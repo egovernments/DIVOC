@@ -33,7 +33,7 @@ const certificateDetailsPaths = {
         format: (data) => (data)
     },
     "Certificate ID": {
-        path: ["certificate", "id"],
+        path: ["evidence", "0", "certificateId"],
         format: (data) => (data)
     },
     "Date of Issue": {
@@ -74,12 +74,13 @@ const customLoader = url => {
     return documentLoader()(url);
 };
 
-export const CertificateStatus = ({data, goBack}) => {
+export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
+    const [data, setData] = useState({});
     useEffect(() => {
         async function verifyData() {
             try {
-                const signedJSON = JSON.parse(data);
+                const signedJSON = JSON.parse(certificateData);
                 const publicKey = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
                     id: 'did:india',
@@ -105,6 +106,7 @@ export const CertificateStatus = ({data, goBack}) => {
                 if (result.verified) {
                     console.log('Signature verified.');
                     setValid(true);
+                    setData(JSON.parse(certificateData));
                 } else {
                     console.log('Signature verification error:', result.error);
                     setValid(false);

@@ -87,7 +87,7 @@ function ageOfRecipient(recipient) {
   return "";
 }
 
-function transformW3(cert) {
+function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
@@ -105,7 +105,8 @@ function transformW3(cert) {
     issuer: "https://nha.gov.in/",
     issuanceDate: new Date().toISOString().toLowerCase(),
     evidence: [{
-      "id": "https://nha.gov.in/evidence/vaccine/1234",
+      "id": "https://nha.gov.in/evidence/vaccine/"+certificateId,
+      "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": cert.vaccination.batch,
       "manufacturer": cert.vaccination.manufacturer,
@@ -138,14 +139,15 @@ function transformW3(cert) {
 }
 
 async function signAndSave(certificate) {
+  const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
-  const w3cCertificate = transformW3(certificate);
+  const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
     name : name,
     contact: contact,
-    certificateId: "" + Math.floor(1e8 + (Math.random() * 9e8)),
+    certificateId: certificateId,
     certificate: JSON.stringify(signedCertificate)
   };
   registry.saveCertificate(signedCertificateForDB)
