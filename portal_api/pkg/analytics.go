@@ -10,6 +10,9 @@ import (
 
 type AnalyticsResponse struct {
 	NumberOfCertificatesIssued   map[string]int64 `json:"numberOfCertificatesIssued"`
+	NumberOfCertificatesIssuedByDate   map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
+	NumberOfCertificatesIssuedByState map[string]int64 `json:"numberOfCertificatesIssuedByState"`
+	NumberOfCertificatesIssuedByAge map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
 }
 
 var connect *sql.DB = initConnection()
@@ -32,23 +35,28 @@ func initConnection() *sql.DB {
 }
 
 func getAnalyticsInfo() AnalyticsResponse {
-	numberOfCertificatesIssued := getCount()
+	countQuery :=`
+SELECT 'all', count() from certificatesv1 
+union all 
+select gender, count() from certificatesv1 group by gender
+`
+	byDateQuery := `select d, count() from certificatesv1 group by toYYYYMMDD(dt) as d`
+	byStateQuery := `select facilityState, count() from certificatesv1 group by facilityState`
+	byAgeQuery := `select a, count() from certificatesv1 group by floor(age/10)*10 as a`
+
 	analyticsResponse := AnalyticsResponse{
-		NumberOfCertificatesIssued:   numberOfCertificatesIssued,
+		NumberOfCertificatesIssued: getCount(countQuery),
+		NumberOfCertificatesIssuedByDate:  getCount(byDateQuery),
+		NumberOfCertificatesIssuedByState: getCount(byStateQuery),
+		NumberOfCertificatesIssuedByAge: getCount(byAgeQuery),
 	}
-
-
 
 	return analyticsResponse
 }
 
-func getCount() map[string]int64 {
+func getCount(query string) map[string]int64 {
 	result := map[string]int64{}
-	rows, err := connect.Query(`
-SELECT 'all', count() from certificatesv1 
-union all 
-select gender, count() from certificatesv1 group by gender
-`)
+	rows, err := connect.Query(query)
 	if err != nil {
 		return result
 	}
@@ -63,5 +71,6 @@ select gender, count() from certificatesv1 group by gender
 		}
 		result[tag] = number
 	}
+	log.Infof("res %+v", result)
 	return result
 }
