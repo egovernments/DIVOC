@@ -29,6 +29,10 @@ export const Home = () => (
                                     <Link className="download-certificate-button d-inline-block" to={"/certificate/"}>Download
                                         Certificate</Link>
                                 </div>
+                                <div className="d-flex align-self-center ml-5">
+                                    <Link className="download-certificate-button d-inline-block" to={"/verify-certificate/"}>Verify
+                                        Certificate</Link>
+                                </div>
                             </div>
                         </div>
                         <span className="pt-5 d-inline-block">You would need your Aadhaar number and Mobile number to verify OTP in order to access your digital certificate</span>
