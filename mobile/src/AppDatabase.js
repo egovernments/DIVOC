@@ -24,16 +24,16 @@ export class AppDatabase {
             return this.db;
         }
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
-            upgrade(db, oldVersion, newVersion) {
+            upgrade(database, oldVersion, newVersion) {
                 debugger
                 if (oldVersion === 0 || newVersion === 5) {
-                    db.createObjectStore(PATIENTS, {keyPath: "code"});
-                    db.createObjectStore(QUEUE, {keyPath: "code"});
-                    db.createObjectStore(VACCINATORS, {keyPath: "osid"});
-                    db.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
+                    database.createObjectStore(PATIENTS, {keyPath: "code"});
+                    database.createObjectStore(QUEUE, {keyPath: "code"});
+                    database.createObjectStore(VACCINATORS, {keyPath: "osid"});
+                    database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
                 }
                 if (oldVersion === 0 || newVersion === 6) {
-                    db.createObjectStore(USER_DETAILS);
+                    database.createObjectStore(USER_DETAILS);
                 }
             }
         });
@@ -49,7 +49,8 @@ export class AppDatabase {
 
     async getPatientDetails(enrollCode, mobileNumber) {
         const patient = await this.db.get(PATIENTS, enrollCode);
-        if (patient) {
+        const inQueue = await this.db.get(QUEUE, enrollCode);
+        if (patient && !inQueue) {
             if (patient.phone === mobileNumber) {
                 patient.dob = this.formatDate(patient.dob)
                 return patient
@@ -57,7 +58,7 @@ export class AppDatabase {
                 return null;
             }
         }
-        return patient;
+        return null;
     }
 
     formatDate(givenDate) {
@@ -72,14 +73,16 @@ export class AppDatabase {
     async recipientDetails() {
         let waiting = 0;
         let issue = 0;
-        const result = await this.db.getAll(QUEUE);
-        result.forEach((item) => {
-            if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
-                waiting++;
-            } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
-                issue++;
-            }
-        });
+        if (this.db) {
+            const result = await this.db.getAll(QUEUE);
+            result.forEach((item) => {
+                if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
+                    waiting++;
+                } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
+                    issue++;
+                }
+            });
+        }
 
         return [
             {titleKey: LANGUAGE_KEYS.RECIPIENT_WAITING, value: waiting},
@@ -167,7 +170,7 @@ export class AppDatabase {
             patient: patient,
             batchCode: event.batchCode,
             enrollCode: event.enrollCode,
-            identify: queue.aadhaarNumber ?? ""
+            identity: queue.aadhaarNumber
         }
     }
 

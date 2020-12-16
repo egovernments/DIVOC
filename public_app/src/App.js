@@ -10,6 +10,7 @@ import config from "./config"
 import {Home} from "./components/Home";
 import {SideEffects} from "./components/SideEffects";
 import Dashboard from "./components/Dashboard";
+import {VerifyCertificate} from "./components/VerifyCertificate";
 
 function App() {
   const {initialized, keycloak} = useKeycloak();
@@ -28,6 +29,7 @@ function App() {
             <Route exact path={config.urlPath + "/login"} component={Login}/>
             <Route exact path={"/side_effects"} component={SideEffects}/>
             <Route exact path={"/dashboard"} component={Dashboard}/>
+            <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
               role={"recipient"} clientId={"certificate-login"}
             />
