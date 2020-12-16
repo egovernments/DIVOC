@@ -9,7 +9,7 @@ export const LatestUpdateCard = () => (
         </div>
         <div className="d-flex flex-column pl-5 pr-5">
             <span className="card-author">Author or update from</span>
-            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor ...</span>
+            <span className="card-content">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor ...</span>
             <a href="/" className="pt-3 d-flex align-items-center">Read More <span className="pl-1" style={{fontSize: '30px'}}> > </span></a>
         </div>
     </div>
