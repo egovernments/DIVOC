@@ -78,7 +78,8 @@ function Home() {
                     selectedState={selectedState}
                 />
             </div>
-            <div className={styles['table-container']}>
+            <div >
+                <div className={styles['table-container']}>
                 <table
                     className="table table-borderless table-hover"
                 >
@@ -90,7 +91,13 @@ function Home() {
                     </thead>
                     <tbody>{getTableData()}</tbody>
                 </table>
+                </div>
+                <div className={`row ${styles['thead']}`}>
+                    <div className="col-sm-6">{selectedState.name}</div>
+                    <div className="col-sm-6">{selectedState.count}</div>
+                </div>
             </div>
+            
         </div>
     );
 }
