@@ -364,6 +364,8 @@ definitions:
           dob:
             type: string
             format: date
+          age:
+            type: string
           gender:
             type: string
           nationality:

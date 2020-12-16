@@ -127,7 +127,7 @@ function CertificateView() {
                         <tr>
                             <td valign={"top"}><img src={moh} className={styles["logo"]}></img></td>
                             {/*<td align={"right"}><img src={qrcode}></img></td>*/}
-                            <td align={"right"}><QRCode size={128} value={JSON.stringify(certificateData.certificate)}/>
+                            <td align={"right"}><QRCode size={128} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>
                             </td>
                         </tr>
                         <tr>
