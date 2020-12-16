@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { MapContainer,TileLayer, SVGOverlay,Marker,Popup,GeoJSON } from 'react-leaflet';
+import React from "react";
+import { MapContainer,GeoJSON } from 'react-leaflet';
 import "leaflet/dist/leaflet.css";
-import states from './states';
 import './IndiaMap.css';
-import countries from "./countries.json";
+import states from "./india_geo.json";
+import certificate_data from "../../DummyData/certificate_data.json";
 
-export default function LeafletMap({data}){
-    const position = [51.505, -0.09]
+export default function LeafletMap({setSelectedState,selectedState}){
     const mapStyle= {
         fillColor: "#CEE5FF",
         weight: 1,
@@ -14,10 +13,11 @@ export default function LeafletMap({data}){
         fillOpacity: 1,
     }
 
-    const onMouseIn = (event) => {
+    const onMouseIn = (event,countryName) => {
         event.target.setStyle({
             fillColor: "#4E67D1",
         })
+        setSelectedState({name: countryName,count: certificate_data[countryName]})
     }
 
     const onMouseOut = (event) => {
@@ -27,18 +27,24 @@ export default function LeafletMap({data}){
     }
     
     const onEachCountry = (country,layer) => {
-        const countryName = country.properties.ADMIN;
-        layer.bindPopup(`State : ${countryName} <br/> certificates Issued : 0`);
+        if(country.properties.ST_NM === selectedState.name){
+            layer.setStyle({
+                fillColor: "#4E67D1",
+            })
+        }
+        const countryName = country.properties.ST_NM;
+        const count = certificate_data[countryName]
+        layer.bindPopup(`State : ${countryName} <br/> certificates Issued : ${count}`);
         layer.on({
-            mouseover: onMouseIn,
+            mouseover: (event) => onMouseIn(event,countryName),
             mouseout: onMouseOut,
         })
     }
 
     return(
         <div id="mapid">
-            <MapContainer className="map-container" center={[20,50]} zoom={2}>
-                <GeoJSON style={mapStyle} data={countries} onEachFeature={onEachCountry}/>
+            <MapContainer className="map-container" center={[25,85]} zoom={4}>
+                <GeoJSON style={mapStyle} data={states} onEachFeature={onEachCountry}/>
             </MapContainer>
         </div>
         
