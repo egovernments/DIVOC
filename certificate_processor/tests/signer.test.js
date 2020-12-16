@@ -75,3 +75,10 @@ test('Verify the signed json', async () => {
   console.log(result);
   expect(result.verified).toBe(true)
 });
+
+test('Signed json to include certificate id', async () => {
+    const certificateId = "123";
+    sign = await signJSON(transformW3(cert2, certificateId));
+    expect(sign.credentialSubject.id).toBe(certificateId);
+    expect(sign.credentialSubject.identity).toBe(cert2.recipient.identity);
+});

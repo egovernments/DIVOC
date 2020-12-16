@@ -23,6 +23,7 @@ const vaccinationv1 = {
         "age": "schema:Number",
         "gender": "schema:gender",
         "nationality": "schema:nationality",
+        "identity": "schema:identity",
       }
     },
     "Vaccination": {
