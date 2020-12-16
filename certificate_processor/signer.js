@@ -89,8 +89,7 @@ function transformW3(cert, certificateId) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: "" + certificateId,
-      identity: cert.recipient.identity,
+      id: cert.recipient.identity,
       name: cert.recipient.name,
       gender: cert.recipient.gender,
       age: cert.recipient.age, //from dob
@@ -99,7 +98,8 @@ function transformW3(cert, certificateId) {
     issuer: "https://nha.gov.in/",
     issuanceDate: new Date().toISOString().toLowerCase(),
     evidence: [{
-      "id": "https://nha.gov.in/evidence/vaccine/1234",
+      "id": "https://nha.gov.in/evidence/vaccine/"+certificateId,
+      "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": cert.vaccination.batch,
       "manufacturer": cert.vaccination.manufacturer,
