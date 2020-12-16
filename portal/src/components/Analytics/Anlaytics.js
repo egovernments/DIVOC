@@ -1,7 +1,14 @@
 import React from "react";
-import AnalyticsImg from "../../assets/img/analytics.png";
+import {CertificateAnalysis} from "../CertificateAnalysis";
+import {Accordion} from "react-bootstrap";
 
 
 export function Analytics() {
-    return <img src={AnalyticsImg} alt={"Analytics"} width={"100%"} height={"100%"}/>
+    return (
+        <div className="container-fluid mt-5">
+            <Accordion defaultActiveKey="0">
+                <CertificateAnalysis/>
+            </Accordion>
+        </div>
+    )
 }
