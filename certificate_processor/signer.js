@@ -80,6 +80,13 @@ async function signJSON(certificate) {
   return signed;
 }
 
+function ageOfRecipient(recipient) {
+  if (recipient.age) return recipient.age;
+  if (recipient.dob && new Date(recipient.dob).getFullYear()>1900)
+    return (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
+  return "";
+}
+
 function transformW3(cert) {
   const certificateFromTemplate = {
     "@context": [
@@ -92,7 +99,7 @@ function transformW3(cert) {
       id: cert.recipient.identity,
       name: cert.recipient.name,
       gender: cert.recipient.gender,
-      age: cert.recipient.age, //from dob
+      age: ageOfRecipient(cert.recipient), //from dob
       nationality: cert.recipient.nationality
     },
     issuer: "https://nha.gov.in/",

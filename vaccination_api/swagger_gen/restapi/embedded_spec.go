@@ -480,6 +480,9 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "age": {
+              "type": "string"
+            },
             "contact": {
               "type": "array",
               "items": {
@@ -1238,6 +1241,9 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "age": {
+              "type": "string"
+            },
             "contact": {
               "type": "array",
               "items": {
@@ -1349,6 +1355,9 @@ func init() {
     "CertificationRequestRecipient": {
       "type": "object",
       "properties": {
+        "age": {
+          "type": "string"
+        },
         "contact": {
           "type": "array",
           "items": {
