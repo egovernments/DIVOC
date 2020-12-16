@@ -14,22 +14,22 @@ export const Home = () => (
     <div className="home-section">
         <div className="section ">
             <div className="d-flex flex-column" style={{height: "100%"}}>
-                <div className="d-flex welcome-wrapper">
+                <div className="d-flex welcome-wrapper p-3 p-lg-0">
                     <div className="welcome-title-wrapper">
                         <span className="welcome-title">Welcome to the</span><br/>
                         <span className="welcome-subtitle font-weight-bold">Digital Infrastructure for Vaccination & Open Certification Portal</span>
                         <div className="facilities-wrapper pt-4">
                             <span className="font-weight-bold">Citizens can:</span>
-                            <div className="d-flex pt-4">
-                                <div className="d-flex align-self-center">
+                            <div className="d-flex flex-column flex-lg-row pt-4">
+                                <div className="d-flex align-self-lg-center">
                                     <img alt={""} src={CertificateSmallImg} width={40}/>
                                     <span className="pl-1">Download Certificates<br/> Post vaccination</span>
                                 </div>
-                                <div className="d-flex align-self-center ml-5">
+                                <div className="d-flex align-self-lg-center mt-3 mt-lg-0 ml-lg-5">
                                     <Link className="download-certificate-button d-inline-block" to={"/certificate/"}>Download
                                         Certificate</Link>
                                 </div>
-                                <div className="d-flex align-self-center ml-5">
+                                <div className="d-flex align-self-lg-center mt-3 mt-lg-0 ml-lg-5">
                                     <Link className="download-certificate-button d-inline-block" to={"/verify-certificate/"}>Verify
                                         Certificate</Link>
                                 </div>
@@ -37,7 +37,7 @@ export const Home = () => (
                         </div>
                         <span className="pt-5 d-inline-block">You would need your Aadhaar number and Mobile number to verify OTP in order to access your digital certificate</span>
                     </div>
-                    <div className="welcome-image-wrapper d-flex justify-content-end">
+                    <div className="welcome-image-wrapper d-lg-flex justify-content-lg-end">
                         <img alt={""} src={CertificateBigImg}/>
                     </div>
                 </div>
@@ -45,18 +45,18 @@ export const Home = () => (
                     <div className="certificate-img-rapper d-flex justify-content-center align-items-center">
                         <img alt={""} src={SideEffectsBannerImg} width={"80%"} height={"100%"}/>
                     </div>
-                    <div className="certificate-info-wrapper">
+                    <div className="certificate-info-wrapper pt-3 pt-lg-0">
                         <span className="font-weight-bold">Provide Feedback</span>
-                        <div className="d-flex pt-3 pb-4">
-                            <span className="text-right">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
+                        <div className="d-flex pt-lg-3 pb-lg-4 pt-2">
+                            <span className="text-lg-right">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
                         </div>
-                        <Link to={"/side_effects"} className="login-button ">Report Side-effects</Link>
+                        <Link to={"/side_effects"} className="login-button mt-2 mt-lg-0">Report Side-effects</Link>
                     </div>
 
                 </div>
             </div>
         </div>
-        <div className="half-section  d-flex">
+        <div className="half-section  d-lg-flex p-3 p-lg-0">
             <div className="divoc-video-wrapper d-flex justify-content-center align-items-center">
                 <iframe width="90%" height="90%" src="https://www.youtube.com/embed/vl_EP9fpzh0" frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -67,13 +67,13 @@ export const Home = () => (
                 <span>DIVOC software specifically addresses the 3rd item above allowing countries to digitally orchestrate rollout across the country using dynamic policies, issuance of digital vaccination certificates that are compliant to international standards, manage post vaccination feedback, and use real time analytics to manage this entire process. DIVOC contains 3 core modules - certificate management, feedback management, and vaccination rollout management - each of which can be used independently or together depending on the need.</span>
             </div>
         </div>
-        <div className="dashboard-section">
-            <div className="h-100 pt-5 d-flex flex-column align-items-center justify-content-center">
+        <div className="dashboard-section p-3 p-lg-0">
+            <div className="h-100 pt-lg-5 d-flex flex-column align-items-center justify-content-center">
                 <h3>Public Dashboard</h3>
-                <span className="pt-3" style={{paddingLeft: "15rem", paddingRight: "15rem"}}>Some introductory text about the dashboard - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
-                <div className="w-100 h-100 pt-5">
-                    <div className="row h-100 w-100">
-                        <div className="col d-flex flex-column justify-content-center align-items-center p-5">
+                <span className="pt-3 dashboard-subtitle">Some introductory text about the dashboard - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+                <div className="w-100 h-100 pt-lg-5">
+                    <div className="row h-100 w-100 row-cols-lg-3 row-cols-1">
+                        <div className="col d-flex flex-column justify-content-center align-items-center  p-3 p-lg-5">
                             <img alt={""} src={CertificateSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <h1 className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</h1>
@@ -82,7 +82,7 @@ export const Home = () => (
                         <div className="col">
                             <img alt={""} src={DashboardBannerImg} width={"100%"} height={"100%"}/>
                         </div>
-                        <div className="col d-flex flex-column justify-content-center align-items-center p-5">
+                        <div className="col d-flex flex-column justify-content-center align-items-center p-3  p-lg-5">
                             <img alt={""} src={CenterSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <b className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</b>
@@ -92,7 +92,7 @@ export const Home = () => (
                 </div>
             </div>
         </div>
-        <div className="updates-section ">
+        <div className="updates-section p-3 p-lg-0">
             <div className="d-flex justify-content-between align-items-center">
                 <span className="font-weight-bold">Latest Updates</span>
                 <span className="d-flex align-items-center" style={{cursor: "pointer"}}>View All Updates <span
@@ -102,7 +102,7 @@ export const Home = () => (
                 naturalSlideWidth={100}
                 naturalSlideHeight={40}
                 totalSlides={3}
-                visibleSlides={2}
+                visibleSlides={window.innerWidth < 1000 ? 1 : 2}
             >
                 <Slider>
                     <Slide index={0}>
