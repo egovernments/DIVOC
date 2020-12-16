@@ -5,7 +5,7 @@ import * as PropTypes from "prop-types";
 
 export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, name, gender, identityType, identityNumber, age, vaccinationCenter, vaccinationValidUntil, dateOfVaccination}) => (
     <div id={"certificate"} className={"certificate-container"}>
-        <table borderless className={"certificate"}>
+        <table className={"certificate"}>
             <tbody>
             <tr>
                 <td valign={"top"}><img src={moh} className={"logo"}/></td>
@@ -72,5 +72,17 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
 );
 
 Certificate.propTypes = {
-    qrCode: PropTypes.element
+    qrCode: PropTypes.element,
+    vaccination: PropTypes.string,
+    certificateId: PropTypes.string,
+    issuedDate: PropTypes.string,
+    name: PropTypes.string,
+    gender: PropTypes.string,
+    identityType: PropTypes.string,
+    identityNumber: PropTypes.string,
+    age: PropTypes.string,
+    vaccinationCenter: PropTypes.string,
+    vaccinationValidUntil: PropTypes.string,
+    dateOfVaccination: PropTypes.string
+
 };
