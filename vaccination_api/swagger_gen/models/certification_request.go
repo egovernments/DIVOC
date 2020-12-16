@@ -260,6 +260,9 @@ func (m *CertificationRequestFacilityAddress) UnmarshalBinary(b []byte) error {
 // swagger:model CertificationRequestRecipient
 type CertificationRequestRecipient struct {
 
+	// age
+	Age string `json:"age,omitempty"`
+
 	// contact
 	Contact []string `json:"contact"`
 
