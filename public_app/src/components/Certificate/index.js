@@ -1,7 +1,7 @@
 import React from "react";
 import moh from "../../assets/img/moh.png";
 import "./index.css";
-import * as PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
 export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, name, gender, identityType, identityNumber, age, vaccinationCenter, vaccinationValidUntil, dateOfVaccination}) => (
     <div id={"certificate"} className={"certificate-container"}>
