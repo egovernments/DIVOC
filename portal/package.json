@@ -15,6 +15,7 @@
     "keycloak-js": "^11.0.3",
     "pure-react-carousel": "^1.27.6",
     "qrcode.react": "^1.0.0",
+    "ramda": "^0.27.1",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-datepicker": "^3.3.0",
@@ -23,6 +24,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.0",
     "react-to-print": "^2.12.0",
+    "react-vis": "^1.11.7",
     "sass": "^1.30.0",
     "web-vitals": "^0.2.4"
   },

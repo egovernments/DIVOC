@@ -1,7 +1,24 @@
-import React from "react";
-import AnalyticsImg from "../../assets/img/analytics.png";
+import React, {useEffect, useState} from "react";
+import {CertificateAnalysis} from "../CertificateAnalysis";
+import {Accordion} from "react-bootstrap";
+import {useAxios} from "../../utils/useAxios";
 
 
 export function Analytics() {
-    return <img src={AnalyticsImg} alt={"Analytics"} width={"100%"} height={"100%"}/>
+    const [analytics, setAnalytics] = useState(null);
+    const getAnalyticsPath = 'divoc/admin/api/v1/analytics';
+    const axiosInstance = useAxios('');
+    useEffect(() => {
+        axiosInstance.current.get(getAnalyticsPath)
+            .then(res => {
+                setAnalytics(res.data)
+            });
+    });
+    return (
+        <div className="container-fluid mt-5">
+            <Accordion defaultActiveKey="0">
+                {analytics && <CertificateAnalysis analytics={analytics}/>}
+            </Accordion>
+        </div>
+    )
 }
