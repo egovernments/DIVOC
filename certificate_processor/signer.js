@@ -109,6 +109,7 @@ function transformW3(cert, certificateId) {
       "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": cert.vaccination.batch,
+      "vaccine": cert.vaccination.name,
       "manufacturer": cert.vaccination.manufacturer,
       "date": cert.vaccination.date,
       "effectiveStart": cert.vaccination.effectiveStart,

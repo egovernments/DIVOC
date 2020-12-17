@@ -160,8 +160,8 @@ function CertificateView() {
                     {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
                     <Dropdown className={styles["btn-success"]}>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic">
-                            Dropdown Button
+                        <Dropdown.Toggle variant="success" id="dropdown-basic" className={"col-12"}>
+                            Download
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>

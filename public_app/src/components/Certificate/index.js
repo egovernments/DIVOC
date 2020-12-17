@@ -17,7 +17,7 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
                 </td>
             </tr>
             <tr>
-                <td colSpan={2}><h5>{vaccination} Vaccination
+                <td colSpan={2}><h5>Vaccination
                     Certificate</h5></td>
             </tr>
             <tr>
@@ -26,19 +26,23 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
                 </td>
             </tr>
             <tr>
+                <td><b>Vaccination</b> <b>{vaccination}</b></td>
+                <td><b></b></td>
+            </tr>
+            <tr>
                 <td colSpan={2} className={"top-pad"}><b>Recipient's details:</b></td>
             </tr>
             <tr>
                 <td><b className={"b500"}>Name:</b>
-                    <span>{name}</span></td>
+                    <span> {name}</span></td>
                 <td><b className={"b500"}>Gender:</b>
-                    <span>{gender}</span></td>
+                    <span> {gender}</span></td>
             </tr>
             <tr>
                 <td><b className={"b500"}>{identityType}:</b>
-                    <span>{identityNumber}</span></td>
+                    <span> {identityNumber}</span></td>
                 <td><b
-                    className={"b500"}>Age:</b><span> {age}</span>
+                    className={"b500"}> Age:</b><span> {age}</span>
                 </td>
             </tr>
             <tr>
@@ -55,14 +59,14 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
                 <td><span>{dateOfVaccination}</span></td>
                 <td><span>{vaccinationValidUntil}</span></td>
             </tr>
-            <tr>
-                <td className={"spacer-height"}><span>&nbsp;<br/>&nbsp;</span></td>
-                <td><span/></td>
-            </tr>
-            <tr>
-                <td><b>Facility Seal</b></td>
-                <td><b>Vaccinator Signature</b></td>
-            </tr>
+            {/*<tr>*/}
+            {/*    <td className={"spacer-height"}><span>&nbsp;<br/>&nbsp;</span></td>*/}
+            {/*    <td><span/></td>*/}
+            {/*</tr>*/}
+            {/*<tr>*/}
+            {/*    <td><b>Facility Seal</b></td>*/}
+            {/*    <td><b>Vaccinator Signature</b></td>*/}
+            {/*</tr>*/}
             {/*<tr>*/}
             {/*    <td colSpan={2}><img src={footer} className={"footer"]}></img></td>*/}
             {/*</tr>*/}

@@ -32,6 +32,7 @@ const vaccinationv1 = {
         "@protected": true,
         "certificateId": "schema:certificateId",
         "batch": "schema:id",
+        "vaccine": "schema:id",
         "manufacturer": "schema:id",
         "date": "schema:date",
         "effectiveStart": "schema:date",
