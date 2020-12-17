@@ -107,7 +107,7 @@ export function useConfirmVaccine() {
             await appIndexDb.saveEvent(state)
             await appIndexDb.markPatientAsComplete(state.enrollCode)
         } catch (e) {
-            return Promise.reject("Failed to save")
+            return Promise.reject(e.message)
         }
     }
 

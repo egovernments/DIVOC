@@ -17,6 +17,7 @@ import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";
 import {ConfirmFlow} from "../ConfirmVaccination";
 import {useLocation} from "react-router";
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
+import {WalkEnrollmentFlow} from "../components/WalkEnrollments";
 
 Dashboard.propTypes = {};
 
@@ -32,6 +33,7 @@ function Dashboard(props) {
                         <PrivateRoute path="/queue" exact component={Queue}/>
                         <PrivateRoute path="/logout" exact component={Logout}/>
                         <PrivateRoute path="/preEnroll/:pageName" component={PreEnrollmentFlow}/>
+                        <PrivateRoute path='/walkInEnroll/:pageName' component={WalkEnrollmentFlow}/>
                         <PrivateRoute path="/confirm/vaccination/:recipient_id/:pageName" component={ConfirmFlow}/>
                         <Route path="/login" exact component={LoginComponent}/>
                     </Switch>

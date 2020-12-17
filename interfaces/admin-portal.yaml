@@ -239,6 +239,19 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /analytics:
+    get:
+      summary: Get analytics query
+      operationId: getAnalytics
+      security:
+        - hasRole: ["admin", "monitoring"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
 definitions:
   FacilityUpdateRequest:
     type: array

@@ -24,4 +24,7 @@ var Config = struct {
 			GroupId  string `yaml:"groupId"`
 		} `yaml:"facilityStaff"`
 	}
+	Analytics struct {
+		Datasource string `yaml:"datasource" default:"tcp://127.0.0.1:9000?debug=true"`
+	}
 }{}

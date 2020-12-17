@@ -58,7 +58,7 @@ function EnterAadhaarOTP(props) {
     }
 
     return (
-        <div className={"aadhaar-container"}>
+        <div className="aadhaar-container">
             <h5>Enter OTP</h5>
             <Form.Control className="control"
                           placeholder="XXXX"

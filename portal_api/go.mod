@@ -3,6 +3,7 @@ module github.com/divoc/portal-api
 go 1.15
 
 require (
+	github.com/ClickHouse/clickhouse-go v1.4.3
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
 	github.com/go-openapi/errors v0.19.7

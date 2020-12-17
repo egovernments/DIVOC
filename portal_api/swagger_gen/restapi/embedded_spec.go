@@ -36,6 +36,31 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/analytics": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "monitoring"
+            ]
+          }
+        ],
+        "summary": "Get analytics query",
+        "operationId": "getAnalytics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/enrollments": {
       "get": {
         "summary": "get enrollments",
@@ -799,6 +824,31 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
+    "/analytics": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "monitoring"
+            ]
+          }
+        ],
+        "summary": "Get analytics query",
+        "operationId": "getAnalytics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/enrollments": {
       "get": {
         "summary": "get enrollments",
