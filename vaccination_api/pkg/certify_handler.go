@@ -13,6 +13,12 @@ import (
 var producer *kafka.Producer
 
 var messages = make(chan string)
+var events = make(chan []byte)
+
+type Event struct {
+	dt time.Time
+	t string
+}
 
 func InitializeKafka() {
 	servers := config.Config.Kafka.BootstrapServers
@@ -30,11 +36,26 @@ func InitializeKafka() {
 	go func() {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
-			msg := <-messages
-			producer.Produce(&kafka.Message{
+			msg := <- messages
+			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          []byte(msg),
-			}, nil)
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
+	go func() {
+		topic := config.Config.Kafka.EventsTopic
+		for {
+			msg := <- events
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
 		}
 	}()
 
@@ -56,6 +77,14 @@ func InitializeKafka() {
 
 func publishCertifyMessage(message []byte) {
 	messages <- string(message)
+}
+
+func publishEvent(event Event) {
+	if messageJson, err := json.Marshal(event); err != nil {
+
+	} else {
+		events <- messageJson
+	}
 }
 
 func createCertificate(data *Scanner, authHeader string) error {
