@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // GetLoggedInUserInfoHandlerFunc turns a function with the right signature into a get logged in user info handler
-type GetLoggedInUserInfoHandlerFunc func(GetLoggedInUserInfoParams, interface{}) middleware.Responder
+type GetLoggedInUserInfoHandlerFunc func(GetLoggedInUserInfoParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetLoggedInUserInfoHandlerFunc) Handle(params GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
+func (fn GetLoggedInUserInfoHandlerFunc) Handle(params GetLoggedInUserInfoParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetLoggedInUserInfoHandler interface for that can handle valid get logged in user info params
 type GetLoggedInUserInfoHandler interface {
-	Handle(GetLoggedInUserInfoParams, interface{}) middleware.Responder
+	Handle(GetLoggedInUserInfoParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetLoggedInUserInfo creates a new http.Handler for the get logged in user info operation
@@ -54,9 +56,9 @@ func (o *GetLoggedInUserInfo) ServeHTTP(rw http.ResponseWriter, r *http.Request)
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

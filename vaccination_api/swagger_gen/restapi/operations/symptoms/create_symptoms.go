@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // CreateSymptomsHandlerFunc turns a function with the right signature into a create symptoms handler
-type CreateSymptomsHandlerFunc func(CreateSymptomsParams, interface{}) middleware.Responder
+type CreateSymptomsHandlerFunc func(CreateSymptomsParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn CreateSymptomsHandlerFunc) Handle(params CreateSymptomsParams, principal interface{}) middleware.Responder {
+func (fn CreateSymptomsHandlerFunc) Handle(params CreateSymptomsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // CreateSymptomsHandler interface for that can handle valid create symptoms params
 type CreateSymptomsHandler interface {
-	Handle(CreateSymptomsParams, interface{}) middleware.Responder
+	Handle(CreateSymptomsParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewCreateSymptoms creates a new http.Handler for the create symptoms operation
@@ -54,9 +56,9 @@ func (o *CreateSymptoms) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
