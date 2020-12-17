@@ -122,6 +122,27 @@ paths:
       responses:
         '200':
           description: OK
+  /bulkCertify:
+    post:
+      tags:
+        - certification
+      summary: Upload certification csv for bulk ingestion
+      description: certify all the data in uploaded csv
+      operationId: bulkCertify
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Certification data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /programs/current:
     get:
       tags:
