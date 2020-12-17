@@ -63,6 +63,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
+		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
+		}),
 		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetEnrollments has not yet been implemented")
 		}),
@@ -149,6 +152,8 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// GetAnalyticsHandler sets the operation handler for the get analytics operation
+	GetAnalyticsHandler GetAnalyticsHandler
 	// GetEnrollmentsHandler sets the operation handler for the get enrollments operation
 	GetEnrollmentsHandler GetEnrollmentsHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
@@ -265,6 +270,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
+	}
+	if o.GetAnalyticsHandler == nil {
+		unregistered = append(unregistered, "GetAnalyticsHandler")
 	}
 	if o.GetEnrollmentsHandler == nil {
 		unregistered = append(unregistered, "GetEnrollmentsHandler")
@@ -414,6 +422,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/analytics"] = NewGetAnalytics(o.context, o.GetAnalyticsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

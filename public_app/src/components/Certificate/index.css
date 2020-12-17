@@ -1,0 +1,36 @@
+.certificate-container {
+    border: 1px solid gray;
+    width: 440px;
+    background-color: white;
+}
+
+.certificate {
+    margin: 1em;
+    width: 400px;
+    font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+
+}
+
+.certificate td {
+    padding: 0;
+}
+
+.logo {
+    width: 180px;
+}
+
+.b500 {
+    font-weight: 500 !important;
+}
+
+.top-pad {
+    padding-top: 20px !important;
+}
+
+.spacer-height {
+    height: 2em;
+}
+
+.footer {
+    width: 400px;
+}

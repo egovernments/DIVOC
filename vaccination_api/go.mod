@@ -3,6 +3,7 @@ module github.com/divoc/api
 go 1.15
 
 require (
+	github.com/ClickHouse/clickhouse-go v1.4.3
 	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
@@ -17,7 +18,6 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2

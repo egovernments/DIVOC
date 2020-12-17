@@ -11,6 +11,24 @@ import (
 	"net/http"
 )
 
+func SetupHandlers(api *operations.DivocPortalAPIAPI) {
+	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
+	api.CreateProgramHandler = operations.CreateProgramHandlerFunc(createProgramHandler)
+	api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(postFacilitiesHandler)
+	api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(postVaccinatorsHandler)
+	api.GetFacilitiesHandler = operations.GetFacilitiesHandlerFunc(getFacilitiesHandler)
+	api.GetVaccinatorsHandler = operations.GetVaccinatorsHandlerFunc(getVaccinatorsHandler)
+	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
+	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
+	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
+	api.CreateFacilityUsersHandler = operations.CreateFacilityUsersHandlerFunc(createFacilityUserHandler)
+	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
+	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
+	api.GetEnrollmentsHandler = operations.GetEnrollmentsHandlerFunc(getEnrollmentsHandler)
+	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
+	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
+}
+
 type GenericResponse struct {
 	statusCode int
 }
@@ -45,22 +63,6 @@ func NewGenericJSONResponse(body interface{}) middleware.Responder {
 
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
-}
-func SetupHandlers(api *operations.DivocPortalAPIAPI) {
-	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
-	api.CreateProgramHandler = operations.CreateProgramHandlerFunc(createProgramHandler)
-	api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(postFacilitiesHandler)
-	api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(postVaccinatorsHandler)
-	api.GetFacilitiesHandler = operations.GetFacilitiesHandlerFunc(getFacilitiesHandler)
-	api.GetVaccinatorsHandler = operations.GetVaccinatorsHandlerFunc(getVaccinatorsHandler)
-	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
-	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
-	api.PostEnrollmentsHandler = operations.PostEnrollmentsHandlerFunc(postEnrollmentsHandler)
-	api.CreateFacilityUsersHandler = operations.CreateFacilityUsersHandlerFunc(createFacilityUserHandler)
-	api.GetFacilityUsersHandler = operations.GetFacilityUsersHandlerFunc(getFacilityUserHandler)
-	api.GetFacilityGroupsHandler = operations.GetFacilityGroupsHandlerFunc(getFacilityGroupHandler)
-	api.GetEnrollmentsHandler = operations.GetEnrollmentsHandlerFunc(getEnrollmentsHandler)
-	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 }
 
 func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal  *models.JWTClaimBody) middleware.Responder {
@@ -202,3 +204,8 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 	}
 	return operations.NewUpdateFacilitiesOK()
 }
+
+func getAnalyticsHandler(params operations.GetAnalyticsParams, principal * models.JWTClaimBody) middleware.Responder {
+	return NewGenericJSONResponse(getAnalyticsInfo())
+}
+

@@ -52,10 +52,4 @@ func InitializeKafka() {
 
 func publishCertifyMessage(message []byte) {
 	messages <- string(message)
-	//topic := config.Config.Kafka.CertifyTopic
-	//err := producer.Produce(&kafka.Message{
-	//	TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-	//	Value:          message,
-	//}, nil)
-	//log.Infof("Error %+v", err)
 }

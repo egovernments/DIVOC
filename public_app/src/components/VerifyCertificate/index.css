@@ -1,0 +1,25 @@
+.verify-certificate-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: calc(100vh - 9rem);
+  overflow: auto;
+}
+.verify-certificate-wrapper .qr-camera {
+    width: 95%;
+}
+
+.verify-certificate-wrapper .scan-btn{
+  background: transparent linear-gradient(90deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  padding: 0.5rem 3rem;
+  margin-top: 1rem
+}
+
+@media (min-width:961px) {
+  .verify-certificate-wrapper .qr-camera {
+    width: 25%;
+  }
+}
