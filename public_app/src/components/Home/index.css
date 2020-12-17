@@ -1,7 +1,11 @@
 .home-section {
 }
 
-.home-section .section {
+.home-section .section .title{
+    font-size: 3rem;
+    padding: 0 10rem;
+    text-align: center;
+    font-weight: bold;
 }
 
 .welcome-wrapper {
@@ -138,6 +142,10 @@
 @media (max-width: 961px) {
     .home-section .section {
         height: 100%;
+    }
+    .home-section .section .title{
+        font-size: 16px;
+        padding: 0 1rem;
     }
     .welcome-wrapper {
         height: 100%;
