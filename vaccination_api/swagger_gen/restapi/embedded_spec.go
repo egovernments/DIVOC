@@ -506,6 +506,9 @@ func init() {
             }
           }
         },
+        "meta": {
+          "type": "object"
+        },
         "preEnrollmentCode": {
           "type": "string"
         },
@@ -1298,6 +1301,9 @@ func init() {
               "type": "string"
             }
           }
+        },
+        "meta": {
+          "type": "object"
         },
         "preEnrollmentCode": {
           "type": "string"
