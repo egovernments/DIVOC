@@ -27,7 +27,7 @@ function App() {
           <Switch>
             <Route exact path={"/"} component={Home}/>
             <Route exact path={config.urlPath + "/login"} component={Login}/>
-            <Route exact path={"/side_effects"} component={SideEffects}/>
+            <Route exact path={"/side-effects"} component={SideEffects}/>
             <Route exact path={"/feedback"} component={SideEffects}/>
             <Route exact path={"/feedback/:id"} component={SideEffects}/>
             <Route exact path={"/dashboard"} component={Dashboard}/>
