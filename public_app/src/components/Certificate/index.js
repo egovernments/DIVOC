@@ -1,14 +1,14 @@
 import React from "react";
-import moh from "../../assets/img/moh.png";
+import logo from "../../assets/img/logo.svg";
 import "./index.css";
 import PropTypes from 'prop-types';
 
-export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, name, gender, identityType, identityNumber, age, vaccinationCenter, vaccinationValidUntil, dateOfVaccination}) => (
+export const Certificate = ({qrCode, vaccination, manufacturer, certificateId, issuedDate, name, gender, identityType, identityNumber, age, vaccinationCenter, vaccinationValidUntil, dateOfVaccination}) => (
     <div id={"certificate"} className={"certificate-container"}>
         <table className={"certificate"}>
             <tbody>
             <tr>
-                <td valign={"top"}><img src={moh} className={"logo"}/></td>
+                <td valign={"top"}><img src={logo} className={"logo"}/></td>
                 {/*<td align={"right"}><img src={qrcode}></img></td>*/}
                 <td align={"right"}>
                     {
@@ -26,23 +26,22 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
                 </td>
             </tr>
             <tr>
-                <td><b>Vaccination</b> <b>{vaccination}</b></td>
-                <td><b></b></td>
+                <td colSpan={2}><b>Vaccination:</b> {vaccination}, {manufacturer}</td>
             </tr>
             <tr>
                 <td colSpan={2} className={"top-pad"}><b>Recipient's details:</b></td>
             </tr>
             <tr>
-                <td><b className={"b500"}>Name:</b>
+                <td><b className={"b500"}>नाम / Name:</b>
                     <span> {name}</span></td>
-                <td><b className={"b500"}>Gender:</b>
+                <td><b className={"b500"}>लिंग / Gender:</b>
                     <span> {gender}</span></td>
             </tr>
             <tr>
                 <td><b className={"b500"}>{identityType}:</b>
                     <span> {identityNumber}</span></td>
                 <td><b
-                    className={"b500"}> Age:</b><span> {age}</span>
+                    className={"b500"}> उम्र / Age:</b><span> {age}</span>
                 </td>
             </tr>
             <tr>
@@ -59,6 +58,10 @@ export const Certificate = ({qrCode, vaccination, certificateId, issuedDate, nam
                 <td><span>{dateOfVaccination}</span></td>
                 <td><span>{vaccinationValidUntil}</span></td>
             </tr>
+            <tr><td colSpan={2}><br/> निर्देश / Instruction</td></tr>
+            <tr><td colSpan={2}><span className={"small"}>For feed back call us 1800 000 000  or at https://divoc.xiv.in/feedback</span></td></tr>
+            <tr><td colSpan={2} className={"text-center"}><hr/><b >
+                करोना हारेगा इंडिया जीतेगा</b></td></tr>
             {/*<tr>*/}
             {/*    <td className={"spacer-height"}><span>&nbsp;<br/>&nbsp;</span></td>*/}
             {/*    <td><span/></td>*/}

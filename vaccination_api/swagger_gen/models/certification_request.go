@@ -20,6 +20,9 @@ type CertificationRequest struct {
 	// facility
 	Facility *CertificationRequestFacility `json:"facility,omitempty"`
 
+	// meta
+	Meta interface{} `json:"meta,omitempty"`
+
 	// pre enrollment code
 	PreEnrollmentCode string `json:"preEnrollmentCode,omitempty"`
 

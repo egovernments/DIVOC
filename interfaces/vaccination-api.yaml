@@ -438,6 +438,8 @@ definitions:
                 type: string
               pincode:
                 type: integer
+      meta:
+        type: object
   Program:
     type: object
     properties:
