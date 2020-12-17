@@ -1,0 +1,16 @@
+.message-player {
+    height: 500px;
+    width: 50%;
+    margin: 8px;
+}
+
+.related-video {
+    width: 100%;
+    margin: 8px;
+    background: #2CD889;
+}
+
+.related-video img {
+    width: 100%;
+    background: #4E67D1;
+}
