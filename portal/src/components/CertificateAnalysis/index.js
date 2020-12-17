@@ -1,22 +1,31 @@
 import React from "react";
 import {Accordion, Card, Row} from "react-bootstrap";
 import {AnalyticsCard} from "../AnalyticsCard";
-import GovernmentFacilitiesImg from "../../assets/img/government-facilities.svg";
-import FemaleImg from "../../assets/img/female-icon.svg";
-import MaleImg from "../../assets/img/male-icon.svg";
 import {ColumnChart} from "../ColumnChart";
 import {AreaChart} from "../AreaChart";
 import {pathOr} from "ramda";
-import {XYPlot} from "react-vis";
+const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export const CertificateAnalysis = ({analytics}) => {
     const certificatesByAge = pathOr({}, ["numberOfCertificatesIssuedByAge"], analytics);
     const certificatesByDate = pathOr({}, ["numberOfCertificatesIssuedByDate"], analytics);
     const certificatesByState = pathOr({}, ["numberOfCertificatesIssuedByState"], analytics);
-    const ageWiseChartData = Object.keys(certificatesByAge).map((key) => ({x: key, y: certificatesByAge[key]}));
+    const ageWiseChartData = Object.keys(certificatesByAge).map((key, index, elements) => {
+        if (index === elements.length - 1) {
+            return {x: `${key} - ${parseInt(key) + 10}`, y: certificatesByAge[key]}
+        } else {
+            return {x: `${key} - ${elements[index + 1]}`, y: certificatesByAge[key]}
+        }
+    });
     let dateWiseChartData = Object.keys(certificatesByDate).map((key) => ({x: key, y: certificatesByDate[key]}));
-    dateWiseChartData = [...dateWiseChartData, {x: dateWiseChartData[dateWiseChartData.length - 1].x + 1, y: 0}];
-    let stateWiseChartData = Object.keys(certificatesByState).map((key) => ({x: key || "All", y: certificatesByState[key]}));
+    dateWiseChartData = [...dateWiseChartData, {x: ""+(parseInt(dateWiseChartData[dateWiseChartData.length - 1].x) + 1), y: 0}];
+    dateWiseChartData = dateWiseChartData.map(({x,y}) => {
+        return {x: (x.substr(0,4) + "-" + MONTH_NAMES[x.substr(4,2)-1] + "-" + x.substr(6,2)), y}
+    });
+    let stateWiseChartData = Object.keys(certificatesByState).map((key) => ({
+        x: key || "All",
+        y: certificatesByState[key]
+    }));
     return (
 
         <Card>
@@ -26,20 +35,16 @@ export const CertificateAnalysis = ({analytics}) => {
             <Accordion.Collapse eventKey="0">
                 <Card.Body>
                     <Row>
-                        <AnalyticsCard lgCols={4} title={"Total Certificates Issued"}
+                        <AnalyticsCard lgCols={2} title={"Total Certificates Issued"}
                                        subtitle={<span className="metric-value">{}</span>}
                                        body={
                                            <div className="p-3 d-flex justify-content-center">
                                                <div
-                                                   className="mr-3 p-1 d-flex justify-content-center align-items-center">
-                                                   <img src={GovernmentFacilitiesImg} alt={""} width={"20%"}/>
-                                                   <div className="ml-3 d-flex flex-column">
-                                                       <span>In Facilities</span>
-                                                       <span style={{
-                                                           fontSize: "20px",
-                                                           fontWeight: "bold"
-                                                       }}>{pathOr("", ["numberOfCertificatesIssued", "all"], analytics)}</span>
-                                                   </div>
+                                                   className="mr-3 p-1 d-flex">
+                                                   <span className="metric-value" style={{
+                                                       fontSize: "5rem",
+                                                       fontWeight: "bold"
+                                                   }}>{pathOr("", ["numberOfCertificatesIssued", "all"], analytics)}</span>
                                                </div>
                                                {/*<div
                                                    className="ml-3 p-1 d-flex justify-content-center align-items-center">
@@ -55,10 +60,29 @@ export const CertificateAnalysis = ({analytics}) => {
                                            </div>
                                        }
                         />
-                        <AnalyticsCard lgCols={3} title={"By Gender"}
-                                       subtitle={<span className="metric-value">{pathOr("", ["numberOfCertificatesIssued", "all"], analytics)}</span>}
+                        <AnalyticsCard lgCols={5} title={"By Gender"}
+                                       subtitle={<span
+                                           className="metric-value">{pathOr("", ["numberOfCertificatesIssued", "all"], analytics)}</span>}
                                        body={
-                                           <div className="d-flex justify-content-center">
+                                           <ColumnChart
+                                               data={[
+                                                   {
+                                                       x: "Male",
+                                                       y: pathOr(0, ["numberOfCertificatesIssued", "Male"], analytics)
+                                                   },
+                                                   {
+                                                       x: "Female",
+                                                       y: pathOr(0, ["numberOfCertificatesIssued", "Female"], analytics)
+                                                   },
+                                                   {
+                                                       x: "Others",
+                                                       y: pathOr(0, ["numberOfCertificatesIssued", ""], analytics) + pathOr(0, ["numberOfCertificatesIssued", "Others"], analytics)
+                                                   }
+                                               ]}
+                                               width={500} height={150}
+                                               color={"rgba(141,162,255,0.5)"}
+                                           />
+                                           /*<div className="d-flex justify-content-center">
                                                <div className="d-flex align-items-center justify-content-center">
                                                    <div className="d-flex flex-column pl-2 pr-2">
                                                        <span
@@ -76,7 +100,7 @@ export const CertificateAnalysis = ({analytics}) => {
                                                    </div>
                                                    <img src={FemaleImg} alt={""} height={"75%"}/>
                                                </div>
-                                           </div>
+                                           </div>*/
                                        }
                         />
                         <AnalyticsCard lgCols={5} title={"By Age Groups"}
@@ -85,7 +109,7 @@ export const CertificateAnalysis = ({analytics}) => {
                                            <ColumnChart
                                                data={ageWiseChartData}
                                                width={500} height={150}
-                                               color={"#DE9D00"}
+                                               color={"rgba(44,216,137,0.5)"}
                                            />
                                        }
                         />
@@ -111,7 +135,7 @@ export const CertificateAnalysis = ({analytics}) => {
                                                <ColumnChart
                                                    data={stateWiseChartData}
                                                    width={600} height={300}
-                                                   color={"#8DA2FF"}
+                                                   color={"rgba(222,157,0,0.5)"}
                                                />
                                            </div>
                                        }
