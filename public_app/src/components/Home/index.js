@@ -85,25 +85,28 @@ export const Home = () => (
                 <img src={Covid19PgmImg} alt={""}/>
                 <h3 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h3>
                 <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
-                <CustomButton className={"purple-btn"} onClick={() => {}}>Know More</CustomButton>
+                <CustomButton className={"purple-btn"} onClick={() => {
+                }}>Know More</CustomButton>
             </div>
         </div>
         <div className="dashboard-section p-3 p-lg-0">
             <div className="h-100 pt-lg-5 d-flex flex-column align-items-center justify-content-center">
                 <h3>Public Dashboard</h3>
                 <span className="pt-3 dashboard-subtitle">Some introductory text about the dashboard - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
-                <div className="w-100 h-100 pt-lg-5">
-                    <div className="row h-100 w-100 row-cols-lg-3 row-cols-1">
-                        <div className="col d-flex flex-column justify-content-center align-items-center  p-3 p-lg-5">
+                <div className="h-100 pt-lg-5">
+                    <div className="row h-100 row-cols-lg-3 row-cols-1">
+                        <div
+                            className="col d-flex flex-column justify-content-center align-items-center  p-3 pt-5 p-lg-3 order-lg-1">
                             <img alt={""} src={CertificateSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <h1 className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</h1>
                             <Link to={"/dashboard"} className="outline-button ">View Numbers ></Link>
                         </div>
-                        <div className="col">
+                        <div className="col order-lg-2 order-3">
                             <img alt={""} src={DashboardBannerImg} width={"100%"} height={"100%"}/>
                         </div>
-                        <div className="col d-flex flex-column justify-content-center align-items-center p-3  p-lg-5">
+                        <div
+                            className="col d-flex flex-column justify-content-center align-items-center p-3 pt-5 p-lg-3 order-lg-3 order-2">
                             <img alt={""} src={CenterSmallImg} width={40}/>
                             <h4 className="pt-3">Certificates Issued</h4>
                             <b className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</b>

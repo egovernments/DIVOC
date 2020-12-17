@@ -93,7 +93,7 @@
 .divoc-info-wrapper {
     width: 50%;
     padding: 3rem;
-    background-color: #FCFCFC;
+    background-color: #F8F8F8;
     display: flex;
     flex-direction: column;
     justify-content: flex-start;
@@ -140,6 +140,7 @@
 .dashboard-subtitle {
     padding-left: 15rem;
     padding-right: 15rem;
+    text-align: center;
 }
 
 @media (max-width: 961px) {
