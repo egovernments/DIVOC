@@ -98,7 +98,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                  className="certificate-status-image"/>
             <h3 className="certificate-status">
                 {
-                    isValid ? "Certificate Successfully authenticated!" : "Invalid Certificate"
+                    isValid ? "Successful" : "Invalid Certificate"
                 }
             </h3>
             {
