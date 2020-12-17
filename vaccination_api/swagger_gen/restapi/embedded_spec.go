@@ -72,6 +72,38 @@ func init() {
         }
       }
     },
+    "/bulkCertify": {
+      "post": {
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload certification csv for bulk ingestion",
+        "operationId": "bulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/certificates/{phone}": {
       "get": {
         "security": [],
@@ -823,6 +855,38 @@ func init() {
             "schema": {
               "$ref": "#/definitions/LoginResponse"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/bulkCertify": {
+      "post": {
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload certification csv for bulk ingestion",
+        "operationId": "bulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           },
           "401": {
             "description": "Unauthorized"

@@ -42,6 +42,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
 	api.SideEffectsCreateSideEffectsHandler = side_effects.CreateSideEffectsHandlerFunc(createSideEffects)
 	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
+	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 }
 
 type GenericResponse struct {
@@ -217,4 +218,14 @@ func certify(params certification.CertifyParams, pricipal interface{}) middlewar
 		}
 	}
 	return certification.NewCertifyOK()
+}
+
+func bulkCertify(params certification.BulkCertifyParams, principal interface{}) middleware.Responder {
+	data := NewScanner(params.File)
+	defer params.File.Close()
+	for data.Scan() {
+		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
+		log.Info(data.Text("recipientName")," - ", data.Text("facilityName"))
+	}
+	return certification.NewBulkCertifyOK()
 }

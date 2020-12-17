@@ -46,7 +46,8 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		APIKeyAuthenticator: security.APIKeyAuth,
 		BearerAuthenticator: security.BearerAuth,
 
-		JSONConsumer: runtime.JSONConsumer(),
+		JSONConsumer:          runtime.JSONConsumer(),
+		MultipartformConsumer: runtime.DiscardConsumer,
 
 		JSONProducer: runtime.JSONProducer(),
 
@@ -58,6 +59,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		IdentityPostIdentityVerifyHandler: identity.PostIdentityVerifyHandlerFunc(func(params identity.PostIdentityVerifyParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation identity.PostIdentityVerify has not yet been implemented")
+		}),
+		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal interface{}) middleware.Responder {
+			return middleware.NotImplemented("operation certification.BulkCertify has not yet been implemented")
 		}),
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal interface{}) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
@@ -133,6 +137,9 @@ type DivocAPI struct {
 	// JSONConsumer registers a consumer for the following mime types:
 	//   - application/json
 	JSONConsumer runtime.Consumer
+	// MultipartformConsumer registers a consumer for the following mime types:
+	//   - multipart/form-data
+	MultipartformConsumer runtime.Consumer
 
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/json
@@ -151,6 +158,8 @@ type DivocAPI struct {
 	LoginPostAuthorizeHandler login.PostAuthorizeHandler
 	// IdentityPostIdentityVerifyHandler sets the operation handler for the post identity verify operation
 	IdentityPostIdentityVerifyHandler identity.PostIdentityVerifyHandler
+	// CertificationBulkCertifyHandler sets the operation handler for the bulk certify operation
+	CertificationBulkCertifyHandler certification.BulkCertifyHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
 	// SideEffectsCreateSideEffectsHandler sets the operation handler for the create side effects operation
@@ -248,6 +257,9 @@ func (o *DivocAPI) Validate() error {
 	if o.JSONConsumer == nil {
 		unregistered = append(unregistered, "JSONConsumer")
 	}
+	if o.MultipartformConsumer == nil {
+		unregistered = append(unregistered, "MultipartformConsumer")
+	}
 
 	if o.JSONProducer == nil {
 		unregistered = append(unregistered, "JSONProducer")
@@ -265,6 +277,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.IdentityPostIdentityVerifyHandler == nil {
 		unregistered = append(unregistered, "identity.PostIdentityVerifyHandler")
+	}
+	if o.CertificationBulkCertifyHandler == nil {
+		unregistered = append(unregistered, "certification.BulkCertifyHandler")
 	}
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
@@ -344,6 +359,8 @@ func (o *DivocAPI) ConsumersFor(mediaTypes []string) map[string]runtime.Consumer
 		switch mt {
 		case "application/json":
 			result["application/json"] = o.JSONConsumer
+		case "multipart/form-data":
+			result["multipart/form-data"] = o.MultipartformConsumer
 		}
 
 		if c, ok := o.customConsumers[mt]; ok {
@@ -413,6 +430,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/identity/verify"] = identity.NewPostIdentityVerify(o.context, o.IdentityPostIdentityVerifyHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/bulkCertify"] = certification.NewBulkCertify(o.context, o.CertificationBulkCertifyHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
