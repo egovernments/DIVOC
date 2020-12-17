@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/swagger_gen/models"
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"io/ioutil"
@@ -37,7 +38,7 @@ func Init() {
 	//fatal(err)
 }
 
-func RoleAuthorizer(bearerToken string, expectedRole []string) (interface{}, error) {
+func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaimBody, error) {
 	claimBody, err := GetClaimBody(bearerToken)
 	if err != nil {
 		return nil, err
@@ -106,8 +107,8 @@ func contains(arr []string, str string) bool {
 	return false
 }
 
-func GetClaimBody(bearerToken string) (*JWTClaimBody, error) {
-	token, err := jwt.ParseWithClaims(bearerToken, &JWTClaimBody{}, func(token *jwt.Token) (interface{}, error) {
+func GetClaimBody(bearerToken string) (*models.JWTClaimBody, error) {
+	token, err := jwt.ParseWithClaims(bearerToken, &models.JWTClaimBody{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("error decoding token")
 		}
@@ -117,7 +118,7 @@ func GetClaimBody(bearerToken string) (*JWTClaimBody, error) {
 		return nil, err
 	}
 	if token.Valid {
-		claims := token.Claims.(*JWTClaimBody)
+		claims := token.Claims.(*models.JWTClaimBody)
 		return claims, nil
 	}
 

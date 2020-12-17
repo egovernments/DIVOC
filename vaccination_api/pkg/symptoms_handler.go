@@ -1,13 +1,14 @@
 package pkg
 
 import (
+	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 )
 
-func createSymptoms(params symptoms.CreateSymptomsParams, principle interface{}) middleware.Responder {
+func createSymptoms(params symptoms.CreateSymptomsParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, symptom := range params.Body {
 		services.MakeRegistryCreateRequest(symptom, "Symptom")
 	}

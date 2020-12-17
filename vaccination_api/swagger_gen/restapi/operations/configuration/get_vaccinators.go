@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // GetVaccinatorsHandlerFunc turns a function with the right signature into a get vaccinators handler
-type GetVaccinatorsHandlerFunc func(GetVaccinatorsParams, interface{}) middleware.Responder
+type GetVaccinatorsHandlerFunc func(GetVaccinatorsParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetVaccinatorsHandlerFunc) Handle(params GetVaccinatorsParams, principal interface{}) middleware.Responder {
+func (fn GetVaccinatorsHandlerFunc) Handle(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetVaccinatorsHandler interface for that can handle valid get vaccinators params
 type GetVaccinatorsHandler interface {
-	Handle(GetVaccinatorsParams, interface{}) middleware.Responder
+	Handle(GetVaccinatorsParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetVaccinators creates a new http.Handler for the get vaccinators operation
@@ -54,9 +56,9 @@ func (o *GetVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

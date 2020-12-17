@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // GetPreEnrollmentsForFacilityHandlerFunc turns a function with the right signature into a get pre enrollments for facility handler
-type GetPreEnrollmentsForFacilityHandlerFunc func(GetPreEnrollmentsForFacilityParams, interface{}) middleware.Responder
+type GetPreEnrollmentsForFacilityHandlerFunc func(GetPreEnrollmentsForFacilityParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetPreEnrollmentsForFacilityHandlerFunc) Handle(params GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
+func (fn GetPreEnrollmentsForFacilityHandlerFunc) Handle(params GetPreEnrollmentsForFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetPreEnrollmentsForFacilityHandler interface for that can handle valid get pre enrollments for facility params
 type GetPreEnrollmentsForFacilityHandler interface {
-	Handle(GetPreEnrollmentsForFacilityParams, interface{}) middleware.Responder
+	Handle(GetPreEnrollmentsForFacilityParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetPreEnrollmentsForFacility creates a new http.Handler for the get pre enrollments for facility operation
@@ -54,9 +56,9 @@ func (o *GetPreEnrollmentsForFacility) ServeHTTP(rw http.ResponseWriter, r *http
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

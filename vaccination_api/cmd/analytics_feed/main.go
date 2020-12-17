@@ -6,33 +6,15 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
 )
-
-type VaccinationCertificateRequest struct {
-	ID     string `json:"id"`
-	Ver    string `json:"ver"`
-	Ets    string `json:"ets"`
-	Params struct {
-		Did   string `json:"did"`
-		Key   string `json:"key"`
-		Msgid string `json:"msgid"`
-	} `json:"params"`
-	Request struct {
-		VaccinationCertificate struct {
-			CertificateID string   `json:"certificateId"`
-			Identity      string   `json:"identity"`
-			Contact       []string `json:"contact"`
-			Name          string   `json:"name"`
-			Certificate   string   `json:"certificate"`
-		} `json:"VaccinationCertificate"`
-	} `json:"request"`
-}
 
 type CertifyMessage struct {
 	Facility struct {
@@ -103,7 +85,26 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = connect.Exec(`
+CREATE TABLE IF NOT EXISTS eventsv1 (
+dt Date,
+source String,
+type String
+) engine = MergeTree() order by dt
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var wg sync.WaitGroup
+	wg.Add(2)
+	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
+	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic)
+	wg.Wait()
+}
 
+type MessageCallback func(*sql.DB, string) error
+
+func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "analytics_feed",
@@ -115,18 +116,13 @@ func main() {
 		panic(err)
 	}
 
-	c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil)
+	c.SubscribeTopics([]string{topic}, nil)
 
 	for {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-			//valid := validate.AgainstSchema()
-			//if !valid {
-			//push to back up queue -- todo what do we do with these requests?
-			//}
-			//message := signCertificate(message)
-			if err := processCertificateMessage(connect, string(msg.Value)); err == nil {
+			if err := callback(connect, string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
@@ -140,7 +136,40 @@ func main() {
 	c.Close()
 }
 
-func processCertificateMessage(connect *sql.DB, msg string) error {
+func saveAnalyticsEvent(connect *sql.DB, msg string) error {
+	event := pkg.Event{}
+	if err := json.Unmarshal([]byte(msg), &event); err != nil {
+		log.Errorf("Kafka message unmarshalling error %+v", err)
+		return errors.New("kafka message unmarshalling failed")
+	}
+	// push to click house - todo: batch it
+	var (
+		tx, _     = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO eventsv1 
+	(  dt,
+	source,
+	type ) 
+	VALUES (?,?,?)`)
+	)
+	if err != nil {
+		log.Infof("Error in preparing stmt %+v", err)
+	}
+	if _, err := stmt.Exec(
+		event.Date,
+		event.Source,
+		event.TypeOfMessage,
+	); err != nil {
+		log.Errorf("Error in saving %+v", err)
+	}
+
+	defer stmt.Close()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func saveCertificateEvent(connect *sql.DB, msg string) error {
 	var certifyMessage CertifyMessage
 	if err := json.Unmarshal([]byte(msg), &certifyMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)

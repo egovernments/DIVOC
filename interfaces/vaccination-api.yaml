@@ -189,8 +189,8 @@ paths:
   /certificates/{phone}:
     get:
       summary: Get certificate json
-      security: []
-#        - hasRole: ["recipient"]
+      security:
+        - hasRole: ["recipient"]
       operationId: getCertificate
       parameters:
         - name: phone
@@ -287,6 +287,21 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /events:
+    post:
+      summary: Send events for monitoring / tracking purpose.
+      operationId: events
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/Event'
+      responses:
+        '200':
+          description: OK
   /ping:
     get:
       summary: Server heartbeat operation
@@ -508,6 +523,16 @@ definitions:
         type: array
         items:
           type: string
+  Event:
+    type: object
+    properties:
+      date:
+        type: string
+        format: date
+      type:
+        type: string
+      extra:
+        type: object
 host: divoc.xiv.in
 schemes:
   - https

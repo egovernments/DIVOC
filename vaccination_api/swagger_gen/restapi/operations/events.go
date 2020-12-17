@@ -13,40 +13,40 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 )
 
-// GetCertificateHandlerFunc turns a function with the right signature into a get certificate handler
-type GetCertificateHandlerFunc func(GetCertificateParams, *models.JWTClaimBody) middleware.Responder
+// EventsHandlerFunc turns a function with the right signature into a events handler
+type EventsHandlerFunc func(EventsParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetCertificateHandlerFunc) Handle(params GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn EventsHandlerFunc) Handle(params EventsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// GetCertificateHandler interface for that can handle valid get certificate params
-type GetCertificateHandler interface {
-	Handle(GetCertificateParams, *models.JWTClaimBody) middleware.Responder
+// EventsHandler interface for that can handle valid events params
+type EventsHandler interface {
+	Handle(EventsParams, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewGetCertificate creates a new http.Handler for the get certificate operation
-func NewGetCertificate(ctx *middleware.Context, handler GetCertificateHandler) *GetCertificate {
-	return &GetCertificate{Context: ctx, Handler: handler}
+// NewEvents creates a new http.Handler for the events operation
+func NewEvents(ctx *middleware.Context, handler EventsHandler) *Events {
+	return &Events{Context: ctx, Handler: handler}
 }
 
-/*GetCertificate swagger:route GET /certificates/{phone} getCertificate
+/*Events swagger:route POST /events events
 
-Get certificate json
+Send events for monitoring / tracking purpose.
 
 */
-type GetCertificate struct {
+type Events struct {
 	Context *middleware.Context
-	Handler GetCertificateHandler
+	Handler EventsHandler
 }
 
-func (o *GetCertificate) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *Events) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewGetCertificateParams()
+	var Params = NewEventsParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

@@ -106,7 +106,13 @@ func init() {
     },
     "/certificates/{phone}": {
       "get": {
-        "security": [],
+        "security": [
+          {
+            "hasRole": [
+              "recipient"
+            ]
+          }
+        ],
         "summary": "Get certificate json",
         "operationId": "getCertificate",
         "parameters": [
@@ -175,6 +181,30 @@ func init() {
             "schema": {
               "$ref": "#/definitions/ApplicationConfiguration"
             }
+          }
+        }
+      }
+    },
+    "/events": {
+      "post": {
+        "summary": "Send events for monitoring / tracking purpose.",
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Event"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -578,6 +608,21 @@ func init() {
         }
       }
     },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "extra": {
+          "type": "object"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    },
     "IdentityVerificationRequest": {
       "type": "object",
       "properties": {
@@ -902,7 +947,13 @@ func init() {
     },
     "/certificates/{phone}": {
       "get": {
-        "security": [],
+        "security": [
+          {
+            "hasRole": [
+              "recipient"
+            ]
+          }
+        ],
         "summary": "Get certificate json",
         "operationId": "getCertificate",
         "parameters": [
@@ -971,6 +1022,30 @@ func init() {
             "schema": {
               "$ref": "#/definitions/ApplicationConfiguration"
             }
+          }
+        }
+      }
+    },
+    "/events": {
+      "post": {
+        "summary": "Send events for monitoring / tracking purpose.",
+        "operationId": "events",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/Event"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1482,6 +1557,21 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
+          "type": "string"
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "extra": {
+          "type": "object"
+        },
+        "type": {
           "type": "string"
         }
       }

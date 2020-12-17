@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/kernel_library/services"
@@ -15,7 +16,7 @@ func createSideEffects(params side_effects.CreateSideEffectsParams) middleware.R
 	return symptoms.NewCreateSymptomsOK()
 }
 
-func getSideEffects(params side_effects.GetSideEffectsParams, principle interface{}) middleware.Responder {
+func getSideEffects(params side_effects.GetSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 	filter := map[string]interface{}{
 		"@type": map[string]interface{}{
 			"eq": SideEffectsEntity,

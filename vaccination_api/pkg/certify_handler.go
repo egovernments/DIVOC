@@ -16,8 +16,10 @@ var messages = make(chan string)
 var events = make(chan []byte)
 
 type Event struct {
-	dt time.Time
-	t string
+	Date time.Time `json:"date"`
+	Source string `json:"source"`
+	TypeOfMessage string `json:"type"`
+	ExtraInfo interface{}  `json:"extra"`
 }
 
 func InitializeKafka() {
@@ -79,9 +81,17 @@ func publishCertifyMessage(message []byte) {
 	messages <- string(message)
 }
 
+func publishSimpleEvent(source string, event string) {
+	publishEvent(Event{
+		Date:          time.Now(),
+		Source:        source,
+		TypeOfMessage: "download",
+	})
+}
+
 func publishEvent(event Event) {
 	if messageJson, err := json.Marshal(event); err != nil {
-
+		log.Errorf("Error in getting json of event %+v", event)
 	} else {
 		events <- messageJson
 	}

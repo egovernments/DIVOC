@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // BulkCertifyHandlerFunc turns a function with the right signature into a bulk certify handler
-type BulkCertifyHandlerFunc func(BulkCertifyParams, interface{}) middleware.Responder
+type BulkCertifyHandlerFunc func(BulkCertifyParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn BulkCertifyHandlerFunc) Handle(params BulkCertifyParams, principal interface{}) middleware.Responder {
+func (fn BulkCertifyHandlerFunc) Handle(params BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // BulkCertifyHandler interface for that can handle valid bulk certify params
 type BulkCertifyHandler interface {
-	Handle(BulkCertifyParams, interface{}) middleware.Responder
+	Handle(BulkCertifyParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewBulkCertify creates a new http.Handler for the bulk certify operation
@@ -56,9 +58,9 @@ func (o *BulkCertify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
