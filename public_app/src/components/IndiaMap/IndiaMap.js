@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import styles from './IndiaMap.module.css';
+import styles from './IndiaMap.css';
 import states from './states';
 
 class IndiaMap extends React.Component {

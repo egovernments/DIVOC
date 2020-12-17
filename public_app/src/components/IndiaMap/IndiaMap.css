@@ -1,0 +1,43 @@
+.bubble{
+    stroke-width: 2;
+    fill-opacity: 0.25;
+    stroke-opacity: .5;
+    fill:#74C9A7;
+    stroke:#74C9A7;
+}
+.bubble:hover{
+    fill-opacity: 0.5;
+    stroke-opacity: .5;
+}
+.bubble-centres{
+    stroke-width: 2;
+    fill-opacity: 0.25;
+    stroke-opacity: .5;
+    fill:#479EFF;
+    stroke:#479EFF;
+}
+.bubble-centres:hover {
+    fill-opacity: 0.5;
+    stroke-opacity: .5;
+}
+.bubble-certificates{
+    stroke-width: 2;
+    fill-opacity: 0.25;
+    stroke-opacity: .5;
+    fill:#74C9A777;
+    stroke:#74C9A7;
+}
+.bubble-certificates:hover{
+    fill-opacity: 0.8;
+    stroke-opacity: .5;
+}
+.div-map{
+    width: 500px;
+    height: 600px;
+}
+
+.map-container{
+    background: white;
+    height: 70vh;
+    background: white !important;
+}
