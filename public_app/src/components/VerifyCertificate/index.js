@@ -26,7 +26,7 @@ export const VerifyCertificate = () => {
                     {!showScanner &&
                     <>
                         <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
-                        <h3 className="text-center">Verify a vaccination certificate as authentic</h3>
+                        <h3 className="text-center">Verify a vaccination certificate</h3>
                         <CustomButton className="green-btn" onClick={() => setShowScanner(true)}>
                             <span>SCAN WITH QR</span>
                             <img className="ml-3" src={QRCodeImg} alt={""}/>
