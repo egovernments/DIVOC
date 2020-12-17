@@ -1,7 +1,11 @@
 .home-section {
 }
 
-.home-section .section {
+.home-section .section .title{
+    font-size: 3rem;
+    padding: 0 10rem;
+    text-align: center;
+    font-weight: bold;
 }
 
 .welcome-wrapper {
@@ -79,7 +83,6 @@
 }
 
 .half-section {
-    height: 50vh;
 }
 
 .divoc-video-wrapper {
@@ -89,7 +92,12 @@
 
 .divoc-info-wrapper {
     width: 50%;
-    padding: 7rem;
+    padding: 3rem;
+    background-color: #F8F8F8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
 }
 
 .updates-section {
@@ -127,17 +135,21 @@
 }
 
 .dashboard-section {
-    height: 70vh;
 }
 
 .dashboard-subtitle {
     padding-left: 15rem;
     padding-right: 15rem;
+    text-align: center;
 }
 
 @media (max-width: 961px) {
     .home-section .section {
         height: 100%;
+    }
+    .home-section .section .title{
+        font-size: 16px;
+        padding: 0 1rem;
     }
     .welcome-wrapper {
         height: 100%;
@@ -194,7 +206,12 @@
 
     .divoc-info-wrapper {
         width: 100%;
-        padding: 1rem 0;
+        padding: 2rem 0;
+        justify-content: center;
+        align-items: center;
+    }
+    .divoc-info-wrapper img{
+        width: 50%;
     }
     .divoc-video-wrapper {
         width: 100%;
