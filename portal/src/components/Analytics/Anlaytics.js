@@ -13,7 +13,7 @@ export function Analytics() {
             .then(res => {
                 setAnalytics(res.data)
             });
-    });
+    }, []);
     return (
         <div className="container-fluid mt-5">
             <Accordion defaultActiveKey="0">
