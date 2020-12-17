@@ -24,14 +24,11 @@ export function AreaChart({data, height, width}) {
     const _rememberValue = value => {
         setValue(value);
     };
-    const xAxisValues= data.map((d) => d.x);
-    const yAxisValues= data.map((d) => d.y);
     return (
-        <XYPlot width={width} height={height} margin={{left: 50, bottom: 50}}>
-            <VerticalGridLines/>
+        <XYPlot onMouseLeave={_forgetValue} width={width} xType="ordinal" height={height} margin={{left: 50, bottom: 50}}>
             <HorizontalGridLines/>
-            <XAxis tickValues={xAxisValues} tickFormat={v => `${v}`} tickLabelAngle={-25}/>
-            <YAxis tickValues={yAxisValues}/>
+            <XAxis  hideLine tickLabelAngle={-25}/>
+            <YAxis hideLine />
             <AreaSeries
                 className="area-series-example"
                 curve="curveNatural"
@@ -40,7 +37,7 @@ export function AreaChart({data, height, width}) {
             />
 
             <MarkSeries
-                onValueMouseOver={_rememberValue}
+                onNearestX={_rememberValue}
                 onValueMouseOut={_forgetValue}
                 data={data}
                 color={"rgb(161,217,251)"}
