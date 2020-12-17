@@ -27,7 +27,7 @@ function App() {
           <Switch>
             <Route exact path={"/"} component={Home}/>
             <Route exact path={config.urlPath + "/login"} component={Login}/>
-            <Route exact path={"/side_effects"} component={SideEffects}/>
+            <Route exact path={"/side-effects"} component={SideEffects}/>
             <Route exact path={"/dashboard"} component={Dashboard}/>
             <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
