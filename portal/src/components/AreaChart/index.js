@@ -14,7 +14,7 @@ import {
 
 const months = ["Jan", "Feb", "Mar", "Apr"];
 
-export function AreaChart(props) {
+export function AreaChart({data, height, width}) {
     const [value, setValue] = useState(null);
 
     const _forgetValue = () => {
@@ -24,39 +24,30 @@ export function AreaChart(props) {
     const _rememberValue = value => {
         setValue(value);
     };
+    const xAxisValues= data.map((d) => d.x);
+    const yAxisValues= data.map((d) => d.y);
     return (
-        <XYPlot width={1000} height={500}>
+        <XYPlot width={width} height={height} margin={{left: 50, bottom: 50}}>
             <VerticalGridLines/>
             <HorizontalGridLines/>
-            <XAxis tickValues={[1, 2, 3]} tickFormat={v => `${months[v - 1]}`}/>
-            <YAxis tickValues={[1, 5, 10, 15,20]}/>
+            <XAxis tickValues={xAxisValues} tickFormat={v => `${v}`} tickLabelAngle={-25}/>
+            <YAxis tickValues={yAxisValues}/>
             <AreaSeries
                 className="area-series-example"
                 curve="curveNatural"
-                data={[{x: 1, y: 10}, {x: 2, y: 5}, {x: 3, y: 15}]}
+                data={data}
                 color={"rgba(161,217,251, 0.5)"}
             />
-            <AreaSeries
-                className="area-series-example"
-                curve="curveNatural"
-                data={[{x: 1, y: 20}, {x: 2, y: 5}, {x: 3, y: 10}]}
-                color={"rgba(170,183,233, 0.5)"}
-            />
+
             <MarkSeries
                 onValueMouseOver={_rememberValue}
                 onValueMouseOut={_forgetValue}
-                data={[{x: 1, y: 10}, {x: 2, y: 5}, {x: 3, y: 15}]}
+                data={data}
                 color={"rgb(161,217,251)"}
                 strokeWidth={1}
             />
-            <MarkSeries
-                onValueMouseOver={_rememberValue}
-                onValueMouseOut={_forgetValue}
-                data={[{x: 1, y: 20}, {x: 2, y: 5}, {x: 3, y: 10}]}
-                color={"rgb(170,183,233)"}
-            />
             {value ? <Hint value={value}/> : null}
-            <DiscreteColorLegend orientation="horizontal" width={300} items={ITEMS} />
+            {/*<DiscreteColorLegend orientation="horizontal" width={300} items={ITEMS} />*/}
         </XYPlot>
     );
 }
