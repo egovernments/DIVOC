@@ -14,6 +14,9 @@ import {Certificate} from "../Certificate";
 const certificateDetailsPaths = {
     ...CertificateDetailsPaths,
     "Vaccination": {
+        path: ["evidence", "0", "vaccine"]
+    },
+    "Manufacturer": {
         path: ["evidence", "0", "manufacturer"]
     },
     "Identity": {
@@ -98,11 +101,12 @@ function CertificateView() {
                 <Certificate
                     qrCode={<QRCode size={128} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
                     vaccination={extractData(certificateData, "Vaccination")}
+                    manufacturer={extractData(certificateData, "Manufacturer")}
                     certificateId={extractData(certificateData, "Certificate ID")}
                     issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
                     name={extractData(certificateData, "Name")}
                     gender={extractData(certificateData, "Gender")}
-                    identityType={"Aadhaar"}
+                    identityType={"आधार / Aadhaar"}
                     identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
                     age={extractData(certificateData, "Age")}
                     vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
@@ -165,7 +169,7 @@ function CertificateView() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As PNG Image</Dropdown.Item>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As an image</Dropdown.Item>
                             <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
                             <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
                         </Dropdown.Menu>
