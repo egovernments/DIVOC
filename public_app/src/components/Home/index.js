@@ -6,6 +6,7 @@ import CertificateImg from '../../assets/img/download-certificate-home.svg'
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import SideEffectsBannerImg from '../../assets/img/side-effects-banner-img.png'
 import DashboardBannerImg from '../../assets/img/dashboard-banner.png'
+import Covid19PgmImg from '../../assets/img/covid19program.svg'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import {LatestUpdateCard} from "../LatestUpdateCard";
 import "./index.css";
@@ -76,13 +77,15 @@ export const Home = () => (
         </div>
         <div className="half-section  d-lg-flex p-3 p-lg-0">
             <div className="divoc-video-wrapper d-flex justify-content-center align-items-center">
-                <iframe width="90%" height="90%" src="https://www.youtube.com/embed/vl_EP9fpzh0" frameBorder="0"
+                <iframe width="90%" height="100%" src="https://www.youtube.com/embed/vl_EP9fpzh0" frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen></iframe>
             </div>
             <div className="divoc-info-wrapper">
-                <span className="font-weight-bold">What is divoc?</span><br/>
-                <span>DIVOC software specifically addresses the 3rd item above allowing countries to digitally orchestrate rollout across the country using dynamic policies, issuance of digital vaccination certificates that are compliant to international standards, manage post vaccination feedback, and use real time analytics to manage this entire process. DIVOC contains 3 core modules - certificate management, feedback management, and vaccination rollout management - each of which can be used independently or together depending on the need.</span>
+                <img src={Covid19PgmImg} alt={""}/>
+                <h3 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h3>
+                <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+                <CustomButton className={"purple-btn"} onClick={() => {}}>Know More</CustomButton>
             </div>
         </div>
         <div className="dashboard-section p-3 p-lg-0">

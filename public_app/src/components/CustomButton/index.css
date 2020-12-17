@@ -16,3 +16,7 @@
 .yellow-btn {
     background: transparent linear-gradient(91deg, #FDBD22 0%, #DE9D00 100%) 0% 0% no-repeat padding-box;
 }
+
+.purple-btn {
+    background: transparent linear-gradient(91deg, #8DA2FF 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+}
