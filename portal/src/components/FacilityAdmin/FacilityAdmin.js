@@ -26,10 +26,10 @@ export default function FacilityAdmin() {
 
     return (
         <TabPanels tabs={[
-            {title: "Role Setup", component: <RoleSetup/>},
-            {title: "Vaccinator Details", component: <VaccinatorList/>},
-            {title: "Program Overview", component: <span>Program Overview</span>},
-            {title: "Bulk Certify", component: <Certificates />},
+            {title: "Upload Certificate Details", component: <Certificates />},
+            // {title: "Role Setup", component: <RoleSetup/>},
+            // {title: "Vaccinator Details", component: <VaccinatorList/>},
+            // {title: "Program Overview", component: <span>Program Overview</span>},
 
         ]}/>
     );
