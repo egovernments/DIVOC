@@ -134,22 +134,17 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                                 history.push("/learn")
                             }}
                             backgroundColor={"#EFF5FD"}/>
-            <SmallInfoCards
-                text={"Download Certificate"}
-                img={DownloadSmallImg}
-                onClick={() => {
-                                                                                          history.push("/certificate/")
-                }}
-                backgroundColor={"#FFFBF0"}/>
         </div>
     )
 };
 
 export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
     <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
-        <img src={img} alt={""}/>
+        <div className="w-50 ">
+            <img src={img} alt={""} />
+        </div>
         <div onClick={onClick}
-             className="d-flex flex-column align-items-start justify-content-center font-weight-bold pl-3">
+             className="w-50 d-flex flex-column align-items-start justify-content-center font-weight-bold">
             <span>{text}</span>
             <img src={NextArrowImg} alt={""}/>
         </div>
