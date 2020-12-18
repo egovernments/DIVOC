@@ -3,6 +3,11 @@ import {Col, Container, Row} from "react-bootstrap";
 import "./index.css";
 import {SubmitSymptomsForm} from "../SubmitSymptomsForm";
 import {ReactComponent as VaccinationActiveImg} from "../../assets/img/FeedbackScreen.svg";
+import CertificateImg from "../../assets/img/download-certificate-home.svg";
+import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
+import {CertificateStatus, SmallInfoCards} from "../CertificateStatus";
+import {Link, useHistory} from "react-router-dom";
+import LearnMoreImg from '../../assets/img/leanr_more_small.png'
 
 const data = {
     0: [{
@@ -69,6 +74,7 @@ const data = {
 
 
 export const SideEffects = () => {
+    const history = useHistory();
     const [symptoms, setSymptoms] = useState(data);
     const [nextSymptoms, setNextSymptoms] = useState({});
     const [selectedSymptomIds, setSelectedSymptomIds] = useState([]);
@@ -133,19 +139,30 @@ export const SideEffects = () => {
     }
 
     let showNextButton = false;
-    // Object.keys(symptoms).forEach((key, idx) => {
-    //     symptoms[key].forEach((d) => {
-    //         if ("types" in d) {
-    //             showNextButton = true;
-    //         }
-    //     });
-    // });
     return (
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
+                    <h3 align="center">Provide Feedback</h3>
+                    <span width="40%" display="inline-block">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
                 {/* <img src={VaccinationActiveImg} alt=""/> */}
                 <VaccinationActiveImg/>
+                    <SmallInfoCards
+                    text={"Verify Certificate"}
+                    img={VerifyCertificateImg}
+                    onClick={() => {
+                        history.push("/verify-certificate/")
+                    }}
+                    backgroundColor={"#F2FAF6"}
+                    />
+                    <br/>
+                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnMoreImg}
+                           onClick={() => {
+                                history.push("/learn/")
+                            }}
+                            backgroundColor={"#EFF5FD"}/>
+                
+                
                 </div>
             </Container>
         </div>

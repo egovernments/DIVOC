@@ -126,7 +126,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     )
 };
 
-const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
+export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
     <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
         <img src={img} alt={""}/>
         <div onClick={onClick} className="d-flex flex-column align-items-start justify-content-center font-weight-bold pl-3">
