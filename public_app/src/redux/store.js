@@ -33,7 +33,6 @@ export const store = createStore(
 );
 store.subscribe(throttle(() => {
     saveState(store.getState());
-    debugger
     postEvents(store.getState().events, store.dispatch)
 }, 1000));
 
