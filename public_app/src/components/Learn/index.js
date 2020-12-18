@@ -68,6 +68,9 @@ function Learn(props) {
             <div className="bottom-container m-4">
                 <SmallInfoCards
                     text={"Provide Feedback"}
+                    onClick={() => {
+                        history.push("/side-effects")
+                    }}
                     img={FeedbackSmallImg}
                     backgroundColor={"#FFFBF0"}/>
                 <SmallInfoCards
