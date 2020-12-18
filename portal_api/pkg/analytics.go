@@ -9,14 +9,15 @@ import (
 )
 
 type AnalyticsResponse struct {
-	NumberOfCertificatesIssued        map[string]int64 `json:"numberOfCertificatesIssued"`
-	NumberOfCertificatesIssuedByDate  map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
-	NumberOfCertificatesIssuedByState map[string]int64 `json:"numberOfCertificatesIssuedByState"`
-	NumberOfCertificatesIssuedByAge   map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
-	DownloadByDate                    map[string]int64 `json:"downloadByDate"`
-	ValidVerificationByDate           map[string]int64 `json:"validVerificationByDate"`
-	InValidVerificationByDate         map[string]int64 `json:"inValidVerificationByDate"`
-	TotalFacilities                   map[string]int64 `json:"totalFacilities"`
+	NumberOfCertificatesIssued          map[string]int64 `json:"numberOfCertificatesIssued"`
+	NumberOfCertificatesIssuedByDate    map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
+	NumberOfCertificatesIssuedByState   map[string]int64 `json:"numberOfCertificatesIssuedByState"`
+	NumberOfCertificatesIssuedByAge     map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
+	DownloadByDate                      map[string]int64 `json:"downloadByDate"`
+	ValidVerificationByDate             map[string]int64 `json:"validVerificationByDate"`
+	InValidVerificationByDate           map[string]int64 `json:"inValidVerificationByDate"`
+	TotalFacilities                     map[string]int64 `json:"totalFacilities"`
+	RateOfCertificateIssuedByFacilities map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
 }
 
 var connect *sql.DB = initConnection()
@@ -51,16 +52,23 @@ select gender, count() from certificatesv1 group by gender
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
 	totalFacilities := `select 'total', count(distinct facilityName) from certificatesv1`
+	rateOfCertificateIssuedByFacilities := `select 'avg', toUInt256(avg(certificateIssued)) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+union all
+select 'min', min(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+union all
+select 'max', max(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+`
 
 	analyticsResponse := AnalyticsResponse{
-		NumberOfCertificatesIssued:        getCount(countQuery),
-		NumberOfCertificatesIssuedByDate:  getCount(byDateQuery),
-		NumberOfCertificatesIssuedByState: getCount(byStateQuery),
-		NumberOfCertificatesIssuedByAge:   getCount(byAgeQuery),
-		DownloadByDate:                    getCount(downloadByDate),
-		ValidVerificationByDate:           getCount(validVerificationByDate),
-		InValidVerificationByDate:         getCount(inValidVerificationByDate),
-		TotalFacilities:                   getCount(totalFacilities),
+		NumberOfCertificatesIssued:          getCount(countQuery),
+		NumberOfCertificatesIssuedByDate:    getCount(byDateQuery),
+		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
+		NumberOfCertificatesIssuedByAge:     getCount(byAgeQuery),
+		DownloadByDate:                      getCount(downloadByDate),
+		ValidVerificationByDate:             getCount(validVerificationByDate),
+		InValidVerificationByDate:           getCount(inValidVerificationByDate),
+		TotalFacilities:                     getCount(totalFacilities),
+		RateOfCertificateIssuedByFacilities: getCount(rateOfCertificateIssuedByFacilities),
 	}
 
 	return analyticsResponse
