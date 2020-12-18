@@ -8,9 +8,10 @@ import LearnProcessImg from "../../assets/img/learn_vaccination_process.png";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
 import config from "../../config";
 import {pathOr} from "ramda";
-import {formatDate} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import {CertificateDetailsPaths} from "../../constants";
+import {useDispatch} from "react-redux";
+import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -48,6 +49,7 @@ const customLoader = url => {
 export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
+    const dispatch = useDispatch();
     useEffect(() => {
         async function verifyData() {
             try {
@@ -77,14 +79,19 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 if (result.verified) {
                     console.log('Signature verified.');
                     setValid(true);
-                    setData(JSON.parse(certificateData));
+                    setData(signedJSON);
+                    dispatch(addEventAction({
+                        type: EVENT_TYPES.VALID_VERIFICATION,
+                        extra: signedJSON.credentialSubject
+                    }));
                 } else {
-                    console.log('Signature verification error:', result.error);
+                    dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
                     setValid(false);
                 }
             } catch (e) {
                 console.log('Invalid data', e);
                 setValid(false);
+                dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
             }
 
         }
@@ -119,9 +126,10 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             }
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
             <SmallInfoCards text={"Provide Feedback"} img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
-            <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg} backgroundColor={"#EFF5FD"}/>
+            <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
+                            backgroundColor={"#EFF5FD"}/>
             <CustomButton className="green-btn mb-5" onClick={goBack}>Message to You <img src={MessagePlayImg}
-                                                                                     alt={""}/></CustomButton>
+                                                                                          alt={""}/></CustomButton>
         </div>
     )
 };
@@ -129,7 +137,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
     <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
         <img src={img} alt={""}/>
-        <div onClick={onClick} className="d-flex flex-column align-items-start justify-content-center font-weight-bold pl-3">
+        <div onClick={onClick}
+             className="d-flex flex-column align-items-start justify-content-center font-weight-bold pl-3">
             <span>{text}</span>
             <img src={NextArrowImg} alt={""}/>
         </div>

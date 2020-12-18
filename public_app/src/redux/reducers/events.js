@@ -1,12 +1,13 @@
 import axios from "axios";
 
-export const EVENT_ACTION_TYPES = {
+const EVENT_ACTION_TYPES = {
     ADD_EVENT: "ADD_EVENT",
     REMOVE_EVENT: "REMOVE_EVENT"
 };
 export const EVENT_TYPES = {
-    "DOWNLOAD_CERTIFICATE": "download",
-    "VERIFY_CERTIFICATE": "verify"
+    CERTIFICATE_DOWNLOAD: "certificate-download",
+    VALID_VERIFICATION: "valid-verification",
+    INVALID_VERIFICATION: "invalid-verification",
 };
 const initialState = {
     data: [],
@@ -48,7 +49,7 @@ const removeEventsAction = (eventIds) => {
 };
 
 export const postEvents = ({data}, dispatch) => {
-    if(data.length > 0) {
+    if (data.length > 0) {
         axios
             .post("/divoc/api/v1/events/", data)
             .then((res) => {
