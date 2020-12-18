@@ -128,7 +128,11 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 </table>
             }
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
-            <SmallInfoCards text={"Provide Feedback"} img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
+            <SmallInfoCards text={"Provide Feedback"}
+                            onClick={() => {
+                                history.push("/side-effects")
+                            }}
+                            img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
             <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
                            onClick={() => {
                                 history.push("/learn")

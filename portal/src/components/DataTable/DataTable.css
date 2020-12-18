@@ -1,12 +1,21 @@
-.thead{
-    background: #4E67D1;
-    color: #FFFFFF;
+
+
+.table-container>table>tbody{
+    height: 500px;
+    overflow: scroll;
+    display:block;
+}
+
+.second-word-formatting{
+    padding: 55px;
 }
 
 .table-container{
-    padding: 15px;
-    box-shadow: 0px 6px 20px #C1CFD933;
-    border-radius: 0px 0px 10px 10px;
-    height: 500px;
-    overflow: scroll;
+    padding: 5px;
 }
+
+.table-container>table>thead{
+    background: #4E67D1;
+    color: white;
+}
+

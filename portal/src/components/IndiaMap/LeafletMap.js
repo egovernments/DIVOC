@@ -14,6 +14,7 @@ export default function LeafletMap({
     setDistrictList,
     stateList,
     setStateList,
+    stateWiseCertificateData
 }) {
     const [stateClicked, setStateClicked] = useState(false);
     const [mapDistrictData,setMapDistrictData] = useState([])
@@ -82,7 +83,8 @@ export default function LeafletMap({
 
     const onEachState = (state, layer) => {
         const stateName = state.properties.st_nm;
-        layer.bindPopup(`State : ${stateName} <br/> certificates Issued : 0`);
+        const count = stateWiseCertificateData[stateName] ? stateWiseCertificateData[stateName] : 0;
+        layer.bindPopup(`State : ${stateName} <br/> certificates Issued : ${count}`);
         layer.on({
             mouseover: onMouseIn,
             mouseout: onMouseOut,
