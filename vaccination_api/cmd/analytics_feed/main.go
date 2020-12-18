@@ -215,7 +215,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		certifyMessage.Facility.Name,
 		"IN",
 		certifyMessage.Facility.Address.State,
-		certifyMessage.Facility.Address.Pincode,
+		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
 	); err != nil {
 		log.Fatal(err)
 	}
