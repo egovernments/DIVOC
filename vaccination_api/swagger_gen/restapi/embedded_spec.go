@@ -74,6 +74,13 @@ func init() {
     },
     "/bulkCertify": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
         "description": "certify all the data in uploaded csv",
         "consumes": [
           "multipart/form-data"
@@ -915,6 +922,13 @@ func init() {
     },
     "/bulkCertify": {
       "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
         "description": "certify all the data in uploaded csv",
         "consumes": [
           "multipart/form-data"
