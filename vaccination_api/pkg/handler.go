@@ -226,11 +226,11 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
-	defer params.File.Close()
 	for data.Scan() {
 		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
+	defer params.File.Close()
 	return certification.NewBulkCertifyOK()
 }
 func eventsHandler(params operations.EventsParams, principal *models.JWTClaimBody) middleware.Responder {

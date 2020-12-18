@@ -226,8 +226,8 @@ function CertificateView() {
 
 
     return (
-        <div className="row-cols-lg-1 row-cols-1 nav-pad">
-            <div className="col-10 d-flex justify-content-center">
+        <div className={"row-cols-lg-1 row-cols-1 nav-pad" }>
+            <div className="col-12 d-flex d-flex justify-content-center">
                 <div className={styles["container"]}>
                     <div className={styles["no-print"]}>
                         <p>Vaccination certificate</p>

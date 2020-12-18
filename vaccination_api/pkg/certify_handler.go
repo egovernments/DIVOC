@@ -128,11 +128,11 @@ func createCertificate(data *Scanner, authHeader string) error {
 	}
 	effectiveStart, terr := time.Parse("2006-01-02", data.Text("vaccinationEffectiveStart"))
 	if terr!= nil {
-		log.Info("error while parsing effectiveStart ", data.Text("effectiveStart"))
+		log.Info("error while parsing effectiveStart ", data.Text("vaccinationEffectiveStart"))
 	}
 	effectiveUntil, terr := time.Parse("2006-01-02", data.Text("vaccinationEffectiveEnd"))
 	if terr!= nil {
-		log.Info("error while parsing effectiveUntil ", data.Text("effectiveUntil"))
+		log.Info("error while parsing effectiveUntil ", data.Text("vaccinationEffectiveEnd"))
 	}
 	vaccination := &models.CertificationRequestVaccination{
 		Batch: data.Text("vaccinationBatch"),
@@ -170,6 +170,7 @@ func createCertificate(data *Scanner, authHeader string) error {
 		Vaccinator: vaccinator,
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
+		log.Infof("Certificate request %+v", jsonRequestString)
 		publishCertifyMessage(jsonRequestString)
 	} else {
 		return err
