@@ -20,7 +20,7 @@ export const CertificateAnalysis = ({analytics}) => {
     });
     let dateWiseChartData = Object.keys(certificatesByDate)
         .map((key) => ({
-            x: (key.substr(0, 4) + "-" + MONTH_NAMES[key.substr(4, 2) - 1] + "-" + key.substr(6, 2)),
+            x: (key.substr(6, 2)+ "-" + MONTH_NAMES[key.substr(4, 2) - 1] + "-" + key.substr(0, 4) ),
             y: certificatesByDate[key]
         }));
     let stateWiseChartData = Object.keys(certificatesByState).map((key) => ({
