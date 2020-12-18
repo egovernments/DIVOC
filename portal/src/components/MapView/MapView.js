@@ -61,7 +61,7 @@ function Home() {
                     setSelectedData={setSelectedDistrict}
                     selectedData={selectedDistrict}
                     data={districtList}
-                    title={selectedState.name}
+                    title={`Districts of ${selectedState.name}`}
                     stateWiseCertificateData={stateWiseCertificateData}
                 /> : ''}
 
