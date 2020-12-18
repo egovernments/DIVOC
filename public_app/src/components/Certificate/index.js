@@ -84,8 +84,10 @@ export const Certificate = ({qrCode, vaccination, manufacturer, certificateId, i
           </td>
           <td>{vaccination} {manufacturer}</td>
       </tr>
+      <tr><td>&nbsp;</td></tr>
       <tr>
-        <td><b>Date of Vaccination /  टीकाकरण की तिथि</b></td>
+        <td>
+          <b>Date of Vaccination /  टीकाकरण की तिथि</b></td>
           <td><span>{dateOfVaccination}</span></td>
 
       </tr>
