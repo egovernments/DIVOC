@@ -11,7 +11,7 @@ function Home() {
     const [selectedDistrict, setSelectedDistrict] = useState([
         { name: "", count: 0 },
     ]);
-    const [stateWiseCertificateData,setStateWiseCertificateData] = useState([])
+    const [stateWiseCertificateData,setStateWiseCertificateData] = useState({})
     const certificateAPI = '/divoc/admin/api/v1/analytics';
     const axiosInstance = useAxios('');
 
@@ -31,7 +31,7 @@ function Home() {
     return (
         <div className={styles["container"]}>
             <div className={styles["map-container"]}>
-                <LeafletMap
+              {(Object.keys(stateWiseCertificateData).length>0)?<LeafletMap
                     setSelectedState={setSelectedState}
                     selectedState={selectedState}
                     selectedDistrict={selectedDistrict}
@@ -40,10 +40,11 @@ function Home() {
                     setDistrictList={setDistrictList}
                     stateList={stateList}
                     setStateList={setStateList}
+                    stateWiseCertificateData={stateWiseCertificateData}
 
-                />
+                />:<span>Not loaded</span>}
             </div>
-            <div className={styles["table-container"]}>
+            <div className={styles["table-container"] + " float-right"}>
                 <DataTable
                     setSelectedData={setSelectedState}
                     selectedData={selectedState}
@@ -52,15 +53,15 @@ function Home() {
                     stateWiseCertificateData={stateWiseCertificateData}
                 />
             </div>
-            {selectedState.name !== "" && <div className={styles["table-container"]}>
-                <DataTable
-                    setSelectedData={setSelectedDistrict}
-                    selectedData={selectedDistrict}
-                    data={districtList}
-                    title={selectedState.name}
-                    stateWiseCertificateData={stateWiseCertificateData}
-                />
-            </div>}
+            {/*{selectedState.name !== "" && <div className={styles["table-container"]}>*/}
+            {/*    <DataTable*/}
+            {/*        setSelectedData={setSelectedDistrict}*/}
+            {/*        selectedData={selectedDistrict}*/}
+            {/*        data={districtList}*/}
+            {/*        title={selectedState.name}*/}
+            {/*        stateWiseCertificateData={stateWiseCertificateData}*/}
+            {/*    />*/}
+            {/*</div>}*/}
 
         </div>
     );
