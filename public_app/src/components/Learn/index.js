@@ -1,13 +1,16 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import "./index.css"
-import {Col, Row} from "react-bootstrap";
+import {Col} from "react-bootstrap";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
 import VerifyCertificateImg from "../../assets/img/verify-certificate-small.png";
-import DownloadImg from "../../assets/img/download-certificate-small.png";
 import {SmallInfoCards} from "../CertificateStatus";
 import {useHistory} from "react-router-dom";
 import VideoThumbnailImg from "../../assets/img/video_static_thumbnail.png";
+import PlaceHolderOneThumbnailImg from "../../assets/img/placeholder_image_1.png";
+import PlaceHolderTwoThumbnailImg from "../../assets/img/placeholder_image_2.png";
+import PlaceHolderThreeThumbnailImg from "../../assets/img/placeholder_image_3.png";
+import PlayIconImg from "../../assets/img/message-play.svg";
 
 Learn.propTypes = {};
 
@@ -19,60 +22,62 @@ class VideoDetails {
     }
 }
 
-const srcPath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-
-
 const videoDetails = [
-    new VideoDetails("A", VideoThumbnailImg, "Description one goes here"),
-    new VideoDetails("B", VideoThumbnailImg, "Description two goes here"),
-    new VideoDetails("C", VideoThumbnailImg, "Description three goes here")
+    new VideoDetails("B", PlaceHolderTwoThumbnailImg, "कोरोना वैक्‍सीन आपको कब और कैसे मिलेगी?"),
+    new VideoDetails("C", PlaceHolderThreeThumbnailImg, "कोरोना के टीकाकरण के लिए दिशा-निर्देश जारी.."),
+    new VideoDetails("A", PlaceHolderOneThumbnailImg, "Guidelines for the drive …")
 ]
+
+const videoHeaderDetails = {
+    title: "Learn about the C-19 Program",
+    description: "The C-19 vaccination drive launched in India in 2021 aims to control, reduce and eradicate the prevalence of …",
+    videoTitle: "Mobile technology to be used for COVID-19",
+    videoUrl: "https://divoc.xiv.in/video/learn/vaccination.m4v"
+}
 
 function Learn(props) {
     const history = useHistory();
     return (
-        <div className="message-player">
+        <div className="learn-container">
+            <div className={"video-container"}>
+                <div className="video-section  d-lg-flex p-lg-0">
 
-            <div className="half-section  d-lg-flex p-3 p-lg-0">
+                    <div className="video-info-wrapper p-3">
+                        <h4 className="text-center mt-3 text-lg-left">{videoHeaderDetails.title}</h4>
+                        <span className="text-center  text-lg-left">{videoHeaderDetails.description}</span>
+                    </div>
+                    <h4 className="text-center mt-3 ml-3 text-lg-left">{videoHeaderDetails.videoTitle}</h4>
+                    <div className="video-wrapper">
+                        <iframe width="100%"
+                                height="100%"
+                                src={videoHeaderDetails.videoUrl}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen/>
 
-                <div className="divoc-info-wrapper">
-                    <h3 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h3>
-                    <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+                    </div>
                 </div>
-                <div className="divoc-video-wrapper">
-                    {/*<h3 className="text-center mt-3 text-lg-left">COVID-19 Video</h3>*/}
-                    <iframe width="100%"
-                            height="100%"
-                            src={srcPath}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen/>
-
+                <div className="related-video p-3">
+                    {
+                        videoDetails.map((item, index) => {
+                            return <RelateVideo videoDetails={item}/>
+                        })
+                    }
                 </div>
             </div>
-            {
-                videoDetails.map((item, index) => {
-                    return <RelateVideo videoDetails={item}/>
-                })
-            }
-            <SmallInfoCards
-                text={"Provide Feedback"}
-                img={FeedbackSmallImg}
-                backgroundColor={"#FFFBF0"}/>
-            <SmallInfoCards
-                text={"Download Certificate"}
-                img={DownloadImg}
-                onClick={() => {
-                    history.push("/certificate/")
-                }}
-                backgroundColor={"#EFF5FD"}/>
-            <SmallInfoCards
-                text={"Verify Certificate"}
-                img={VerifyCertificateImg}
-                onClick={() => {
-                    history.push("/verify-certificate/")
-                }}
-                backgroundColor={"#F2FAF6"}/>
+            <div className="bottom-container m-4">
+                <SmallInfoCards
+                    text={"Provide Feedback"}
+                    img={FeedbackSmallImg}
+                    backgroundColor={"#FFFBF0"}/>
+                <SmallInfoCards
+                    text={"Verify Certificate"}
+                    img={VerifyCertificateImg}
+                    onClick={() => {
+                        history.push("/verify-certificate/")
+                    }}
+                    backgroundColor={"#F2FAF6"}/>
+            </div>
         </div>
     );
 }
@@ -83,15 +88,18 @@ RelateVideo.propType = {
 
 function RelateVideo({videoDetails}) {
     return (
-        <Row className="related-video">
-            <Col xs={3} className="related-image">
+        <div className="related-video-item d-flex flex-row mb-4">
+            <Col xs={5} className="related-image">
                 <img src={videoDetails.imageUrl}
                      alt={""}/>
+                <img className="play-icon" src={PlayIconImg}
+                     alt={""}/>
+
             </Col>
-            <Col xs={7} className="related-text">
+            <Col xs={5} className="related-text">
                 <h6>{videoDetails.description}</h6>
             </Col>
-        </Row>
+        </div>
     );
 }
 
