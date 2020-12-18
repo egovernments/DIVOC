@@ -129,6 +129,8 @@ paths:
       summary: Upload certification csv for bulk ingestion
       description: certify all the data in uploaded csv
       operationId: bulkCertify
+      security: 
+        - hasRole: ['facility-admin']
       consumes:
         - multipart/form-data
       parameters:
