@@ -32,23 +32,24 @@ const videoDetails = [
 function Learn(props) {
     const history = useHistory();
     return (
-        <div className="message-player">
+        <div className="learn-container">
+            <div className={"video-container"}>
+                <div className="video-section  d-lg-flex p-lg-0">
 
-            <div className="video-section  d-lg-flex flex-column p-lg-0">
+                    <div className="video-info-wrapper p-3">
+                        <h4 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h4>
+                        <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+                    </div>
+                    <h4 className="text-center mt-3 text-lg-left">COVID-19 Video</h4>
+                    <div className="video-wrapper">
+                        <iframe width="100%"
+                                height="100%"
+                                src={srcPath}
+                                frameBorder="0"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen/>
 
-                <div className="video-info-wrapper p-3">
-                    <h4 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h4>
-                    <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
-                </div>
-                <h4 className="text-center mt-3 text-lg-left">COVID-19 Video</h4>
-                <div className="video-wrapper">
-                    <iframe width="100%"
-                            height="100%"
-                            src={srcPath}
-                            frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen/>
-
+                    </div>
                 </div>
                 <div className="related-video p-3">
                     {
@@ -58,8 +59,7 @@ function Learn(props) {
                     }
                 </div>
             </div>
-
-            <div className="m-4">
+            <div className="bottom-container m-4">
                 <SmallInfoCards
                     text={"Provide Feedback"}
                     img={FeedbackSmallImg}

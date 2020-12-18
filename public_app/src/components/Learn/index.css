@@ -1,5 +1,8 @@
-.message-player {
+.learn-container {
     width: 100%;
+}
+
+.video-container {
 }
 
 .video-section {
@@ -42,4 +45,32 @@
 .related-text {
     text-align: center;
     height: 100%;
+}
+
+.bottom-container {
+}
+
+@media (min-width: 961px) {
+    .video-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .video-wrapper {
+        height: 100%;
+    }
+
+    .video-section {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .bottom-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .small-info-card-wrapper {
+        margin: 8px;
+    }
 }
