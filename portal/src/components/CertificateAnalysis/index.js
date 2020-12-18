@@ -1,5 +1,6 @@
 import React from "react";
 import {Accordion, Card, Row} from "react-bootstrap";
+import { useRouteMatch,useHistory } from 'react-router-dom';
 import {AnalyticsCard} from "../AnalyticsCard";
 import {ColumnChart} from "../ColumnChart";
 import {AreaChart} from "../AreaChart";
@@ -17,15 +18,25 @@ export const CertificateAnalysis = ({analytics}) => {
             return {x: `${key} - ${elements[index + 1]}`, y: certificatesByAge[key]}
         }
     });
-    let dateWiseChartData = Object.keys(certificatesByDate).map((key) => ({x: key, y: certificatesByDate[key]}));
-    dateWiseChartData = [...dateWiseChartData, {x: ""+(parseInt(dateWiseChartData[dateWiseChartData.length - 1].x) + 1), y: 0}];
-    dateWiseChartData = dateWiseChartData.map(({x,y}) => {
-        return {x: (x.substr(0,4) + "-" + MONTH_NAMES[x.substr(4,2)-1] + "-" + x.substr(6,2)), y}
-    });
+    let dateWiseChartData = Object.keys(certificatesByDate)
+        .map((key) => ({
+            x: (key.substr(6, 2)+ "-" + MONTH_NAMES[key.substr(4, 2) - 1] + "-" + key.substr(0, 4) ),
+            y: certificatesByDate[key]
+        }));
     let stateWiseChartData = Object.keys(certificatesByState).map((key) => ({
         x: key || "All",
         y: certificatesByState[key]
     }));
+
+    const { path } = useRouteMatch();
+    const history = useHistory();
+
+    const handleClick = () => {
+        history.push({
+          pathname: `${path}/map`,
+        });
+      };
+
     return (
 
         <Card>
@@ -61,8 +72,7 @@ export const CertificateAnalysis = ({analytics}) => {
                                        }
                         />
                         <AnalyticsCard lgCols={5} title={"By Gender"}
-                                       subtitle={<span
-                                           className="metric-value">{pathOr("", ["numberOfCertificatesIssued", "all"], analytics)}</span>}
+                                       subtitle={<span/>}
                                        body={
                                            <ColumnChart
                                                data={[
@@ -129,17 +139,19 @@ export const CertificateAnalysis = ({analytics}) => {
                         />
                         <AnalyticsCard lgCols={6} title={"By State"}
                                        className="mt-3"
-                                       subtitle={<span/>}
+                                       subtitle={<button onClick={() => handleClick()}>Map View</button>}
                                        body={
                                            <div className="d-flex justify-content-center">
                                                <ColumnChart
                                                    data={stateWiseChartData}
                                                    width={600} height={300}
                                                    color={"rgba(222,157,0,0.5)"}
+                                                   tickLabelAngle={-25}
                                                />
                                            </div>
                                        }
                         />
+                         
                     </Row>
                 </Card.Body>
             </Accordion.Collapse>
