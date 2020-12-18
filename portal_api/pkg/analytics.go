@@ -48,15 +48,15 @@ select gender, count() from certificatesv1 group by gender
 	byDateQuery := `select d, count() from certificatesv1 group by toYYYYMMDD(effectiveStart) as d`
 	byStateQuery := `select facilityState, count() from certificatesv1 group by facilityState`
 	byAgeQuery := `select a, count() from certificatesv1 group by floor(age/10)*10 as a`
-	downloadByDate := `select d, count() from eventsv1 where type='certificate-download' group by toYYYYMMDD(dt) as d`
+	downloadByDate := `select d, count() from eventsv1 where type='download' group by toYYYYMMDD(dt) as d`
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
 	totalFacilities := `select 'total', count(distinct facilityName) from certificatesv1`
-	rateOfCertificateIssuedByFacilities := `select 'avg', toUInt256(avg(certificateIssued)) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+	rateOfCertificateIssuedByFacilities := `select 'avg' as id, toUInt64(avg(certificateIssued)) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
-select 'min', min(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+select 'min' as id, min(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
-select 'max', max(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+select 'max' as id, max(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 `
 
 	analyticsResponse := AnalyticsResponse{
@@ -78,6 +78,7 @@ func getCount(query string) map[string]int64 {
 	result := map[string]int64{}
 	rows, err := connect.Query(query)
 	if err != nil {
+		log.Errorf("Error while preparing the query %+v", err)
 		return result
 	}
 	defer rows.Close()
