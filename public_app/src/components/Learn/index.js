@@ -8,6 +8,7 @@ import DownloadImg from "../../assets/img/download-certificate-small.png";
 import {SmallInfoCards} from "../CertificateStatus";
 import {useHistory} from "react-router-dom";
 import VideoThumbnailImg from "../../assets/img/video_static_thumbnail.png";
+import PlayIconImg from "../../assets/img/message-play.svg";
 
 Learn.propTypes = {};
 
@@ -33,14 +34,14 @@ function Learn(props) {
     return (
         <div className="message-player">
 
-            <div className="half-section  d-lg-flex p-3 p-lg-0">
+            <div className="video-section  d-lg-flex flex-column p-lg-0">
 
-                <div className="divoc-info-wrapper">
-                    <h3 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h3>
-                    <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
+                <div className="video-info-wrapper p-3">
+                    <h4 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h4>
+                    <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
                 </div>
-                <div className="divoc-video-wrapper">
-                    {/*<h3 className="text-center mt-3 text-lg-left">COVID-19 Video</h3>*/}
+                <h4 className="text-center mt-3 text-lg-left">COVID-19 Video</h4>
+                <div className="video-wrapper">
                     <iframe width="100%"
                             height="100%"
                             src={srcPath}
@@ -49,30 +50,35 @@ function Learn(props) {
                             allowFullScreen/>
 
                 </div>
+                <div className="related-video p-3">
+                    {
+                        videoDetails.map((item, index) => {
+                            return <RelateVideo videoDetails={item}/>
+                        })
+                    }
+                </div>
             </div>
-            {
-                videoDetails.map((item, index) => {
-                    return <RelateVideo videoDetails={item}/>
-                })
-            }
-            <SmallInfoCards
-                text={"Provide Feedback"}
-                img={FeedbackSmallImg}
-                backgroundColor={"#FFFBF0"}/>
-            <SmallInfoCards
-                text={"Download Certificate"}
-                img={DownloadImg}
-                onClick={() => {
-                    history.push("/certificate/")
-                }}
-                backgroundColor={"#EFF5FD"}/>
-            <SmallInfoCards
-                text={"Verify Certificate"}
-                img={VerifyCertificateImg}
-                onClick={() => {
-                    history.push("/verify-certificate/")
-                }}
-                backgroundColor={"#F2FAF6"}/>
+
+            <div className="m-4">
+                <SmallInfoCards
+                    text={"Provide Feedback"}
+                    img={FeedbackSmallImg}
+                    backgroundColor={"#FFFBF0"}/>
+                <SmallInfoCards
+                    text={"Download Certificate"}
+                    img={DownloadImg}
+                    onClick={() => {
+                        history.push("/certificate/")
+                    }}
+                    backgroundColor={"#EFF5FD"}/>
+                <SmallInfoCards
+                    text={"Verify Certificate"}
+                    img={VerifyCertificateImg}
+                    onClick={() => {
+                        history.push("/verify-certificate/")
+                    }}
+                    backgroundColor={"#F2FAF6"}/>
+            </div>
         </div>
     );
 }
@@ -83,15 +89,18 @@ RelateVideo.propType = {
 
 function RelateVideo({videoDetails}) {
     return (
-        <Row className="related-video">
-            <Col xs={3} className="related-image">
+        <div className="related-video-item d-flex flex-row mb-4">
+            <Col xs={5} className="related-image">
                 <img src={videoDetails.imageUrl}
                      alt={""}/>
+                <img className="play-icon" src={PlayIconImg}
+                     alt={""}/>
+
             </Col>
-            <Col xs={7} className="related-text">
+            <Col xs={5} className="related-text">
                 <h6>{videoDetails.description}</h6>
             </Col>
-        </Row>
+        </div>
     );
 }
 
