@@ -12,7 +12,6 @@ import {
     YAxis
 } from 'react-vis';
 
-const months = ["Jan", "Feb", "Mar", "Apr"];
 
 export function AreaChart({data, height, width}) {
     const [value, setValue] = useState(null);
@@ -52,7 +51,3 @@ export function AreaChart({data, height, width}) {
         </XYPlot>
     );
 }
-const ITEMS = [
-    {title: 'Vaccine 1', color: "rgb(161,217,251)", strokeStyle: "dashed"},
-    {title: 'Vaccine 2', color: 'rgb(170,183,233)', strokeDasharray: "1 2 3 4 5 6 7"},
-];

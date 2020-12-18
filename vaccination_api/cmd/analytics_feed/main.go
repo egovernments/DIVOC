@@ -79,7 +79,8 @@ func main() {
   facilityName String,
   facilityCountryCode FixedString(2),
   facilityState String,
-  facilityPostalCode String
+  facilityPostalCode String,
+  vaccinatorName String
 ) engine = MergeTree() order by dt
 	`)
 	if err != nil {
@@ -192,8 +193,9 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	facilityName,
 	facilityCountryCode,
 	facilityState,
-	facilityPostalCode ) 
-	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+	facilityPostalCode,
+	vaccinatorName) 
+	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 	)
 
 	if err != nil {
@@ -223,6 +225,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		"IN",
 		certifyMessage.Facility.Address.State,
 		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
+		certifyMessage.Vaccinator.Name,
 	); err != nil {
 		log.Fatal(err)
 	}

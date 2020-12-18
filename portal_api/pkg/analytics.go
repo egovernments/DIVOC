@@ -16,8 +16,10 @@ type AnalyticsResponse struct {
 	DownloadByDate                      map[string]int64 `json:"downloadByDate"`
 	ValidVerificationByDate             map[string]int64 `json:"validVerificationByDate"`
 	InValidVerificationByDate           map[string]int64 `json:"inValidVerificationByDate"`
-	TotalFacilities                     map[string]int64 `json:"totalFacilities"`
+	FacilitiesCount                     map[string]int64 `json:"facilitiesCount"`
 	RateOfCertificateIssuedByFacilities map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
+	VaccinatorsCount                    map[string]int64 `json:"vaccinatorsCount"`
+	AvgRateAcrossFacilities             map[string]int64 `json:"avgRateAcrossFacilities"`
 }
 
 var connect *sql.DB = initConnection()
@@ -51,7 +53,9 @@ select gender, count() from certificatesv1 group by gender
 	downloadByDate := `select d, count() from eventsv1 where type='download' group by toYYYYMMDD(dt) as d`
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
-	totalFacilities := `select 'total', count(distinct facilityName) from certificatesv1`
+	facilitiesCount := `select 'value', count(distinct facilityName) from certificatesv1`
+	vaccinatorsCount := `select 'value', count(distinct vaccinatorName) as count from certificatesv1`
+	avgRateAcrossFacilities := `select 'value', avg(count) from (select facilityName, count() as count from certificatesv1 group by facilityName);`
 	rateOfCertificateIssuedByFacilities := `select 'avg' as id, toUInt64(avg(certificateIssued)) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
 select 'min' as id, min(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
@@ -67,8 +71,10 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 		DownloadByDate:                      getCount(downloadByDate),
 		ValidVerificationByDate:             getCount(validVerificationByDate),
 		InValidVerificationByDate:           getCount(inValidVerificationByDate),
-		TotalFacilities:                     getCount(totalFacilities),
+		FacilitiesCount:                     getCount(facilitiesCount),
 		RateOfCertificateIssuedByFacilities: getCount(rateOfCertificateIssuedByFacilities),
+		VaccinatorsCount:                    getCount(vaccinatorsCount),
+		AvgRateAcrossFacilities:                    getCount(avgRateAcrossFacilities),
 	}
 
 	return analyticsResponse

@@ -20,15 +20,15 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('../../utils/credentials');
-const {vaccinationv1} = require('../../utils/vaccinationv1');
+const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
         "did:india": config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
-        "https://www.w3.org/2018/credentials/v1": credentialsv1
-        , "https://www.who.int/2020/credentials/vaccination/v1": vaccinationv1
+        "https://www.w3.org/2018/credentials/v1": credentialsv1,
+        "https://www.who.int/2020/credentials/vaccination/v1": vaccinationContext
     };
     let context = c[url];
     if (context === undefined) {
