@@ -14,6 +14,7 @@ import Admin from "./components/Admin/Admin";
 import FacilityController from "./components/FacilityController/FacilityController";
 import PrintCertificate from "./components/PrintCertificate/PrintCertificate";
 import {Analytics} from "./components/Analytics/Anlaytics";
+import MapView from "./components/MapView/MapView"
 
 
 export default function App() {
@@ -31,6 +32,7 @@ export default function App() {
                     <Switch>
                         <Route exact path="/" component={Home}/>
                         <Route exact path="/login" component={Login}/>
+                        <Route exact path="/analytics/map" component={MapView}/>
                         <PrivateRoute exact path="/dashboard" component={Dashboard}/>
                         <PrivateRoute exact path="/about" component={About}/>
                         <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>

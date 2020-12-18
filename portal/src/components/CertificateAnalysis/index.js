@@ -1,10 +1,10 @@
 import React from "react";
 import {Accordion, Card, Row} from "react-bootstrap";
+import { useRouteMatch,useHistory } from 'react-router-dom';
 import {AnalyticsCard} from "../AnalyticsCard";
 import {ColumnChart} from "../ColumnChart";
 import {AreaChart} from "../AreaChart";
 import {pathOr} from "ramda";
-
 const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export const CertificateAnalysis = ({analytics}) => {
@@ -27,6 +27,16 @@ export const CertificateAnalysis = ({analytics}) => {
         x: key || "All",
         y: certificatesByState[key]
     }));
+
+    const { path } = useRouteMatch();
+    const history = useHistory();
+
+    const handleClick = () => {
+        history.push({
+          pathname: `${path}/map`,
+        });
+      };
+
     return (
 
         <Card>
@@ -129,7 +139,7 @@ export const CertificateAnalysis = ({analytics}) => {
                         />
                         <AnalyticsCard lgCols={6} title={"By State"}
                                        className="mt-3"
-                                       subtitle={<span/>}
+                                       subtitle={<button onClick={() => handleClick()}>Map View</button>}
                                        body={
                                            <div className="d-flex justify-content-center">
                                                <ColumnChart
@@ -141,6 +151,7 @@ export const CertificateAnalysis = ({analytics}) => {
                                            </div>
                                        }
                         />
+                         
                     </Row>
                 </Card.Body>
             </Accordion.Collapse>
