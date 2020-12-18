@@ -4,7 +4,7 @@ import {
     AreaSeries,
     DiscreteColorLegend,
     Hint,
-    HorizontalGridLines,
+    HorizontalGridLines, LineMarkSeries,
     MarkSeries,
     VerticalGridLines,
     XAxis,
@@ -27,11 +27,15 @@ export function AreaChart({data, height, width}) {
     return (
         <XYPlot onMouseLeave={_forgetValue} width={width} xType="ordinal" height={height} margin={{left: 50, bottom: 50}}>
             <HorizontalGridLines/>
-            <XAxis  hideLine tickLabelAngle={-25}/>
-            <YAxis hideLine />
-            <AreaSeries
-                className="area-series-example"
-                curve="curveNatural"
+            <XAxis tickLabelAngle={-25}/>
+            <YAxis hideLine/>
+            <LineMarkSeries
+                className="linemark-series-example"
+                style={{
+                    strokeWidth: '3px'
+                }}
+                lineStyle={{stroke: 'rgba(161,217,251, 0.5)'}}
+                markStyle={{stroke: 'rgba(161,217,251, 0.5)'}}
                 data={data}
                 color={"rgba(161,217,251, 0.5)"}
             />

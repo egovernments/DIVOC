@@ -5,6 +5,7 @@ import {AnalyticsCard} from "../AnalyticsCard";
 import {ColumnChart} from "../ColumnChart";
 import {AreaChart} from "../AreaChart";
 import {pathOr} from "ramda";
+import Button from "@material-ui/core/Button";
 const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export const CertificateAnalysis = ({analytics}) => {
@@ -139,7 +140,9 @@ export const CertificateAnalysis = ({analytics}) => {
                         />
                         <AnalyticsCard lgCols={6} title={"By State"}
                                        className="mt-3"
-                                       subtitle={<button onClick={() => handleClick()}>Map View</button>}
+                                       subtitle={<Button variant="outlined" color="primary" onClick={() => handleClick()}>
+                                           Map View
+                                       </Button>}
                                        body={
                                            <div className="d-flex justify-content-center">
                                                <ColumnChart

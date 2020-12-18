@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
@@ -233,14 +234,26 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	}
 	return certification.NewBulkCertifyOK()
 }
-func eventsHandler(params operations.EventsParams, principal *models.JWTClaimBody) middleware.Responder {
+func eventsHandler(params operations.EventsParams) middleware.Responder {
+	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
 		publishEvent(Event{
 			Date:          time.Time(e.Date),
-			Source:        principal.PreferredUsername,
+			Source:        preferredUsername,
 			TypeOfMessage: e.Type,
 			ExtraInfo:     e.Extra,
 		})
 	}
 	return operations.NewEventsOK()
+}
+
+func getUserName(params *http.Request) string {
+	authHeader := params.Header.Get("Authorization")
+	preferredUsername := ""
+	if authHeader != "" {
+		bearerToken, _ := auth.GetToken(authHeader)
+		claimBody, _ := auth.GetClaimBody(bearerToken)
+		preferredUsername = claimBody.PreferredUsername
+	}
+	return preferredUsername
 }
