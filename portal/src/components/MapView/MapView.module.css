@@ -27,6 +27,9 @@
 
 .container {
     display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
 }
 
 .map-container{
@@ -102,5 +105,5 @@
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 0px 0px 10px 10px;
     height: 500px;
-    overflow: scroll;
+    overflow: auto;
 }
