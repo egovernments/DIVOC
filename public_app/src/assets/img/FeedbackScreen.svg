@@ -1,0 +1,603 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="375" height="1029" viewBox="0 0 375 1029">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.033" y1="0.5" x2="0.86" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#ffcd54"/>
+      <stop offset="0.542" stop-color="#de9d00"/>
+      <stop offset="1" stop-color="#fc573b"/>
+    </linearGradient>
+    <linearGradient id="linear-gradient-2" x1="0.027" y1="0.615" x2="1" y2="0.598" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#2cd889"/>
+      <stop offset="1" stop-color="#4ca07a"/>
+    </linearGradient>
+    <filter id="Rectangle" x="288.5" y="109.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-2" x="291.5" y="113" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-2"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-2"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-3" x="291.5" y="112.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-3"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-3"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-4" x="288.5" y="385.5" width="26" height="25" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-4"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-4"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-5" x="291.5" y="389" width="20" height="19.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-5"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-5"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-6" x="291.5" y="388.5" width="20" height="19" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-6"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-6"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-7" x="288.5" y="583.5" width="26" height="25" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-7"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-7"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-8" x="291.5" y="587" width="20" height="19.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-8"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-8"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-9" x="291.5" y="586.5" width="20" height="19" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-9"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-9"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-10" x="288.5" y="705.5" width="26" height="25" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-10"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-10"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-11" x="291.5" y="709" width="20" height="19.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-11"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-11"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-12" x="291.5" y="708.5" width="20" height="19" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-12"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-12"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-path">
+      <rect id="Mask" width="259" height="2" rx="1" fill="#8da2ff"/>
+    </clipPath>
+    <clipPath id="clip-path-2">
+      <rect id="Mask-2" data-name="Mask" width="118" height="2" rx="1" fill="#4e67d1"/>
+    </clipPath>
+    <clipPath id="clip-path-3">
+      <rect id="Mask-3" data-name="Mask" width="324" height="2" rx="1" fill="url(#linear-gradient)"/>
+    </clipPath>
+    <filter id="Rectangle-13" x="281.5" y="260.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-13"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-13"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-14" x="284.5" y="264" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-14"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-14"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-15" x="284.5" y="263.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-15"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-15"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-16" x="281.5" y="543.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-16"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-16"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-17" x="284.5" y="547" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-17"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-17"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-18" x="284.5" y="546.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-18"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-18"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-19" x="281.5" y="665.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-19"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-19"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-20" x="284.5" y="669" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-20"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-20"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-21" x="284.5" y="668.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-21"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-21"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-22" x="281.5" y="342.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-22"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-22"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-23" x="284.5" y="346" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-23"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-23"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-24" x="284.5" y="345.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-24"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-24"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-25" x="281.5" y="624.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-25"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-25"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-26" x="284.5" y="628" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-26"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-26"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-27" x="284.5" y="627.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-27"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-27"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-28" x="281.5" y="747.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-28"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-28"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-29" x="284.5" y="751" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-29"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-29"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-30" x="284.5" y="750.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-30"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-30"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-31" x="281.5" y="788.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-31"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-31"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-32" x="284.5" y="792" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-32"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-32"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-33" x="284.5" y="791.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-33"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-33"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-34" x="281.5" y="301.5" width="26" height="26" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="1.5" result="blur-34"/>
+      <feFlood flood-opacity="0.2"/>
+      <feComposite operator="in" in2="blur-34"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-35" x="284.5" y="305" width="20" height="20.5" filterUnits="userSpaceOnUse">
+      <feOffset dy="2" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-35"/>
+      <feFlood flood-opacity="0.122"/>
+      <feComposite operator="in" in2="blur-35"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <filter id="Rectangle-36" x="284.5" y="304.5" width="20" height="20" filterUnits="userSpaceOnUse">
+      <feOffset dy="1" input="SourceAlpha"/>
+      <feGaussianBlur stdDeviation="0.5" result="blur-36"/>
+      <feFlood flood-opacity="0.141"/>
+      <feComposite operator="in" in2="blur-36"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+    <clipPath id="clip-Feedback_4">
+      <rect width="375" height="1029"/>
+    </clipPath>
+  </defs>
+  <g id="Feedback_4" data-name="Feedback – 4" clip-path="url(#clip-Feedback_4)">
+    <rect width="375" height="1029" fill="#fff"/>
+    <text id="Report_Side-effects" data-name="Report Side-effects" transform="translate(26 19)" fill="#040e28" font-size="23" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="21">Report Side-effects</tspan></text>
+    <text id="Select_Symptoms" data-name="Select Symptoms" transform="translate(26 71)" fill="#1d1d1d" font-size="18" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">Select Symptoms</tspan></text>
+    <text id="Yes" transform="translate(328 124)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">Yes</tspan></text>
+    <text id="No" transform="translate(328 277)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-2" data-name="No" transform="translate(328 559)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-3" data-name="No" transform="translate(328 682)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-4" data-name="No" transform="translate(328 359)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-5" data-name="No" transform="translate(328 641)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-6" data-name="No" transform="translate(328 764)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-7" data-name="No" transform="translate(328 805)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="No-8" data-name="No" transform="translate(328 318)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">No</tspan></text>
+    <text id="Yes-2" data-name="Yes" transform="translate(328 403)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">Yes</tspan></text>
+    <text id="Yes-3" data-name="Yes" transform="translate(328 601)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">Yes</tspan></text>
+    <text id="Yes-4" data-name="Yes" transform="translate(328 723)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">Yes</tspan></text>
+    <text id="_95" data-name="95" transform="translate(26 233)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">95</tspan></text>
+    <text id="_0" data-name="0" transform="translate(26 518)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">0</tspan></text>
+    <text id="_108" data-name="108" transform="translate(328 233)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">108</tspan></text>
+    <text id="_10" data-name="10" transform="translate(336 518)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="0" y="0">10</tspan></text>
+    <text id="DATE_OF_ADMIT" data-name="DATE OF ADMIT" transform="translate(26.5 124)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Flu-like symptoms</tspan></text>
+    <text id="DATE_OF_ADMIT-2" data-name="DATE OF ADMIT" transform="translate(26.5 278)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Rapid Heartbeat</tspan></text>
+    <text id="DATE_OF_ADMIT-3" data-name="DATE OF ADMIT" transform="translate(26.5 560)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Chills</tspan></text>
+    <text id="DATE_OF_ADMIT-4" data-name="DATE OF ADMIT" transform="translate(26.5 683)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Arm Soreness</tspan></text>
+    <text id="DATE_OF_ADMIT-5" data-name="DATE OF ADMIT" transform="translate(26.5 360)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Headache</tspan></text>
+    <text id="DATE_OF_ADMIT-6" data-name="DATE OF ADMIT" transform="translate(26.5 642)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Paralysis</tspan></text>
+    <text id="DATE_OF_ADMIT-7" data-name="DATE OF ADMIT" transform="translate(26.5 765)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Migraine</tspan></text>
+    <text id="DATE_OF_ADMIT-8" data-name="DATE OF ADMIT" transform="translate(26.5 806)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Swollen Glands</tspan></text>
+    <text id="DATE_OF_ADMIT-9" data-name="DATE OF ADMIT" transform="translate(26.5 318)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Fatigue</tspan></text>
+    <text id="DATE_OF_ADMIT-10" data-name="DATE OF ADMIT" transform="translate(26.5 600)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Cough</tspan></text>
+    <text id="DATE_OF_ADMIT-11" data-name="DATE OF ADMIT" transform="translate(26.5 723)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Nausea</tspan></text>
+    <text id="DATE_OF_ADMIT-12" data-name="DATE OF ADMIT" transform="translate(26.5 403)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Muscle/Joint Pain</tspan></text>
+    <text id="DATE_OF_ADMIT-13" data-name="DATE OF ADMIT" transform="translate(26.5 177)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Temperature</tspan></text>
+    <text id="DATE_OF_ADMIT-14" data-name="DATE OF ADMIT" transform="translate(26.5 467)" fill="#4e4e4e" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Pain Scale</tspan></text>
+    <text id="DATE_OF_ADMIT-15" data-name="DATE OF ADMIT" transform="translate(43.5 892)" fill="#a8a8a8" font-size="16" font-family="ProximaNova-Regular, Proxima Nova"><tspan x="0" y="0">Type to enter any other conditions</tspan></text>
+    <rect id="Button_BG" data-name="Button BG" width="324" height="59" rx="4" transform="translate(26 858)" fill="none" stroke="#e6e6e6" stroke-width="1"/>
+    <g id="Group_2920" data-name="Group 2920" transform="translate(98.859 950)">
+      <rect id="Rectangle_166" data-name="Rectangle 166" width="223" height="50" rx="4" transform="translate(-22.859 0)" fill="url(#linear-gradient-2)"/>
+      <text id="Confirm_Symptoms" data-name="Confirm Symptoms" transform="translate(89.141 30)" fill="#fff" font-size="16" font-family="Avenir-Heavy, Avenir" font-weight="800"><tspan x="-71.528" y="0">Confirm Symptoms</tspan></text>
+    </g>
+    <g id="Group_3325" data-name="Group 3325" transform="translate(281.5 105)">
+      <g id="Light_Selection_Controls_3._Switch_2_States_" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0 8.295)">
+        <rect id="_Color_l_Track" data-name="🎨 Color l Track" width="28" height="11" rx="5.5" transform="translate(0.5 2.705)" fill="#b2d9c7"/>
+        <g id="Light_Elevation_00dp" data-name="Light 🌕/Elevation/00dp" transform="translate(11.614)">
+          <g id="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+            <g transform="matrix(1, 0, 0, 1, -293.11, -113.3)" filter="url(#Rectangle)">
+              <rect id="Rectangle-37" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(293 113)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -113.3)" filter="url(#Rectangle-2)">
+              <rect id="Rectangle-38" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(293 113)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -113.3)" filter="url(#Rectangle-3)">
+              <rect id="Rectangle-39" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(293 113)" fill="#fff"/>
+            </g>
+          </g>
+        </g>
+        <circle id="_Color_l_Thumb" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(11.5 -0.295)" fill="#88c6a9"/>
+      </g>
+      <path id="_States" data-name="💡States" d="M16.591,0A16.591,16.591,0,1,1,0,16.591,16.591,16.591,0,0,1,16.591,0Z" transform="translate(3.318)" fill="rgba(136,198,169,0.12)"/>
+    </g>
+    <g id="Group_3326" data-name="Group 3326" transform="translate(281.5 380.443)">
+      <g id="Light_Selection_Controls_3._Switch_2_States_2" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0 8.295)">
+        <rect id="_Color_l_Track-2" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.5 2.261)" fill="#b2d9c7"/>
+        <g id="Light_Elevation_00dp-2" data-name="Light 🌕/Elevation/00dp" transform="translate(11.614)">
+          <g id="Shadow-2" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+            <g transform="matrix(1, 0, 0, 1, -293.11, -388.74)" filter="url(#Rectangle-4)">
+              <rect id="Rectangle-40" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 389)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -388.74)" filter="url(#Rectangle-5)">
+              <rect id="Rectangle-41" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 389)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -388.74)" filter="url(#Rectangle-6)">
+              <rect id="Rectangle-42" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 389)" fill="#fff"/>
+            </g>
+          </g>
+        </g>
+        <ellipse id="_Color_l_Thumb-2" data-name="🎨 Color l Thumb" cx="8.5" cy="8" rx="8.5" ry="8" transform="translate(11.5 0.261)" fill="#88c6a9"/>
+      </g>
+      <path id="_States-2" data-name="💡States" d="M16.591,0A16.591,16.591,0,1,1,0,16.591,16.591,16.591,0,0,1,16.591,0Z" transform="translate(3.318)" fill="rgba(136,198,169,0.12)"/>
+    </g>
+    <g id="Group_3362" data-name="Group 3362" transform="translate(281.5 578.443)">
+      <g id="Light_Selection_Controls_3._Switch_2_States_3" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0 8.295)">
+        <rect id="_Color_l_Track-3" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.5 2.261)" fill="#b2d9c7"/>
+        <g id="Light_Elevation_00dp-3" data-name="Light 🌕/Elevation/00dp" transform="translate(11.614)">
+          <g id="Shadow-3" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+            <g transform="matrix(1, 0, 0, 1, -293.11, -586.74)" filter="url(#Rectangle-7)">
+              <rect id="Rectangle-43" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 587)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -586.74)" filter="url(#Rectangle-8)">
+              <rect id="Rectangle-44" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 587)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -586.74)" filter="url(#Rectangle-9)">
+              <rect id="Rectangle-45" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 587)" fill="#fff"/>
+            </g>
+          </g>
+        </g>
+        <ellipse id="_Color_l_Thumb-3" data-name="🎨 Color l Thumb" cx="8.5" cy="8" rx="8.5" ry="8" transform="translate(11.5 0.261)" fill="#88c6a9"/>
+      </g>
+      <path id="_States-3" data-name="💡States" d="M16.591,0A16.591,16.591,0,1,1,0,16.591,16.591,16.591,0,0,1,16.591,0Z" transform="translate(3.318)" fill="rgba(136,198,169,0.12)"/>
+    </g>
+    <g id="Group_3363" data-name="Group 3363" transform="translate(281.5 700.443)">
+      <g id="Light_Selection_Controls_3._Switch_2_States_4" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0 8.295)">
+        <rect id="_Color_l_Track-4" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.5 2.261)" fill="#b2d9c7"/>
+        <g id="Light_Elevation_00dp-4" data-name="Light 🌕/Elevation/00dp" transform="translate(11.614)">
+          <g id="Shadow-4" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+            <g transform="matrix(1, 0, 0, 1, -293.11, -708.74)" filter="url(#Rectangle-10)">
+              <rect id="Rectangle-46" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 709)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -708.74)" filter="url(#Rectangle-11)">
+              <rect id="Rectangle-47" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 709)" fill="#fff"/>
+            </g>
+            <g transform="matrix(1, 0, 0, 1, -293.11, -708.74)" filter="url(#Rectangle-12)">
+              <rect id="Rectangle-48" data-name="Rectangle" width="17" height="16" rx="8" transform="translate(293 709)" fill="#fff"/>
+            </g>
+          </g>
+        </g>
+        <ellipse id="_Color_l_Thumb-4" data-name="🎨 Color l Thumb" cx="8.5" cy="8" rx="8.5" ry="8" transform="translate(11.5 0.261)" fill="#88c6a9"/>
+      </g>
+      <path id="_States-4" data-name="💡States" d="M16.591,0A16.591,16.591,0,1,1,0,16.591,16.591,16.591,0,0,1,16.591,0Z" transform="translate(3.318)" fill="rgba(136,198,169,0.12)"/>
+    </g>
+    <g id="Rectangle_1512" data-name="Rectangle 1512" transform="translate(282 157)" fill="#fff" stroke="#707070" stroke-width="1">
+      <rect width="68" height="30" rx="15" stroke="none"/>
+      <rect x="0.5" y="0.5" width="67" height="29" rx="14.5" fill="none"/>
+    </g>
+    <g id="Rectangle_1513" data-name="Rectangle 1513" transform="translate(282 447)" fill="#fff" stroke="#707070" stroke-width="1">
+      <rect width="68" height="30" rx="15" stroke="none"/>
+      <rect x="0.5" y="0.5" width="67" height="29" rx="14.5" fill="none"/>
+    </g>
+    <g id="Light_Slider_1._Continuous_A._knob_Focused" data-name="Light 🌕/ Slider/1. Continuous/A. knob/ Focused" transform="translate(117 192)">
+      <g id="Light_Slider_ΩElements_1._Track" data-name="Light 🌕/ Slider/ΩElements/1. Track" transform="translate(-26 19)">
+        <g id="Mask-4" data-name="Mask" clip-path="url(#clip-path)">
+          <rect id="Track" width="360" height="2" rx="1" fill="#8da2ff"/>
+        </g>
+      </g>
+      <g id="Light_Slider_ΩElements_1._Track_Highlight" data-name="Light 🌕/ Slider/ΩElements/1. Track/ Highlight" transform="translate(-91 19)">
+        <g id="Mask-5" data-name="Mask" clip-path="url(#clip-path-2)">
+          <rect id="Track-2" data-name="Track" width="360" height="2" rx="1" transform="translate(-153.085)" fill="#4e67d1"/>
+        </g>
+      </g>
+      <g id="Light_Slider_ΩElements_2._Knobs" data-name="Light 🌕/ Slider/ΩElements/2. Knobs" transform="translate(7)">
+        <circle id="Nobs" cx="6" cy="6" r="6" transform="translate(14 14)" fill="#4e67d1"/>
+        <path id="_States-5" data-name="💡States" d="M15.529,0A15.529,15.529,0,1,1,0,15.529,15.529,15.529,0,0,1,15.529,0Z" transform="translate(4.471 4.471)" fill="rgba(92,158,248,0.12)"/>
+      </g>
+    </g>
+    <g id="Light_Slider_1._Continuous_A._knob_Focused-2" data-name="Light 🌕/ Slider/1. Continuous/A. knob/ Focused" transform="translate(117 478)">
+      <g id="Light_Slider_ΩElements_1._Track-2" data-name="Light 🌕/ Slider/ΩElements/1. Track" transform="translate(-91 19)">
+        <g id="Mask-6" data-name="Mask" clip-path="url(#clip-path-3)">
+          <rect id="Track-3" data-name="Track" width="360" height="2" rx="1" fill="url(#linear-gradient)"/>
+        </g>
+      </g>
+    </g>
+    <text id="_99.7_C" data-name="99.7 C" transform="translate(316 177)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="-19.761" y="0">99.7 C</tspan></text>
+    <text id="_3" data-name="3" transform="translate(316 467)" fill="#1d1d1d" font-size="14" font-family="ProximaNova-Semibold, Proxima Nova" font-weight="600"><tspan x="-4.018" y="0">3</tspan></text>
+    <g id="Group_3315" data-name="Group 3315" transform="translate(285.648 264.216)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.216)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_5" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-5" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-5" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-5" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -264)" filter="url(#Rectangle-13)">
+                <rect id="Rectangle-49" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 264)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -264)" filter="url(#Rectangle-14)">
+                <rect id="Rectangle-50" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 264)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -264)" filter="url(#Rectangle-15)">
+                <rect id="Rectangle-51" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 264)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-5" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3318" data-name="Group 3318" transform="translate(285.648 547.148)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_2" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.148)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_6" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-6" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-6" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-6" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -547)" filter="url(#Rectangle-16)">
+                <rect id="Rectangle-52" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 547)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -547)" filter="url(#Rectangle-17)">
+                <rect id="Rectangle-53" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 547)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -547)" filter="url(#Rectangle-18)">
+                <rect id="Rectangle-54" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 547)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-6" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3321" data-name="Group 3321" transform="translate(285.648 669.182)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_3" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.182)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_7" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-7" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-7" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-7" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -669)" filter="url(#Rectangle-19)">
+                <rect id="Rectangle-55" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 669)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -669)" filter="url(#Rectangle-20)">
+                <rect id="Rectangle-56" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 669)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -669)" filter="url(#Rectangle-21)">
+                <rect id="Rectangle-57" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 669)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-7" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3317" data-name="Group 3317" transform="translate(285.648 346.239)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_4" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.239)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_8" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-8" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-8" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-8" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -346)" filter="url(#Rectangle-22)">
+                <rect id="Rectangle-58" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 346)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -346)" filter="url(#Rectangle-23)">
+                <rect id="Rectangle-59" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 346)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -346)" filter="url(#Rectangle-24)">
+                <rect id="Rectangle-60" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 346)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-8" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3319" data-name="Group 3319" transform="translate(285.648 628.17)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_5" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.17)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_9" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-9" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-9" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-9" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -628)" filter="url(#Rectangle-25)">
+                <rect id="Rectangle-61" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 628)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -628)" filter="url(#Rectangle-26)">
+                <rect id="Rectangle-62" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 628)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -628)" filter="url(#Rectangle-27)">
+                <rect id="Rectangle-63" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 628)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-9" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3322" data-name="Group 3322" transform="translate(285.648 751.205)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_6" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.205)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_10" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-10" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-10" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-10" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -751)" filter="url(#Rectangle-28)">
+                <rect id="Rectangle-64" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 751)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -751)" filter="url(#Rectangle-29)">
+                <rect id="Rectangle-65" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 751)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -751)" filter="url(#Rectangle-30)">
+                <rect id="Rectangle-66" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 751)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-10" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3324" data-name="Group 3324" transform="translate(285.648 792.216)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_7" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.216)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_11" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-11" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-11" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-11" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -792)" filter="url(#Rectangle-31)">
+                <rect id="Rectangle-67" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 792)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -792)" filter="url(#Rectangle-32)">
+                <rect id="Rectangle-68" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 792)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -792)" filter="url(#Rectangle-33)">
+                <rect id="Rectangle-69" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 792)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-11" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Group_3316" data-name="Group 3316" transform="translate(285.648 305.227)">
+      <g id="Light_Selection_Controls_3._Switch_B._Off_5_States_8" data-name="Light 🌕/ Selection Controls/3. Switch/B. Off/(5 States)" transform="translate(0.352 -0.227)">
+        <g id="Light_Selection_Controls_3._Switch_2_States_12" data-name="Light 🌕/ Selection Controls/3. Switch/ (2 States)" transform="translate(0)">
+          <rect id="_Color_l_Track-12" data-name="🎨 Color l Track" width="28" height="12" rx="6" transform="translate(0.001 2)" fill="rgba(0,0,0,0.38)"/>
+          <g id="Light_Elevation_00dp-12" data-name="Light 🌕/Elevation/00dp" transform="translate(0.001)">
+            <g id="Shadow-12" data-name="Shadow" style="mix-blend-mode: multiply;isolation: isolate">
+              <g transform="matrix(1, 0, 0, 1, -286, -305)" filter="url(#Rectangle-34)">
+                <rect id="Rectangle-70" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 305)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -305)" filter="url(#Rectangle-35)">
+                <rect id="Rectangle-71" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 305)" fill="#fff"/>
+              </g>
+              <g transform="matrix(1, 0, 0, 1, -286, -305)" filter="url(#Rectangle-36)">
+                <rect id="Rectangle-72" data-name="Rectangle" width="17" height="17" rx="8.5" transform="translate(286 305)" fill="#fff"/>
+              </g>
+            </g>
+          </g>
+          <circle id="_Color_l_Thumb-12" data-name="🎨 Color l Thumb" cx="8.5" cy="8.5" r="8.5" transform="translate(0.001)" fill="#fff"/>
+        </g>
+      </g>
+    </g>
+    <g id="Light_Slider_ΩElements_2._Knobs-2" data-name="Light 🌕/ Slider/ΩElements/2. Knobs" transform="translate(168 478)">
+      <circle id="Nobs-2" data-name="Nobs" cx="6" cy="6" r="6" transform="translate(-28 14)" fill="#de9d00"/>
+      <path id="_States-6" data-name="💡States" d="M15.529,0A15.529,15.529,0,1,1,0,15.529,15.529,15.529,0,0,1,15.529,0Z" transform="translate(-37.529 4.471)" fill="rgba(222,157,0,0.12)"/>
+    </g>
+  </g>
+</svg>

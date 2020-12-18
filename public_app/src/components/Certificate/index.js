@@ -84,8 +84,10 @@ export const Certificate = ({qrCode, vaccination, manufacturer, certificateId, i
           </td>
           <td>{vaccination} {manufacturer}</td>
       </tr>
+      <tr><td>&nbsp;</td></tr>
       <tr>
-        <td><b>Date of Vaccination /  टीकाकरण की तिथि</b></td>
+        <td>
+          <b>Date of Vaccination /  टीकाकरण की तिथि</b></td>
           <td><span>{dateOfVaccination}</span></td>
 
       </tr>
@@ -102,7 +104,11 @@ export const Certificate = ({qrCode, vaccination, manufacturer, certificateId, i
         <td colSpan={2}>
             <div className={"row"}>
             <span className={"col-1"}><img src={programLogo} className={"program-logo"}></img> </span>
-            <span className={"col-5 text-center"}><b>करोना हारेगा इंडिया जीतेगा</b></span>
+            <span className={"col-5"}>
+              <b>Carona Harega India Jeetega</b>
+              <br/>
+              <b>करोना हारेगा इंडिया जीतेगा</b>
+            </span>
         <div className={"col-6"}>
             <span className={"small"}>For more information / अधिक जानकारी के लिए</span><br/>
             <img src={globe}></img> <b> {"https://divoc.xiv.in/learn"}</b>
