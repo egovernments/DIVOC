@@ -1,12 +1,15 @@
-.thead{
-    background: #4E67D1;
-    color: #FFFFFF;
-}
 
-.table-container{
+
+.table-container>table>tbody{
     padding: 15px;
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 0px 0px 10px 10px;
     height: 500px;
     overflow: scroll;
+    display:block;
 }
+
+.header-fixed>thead{
+    color: black;
+}
+
