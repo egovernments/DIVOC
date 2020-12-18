@@ -201,6 +201,13 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	}
 	//todo collect n messages and batch write to analytics db.
 	age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
+	if age == 0 {
+		if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob); err == nil {
+			if (dobTime.Year()>1900) {
+				age = time.Now().Year() - dobTime.Year()
+			}
+		}
+	}
 	if _, err := stmt.Exec(
 		"",
 		age,
