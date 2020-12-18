@@ -2,7 +2,7 @@ import React from 'react';
 import './DataTable.css';
 
 
-function DataTable({title,selectedData,setSelectedData,data}) {
+function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificateData}) {
 
     const handleRowClick = (data) => {
         setSelectedData({name : data,count: 0});
@@ -20,7 +20,7 @@ function DataTable({title,selectedData,setSelectedData,data}) {
                     onClick={() => handleRowClick(state)}
                 >
                     <td>{state}</td>
-                    <td>0</td>
+                    <td>{stateWiseCertificateData[state]? stateWiseCertificateData[state] : 0}</td>
                 </tr>
             );
         });

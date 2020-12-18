@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./MapView.module.css";
 import LeafletMap from "../IndiaMap/LeafletMap";
 import DataTable from "../DataTable/DataTable";
+import {useAxios} from "../../utils/useAxios";
 
 function Home() {
     const [districtList, setDistrictList] = useState([]);
@@ -12,6 +13,21 @@ function Home() {
     const [selectedDistrict, setSelectedDistrict] = useState([
         { name: "", count: 0 },
     ]);
+    const [stateWiseCertificateData,setStateWiseCertificateData] = useState([])
+    const certificateAPI = '/divoc/admin/api/v1/analytics';
+    const axiosInstance = useAxios('');
+
+    useEffect(() => {
+        fetchStatewiseCertificateData()
+    }, []);
+
+    function fetchStatewiseCertificateData() {
+        axiosInstance.current.get(certificateAPI)
+            .then(res => {
+                setStateWiseCertificateData(res.data.numberOfCertificatesIssuedByState)
+                console.log("data",res.data.numberOfCertificatesIssuedByState)
+            });
+    }
 
 
     return (
@@ -35,6 +51,7 @@ function Home() {
                     selectedData={selectedState}
                     data={stateList}
                     title="ALL OF INDIA"
+                    stateWiseCertificateData={stateWiseCertificateData}
                 />
             </div>
             <div className={styles["table-container"]}>
@@ -43,6 +60,7 @@ function Home() {
                     selectedData={selectedDistrict}
                     data={districtList}
                     title={selectedState.name}
+                    stateWiseCertificateData={stateWiseCertificateData}
                 />
             </div>
 
