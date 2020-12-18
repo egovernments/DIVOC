@@ -291,6 +291,7 @@ paths:
     post:
       summary: Send events for monitoring / tracking purpose.
       operationId: events
+      security: []
       parameters:
         - in: body
           name: body

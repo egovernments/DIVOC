@@ -11,36 +11,39 @@ import {Home} from "./components/Home";
 import {SideEffects} from "./components/SideEffects";
 import Dashboard from "./components/Dashboard";
 import {VerifyCertificate} from "./components/VerifyCertificate";
+import {Provider} from "react-redux";
+import {store} from "./redux/store";
 
 function App() {
-  const {initialized, keycloak} = useKeycloak();
+    const {initialized, keycloak} = useKeycloak();
 
-  if (!initialized) {
-      return <div>Loading...</div>
-  }
-
-  return (
-    <div className={""}>
-      <Router>
-        <Header/>
-        <div style={{paddingBottom: "6rem", paddingTop: "3rem"}}>
-          <Switch>
-            <Route exact path={"/"} component={Home}/>
-            <Route exact path={config.urlPath + "/login"} component={Login}/>
-            <Route exact path={"/side-effects"} component={SideEffects}/>
-            <Route exact path={"/feedback"} component={SideEffects}/>
-            <Route exact path={"/feedback/:id"} component={SideEffects}/>
-            <Route exact path={"/dashboard"} component={Dashboard}/>
-            <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
-            <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
-              role={"recipient"} clientId={"certificate-login"}
-            />
-          </Switch>
-        </div>
-        <Footer />
-      </Router>
-    </div>
-  );
+    if (!initialized) {
+        return <div>Loading...</div>
+    }
+    return (
+        <Provider store={store}>
+            <div className={""}>
+                <Router>
+                    <Header/>
+                    <div style={{paddingBottom: "6rem", paddingTop: "3rem"}}>
+                        <Switch>
+                            <Route exact path={"/"} component={Home}/>
+                            <Route exact path={config.urlPath + "/login"} component={Login}/>
+                            <Route exact path={"/side-effects"} component={SideEffects}/>
+                            <Route exact path={"/feedback"} component={SideEffects}/>
+                            <Route exact path={"/feedback/:id"} component={SideEffects}/>
+                            <Route exact path={"/dashboard"} component={Dashboard}/>
+                            <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
+                            <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
+                                          role={"recipient"} clientId={"certificate-login"}
+                            />
+                        </Switch>
+                    </div>
+                    <Footer/>
+                </Router>
+            </div>
+        </Provider>
+    );
 }
 
 export default App;
