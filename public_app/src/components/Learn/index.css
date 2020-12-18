@@ -1,0 +1,15 @@
+.message-player {
+    width: 100%;
+}
+
+.related-video {
+    width: 100%;
+    margin: 4%;
+    padding: 4%;
+    background: #F8F8F8;
+}
+
+.related-video img {
+    width: 100%;
+    background: #4E67D1;
+}

@@ -6,6 +6,7 @@ import CertificateImg from '../../assets/img/download-certificate-home.svg'
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import SideEffectsBannerImg from '../../assets/img/side-effects-banner-img.png'
 import DashboardBannerImg from '../../assets/img/dashboard-banner.png'
+import LearnMoreBannerImg from '../../assets/img/leanr_more.png'
 import Covid19PgmImg from '../../assets/img/covid19program.svg'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import {LatestUpdateCard} from "../LatestUpdateCard";
@@ -43,7 +44,8 @@ export const Home = () => {
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
                         <h3>Welcome to the</h3>
-                        <span className="title">Digital Infrastructure for Vaccination & Open Certification Portal</span>
+                        <span
+                            className="title">Digital Infrastructure for Vaccination & Open Certification Portal</span>
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={"Download your Vaccination Certificate"}
@@ -75,6 +77,17 @@ export const Home = () => {
                                       }}
                                       buttonClassName={"yellow-btn"}
                                       backgroundColor={"#FFFBF0"}
+                            />
+
+                            <HomeCard img={<img src={LearnMoreBannerImg} alt={""} width={"60%"}/>}
+                                      title={"Learn"}
+                                      subtitle={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
+                                      buttonText={"Learn"}
+                                      buttonOnClick={() => {
+                                          history.push("/learn")
+                                      }}
+                                      buttonClassName={"purple-btn"}
+                                      backgroundColor={"#F8FAFF"}
                             />
                         </Row>
                     </div>
