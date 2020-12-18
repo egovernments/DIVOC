@@ -12,7 +12,6 @@ export const VerifyCertificate = () => {
     const [showScanner, setShowScanner] = useState(false);
     const handleScan = data => {
         if (data) {
-            console.log(data)
             setResult(data)
         }
     };
