@@ -170,7 +170,7 @@ func createCertificate(data *Scanner, authHeader string) error {
 		Vaccinator: vaccinator,
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
-		log.Infof("Certificate request %+v", jsonRequestString)
+		log.Infof("Certificate request %+v", string(jsonRequestString))
 		publishCertifyMessage(jsonRequestString)
 	} else {
 		return err
