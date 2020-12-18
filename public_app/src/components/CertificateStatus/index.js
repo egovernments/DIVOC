@@ -2,16 +2,17 @@ import React, {useEffect, useState} from "react";
 import "./index.css";
 import CertificateValidImg from "../../assets/img/certificate-valid.svg";
 import CertificateInValidImg from "../../assets/img/certificate-invalid.svg";
-import MessagePlayImg from "../../assets/img/message-play.svg";
 import NextArrowImg from "../../assets/img/next-arrow.svg";
-import LearnProcessImg from "../../assets/img/learn_vaccination_process.png";
+import LearnProcessImg from "../../assets/img/leanr_more_small.png";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
+import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
 import config from "../../config";
 import {pathOr} from "ramda";
 import {CustomButton} from "../CustomButton";
 import {CertificateDetailsPaths} from "../../constants";
 import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
+import {useHistory} from "react-router-dom";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -49,6 +50,8 @@ const customLoader = url => {
 export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
+    const history = useHistory();
+
     const dispatch = useDispatch();
     useEffect(() => {
         async function verifyData() {
@@ -127,14 +130,22 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
             <SmallInfoCards text={"Provide Feedback"} img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
             <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
+                           onClick={() => {
+                                history.push("/learn")
+                            }}
                             backgroundColor={"#EFF5FD"}/>
-            <CustomButton className="green-btn mb-5" onClick={goBack}>Message to You <img src={MessagePlayImg}
-                                                                                          alt={""}/></CustomButton>
+            <SmallInfoCards
+                text={"Download Certificate"}
+                img={DownloadSmallImg}
+                onClick={() => {
+                                                                                          history.push("/certificate/")
+                }}
+                backgroundColor={"#FFFBF0"}/>
         </div>
     )
 };
 
-const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
+export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
     <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
         <img src={img} alt={""}/>
         <div onClick={onClick}

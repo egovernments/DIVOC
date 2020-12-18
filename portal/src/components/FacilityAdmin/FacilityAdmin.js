@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {TabPanels} from "../TabPanel/TabPanel";
 import {RoleSetup} from "../RoleSetup";
 import VaccinatorList from "../facility/VaccinatorList/VaccinatorList";
+import Certificates from "../CertificateRegistry/CertificateRegistry"
 import {useKeycloak} from "@react-keycloak/web";
 import {useAxios} from "../../utils/useAxios";
 
@@ -28,6 +29,7 @@ export default function FacilityAdmin() {
             {title: "Role Setup", component: <RoleSetup/>},
             {title: "Vaccinator Details", component: <VaccinatorList/>},
             {title: "Program Overview", component: <span>Program Overview</span>},
+            {title: "Bulk Certify", component: <Certificates />},
 
         ]}/>
     );

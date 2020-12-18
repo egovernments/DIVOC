@@ -13,6 +13,7 @@ import Dashboard from "./components/Dashboard";
 import {VerifyCertificate} from "./components/VerifyCertificate";
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
+import Learn from "./components/Learn";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -34,7 +35,8 @@ function App() {
                             <Route exact path={"/feedback/:id"} component={SideEffects}/>
                             <Route exact path={"/dashboard"} component={Dashboard}/>
                             <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
-                            <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
+                            <Route exact path={"/learn"} component={Learn}/>
+                        <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
                                           role={"recipient"} clientId={"certificate-login"}
                             />
                         </Switch>

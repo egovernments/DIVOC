@@ -22,7 +22,7 @@ type CertifyMessage struct {
 			AddressLine1 string `json:"addressLine1"`
 			District     string `json:"district"`
 			State        string `json:"state"`
-			Pincode      string `json:"pincode"`
+			Pincode      int32 `json:"pincode"`
 		} `json:"address"`
 		Name string `json:"name"`
 	} `json:"facility"`
@@ -215,7 +215,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		certifyMessage.Facility.Name,
 		"IN",
 		certifyMessage.Facility.Address.State,
-		certifyMessage.Facility.Address.Pincode,
+		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
 	); err != nil {
 		log.Fatal(err)
 	}
