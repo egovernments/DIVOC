@@ -55,7 +55,7 @@ select gender, count() from certificatesv1 group by gender
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
 	facilitiesCount := `select 'value', count(distinct facilityName) from certificatesv1`
 	vaccinatorsCount := `select 'value', count(distinct vaccinatorName) as count from certificatesv1`
-	avgRateAcrossFacilities := `select 'value', avg(count) from (select facilityName, count() as count from certificatesv1 group by facilityName);`
+	avgRateAcrossFacilities := `select 'value', toUInt64(avg(count)) from (select facilityName, count() as count from certificatesv1 group by facilityName)`
 	rateOfCertificateIssuedByFacilities := `select 'avg' as id, toUInt64(avg(certificateIssued)) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
 select 'min' as id, min(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
