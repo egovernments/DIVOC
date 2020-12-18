@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // GetConfigurationHandlerFunc turns a function with the right signature into a get configuration handler
-type GetConfigurationHandlerFunc func(GetConfigurationParams, interface{}) middleware.Responder
+type GetConfigurationHandlerFunc func(GetConfigurationParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetConfigurationHandlerFunc) Handle(params GetConfigurationParams, principal interface{}) middleware.Responder {
+func (fn GetConfigurationHandlerFunc) Handle(params GetConfigurationParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetConfigurationHandler interface for that can handle valid get configuration params
 type GetConfigurationHandler interface {
-	Handle(GetConfigurationParams, interface{}) middleware.Responder
+	Handle(GetConfigurationParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetConfiguration creates a new http.Handler for the get configuration operation
@@ -54,9 +56,9 @@ func (o *GetConfiguration) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

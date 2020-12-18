@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // CertifyHandlerFunc turns a function with the right signature into a certify handler
-type CertifyHandlerFunc func(CertifyParams, interface{}) middleware.Responder
+type CertifyHandlerFunc func(CertifyParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn CertifyHandlerFunc) Handle(params CertifyParams, principal interface{}) middleware.Responder {
+func (fn CertifyHandlerFunc) Handle(params CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // CertifyHandler interface for that can handle valid certify params
 type CertifyHandler interface {
-	Handle(CertifyParams, interface{}) middleware.Responder
+	Handle(CertifyParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewCertify creates a new http.Handler for the certify operation
@@ -56,9 +58,9 @@ func (o *Certify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

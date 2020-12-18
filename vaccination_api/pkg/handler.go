@@ -18,6 +18,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -43,6 +44,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.SideEffectsCreateSideEffectsHandler = side_effects.CreateSideEffectsHandlerFunc(createSideEffects)
 	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
+	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
 }
 
 type GenericResponse struct {
@@ -77,7 +79,7 @@ func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
 }
 
-func vaccinationGetLoggedInUserInfoHandler(params vaccination.GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
+func vaccinationGetLoggedInUserInfoHandler(params vaccination.GetLoggedInUserInfoParams, principal *models.JWTClaimBody) middleware.Responder {
 	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
@@ -87,7 +89,7 @@ func vaccinationGetLoggedInUserInfoHandler(params vaccination.GetLoggedInUserInf
 	}
 }
 
-func getCertificate(params operations.GetCertificateParams) middleware.Responder {
+func getCertificate(params operations.GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
 		"@type": map[string]interface{}{
@@ -118,9 +120,11 @@ func getCertificate(params operations.GetCertificateParams) middleware.Responder
 				}
 				result = append(result, v)
 			}
+			go publishSimpleEvent(principal.PreferredUsername, "download")
 			return NewGenericJSONResponse(result)
 		}
 	}
+
 	return NewGenericServerError()
 }
 
@@ -128,7 +132,7 @@ func pingResponder(params operations.GetPingParams) middleware.Responder {
 	return operations.NewGetPingOK()
 }
 
-func getLoggedInUserInfo(params vaccination.GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
+func getLoggedInUserInfo(params vaccination.GetLoggedInUserInfoParams, principal *models.JWTClaimBody) middleware.Responder {
 	payload := &models.UserInfo{
 		FirstName: "Ram",
 		LastName:  "Lal",
@@ -149,7 +153,7 @@ func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
 	return login.NewPostAuthorizeUnauthorized()
 }
 
-func getVaccinators(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
+func getVaccinators(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
@@ -159,7 +163,7 @@ func getVaccinators(params configuration.GetVaccinatorsParams, principal interfa
 	}
 }
 
-func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
+func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
@@ -169,7 +173,7 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 	}
 }
 
-func getConfigurationResponder(params configuration.GetConfigurationParams, principal interface{}) middleware.Responder {
+func getConfigurationResponder(params configuration.GetConfigurationParams, principal *models.JWTClaimBody) middleware.Responder {
 	payload := &models.ApplicationConfiguration{
 		Navigation: nil,
 		Styles:     map[string]string{"a": "a"},
@@ -178,14 +182,14 @@ func getConfigurationResponder(params configuration.GetConfigurationParams, prin
 	return configuration.NewGetConfigurationOK().WithPayload(payload)
 }
 
-func postIdentityHandler(params identity.PostIdentityVerifyParams, pricipal interface{}) middleware.Responder {
+func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token) != "" {
 		return identity.NewPostIdentityVerifyOK()
 	}
 	return identity.NewPostIdentityVerifyPartialContent()
 }
 
-func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interface{}) middleware.Responder {
+func getPreEnrollment(params vaccination.GetPreEnrollmentParams, principal *models.JWTClaimBody) middleware.Responder {
 	code := params.PreEnrollmentCode
 	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
@@ -197,7 +201,7 @@ func getPreEnrollment(params vaccination.GetPreEnrollmentParams, pricipal interf
 	return NewGenericServerError()
 }
 
-func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, pricipal interface{}) middleware.Responder {
+func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		return NewGenericServerError()
@@ -208,7 +212,7 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 	return NewGenericServerError()
 }
 
-func certify(params certification.CertifyParams, pricipal interface{}) middleware.Responder {
+func certify(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
 	fmt.Printf("%+v\n", params.Body[0])
@@ -220,12 +224,23 @@ func certify(params certification.CertifyParams, pricipal interface{}) middlewar
 	return certification.NewCertifyOK()
 }
 
-func bulkCertify(params certification.BulkCertifyParams, principal interface{}) middleware.Responder {
+func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
 		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
-		log.Info(data.Text("recipientName")," - ", data.Text("facilityName"))
+		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	return certification.NewBulkCertifyOK()
+}
+func eventsHandler(params operations.EventsParams, principal *models.JWTClaimBody) middleware.Responder {
+	for _, e := range params.Body {
+		publishEvent(Event{
+			Date:          time.Time(e.Date),
+			Source:        principal.PreferredUsername,
+			TypeOfMessage: e.Type,
+			ExtraInfo:     e.Extra,
+		})
+	}
+	return operations.NewEventsOK()
 }

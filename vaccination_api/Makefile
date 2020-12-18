@@ -11,7 +11,7 @@ deps:
 
 swagger_gen/restapi/server.go: ../interfaces/vaccination-api.yaml
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
-	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/../interfaces/vaccination-api.yaml
+	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/../interfaces/vaccination-api.yaml --principal models.JWTClaimBody
 
 api_docs:
 	@echo "Installing swagger-merger" && npm install swagger-merger -g

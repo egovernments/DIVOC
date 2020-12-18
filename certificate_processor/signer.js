@@ -106,6 +106,8 @@ function transformW3(cert, certificateId) {
     issuanceDate: new Date().toISOString().toLowerCase(),
     evidence: [{
       "id": "https://nha.gov.in/evidence/vaccine/"+certificateId,
+      "feedbackUrl":"https://divoc.xiv.in/feedback/" + certificateId,
+      "infoUrl":"https://divoc.xiv.in/learn/" + certificateId,
       "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": cert.vaccination.batch,

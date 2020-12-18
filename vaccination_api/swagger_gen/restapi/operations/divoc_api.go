@@ -19,6 +19,7 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
+	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
@@ -57,53 +58,56 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		LoginPostAuthorizeHandler: login.PostAuthorizeHandlerFunc(func(params login.PostAuthorizeParams) middleware.Responder {
 			return middleware.NotImplemented("operation login.PostAuthorize has not yet been implemented")
 		}),
-		IdentityPostIdentityVerifyHandler: identity.PostIdentityVerifyHandlerFunc(func(params identity.PostIdentityVerifyParams, principal interface{}) middleware.Responder {
+		IdentityPostIdentityVerifyHandler: identity.PostIdentityVerifyHandlerFunc(func(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation identity.PostIdentityVerify has not yet been implemented")
 		}),
-		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal interface{}) middleware.Responder {
+		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.BulkCertify has not yet been implemented")
 		}),
-		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal interface{}) middleware.Responder {
+		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
 		}),
 		SideEffectsCreateSideEffectsHandler: side_effects.CreateSideEffectsHandlerFunc(func(params side_effects.CreateSideEffectsParams) middleware.Responder {
 			return middleware.NotImplemented("operation side_effects.CreateSideEffects has not yet been implemented")
 		}),
-		SymptomsCreateSymptomsHandler: symptoms.CreateSymptomsHandlerFunc(func(params symptoms.CreateSymptomsParams, principal interface{}) middleware.Responder {
+		SymptomsCreateSymptomsHandler: symptoms.CreateSymptomsHandlerFunc(func(params symptoms.CreateSymptomsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.CreateSymptoms has not yet been implemented")
 		}),
-		GetCertificateHandler: GetCertificateHandlerFunc(func(params GetCertificateParams) middleware.Responder {
+		EventsHandler: EventsHandlerFunc(func(params EventsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation Events has not yet been implemented")
+		}),
+		GetCertificateHandler: GetCertificateHandlerFunc(func(params GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetCertificate has not yet been implemented")
 		}),
-		ConfigurationGetConfigurationHandler: configuration.GetConfigurationHandlerFunc(func(params configuration.GetConfigurationParams, principal interface{}) middleware.Responder {
+		ConfigurationGetConfigurationHandler: configuration.GetConfigurationHandlerFunc(func(params configuration.GetConfigurationParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetConfiguration has not yet been implemented")
 		}),
-		ConfigurationGetCurrentProgramsHandler: configuration.GetCurrentProgramsHandlerFunc(func(params configuration.GetCurrentProgramsParams, principal interface{}) middleware.Responder {
+		ConfigurationGetCurrentProgramsHandler: configuration.GetCurrentProgramsHandlerFunc(func(params configuration.GetCurrentProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetCurrentPrograms has not yet been implemented")
 		}),
 		SymptomsGetInstructionsHandler: symptoms.GetInstructionsHandlerFunc(func(params symptoms.GetInstructionsParams) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.GetInstructions has not yet been implemented")
 		}),
-		VaccinationGetLoggedInUserInfoHandler: vaccination.GetLoggedInUserInfoHandlerFunc(func(params vaccination.GetLoggedInUserInfoParams, principal interface{}) middleware.Responder {
+		VaccinationGetLoggedInUserInfoHandler: vaccination.GetLoggedInUserInfoHandlerFunc(func(params vaccination.GetLoggedInUserInfoParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetLoggedInUserInfo has not yet been implemented")
 		}),
-		VaccinationGetPreEnrollmentHandler: vaccination.GetPreEnrollmentHandlerFunc(func(params vaccination.GetPreEnrollmentParams, principal interface{}) middleware.Responder {
+		VaccinationGetPreEnrollmentHandler: vaccination.GetPreEnrollmentHandlerFunc(func(params vaccination.GetPreEnrollmentParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollment has not yet been implemented")
 		}),
-		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal interface{}) middleware.Responder {
+		VaccinationGetPreEnrollmentsForFacilityHandler: vaccination.GetPreEnrollmentsForFacilityHandlerFunc(func(params vaccination.GetPreEnrollmentsForFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation vaccination.GetPreEnrollmentsForFacility has not yet been implemented")
 		}),
-		SideEffectsGetSideEffectsHandler: side_effects.GetSideEffectsHandlerFunc(func(params side_effects.GetSideEffectsParams, principal interface{}) middleware.Responder {
+		SideEffectsGetSideEffectsHandler: side_effects.GetSideEffectsHandlerFunc(func(params side_effects.GetSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation side_effects.GetSideEffects has not yet been implemented")
 		}),
 		SymptomsGetSymptomsHandler: symptoms.GetSymptomsHandlerFunc(func(params symptoms.GetSymptomsParams) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.GetSymptoms has not yet been implemented")
 		}),
-		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal interface{}) middleware.Responder {
+		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
 		}),
 
-		HasRoleAuth: func(token string, scopes []string) (interface{}, error) {
+		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
@@ -147,7 +151,7 @@ type DivocAPI struct {
 
 	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
 	// it performs authentication based on an oauth2 bearer token provided in the request
-	HasRoleAuth func(string, []string) (interface{}, error)
+	HasRoleAuth func(string, []string) (*models.JWTClaimBody, error)
 
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
@@ -166,6 +170,8 @@ type DivocAPI struct {
 	SideEffectsCreateSideEffectsHandler side_effects.CreateSideEffectsHandler
 	// SymptomsCreateSymptomsHandler sets the operation handler for the create symptoms operation
 	SymptomsCreateSymptomsHandler symptoms.CreateSymptomsHandler
+	// EventsHandler sets the operation handler for the events operation
+	EventsHandler EventsHandler
 	// GetCertificateHandler sets the operation handler for the get certificate operation
 	GetCertificateHandler GetCertificateHandler
 	// ConfigurationGetConfigurationHandler sets the operation handler for the get configuration operation
@@ -290,6 +296,9 @@ func (o *DivocAPI) Validate() error {
 	if o.SymptomsCreateSymptomsHandler == nil {
 		unregistered = append(unregistered, "symptoms.CreateSymptomsHandler")
 	}
+	if o.EventsHandler == nil {
+		unregistered = append(unregistered, "EventsHandler")
+	}
 	if o.GetCertificateHandler == nil {
 		unregistered = append(unregistered, "GetCertificateHandler")
 	}
@@ -339,7 +348,9 @@ func (o *DivocAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map
 	for name := range schemes {
 		switch name {
 		case "hasRole":
-			result[name] = o.BearerAuthenticator(name, o.HasRoleAuth)
+			result[name] = o.BearerAuthenticator(name, func(token string, scopes []string) (interface{}, error) {
+				return o.HasRoleAuth(token, scopes)
+			})
 
 		}
 	}
@@ -446,6 +457,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/symptoms"] = symptoms.NewCreateSymptoms(o.context, o.SymptomsCreateSymptomsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/events"] = NewEvents(o.context, o.EventsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // GetSideEffectsHandlerFunc turns a function with the right signature into a get side effects handler
-type GetSideEffectsHandlerFunc func(GetSideEffectsParams, interface{}) middleware.Responder
+type GetSideEffectsHandlerFunc func(GetSideEffectsParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetSideEffectsHandlerFunc) Handle(params GetSideEffectsParams, principal interface{}) middleware.Responder {
+func (fn GetSideEffectsHandlerFunc) Handle(params GetSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // GetSideEffectsHandler interface for that can handle valid get side effects params
 type GetSideEffectsHandler interface {
-	Handle(GetSideEffectsParams, interface{}) middleware.Responder
+	Handle(GetSideEffectsParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewGetSideEffects creates a new http.Handler for the get side effects operation
@@ -54,9 +56,9 @@ func (o *GetSideEffects) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params

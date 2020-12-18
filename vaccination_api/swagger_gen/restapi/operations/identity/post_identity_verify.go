@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // PostIdentityVerifyHandlerFunc turns a function with the right signature into a post identity verify handler
-type PostIdentityVerifyHandlerFunc func(PostIdentityVerifyParams, interface{}) middleware.Responder
+type PostIdentityVerifyHandlerFunc func(PostIdentityVerifyParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn PostIdentityVerifyHandlerFunc) Handle(params PostIdentityVerifyParams, principal interface{}) middleware.Responder {
+func (fn PostIdentityVerifyHandlerFunc) Handle(params PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
 // PostIdentityVerifyHandler interface for that can handle valid post identity verify params
 type PostIdentityVerifyHandler interface {
-	Handle(PostIdentityVerifyParams, interface{}) middleware.Responder
+	Handle(PostIdentityVerifyParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewPostIdentityVerify creates a new http.Handler for the post identity verify operation
@@ -54,9 +56,9 @@ func (o *PostIdentityVerify) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	if aCtx != nil {
 		r = aCtx
 	}
-	var principal interface{}
+	var principal *models.JWTClaimBody
 	if uprinc != nil {
-		principal = uprinc
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
 	}
 
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
