@@ -106,7 +106,12 @@ func createCertificate(data *Scanner, authHeader string) error {
 	contact := []string{"tel:"+data.Text("recipientMobileNumber")}
 	dob, terr := time.Parse("2006-01-02", data.Text("recipientDOB"))
 	if terr!= nil {
-		log.Info("error while parsing DOB ", data.Text("recipientDOB"))
+		dob2, terr := time.Parse("02-Jan-2006", data.Text("recipientDOB"))
+		if terr!= nil {
+			log.Info("error while parsing DOB ", data.Text("recipientDOB"))
+		} else {
+			dob = dob2
+		}
 	}
 	reciepient := &models.CertificationRequestRecipient{
 		Name: data.Text("recipientName"),
