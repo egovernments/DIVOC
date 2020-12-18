@@ -23,10 +23,14 @@ function Home() {
         axiosInstance.current.get(certificateAPI)
             .then(res => {
                 setStateWiseCertificateData(res.data.numberOfCertificatesIssuedByState)
-                console.log("data",res.data.numberOfCertificatesIssuedByState)
             });
     }
 
+    const stateWiseTotalCertificateCount = () =>{
+        let sum = 0;
+        Object.keys(stateWiseCertificateData).map( data => sum = sum + stateWiseCertificateData[data])
+        return sum;
+    }
 
     return (
         <div className={styles["container"]}>
@@ -40,27 +44,24 @@ function Home() {
                     setDistrictList={setDistrictList}
                     stateList={stateList}
                     setStateList={setStateList}
-
+                    stateWiseCertificateData={stateWiseCertificateData}
                 />
             </div>
-            <div className={styles["table-container"]}>
-                <DataTable
+            <DataTable
                     setSelectedData={setSelectedState}
                     selectedData={selectedState}
                     data={stateList}
                     title="ALL OF INDIA"
                     stateWiseCertificateData={stateWiseCertificateData}
-                />
-            </div>
-            {selectedState.name !== "" && <div className={styles["table-container"]}>
-                <DataTable
+                    total={stateWiseTotalCertificateCount()}
+            />
+            {districtList.length>0 ? <DataTable
                     setSelectedData={setSelectedDistrict}
                     selectedData={selectedDistrict}
                     data={districtList}
                     title={selectedState.name}
                     stateWiseCertificateData={stateWiseCertificateData}
-                />
-            </div>}
+                /> : '' }
 
         </div>
     );
