@@ -26,7 +26,7 @@ export default function FacilityAdmin() {
 
     return (
         <TabPanels tabs={[
-            {title: "Upload Certificate Details", component: <Certificates />},
+            {title: "Upload Vaccination Details", component: <Certificates />},
             // {title: "Role Setup", component: <RoleSetup/>},
             // {title: "Vaccinator Details", component: <VaccinatorList/>},
             // {title: "Program Overview", component: <span>Program Overview</span>},
