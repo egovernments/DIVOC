@@ -6,6 +6,7 @@
     padding: 3rem 5rem;
     height: 100%;
     overflow: auto;
+    text-align:center;
 }
 
 .symptoms-container {
