@@ -58,6 +58,7 @@
 
     .video-wrapper {
         height: 100%;
+        margin-left: 8px;
     }
 
     .video-section {

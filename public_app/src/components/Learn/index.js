@@ -1,13 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import "./index.css"
-import {Col, Row} from "react-bootstrap";
+import {Col} from "react-bootstrap";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
 import VerifyCertificateImg from "../../assets/img/verify-certificate-small.png";
-import DownloadImg from "../../assets/img/download-certificate-small.png";
 import {SmallInfoCards} from "../CertificateStatus";
 import {useHistory} from "react-router-dom";
 import VideoThumbnailImg from "../../assets/img/video_static_thumbnail.png";
+import PlaceHolderOneThumbnailImg from "../../assets/img/placeholder_image_1.png";
+import PlaceHolderTwoThumbnailImg from "../../assets/img/placeholder_image_2.png";
+import PlaceHolderThreeThumbnailImg from "../../assets/img/placeholder_image_3.png";
 import PlayIconImg from "../../assets/img/message-play.svg";
 
 Learn.propTypes = {};
@@ -20,14 +22,18 @@ class VideoDetails {
     }
 }
 
-const srcPath = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
-
-
 const videoDetails = [
-    new VideoDetails("A", VideoThumbnailImg, "Description one goes here"),
-    new VideoDetails("B", VideoThumbnailImg, "Description two goes here"),
-    new VideoDetails("C", VideoThumbnailImg, "Description three goes here")
+    new VideoDetails("B", PlaceHolderTwoThumbnailImg, "कोरोना वैक्‍सीन आपको कब और कैसे मिलेगी?"),
+    new VideoDetails("C", PlaceHolderThreeThumbnailImg, "कोरोना के टीकाकरण के लिए दिशा-निर्देश जारी.."),
+    new VideoDetails("A", PlaceHolderOneThumbnailImg, "Guidelines for the drive …")
 ]
+
+const videoHeaderDetails = {
+    title: "Learn about the C-19 Program",
+    description: "The C-19 vaccination drive launched in India in 2021 aims to control, reduce and eradicate the prevalence of …",
+    videoTitle: "Mobile technology to be used for COVID-19",
+    videoUrl: "https://divoc.xiv.in/video/learn/vaccination.m4v"
+}
 
 function Learn(props) {
     const history = useHistory();
@@ -37,14 +43,14 @@ function Learn(props) {
                 <div className="video-section  d-lg-flex p-lg-0">
 
                     <div className="video-info-wrapper p-3">
-                        <h4 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h4>
-                        <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+                        <h4 className="text-center mt-3 text-lg-left">{videoHeaderDetails.title}</h4>
+                        <span className="text-center  text-lg-left">{videoHeaderDetails.description}</span>
                     </div>
-                    <h4 className="text-center mt-3 text-lg-left">COVID-19 Video</h4>
+                    <h4 className="text-center mt-3 ml-3 text-lg-left">{videoHeaderDetails.videoTitle}</h4>
                     <div className="video-wrapper">
                         <iframe width="100%"
                                 height="100%"
-                                src={srcPath}
+                                src={videoHeaderDetails.videoUrl}
                                 frameBorder="0"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                 allowFullScreen/>
@@ -64,13 +70,6 @@ function Learn(props) {
                     text={"Provide Feedback"}
                     img={FeedbackSmallImg}
                     backgroundColor={"#FFFBF0"}/>
-                <SmallInfoCards
-                    text={"Download Certificate"}
-                    img={DownloadImg}
-                    onClick={() => {
-                        history.push("/certificate/")
-                    }}
-                    backgroundColor={"#EFF5FD"}/>
                 <SmallInfoCards
                     text={"Verify Certificate"}
                     img={VerifyCertificateImg}
