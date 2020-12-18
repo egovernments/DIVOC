@@ -30,7 +30,11 @@ const vaccinationv1 = {
       "@context": {
         "@version": 1.1,
         "@protected": true,
+        "certificateId": "schema:id",
+        "feedbackUrl": "schema:url",
+        "infoUrl": "schema:url",
         "batch": "schema:id",
+        "vaccine": "schema:id",
         "manufacturer": "schema:id",
         "date": "schema:date",
         "effectiveStart": "schema:date",

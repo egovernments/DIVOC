@@ -1,12 +1,12 @@
 .certificate-container {
     border: 1px solid gray;
-    width: 440px;
+    width: 640px;
     background-color: white;
 }
 
 .certificate {
     margin: 1em;
-    width: 400px;
+    width:600px;
     font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 
 }
@@ -34,4 +34,10 @@
 
 .footer {
     width: 400px;
+}
+td {
+    padding-top: 5px;
+}
+.program-logo{
+    width: 32px;
 }
