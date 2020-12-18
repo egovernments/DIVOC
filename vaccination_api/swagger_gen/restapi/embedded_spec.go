@@ -187,6 +187,7 @@ func init() {
     },
     "/events": {
       "post": {
+        "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
         "operationId": "events",
         "parameters": [
@@ -1028,6 +1029,7 @@ func init() {
     },
     "/events": {
       "post": {
+        "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
         "operationId": "events",
         "parameters": [
