@@ -153,3 +153,13 @@ body {
   font-size: 14px;
   margin-left: 30px;
 }
+
+@media (max-width: 992px) {
+  .login-content {
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  }
+  .login-content .box {
+    width: 100%;
+  }
+}
