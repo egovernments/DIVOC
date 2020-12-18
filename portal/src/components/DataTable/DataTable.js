@@ -29,12 +29,11 @@ function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificate
     return (
         <div className="table-container">
             <table
-            className="table table-borderless table-hover header-fixed"
+            className="table table-borderless table-hover"
         >
             <thead>
                 <tr>
-                    <td >{title}</td>
-                    <td>{total}</td>
+                    <td >{title}<span className="second-word-formatting"/>{total}</td>
                 </tr>
             </thead>
             <tbody>{getTableData()}</tbody>
