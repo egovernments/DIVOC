@@ -2,7 +2,7 @@ import React from 'react';
 import './DataTable.css';
 
 
-function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificateData}) {
+function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificateData,total}) {
 
     const handleRowClick = (data) => {
         setSelectedData({name : data,count: 0});
@@ -27,17 +27,18 @@ function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificate
     };
 
     return (
-        <table
+        <div className="table-container">
+            <table
             className="table table-borderless table-hover"
         >
-            <thead className="thead">
+            <thead>
                 <tr>
-                    <td >{title}</td>
-                    <td></td>
+                    <td >{title}{total ? <span className="second-word-formatting"/> : ''}{total}</td>
                 </tr>
             </thead>
             <tbody>{getTableData()}</tbody>
         </table>
+        </div>
     );
 }
 

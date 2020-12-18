@@ -85,3 +85,33 @@
 .otp-prefix {
     color: #4CA07A;
 }
+
+@media (max-width: 992px) {
+
+    .main-img-wrapper {
+        width: 100%;
+    }
+    .main-img-wrapper img {
+        height: 90%;
+
+    }
+    .form-content {
+        padding: 0 2rem;
+    }
+    .form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .form-subtitle {
+        font-size: 25px;
+        text-align: center;
+    }
+    .input-wrapper {
+        flex-direction: column;
+    }
+    .otp {
+        margin-top: 1rem
+    }
+}
