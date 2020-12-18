@@ -2,6 +2,7 @@ import React, {useState} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 import "./index.css";
 import {SubmitSymptomsForm} from "../SubmitSymptomsForm";
+import {ReactComponent as VaccinationActiveImg} from "../../assets/img/FeedbackScreen.svg";
 
 const data = {
     0: [{
@@ -64,6 +65,9 @@ const data = {
         ]
     }],
 };
+
+
+
 export const SideEffects = () => {
     const [symptoms, setSymptoms] = useState(data);
     const [nextSymptoms, setNextSymptoms] = useState({});
@@ -129,107 +133,19 @@ export const SideEffects = () => {
     }
 
     let showNextButton = false;
-    Object.keys(symptoms).forEach((key, idx) => {
-        symptoms[key].forEach((d) => {
-            if ("types" in d) {
-                showNextButton = true;
-            }
-        });
-    });
+    // Object.keys(symptoms).forEach((key, idx) => {
+    //     symptoms[key].forEach((d) => {
+    //         if ("types" in d) {
+    //             showNextButton = true;
+    //         }
+    //     });
+    // });
     return (
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
-                    <h3 className="mb-4">Report Side-effects</h3>
-                    <Row>
-                        <Col lg={6}>
-                            <Row>
-                                <Col lg={6}>
-                                    <h5>Select Symptoms</h5>
-                                    <div className="symptoms-container">
-                                        {
-                                            Object.keys(symptoms).map((key, idx) => {
-
-                                                return (
-                                                    <>
-                                                        {showGroupHeader && <span className="mt-1 group-header">{key}</span>}
-                                                        {
-                                                            symptoms[key].map((symptom) => (
-                                                                <div key={idx}
-                                                                     className="symptom-wrapper d-flex align-items-center pb-2"
-                                                                     onClick={() => {
-                                                                         onSymptomSelected(symptom, symptom.name)
-                                                                     }}>
-                                                    <span
-                                                        className={`custom-checkbox ${selectedSymptomIds.includes(symptom.name) ? 'active' : ''}`}/>
-                                                                    <span className="title">{symptom.name}</span>
-                                                                </div>
-                                                            ))
-                                                        }
-                                                    </>)
-                                            })
-                                        }
-
-                                        {
-                                            showOtherSection &&
-                                            <div className="symptom-wrapper d-flex align-items-center pt-3"
-                                                 onClick={() => {
-                                                     addOrRemoveSelectedItem("others")
-                                                 }}>
-                                            <span
-                                                className={`custom-checkbox ${selectedSymptomIds.includes("others") ? 'active' : ''}`}/>
-                                                <span className="title">{"Others"}</span>
-                                            </div>
-                                        }
-                                        {
-                                            showOtherSection &&
-                                            <textarea className="others-textarea" placeholder={"Please elaborate"}
-                                                      disabled={!selectedSymptomIds.includes("others")}
-                                                      onChange={onOtherSymptomChange}/>
-                                        }
-                                    </div>
-                                    {
-                                        <button className="confirm-symptoms-btn mr-3" style={{background: "grey"}}
-                                                onClick={onReset}>Reset</button>
-                                    }
-                                    {
-                                        showNextButton &&
-                                        <button className="confirm-symptoms-btn"
-                                                disabled={Object.keys(nextSymptoms).length === 0}
-                                                onClick={onNextBtnClick}>Next</button>
-                                    }
-                                    {
-                                        !showNextButton && <button className="confirm-symptoms-btn"
-                                                                   onClick={onConfirmSymptomsClick}>Confirm
-                                            Symptoms</button>
-                                    }
-                                </Col>
-                                <Col lg={6}>
-                                    {instructions.length > 0 && <h5>Follow Instructions</h5>}
-                                    <div className="instructions-container">
-                                        {
-                                            instructions.map((data, idx) => {
-                                                return (
-                                                    data.instructions.map((instruction, index) => (
-                                                        <div className="instruction-wrapper" key={idx}>
-                                                            <span className="instruction-title">{data.name}</span><br/>
-                                                            <span
-                                                                className="instruction-heading">Instructions</span>
-                                                            <br/>
-                                                            <span key={index}>{instruction}</span>
-                                                        </div>
-                                                    ))
-                                                )
-                                            })
-                                        }
-                                    </div>
-                                </Col>
-                            </Row>
-                        </Col>
-                        <Col lg={6}>{
-                            showSubmitForm && <SubmitSymptomsForm onComplete={onReset}/>
-                        }</Col>
-                    </Row>
+                {/* <img src={VaccinationActiveImg} alt=""/> */}
+                <VaccinationActiveImg/>
                 </div>
             </Container>
         </div>

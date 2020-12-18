@@ -73,7 +73,7 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		SymptomsCreateSymptomsHandler: symptoms.CreateSymptomsHandlerFunc(func(params symptoms.CreateSymptomsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation symptoms.CreateSymptoms has not yet been implemented")
 		}),
-		EventsHandler: EventsHandlerFunc(func(params EventsParams, principal *models.JWTClaimBody) middleware.Responder {
+		EventsHandler: EventsHandlerFunc(func(params EventsParams) middleware.Responder {
 			return middleware.NotImplemented("operation Events has not yet been implemented")
 		}),
 		GetCertificateHandler: GetCertificateHandlerFunc(func(params GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {

@@ -10,6 +10,8 @@ import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
 import {Certificate} from "../Certificate";
+import {useDispatch} from "react-redux";
+import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
 
@@ -36,7 +38,7 @@ function CertificateView() {
     const [certificateData, setCertificateData] = useState(null);
     const ref = React.createRef();
     const userMobileNumber = keycloak.idTokenParsed.preferred_username;
-
+    const dispatch = useDispatch();
     const config = {
         headers: {
             Authorization: `Bearer ${keycloak.token} `,
@@ -53,6 +55,7 @@ function CertificateView() {
         const response = await axios
             .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
             .then((res) => {
+                dispatch(addEventAction({type: EVENT_TYPES.CERTIFICATE_DOWNLOAD, extra: {mobile_number: userMobileNumber}}));
                 return res.data;
             });
         console.log(response);
