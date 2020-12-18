@@ -178,7 +178,7 @@ function CertificateView() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As an image</Dropdown.Item>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As Image</Dropdown.Item>
                             <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
                             <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
                         </Dropdown.Menu>
@@ -206,6 +206,10 @@ function CertificateView() {
                     <button className={styles["button"] + " float-right col-12"} onClick={() => window.print()}>Print
                     </button>
                 </div>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
             </div>
         </>;
     };
