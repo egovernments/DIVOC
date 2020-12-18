@@ -7,9 +7,7 @@ import {useAxios} from "../../utils/useAxios";
 function Home() {
     const [districtList, setDistrictList] = useState([]);
     const [stateList, setStateList] = useState([]);
-    const [selectedState, setSelectedState] = useState([
-        { name: "", count: 0 },
-    ]);
+    const [selectedState, setSelectedState] = useState({ name: "", count: 0 });
     const [selectedDistrict, setSelectedDistrict] = useState([
         { name: "", count: 0 },
     ]);
@@ -58,12 +56,17 @@ function Home() {
                     total={stateWiseTotalCertificateCount()}
                 />
                 {districtList.length>0 ? <DataTable
+            </div>
+            {selectedState.name !== "" && <div className={styles["table-container"]}>
+                <DataTable
                     setSelectedData={setSelectedDistrict}
                     selectedData={selectedDistrict}
                     data={districtList}
                     title={`Districts of ${selectedState.name}`}
                     stateWiseCertificateData={stateWiseCertificateData}
                 /> : ''}
+                />
+            </div>}
 
         </div>
     );

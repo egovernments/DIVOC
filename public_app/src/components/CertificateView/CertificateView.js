@@ -10,6 +10,10 @@ import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
 import {Certificate} from "../Certificate";
+import {useDispatch} from "react-redux";
+import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
+import digilocker from "../../assets/img/digilocker.png"
+import commonPass from "../../assets/img/CommonPass.png"
 
 const certificateDetailsPaths = {
     ...CertificateDetailsPaths,
@@ -21,6 +25,9 @@ const certificateDetailsPaths = {
     },
     "Identity": {
         path: ["credentialSubject", "id"]
+    },
+    "Info Url": {
+        path: ["evidence", "0", "infoUrl"]
     }
 };
 
@@ -31,7 +38,7 @@ function CertificateView() {
     const [certificateData, setCertificateData] = useState(null);
     const ref = React.createRef();
     const userMobileNumber = keycloak.idTokenParsed.preferred_username;
-
+    const dispatch = useDispatch();
     const config = {
         headers: {
             Authorization: `Bearer ${keycloak.token} `,
@@ -48,6 +55,7 @@ function CertificateView() {
         const response = await axios
             .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
             .then((res) => {
+                dispatch(addEventAction({type: EVENT_TYPES.CERTIFICATE_DOWNLOAD, extra: {mobile_number: userMobileNumber}}));
                 return res.data;
             });
         console.log(response);
@@ -98,20 +106,22 @@ function CertificateView() {
                     <div/>
                     <div className={"right"}/>
                 </div>
+
                 <Certificate
-                    qrCode={<QRCode size={128} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
+                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
                     vaccination={extractData(certificateData, "Vaccination")}
                     manufacturer={extractData(certificateData, "Manufacturer")}
                     certificateId={extractData(certificateData, "Certificate ID")}
                     issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
                     name={extractData(certificateData, "Name")}
                     gender={extractData(certificateData, "Gender")}
-                    identityType={"आधार / Aadhaar"}
+                    identityType={"Aadhaar / आधार"}
                     identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
                     age={extractData(certificateData, "Age")}
                     vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
                     dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
                     vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
+                    infoUrl={extractData(certificateData, "Info Url")}
                 />
             </>
         );
@@ -156,7 +166,7 @@ function CertificateView() {
         return <>
             {showCertificatePreview(certificateData)}
             <div className={styles["top-pad"] + " " + styles["no-print"] + " row"}>
-                <div className={"col-6"}>
+                <div className={"col-4"}>
                     {/*<button className={styles["button"]} onClick={handleClick}>*/}
                     {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
@@ -169,16 +179,38 @@ function CertificateView() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As an image</Dropdown.Item>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As Image</Dropdown.Item>
                             <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
                             <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
-                <div className={"col-6"}>
+                <div className={"col-4"}>
+                    {/*<button className={styles["button"]} onClick={handleClick}>*/}
+                    {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
+                    {/*</button>*/}
+                    {/*<button className={styles["button"]} onClick={downloadAsImage}>*/}
+                    {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
+                    {/*</button>*/}
+                    <Dropdown className={styles["btn-success"]}>
+                        <Dropdown.Toggle variant="success" id="dropdown-basic" className={"col-12"}>
+                            Export
+                        </Dropdown.Toggle>
+
+                        <Dropdown.Menu>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
+                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                        </Dropdown.Menu>
+                    </Dropdown>
+                </div>
+                <div className={"col-4"}>
                     <button className={styles["button"] + " float-right col-12"} onClick={() => window.print()}>Print
                     </button>
                 </div>
+                <br/>
+                <br/>
+                <br/>
+                <br/>
             </div>
         </>;
     };
@@ -201,8 +233,8 @@ function CertificateView() {
 
 
     return (
-        <div className="row-cols-lg-1 row-cols-1 nav-pad">
-            <div className="col-12 d-flex justify-content-center">
+        <div className={"row-cols-lg-1 row-cols-1 nav-pad" }>
+            <div className="col-12 d-flex d-flex justify-content-center">
                 <div className={styles["container"]}>
                     <div className={styles["no-print"]}>
                         <p>Vaccination certificate</p>

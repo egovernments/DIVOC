@@ -33,3 +33,17 @@
         display: none !important;
     }
 }
+.export-icon {
+    width: 30px;
+    height: 30px;
+    padding-right: 5px;
+}
+
+.common-pass {
+    width: 30px;
+    height: 26px;
+    padding-right: 5px;
+}
+.cert-top{
+    padding-left: 15rem;
+}
