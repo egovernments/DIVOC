@@ -16,6 +16,7 @@ type AnalyticsResponse struct {
 	DownloadByDate                    map[string]int64 `json:"downloadByDate"`
 	ValidVerificationByDate           map[string]int64 `json:"validVerificationByDate"`
 	InValidVerificationByDate         map[string]int64 `json:"inValidVerificationByDate"`
+	TotalFacilities                   map[string]int64 `json:"totalFacilities"`
 }
 
 var connect *sql.DB = initConnection()
@@ -49,6 +50,7 @@ select gender, count() from certificatesv1 group by gender
 	downloadByDate := `select d, count() from eventsv1 where type='certificate-download' group by toYYYYMMDD(dt) as d`
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
+	totalFacilities := `select 'total', count(distinct facilityName) from certificatesv1`
 
 	analyticsResponse := AnalyticsResponse{
 		NumberOfCertificatesIssued:        getCount(countQuery),
@@ -58,6 +60,7 @@ select gender, count() from certificatesv1 group by gender
 		DownloadByDate:                    getCount(downloadByDate),
 		ValidVerificationByDate:           getCount(validVerificationByDate),
 		InValidVerificationByDate:         getCount(inValidVerificationByDate),
+		TotalFacilities:                   getCount(totalFacilities),
 	}
 
 	return analyticsResponse
