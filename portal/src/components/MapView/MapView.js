@@ -54,19 +54,14 @@ function Home() {
                     title="ALL OF INDIA"
                     stateWiseCertificateData={stateWiseCertificateData}
                     total={stateWiseTotalCertificateCount()}
-                />
-                {districtList.length>0 ? <DataTable
-            </div>
-            {selectedState.name !== "" && <div className={styles["table-container"]}>
-                <DataTable
+            />
+            {districtList.length>0 ? <DataTable
                     setSelectedData={setSelectedDistrict}
                     selectedData={selectedDistrict}
                     data={districtList}
-                    title={`Districts of ${selectedState.name}`}
+                    title={selectedState.name}
                     stateWiseCertificateData={stateWiseCertificateData}
-                /> : ''}
-                />
-            </div>}
+                /> : '' }
 
         </div>
     );
