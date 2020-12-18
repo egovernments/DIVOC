@@ -9,12 +9,13 @@ import (
 )
 
 type AnalyticsResponse struct {
-	NumberOfCertificatesIssued   map[string]int64 `json:"numberOfCertificatesIssued"`
-	NumberOfCertificatesIssuedByDate   map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
+	NumberOfCertificatesIssued        map[string]int64 `json:"numberOfCertificatesIssued"`
+	NumberOfCertificatesIssuedByDate  map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
 	NumberOfCertificatesIssuedByState map[string]int64 `json:"numberOfCertificatesIssuedByState"`
-	NumberOfCertificatesIssuedByAge map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
-	DownloadByDate map[string]int64 `json:"downloadByDate"`
-	VerificationByDate map[string]int64 `json:"verificationByDate"`
+	NumberOfCertificatesIssuedByAge   map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
+	DownloadByDate                    map[string]int64 `json:"downloadByDate"`
+	ValidVerificationByDate           map[string]int64 `json:"validVerificationByDate"`
+	InValidVerificationByDate         map[string]int64 `json:"inValidVerificationByDate"`
 }
 
 var connect *sql.DB = initConnection()
@@ -37,7 +38,7 @@ func initConnection() *sql.DB {
 }
 
 func getAnalyticsInfo() AnalyticsResponse {
-	countQuery :=`
+	countQuery := `
 SELECT 'all', count() from certificatesv1 
 union all 
 select gender, count() from certificatesv1 group by gender
@@ -45,17 +46,18 @@ select gender, count() from certificatesv1 group by gender
 	byDateQuery := `select d, count() from certificatesv1 group by toYYYYMMDD(dt) as d`
 	byStateQuery := `select facilityState, count() from certificatesv1 group by facilityState`
 	byAgeQuery := `select a, count() from certificatesv1 group by floor(age/10)*10 as a`
-	downloadByDate := `select d, count() from eventsv1 where type='download' group by toYYYYMMDD(dt) as d`
-	verificationByDate := `select d, count() from eventsv1 where type='verify' group by toYYYYMMDD(dt) as d`
-
+	downloadByDate := `select d, count() from eventsv1 where type='certificate-download' group by toYYYYMMDD(dt) as d`
+	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
+	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
 
 	analyticsResponse := AnalyticsResponse{
-		NumberOfCertificatesIssued: getCount(countQuery),
+		NumberOfCertificatesIssued:        getCount(countQuery),
 		NumberOfCertificatesIssuedByDate:  getCount(byDateQuery),
 		NumberOfCertificatesIssuedByState: getCount(byStateQuery),
-		NumberOfCertificatesIssuedByAge: getCount(byAgeQuery),
-		DownloadByDate: getCount(downloadByDate),
-		VerificationByDate: getCount(verificationByDate),
+		NumberOfCertificatesIssuedByAge:   getCount(byAgeQuery),
+		DownloadByDate:                    getCount(downloadByDate),
+		ValidVerificationByDate:           getCount(validVerificationByDate),
+		InValidVerificationByDate:         getCount(inValidVerificationByDate),
 	}
 
 	return analyticsResponse
