@@ -131,7 +131,7 @@ function transformW3(cert, certificateId) {
           "city": cert.facility.address.city,
           "addressRegion": cert.facility.address.state,
           "addressCountry": cert.facility.address.country?cert.facility.address.country:"IN",
-          "postalCode": cert.facility.address.pin
+          "postalCode": cert.facility.address.pincode
         },
         // "seal-image": "..."
       }
