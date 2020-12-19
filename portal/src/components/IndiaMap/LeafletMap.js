@@ -154,7 +154,7 @@ export default function LeafletMap({
     };
     return (
         <div id="mapid">
-            <MapContainer className="map-container" center={[22, 82]} zoom={5}>
+            <MapContainer className="map-container" center={[22, 82]} zoom={4} minZoom={4} maxZoom={6}>
                 <GeoJSON
                     style={mapStyle}
                     data={states}
