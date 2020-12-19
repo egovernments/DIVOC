@@ -13,6 +13,7 @@ import {CertificateDetailsPaths} from "../../constants";
 import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
+import axios from "axios";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -51,6 +52,18 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
+
+    setTimeout(()=>{
+        try {
+            axios
+              .post("/divoc/api/v1/events/", {"date":new Date().toISOString(), "type":"verify"})
+              .catch((e) => {
+                console.log(e);
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }, 100)
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -95,6 +108,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 console.log('Invalid data', e);
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
+
             }
 
         }
