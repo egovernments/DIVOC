@@ -87,9 +87,6 @@
     </div>
     <div class="footer-content">
         <div>
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/mhfw.png" alt="">
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/meit.png" alt="">
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/di.png" alt="">
         </div>
         <div class="d-none d-lg-block">
             <span class="footer-link">Contact Us</span>
