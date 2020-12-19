@@ -52,19 +52,8 @@ type CertifyMessage struct {
 func main() {
 	config.Initialize()
 	log.Infof("Starting analytics collector")
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := connect.Ping(); err != nil {
-		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
-		} else {
-			fmt.Println(err)
-		}
-		return
-	}
-	_, err = connect.Exec(`
+	connect := initClickhouse()
+	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS certificatesv1 (
   certificateId String,
   age UInt8,
@@ -103,6 +92,23 @@ type String
 	wg.Wait()
 }
 
+func initClickhouse() *sql.DB {
+	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := connect.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+
+		} else {
+			fmt.Println(err)
+		}
+		return nil
+	}
+	return connect
+}
+
 type MessageCallback func(*sql.DB, string) error
 
 func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string) {
@@ -123,6 +129,12 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+			if connect == nil {
+				connect = initClickhouse()
+				if connect == nil {
+					log.Fatal("Unable to get clickhouse connection")
+				}
+			}
 			if err := callback(connect, string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
