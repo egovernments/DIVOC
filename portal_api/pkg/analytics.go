@@ -48,7 +48,7 @@ union all
 select gender, count() from certificatesv1 group by gender
 `
 	byDateQuery := `select d, count() from certificatesv1 group by toYYYYMMDD(effectiveStart) as d`
-	byStateQuery := `select facilityState, count() from certificatesv1 group by facilityState`
+	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
 	byAgeQuery := `select a, count() from certificatesv1 group by floor(age/10)*10 as a`
 	downloadByDate := `select d, count() from eventsv1 where type='download' group by toYYYYMMDD(dt) as d`
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
