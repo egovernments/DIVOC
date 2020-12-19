@@ -37,7 +37,7 @@ export function eventsReducer(state = initialState, action) {
 export const addEventAction = (event) => {
     return {
         type: EVENT_ACTION_TYPES.ADD_EVENT,
-        payload: {...event, date: new Date().getTime()}
+        payload: {...event, date: new Date().toISOString()}
     }
 };
 
