@@ -84,7 +84,7 @@ export default function LeafletMap({
     const onEachState = (state, layer) => {
         const stateName = state.properties.st_nm;
         const count = stateWiseCertificateData[stateName] ? stateWiseCertificateData[stateName] : 0;
-        layer.bindPopup(`State : ${stateName} <br/> certificates Issued : ${count}`);
+        layer.bindTooltip(`State : ${stateName} <br/> certificates Issued : ${count}`);
         layer.on({
             mouseover: onMouseIn,
             mouseout: onMouseOut,
@@ -94,7 +94,7 @@ export default function LeafletMap({
 
     const onEachDistrict = (district, layer) => {
         const districtName = district.properties.district;
-        layer.bindPopup(`District : ${districtName}`);
+        layer.bindTooltip(`District : ${districtName}`);
         layer.on({
             mouseover: (event) => {
                 event.target.setStyle({
@@ -109,18 +109,20 @@ export default function LeafletMap({
         <div id="mapid">
             <MapContainer className="map-container" center={[22, 82]} zoom={5}>
                 <GeoJSON
+                    key="whatever"
                     style={mapStyle}
                     data={states}
                     onEachFeature={onEachState}
                 />
                 {stateClicked ? (
                     <LayerGroup>
-                        <GeoJSON
-                            style={mapStyle}
-                            data={mapDistrictData}
-                            onEachFeature={onEachDistrict}
-                        />
-                    </LayerGroup>
+                    <GeoJSON
+                        key={new Date().getTime()}
+                        style={mapStyle}
+                        data={mapDistrictData}
+                        onEachFeature={onEachDistrict}
+                    />
+                </LayerGroup>
                 ) : (
                     ""
                 )}

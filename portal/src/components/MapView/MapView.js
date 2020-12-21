@@ -35,7 +35,7 @@ function Home() {
     return (
         <div className={styles["container"]}>
             <div className={styles["map-container"]}>
-                <LeafletMap
+                {Object.keys(stateWiseCertificateData).length > 0 && <LeafletMap
                     setSelectedState={setSelectedState}
                     selectedState={selectedState}
                     selectedDistrict={selectedDistrict}
@@ -45,7 +45,7 @@ function Home() {
                     stateList={stateList}
                     setStateList={setStateList}
                     stateWiseCertificateData={stateWiseCertificateData}
-                />
+                />}
             </div>
             <DataTable
                     setSelectedData={setSelectedState}

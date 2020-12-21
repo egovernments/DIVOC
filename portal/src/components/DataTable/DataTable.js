@@ -33,7 +33,8 @@ function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificate
         >
             <thead>
                 <tr>
-                    <td >{title}{total ? <span className="second-word-formatting"/> : ''}{total}</td>
+                    <td >{title}</td>
+                    <td>{total}</td>
                 </tr>
             </thead>
             <tbody>{getTableData()}</tbody>
