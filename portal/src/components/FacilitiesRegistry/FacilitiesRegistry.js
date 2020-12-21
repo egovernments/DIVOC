@@ -3,6 +3,7 @@ import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
 import {TotalRecords} from "../TotalRecords";
+import {SampleCSV} from "../../utils/constants";
 
 function Facilities() {
     const [facilities, setFacilities] = useState([]);
@@ -23,7 +24,8 @@ function Facilities() {
     return (
         <div>
             <div className="d-flex mt-3">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchFacilities}/>
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchFacilities}
+                           sampleCSV={SampleCSV.FACILITY_REGISTRY}/>
                 <TotalRecords
                     title={"Total # of Records in the\n DIVOC Facility Registry"}
                     count={facilities.length}
