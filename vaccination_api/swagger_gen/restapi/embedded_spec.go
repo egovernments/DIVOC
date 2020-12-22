@@ -245,24 +245,6 @@ func init() {
         }
       }
     },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "security": [],
@@ -399,67 +381,6 @@ func init() {
             "schema": {
               "type": "object"
             }
-          }
-        }
-      }
-    },
-    "/symptoms": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1098,24 +1019,6 @@ func init() {
         }
       }
     },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "security": [],
@@ -1252,67 +1155,6 @@ func init() {
             "schema": {
               "type": "object"
             }
-          }
-        }
-      }
-    },
-    "/symptoms": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }

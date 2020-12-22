@@ -204,56 +204,6 @@ paths:
           description: OK
           schema:
             type: object
-  /symptoms:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms
-      operationId: getSymptoms
-      security: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-    post:
-      tags:
-        - symptoms
-      summary: Create symptoms
-      operationId: createSymptoms
-      security:
-        - hasRole: ["admin"]
-      parameters:
-        - in: body
-          name: body
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-          description: Symptoms data
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
-  /instructions:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms instructions
-      security: []
-      operationId: getInstructions
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
   /sideEffects:
     get:
       tags:

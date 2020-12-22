@@ -12,7 +12,6 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
 	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
-	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
@@ -40,9 +39,6 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
-	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
-	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
-	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
 	api.SideEffectsGetSideEffectsMetadataHandler = side_effects.GetSideEffectsMetadataHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
