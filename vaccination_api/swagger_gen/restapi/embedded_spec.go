@@ -387,58 +387,18 @@ func init() {
     },
     "/sideEffects": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
+        "security": [],
         "tags": [
           "sideEffects"
         ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
               "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1280,58 +1240,18 @@ func init() {
     },
     "/sideEffects": {
       "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
+        "security": [],
         "tags": [
           "sideEffects"
         ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
               "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }

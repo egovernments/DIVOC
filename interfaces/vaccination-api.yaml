@@ -258,37 +258,14 @@ paths:
     get:
       tags:
         - sideEffects
-      summary: Get Side Effects
-      security:
-        - hasRole: ["admin"]
-      operationId: getSideEffects
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
-    post:
-      tags:
-        - sideEffects
-      summary: Post side effects
+      summary: Get Side Effects Metadata
       security: []
-      operationId: createSideEffects
-      parameters:
-        - in: body
-          name: body
-          schema:
-            type: object
-            properties:
-              sideEffects:
-                type: object
-                $ref: '#/definitions/SideEffects'
+      operationId: getSideEffectsMetadata
       responses:
         '200':
           description: OK
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
+          schema:
+            type: object
   /report-side-effects:
     post:
       tags:
