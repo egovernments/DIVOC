@@ -11,30 +11,41 @@ import TableHead from "@material-ui/core/TableHead";
 import PropTypes from 'prop-types';
 
 const useStyles = makeStyles({
-    table: {
-        minWidth: 650,
-    },
-});
+        table: {
+            minWidth: 650,
+        }
+    })
+;
 
 const CustomPaper = withStyles({
     root: {
         boxShadow: "0px 6px 20px #C1CFD933",
         borderRadius: "10px",
         width: "100%",
-        height: '60vh'
+        height: '60vh',
+        padding: "16px",
+        borderBottom: "1px solid #CEE5FF"
     }
 })(Paper);
 
-const BorderLessTableCell = withStyles({
+const RowTableCell = withStyles({
     root: {
-        borderBottom: "none",
-        width: "200px"
+        fontSize: "0.75rem",
+        padding: "8px",
+        color: "#646D82",
+        borderBottom: "1px solid #CEE5FF",
+        font: "Proxima Nova"
     }
 })(TableCell);
 
-function createData(name, calories, fat, carbs, protein) {
-    return {name, calories, fat, carbs, protein};
-}
+const HeaderTableCell = withStyles({
+    root: {
+        fontSize: "0.75rem",
+        fontWeight: "bold",
+        color: "#646D82",
+        borderBottom: "1px solid #CEE5FF"
+    }
+})(TableCell);
 
 export class HistoryData {
     constructor(fileName, date, time, records, errors) {
@@ -59,37 +70,47 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
     const classes = useStyles();
 
     return (
-        <TableContainer component={CustomPaper}>
-            <Table className={classes.table}
-                   aria-label="facility staffs">
-                <TableHead>
-                    <TableRow>
+        <div>
+            <TableContainer component={CustomPaper}>
+                <h5 className="m-2">Uploads History</h5>
+                <hr color="#CEE5FF" style={{
+                    border: 0,
+                    borderBottom: "1px solid #CEE5FF"
+
+                }}/>
+                <Table className={classes.table}
+                       aria-label="facility staffs">
+                    <TableHead>
+                        <TableRow>
+                            {
+                                headerData.map((field, index) => (
+                                    <TableCell component={HeaderTableCell} size="small"
+                                               key={index}>{field.title}</TableCell>
+                                ))
+                            }
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {
-                            headerData.map((field, index) => (
-                                <TableCell key={index}>{field.title}</TableCell>
+                            data.map((row) => (
+                                <TableRow onClick={() => {
+                                    if (onCellClicked) {
+                                        onCellClicked(row)
+                                    }
+                                }}>
+                                    {
+                                        headerData.map((field, index) => (
+                                            <TableCell component={RowTableCell} size="small"
+                                                       key={index}>{row[field.key]}</TableCell>
+                                        ))
+                                    }
+                                </TableRow>
                             ))
                         }
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {
-                        data.map((row) => (
-                            <TableRow onClick={() => {
-                                if (onCellClicked) {
-                                    onCellClicked(row)
-                                }
-                            }}>
-                                {
-                                    headerData.map((field, index) => (
-                                        <TableCell key={index}>{row[field.key]}</TableCell>
-                                    ))
-                                }
-                            </TableRow>
-                        ))
-                    }
-                </TableBody>
-            </Table>
-        </TableContainer>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </div>
     );
 };
 
