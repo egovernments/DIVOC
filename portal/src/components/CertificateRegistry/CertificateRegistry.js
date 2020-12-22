@@ -4,6 +4,7 @@ import {SampleCSV} from "../../utils/constants";
 import {UploadHistoryTable} from "../UploadHistoryTable";
 import {Card} from "@material-ui/core";
 import {useAxios} from "../../utils/useAxios";
+import "./CertificateRegistry.css"
 
 function Certificates() {
     const fileUploadAPI = '/divoc/api/v1/bulkCertify';
@@ -45,14 +46,17 @@ function Certificates() {
     }
 
     return (
-        <div>
-            <div className="d-flex mt-3">
+        <div className="certificate-container">
+            <div className="upload-csv">
                 <UploadCSV fileUploadAPI={fileUploadAPI}
                            sampleCSV={SampleCSV.BULK_CERTIFY}
                 />
             </div>
-            <div className="d-flex flex-row justify-content-around">
+            <div className="total"/>
+            <div className="error-container">
                 {selectedHistory && <UploadErrors uploadHistory={selectedHistory}/>}
+            </div>
+            <div className="upload-history">
                 <UploadHistoryTable
                     data={uploadHistory}
                     headerData={headerData}
@@ -87,7 +91,7 @@ function UploadErrors({uploadHistory}) {
     }
 
     return (
-        <Card className="d-flex flex-row">
+        <Card className="error-container d-flex flex-row">
             <div>
                 <h3>{uploadHistory.records}</h3>
                 <h4>Record Uploaded</h4>

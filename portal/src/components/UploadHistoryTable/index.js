@@ -59,39 +59,37 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
     const classes = useStyles();
 
     return (
-        <div className="mt-3">
-            <TableContainer component={CustomPaper}>
-                <Table className={classes.table}
-                       aria-label="facility staffs">
-                    <TableHead>
-                        <TableRow>
-                            {
-                                headerData.map((field, index) => (
-                                    <TableCell key={index}>{field.title}</TableCell>
-                                ))
-                            }
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
+        <TableContainer component={CustomPaper}>
+            <Table className={classes.table}
+                   aria-label="facility staffs">
+                <TableHead>
+                    <TableRow>
                         {
-                            data.map((row) => (
-                                <TableRow onClick={() => {
-                                    if (onCellClicked) {
-                                        onCellClicked(row)
-                                    }
-                                }}>
-                                    {
-                                        headerData.map((field, index) => (
-                                            <TableCell key={index}>{row[field.key]}</TableCell>
-                                        ))
-                                    }
-                                </TableRow>
+                            headerData.map((field, index) => (
+                                <TableCell key={index}>{field.title}</TableCell>
                             ))
                         }
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </div>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {
+                        data.map((row) => (
+                            <TableRow onClick={() => {
+                                if (onCellClicked) {
+                                    onCellClicked(row)
+                                }
+                            }}>
+                                {
+                                    headerData.map((field, index) => (
+                                        <TableCell key={index}>{row[field.key]}</TableCell>
+                                    ))
+                                }
+                            </TableRow>
+                        ))
+                    }
+                </TableBody>
+            </Table>
+        </TableContainer>
     );
 };
 

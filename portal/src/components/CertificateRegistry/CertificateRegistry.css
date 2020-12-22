@@ -1,0 +1,23 @@
+.certificate-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 2%;
+    margin-top: 4%;
+}
+
+.upload-csv {
+}
+
+.upload-csv .UploadCSV_container__1cn_q {
+    width: 100%;
+}
+
+.total {
+}
+
+.error-container {
+    height: 100%;
+}
+
+.upload-history {
+}
