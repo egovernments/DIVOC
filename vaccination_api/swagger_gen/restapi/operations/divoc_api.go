@@ -24,6 +24,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
@@ -66,6 +67,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
+		}),
+		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams) middleware.Responder {
+			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
 		}),
 		SideEffectsCreateSideEffectsHandler: side_effects.CreateSideEffectsHandlerFunc(func(params side_effects.CreateSideEffectsParams) middleware.Responder {
 			return middleware.NotImplemented("operation side_effects.CreateSideEffects has not yet been implemented")
@@ -166,6 +170,8 @@ type DivocAPI struct {
 	CertificationBulkCertifyHandler certification.BulkCertifyHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
+	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
+	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// SideEffectsCreateSideEffectsHandler sets the operation handler for the create side effects operation
 	SideEffectsCreateSideEffectsHandler side_effects.CreateSideEffectsHandler
 	// SymptomsCreateSymptomsHandler sets the operation handler for the create symptoms operation
@@ -289,6 +295,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
+	}
+	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
+		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
 	}
 	if o.SideEffectsCreateSideEffectsHandler == nil {
 		unregistered = append(unregistered, "side_effects.CreateSideEffectsHandler")
@@ -449,6 +458,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/certify"] = certification.NewCertify(o.context, o.CertificationCertifyHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/report-side-effects"] = report_side_effects.NewCreateReportedSideEffects(o.context, o.ReportSideEffectsCreateReportedSideEffectsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

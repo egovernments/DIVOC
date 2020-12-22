@@ -129,7 +129,7 @@ paths:
       summary: Upload certification csv for bulk ingestion
       description: certify all the data in uploaded csv
       operationId: bulkCertify
-      security: 
+      security:
         - hasRole: ['facility-admin']
       consumes:
         - multipart/form-data
@@ -282,6 +282,34 @@ paths:
               sideEffects:
                 type: object
                 $ref: '#/definitions/SideEffects'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /report-side-effects:
+    post:
+      tags:
+        - reportSideEffects
+      summary: Create reported side effects
+      security: []
+      operationId: createReportedSideEffects
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              mobileNumber:
+                type: string
+              certificateId:
+                type: string
+              sideEffectsResponse:
+                type: array
+                items:
+                  $ref: '../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse'
       responses:
         '200':
           description: OK

@@ -341,6 +341,50 @@ func init() {
         }
       }
     },
+    "/report-side-effects": {
+      "post": {
+        "security": [],
+        "tags": [
+          "reportSideEffects"
+        ],
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "certificateId": {
+                  "type": "string"
+                },
+                "mobileNumber": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/sideEffects": {
       "get": {
         "security": [
@@ -1190,6 +1234,50 @@ func init() {
         }
       }
     },
+    "/report-side-effects": {
+      "post": {
+        "security": [],
+        "tags": [
+          "reportSideEffects"
+        ],
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "certificateId": {
+                  "type": "string"
+                },
+                "mobileNumber": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/sideEffectsResponse"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/sideEffects": {
       "get": {
         "security": [
@@ -1824,6 +1912,38 @@ func init() {
           }
         }
       }
+    },
+    "sideEffectsResponse": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "SideEffectsResponse",
+      "required": [
+        "symptom",
+        "response"
+      ],
+      "properties": {
+        "response": {
+          "description": "response",
+          "type": "string",
+          "title": "response",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/response"
+        },
+        "symptom": {
+          "description": "symptom",
+          "type": "string",
+          "title": "symptom",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/symptom"
+        }
+      },
+      "$id": "#/properties/SideEffectsResponse",
+      "examples": [
+        {
+          "response": "yes",
+          "symptom": "rapid heartbeat"
+        }
+      ]
     },
     "signature": {
       "type": "object",

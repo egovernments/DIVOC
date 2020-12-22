@@ -10,6 +10,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
@@ -46,6 +47,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
+	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
 }
 
 type GenericResponse struct {
@@ -248,11 +250,9 @@ func eventsHandler(params operations.EventsParams) middleware.Responder {
 }
 
 func getUserName(params *http.Request) string {
-	authHeader := params.Header.Get("Authorization")
 	preferredUsername := ""
-	if authHeader != "" {
-		bearerToken, _ := auth.GetToken(authHeader)
-		claimBody, _ := auth.GetClaimBody(bearerToken)
+	claimBody := auth.ExtractClaimBodyFromHeader(params)
+	if claimBody != nil {
 		preferredUsername = claimBody.PreferredUsername
 	}
 	return preferredUsername
