@@ -81,7 +81,7 @@ export const Home = () => {
 
                             <HomeCard img={<img src={LearnMoreBannerImg} alt={""} width={"60%"}/>}
                                       title={"Learn"}
-                                      subtitle={"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
+                                      subtitle={"The C-19 vaccination drive launched in India in 2021 aims to control, reduce and eradicate the prevalence of Covid in India. These videos will help you understand the program and learn about side-effect post vaccination."}
                                       buttonText={"Learn"}
                                       buttonOnClick={() => {
                                           history.push("/learn")

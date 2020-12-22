@@ -3,7 +3,7 @@ import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
 import {useKeycloak} from "@react-keycloak/web";
-import {CONSTANTS} from "../../utils/constants";
+import {CONSTANTS, SampleCSV} from "../../utils/constants";
 import {TotalRecords} from "../TotalRecords";
 
 function VaccinatorsRegistry() {
@@ -26,7 +26,9 @@ function VaccinatorsRegistry() {
         <div>
             {keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) &&
             <div className="d-flex mt-3">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}/>
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchVaccinators}
+                           sampleCSV={SampleCSV.VACCINATOR_REGISTRY}
+                />
                 <TotalRecords
                     title={"Total # of Records in the\nDIVOC Vaccinators Registry"}
                     count={vaccinators.length}
