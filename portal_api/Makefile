@@ -12,7 +12,7 @@ deps:
 swagger_gen/restapi/server.go: ../interfaces/admin-portal.yaml
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
 	@echo $(PWD)/../interfaces/admin-portal.yaml
-	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/../interfaces/admin-portal.yaml --principal models.JWTClaimBody
+	swagger generate server --exclude-main -t ./swagger_gen -f ../interfaces/admin-portal.yaml --principal models.JWTClaimBody
 
 api_docs:
 	@echo "Installing swagger-merger" && npm install swagger-merger -g

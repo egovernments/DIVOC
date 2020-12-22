@@ -80,6 +80,16 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 	return analyticsResponse
 }
 
+func getPublicAnalyticsInfo() AnalyticsResponse {
+	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
+
+	analyticsResponse := AnalyticsResponse{
+		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
+	}
+
+	return analyticsResponse
+}
+
 func getCount(query string) map[string]int64 {
 	result := map[string]int64{}
 	rows, err := connect.Query(query)

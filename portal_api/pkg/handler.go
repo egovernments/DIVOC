@@ -27,6 +27,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetEnrollmentsHandler = operations.GetEnrollmentsHandlerFunc(getEnrollmentsHandler)
 	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
+	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
 }
 
 type GenericResponse struct {
@@ -207,5 +208,9 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 
 func getAnalyticsHandler(params operations.GetAnalyticsParams, principal * models.JWTClaimBody) middleware.Responder {
 	return NewGenericJSONResponse(getAnalyticsInfo())
+}
+
+func getPublicAnalyticsHandler(params operations.GetAnalyticsParams, principal * models.JWTClaimBody) middleware.Responder {
+	return NewGenericJSONResponse(getPublicAnalyticsInfo())
 }
 
