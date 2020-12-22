@@ -18,8 +18,8 @@ import (
 type Event struct {
 
 	// date
-	// Format: date
-	Date strfmt.Date `json:"date,omitempty"`
+	// Format: date-time
+	Date strfmt.DateTime `json:"date,omitempty"`
 
 	// extra
 	Extra interface{} `json:"extra,omitempty"`
@@ -48,7 +48,7 @@ func (m *Event) validateDate(formats strfmt.Registry) error {
 		return nil
 	}
 
-	if err := validate.FormatOf("date", "body", "date", m.Date.String(), formats); err != nil {
+	if err := validate.FormatOf("date", "body", "date-time", m.Date.String(), formats); err != nil {
 		return err
 	}
 

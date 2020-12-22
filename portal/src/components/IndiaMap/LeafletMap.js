@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { MapContainer, GeoJSON, LayerGroup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import "./IndiaMap.css";
-import states from "./india_geo.json";
+import geoStates from "./india_geo.json";
 import districts from "./districts.json";
 
 export default function LeafletMap({
@@ -14,14 +14,32 @@ export default function LeafletMap({
     setDistrictList,
     stateList,
     setStateList,
-    stateWiseCertificateData
+    stateWiseCertificateData,
 }) {
+    const [states, setStates] = useState(geoStates);
     const [stateClicked, setStateClicked] = useState(false);
     const [mapDistrictData,setMapDistrictData] = useState([])
 
     useEffect(()=>{
         filterStateList();
     },[])
+
+    useEffect((x)=> {
+    if (Object.keys(stateWiseCertificateData).length>0)
+    {
+        let features = [...geoStates.features]
+        features = features.map(s => {
+            if (stateWiseCertificateData[s.properties['st_nm']] !== undefined) {
+                s.properties['count'] = stateWiseCertificateData[s.properties['st_nm']];
+            }
+            return s;
+        });
+        setStates({features});
+
+    }
+
+
+    }, [stateWiseCertificateData]);
 
     useEffect(() => {
         filterDistrictList();
@@ -31,12 +49,32 @@ export default function LeafletMap({
         filterDistricts();
     },[mapDistrictData])
 
-    const mapStyle = {
-        fillColor: "#CEE5FF",
-        weight: 1,
-        color: "white",
-        fillOpacity: 1,
+    function getColor(d) {
+        console.log(d);
+        if (d === undefined)
+            return '#ffffaf';
+
+        return d > 1000 ? '#800026' :
+          d > 500  ? '#BD0026' :
+            d > 200  ? '#E31A1C' :
+              d > 100  ? '#FC4E2A' :
+                d > 50   ? '#FD8D3C' :
+                  d > 20   ? '#FEB24C' :
+                    d > 10   ? '#FED976' :
+                    d > 0   ? '#FFEDA0' :
+                      '#0000f0';
+    }
+
+    const mapStyle = (feature) => {
+        let color = getColor(feature.properties['count'])
+        return {
+            fillColor: color,
+            weight: 3,
+            color: "white",
+            fillOpacity: 1, //feature.properties['count']===undefined?0:1,
+        };
     };
+    
 
     const filterStateList = () => {
         let newStateList = []
@@ -66,13 +104,15 @@ export default function LeafletMap({
 
     const onMouseIn = (event) => {
         event.target.setStyle({
-            fillColor: "#4E67D1",
+            // fillColor: "#4E67D1",
+            fillOpacity: 0.7,
         });
     };
 
     const onMouseOut = (event) => {
         event.target.setStyle({
-            fillColor: "#CEE5FF",
+            // fillColor: "#CEE5FF",
+            fillOpacity: 1,
         });
     };
 
@@ -81,14 +121,15 @@ export default function LeafletMap({
         setStateClicked(!stateClicked);
     };
 
+
     const onEachState = (state, layer) => {
         const stateName = state.properties.st_nm;
         const count = stateWiseCertificateData[stateName] ? stateWiseCertificateData[stateName] : 0;
-        layer.bindTooltip(`State : ${stateName} <br/> certificates Issued : ${count}`);
+        layer.bindTooltip(`<b>State : ${stateName}</b> <br/> certificates Issued : ${count}`);
         layer.on({
             mouseover: onMouseIn,
             mouseout: onMouseOut,
-            click: (event) => handleClick(event, stateName),
+            click: (event) => handleClick(event,stateName),
         });
     };
 
@@ -107,9 +148,9 @@ export default function LeafletMap({
     };
     return (
         <div id="mapid">
-            <MapContainer className="map-container" center={[22, 82]} zoom={5}>
+            <MapContainer className="map-container" center={[22, 82]} zoom={5} minZoom={4} maxZoom={6}>
                 <GeoJSON
-                    key="whatever"
+                    key="india"
                     style={mapStyle}
                     data={states}
                     onEachFeature={onEachState}

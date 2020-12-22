@@ -55,7 +55,6 @@ function CertificateView() {
         const response = await axios
             .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
             .then((res) => {
-                dispatch(addEventAction({type: EVENT_TYPES.CERTIFICATE_DOWNLOAD, extra: {mobile_number: userMobileNumber}}));
                 return res.data;
             });
         console.log(response);
@@ -233,7 +232,7 @@ function CertificateView() {
 
 
     return (
-        <div className={"row-cols-lg-1 row-cols-1 nav-pad" }>
+        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top" }>
             <div className="col-12 d-flex d-flex justify-content-center">
                 <div className={styles["container"]}>
                     <div className={styles["no-print"]}>

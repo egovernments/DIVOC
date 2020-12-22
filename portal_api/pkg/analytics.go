@@ -16,8 +16,10 @@ type AnalyticsResponse struct {
 	DownloadByDate                      map[string]int64 `json:"downloadByDate"`
 	ValidVerificationByDate             map[string]int64 `json:"validVerificationByDate"`
 	InValidVerificationByDate           map[string]int64 `json:"inValidVerificationByDate"`
-	TotalFacilities                     map[string]int64 `json:"totalFacilities"`
+	FacilitiesCount                     map[string]int64 `json:"facilitiesCount"`
 	RateOfCertificateIssuedByFacilities map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
+	VaccinatorsCount                    map[string]int64 `json:"vaccinatorsCount"`
+	AvgRateAcrossFacilities             map[string]int64 `json:"avgRateAcrossFacilities"`
 }
 
 var connect *sql.DB = initConnection()
@@ -46,17 +48,19 @@ union all
 select gender, count() from certificatesv1 group by gender
 `
 	byDateQuery := `select d, count() from certificatesv1 group by toYYYYMMDD(effectiveStart) as d`
-	byStateQuery := `select facilityState, count() from certificatesv1 group by facilityState`
+	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
 	byAgeQuery := `select a, count() from certificatesv1 group by floor(age/10)*10 as a`
-	downloadByDate := `select d, count() from eventsv1 where type='certificate-download' group by toYYYYMMDD(dt) as d`
+	downloadByDate := `select d, count() from eventsv1 where type='download' group by toYYYYMMDD(dt) as d`
 	validVerificationByDate := `select d, count() from eventsv1 where type='valid-verification' group by toYYYYMMDD(dt) as d`
 	inValidVerificationByDate := `select d, count() from eventsv1 where type='invalid-verification' group by toYYYYMMDD(dt) as d`
-	totalFacilities := `select 'total', count(distinct facilityName) from certificatesv1`
-	rateOfCertificateIssuedByFacilities := `select 'avg', toUInt256(avg(certificateIssued)) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+	facilitiesCount := `select 'value', count(distinct facilityName) from certificatesv1`
+	vaccinatorsCount := `select 'value', count(distinct vaccinatorName) as count from certificatesv1`
+	avgRateAcrossFacilities := `select 'value', toUInt64(avg(count)) from (select facilityName, count() as count from certificatesv1 group by facilityName)`
+	rateOfCertificateIssuedByFacilities := `select 'avg' as id, toUInt64(avg(certificateIssued)) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
-select 'min', min(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+select 'min' as id, min(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 union all
-select 'max', max(certificateIssued) from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
+select 'max' as id, max(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 `
 
 	analyticsResponse := AnalyticsResponse{
@@ -67,8 +71,10 @@ select 'max', max(certificateIssued) from ( select facilityName, count(*) as cer
 		DownloadByDate:                      getCount(downloadByDate),
 		ValidVerificationByDate:             getCount(validVerificationByDate),
 		InValidVerificationByDate:           getCount(inValidVerificationByDate),
-		TotalFacilities:                     getCount(totalFacilities),
+		FacilitiesCount:                     getCount(facilitiesCount),
 		RateOfCertificateIssuedByFacilities: getCount(rateOfCertificateIssuedByFacilities),
+		VaccinatorsCount:                    getCount(vaccinatorsCount),
+		AvgRateAcrossFacilities:                    getCount(avgRateAcrossFacilities),
 	}
 
 	return analyticsResponse
@@ -78,6 +84,7 @@ func getCount(query string) map[string]int64 {
 	result := map[string]int64{}
 	rows, err := connect.Query(query)
 	if err != nil {
+		log.Errorf("Error while preparing the query %+v", err)
 		return result
 	}
 	defer rows.Close()

@@ -11,7 +11,7 @@ function Home() {
     const [selectedDistrict, setSelectedDistrict] = useState([
         { name: "", count: 0 },
     ]);
-    const [stateWiseCertificateData,setStateWiseCertificateData] = useState([])
+    const [stateWiseCertificateData,setStateWiseCertificateData] = useState({})
     const certificateAPI = '/divoc/admin/api/v1/analytics';
     const axiosInstance = useAxios('');
 
@@ -23,15 +23,14 @@ function Home() {
         axiosInstance.current.get(certificateAPI)
             .then(res => {
                 setStateWiseCertificateData(res.data.numberOfCertificatesIssuedByState)
+                console.log("data",res.data.numberOfCertificatesIssuedByState)
             });
     }
 
-    const stateWiseTotalCertificateCount = () =>{
-        let sum = 0;
-        Object.keys(stateWiseCertificateData).map( data => sum = sum + stateWiseCertificateData[data])
-        return sum;
-    }
+    
 
+
+    
     return (
         <div className={styles["container"]}>
             <div className={styles["map-container"]}>
@@ -45,23 +44,27 @@ function Home() {
                     stateList={stateList}
                     setStateList={setStateList}
                     stateWiseCertificateData={stateWiseCertificateData}
+
                 />}
             </div>
-            <DataTable
+            <div className={styles["table-container"] + " float-right"}>
+                <DataTable
                     setSelectedData={setSelectedState}
                     selectedData={selectedState}
                     data={stateList}
                     title="ALL OF INDIA"
                     stateWiseCertificateData={stateWiseCertificateData}
-                    total={stateWiseTotalCertificateCount()}
-            />
-            {districtList.length>0 ? <DataTable
+                />
+            </div>
+            {selectedState.name !== "" && <div className={styles["table-container"]}>
+               <DataTable
                     setSelectedData={setSelectedDistrict}
                     selectedData={selectedDistrict}
                     data={districtList}
                     title={selectedState.name}
                     stateWiseCertificateData={stateWiseCertificateData}
-                /> : '' }
+               />
+            </div>}
 
         </div>
     );

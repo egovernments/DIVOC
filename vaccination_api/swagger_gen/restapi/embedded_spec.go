@@ -621,7 +621,7 @@ func init() {
       "properties": {
         "date": {
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         },
         "extra": {
           "type": "object"
@@ -1582,7 +1582,7 @@ func init() {
       "properties": {
         "date": {
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         },
         "extra": {
           "type": "object"

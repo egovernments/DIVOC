@@ -28,11 +28,10 @@ const persistedState = loadState();
 
 export const store = createStore(
     rootReducer,
-    persistedState,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
 store.subscribe(throttle(() => {
-    saveState(store.getState());
+    // saveState(store.getState());
     postEvents(store.getState().events, store.dispatch)
 }, 1000));
 

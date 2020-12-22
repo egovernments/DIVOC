@@ -52,19 +52,8 @@ type CertifyMessage struct {
 func main() {
 	config.Initialize()
 	log.Infof("Starting analytics collector")
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	if err := connect.Ping(); err != nil {
-		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
-		} else {
-			fmt.Println(err)
-		}
-		return
-	}
-	_, err = connect.Exec(`
+	connect := initClickhouse()
+	_, err := connect.Exec(`
 		CREATE TABLE IF NOT EXISTS certificatesv1 (
   certificateId String,
   age UInt8,
@@ -79,7 +68,8 @@ func main() {
   facilityName String,
   facilityCountryCode FixedString(2),
   facilityState String,
-  facilityPostalCode String
+  facilityPostalCode String,
+  vaccinatorName String
 ) engine = MergeTree() order by dt
 	`)
 	if err != nil {
@@ -102,6 +92,23 @@ type String
 	wg.Wait()
 }
 
+func initClickhouse() *sql.DB {
+	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := connect.Ping(); err != nil {
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+
+		} else {
+			fmt.Println(err)
+		}
+		return nil
+	}
+	return connect
+}
+
 type MessageCallback func(*sql.DB, string) error
 
 func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string) {
@@ -122,6 +129,12 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+			if connect == nil {
+				connect = initClickhouse()
+				if connect == nil {
+					log.Fatal("Unable to get clickhouse connection")
+				}
+			}
 			if err := callback(connect, string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
@@ -192,8 +205,9 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	facilityName,
 	facilityCountryCode,
 	facilityState,
-	facilityPostalCode ) 
-	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+	facilityPostalCode,
+	vaccinatorName) 
+	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 	)
 
 	if err != nil {
@@ -201,6 +215,13 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	}
 	//todo collect n messages and batch write to analytics db.
 	age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
+	if age == 0 {
+		if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob); err == nil {
+			if (dobTime.Year()>1900) {
+				age = time.Now().Year() - dobTime.Year()
+			}
+		}
+	}
 	if _, err := stmt.Exec(
 		"",
 		age,
@@ -216,6 +237,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		"IN",
 		certifyMessage.Facility.Address.State,
 		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
+		certifyMessage.Vaccinator.Name,
 	); err != nil {
 		log.Fatal(err)
 	}

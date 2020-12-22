@@ -1,4 +1,4 @@
-const vaccinationv1 = {
+const vaccinationContext = {
   "@context": {
     "@version": 1.1,
     "@protected": true,
@@ -22,7 +22,7 @@ const vaccinationv1 = {
         "name": "schema:name",
         "age": "schema:Number",
         "gender": "schema:gender",
-        "nationality": "schema:nationality",
+        "nationality": "schema:nationality"
       }
     },
     "Vaccination": {
@@ -66,16 +66,17 @@ const vaccinationv1 = {
                 "district": "vac:district",
                 "addressRegion": "schema:addressRegion",
                 "postalCode": "schema:postalCode",
-                "addressCountry": "schema:addressCountry",
+                "addressCountry": "schema:addressCountry"
               }
             },
             "seal-image": "schema:image"
           }
-        },
+        }
       }
     }
   }
-};
+}
+
 module.exports = {
-  vaccinationv1
+  vaccinationContext
 }

@@ -21,7 +21,7 @@ export const FacilityAnalysis = ({analytics}) => {
                                                    <span className="metric-value" style={{
                                                        fontSize: "5rem",
                                                        fontWeight: "bold"
-                                                   }}>{pathOr(0, ["totalFacilities", "all"], analytics)}</span>
+                                                   }}>{pathOr(0, ["facilitiesCount", "value"], analytics)}</span>
                                                </div>
                                            </div>
                                        }
@@ -35,7 +35,7 @@ export const FacilityAnalysis = ({analytics}) => {
                                                    <span className="metric-value" style={{
                                                        fontSize: "5rem",
                                                        fontWeight: "bold"
-                                                   }}>{pathOr(0, ["totalVaccinators", "all"], analytics)}</span>
+                                                   }}>{pathOr(0, ["vaccinatorsCount", "value"], analytics)}</span>
                                                </div>
                                            </div>
                                        }
@@ -49,7 +49,7 @@ export const FacilityAnalysis = ({analytics}) => {
                                                    <span className="metric-value" style={{
                                                        fontSize: "5rem",
                                                        fontWeight: "bold"
-                                                   }}>{pathOr(0, ["averageRate", "all"], analytics)}</span>
+                                                   }}>{pathOr(0, ["avgRateAcrossFacilities", "value"], analytics)}</span>
                                                </div>
                                            </div>
                                        }

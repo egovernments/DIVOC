@@ -6,6 +6,7 @@
     <head>
         <meta charset="utf-8">
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="robots" content="noindex, nofollow">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
               integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
@@ -74,7 +75,7 @@
             <div class="form-content">
                 <div class="title-content">
                     <br/>
-                    <span class="form-subtitle">Please Enter your Mobile Number and OTP</span>
+                    <p class="form-subtitle">Please Enter your Mobile Number and OTP</p>
                 </div>
             <#nested "form">
             </div>
@@ -86,11 +87,8 @@
     </div>
     <div class="footer-content">
         <div>
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/mhfw.png" alt="">
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/meit.png" alt="">
-            <img class="footer-gov-logo" src="${url.resourcesPath}/img/di.png" alt="">
         </div>
-        <div>
+        <div class="d-none d-lg-block">
             <span class="footer-link">Contact Us</span>
             <span class="footer-link">Term of use</span>
             <span class="footer-link">Privacy Policy</span>

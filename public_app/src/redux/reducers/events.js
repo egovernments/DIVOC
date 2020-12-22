@@ -37,7 +37,7 @@ export function eventsReducer(state = initialState, action) {
 export const addEventAction = (event) => {
     return {
         type: EVENT_ACTION_TYPES.ADD_EVENT,
-        payload: {...event, date: new Date().getTime()}
+        payload: {...event, date: new Date().toISOString()}
     }
 };
 
@@ -50,10 +50,16 @@ const removeEventsAction = (eventIds) => {
 
 export const postEvents = ({data}, dispatch) => {
     if (data.length > 0) {
-        axios
-            .post("/divoc/api/v1/events/", data)
-            .then((res) => {
-                return dispatch(removeEventsAction(data.map(e => e.id)));
+        try {
+            axios
+              .post("/divoc/api/v1/events/", data)
+              .then((res) => {
+                  return dispatch(removeEventsAction(data.map(e => e.id)));
+              }).catch((e) => {
+                console.log(e);
             });
+        } catch (e) {
+            console.log(e);
+        }
     }
 };

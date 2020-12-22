@@ -13,6 +13,7 @@ import {CertificateDetailsPaths} from "../../constants";
 import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
+import axios from "axios";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -20,15 +21,15 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('../../utils/credentials');
-const {vaccinationv1} = require('../../utils/vaccinationv1');
+const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
         "did:india": config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
-        "https://www.w3.org/2018/credentials/v1": credentialsv1
-        , "https://www.who.int/2020/credentials/vaccination/v1": vaccinationv1
+        "https://www.w3.org/2018/credentials/v1": credentialsv1,
+        "https://www.who.int/2020/credentials/vaccination/v1": vaccinationContext
     };
     let context = c[url];
     if (context === undefined) {
@@ -51,6 +52,18 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
+
+    setTimeout(()=>{
+        try {
+            axios
+              .post("/divoc/api/v1/events/", {"date":new Date().toISOString(), "type":"verify"})
+              .catch((e) => {
+                console.log(e);
+            });
+        } catch (e) {
+            console.log(e);
+        }
+    }, 100)
 
     const dispatch = useDispatch();
     useEffect(() => {
@@ -95,6 +108,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 console.log('Invalid data', e);
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
+
             }
 
         }
@@ -128,7 +142,11 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 </table>
             }
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
-            <SmallInfoCards text={"Provide Feedback"} img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
+            <SmallInfoCards text={"Provide Feedback"}
+                            onClick={() => {
+                                history.push("/side-effects")
+                            }}
+                            img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
             <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
                            onClick={() => {
                                 history.push("/learn")
@@ -141,7 +159,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
     <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
         <div className="w-50 ">
-            <img src={img} alt={""} />
+            <img src={img} alt={""} className="small-card-img float-right"/>
         </div>
         <div onClick={onClick}
              className="w-50 d-flex flex-column align-items-start justify-content-center font-weight-bold">
