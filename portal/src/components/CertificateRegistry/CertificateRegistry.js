@@ -7,6 +7,9 @@ import {useAxios} from "../../utils/useAxios";
 import "./CertificateRegistry.css"
 import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
 import ProgramActive from "../../assets/img/program-active.svg"
+import withStyles from "@material-ui/core/styles/withStyles";
+import Paper from "@material-ui/core/Paper";
+import {formatDate} from "../../utils/dateutil";
 
 function Certificates() {
     const fileUploadAPI = '/divoc/api/v1/bulkCertify';
@@ -32,11 +35,14 @@ function Certificates() {
             })
             .then((result) => {
                 return result.map((item, index) => {
+                    const uploadedDate = new Date(item.uploadedTime)
+                    const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                    const uploadLocalDate = formatDate(uploadedDate)
                     return {
                         id: item.id,
                         fileName: item.filename,
-                        date: item.uploadedTime,
-                        time: "11:00 AM",
+                        date: uploadLocalDate,
+                        time: uploadLocalTime,
                         records: item.TotalRecords,
                         errors: item.TotalErrorRows
                     };
@@ -93,8 +99,18 @@ function UploadErrors({uploadHistory}) {
             });
     }
 
+    const CustomPaper = withStyles({
+        root: {
+            boxShadow: "0px 6px 20px #C1CFD933",
+            borderRadius: "10px",
+            width: "100%",
+            height: '60vh',
+            padding: "16px"
+        }
+    })(Paper);
+
     return (
-        <Card>
+        <Card component={CustomPaper}>
             <div className="error-container">
                 <div className="error-count ml-lg-5 mt-5">
                     <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
