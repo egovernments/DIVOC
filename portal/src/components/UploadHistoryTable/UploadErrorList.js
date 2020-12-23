@@ -11,6 +11,7 @@ import UploadErrorIcon from "../../assets/img/upload_error.svg"
 
 const CustomPaper = withStyles({
     root: {
+        boxShadow: "none",
         width: "100%",
         padding: "32px"
     }

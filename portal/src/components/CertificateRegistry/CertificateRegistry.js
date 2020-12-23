@@ -56,9 +56,7 @@ function Certificates() {
     return (
         <div className="certificate-container">
             <div className="upload-csv">
-                <UploadCSV fileUploadAPI={fileUploadAPI}
-                           sampleCSV={SampleCSV.BULK_CERTIFY}
-                />
+                <UploadCSV fileUploadAPI={fileUploadAPI}/>
             </div>
             <div className="total"/>
             <div className="upload-history">
