@@ -143,6 +143,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
   /programs/current:
@@ -491,6 +493,16 @@ definitions:
         type: string
       extra:
         type: object
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message
 host: divoc.xiv.in
 schemes:
   - https

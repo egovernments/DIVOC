@@ -3,6 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -17,9 +21,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -223,7 +224,26 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	requiredHeaders := []string {"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity", 
+	"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName", 
+	"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
+	
 	data := NewScanner(params.File)
+
+	// csv template validation
+	csvHeaders := data.GetHeaders()
+	for _, a := range requiredHeaders {
+		if !contains(csvHeaders, a) {
+			code := "INVALID_TEMPLATE"
+			message := a + " column doesnt exist in uploaded csv file"
+			error := &models.Error {
+				Code: &code,
+				Message: &message,
+			}
+			return certification.NewBulkCertifyBadRequest().WithPayload(error)
+		}
+	}
+
 	for data.Scan() {
 		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))

@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // BulkCertifyOKCode is the HTTP code returned for type BulkCertifyOK
@@ -43,6 +45,11 @@ const BulkCertifyBadRequestCode int = 400
 swagger:response bulkCertifyBadRequest
 */
 type BulkCertifyBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewBulkCertifyBadRequest creates BulkCertifyBadRequest with default headers values
@@ -51,12 +58,27 @@ func NewBulkCertifyBadRequest() *BulkCertifyBadRequest {
 	return &BulkCertifyBadRequest{}
 }
 
+// WithPayload adds the payload to the bulk certify bad request response
+func (o *BulkCertifyBadRequest) WithPayload(payload *models.Error) *BulkCertifyBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the bulk certify bad request response
+func (o *BulkCertifyBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *BulkCertifyBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 // BulkCertifyUnauthorizedCode is the HTTP code returned for type BulkCertifyUnauthorized
