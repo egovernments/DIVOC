@@ -1,81 +1,18 @@
 import React, {useState} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 import "./index.css";
-import {SubmitSymptomsForm} from "../SubmitSymptomsForm";
-import {ReactComponent as VaccinationActiveImg} from "../../assets/img/FeedbackScreen.svg";
-import CertificateImg from "../../assets/img/download-certificate-home.svg";
+import {useHistory} from "react-router-dom";
+import Form from "@rjsf/core";
+import {CustomCheckboxWidget} from "../CustomCheckboxWidget";
+import {CustomRangeWidget} from "../CustomRangeWidget";
+import {CustomButton} from "../CustomButton";
+import {SmallInfoCards} from "../CertificateStatus";
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
-import {CertificateStatus, SmallInfoCards} from "../CertificateStatus";
-import {Link, useHistory} from "react-router-dom";
 import LearnMoreImg from '../../assets/img/leanr_more_small.png'
-
-const data = {
-    0: [{
-        "name": "Loss of Sense",
-        "types": [
-            {
-                "name": "Loss of Smell",
-                "instructions": ["You should get Covid-19 test done."]
-            },
-            {
-                "name": "Loss of Taste",
-                "instructions": ["You should get Covid-19 test done."]
-            },
-            {
-                "name": "Temporary loss of Vision ",
-                "instructions": ["You should consult a pulmonologist"]
-            },
-        ]
-    }],
-    1: [{
-        "name": "Mental Health",
-        "types": [
-            {
-                "name": "Memory loss",
-                "instructions": ["You should consult post-Covid support"]
-            },
-            {
-                "name": "Bouts of Depression / Anxiety / Panic Attacks",
-                "instructions": ["You should consult a psychiatrist"]
-            },
-            {
-                "name": "Severe Headache",
-                "instructions": ["You should consult post-Covid support"]
-            },
-        ]
-    }],
-    2: [{
-        "name": "Cardiovascular disease symptoms",
-        "types": [
-            {
-                "name": "Sudden black Out",
-                "instructions": ["You should consult a cardiologist"]
-            },
-            {
-                "name": "Palpitations",
-                "instructions": ["You should consult a cardiologist"]
-            },
-        ]
-    }],
-    3: [{
-        "name": "Paralysis",
-        "types": [
-            {
-                "name": "Temporary Paralysis",
-                "instructions": ["You should consult a neurologist"]
-            }, {
-                "name": "Permanent Paralysis",
-                "instructions": ["You should consult a neurologist"]
-            }
-        ]
-    }],
-};
-
-
 
 export const SideEffects = () => {
     const history = useHistory();
-    const [symptoms, setSymptoms] = useState(data);
+
     const [nextSymptoms, setNextSymptoms] = useState({});
     const [selectedSymptomIds, setSelectedSymptomIds] = useState([]);
     const [instructions, setInstructions] = useState([]);
@@ -121,48 +58,158 @@ export const SideEffects = () => {
         setShowSubmitForm(true)
     }
 
-    function onNextBtnClick() {
-        setSymptoms(nextSymptoms);
-        setNextSymptoms({});
-        setShowOtherSection(false);
-        setShowGroupHeader(true);
-    }
-
-    function onReset() {
-        setShowSubmitForm(false);
-        setSymptoms(data);
-        setInstructions([]);
-        setShowOtherSection(true);
-        setNextSymptoms({});
-        setSelectedSymptomIds([]);
-        setShowGroupHeader(false);
-    }
 
     let showNextButton = false;
+    const schema = {
+        properties: {
+            "Flu-like symptoms": {
+                "type": "boolean",
+                "title": "Flu-like symptoms",
+                "enumNames": ["Yes", "No"]
+            },
+            "Temperature": {
+                "type": "number",
+                "title": "Temperature",
+                "minimum": 90,
+                "maximum": 108,
+                "multipleOf": 0.1,
+                "unit": "°F"
+            },
+            "Rapid Heartbeat": {
+                "type": "boolean",
+                "title": "Rapid Heartbeat",
+                "enumNames": ["Yes", "No"]
+            },
+            "Fatigue": {
+                "type": "boolean",
+                "title": "Fatigue",
+                "enumNames": ["Yes", "No"]
+            },
+            "Headache": {
+                "type": "boolean",
+                "title": "Headache",
+                "enumNames": ["Yes", "No"]
+            },
+            "Muscle/Joint Pain": {
+                "type": "boolean",
+                "title": "Muscle/Joint Pain",
+                "enumNames": ["Yes", "No"]
+            },
+            "Pain Scale": {
+                "type": "number",
+                "title": "Pain Scale",
+                "minimum": 0,
+                "maximum": 10,
+                "multipleOf": 1,
+                "unit": ""
+            },
+            "Chills": {
+                "type": "boolean",
+                "title": "Chills",
+                "enumNames": ["Yes", "No"]
+            },
+            "Cough": {
+                "type": "boolean",
+                "title": "Cough",
+                "enumNames": ["Yes", "No"]
+            },
+            "Paralysis": {
+                "type": "boolean",
+                "title": "Paralysis",
+                "enumNames": ["Yes", "No"]
+            },
+            "Arm Soreness": {
+                "type": "boolean",
+                "title": "Arm Soreness",
+                "enumNames": ["Yes", "No"]
+            },
+            "Nausea": {
+                "type": "boolean",
+                "title": "Nausea",
+                "enumNames": ["Yes", "No"]
+            },
+            "Migraine": {
+                "type": "boolean",
+                "title": "Migraine",
+                "enumNames": ["Yes", "No"],
+            },
+            "Swollen Glands": {
+                "type": "boolean",
+                "title": "Swollen Glands",
+                "enumNames": ["Yes", "No"]
+            },
+            "Other": {
+                "className": "feedback-input-box",
+                "type": "string"
+            }
+
+        }
+    };
+
+    const uiSchema = {
+        "Temperature": {
+            "ui:options": {label: false},
+            "ui:widget": "range"
+        },
+        "Pain Scale": {
+            "ui:options": {label: false},
+            "ui:widget": "range"
+        },
+        "Other": {
+            "classNames": ["side-effects-input-box"],
+            "ui:options": {label: false},
+            "ui:placeholder": "Type to enter any other conditions"
+        }
+    };
+
+    const widgets = {
+        CheckboxWidget: CustomCheckboxWidget,
+        RangeWidget: CustomRangeWidget
+    };
+
+    const onSideEffectsSubmit = (data, e) => {
+        debugger
+    }
+
     return (
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
-                    <h3 align="center">Provide Feedback</h3>
-                    <span width="40%" display="inline-block">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
-                {/* <img src={VaccinationActiveImg} alt=""/> */}
-                <VaccinationActiveImg/>
+                    <h3 className="text-center">Provide Feedback</h3>
+                    <span className="text-center d-block">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
+                    <Container className="pt-5">
+                        <Row>
+                            <Col>
+                                <h4 align="">Report Side-effects</h4>
+                                <h5 align="">Select Symptoms</h5>
+                                <Form schema={schema}
+                                      uiSchema={uiSchema} widgets={widgets} onSubmit={onSideEffectsSubmit}>
+                                    <div className="d-flex justify-content-center">
+                                        <CustomButton className="green-btn" type="submit" onClick={() => {
+                                        }}>
+                                            <span>Confirm Symptoms</span>
+                                        </CustomButton>
+                                    </div>
+                                </Form>
+                            </Col>
+                        </Row>
+                    </Container>
                     <SmallInfoCards
-                    text={"Verify Certificate"}
-                    img={VerifyCertificateImg}
-                    onClick={() => {
-                        history.push("/verify-certificate/")
-                    }}
-                    backgroundColor={"#F2FAF6"}
+                        text={"Verify Certificate"}
+                        img={VerifyCertificateImg}
+                        onClick={() => {
+                            history.push("/verify-certificate/")
+                        }}
+                        backgroundColor={"#F2FAF6"}
                     />
                     <br/>
                     <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnMoreImg}
-                           onClick={() => {
-                                history.push("/learn/")
-                            }}
-                            backgroundColor={"#EFF5FD"}/>
-                
-                
+                                    onClick={() => {
+                                        history.push("/learn/")
+                                    }}
+                                    backgroundColor={"#EFF5FD"}/>
+
+
                 </div>
             </Container>
         </div>
