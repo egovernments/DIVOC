@@ -57,7 +57,17 @@
 }
 
 .error-list {
-    grid-row: 1 / 4;
+    grid-row: 1 / 3;
+    margin: 4%;
     text-align: center;
+    border-radius: 25px;
+    border: 1px solid #FC573B;
+    padding: 4%;
+}
+
+.error-list h6 {
+    font-weight: bold;
+    color: #FC573B;
+    font-size: 18px;
 }
 

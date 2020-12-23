@@ -96,13 +96,13 @@ function UploadErrors({uploadHistory}) {
     return (
         <Card>
             <div className="error-container">
-                <div className="error-count ml-4 mt-4">
+                <div className="error-count ml-lg-5 mt-5">
                     <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
                     <h3>{uploadHistory.records}</h3>
                     <h5>Records<br/>Uploaded</h5>
                 </div>
                 <UploadErrorList uploadHistoryDetails={uploadHistoryDetails}/>
-                <div className="error-file-details  ml-4 mb-4">
+                <div className="error-file-details  ml-lg-5 mb-5">
                     <p>{uploadHistory.fileName}</p>
                     <p>{uploadHistory.date}</p>
                     <p>{uploadHistory.time}</p>
