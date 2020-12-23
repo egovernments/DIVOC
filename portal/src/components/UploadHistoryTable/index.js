@@ -23,8 +23,7 @@ const CustomPaper = withStyles({
         borderRadius: "10px",
         width: "100%",
         height: '60vh',
-        padding: "16px",
-        borderBottom: "1px solid #CEE5FF"
+        padding: "16px"
     }
 })(Paper);
 
@@ -84,8 +83,11 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
                         <TableRow>
                             {
                                 headerData.map((field, index) => (
-                                    <TableCell component={HeaderTableCell} size="small"
-                                               key={index}>{field.title}</TableCell>
+                                    <TableCell
+                                        component={HeaderTableCell}
+                                        size="small"
+                                        align="center"
+                                        key={index}>{field.title}</TableCell>
                                 ))
                             }
                         </TableRow>
@@ -100,8 +102,11 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
                                 }}>
                                     {
                                         headerData.map((field, index) => (
-                                            <TableCell component={RowTableCell} size="small"
-                                                       key={index}>{row[field.key]}</TableCell>
+                                            <TableCell
+                                                component={RowTableCell}
+                                                size="small"
+                                                align="center"
+                                                key={index}>{row[field.key]}</TableCell>
                                         ))
                                     }
                                 </TableRow>

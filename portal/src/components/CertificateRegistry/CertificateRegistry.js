@@ -5,6 +5,8 @@ import {UploadHistoryTable} from "../UploadHistoryTable";
 import {Card} from "@material-ui/core";
 import {useAxios} from "../../utils/useAxios";
 import "./CertificateRegistry.css"
+import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
+import ProgramActive from "../../assets/img/program-active.svg"
 
 function Certificates() {
     const fileUploadAPI = '/divoc/api/v1/bulkCertify';
@@ -53,7 +55,7 @@ function Certificates() {
                 />
             </div>
             <div className="total"/>
-            <div className="error-container">
+            <div className="error-temp">
                 {selectedHistory && <UploadErrors uploadHistory={selectedHistory}/>}
             </div>
             <div className="upload-history">
@@ -91,24 +93,24 @@ function UploadErrors({uploadHistory}) {
     }
 
     return (
-        <Card className="error-container d-flex flex-row">
-            <div>
-                <h3>{uploadHistory.records}</h3>
-                <h4>Record Uploaded</h4>
-                <p>{uploadHistory.fileName}</p>
-                <p>{uploadHistory.date}</p>
-                <p>{uploadHistory.time}</p>
-            </div>
+        <Card>
+            <div className="error-container">
+                <div className="error-count ml-4 mt-4">
+                    <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
+                    <h3>{uploadHistory.records}</h3>
+                    <h5>Records<br/>Uploaded</h5>
+                </div>
+                <UploadErrorList uploadHistoryDetails={uploadHistoryDetails}/>
+                <div className="error-file-details  ml-4 mb-4">
+                    <p>{uploadHistory.fileName}</p>
+                    <p>{uploadHistory.date}</p>
+                    <p>{uploadHistory.time}</p>
+                </div>
 
-            <div>
-                {
-                    uploadHistoryDetails.map((item, index) => <h6>{item.errorMessage}</h6>)
-                }
             </div>
         </Card>
     );
 }
-
 
 const headerData = [
     {
