@@ -3,9 +3,10 @@ import {TabPanels} from "../TabPanel/TabPanel";
 import Certificates from "../CertificateRegistry/CertificateRegistry"
 import {useKeycloak} from "@react-keycloak/web";
 import {useAxios} from "../../utils/useAxios";
-import {Button} from "react-bootstrap";
 import {SampleCSV} from "../../utils/constants";
+import DownloadImg from "../../assets/img/download.svg"
 import "./FacilityAdmin.css"
+import {Button, Col, Row} from "react-bootstrap";
 
 
 export default function FacilityAdmin() {
@@ -30,13 +31,12 @@ export default function FacilityAdmin() {
             {
                 title: "Upload Vaccination Details",
                 component: <Certificates/>,
-                rightTabContent: <a href={SampleCSV.BULK_CERTIFY} className={"btn-template"}>
-                    <div onClick={() => {
-                    }}>
-                        <p>DOWNLOAD TEMPLATE>CSV</p>
-                        <img/>
-                    </div>
-                </a>
+                rightTabContent: <Button bsPrefix={"btn-template"}>
+                    <Col className="d-flex flex-row">
+                        <h6>DOWNLOAD TEMPLATE.CSV</h6>
+                        <img src={DownloadImg} alt={"Download CSV"}/>
+                    </Col>
+                </Button>
             },
             // {title: "Role Setup", component: <RoleSetup/>},
             // {title: "Vaccinator Details", component: <VaccinatorList/>},
