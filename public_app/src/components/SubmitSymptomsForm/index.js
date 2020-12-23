@@ -58,18 +58,27 @@ export const SubmitSymptomsForm = (props) => {
         }
         if (currentState === state.ShowPatientDetails) {
             if (confirmDetails) {
-                setCurrentState(state.CompletedMessage)
                 submitSymptoms()
             }
         }
 
         if (currentState === state.CompletedMessage) {
+            history.push("/feedback");
         }
     }
 
     async function submitSymptoms() {
         let sideEffectsData = localStorage.getItem(SIDE_EFFECTS_DATA);
         sideEffectsData = JSON.parse(sideEffectsData);
+        //TODO: added empty symptom and response, min 2 array fields required for registry to work
+        const sideEffectsResponse = Object.keys(sideEffectsData).map(key => ({
+            symptom: key,
+            response: sideEffectsData[key].toString()
+        })).concat({symptom:"", response: ""});
+        const reportSideEffects = {
+            certificateId: recipients[patientSelected].certificateId,
+            sideEffectsResponse: sideEffectsResponse
+        };
         const config = {
             headers: {
                 Authorization: `Bearer ${keycloak.token} `,
@@ -77,10 +86,12 @@ export const SubmitSymptomsForm = (props) => {
             },
         };
         await axios
-            .post("/divoc/api/v1//report-side-effects", sideEffectsData, config)
+            .post("/divoc/api/v1/report-side-effects", reportSideEffects, config)
             .then((res) => {
-
+                setCurrentState(state.CompletedMessage);
                 return res.data;
+            }).catch((err) => {
+                console.log(err)
             }).finally(() => {
                 localStorage.removeItem(SIDE_EFFECTS_DATA);
             });
