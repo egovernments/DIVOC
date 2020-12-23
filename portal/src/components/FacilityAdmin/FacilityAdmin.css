@@ -1,0 +1,9 @@
+.btn-template {
+    border-radius: 6px;
+    border: none;
+    color: #FFFFFF;
+    background: #4CA07A;
+    height: 30px;
+    padding: 4px 8px;
+    font-size: 12px;
+}

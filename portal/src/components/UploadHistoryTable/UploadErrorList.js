@@ -8,6 +8,8 @@ import TableBody from "@material-ui/core/TableBody";
 import Paper from "@material-ui/core/Paper";
 import UploadErrorIcon from "../../assets/img/upload_error.svg"
 
+var Papa = require("papaparse/papaparse");
+
 
 const CustomPaper = withStyles({
     root: {
@@ -51,7 +53,11 @@ export function UploadErrorList({uploadHistoryDetails}) {
                     </TableBody>
                 </Table>
             </div>
-            <Button variant="danger" className="m-4">Download Error CSV</Button>
+            <Button variant="danger" className="m-4" onClick={() => {
+                const rawCSV = uploadHistoryDetails.map((item, index) => item.rawData);
+                const csv = Papa.unparse(rawCSV)
+                //console.log(JSON.stringify(csv))
+            }}>Download Error CSV</Button>
         </div>
     );
 }

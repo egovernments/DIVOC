@@ -5,7 +5,7 @@ import {useKeycloak} from "@react-keycloak/web";
 import {useAxios} from "../../utils/useAxios";
 import {Button} from "react-bootstrap";
 import {SampleCSV} from "../../utils/constants";
-import styles from "../FacilityAdmin/FacilityAdmin.module.css"
+import "./FacilityAdmin.css"
 
 
 export default function FacilityAdmin() {
@@ -30,11 +30,13 @@ export default function FacilityAdmin() {
             {
                 title: "Upload Vaccination Details",
                 component: <Certificates/>,
-                rightTabContent: <Button
-                    variant={"success"}
-                    href={SampleCSV.BULK_CERTIFY}
-                    size="sm">DOWNLOAD
-                    TEMPLATE.CSV</Button>
+                rightTabContent: <a href={SampleCSV.BULK_CERTIFY} className={"btn-template"}>
+                    <div onClick={() => {
+                    }}>
+                        <p>DOWNLOAD TEMPLATE>CSV</p>
+                        <img/>
+                    </div>
+                </a>
             },
             // {title: "Role Setup", component: <RoleSetup/>},
             // {title: "Vaccinator Details", component: <VaccinatorList/>},

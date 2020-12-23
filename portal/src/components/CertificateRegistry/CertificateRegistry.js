@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import UploadCSV from '../UploadCSV/UploadCSV';
-import {SampleCSV} from "../../utils/constants";
 import {UploadHistoryTable} from "../UploadHistoryTable";
 import {Card} from "@material-ui/core";
 import {useAxios} from "../../utils/useAxios";
@@ -154,15 +153,15 @@ const errorData = " [\n" +
     "    {\n" +
     "        \"field\": \"somefield\",\n" +
     "        \"errorMessage\": \"Failed to upload mobile number\",\n" +
-    "        \"rawData\": \"cdvData\"\n" +
+    "        \"rawData\": \"1-1,1-2,1-3,1-4\"\n" +
     "    }, {\n" +
     "        \"field\": \"somefield\",\n" +
     "        \"errorMessage\": \"Failed to upload facility id\",\n" +
-    "        \"rawData\": \"cdvData\"\n" +
+    "        \"rawData\": \"2-1,2-2,2-3,2-4\"\n" +
     "    }, {\n" +
     "        \"field\": \"somefield\",\n" +
     "        \"errorMessage\": \"Failed to upload invalid name\",\n" +
-    "        \"rawData\": \"cdvData\"\n" +
+    "        \"rawData\": \"3-1,3-2,3-3,3-4\"\n" +
     "    }\n" +
     "]"
 
