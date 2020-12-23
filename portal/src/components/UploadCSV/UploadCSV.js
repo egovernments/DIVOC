@@ -5,7 +5,7 @@ import React, {useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
 
-function UploadCSV({fileUploadAPI, onUploadComplete}) {
+function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
 
     const {keycloak} = useKeycloak();
@@ -53,6 +53,11 @@ function UploadCSV({fileUploadAPI, onUploadComplete}) {
                 >
                     UPLOAD CSV
                 </label>
+                {sampleCSV && <div className="sample-link">
+                    <a href={sampleCSV} download>
+                        Download sample CSV
+                    </a>
+                </div>}
             </div>
             <div className={styles['progress-bar-container']}>
                 <div className={styles['progress-bar']}>{uploadPercentage > 0 && `${uploadPercentage}%`}</div>

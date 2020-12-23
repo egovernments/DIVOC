@@ -3,8 +3,9 @@ import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {CustomTable} from "../CustomTable";
 import {TotalRecords} from "../TotalRecords";
+import {SampleCSV} from "../../utils/constants";
 
-function PreEnrollment(){
+function PreEnrollment() {
     const [enrollments, setEnrollments] = useState([]);
     const fileUploadAPI = 'divoc/admin/api/v1/enrollments';
     const axiosInstance = useAxios('');
@@ -18,10 +19,13 @@ function PreEnrollment(){
                 setEnrollments(res.data)
             });
     }
-    return(
+
+    return (
         <div>
             <div className="d-flex mt-3">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchEnrollment}/>
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchEnrollment}
+                           sampleCSV={SampleCSV.PRE_ENROLLMENT}
+                />
                 <TotalRecords
                     title={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
                     count={enrollments.length}
@@ -31,4 +35,5 @@ function PreEnrollment(){
         </div>
     );
 }
+
 export default PreEnrollment;

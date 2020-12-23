@@ -3,6 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -10,16 +14,13 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
-	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -39,13 +40,10 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
-	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
-	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
-	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
-	api.SideEffectsCreateSideEffectsHandler = side_effects.CreateSideEffectsHandlerFunc(createSideEffects)
-	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
+	api.SideEffectsGetSideEffectsMetadataHandler = side_effects.GetSideEffectsMetadataHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
+	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
 }
 
 type GenericResponse struct {
@@ -226,7 +224,26 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	requiredHeaders := []string {"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity", 
+	"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName", 
+	"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
+	
 	data := NewScanner(params.File)
+
+	// csv template validation
+	csvHeaders := data.GetHeaders()
+	for _, a := range requiredHeaders {
+		if !contains(csvHeaders, a) {
+			code := "INVALID_TEMPLATE"
+			message := a + " column doesnt exist in uploaded csv file"
+			error := &models.Error {
+				Code: &code,
+				Message: &message,
+			}
+			return certification.NewBulkCertifyBadRequest().WithPayload(error)
+		}
+	}
+
 	for data.Scan() {
 		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
@@ -248,11 +265,9 @@ func eventsHandler(params operations.EventsParams) middleware.Responder {
 }
 
 func getUserName(params *http.Request) string {
-	authHeader := params.Header.Get("Authorization")
 	preferredUsername := ""
-	if authHeader != "" {
-		bearerToken, _ := auth.GetToken(authHeader)
-		claimBody, _ := auth.GetClaimBody(bearerToken)
+	claimBody := auth.ExtractClaimBodyFromHeader(params)
+	if claimBody != nil {
 		preferredUsername = claimBody.PreferredUsername
 	}
 	return preferredUsername
