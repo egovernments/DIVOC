@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 import "./index.css";
 import {useHistory} from "react-router-dom";
@@ -9,57 +9,12 @@ import {CustomButton} from "../CustomButton";
 import {SmallInfoCards} from "../CertificateStatus";
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import LearnMoreImg from '../../assets/img/leanr_more_small.png'
+import {useKeycloak} from "@react-keycloak/web";
+import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE, SIDE_EFFECTS_DATA} from "../../constants";
 
 export const SideEffects = () => {
     const history = useHistory();
-
-    const [nextSymptoms, setNextSymptoms] = useState({});
-    const [selectedSymptomIds, setSelectedSymptomIds] = useState([]);
-    const [instructions, setInstructions] = useState([]);
-    const [showOtherSection, setShowOtherSection] = useState(true);
-    const [showSubmitForm, setShowSubmitForm] = useState(false);
-    const [showGroupHeader, setShowGroupHeader] = useState(false);
-
-    function addOrRemoveSelectedItem(itemIdx) {
-        if (selectedSymptomIds.includes(itemIdx)) {
-            setSelectedSymptomIds(selectedSymptomIds.filter(i => i !== itemIdx))
-        } else {
-            setSelectedSymptomIds(selectedSymptomIds.concat(itemIdx))
-        }
-    }
-
-    function onSymptomSelected(symptom, groupIndex) {
-        const nextSymptomsData = {...nextSymptoms};
-        if ("types" in symptom) {
-            const id = symptom.name;
-            if (id in nextSymptomsData) {
-                delete nextSymptomsData[id];
-            } else {
-                nextSymptomsData[id] = symptom.types;
-            }
-        }
-        if ("instructions" in symptom) {
-            const updatedInstructions = instructions.filter(data => data.name !== symptom.name);
-            if (updatedInstructions.length === instructions.length) {
-                updatedInstructions.push({name: symptom.name, instructions: symptom.instructions})
-            }
-            setInstructions(updatedInstructions)
-        }
-        addOrRemoveSelectedItem(groupIndex);
-        setNextSymptoms(nextSymptomsData);
-    }
-
-
-    function onOtherSymptomChange(evt) {
-
-    }
-
-    function onConfirmSymptomsClick() {
-        setShowSubmitForm(true)
-    }
-
-
-    let showNextButton = false;
+    const {keycloak} = useKeycloak();
     const schema = {
         properties: {
             "Flu-like symptoms": {
@@ -166,10 +121,21 @@ export const SideEffects = () => {
         CheckboxWidget: CustomCheckboxWidget,
         RangeWidget: CustomRangeWidget
     };
-
-    const onSideEffectsSubmit = (data, e) => {
-        debugger
-    }
+    useEffect(() => {
+        if (keycloak.authenticated) {
+            if (!keycloak.hasResourceRole(RECIPIENT_ROLE, RECIPIENT_CLIENT_ID)) {
+                keycloak.logout();
+            }
+        }
+    }, []);
+    const onSideEffectsSubmit = async ({formData}, e) => {
+        if(Object.keys(formData).length > 0 ) {
+            localStorage.setItem(SIDE_EFFECTS_DATA, JSON.stringify(formData));
+            history.push("/feedback/verify")
+        } else {
+            alert("No symptoms selected")
+        }
+    };
 
     return (
         <div className="main-container">
@@ -214,4 +180,4 @@ export const SideEffects = () => {
             </Container>
         </div>
     );
-}
+};

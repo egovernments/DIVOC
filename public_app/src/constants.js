@@ -1,5 +1,8 @@
 import {formatDate} from "./utils/CustomDate";
 
+export const RECIPIENT_CLIENT_ID = "certificate-login";
+export const RECIPIENT_ROLE = "recipient";
+export const SIDE_EFFECTS_DATA = "SIDE_EFFECTS_DATA";
 export const API_ROOT_URL = 'https://api.covid19india.org/v4';
 
 export const STATE_NAMES = {
