@@ -149,7 +149,7 @@ func createCertificate(data *Scanner, authHeader string) error {
 	
 	addressline1 := data.Text("facilityAddressLine1")
 	addressline2 := data.Text("facilityAddressLine2")
-	district := data.Text("facilityDistict")
+	district := data.Text("facilityDistrict")
 	state := data.Text("facilityState")
 	pincode := data.int64("facilityPincode")
 	facility := &models.CertificationRequestFacility{
