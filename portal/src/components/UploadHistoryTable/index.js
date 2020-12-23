@@ -77,43 +77,45 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
                     borderBottom: "1px solid #CEE5FF"
 
                 }}/>
-                <Table className={classes.table}
-                       aria-label="facility staffs">
-                    <TableHead>
-                        <TableRow>
+                {data.length === 0 ? <div className="centered-and-flexed">No Upload history found</div> :
+                    <Table className={classes.table}
+                           aria-label="facility staffs">
+                        <TableHead>
+                            <TableRow>
+                                {
+                                    headerData.map((field, index) => (
+                                        <TableCell
+                                            component={HeaderTableCell}
+                                            size="small"
+                                            align="center"
+                                            key={index}>{field.title}</TableCell>
+                                    ))
+                                }
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
                             {
-                                headerData.map((field, index) => (
-                                    <TableCell
-                                        component={HeaderTableCell}
-                                        size="small"
-                                        align="center"
-                                        key={index}>{field.title}</TableCell>
+                                data.map((row) => (
+                                    <TableRow onClick={() => {
+                                        if (onCellClicked) {
+                                            onCellClicked(row)
+                                        }
+                                    }}>
+                                        {
+                                            headerData.map((field, index) => (
+                                                <TableCell
+                                                    component={RowTableCell}
+                                                    size="small"
+                                                    align="center"
+                                                    key={index}>{row[field.key]}</TableCell>
+                                            ))
+                                        }
+                                    </TableRow>
                                 ))
                             }
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {
-                            data.map((row) => (
-                                <TableRow onClick={() => {
-                                    if (onCellClicked) {
-                                        onCellClicked(row)
-                                    }
-                                }}>
-                                    {
-                                        headerData.map((field, index) => (
-                                            <TableCell
-                                                component={RowTableCell}
-                                                size="small"
-                                                align="center"
-                                                key={index}>{row[field.key]}</TableCell>
-                                        ))
-                                    }
-                                </TableRow>
-                            ))
-                        }
-                    </TableBody>
-                </Table>
+                        </TableBody>
+                    </Table>
+                }
             </TableContainer>
         </div>
     );
