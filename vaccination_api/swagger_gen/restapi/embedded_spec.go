@@ -275,24 +275,6 @@ func init() {
         }
       }
     },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "security": [],
@@ -371,36 +353,14 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
-      "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
+    "/report-side-effects": {
       "post": {
         "security": [],
         "tags": [
-          "sideEffects"
+          "reportSideEffects"
         ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
         "parameters": [
           {
             "name": "body",
@@ -408,9 +368,17 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
+                "certificateId": {
+                  "type": "string"
+                },
+                "mobileNumber": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse"
+                  }
                 }
               }
             }
@@ -429,63 +397,20 @@ func init() {
         }
       }
     },
-    "/symptoms": {
+    "/sideEffects": {
       "get": {
         "security": [],
         "tags": [
-          "symptoms"
+          "sideEffects"
         ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
+              "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1169,24 +1094,6 @@ func init() {
         }
       }
     },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      }
-    },
     "/ping": {
       "get": {
         "security": [],
@@ -1265,36 +1172,14 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
-      "get": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
+    "/report-side-effects": {
       "post": {
         "security": [],
         "tags": [
-          "sideEffects"
+          "reportSideEffects"
         ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
         "parameters": [
           {
             "name": "body",
@@ -1302,9 +1187,17 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
+                "certificateId": {
+                  "type": "string"
+                },
+                "mobileNumber": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/sideEffectsResponse"
+                  }
                 }
               }
             }
@@ -1323,63 +1216,20 @@ func init() {
         }
       }
     },
-    "/symptoms": {
+    "/sideEffects": {
       "get": {
         "security": [],
         "tags": [
-          "symptoms"
+          "sideEffects"
         ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
+              "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1914,6 +1764,38 @@ func init() {
           }
         }
       }
+    },
+    "sideEffectsResponse": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "SideEffectsResponse",
+      "required": [
+        "symptom",
+        "response"
+      ],
+      "properties": {
+        "response": {
+          "description": "response",
+          "type": "string",
+          "title": "response",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/response"
+        },
+        "symptom": {
+          "description": "symptom",
+          "type": "string",
+          "title": "symptom",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/symptom"
+        }
+      },
+      "$id": "#/properties/SideEffectsResponse",
+      "examples": [
+        {
+          "response": "yes",
+          "symptom": "rapid heartbeat"
+        }
+      ]
     },
     "signature": {
       "type": "object",

@@ -129,7 +129,7 @@ paths:
       summary: Upload certification csv for bulk ingestion
       description: certify all the data in uploaded csv
       operationId: bulkCertify
-      security: 
+      security:
         - hasRole: ['facility-admin']
       consumes:
         - multipart/form-data
@@ -221,84 +221,39 @@ paths:
           description: OK
           schema:
             type: object
-  /symptoms:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms
-      operationId: getSymptoms
-      security: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-    post:
-      tags:
-        - symptoms
-      summary: Create symptoms
-      operationId: createSymptoms
-      security:
-        - hasRole: ["admin"]
-      parameters:
-        - in: body
-          name: body
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-          description: Symptoms data
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
-  /instructions:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms instructions
-      security: []
-      operationId: getInstructions
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
   /sideEffects:
     get:
       tags:
         - sideEffects
-      summary: Get Side Effects
-      security:
-        - hasRole: ["admin"]
-      operationId: getSideEffects
+      summary: Get Side Effects Metadata
+      security: []
+      operationId: getSideEffectsMetadata
       responses:
         '200':
           description: OK
           schema:
             type: object
+  /report-side-effects:
     post:
       tags:
-        - sideEffects
-      summary: Post side effects
+        - reportSideEffects
+      summary: Create reported side effects
       security: []
-      operationId: createSideEffects
+      operationId: createReportedSideEffects
       parameters:
         - in: body
           name: body
           schema:
             type: object
             properties:
-              sideEffects:
-                type: object
-                $ref: '#/definitions/SideEffects'
+              mobileNumber:
+                type: string
+              certificateId:
+                type: string
+              sideEffectsResponse:
+                type: array
+                items:
+                  $ref: '../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse'
       responses:
         '200':
           description: OK
