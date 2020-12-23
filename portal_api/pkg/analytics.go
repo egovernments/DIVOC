@@ -82,9 +82,11 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 
 func getPublicAnalyticsInfo() AnalyticsResponse {
 	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
+    byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
 
 	analyticsResponse := AnalyticsResponse{
 		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
+		NumberOfCertificatesIssuedByDistrict:   getCount(byDistrictQuery),
 	}
 
 	return analyticsResponse
