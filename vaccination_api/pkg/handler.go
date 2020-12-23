@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/divoc/api/pkg/auth"
+	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
@@ -47,6 +48,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
+	api.CertificationGetCertifyUploadsHandler = certification.GetCertifyUploadsHandlerFunc(getCertifyUploads)
 }
 
 type GenericResponse struct {
@@ -227,10 +229,10 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
-	requiredHeaders := []string {"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity", 
-	"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName", 
-	"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
-	
+	requiredHeaders := []string{"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity",
+		"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName",
+		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
+
 	data := NewScanner(params.File)
 
 	// csv template validation
@@ -238,22 +240,45 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	for _, a := range requiredHeaders {
 		if !contains(csvHeaders, a) {
 			code := "INVALID_TEMPLATE"
-			message := a + " column doesnt exist in uploaded csv file"
-			error := &models.Error {
-				Code: &code,
+			message := a + " column doesn't exist in uploaded csv file"
+			error := &models.Error{
+				Code:    &code,
 				Message: &message,
 			}
 			return certification.NewBulkCertifyBadRequest().WithPayload(error)
 		}
 	}
 
+	// Initializing CertifyUpload entity
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	uploadEntry := db.CertifyUploads{}
+	uploadEntry.Filename = fileName
+	uploadEntry.UserID = preferredUsername
+	uploadEntry.Status = "Processing"
+	uploadEntry.TotalRecords = 0
+	uploadEntry.TotalErrorRows = 0
+
+	// Creating Certificates
 	for data.Scan() {
-		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
+		createCertificate(&data, &uploadEntry)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
+
+	if uploadEntry.TotalErrorRows > 0 {
+		uploadEntry.Status = "Failed"
+	} else {
+		uploadEntry.Status = "Success"
+	}
+
+	// Persisting uploaded file details
+	db.CreateCertifyUpload(&uploadEntry)
+
 	return certification.NewBulkCertifyOK()
 }
+
 func eventsHandler(params operations.EventsParams) middleware.Responder {
 	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
@@ -276,4 +301,13 @@ func getUserName(params *http.Request) string {
 		preferredUsername = claimBody.PreferredUsername
 	}
 	return preferredUsername
+}
+
+func getCertifyUploads(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := getUserName(params.HTTPRequest)
+	certifyUploads, err := db.GetCertifyUploadsForUser(preferredUsername)
+	if err == nil {
+		return NewGenericJSONResponse(certifyUploads)
+	}
+	return NewGenericServerError()
 }
