@@ -221,7 +221,8 @@ paths:
       tags:
         - reportSideEffects
       summary: Create reported side effects
-      security: []
+      security:
+        - hasRole: ["recipient"]
       operationId: createReportedSideEffects
       parameters:
         - in: body
@@ -229,8 +230,6 @@ paths:
           schema:
             type: object
             properties:
-              mobileNumber:
-                type: string
               certificateId:
                 type: string
               sideEffectsResponse:
