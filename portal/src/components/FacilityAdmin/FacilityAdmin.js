@@ -1,7 +1,5 @@
 import React, {useEffect, useState} from "react";
 import {TabPanels} from "../TabPanel/TabPanel";
-import {RoleSetup} from "../RoleSetup";
-import VaccinatorList from "../facility/VaccinatorList/VaccinatorList";
 import Certificates from "../CertificateRegistry/CertificateRegistry"
 import {useKeycloak} from "@react-keycloak/web";
 import {useAxios} from "../../utils/useAxios";

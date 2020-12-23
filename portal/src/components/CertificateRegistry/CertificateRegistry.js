@@ -55,16 +55,16 @@ function Certificates() {
                 />
             </div>
             <div className="total"/>
-            <div className="error-temp">
-                {selectedHistory ? <UploadErrors uploadHistory={selectedHistory}/> :
-                    <div className="d-flex justify-content-center">No history selected</div>}
-            </div>
             <div className="upload-history">
                 <UploadHistoryTable
                     data={uploadHistory}
                     headerData={headerData}
                     onCellClicked={(value) => setSelectedHistory(value)}
                 />
+            </div>
+            <div className="error-temp">
+                {selectedHistory ? <UploadErrors uploadHistory={selectedHistory}/> :
+                    <div className="d-flex justify-content-center">No history selected</div>}
             </div>
         </div>
     );
