@@ -97,6 +97,7 @@
       "classNames": ["side-effects-input-box"],
       "ui:options": {"label": false},
       "ui:placeholder": "Type to enter any other conditions"
-    }
+    },
+    "ui:order": ["*", "Other"]
   }
 }
