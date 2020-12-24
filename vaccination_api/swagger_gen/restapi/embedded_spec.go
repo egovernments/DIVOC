@@ -171,6 +171,33 @@ func init() {
         }
       }
     },
+    "/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for certification for given facility admin",
+        "operationId": "getCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
     "/divoc/configuration": {
       "get": {
         "tags": [
@@ -962,6 +989,33 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for certification for given facility admin",
+        "operationId": "getCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }

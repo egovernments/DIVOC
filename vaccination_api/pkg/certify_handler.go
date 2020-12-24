@@ -3,9 +3,11 @@ package pkg
 import (
 	"encoding/json"
 	"time"
-	"github.com/go-openapi/strfmt"
-	"github.com/divoc/api/swagger_gen/models"
+
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/db"
+	"github.com/divoc/api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -97,63 +99,77 @@ func publishEvent(event Event) {
 	}
 }
 
-func createCertificate(data *Scanner, authHeader string) error {
+func createCertificate(data *Scanner, certifyUploads *db.CertifyUploads) error {
 	//recipientName,recipientMobileNumber,recipientDOB,recipientGender,recipientNationality,recipientIdentity,
 	//vaccinationBatch,vaccinationDate,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,
 	//vaccinatorName,
 	//facilityName,facilityAddressLine1,facilityAddressLine2,facilityDistict,facilityState,facilityPincode
 
-	contact := []string{"tel:"+data.Text("recipientMobileNumber")}
+	certifyUploads.TotalRecords = certifyUploads.TotalRecords + 1
+
+	// mandatory fields check
+	mobileNumber := data.Text("recipientMobileNumber")
+	if mobileNumber == "" {
+		certifyUploads.TotalErrorRows = certifyUploads.TotalErrorRows + 1
+		return nil
+	}
+	recipientName := data.Text("recipientName")
+	if recipientName == "" {
+		certifyUploads.TotalErrorRows = certifyUploads.TotalErrorRows + 1
+		return nil
+	}
+
+	contact := []string{"tel:" + mobileNumber}
 	dob, terr := time.Parse("2006-01-02", data.Text("recipientDOB"))
-	if terr!= nil {
+	if terr != nil {
 		dob2, terr := time.Parse("02-Jan-2006", data.Text("recipientDOB"))
-		if terr!= nil {
+		if terr != nil {
 			log.Info("error while parsing DOB ", data.Text("recipientDOB"))
 		} else {
 			dob = dob2
 		}
 	}
 	reciepient := &models.CertificationRequestRecipient{
-		Name: data.Text("recipientName"),
-		Contact: contact,
-		Dob: strfmt.Date(dob),
-		Gender: data.Text("recipientGender"),
+		Name:        recipientName,
+		Contact:     contact,
+		Dob:         strfmt.Date(dob),
+		Gender:      data.Text("recipientGender"),
 		Nationality: data.Text("recipientNationality"),
-		Identity: data.Text("recipientIdentity"),
+		Identity:    data.Text("recipientIdentity"),
 	}
 
 	vaccinationDate, terr := time.Parse(time.RFC3339, data.Text("vaccinationDate"))
-	if terr!= nil {
+	if terr != nil {
 		log.Info("error while parsing vaccinationDate ", data.Text("vaccinationDate"))
 	}
 	effectiveStart, terr := time.Parse("2006-01-02", data.Text("vaccinationEffectiveStart"))
-	if terr!= nil {
+	if terr != nil {
 		log.Info("error while parsing effectiveStart ", data.Text("vaccinationEffectiveStart"))
 	}
 	effectiveUntil, terr := time.Parse("2006-01-02", data.Text("vaccinationEffectiveEnd"))
-	if terr!= nil {
+	if terr != nil {
 		log.Info("error while parsing effectiveUntil ", data.Text("vaccinationEffectiveEnd"))
 	}
 	vaccination := &models.CertificationRequestVaccination{
-		Batch: data.Text("vaccinationBatch"),
-		Date: strfmt.DateTime(vaccinationDate),
+		Batch:          data.Text("vaccinationBatch"),
+		Date:           strfmt.DateTime(vaccinationDate),
 		EffectiveStart: strfmt.Date(effectiveStart),
 		EffectiveUntil: strfmt.Date(effectiveUntil),
-		Manufacturer: data.Text("vaccinationManufacturer"),
-		Name: data.Text("vaccinationName"),
+		Manufacturer:   data.Text("vaccinationManufacturer"),
+		Name:           data.Text("vaccinationName"),
 	}
 
 	vaccinator := &models.CertificationRequestVaccinator{
 		Name: data.Text("vaccinatorName"),
 	}
-	
+
 	addressline1 := data.Text("facilityAddressLine1")
 	addressline2 := data.Text("facilityAddressLine2")
 	district := data.Text("facilityDistrict")
 	state := data.Text("facilityState")
 	pincode := data.int64("facilityPincode")
 	facility := &models.CertificationRequestFacility{
-		Name:       data.Text("facilityName"),
+		Name: data.Text("facilityName"),
 		Address: &models.CertificationRequestFacilityAddress{
 			AddressLine1: addressline1,
 			AddressLine2: addressline2,
@@ -164,10 +180,10 @@ func createCertificate(data *Scanner, authHeader string) error {
 	}
 
 	certificate := models.CertificationRequest{
-		Facility: facility,
-		Recipient: reciepient,
+		Facility:    facility,
+		Recipient:   reciepient,
 		Vaccination: vaccination,
-		Vaccinator: vaccinator,
+		Vaccinator:  vaccinator,
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
