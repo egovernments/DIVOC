@@ -1,46 +1,52 @@
-import React from 'react';
-import styles from './DataTable.module.css';
+import React, { useEffect } from 'react';
+import './DataTable.css';
 
 
-function DataTable({tableData}) {
+function DataTable({title,selectedData,setSelectedData,rowTitle,rowData,total}) {
 
-    const formatTableData = () => {
-        let tableCells;
-        const tableRow = [];
+    const handleRowClick = (data) => {
+        setSelectedData({name : data,count: 0});
+    };
 
-        console.log("tabledata", tableData)
-        tableData.forEach(data => {
-            console.log("data", data)
-            tableCells = []
-            Object.values(data).forEach(rowData => {
-                    console.log("rowdata", rowData)
-                    for (let item in rowData) {
-                        tableCells.push(
-                            <tr className={styles['tr']} key={item}>
-                                <td className={styles['td']}>{item}</td>
-                                <td className={styles['td']}>{rowData[item]}</td>
-                            </tr>
-                        )
+    useEffect(()=>{
+        if(selectedData.name){
+            document.getElementById(selectedData.name).scrollIntoView()
+        }
+        
+    },[selectedData])
+
+    const getTableData = () => {
+        return rowTitle.map((state) => {
+            return (
+                <tr
+                    id={state}
+                    style={
+                        selectedData.name === state
+                            ? { background: "#CEE5FF" }
+                            : { background: "white" }
                     }
-                }
-            )
-            tableRow.push(
-                <table key={Object.keys(data)}>
-                    <thead className={styles['thead']}>
-                    <tr><td colSpan={2}>{Object.keys(data)}</td></tr>
-                    </thead>
-                    <tbody>{tableCells}</tbody>
-                </table>
-            )
-        })
-
-        return tableRow;
-
-    }
+                    onClick={() => handleRowClick(state)}
+                >
+                    <td>{state}</td>
+                    <td>{rowData[state]? rowData[state] : 0}</td>
+                </tr>
+            );
+        });
+    };
 
     return (
-        <div className={styles['table']}>
-            {formatTableData()}
+        <div className="table-container">
+            <table
+            className="table table-borderless table-hover"
+        >
+            <thead>
+                <tr>
+                    <td >{title}</td>
+                    <td>{total}</td>
+                </tr>
+            </thead>
+            <tbody>{getTableData()}</tbody>
+        </table>
         </div>
     );
 }
