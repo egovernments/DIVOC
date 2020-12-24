@@ -14,10 +14,11 @@ import (
 )
 
 const (
-	clientId       = "vaccination_api"
-	admin          = "admin"
-	facilityAdmin  = "facility_admin"
-	portalClientId = "facility-admin-portal"
+	clientId            = "vaccination_api"
+	admin               = "admin"
+	facilityAdmin       = "facility_admin"
+	portalClientId      = "facility-admin-portal"
+	certificateClientId = "certificate-login"
 )
 
 var (
@@ -57,6 +58,9 @@ func AuthorizeRole(expectedRole []string, claimBody *models.JWTClaimBody) bool {
 			return true
 		}
 		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
+			return true
+		}
+		if contains(claimBody.ResourceAccess[certificateClientId].Roles, role) {
 			return true
 		}
 	}

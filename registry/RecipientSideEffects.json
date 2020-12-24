@@ -22,9 +22,6 @@
         "recipientCertificateId": {
           "type": "string"
         },
-        "recipientMobileNumber": {
-          "type": "string"
-        },
         "sideEffectsResponse": {
           "$id": "#/properties/sideEffectsResponse",
           "type": "array",

@@ -355,7 +355,13 @@ func init() {
     },
     "/report-side-effects": {
       "post": {
-        "security": [],
+        "security": [
+          {
+            "hasRole": [
+              "recipient"
+            ]
+          }
+        ],
         "tags": [
           "reportSideEffects"
         ],
@@ -369,9 +375,6 @@ func init() {
               "type": "object",
               "properties": {
                 "certificateId": {
-                  "type": "string"
-                },
-                "mobileNumber": {
                   "type": "string"
                 },
                 "sideEffectsResponse": {
@@ -1174,7 +1177,13 @@ func init() {
     },
     "/report-side-effects": {
       "post": {
-        "security": [],
+        "security": [
+          {
+            "hasRole": [
+              "recipient"
+            ]
+          }
+        ],
         "tags": [
           "reportSideEffects"
         ],
@@ -1188,9 +1197,6 @@ func init() {
               "type": "object",
               "properties": {
                 "certificateId": {
-                  "type": "string"
-                },
-                "mobileNumber": {
                   "type": "string"
                 },
                 "sideEffectsResponse": {
