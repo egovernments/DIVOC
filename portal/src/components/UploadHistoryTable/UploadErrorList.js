@@ -28,6 +28,11 @@ const RowTableCell = withStyles({
 })(TableCell);
 
 export function UploadErrorList({uploadHistoryDetails, fileName}) {
+    if (!uploadHistoryDetails) {
+        return <div>Something went wrong</div>
+    }
+
+    const isErrorFound = uploadHistoryDetails.length > 0;
     return (
 
         <div className="error-list d-flex flex-column justify-content-between">
@@ -41,7 +46,7 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                     borderBottom: "1px solid #FC573B"
 
                 }}/>
-                <Table component={CustomPaper}>
+                {isErrorFound ? <Table component={CustomPaper}>
                     <TableBody>
                         {
                             uploadHistoryDetails.map((item, index) =>
@@ -53,9 +58,9 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                                 </TableRow>)
                         }
                     </TableBody>
-                </Table>
+                </Table> : <p>No Error Found</p>}
             </div>
-            <Button variant="danger" className="m-4" onClick={() => {
+            {isErrorFound && <Button variant="danger" className="m-4" onClick={() => {
                 // const rawCSV = uploadHistoryDetails.map((item, index) => item.rawData);
                 const csv = Papa.unparse(uploadHistoryDetails)
                 console.log(JSON.stringify(csv))
@@ -67,7 +72,7 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-            }}>Download Error CSV</Button>
+            }}>Download Error CSV</Button>}
         </div>
     );
 }
