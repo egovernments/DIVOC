@@ -12,4 +12,4 @@ DIVOC is an open source project created to help countries rapidly rollout vaccin
 2. **Sahaj Technologies**: Engineering Partner
 3. **E&Y India**: Project management Partner
 
-If you have questions, please use [Project Discussions Page](https://github.com/bharat-dpi/DIVOC/discussions). 
+If you have questions, please use [Project Discussions Page](https://github.com/egovernments/DIVOC/discussions). 
