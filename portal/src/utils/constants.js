@@ -8,8 +8,8 @@ export const CONSTANTS = Object.freeze({
 });
 
 export class SampleCSV {
-    static FACILITY_REGISTRY = "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/facilities.csv"
-    static VACCINATOR_REGISTRY = "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/vaccinators.csv"
-    static PRE_ENROLLMENT = "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/enrollments.csv"
-    static BULK_CERTIFY = "https://raw.githubusercontent.com/bharat-dpi/DIVOC/main/interfaces/certificates.csv"
+    static FACILITY_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/facilities.csv"
+    static VACCINATOR_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/vaccinators.csv"
+    static PRE_ENROLLMENT = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/enrollments.csv"
+    static BULK_CERTIFY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/certificates.csv"
 }
