@@ -228,7 +228,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	requiredHeaders := []string{"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity",
 		"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName",
-		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
+		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistrict", "facilityState", "facilityPincode"}
 
 	data := NewScanner(params.File)
 
@@ -256,6 +256,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry.Status = "Processing"
 	uploadEntry.TotalRecords = 0
 	uploadEntry.TotalErrorRows = 0
+	db.CreateCertifyUpload(&uploadEntry)
 
 	// Creating Certificates
 	for data.Scan() {
@@ -270,8 +271,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 		uploadEntry.Status = "Success"
 	}
 
-	// Persisting uploaded file details
-	db.CreateCertifyUpload(&uploadEntry)
+	db.UpdateCertifyUpload(&uploadEntry)
 
 	return certification.NewBulkCertifyOK()
 }

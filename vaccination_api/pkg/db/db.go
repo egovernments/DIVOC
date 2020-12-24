@@ -32,6 +32,40 @@ type CertifyUploads struct {
 	UserID string
 }
 
+type CertifyUploadErrors struct {
+	gorm.Model
+
+	// ID of CertifyUploads
+	CertifyUploadID uint `gorm:"index"`
+
+	Errors string
+
+	CertifyUploadFields
+
+}
+
+type CertifyUploadFields struct {
+	RecipientName string
+	RecipientMobileNumber string
+	RecipientDOB string
+	RecipientGender string
+	RecipientNationality string
+	RecipientIdentity string
+	VaccinationBatch string
+	VaccinationDate string
+	VaccinationEffectiveStart string
+	VaccinationEffectiveEnd string
+	VaccinationManufacturer string
+	VaccinationName string
+	VaccinatorName string
+	FacilityName string
+	FacilityAddressLine1 string
+	FacilityAddressLine2 string
+	FacilityDistrict string
+	FacilityState string
+	FacilityPincode int64
+}
+
 func Init() {
 	var e error
 	db, e = gorm.Open("postgres", dbPath)
@@ -45,12 +79,13 @@ func Init() {
 	}
 
 	db.AutoMigrate(&CertifyUploads{})
+	db.AutoMigrate(&CertifyUploadErrors{})
 }
 
 // CreateCertifyUpload - Create new certify upload entry in DB
 func CreateCertifyUpload(data *CertifyUploads) error {
 	if result := db.Create(&data); result.Error != nil {
-		log.Error("Error occured while creating certifyUpload for ", data, result.Error)
+		log.Error("Error occurred while creating certifyUpload for ", data, result.Error)
 		return errors.New("error occurred while saving certifyUpload")
 	}
 	log.Info("Created certifyUploads for file ", data.Filename)
@@ -65,4 +100,21 @@ func GetCertifyUploadsForUser(userID string) ([]*CertifyUploads, error) {
 		return nil, errors.New("error occurred while retrieving certifyUploads")
 	}
 	return certifyUploads, nil
+}
+
+func UpdateCertifyUpload(data *CertifyUploads) error {
+	if result := db.Save(data); result.Error != nil {
+		log.Error("Error occurred while saving certifyUploads with ID - ", data.ID)
+		return errors.New("error occurred while saving certifyUploads")
+	}
+	return nil
+}
+
+func CreateCertifyUploadError(data *CertifyUploadErrors) error {
+	if result := db.Create(&data); result.Error != nil {
+		log.Error("Error occurred while creating CertifyUploadErrors for ", data, result.Error)
+		return errors.New("error occurred while saving certifyUpload")
+	}
+	log.Info("Created certifyUploadError for fileUploadID - ", data.CertifyUploadID)
+	return nil
 }
