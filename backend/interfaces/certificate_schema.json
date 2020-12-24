@@ -1,0 +1,39 @@
+{
+  "type": "https://www.who.int/2020/credentials/vaccination/v1",
+  "modelVersion": "1.0",
+  "id": "did:work:MDP8AsFhHzhwUvGNuYkX7T;id=06e126d1-fa44-4882-a243-1e326fbe21db;version=1.0",
+  "name": "ProofOfVaccinationCredentialSchema",
+  "author": "did:work:MDP8AsFhHzhwUvGNuYkX7T",
+  "authored": "2020-12-01T00:00:00+00:00",
+  "schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "description": "recipient",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string"
+      },
+      "emailAddress": {
+        "type": "string",
+        "format": "email"
+      },
+      "age": {
+        "type": "number"
+      },
+      "gender": {
+        "type": "string",
+        "enum": ["Male", "Female", "Other"]
+      }
+    },
+
+    "required": ["name"],
+    "additionalProperties": false
+  },
+  "proof": {
+    "created": "2019-09-27T06:26:11Z",
+    "creator": "did:work:MDP8AsFhHzhwUvGNuYkX7T#key-1",
+    "nonce": "0efba23d-2987-4441-998e-23a9d9af79f0",
+    "signatureValue": "2A7ZF9f9TWMdtgn57Y6dP6RQGs52xg2QdjUESZUuf4J9BUnwwWFNL8vFshQAEQF6ZFBXjYLYNU4hzXNKc3R6y6re",
+    "type": "Ed25519VerificationKey2018"
+  }
+}

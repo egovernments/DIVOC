@@ -1,0 +1,5 @@
+serialNum,code,name,nationalIdentifier,mobileNumber,status,facilityIds
+1,EE341,Vaidya Acharya,223434223,7897891244,Active,
+2,EE342,Krishna Reddy,223434223,7897891233,Active,
+3,EE344,Narayan Reddy,223434223,7897891235,Active,BLR341
+4,EE345,Nayan A,223434223,7897891236,Active,DEL002
