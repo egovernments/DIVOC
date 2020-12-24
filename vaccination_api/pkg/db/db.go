@@ -118,3 +118,23 @@ func CreateCertifyUploadError(data *CertifyUploadErrors) error {
 	log.Info("Created certifyUploadError for fileUploadID - ", data.CertifyUploadID)
 	return nil
 }
+
+func GetCertifyUploadsForID(id uint) (*CertifyUploads, error) {
+	certifyUpload := &CertifyUploads{}
+	if result := db.First(&certifyUpload, "id = ?", id); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for ID ", id, result.Error)
+		return nil, result.Error
+	}
+	return certifyUpload, nil
+
+}
+
+func GetCertifyUploadErrorsForUploadID(uploadId int64) ([]*CertifyUploadErrors, error) {
+	var certifyUploadErrors []*CertifyUploadErrors
+	if result := db.Find(&certifyUploadErrors, "certify_upload_id = ?", uploadId); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", uploadId)
+		return nil, errors.New("error occurred while retrieving certifyUploads")
+	}
+	return certifyUploadErrors, nil
+
+}
