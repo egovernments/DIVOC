@@ -59,20 +59,22 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
 
 // Consumer to handle sms notifications on "certified" topic
 (async function() {
-  await sms_notifier_consumer.connect();
-  await sms_notifier_consumer.subscribe({topic: config.CERTIFIED_TOPIC, fromBeginning: false});
+  if(config.ENABLE_SMS_NOTIFICATION) {
+    await sms_notifier_consumer.connect();
+    await sms_notifier_consumer.subscribe({topic: config.CERTIFIED_TOPIC, fromBeginning: false});
 
-  await sms_notifier_consumer.run({
-    eachMessage: async ({topic, partition, message}) => {
-      console.log({
-        certified: message.value.toString(),
-      });
-      try {
-        jsonMessage = JSON.parse(message.value.toString());
-        smsNotifier.sendSMS(jsonMessage);
-      } catch (e) {
-        console.error("ERROR: " + e.message)
-      }
-    },
-  })
+    await sms_notifier_consumer.run({
+      eachMessage: async ({topic, partition, message}) => {
+        console.log({
+          certified: message.value.toString(),
+        });
+        try {
+          jsonMessage = JSON.parse(message.value.toString());
+          smsNotifier.sendSMS(jsonMessage);
+        } catch (e) {
+          console.error("ERROR: " + e.message)
+        }
+      },
+    })
+  }
 })();
