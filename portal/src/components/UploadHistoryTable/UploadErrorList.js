@@ -21,9 +21,9 @@ const CustomPaper = withStyles({
 
 const RowTableCell = withStyles({
     root: {
-        fontSize: "1rem",
+        fontSize: "0.90rem",
         color: "#646D82",
-        padding: "12px",
+        padding: "10px",
     }
 })(TableCell);
 

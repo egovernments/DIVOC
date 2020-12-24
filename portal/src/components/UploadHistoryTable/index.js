@@ -29,7 +29,7 @@ const CustomPaper = withStyles({
 
 const RowTableCell = withStyles({
     root: {
-        fontSize: "0.75rem",
+        fontSize: "0.85rem",
         padding: "8px",
         color: "#646D82",
         borderBottom: "1px solid #CEE5FF",

@@ -67,7 +67,7 @@ function Certificates() {
             </div>
             <div className="error-temp">
                 {selectedHistory ? <UploadErrors uploadHistory={selectedHistory}/> :
-                    <div className="d-flex justify-content-center">No history selected</div>}
+                    <div/>}
             </div>
         </div>
     );
