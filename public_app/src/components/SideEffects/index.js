@@ -16,7 +16,7 @@ import axios from "axios";
 export const SideEffects = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
-    const [formSchema, setFormSchema] = useState();
+    const [formSchema, setFormSchema] = useState({schema:{}, uiSchema: {}});
     useEffect(() => {
         axios
             .get("/divoc/api/v1/sideEffects")
