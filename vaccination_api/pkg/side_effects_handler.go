@@ -11,7 +11,7 @@ import (
 
 func getSideEffects(params side_effects.GetSideEffectsMetadataParams) middleware.Responder {
 	//TODO: replace with side effects json file
-	jsonFile, err := os.Open("../portal/src/jsonSchema/vaccineSchema.json")
+	jsonFile, err := os.Open("./config/sideEffectsSchema.json")
 	if err != nil {
 		log.Errorf("Error while reading file %+v", err)
 		return NewGenericServerError()

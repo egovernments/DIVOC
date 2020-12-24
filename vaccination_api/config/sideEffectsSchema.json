@@ -1,0 +1,102 @@
+{
+  "schema": {
+    "properties": {
+      "Flu-like symptoms": {
+        "type": "boolean",
+        "title": "Flu-like symptoms",
+        "enumNames": ["Yes", "No"]
+      },
+      "Temperature": {
+        "type": "number",
+        "title": "Temperature",
+        "minimum": 90,
+        "maximum": 108,
+        "multipleOf": 0.1,
+        "unit": "°F"
+      },
+      "Rapid Heartbeat": {
+        "type": "boolean",
+        "title": "Rapid Heartbeat",
+        "enumNames": ["Yes", "No"]
+      },
+      "Fatigue": {
+        "type": "boolean",
+        "title": "Fatigue",
+        "enumNames": ["Yes", "No"]
+      },
+      "Headache": {
+        "type": "boolean",
+        "title": "Headache",
+        "enumNames": ["Yes", "No"]
+      },
+      "Muscle/Joint Pain": {
+        "type": "boolean",
+        "title": "Muscle/Joint Pain",
+        "enumNames": ["Yes", "No"]
+      },
+      "Pain Scale": {
+        "type": "number",
+        "title": "Pain Scale",
+        "minimum": 0,
+        "maximum": 10,
+        "multipleOf": 1,
+        "unit": ""
+      },
+      "Chills": {
+        "type": "boolean",
+        "title": "Chills",
+        "enumNames": ["Yes", "No"]
+      },
+      "Cough": {
+        "type": "boolean",
+        "title": "Cough",
+        "enumNames": ["Yes", "No"]
+      },
+      "Paralysis": {
+        "type": "boolean",
+        "title": "Paralysis",
+        "enumNames": ["Yes", "No"]
+      },
+      "Arm Soreness": {
+        "type": "boolean",
+        "title": "Arm Soreness",
+        "enumNames": ["Yes", "No"]
+      },
+      "Nausea": {
+        "type": "boolean",
+        "title": "Nausea",
+        "enumNames": ["Yes", "No"]
+      },
+      "Migraine": {
+        "type": "boolean",
+        "title": "Migraine",
+        "enumNames": ["Yes", "No"]
+      },
+      "Swollen Glands": {
+        "type": "boolean",
+        "title": "Swollen Glands",
+        "enumNames": ["Yes", "No"]
+      },
+      "Other": {
+        "className": "feedback-input-box",
+        "type": "string"
+      }
+
+    }
+  },
+  "uiSchema": {
+    "Temperature": {
+      "ui:options": {"label": false},
+      "ui:widget": "range"
+    },
+    "Pain Scale": {
+      "ui:options": {"label": false},
+      "ui:widget": "range"
+    },
+    "Other": {
+      "classNames": ["side-effects-input-box"],
+      "ui:options": {"label": false},
+      "ui:placeholder": "Type to enter any other conditions"
+    }
+  }
+}
