@@ -2,6 +2,7 @@ const { Kafka } = require('kafkajs');
 const config = require('./config/config');
 const signer = require('./signer');
 const notifier = require('./notification');
+const smsNotifier = require('./sms-notification');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER)
 const kafka = new Kafka({
