@@ -51,7 +51,7 @@ func Init() {
 func CreateCertifyUpload(data *CertifyUploads) error {
 	if result := db.Create(&data); result.Error != nil {
 		log.Error("Error occured while creating certifyUpload for ", data, result.Error)
-		return errors.New("Error occurred while saving certifyUpload")
+		return errors.New("error occurred while saving certifyUpload")
 	}
 	log.Info("Created certifyUploads for file ", data.Filename)
 	return nil
@@ -60,9 +60,9 @@ func CreateCertifyUpload(data *CertifyUploads) error {
 // GetCertifyUploadsForUser - Get all certify file uploads for giver user
 func GetCertifyUploadsForUser(userID string) ([]*CertifyUploads, error) {
 	var certifyUploads []*CertifyUploads
-	if result := db.Find(&certifyUploads, "user_id = ?", userID); result.Error != nil {
+	if result := db.Order("created_at desc").Find(&certifyUploads, "user_id = ?", userID); result.Error != nil {
 		log.Error("Error occurred while retrieving certifyUploads for user ", userID)
-		return nil, errors.New("Error occurred while retrieving certifyUploads")
+		return nil, errors.New("error occurred while retrieving certifyUploads")
 	}
 	return certifyUploads, nil
 }
