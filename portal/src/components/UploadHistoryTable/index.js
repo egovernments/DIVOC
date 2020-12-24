@@ -123,5 +123,5 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
 
 UploadHistoryTable.propTypes = {
     data: PropTypes.array,
-    headerData: PropTypes.instanceOf(HeaderData)
+    headerData: PropTypes.array
 };

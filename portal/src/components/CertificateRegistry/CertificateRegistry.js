@@ -12,7 +12,7 @@ import {formatDate} from "../../utils/dateutil";
 
 function Certificates() {
     const fileUploadAPI = '/divoc/api/v1/bulkCertify';
-    const fileUploadHistory = fileUploadAPI + "/history"
+    const fileUploadHistory = "/divoc/api/v1/certify/uploads"
     const axiosInstance = useAxios('');
     const [uploadHistory, setUploadHistory] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null)
@@ -22,28 +22,26 @@ function Certificates() {
     }, []);
 
     function fetchUploadHistory() {
-        const response = JSON.parse(fakeHistoryResponse);
         axiosInstance.current.get(fileUploadHistory)
             .then(res => {
-                //return res.json();
-                return response
+                return res.data
             })
             .catch(e => {
                 console.log(e);
-                return response
+                return []
             })
             .then((result) => {
                 return result.map((item, index) => {
-                    const uploadedDate = new Date(item.uploadedTime)
+                    const uploadedDate = new Date(item["CreatedAt"])
                     const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
                     const uploadLocalDate = formatDate(uploadedDate)
                     return {
-                        id: item.id,
-                        fileName: item.filename,
+                        id: item["ID"],
+                        fileName: item["Filename"],
                         date: uploadLocalDate,
                         time: uploadLocalTime,
-                        records: item.TotalRecords,
-                        errors: item.TotalErrorRows
+                        records: item["TotalRecords"],
+                        errors: item["TotalErrorRows"]
                     };
                 })
             })
@@ -55,7 +53,9 @@ function Certificates() {
     return (
         <div className="certificate-container">
             <div className="upload-csv">
-                <UploadCSV fileUploadAPI={fileUploadAPI}/>
+                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={() => {
+                    fetchUploadHistory()
+                }}/>
             </div>
             <div className="total"/>
             <div className="upload-history">
@@ -114,7 +114,9 @@ function UploadErrors({uploadHistory}) {
                     <h3>{uploadHistory.records}</h3>
                     <h5>Records<br/>Uploaded</h5>
                 </div>
-                <UploadErrorList uploadHistoryDetails={uploadHistoryDetails}/>
+                <UploadErrorList
+                    uploadHistoryDetails={uploadHistoryDetails}
+                    fileName={uploadHistory.fileName}/>
                 <div className="error-file-details  ml-lg-5 mb-5">
                     <p>{uploadHistory.fileName}</p>
                     <p>{uploadHistory.date}</p>
@@ -149,43 +151,21 @@ const headerData = [
     }
 ]
 
-const errorData = " [\n" +
-    "    {\n" +
-    "        \"field\": \"somefield\",\n" +
-    "        \"errorMessage\": \"Failed to upload mobile number\",\n" +
-    "        \"rawData\": \"1-1,1-2,1-3,1-4\"\n" +
-    "    }, {\n" +
-    "        \"field\": \"somefield\",\n" +
-    "        \"errorMessage\": \"Failed to upload facility id\",\n" +
-    "        \"rawData\": \"2-1,2-2,2-3,2-4\"\n" +
-    "    }, {\n" +
-    "        \"field\": \"somefield\",\n" +
-    "        \"errorMessage\": \"Failed to upload invalid name\",\n" +
-    "        \"rawData\": \"3-1,3-2,3-3,3-4\"\n" +
-    "    }\n" +
+const errorData = "[\n" +
+    "\t{\n" +
+    "\t    \"Column 1\": \"1-1\",\n" +
+    "\t    \"Column 2\": \"1-2\",\n" +
+    "\t    \"Column 3\": \"1-3\",\n" +
+    "\t    \"Column 4\": \"1-4\",\n" +
+    "        \"ERRORS\":[\"E1\",\"E2\"]\n" +
+    "\t},\n" +
+    "\t{\n" +
+    "\t    \"Column 1\": \"2-1\",\n" +
+    "\t    \"Column 2\": \"2-2\",\n" +
+    "\t    \"Column 3\": \"2-3\",\n" +
+    "\t    \"Column 4\": \"2-4\",\n" +
+    "        \"ERRORS\":[\"E1\",\"E2\",\"E3\"]\n" +
+    "\t}\n" +
     "]"
-
-const fakeHistoryResponse = "[\n" +
-    "    {\n" +
-    "        \"id\": \"sdgfat2346575\",\n" +
-    "        \"filename\": \"certificate1.csv\",\n" +
-    "        \"userId\": \"1111111112\",\n" +
-    "        \"uploadedTime\": \"2020-12-02T19:21:18.646Z\",\n" +
-    "        \"createdTime\": \"\",\n" +
-    "        \"status\": \"Success\",\n" +
-    "        \"TotalRecords\": 120,\n" +
-    "        \"TotalErrorRows\": 10\n" +
-    "    },\n" +
-    "    {\n" +
-    "        \"id\": \"sdgfat2346576\",\n" +
-    "        \"filename\": \"certificate2.csv\",\n" +
-    "        \"userId\": \"1111111113\",\n" +
-    "        \"uploadedTime\": \"2020-11-02T19:21:18.646Z\",\n" +
-    "        \"createdTime\": \"\",\n" +
-    "        \"status\": \"Success\",\n" +
-    "        \"TotalRecords\": 220,\n" +
-    "        \"TotalErrorRows\": 8\n" +
-    "    }\n" +
-    "]\n"
 
 export default Certificates;

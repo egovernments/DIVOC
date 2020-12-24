@@ -4,7 +4,7 @@
     color: #FFFFFF;
     background: #88C6A9;
     text-align: center;
-    padding: 0;
+    padding-top: 10px;
 }
 
 .btn-template h6 {
@@ -13,6 +13,11 @@
     font-size: 12px;
     margin: 0;
     padding: 5px;
+}
+
+.btn-template a {
+    padding: 0;
+    margin: 0;
 }
 
 .btn-template img {

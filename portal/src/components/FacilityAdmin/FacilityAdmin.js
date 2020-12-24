@@ -31,7 +31,7 @@ export default function FacilityAdmin() {
             {
                 title: "Upload Vaccination Details",
                 component: <Certificates/>,
-                rightTabContent: <Button bsPrefix={"btn-template"}>
+                rightTabContent: <Button bsPrefix={"btn-template"} href={SampleCSV.BULK_CERTIFY}>
                     <Col className="d-flex flex-row">
                         <h6>DOWNLOAD TEMPLATE.CSV</h6>
                         <img src={DownloadImg} alt={"Download CSV"}/>
