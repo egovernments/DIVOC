@@ -1,22 +1,24 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
+	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/restapi"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/loads"
 	"github.com/jessevdk/go-flags"
-	"log"
-	"os"
 )
 
 func main() {
 	config.Initialize()
 	auth.Init()
 	pkg.InitializeKafka()
-
+	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

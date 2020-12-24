@@ -147,6 +147,21 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+  /certify/uploads:
+    get:
+      tags:
+        - certification
+      summary: Get all file uploads for certification for given facility admin
+      operationId: getCertifyUploads
+      security: 
+        - hasRole: ['facility-admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
   /programs/current:
     get:
       tags:
