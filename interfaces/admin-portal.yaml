@@ -252,6 +252,18 @@ paths:
             type: object
         '401':
           description: Unauthorized
+  /public:
+    get:
+      summary: Get public analytics query
+      operationId: getPublicAnalytics
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
 definitions:
   FacilityUpdateRequest:
     type: array
