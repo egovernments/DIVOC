@@ -6,3 +6,4 @@ Open source digital platform for large scale vaccination and certification progr
 ## [Discuss with community](https://github.com/egovernments/DIVOC/discussions)
 
 ## [Issue Reporting](https://github.com/egovernments/DIVOC/issues)
+
