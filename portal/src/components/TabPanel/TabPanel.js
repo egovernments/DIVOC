@@ -2,6 +2,7 @@ import React from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {makeStyles, withStyles} from '@material-ui/core/styles';
+import {Button, Row} from "react-bootstrap";
 
 
 export const StyledTabs = withStyles({
@@ -49,18 +50,21 @@ export const TabPanels = ({tabs}) => {
     };
     return (
         <div className={classes.root}>
-            <StyledTabs
-                value={value}
-                indicatorColor="secondary"
-                onChange={handleChange}
-                aria-label="styled tabs example"
-            >
-                {
-                    tabs.map((tab, index) => (
-                        <StyledTab label={tab.title}/>
-                    ))
-                }
-            </StyledTabs>
+            <div className="d-flex flex-row justify-content-between">
+                <StyledTabs
+                    value={value}
+                    indicatorColor="secondary"
+                    onChange={handleChange}
+                    aria-label="styled tabs example"
+                >
+                    {
+                        tabs.map((tab, index) => (
+                            <StyledTab label={tab.title}/>
+                        ))
+                    }
+                </StyledTabs>
+                {tabs[value].rightTabContent}
+            </div>
             {
                 tabs[value].component
             }
