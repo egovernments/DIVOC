@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
 	"net/http"
 	"strings"
 	"time"
@@ -46,6 +48,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
 	api.CertificationGetCertifyUploadsHandler = certification.GetCertifyUploadsHandlerFunc(getCertifyUploads)
 	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
+	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 }
 
 type GenericResponse struct {
@@ -228,7 +231,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	requiredHeaders := []string{"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity",
 		"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName",
-		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistict", "facilityState", "facilityPincode"}
+		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistrict", "facilityState", "facilityPincode"}
 
 	data := NewScanner(params.File)
 
@@ -256,6 +259,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry.Status = "Processing"
 	uploadEntry.TotalRecords = 0
 	uploadEntry.TotalErrorRows = 0
+	db.CreateCertifyUpload(&uploadEntry)
 
 	// Creating Certificates
 	for data.Scan() {
@@ -270,8 +274,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 		uploadEntry.Status = "Success"
 	}
 
-	// Persisting uploaded file details
-	db.CreateCertifyUpload(&uploadEntry)
+	db.UpdateCertifyUpload(&uploadEntry)
 
 	return certification.NewBulkCertifyOK()
 }
@@ -299,10 +302,48 @@ func getUserName(params *http.Request) string {
 }
 
 func getCertifyUploads(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
-	preferredUsername := getUserName(params.HTTPRequest)
+	preferredUsername := principal.PreferredUsername
 	certifyUploads, err := db.GetCertifyUploadsForUser(preferredUsername)
 	if err == nil {
 		return NewGenericJSONResponse(certifyUploads)
+	}
+	return NewGenericServerError()
+}
+
+func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+
+	// check if user has permission to get errors
+	preferredUsername := principal.PreferredUsername
+	certifyUpload, err := db.GetCertifyUploadsForID(uint(uploadID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// certifyUpload itself not there
+			// then throw 404 error
+			return certification.NewGetCertifyUploadErrorsNotFound()
+		}
+		return NewGenericServerError()
+	}
+
+	// user in certifyUpload doesnt match preferredUsername
+	// then throw 403 error
+	if certifyUpload.UserID != preferredUsername {
+		return certification.NewGetCertifyUploadErrorsForbidden()
+	}
+
+	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
+	if err == nil {
+		var results []map[string]interface{}
+		inrec, _ := json.Marshal(certifyUploadErrors)
+		json.Unmarshal(inrec, &results)
+		for _, el := range results {
+			fieldsToHide := []string{"ID", "CreatedAt", "DeletedAt", "CertifyUploadID"}
+			for _, k := range fieldsToHide {
+				delete(el, k)
+			}
+			el["Errors"] = strings.Split(el["Errors"].(string), ",")
+		}
+		return NewGenericJSONResponse(results)
 	}
 	return NewGenericServerError()
 }
