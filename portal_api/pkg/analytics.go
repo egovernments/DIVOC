@@ -22,6 +22,11 @@ type AnalyticsResponse struct {
 	AvgRateAcrossFacilities             map[string]int64 `json:"avgRateAcrossFacilities"`
 }
 
+type PublicAnalyticsResponse struct {
+    NumberOfCertificatesIssuedByState       map[string]int64 `json:"numberOfCertificatesIssuedByState"`
+    NumberOfCertificatesIssuedByDistrict    map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
+}
+
 var connect *sql.DB = initConnection()
 
 func initConnection() *sql.DB {
@@ -78,6 +83,18 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 	}
 
 	return analyticsResponse
+}
+
+func getPublicAnalyticsInfo() PublicAnalyticsResponse {
+	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
+    byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
+
+	publicAnalyticsResponse := PublicAnalyticsResponse{
+		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
+		NumberOfCertificatesIssuedByDistrict:   getCount(byDistrictQuery),
+	}
+
+	return publicAnalyticsResponse
 }
 
 func getCount(query string) map[string]int64 {

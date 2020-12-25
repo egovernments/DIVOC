@@ -103,7 +103,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -164,6 +167,75 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for certification for given facility admin",
+        "operationId": "getCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "certify upload for given uploadID not found"
           }
         }
       }
@@ -241,24 +313,6 @@ func init() {
           },
           "206": {
             "description": "Need OTP"
-          }
-        }
-      }
-    },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
           }
         }
       }
@@ -341,36 +395,20 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
-      "get": {
+    "/report-side-effects": {
+      "post": {
         "security": [
           {
             "hasRole": [
-              "admin"
+              "recipient"
             ]
           }
         ],
         "tags": [
-          "sideEffects"
+          "reportSideEffects"
         ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
-      "post": {
-        "security": [],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
         "parameters": [
           {
             "name": "body",
@@ -378,9 +416,14 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
+                "certificateId": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse"
+                  }
                 }
               }
             }
@@ -399,63 +442,20 @@ func init() {
         }
       }
     },
-    "/symptoms": {
+    "/sideEffects": {
       "get": {
         "security": [],
         "tags": [
-          "symptoms"
+          "sideEffects"
         ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
+              "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -613,6 +613,21 @@ func init() {
               "type": "string"
             }
           }
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
         }
       }
     },
@@ -952,7 +967,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1013,6 +1031,75 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for certification for given facility admin",
+        "operationId": "getCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "certify upload for given uploadID not found"
           }
         }
       }
@@ -1090,24 +1177,6 @@ func init() {
           },
           "206": {
             "description": "Need OTP"
-          }
-        }
-      }
-    },
-    "/instructions": {
-      "get": {
-        "security": [],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Get symptoms instructions",
-        "operationId": "getInstructions",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
           }
         }
       }
@@ -1190,36 +1259,20 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
-      "get": {
+    "/report-side-effects": {
+      "post": {
         "security": [
           {
             "hasRole": [
-              "admin"
+              "recipient"
             ]
           }
         ],
         "tags": [
-          "sideEffects"
+          "reportSideEffects"
         ],
-        "summary": "Get Side Effects",
-        "operationId": "getSideEffects",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          }
-        }
-      },
-      "post": {
-        "security": [],
-        "tags": [
-          "sideEffects"
-        ],
-        "summary": "Post side effects",
-        "operationId": "createSideEffects",
+        "summary": "Create reported side effects",
+        "operationId": "createReportedSideEffects",
         "parameters": [
           {
             "name": "body",
@@ -1227,9 +1280,14 @@ func init() {
             "schema": {
               "type": "object",
               "properties": {
-                "sideEffects": {
-                  "type": "object",
-                  "$ref": "#/definitions/SideEffects"
+                "certificateId": {
+                  "type": "string"
+                },
+                "sideEffectsResponse": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/sideEffectsResponse"
+                  }
                 }
               }
             }
@@ -1248,63 +1306,20 @@ func init() {
         }
       }
     },
-    "/symptoms": {
+    "/sideEffects": {
       "get": {
         "security": [],
         "tags": [
-          "symptoms"
+          "sideEffects"
         ],
-        "summary": "Get symptoms",
-        "operationId": "getSymptoms",
+        "summary": "Get Side Effects Metadata",
+        "operationId": "getSideEffectsMetadata",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
+              "type": "object"
             }
-          }
-        }
-      },
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "admin"
-            ]
-          }
-        ],
-        "tags": [
-          "symptoms"
-        ],
-        "summary": "Create symptoms",
-        "operationId": "createSymptoms",
-        "parameters": [
-          {
-            "description": "Symptoms data",
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "$ref": "#/definitions/Symptoms"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1577,6 +1592,21 @@ func init() {
         }
       }
     },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "Event": {
       "type": "object",
       "properties": {
@@ -1824,6 +1854,38 @@ func init() {
           }
         }
       }
+    },
+    "sideEffectsResponse": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "SideEffectsResponse",
+      "required": [
+        "symptom",
+        "response"
+      ],
+      "properties": {
+        "response": {
+          "description": "response",
+          "type": "string",
+          "title": "response",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/response"
+        },
+        "symptom": {
+          "description": "symptom",
+          "type": "string",
+          "title": "symptom",
+          "default": "",
+          "$id": "#/properties/sideEffectsResponse/properties/symptom"
+        }
+      },
+      "$id": "#/properties/SideEffectsResponse",
+      "examples": [
+        {
+          "response": "yes",
+          "symptom": "rapid heartbeat"
+        }
+      ]
     },
     "signature": {
       "type": "object",

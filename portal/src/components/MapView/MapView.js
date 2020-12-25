@@ -27,11 +27,14 @@ function Home() {
             });
     }
 
+    
 
+
+    
     return (
         <div className={styles["container"]}>
             <div className={styles["map-container"]}>
-              {(Object.keys(stateWiseCertificateData).length>0)?<LeafletMap
+                {Object.keys(stateWiseCertificateData).length > 0 && <LeafletMap
                     setSelectedState={setSelectedState}
                     selectedState={selectedState}
                     selectedDistrict={selectedDistrict}
@@ -42,7 +45,7 @@ function Home() {
                     setStateList={setStateList}
                     stateWiseCertificateData={stateWiseCertificateData}
 
-                />:<span>Not loaded</span>}
+                />}
             </div>
             <div className={styles["table-container"] + " float-right"}>
                 <DataTable
@@ -53,15 +56,15 @@ function Home() {
                     stateWiseCertificateData={stateWiseCertificateData}
                 />
             </div>
-            {/*{selectedState.name !== "" && <div className={styles["table-container"]}>*/}
-            {/*    <DataTable*/}
-            {/*        setSelectedData={setSelectedDistrict}*/}
-            {/*        selectedData={selectedDistrict}*/}
-            {/*        data={districtList}*/}
-            {/*        title={selectedState.name}*/}
-            {/*        stateWiseCertificateData={stateWiseCertificateData}*/}
-            {/*    />*/}
-            {/*</div>}*/}
+            {selectedState.name !== "" && <div className={styles["table-container"]}>
+               <DataTable
+                    setSelectedData={setSelectedDistrict}
+                    selectedData={selectedDistrict}
+                    data={districtList}
+                    title={selectedState.name}
+                    stateWiseCertificateData={stateWiseCertificateData}
+               />
+            </div>}
 
         </div>
     );

@@ -31,8 +31,7 @@
 }
 
 .patient-details-table {
-    margin-left: 5rem;
-    width: 100%;
+    width: 30%;
 }
 
 .patient-details-table .table-title{
@@ -66,4 +65,14 @@
     color: #4E67D1;
     margin: 0;
     user-select: none;
+}
+
+
+@media (max-width: 961px) {
+    .submit-symptoms-form {
+        padding: 2rem 2rem;
+    }
+    .patient-details-table {
+        width: 70%;
+    }
 }

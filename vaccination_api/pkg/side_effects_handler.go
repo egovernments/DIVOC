@@ -1,31 +1,24 @@
 package pkg
 
 import (
-	"github.com/divoc/api/swagger_gen/models"
+	"encoding/json"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
-	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
-	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
+	"io/ioutil"
+	"os"
 )
 
-const SideEffectsEntity = "SideEffects"
-
-func createSideEffects(params side_effects.CreateSideEffectsParams) middleware.Responder {
-	services.MakeRegistryCreateRequest(params.Body, SideEffectsEntity)
-	return symptoms.NewCreateSymptomsOK()
-}
-
-func getSideEffects(params side_effects.GetSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
-	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": SideEffectsEntity,
-		},
-	}
-	queryResults, err := services.QueryRegistry(SideEffectsEntity, filter)
+func getSideEffects(params side_effects.GetSideEffectsMetadataParams) middleware.Responder {
+	//TODO: replace with side effects json file
+	jsonFile, err := os.Open("./config/sideEffectsSchema.json")
 	if err != nil {
-		log.Errorf("Error in querying registry", err)
+		log.Errorf("Error while reading file %+v", err)
 		return NewGenericServerError()
 	}
-	return NewGenericJSONResponse(queryResults[SideEffectsEntity])
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var result map[string]interface{}
+	json.Unmarshal([]byte(byteValue), &result)
+	return NewGenericJSONResponse(result)
 }

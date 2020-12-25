@@ -2,24 +2,28 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"github.com/jinzhu/gorm"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/pkg/auth"
+	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
 	"github.com/divoc/api/swagger_gen/restapi/operations/login"
+	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
-	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -39,13 +43,12 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(vaccinationGetLoggedInUserInfoHandler)
-	api.SymptomsCreateSymptomsHandler = symptoms.CreateSymptomsHandlerFunc(createSymptoms)
-	api.SymptomsGetSymptomsHandler = symptoms.GetSymptomsHandlerFunc(getSymptoms)
-	api.SymptomsGetInstructionsHandler = symptoms.GetInstructionsHandlerFunc(getInstructions)
-	api.SideEffectsCreateSideEffectsHandler = side_effects.CreateSideEffectsHandlerFunc(createSideEffects)
-	api.SideEffectsGetSideEffectsHandler = side_effects.GetSideEffectsHandlerFunc(getSideEffects)
+	api.SideEffectsGetSideEffectsMetadataHandler = side_effects.GetSideEffectsMetadataHandlerFunc(getSideEffects)
 	api.CertificationBulkCertifyHandler = certification.BulkCertifyHandlerFunc(bulkCertify)
 	api.EventsHandler = operations.EventsHandlerFunc(eventsHandler)
+	api.CertificationGetCertifyUploadsHandler = certification.GetCertifyUploadsHandlerFunc(getCertifyUploads)
+	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
+	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 }
 
 type GenericResponse struct {
@@ -226,14 +229,56 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	requiredHeaders := []string{"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity",
+		"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName",
+		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistrict", "facilityState", "facilityPincode"}
+
 	data := NewScanner(params.File)
+
+	// csv template validation
+	csvHeaders := data.GetHeaders()
+	for _, a := range requiredHeaders {
+		if !contains(csvHeaders, a) {
+			code := "INVALID_TEMPLATE"
+			message := a + " column doesn't exist in uploaded csv file"
+			error := &models.Error{
+				Code:    &code,
+				Message: &message,
+			}
+			return certification.NewBulkCertifyBadRequest().WithPayload(error)
+		}
+	}
+
+	// Initializing CertifyUpload entity
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	uploadEntry := db.CertifyUploads{}
+	uploadEntry.Filename = fileName
+	uploadEntry.UserID = preferredUsername
+	uploadEntry.Status = "Processing"
+	uploadEntry.TotalRecords = 0
+	uploadEntry.TotalErrorRows = 0
+	db.CreateCertifyUpload(&uploadEntry)
+
+	// Creating Certificates
 	for data.Scan() {
-		createCertificate(&data, params.HTTPRequest.Header.Get("Authorization"))
+		createCertificate(&data, &uploadEntry)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
+
+	if uploadEntry.TotalErrorRows > 0 {
+		uploadEntry.Status = "Failed"
+	} else {
+		uploadEntry.Status = "Success"
+	}
+
+	db.UpdateCertifyUpload(&uploadEntry)
+
 	return certification.NewBulkCertifyOK()
 }
+
 func eventsHandler(params operations.EventsParams) middleware.Responder {
 	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
@@ -248,12 +293,57 @@ func eventsHandler(params operations.EventsParams) middleware.Responder {
 }
 
 func getUserName(params *http.Request) string {
-	authHeader := params.Header.Get("Authorization")
 	preferredUsername := ""
-	if authHeader != "" {
-		bearerToken, _ := auth.GetToken(authHeader)
-		claimBody, _ := auth.GetClaimBody(bearerToken)
+	claimBody := auth.ExtractClaimBodyFromHeader(params)
+	if claimBody != nil {
 		preferredUsername = claimBody.PreferredUsername
 	}
 	return preferredUsername
+}
+
+func getCertifyUploads(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	certifyUploads, err := db.GetCertifyUploadsForUser(preferredUsername)
+	if err == nil {
+		return NewGenericJSONResponse(certifyUploads)
+	}
+	return NewGenericServerError()
+}
+
+func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+
+	// check if user has permission to get errors
+	preferredUsername := principal.PreferredUsername
+	certifyUpload, err := db.GetCertifyUploadsForID(uint(uploadID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// certifyUpload itself not there
+			// then throw 404 error
+			return certification.NewGetCertifyUploadErrorsNotFound()
+		}
+		return NewGenericServerError()
+	}
+
+	// user in certifyUpload doesnt match preferredUsername
+	// then throw 403 error
+	if certifyUpload.UserID != preferredUsername {
+		return certification.NewGetCertifyUploadErrorsForbidden()
+	}
+
+	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
+	if err == nil {
+		var results []map[string]interface{}
+		inrec, _ := json.Marshal(certifyUploadErrors)
+		json.Unmarshal(inrec, &results)
+		for _, el := range results {
+			fieldsToHide := []string{"ID", "CreatedAt", "DeletedAt", "CertifyUploadID"}
+			for _, k := range fieldsToHide {
+				delete(el, k)
+			}
+			el["Errors"] = strings.Split(el["Errors"].(string), ",")
+		}
+		return NewGenericJSONResponse(results)
+	}
+	return NewGenericServerError()
 }

@@ -46,3 +46,12 @@ func (o Scanner) int64(s string) int64 {
 	}
 	return number
 }
+
+// Headers Returns the headers of csv as array of string
+func (o Scanner) GetHeaders() []string {
+	keys := make([]string, 0, len(o.Head))
+    for k := range o.Head {
+        keys = append(keys, k)
+	}
+	return keys
+}

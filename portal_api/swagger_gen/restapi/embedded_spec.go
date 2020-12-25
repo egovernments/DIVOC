@@ -366,6 +366,24 @@ func init() {
         }
       }
     },
+    "/public": {
+      "get": {
+        "security": [],
+        "summary": "Get public analytics query",
+        "operationId": "getPublicAnalytics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/vaccinators": {
       "get": {
         "security": [
@@ -1147,6 +1165,24 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/public": {
+      "get": {
+        "security": [],
+        "summary": "Get public analytics query",
+        "operationId": "getPublicAnalytics",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           },
           "401": {
             "description": "Unauthorized"

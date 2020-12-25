@@ -1,15 +1,18 @@
 
 
 .table-container>table>tbody{
-    height: 500px;
-    overflow: scroll;
+    height: 60vh;
+    overflow-y: scroll;
     display:block;
 }
 
-.second-word-formatting{
-    padding: 55px;
+.table-container>table>thead {
+    display: block;
 }
-
+.table-container>table>thead>tr {
+    display: flex;
+    justify-content: space-between;
+}
 .table-container{
     padding: 5px;
 }

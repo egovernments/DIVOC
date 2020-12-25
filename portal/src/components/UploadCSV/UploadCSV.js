@@ -30,6 +30,11 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
                 alert("Successfully uploaded CSV");
             }, 500);
             onUploadComplete();
+        }).catch((error) => {
+            if (error.response && error.response.status === 400) {
+                setUploadPercentage(0)
+                alert(error.response.data["message"]);
+            }
         })
     };
 
