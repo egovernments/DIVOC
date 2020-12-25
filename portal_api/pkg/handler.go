@@ -210,7 +210,7 @@ func getAnalyticsHandler(params operations.GetAnalyticsParams, principal * model
 	return NewGenericJSONResponse(getAnalyticsInfo())
 }
 
-func getPublicAnalyticsHandler(params operations.GetAnalyticsParams, principal * models.JWTClaimBody) middleware.Responder {
+func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
 }
 
