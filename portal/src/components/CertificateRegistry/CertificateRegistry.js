@@ -76,21 +76,19 @@ function Certificates() {
 
 function UploadErrors({uploadHistory}) {
 
-    const fileUploadHistoryDetailsAPI = '/divoc/api/v1/bulkCertify/history/' + uploadHistory.id;
+    const fileUploadHistoryDetailsAPI = '/divoc/api/v1/certify/uploads/' + uploadHistory.id + '/errors';
     const axiosInstance = useAxios('');
     const [uploadHistoryDetails, setUploadHistoryDetails] = useState([]);
     useEffect(() => {
         fetchUploadHistoryDetails()
-    }, []);
+    }, [uploadHistory.id]);
 
     function fetchUploadHistoryDetails() {
-        const fakeErrorData = JSON.parse(errorData);
         axiosInstance.current.get(fileUploadHistoryDetailsAPI)
             .then(res => {
-                //return res.json();
-                return fakeErrorData
+                return res.data
             })
-            .catch(e => fakeErrorData)
+            .catch(e => [])
             .then((result) => {
                 setUploadHistoryDetails(result)
             });
@@ -150,22 +148,5 @@ const headerData = [
         key: "errors"
     }
 ]
-
-const errorData = "[\n" +
-    "\t{\n" +
-    "\t    \"Column 1\": \"1-1\",\n" +
-    "\t    \"Column 2\": \"1-2\",\n" +
-    "\t    \"Column 3\": \"1-3\",\n" +
-    "\t    \"Column 4\": \"1-4\",\n" +
-    "        \"ERRORS\":[\"E1\",\"E2\"]\n" +
-    "\t},\n" +
-    "\t{\n" +
-    "\t    \"Column 1\": \"2-1\",\n" +
-    "\t    \"Column 2\": \"2-2\",\n" +
-    "\t    \"Column 3\": \"2-3\",\n" +
-    "\t    \"Column 4\": \"2-4\",\n" +
-    "        \"ERRORS\":[\"E1\",\"E2\",\"E3\"]\n" +
-    "\t}\n" +
-    "]"
 
 export default Certificates;

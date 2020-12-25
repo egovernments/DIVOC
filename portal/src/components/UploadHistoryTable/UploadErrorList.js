@@ -53,7 +53,7 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                                 <TableRow>
                                     <TableCell
                                         component={RowTableCell}>Row {index + 1} :
-                                        Errors {item["ERRORS"].length}
+                                        Errors {item["Errors"].length ?? 0}
                                     </TableCell>
                                 </TableRow>)
                         }
@@ -61,10 +61,8 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                 </Table> : <p>No Error Found</p>}
             </div>
             {isErrorFound && <Button variant="danger" className="m-4" onClick={() => {
-                // const rawCSV = uploadHistoryDetails.map((item, index) => item.rawData);
                 const csv = Papa.unparse(uploadHistoryDetails)
                 console.log(JSON.stringify(csv))
-                // Dummy implementation for Desktop download purpose
                 const blob = new Blob([csv]);
                 const a = window.document.createElement('a');
                 a.href = window.URL.createObjectURL(blob);
