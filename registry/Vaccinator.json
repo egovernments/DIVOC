@@ -25,14 +25,6 @@
         "status"
       ],
       "properties": {
-        "signatures": {
-          "$id": "#/properties/signatures",
-          "type": "array",
-          "items": {
-            "$ref": "Signature.json#/definitions/Signature"
-          },
-          "$comment": "Placeholder for all verifiable claims"
-        },
         "serialNum": {
           "$id": "#/properties/serialNum",
           "type": "integer",

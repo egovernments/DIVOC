@@ -67,7 +67,7 @@ export const CustomTable = ({data, fields, canSelectColumn = true}) => {
                     </TableHead>
                     <TableBody>
                         {
-                            data.map((row) => (
+                            data && data.map && data.map((row) => (
                                 <TableRow>
                                     {
                                         fields.concat(columns).map((field, index) => (

@@ -1,10 +1,8 @@
 {
   "realm": "divoc",
-  "auth-server-url": "https://divoc.xiv.in/keycloak/auth/",
-  "ssl-required": "external",
+  "auth-server-url": "http://localhost/auth",
   "resource": "facility-admin-portal",
   "public-client": true,
-  "verify-token-audience": true,
-  "use-resource-role-mappings": true,
   "confidential-port": 0
 }
+

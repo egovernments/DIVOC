@@ -24,12 +24,15 @@ var Config = struct {
 		Url           string `env:"KEYCLOAK_URL"`
 		PubkeyPath string `default:"config/local_rsa.pub"`
 		Realm string `default:"divoc"`
-		AuthHeader string
+		AuthHeader string `env:"AUTH_TOKEN"`
 		RecipientGroupId string `default:"recipient"`
 	}
 	Kafka struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic string `default:"certify" yaml:"certifyTopic"`
 		EventsTopic string `default:"events" yaml:"eventsTopic"`
+	}
+	Clickhouse struct {
+		Dsn string `env:"CLICKHOUSE_DSN"`
 	}
 }{}

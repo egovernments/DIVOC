@@ -1,22 +1,24 @@
 PWD := $(shell pwd)
 GOPATH := $(shell go env GOPATH)
 source := $(wildcard *.go **/*.go */*/*.go)
+ifeq ($(SPEC_FILE), )
+SPEC_FILE := $(PWD)/../../interfaces/admin-portal.yaml
+endif
 
-all: divoc-portal-api-server run
+all: divoc-portal-api-server
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
 	@$(GOPATH)/bin/gobin github.com/go-swagger/go-swagger/cmd/swagger@v0.25.0
 	@$(GOPATH)/bin/gobin github.com/golangci/golangci-lint/cmd/golangci-lint@v1.24.0
 
-swagger_gen/restapi/server.go: ../../interfaces/admin-portal.yaml
+swagger_gen/restapi/server.go: $(SPEC_FILE)
 	@mkdir $(PWD)/swagger_gen || echo 'exists'
-	@echo $(PWD)/../../interfaces/admin-portal.yaml
-	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(PWD)/../../interfaces/admin-portal.yaml --principal models.JWTClaimBody
+	@$(GOPATH)/bin/swagger generate server --exclude-main -t ./swagger_gen -f $(SPEC_FILE) --principal models.JWTClaimBody
 
 api_docs:
 	@echo "Installing swagger-merger" && npm install swagger-merger -g
-	@swagger-merger -i $(PWD)/../../interfaces/admin-portal.yaml -o $(PWD)/docs/api_docs/bundle.yaml
+	@swagger-merger -i $(SPEC_FILE) -o $(PWD)/docs/api_docs/bundle.yaml
 
 build: divoc-portal-api-server
 	@echo "building $(source)"

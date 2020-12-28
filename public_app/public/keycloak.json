@@ -1,6 +1,6 @@
 {
     "realm": "divoc",
-    "auth-server-url": "https://divoc.xiv.in/keycloak/auth/",
+    "auth-server-url": "/keycloak/auth/",
     "ssl-required": "external",
     "resource": "certificate-login",
     "public-client": true,
