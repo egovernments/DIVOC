@@ -4,15 +4,14 @@ package restapi
 
 import (
 	"crypto/tls"
+	"github.com/divoc/notification-service/pkg"
+	"github.com/divoc/notification-service/pkg/auth"
+	"github.com/go-openapi/runtime/security"
 	"net/http"
 
+	"github.com/divoc/notification-service/swagger_gen/restapi/operations"
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
-	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/divoc/notification-service/swagger_gen/models"
-	"github.com/divoc/notification-service/swagger_gen/restapi/operations"
-	"github.com/divoc/notification-service/swagger_gen/restapi/operations/notification"
 )
 
 //go:generate swagger generate server --target ../../swagger_gen --name NotificationService --spec ../../../interfaces/notification-service.yaml --principal models.JWTClaimBody --exclude-main
@@ -39,22 +38,19 @@ func configureAPI(api *operations.NotificationServiceAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	if api.HasRoleAuth == nil {
-		api.HasRoleAuth = func(token string, scopes []string) (*models.JWTClaimBody, error) {
-			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
-		}
-	}
-
+	api.HasRoleAuth = auth.RoleAuthorizer
+	pkg.SetupHandlers(api)
+	api.APIAuthorizer = security.Authorized()
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer
 	//
 	// Example:
 	// api.APIAuthorizer = security.Authorized()
-	if api.NotificationPostNotificationHandler == nil {
-		api.NotificationPostNotificationHandler = notification.PostNotificationHandlerFunc(func(params notification.PostNotificationParams, principal *models.JWTClaimBody) middleware.Responder {
-			return middleware.NotImplemented("operation notification.PostNotification has not yet been implemented")
-		})
-	}
+	//if api.NotificationPostNotificationHandler == nil {
+	//	api.NotificationPostNotificationHandler = notification.PostNotificationHandlerFunc(func(params notification.PostNotificationParams, principal *models.JWTClaimBody) middleware.Responder {
+	//		return middleware.NotImplemented("operation notification.PostNotification has not yet been implemented")
+	//	})
+	//}
 
 	api.PreServerShutdown = func() {}
 

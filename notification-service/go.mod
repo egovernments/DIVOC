@@ -13,6 +13,8 @@ require (
 	github.com/go-openapi/validate v0.20.0
 	github.com/gospotcheck/jwt-go v4.0.0+incompatible
 	github.com/jessevdk/go-flags v1.4.0
+	github.com/jinzhu/configor v1.2.1
+	github.com/sirupsen/logrus v1.4.2
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 )
 

@@ -1,0 +1,4 @@
+kafka:
+  bootstrapServers: localhost
+  certifyTopic: certify
+  eventsTopic: events
