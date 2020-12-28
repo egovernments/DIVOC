@@ -1,5 +1,5 @@
 package consumers
 
 func Init() {
-	SmsNotifierConsumer()
+	go SMSNotifyConsumer()
 }

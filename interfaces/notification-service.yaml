@@ -15,9 +15,11 @@ securityDefinitions:
       facility-admin: scope of facility admin
       facility-staff: scope of facility staff
 
-security:
-  - hasRole: []
-
+security: []
+consumes:
+  - application/json
+produces:
+  - application/json
 paths:
   /notification:
     post:

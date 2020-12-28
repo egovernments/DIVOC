@@ -19,7 +19,6 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 
-	"github.com/divoc/notification-service/swagger_gen/models"
 	"github.com/divoc/notification-service/swagger_gen/restapi/operations/notification"
 )
 
@@ -45,15 +44,9 @@ func NewNotificationServiceAPI(spec *loads.Document) *NotificationServiceAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		NotificationPostNotificationHandler: notification.PostNotificationHandlerFunc(func(params notification.PostNotificationParams, principal *models.JWTClaimBody) middleware.Responder {
+		NotificationPostNotificationHandler: notification.PostNotificationHandlerFunc(func(params notification.PostNotificationParams) middleware.Responder {
 			return middleware.NotImplemented("operation notification.PostNotification has not yet been implemented")
 		}),
-
-		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
-			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
-		},
-		// default authorizer is authorized meaning no requests are blocked
-		APIAuthorizer: security.Authorized(),
 	}
 }
 
@@ -87,13 +80,6 @@ type NotificationServiceAPI struct {
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/json
 	JSONProducer runtime.Producer
-
-	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
-	// it performs authentication based on an oauth2 bearer token provided in the request
-	HasRoleAuth func(string, []string) (*models.JWTClaimBody, error)
-
-	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
-	APIAuthorizer runtime.Authorizer
 
 	// NotificationPostNotificationHandler sets the operation handler for the post notification operation
 	NotificationPostNotificationHandler notification.PostNotificationHandler
@@ -173,10 +159,6 @@ func (o *NotificationServiceAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
-	if o.HasRoleAuth == nil {
-		unregistered = append(unregistered, "HasRoleAuth")
-	}
-
 	if o.NotificationPostNotificationHandler == nil {
 		unregistered = append(unregistered, "notification.PostNotificationHandler")
 	}
@@ -195,22 +177,12 @@ func (o *NotificationServiceAPI) ServeErrorFor(operationID string) func(http.Res
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
 func (o *NotificationServiceAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
-	result := make(map[string]runtime.Authenticator)
-	for name := range schemes {
-		switch name {
-		case "hasRole":
-			result[name] = o.BearerAuthenticator(name, func(token string, scopes []string) (interface{}, error) {
-				return o.HasRoleAuth(token, scopes)
-			})
-
-		}
-	}
-	return result
+	return nil
 }
 
 // Authorizer returns the registered authorizer
 func (o *NotificationServiceAPI) Authorizer() runtime.Authorizer {
-	return o.APIAuthorizer
+	return nil
 }
 
 // ConsumersFor gets the consumers for the specified media types.

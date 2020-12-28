@@ -4,9 +4,7 @@ package restapi
 
 import (
 	"crypto/tls"
-	"github.com/divoc/notification-service/pkg"
-	"github.com/divoc/notification-service/pkg/auth"
-	"github.com/go-openapi/runtime/security"
+	"github.com/divoc/notification-service/pkg/handlers"
 	"net/http"
 
 	"github.com/divoc/notification-service/swagger_gen/restapi/operations"
@@ -38,9 +36,9 @@ func configureAPI(api *operations.NotificationServiceAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
-	api.HasRoleAuth = auth.RoleAuthorizer
-	pkg.SetupHandlers(api)
-	api.APIAuthorizer = security.Authorized()
+	//api.HasRoleAuth = auth.RoleAuthorizer
+	handlers.SetupHandlers(api)
+	//api.APIAuthorizer = security.Authorized()
 	// Set your custom authorizer if needed. Default one is security.Authorized()
 	// Expected interface runtime.Authorizer
 	//
