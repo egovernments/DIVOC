@@ -20,6 +20,7 @@ type AnalyticsResponse struct {
 	RateOfCertificateIssuedByFacilities map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
 	VaccinatorsCount                    map[string]int64 `json:"vaccinatorsCount"`
 	AvgRateAcrossFacilities             map[string]int64 `json:"avgRateAcrossFacilities"`
+	NumberOfCertificatesIssuedByDistrict   map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
 }
 
 type PublicAnalyticsResponse struct {
@@ -67,6 +68,7 @@ select 'min' as id, min(certificateIssued) as count from ( select facilityName, 
 union all
 select 'max' as id, max(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 `
+    byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
 
 	analyticsResponse := AnalyticsResponse{
 		NumberOfCertificatesIssued:          getCount(countQuery),
@@ -80,6 +82,7 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 		RateOfCertificateIssuedByFacilities: getCount(rateOfCertificateIssuedByFacilities),
 		VaccinatorsCount:                    getCount(vaccinatorsCount),
 		AvgRateAcrossFacilities:                    getCount(avgRateAcrossFacilities),
+		NumberOfCertificatesIssuedByDistrict:   getCount(byDistrictQuery),
 	}
 
 	return analyticsResponse
