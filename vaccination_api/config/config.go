@@ -39,4 +39,9 @@ var Config = struct {
 		Port string `default:"5432" yaml:"port"`
 		DBName string `default:"postgres" yaml:"dbname"`
 	}
+	Certificate struct {
+		Upload struct {
+			Columns string `yaml:"columns"`
+		}
+	}
 }{}
