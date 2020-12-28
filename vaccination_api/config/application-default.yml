@@ -11,3 +11,9 @@ kafka:
   bootstrapServers: localhost
   certifyTopic: certify
   eventsTopic: events
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  dbname: postgres
+  password: postgres
