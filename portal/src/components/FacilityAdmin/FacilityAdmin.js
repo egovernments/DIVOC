@@ -10,7 +10,7 @@ import {useAxios} from "../../utils/useAxios";
 export default function FacilityAdmin() {
     const {keycloak} = useKeycloak();
     const [vaccinators, setVaccinators] = useState([]);
-    const getVaccinatorPath = 'divoc/admin/api/v1/vaccinators';
+    const getVaccinatorPath = '/divoc/admin/api/v1/vaccinators';
     const axiosInstance = useAxios('');
 
     useEffect(() => {
@@ -27,9 +27,9 @@ export default function FacilityAdmin() {
     return (
         <TabPanels tabs={[
             {title: "Upload Vaccination Details", component: <Certificates />},
-            // {title: "Role Setup", component: <RoleSetup/>},
-            // {title: "Vaccinator Details", component: <VaccinatorList/>},
-            // {title: "Program Overview", component: <span>Program Overview</span>},
+            {title: "Role Setup", component: <RoleSetup/>},
+            {title: "Vaccinator Details", component: <VaccinatorList/>},
+            {title: "Program Overview", component: <span>Program Overview</span>},
 
         ]}/>
     );

@@ -43,6 +43,6 @@ CMD ["/app/certificate_processor"]
 FROM alpine:3.9 as portal_api
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/portal_api/divoc-portal-api-server /app/divoc-portal-api-server
-COPY vaccination_api/config /config
+COPY portal_api/config /config
 EXPOSE 8001
 CMD ["/app/divoc-portal-api-server", "--scheme", "http", "--port", "8001", "--host", "0.0.0.0"]

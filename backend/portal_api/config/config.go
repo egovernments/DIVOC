@@ -25,6 +25,6 @@ var Config = struct {
 		} `yaml:"facilityStaff"`
 	}
 	Analytics struct {
-		Datasource string `yaml:"datasource" default:"tcp://127.0.0.1:9000?debug=true"`
+		Datasource string `yaml:"datasource" env:"CLICK_HOUSE_URL" default:"tcp://127.0.0.1:9000?debug=true"`
 	}
 }{}

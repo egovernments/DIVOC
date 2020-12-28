@@ -7,7 +7,7 @@ import {SampleCSV} from "../../utils/constants";
 
 function Facilities() {
     const [facilities, setFacilities] = useState([]);
-    const fileUploadAPI = 'divoc/admin/api/v1/facilities';
+    const fileUploadAPI = '/divoc/admin/api/v1/facilities';
     const axiosInstance = useAxios('');
 
     useEffect(() => {

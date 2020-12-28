@@ -87,7 +87,7 @@ services:
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KEYCLOAK_URL: https://divoc.xiv.in/keycloak/auth
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
     ports:
       - "8000:8000"
     depends_on:
@@ -97,6 +97,10 @@ services:
     image: dockerhub/portal_api
     ports:
       - "8001:8001"
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      CLICK_HOUSE_URL: tcp://clickhouse:9000?debug=true
     depends_on:
       - kafka
       - db
