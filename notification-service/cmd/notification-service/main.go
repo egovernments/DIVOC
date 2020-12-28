@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/divoc/notification-service/config"
+	"github.com/divoc/notification-service/pkg/consumers"
 	"github.com/divoc/notification-service/swagger_gen/restapi"
 	"github.com/divoc/notification-service/swagger_gen/restapi/operations"
 	"github.com/go-openapi/loads"
@@ -12,6 +13,7 @@ import (
 
 func main() {
 	config.Initialize()
+	consumers.Init()
 	log.Infof("Starting certificate processor")
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

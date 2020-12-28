@@ -2,3 +2,7 @@ kafka:
   bootstrapServers: localhost
   certifyTopic: certify
   eventsTopic: events
+
+smsapi:
+  url: https://api.msg91.com/api/v2/sendsms
+  authKey: abc123
