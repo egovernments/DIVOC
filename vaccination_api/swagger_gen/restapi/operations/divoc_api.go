@@ -76,6 +76,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		GetCertificateHandler: GetCertificateHandlerFunc(func(params GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetCertificate has not yet been implemented")
 		}),
+		CertificationGetCertifyUploadErrorsHandler: certification.GetCertifyUploadErrorsHandlerFunc(func(params certification.GetCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.GetCertifyUploadErrors has not yet been implemented")
+		}),
 		CertificationGetCertifyUploadsHandler: certification.GetCertifyUploadsHandlerFunc(func(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.GetCertifyUploads has not yet been implemented")
 		}),
@@ -166,6 +169,8 @@ type DivocAPI struct {
 	EventsHandler EventsHandler
 	// GetCertificateHandler sets the operation handler for the get certificate operation
 	GetCertificateHandler GetCertificateHandler
+	// CertificationGetCertifyUploadErrorsHandler sets the operation handler for the get certify upload errors operation
+	CertificationGetCertifyUploadErrorsHandler certification.GetCertifyUploadErrorsHandler
 	// CertificationGetCertifyUploadsHandler sets the operation handler for the get certify uploads operation
 	CertificationGetCertifyUploadsHandler certification.GetCertifyUploadsHandler
 	// ConfigurationGetConfigurationHandler sets the operation handler for the get configuration operation
@@ -288,6 +293,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.GetCertificateHandler == nil {
 		unregistered = append(unregistered, "GetCertificateHandler")
+	}
+	if o.CertificationGetCertifyUploadErrorsHandler == nil {
+		unregistered = append(unregistered, "certification.GetCertifyUploadErrorsHandler")
 	}
 	if o.CertificationGetCertifyUploadsHandler == nil {
 		unregistered = append(unregistered, "certification.GetCertifyUploadsHandler")
@@ -445,6 +453,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/certificates/{phone}"] = NewGetCertificate(o.context, o.GetCertificateHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/certify/uploads/{uploadId}/errors"] = certification.NewGetCertifyUploadErrors(o.context, o.CertificationGetCertifyUploadErrorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

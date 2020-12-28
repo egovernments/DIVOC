@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
 import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
-import {CustomTable} from "../CustomTable";
 import {TotalRecords} from "../TotalRecords";
 import {SampleCSV} from "../../utils/constants";
+import {CustomTable} from "../CustomTable";
 
 function Facilities() {
     const [facilities, setFacilities] = useState([]);

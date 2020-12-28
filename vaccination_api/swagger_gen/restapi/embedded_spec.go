@@ -198,6 +198,48 @@ func init() {
         }
       }
     },
+    "/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "certify upload for given uploadID not found"
+          }
+        }
+      }
+    },
     "/divoc/configuration": {
       "get": {
         "tags": [
@@ -1016,6 +1058,48 @@ func init() {
                 "type": "object"
               }
             }
+          }
+        }
+      }
+    },
+    "/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "certify upload for given uploadID not found"
           }
         }
       }
