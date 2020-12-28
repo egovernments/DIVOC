@@ -1,34 +1,23 @@
 swagger: '2.0'
 info:
   version: '1.0.0'
-  title: Notification service to integrate with DIVOC
-#https://app.swaggerhub.com/apis/divoc/notification-servic/1.0.0
-# Under securityDefinitions we declare which security schemes can be used.
-# These definitions do not affect to the operations, but can be applied
-# using the 'security' key at the global level or the operation level.
-# In this sample, we'll see how to apply the security definition globally,
-# and override it at the operation level.
-#
-# Note that for Access Code Flow, you must provide the Token URL.
-securityDefinitions: #TODO check security for provider
-  accessCode:
-    type: oauth2
-    # This should be updated to the Token URL of your OAuth provider.
-    tokenUrl: http://example.com/oauth/token
-    # This should be updated to the Authorization URL of your OAuth provider.
-    authorizationUrl: http://example.com/oauth/auth
-    flow: accessCode
-    scopes:
-      write: allows modifying resources
-      read: allows reading resources
+  title: Notification service
+  description: Notification service to integrate with DIVOC
 
-# Here we apply the security flow called 'accessCode' globally to all the operations in the spec.
-# This security scheme is defined above in the 'securityDefinitions' section.
-# Global security can be overridden an operation level as seen in the example below
+securityDefinitions:
+  hasRole:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth'
+    tokenUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token'
+    scopes:
+      admin: scope of super admin
+      facility-admin: scope of facility admin
+      facility-staff: scope of facility staff
+
 security:
-  - accessCode:
-      - read
-      - write
+  - hasRole: []
+
 paths:
   /notification:
     post:
@@ -61,7 +50,7 @@ definitions:
       #attachment:
       #  type:
 
-host: virtserver.swaggerhub.com
-basePath: /divoc/notification-servic/1.0.0
+host: divoc.xiv.in
+basePath: /divoc/notification-service/v1
 schemes:
   - https
