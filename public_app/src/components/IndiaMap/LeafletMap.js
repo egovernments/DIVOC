@@ -15,6 +15,7 @@ export default function LeafletMap({
     stateList,
     setStateList,
     stateWiseCertificateData,
+    districtWiseCertificateData
 }) {
     const [states, setStates] = useState(geoStates);
     const [stateClicked, setStateClicked] = useState(false);
@@ -78,7 +79,7 @@ export default function LeafletMap({
 
     const filterStateList = () => {
         let newStateList = []
-        states.features.map( state => newStateList.push(state.properties.st_nm))
+        states.features.map( state => newStateList.push(state.properties.ST_NM))
         setStateList(newStateList);
     };
 
@@ -123,7 +124,7 @@ export default function LeafletMap({
 
 
     const onEachState = (state, layer) => {
-        const stateName = state.properties.st_nm;
+        const stateName = state.properties.ST_NM;
         const count = stateWiseCertificateData[stateName] ? stateWiseCertificateData[stateName] : 0;
         layer.bindTooltip(`<b>State : ${stateName}</b> <br/> certificates Issued : ${count}`);
         layer.on({
@@ -135,7 +136,8 @@ export default function LeafletMap({
 
     const onEachDistrict = (district, layer) => {
         const districtName = district.properties.district;
-        layer.bindTooltip(`District : ${districtName}`);
+        const count = districtWiseCertificateData[districtName] ? districtWiseCertificateData[districtName] : 0;
+        layer.bindTooltip(`District : ${districtName}</b> <br/> certificates Issued : ${count}`);
         layer.on({
             mouseover: (event) => {
                 event.target.setStyle({

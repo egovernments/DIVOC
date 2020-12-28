@@ -40,6 +40,7 @@ function Home() {
                     stateList={stateList}
                     setStateList={setStateList}
                     stateWiseCertificateData={stateWiseCertificateData}
+                    districtWiseCertificateData={districtWiseCertificateData}
                 />}
             </div>
             <div className={styles["table-container"] + " float-right"}>
