@@ -5,4 +5,10 @@ kafka:
 
 smsapi:
   url: https://api.msg91.com/api/v2/sendsms
-  authKey: abc123
+  authKey: secret
+  enable: true
+
+emailsmtp:
+  fromAddress: from@gmail.com
+  password: secret
+  enable: true

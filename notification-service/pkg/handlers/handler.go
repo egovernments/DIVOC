@@ -6,10 +6,7 @@ import (
 	"github.com/divoc/notification-service/swagger_gen/restapi/operations/notification"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
-
-const MobileNumberPrefix = "tel:"
 
 func SetupHandlers(api *operations.NotificationServiceAPI) {
 	api.NotificationPostNotificationHandler = notification.PostNotificationHandlerFunc(postNotificationHandler)
@@ -19,13 +16,19 @@ func SetupHandlers(api *operations.NotificationServiceAPI) {
 func postNotificationHandler(params notification.PostNotificationParams) middleware.Responder {
 	requestBody := params.Body
 
-	if strings.Contains(*requestBody.Recepient, MobileNumberPrefix) {
-		if response, err := services.SendSMS(strings.Split(*requestBody.Recepient, MobileNumberPrefix)[1], *requestBody.Message); err == nil {
+	if mobileNumber, err := services.GetMobileNumber(*requestBody.Recepient); err == nil {
+		if response, err := services.SendSMS(mobileNumber, *requestBody.Message); err == nil {
 			log.Infof("Successfully sent SMS %+v", response)
 		} else {
 			log.Errorf("Failed sending SMS %+v", err)
 		}
-
+	}
+	if emailId, err := services.GetEmailId(*requestBody.Recepient); err == nil {
+		if err := services.SendEmail(emailId, requestBody.Subject, *requestBody.Message); err == nil {
+			log.Infof("Successfully sent Email %+v")
+		} else {
+			log.Errorf("Failed sending email %+v", err)
+		}
 	}
 	return notification.NewPostNotificationOK()
 }

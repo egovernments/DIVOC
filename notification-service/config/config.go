@@ -24,5 +24,11 @@ var Config = struct {
 	SmsAPI struct {
 		URL     string `default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`
 		AuthKey string `default:"" yaml:"authKey"`
+		Enable  bool   `yaml:"enable"`
+	}
+	EmailSMTP struct {
+		FromAddress string `yaml:"fromAddress"`
+		Password    string `yaml:"password"`
+		Enable      bool   `yaml:"enable"`
 	}
 }{}

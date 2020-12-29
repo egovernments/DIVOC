@@ -1,5 +1,6 @@
 package consumers
 
 func Init() {
-	go SMSNotifyConsumer()
+	go smsNotifyConsumer()
+	go emailNotifyConsumer()
 }

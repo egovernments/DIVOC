@@ -10,7 +10,7 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-func SMSNotifyConsumer() {
+func smsNotifyConsumer() {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "sms_notifier",
@@ -31,15 +31,18 @@ func SMSNotifyConsumer() {
 				log.Errorf("Received message is not in required format %+v", err)
 			}
 			if len(certifyMessage.Recipient.Contact) > 0 {
-				mobileNumber := certifyMessage.Recipient.Contact[0]
-				vaccineName := certifyMessage.Vaccination.Name
-				recipientName := certifyMessage.Recipient.Name
-				message := recipientName + ", your " + vaccineName + " vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ "
-				if resp, err := services.SendSMS(mobileNumber, message); err == nil {
-					log.Debugf("SMS sent response %+v", resp)
-					c.CommitMessage(msg)
-				} else {
-					log.Errorf("Error in sending SMS %+v", err)
+				for _, contact := range certifyMessage.Recipient.Contact {
+					//TODO: check for prefix
+					mobileNumber := contact
+					vaccineName := certifyMessage.Vaccination.Name
+					recipientName := certifyMessage.Recipient.Name
+					message := recipientName + ", your " + vaccineName + " vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ "
+					if resp, err := services.SendSMS(mobileNumber, message); err == nil {
+						log.Debugf("SMS sent response %+v", resp)
+						c.CommitMessage(msg)
+					} else {
+						log.Errorf("Error in sending SMS %+v", err)
+					}
 				}
 			} else {
 				log.Errorf("Mobile number not available to send SMS %+v", certifyMessage)
