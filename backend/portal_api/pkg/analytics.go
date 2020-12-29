@@ -9,42 +9,42 @@ import (
 )
 
 type AnalyticsResponse struct {
-	NumberOfCertificatesIssued          map[string]int64 `json:"numberOfCertificatesIssued"`
-	NumberOfCertificatesIssuedByDate    map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
-	NumberOfCertificatesIssuedByState   map[string]int64 `json:"numberOfCertificatesIssuedByState"`
-	NumberOfCertificatesIssuedByAge     map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
-	DownloadByDate                      map[string]int64 `json:"downloadByDate"`
-	ValidVerificationByDate             map[string]int64 `json:"validVerificationByDate"`
-	InValidVerificationByDate           map[string]int64 `json:"inValidVerificationByDate"`
-	FacilitiesCount                     map[string]int64 `json:"facilitiesCount"`
-	RateOfCertificateIssuedByFacilities map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
-	VaccinatorsCount                    map[string]int64 `json:"vaccinatorsCount"`
-	AvgRateAcrossFacilities             map[string]int64 `json:"avgRateAcrossFacilities"`
-	NumberOfCertificatesIssuedByDistrict   map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
+	NumberOfCertificatesIssued           map[string]int64 `json:"numberOfCertificatesIssued"`
+	NumberOfCertificatesIssuedByDate     map[string]int64 `json:"numberOfCertificatesIssuedByDate"`
+	NumberOfCertificatesIssuedByState    map[string]int64 `json:"numberOfCertificatesIssuedByState"`
+	NumberOfCertificatesIssuedByAge      map[string]int64 `json:"numberOfCertificatesIssuedByAge"`
+	DownloadByDate                       map[string]int64 `json:"downloadByDate"`
+	ValidVerificationByDate              map[string]int64 `json:"validVerificationByDate"`
+	InValidVerificationByDate            map[string]int64 `json:"inValidVerificationByDate"`
+	FacilitiesCount                      map[string]int64 `json:"facilitiesCount"`
+	RateOfCertificateIssuedByFacilities  map[string]int64 `json:"rateOfCertificateIssuedByFacilities"`
+	VaccinatorsCount                     map[string]int64 `json:"vaccinatorsCount"`
+	AvgRateAcrossFacilities              map[string]int64 `json:"avgRateAcrossFacilities"`
+	NumberOfCertificatesIssuedByDistrict map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
 }
 
 type PublicAnalyticsResponse struct {
-    NumberOfCertificatesIssuedByState       map[string]int64 `json:"numberOfCertificatesIssuedByState"`
-    NumberOfCertificatesIssuedByDistrict    map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
+	NumberOfCertificatesIssuedByState    map[string]int64 `json:"numberOfCertificatesIssuedByState"`
+	NumberOfCertificatesIssuedByDistrict map[string]int64 `json:"numberOfCertificatesIssuedByDistrict"`
 }
 
-var connect *sql.DB = initConnection()
+var DB *sql.DB
 
-func initConnection() *sql.DB {
+func InitClickHouseConnection() {
 	log.Infof("Using analytics db %+v", config.Config.Analytics.Datasource)
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
+	var err error
+	DB, err = sql.Open("clickhouse", config.Config.Analytics.Datasource)
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := connect.Ping(); err != nil {
+	if err := DB.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
 			fmt.Println(err)
 		}
-		return nil
+		return
 	}
-	return connect
 }
 
 func getAnalyticsInfo() AnalyticsResponse {
@@ -68,21 +68,21 @@ select 'min' as id, min(certificateIssued) as count from ( select facilityName, 
 union all
 select 'max' as id, max(certificateIssued) as count from ( select facilityName, count(*) as certificateIssued from certificatesv1 group by facilityName)
 `
-    byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
+	byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
 
 	analyticsResponse := AnalyticsResponse{
-		NumberOfCertificatesIssued:          getCount(countQuery),
-		NumberOfCertificatesIssuedByDate:    getCount(byDateQuery),
-		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
-		NumberOfCertificatesIssuedByAge:     getCount(byAgeQuery),
-		DownloadByDate:                      getCount(downloadByDate),
-		ValidVerificationByDate:             getCount(validVerificationByDate),
-		InValidVerificationByDate:           getCount(inValidVerificationByDate),
-		FacilitiesCount:                     getCount(facilitiesCount),
-		RateOfCertificateIssuedByFacilities: getCount(rateOfCertificateIssuedByFacilities),
-		VaccinatorsCount:                    getCount(vaccinatorsCount),
-		AvgRateAcrossFacilities:                    getCount(avgRateAcrossFacilities),
-		NumberOfCertificatesIssuedByDistrict:   getCount(byDistrictQuery),
+		NumberOfCertificatesIssued:           getCount(countQuery),
+		NumberOfCertificatesIssuedByDate:     getCount(byDateQuery),
+		NumberOfCertificatesIssuedByState:    getCount(byStateQuery),
+		NumberOfCertificatesIssuedByAge:      getCount(byAgeQuery),
+		DownloadByDate:                       getCount(downloadByDate),
+		ValidVerificationByDate:              getCount(validVerificationByDate),
+		InValidVerificationByDate:            getCount(inValidVerificationByDate),
+		FacilitiesCount:                      getCount(facilitiesCount),
+		RateOfCertificateIssuedByFacilities:  getCount(rateOfCertificateIssuedByFacilities),
+		VaccinatorsCount:                     getCount(vaccinatorsCount),
+		AvgRateAcrossFacilities:              getCount(avgRateAcrossFacilities),
+		NumberOfCertificatesIssuedByDistrict: getCount(byDistrictQuery),
 	}
 
 	return analyticsResponse
@@ -90,11 +90,11 @@ select 'max' as id, max(certificateIssued) as count from ( select facilityName, 
 
 func getPublicAnalyticsInfo() PublicAnalyticsResponse {
 	byStateQuery := `select facilityState, count() from certificatesv1 where facilityState != '' group by facilityState`
-    byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
+	byDistrictQuery := `select facilityDistrict, count() from certificatesv1 where facilityDistrict != '' group by facilityDistrict`
 
 	publicAnalyticsResponse := PublicAnalyticsResponse{
-		NumberOfCertificatesIssuedByState:   getCount(byStateQuery),
-		NumberOfCertificatesIssuedByDistrict:   getCount(byDistrictQuery),
+		NumberOfCertificatesIssuedByState:    getCount(byStateQuery),
+		NumberOfCertificatesIssuedByDistrict: getCount(byDistrictQuery),
 	}
 
 	return publicAnalyticsResponse
@@ -102,7 +102,10 @@ func getPublicAnalyticsInfo() PublicAnalyticsResponse {
 
 func getCount(query string) map[string]int64 {
 	result := map[string]int64{}
-	rows, err := connect.Query(query)
+	if DB == nil {
+		InitClickHouseConnection()
+	}
+	rows, err := DB.Query(query)
 	if err != nil {
 		log.Errorf("Error while preparing the query %+v", err)
 		return result

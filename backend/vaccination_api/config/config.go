@@ -45,6 +45,6 @@ var Config = struct {
 		}
 	}
 	Clickhouse struct {
-		Dsn string `env:"CLICKHOUSE_DSN"`
+		Dsn string `env:"CLICK_HOUSE_URL"`
 	}
 }{}

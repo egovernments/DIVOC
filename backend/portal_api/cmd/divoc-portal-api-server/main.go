@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/pkg"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -19,6 +20,7 @@ func main() {
 	if err != nil {
 		panic("Unable to read configurations")
 	}
+	pkg.InitClickHouseConnection()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

@@ -118,7 +118,7 @@ services:
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
-      CLICKHOUSE_DSN: tcp://clickhouse-server:9000?debug=true
+      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server

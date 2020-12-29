@@ -94,7 +94,7 @@ type String
 }
 
 func initClickhouse() *sql.DB {
-	connect, err := sql.Open("clickhouse", "tcp://127.0.0.1:9000?debug=true")
+	connect, err := sql.Open("clickhouse", config.Config.Clickhouse.Dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
