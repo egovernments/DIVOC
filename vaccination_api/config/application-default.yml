@@ -11,3 +11,12 @@ kafka:
   bootstrapServers: localhost
   certifyTopic: certify
   eventsTopic: events
+database:
+  host: localhost
+  port: 5432
+  user: postgres
+  dbname: postgres
+  password: postgres
+certificate:
+  upload:
+   columns: "recipientName,recipientMobileNumber,recipientDOB,recipientGender,recipientNationality,recipientIdentity,vaccinationBatch,vaccinationDate,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,vaccinatorName,facilityName,facilityAddressLine1,facilityAddressLine2,facilityDistrict,facilityState,facilityPincode"

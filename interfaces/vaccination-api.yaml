@@ -180,9 +180,7 @@ paths:
         '200':
           description: OK
           schema:
-            type: array
-            items:
-              type: object
+            type: object
         '404':
           description: certify upload for given uploadID not found
         '403':
