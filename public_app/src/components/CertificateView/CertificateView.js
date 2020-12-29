@@ -11,7 +11,6 @@ import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
 import {Certificate} from "../Certificate";
 import {useDispatch} from "react-redux";
-import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
 
@@ -57,7 +56,6 @@ function CertificateView() {
             .then((res) => {
                 return res.data;
             });
-        console.log(response);
         setCertificateList(response);
         if (response.length === 1) {
             setCertificateData(response[0]);
@@ -197,8 +195,12 @@ function CertificateView() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
-                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker}
+                                                                                         className={styles["export-icon"]}></img>to
+                                DigiLocker</Dropdown.Item>
+                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}
+                                                                                     className={styles["common-pass"]}></img>to
+                                CommonPass</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
@@ -232,7 +234,7 @@ function CertificateView() {
 
 
     return (
-        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top" }>
+        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
             <div className="col-12 d-flex d-flex justify-content-center">
                 <div className={styles["container"]}>
                     <div className={styles["no-print"]}>

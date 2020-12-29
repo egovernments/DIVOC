@@ -1,6 +1,11 @@
 package config
 
 import "github.com/jinzhu/configor"
+import(
+log "github.com/sirupsen/logrus"
+"github.com/imroc/req"
+"errors"
+)
 
 func Initialize() {
 	err := configor.Load(&Config, "./config/application-default.yml",
@@ -9,8 +14,29 @@ func Initialize() {
 	if err != nil {
 		panic("Unable to read configurations")
 	}
-
+    if Config.Keycloak.Pubkey == "" {
+        updatePublicKeyFromKeycloak()
+    }
 }
+
+
+func updatePublicKeyFromKeycloak() error {
+    url := Config.Keycloak.Url + "/realms/" + Config.Keycloak.Realm
+    log.Info("Public key url ", url)
+    resp, err := req.Get(url)
+    if err != nil {
+        return  err
+    }
+    log.Infof("Got response %+v", resp.String())
+    responseObject := map[string]interface{}{}
+    if err := resp.ToJSON(&responseObject); err == nil {
+        if publicKey, ok := responseObject["public_key"].(string); ok {
+            Config.Keycloak.Pubkey = publicKey
+        }
+    }
+    return errors.New("Unable to get public key from keycloak")
+}
+
 
 var Config = struct {
 	Registry struct {
@@ -23,6 +49,7 @@ var Config = struct {
 	Keycloak struct {
 		Url           string `env:"KEYCLOAK_URL"`
 		PubkeyPath string `default:"config/local_rsa.pub"`
+		Pubkey        string `env:"PUBLIC_KEY"`
 		Realm string `default:"divoc"`
 		AuthHeader string `env:"AUTH_TOKEN"`
 		RecipientGroupId string `default:"recipient"`
