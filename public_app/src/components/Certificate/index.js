@@ -1,30 +1,46 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import logo from "../../assets/img/logo.svg";
 import "./index.css";
 import PropTypes from 'prop-types';
 import programLogo from "../../assets/img/program_logo.png"
 import phone from "../../assets/img/phone.svg"
 import globe from "../../assets/img/globe.svg"
-import {labelConfig} from "../CertificateView/labelConfig";
+import {getCertificateLabels} from "../../utils/config";
 
+export const Certificate = function ({
+                                         qrCode,
+                                         vaccination,
+                                         manufacturer,
+                                         certificateId,
+                                         issuedDate,
+                                         name,
+                                         gender,
+                                         identityType,
+                                         identityNumber,
+                                         age,
+                                         vaccinationCenter,
+                                         vaccinationValidUntil,
+                                         dateOfVaccination,
+                                         infoUrl
+                                     }) {
+    const [labelConfig, setLabelConfig] = useState(null)
+    const [error, setError] = useState(null)
 
-export const Certificate = ({
-                                qrCode,
-                                vaccination,
-                                manufacturer,
-                                certificateId,
-                                issuedDate,
-                                name,
-                                gender,
-                                identityType,
-                                identityNumber,
-                                age,
-                                vaccinationCenter,
-                                vaccinationValidUntil,
-                                dateOfVaccination,
-                                infoUrl
-                            }) => (
-    <div id={"certificate"} className={"certificate-container"}>
+    useEffect(() => {
+        getCertificateLabels()
+            .then((result) => {
+                setError(null)
+                setLabelConfig(result)
+            })
+            .catch((e) => setError(e))
+    }, [])
+    if (!labelConfig) {
+        return <div>Loading..</div>
+    }
+    if (error) {
+        return <div>Failed to load certificate. Please try again</div>
+    }
+    return <div id={"certificate"} className={"certificate-container"}>
         <table className={"certificate"}>
             <tbody>
             <tr>
@@ -155,8 +171,8 @@ export const Certificate = ({
             {/*</tr>*/}
             </tbody>
         </table>
-    </div>
-);
+    </div>;
+};
 
 Certificate.propTypes = {
     qrCode: PropTypes.element,
