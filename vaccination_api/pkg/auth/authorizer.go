@@ -8,6 +8,7 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
+// 	"io/ioutil"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -26,13 +27,16 @@ var (
 )
 
 func Init() {
-	log.Infof("Using the public from %s", config.Config.Keycloak.PubkeyPath)
-	verifyBytes, err := ioutil.ReadFile(config.Config.Keycloak.PubkeyPath)
-	if err != nil {
-		log.Print(err)
-	}
-	//fatal(err)
+// 	log.Infof("Using the public from %s", config.Config.Keycloak.PubkeyPath)
+// 	verifyBytes, err := ioutil.ReadFile(config.Config.Keycloak.PubkeyPath)
+// 	if err != nil {
+// 		log.Errorf("", err)
+// 	}
 
+	verifyBytes := ([]byte)("-----BEGIN PUBLIC KEY-----\n" + config.Config.Keycloak.Pubkey + "\n-----END PUBLIC KEY-----\n")
+    log.Infof("Using the public key %s", string(verifyBytes))
+	//fatal(err)
+    var err error
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
 		log.Print(err)
