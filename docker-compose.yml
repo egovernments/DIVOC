@@ -40,6 +40,15 @@ services:
       - "9990:9990"
     depends_on:
       - db
+  flagr:
+    image: checkr/flagr
+    environment:
+      FLAGR_DB_DBDRIVER: postgres
+      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+      HOST: 0.0.0.0
+      FLAGR_WEB_PREFIX: /config
+    ports:
+      - "18000:18000"
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:
