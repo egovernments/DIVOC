@@ -38,31 +38,31 @@ type CertifyUploadErrors struct {
 	// ID of CertifyUploads
 	CertifyUploadID uint `gorm:"index"`
 
-	Errors string
+	Errors string	`json:"errors"`
 
 	CertifyUploadFields
 }
 
 type CertifyUploadFields struct {
-	RecipientName             string
-	RecipientMobileNumber     string
-	RecipientDOB              string
-	RecipientGender           string
-	RecipientNationality      string
-	RecipientIdentity         string
-	VaccinationBatch          string
-	VaccinationDate           string
-	VaccinationEffectiveStart string
-	VaccinationEffectiveEnd   string
-	VaccinationManufacturer   string
-	VaccinationName           string
-	VaccinatorName            string
-	FacilityName              string
-	FacilityAddressLine1      string
-	FacilityAddressLine2      string
-	FacilityDistrict          string
-	FacilityState             string
-	FacilityPincode           int64
+	RecipientName             string	`json:"recipientName"`
+	RecipientMobileNumber     string	`json:"recipientMobileNumber"`
+	RecipientDOB              string	`json:"recipientDOB"`
+	RecipientGender           string	`json:"recipientGender"`
+	RecipientNationality      string	`json:"recipientNationality"`
+	RecipientIdentity         string	`json:"recipientIdentity"`
+	VaccinationBatch          string	`json:"vaccinationBatch"`
+	VaccinationDate           string	`json:"vaccinationDate"`
+	VaccinationEffectiveStart string	`json:"vaccinationEffectiveStart"`
+	VaccinationEffectiveEnd   string	`json:"vaccinationEffectiveEnd"`
+	VaccinationManufacturer   string	`json:"vaccinationManufacturer"`
+	VaccinationName           string	`json:"vaccinationName"`
+	VaccinatorName            string	`json:"vaccinatorName"`
+	FacilityName              string	`json:"facilityName"`
+	FacilityAddressLine1      string	`json:"facilityAddressLine1"`
+	FacilityAddressLine2      string	`json:"facilityAddressLine2"`
+	FacilityDistrict          string	`json:"facilityDistrict"`
+	FacilityState             string	`json:"facilityState"`
+	FacilityPincode           int64		`json:"facilityPincode"`
 }
 
 func Init() {
