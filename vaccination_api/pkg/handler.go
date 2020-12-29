@@ -331,9 +331,10 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 	}
 
 	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
+	columnHeaders := strings.Split(config.Config.Certificate.Upload.Columns, ",")
 	if err == nil {
 		return NewGenericJSONResponse(map[string]interface{} {
-			"columns": strings.Split(config.Config.Certificate.Upload.Columns, ","),
+			"columns": append(columnHeaders, "errors"),
 			"errorRows": certifyUploadErrors,
 		})
 	}
