@@ -66,19 +66,19 @@ func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
 }
 
-func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return services.GetEntityType("Enrollment")
 }
 
-func getProgramsHandler(params operations.GetProgramsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getProgramsHandler(params operations.GetProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return services.GetEntityType("Program")
 }
 
-func getMedicinesHandler(params operations.GetMedicinesParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getMedicinesHandler(params operations.GetMedicinesParams, principal *models.JWTClaimBody) middleware.Responder {
 	return services.GetEntityType("Medicine")
 }
 
-func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	if HasResourceRole(portalClientId, "admin", principal) {
 		return services.GetEntityType("Vaccinator")
 	}
@@ -95,11 +95,11 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal  *m
 	}
 }
 
-func getFacilitiesHandler(params operations.GetFacilitiesParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	return services.GetEntityType("Facility")
 }
 
-func createMedicineHandler(params operations.CreateMedicineParams, principal  *models.JWTClaimBody) middleware.Responder {
+func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Create medicine %+v", params.Body)
 	objectId := "Medicine"
 	requestBody, err := json.Marshal(params.Body)
@@ -115,7 +115,7 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal  *m
 	return services.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
-func createProgramHandler(params operations.CreateProgramParams, principal  *models.JWTClaimBody) middleware.Responder {
+func createProgramHandler(params operations.CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Create Program %+v", params.Body)
 	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
@@ -131,7 +131,7 @@ func createProgramHandler(params operations.CreateProgramParams, principal  *mod
 	return services.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
-func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
@@ -141,7 +141,7 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal  
 	return operations.NewPostEnrollmentsOK()
 }
 
-func postFacilitiesHandler(params operations.PostFacilitiesParams, principal  *models.JWTClaimBody) middleware.Responder {
+func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
@@ -151,7 +151,7 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal  *m
 	return operations.NewPostFacilitiesOK()
 }
 
-func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	defer params.File.Close()
 	for data.Scan() {
@@ -161,7 +161,7 @@ func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal  
 	return operations.NewPostFacilitiesOK()
 }
 
-func createFacilityUserHandler(params operations.CreateFacilityUsersParams, principal  *models.JWTClaimBody) middleware.Responder {
+func createFacilityUserHandler(params operations.CreateFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 	err := CreateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
@@ -170,7 +170,7 @@ func createFacilityUserHandler(params operations.CreateFacilityUsersParams, prin
 	return operations.NewCreateFacilityUsersOK()
 }
 
-func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 	users, err := GetFacilityUsers(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
@@ -179,7 +179,7 @@ func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal 
 	return &operations.GetFacilityUsersOK{Payload: users}
 }
 
-func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principal  *models.JWTClaimBody) middleware.Responder {
+func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 	groups, err := GetFacilityGroups(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
@@ -188,7 +188,7 @@ func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principa
 	return &operations.GetFacilityGroupsOK{Payload: groups}
 }
 
-func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal  *models.JWTClaimBody) middleware.Responder {
+func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
 		requestBody, err := json.Marshal(updateRequest)
 		if err != nil {
@@ -206,11 +206,10 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 	return operations.NewUpdateFacilitiesOK()
 }
 
-func getAnalyticsHandler(params operations.GetAnalyticsParams, principal * models.JWTClaimBody) middleware.Responder {
+func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 	return NewGenericJSONResponse(getAnalyticsInfo())
 }
 
 func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
 }
-

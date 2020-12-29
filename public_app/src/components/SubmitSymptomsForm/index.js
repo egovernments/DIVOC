@@ -1,8 +1,10 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./index.css"
 import axios from "axios";
 import {pathOr} from "ramda";
-import {CertificateDetailsPaths} from "../../constants";
+import {CertificateDetailsPaths, SIDE_EFFECTS_DATA} from "../../constants";
+import {useKeycloak} from "@react-keycloak/web";
+import {useHistory} from "react-router-dom";
 
 const state = {
     GenerateOTP: "GenerateOTP",
@@ -30,25 +32,25 @@ const stateDetails = {
 };
 
 export const SubmitSymptomsForm = (props) => {
+    const history = useHistory();
+    const {keycloak} = useKeycloak();
     const [mobileNumber, setMobileNumber] = useState("");
     const [patientSelected, setPatientSelected] = useState(-1);
     const [recipients, setRecipients] = useState([]);
     const [otp, setOTP] = useState("");
-    const [currentState, setCurrentState] = useState("GenerateOTP");
+    const [currentState, setCurrentState] = useState(state.ChoosePatient);
     const [confirmDetails, setConfirmDetails] = useState(false);
+    useEffect(() => {
+        let sideEffectsData = localStorage.getItem(SIDE_EFFECTS_DATA);
+        if (sideEffectsData == null) {
+            history.push("/feedback");
+        } else {
+            fetchPatients()
+        }
+    }, []);
 
     async function moveToNextState() {
-        if (currentState === state.GenerateOTP) {
-            if (mobileNumber.length === 10) {
-                setCurrentState(state.VerifyOTP)
-            }
-        }
-        if (currentState === state.VerifyOTP) {
-            if (otp === "1234") {
-                setCurrentState(state.ChoosePatient);
-                await fetchPatients()
-            }
-        }
+
         if (currentState === state.ChoosePatient) {
             if (patientSelected >= 0) {
                 setCurrentState(state.ShowPatientDetails)
@@ -56,18 +58,55 @@ export const SubmitSymptomsForm = (props) => {
         }
         if (currentState === state.ShowPatientDetails) {
             if (confirmDetails) {
-                setCurrentState(state.CompletedMessage)
+                submitSymptoms()
             }
         }
 
         if (currentState === state.CompletedMessage) {
-            props.onComplete()
+            history.push("/feedback");
         }
     }
 
+    async function submitSymptoms() {
+        let sideEffectsData = localStorage.getItem(SIDE_EFFECTS_DATA);
+        sideEffectsData = JSON.parse(sideEffectsData);
+        //TODO: added empty symptom and response, min 2 array fields required for registry to work
+        const sideEffectsResponse = Object.keys(sideEffectsData).map(key => ({
+            symptom: key,
+            response: sideEffectsData[key].toString()
+        })).concat({symptom:"", response: ""});
+        const reportSideEffects = {
+            certificateId: recipients[patientSelected].certificateId,
+            sideEffectsResponse: sideEffectsResponse
+        };
+        const config = {
+            headers: {
+                Authorization: `Bearer ${keycloak.token} `,
+                "Content-Type": "application/json",
+            },
+        };
+        await axios
+            .post("/divoc/api/v1/report-side-effects", reportSideEffects, config)
+            .then((res) => {
+                setCurrentState(state.CompletedMessage);
+                return res.data;
+            }).catch((err) => {
+                console.log(err)
+            }).finally(() => {
+                localStorage.removeItem(SIDE_EFFECTS_DATA);
+            });
+    }
+
     async function fetchPatients() {
+        const userMobileNumber = keycloak.idTokenParsed.preferred_username;
+        const config = {
+            headers: {
+                Authorization: `Bearer ${keycloak.token} `,
+                "Content-Type": "application/json",
+            },
+        };
         const response = await axios
-            .get("/divoc/api/v1/certificates/" + mobileNumber)
+            .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
             .then((res) => {
                 return res.data;
             });
@@ -79,7 +118,8 @@ export const SubmitSymptomsForm = (props) => {
             {
                 currentState === state.CompletedMessage && <div>
                     <h5>The healthcare facility has been notified. You will receive a call back soon.</h5>
-                    <h5>If the symptoms worsen, please visit the facility so that the doctors can attend to at the earliest.</h5>
+                    <h5>If the symptoms worsen, please visit the facility so that the doctors can attend to at the
+                        earliest.</h5>
                     <h6 className="mt-5" style={{color: "#5C9EF8"}}>If you need to contact the facility immediately</h6>
                     <span className="mt-3 d-inline-block" style={{fontSize: '14px'}}>
                         {pathOr("NA", CertificateDetailsPaths["Vaccination Facility"].path, recipients[patientSelected].certificate)}
@@ -102,26 +142,6 @@ export const SubmitSymptomsForm = (props) => {
                 currentState !== state.CompletedMessage && <>
                     <h5 className="form-title">Can you help us identify the patient with these symptoms</h5>
                     <span className="form-subtitle">{stateDetails[currentState].subTitle}</span>
-                    {
-                        currentState === state.GenerateOTP &&
-                        <>
-                            <input type="number" className="input-text" maxLength={10} value={mobileNumber}
-                                   placeholder={"+91 XXXXXXXXXX"}
-                                   onChange={(evt) => setMobileNumber(evt.target.value)}/>
-                            <button className="form-btn" onClick={moveToNextState}>Generate OTP</button>
-                        </>
-                    }
-                    {
-                        currentState === state.VerifyOTP &&
-                        <>
-                            <input type="text" className="input-text" maxLength={10} value={mobileNumber}
-                                   placeholder={"+91 XXXXXXXXXX"}
-                                   disabled={true}/>
-                            <input type="text" className="input-text" maxLength={4} value={otp} placeholder={"OTP - XXXX"}
-                                   onChange={(evt) => setOTP(evt.target.value)}/>
-                            <button className="form-btn" onClick={moveToNextState}>Verify OTP</button>
-                        </>
-                    }
                     {
                         currentState === state.ChoosePatient && <div>
                             {
@@ -158,10 +178,16 @@ export const SubmitSymptomsForm = (props) => {
                                 }
                             </table>
                             <div className="confirmation-wrapper">
-                                <input type="checkbox" id="confirm-wrapper" className="confirmation-checkbox" checked={confirmDetails} onChange={()=>{setConfirmDetails(!confirmDetails)}}/>
-                                <label for={"confirm-wrapper"} className="confirmation-msg">I confirm that this patient is having the identified symptoms</label>
+                                <input type="checkbox" id="confirm-wrapper" className="confirmation-checkbox"
+                                       checked={confirmDetails} onChange={() => {
+                                    setConfirmDetails(!confirmDetails)
+                                }}/>
+                                <label for={"confirm-wrapper"} className="confirmation-msg">I confirm that this patient
+                                    is having the identified symptoms</label>
                             </div>
-                            <button className="form-btn" onClick={moveToNextState} disabled={!confirmDetails}>Confirm Patient</button>
+                            <button className="form-btn" onClick={moveToNextState} disabled={!confirmDetails}>Confirm
+                                Patient
+                            </button>
                         </>
                     }
                 </>

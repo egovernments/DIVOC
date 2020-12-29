@@ -129,7 +129,7 @@ paths:
       summary: Upload certification csv for bulk ingestion
       description: certify all the data in uploaded csv
       operationId: bulkCertify
-      security: 
+      security:
         - hasRole: ['facility-admin']
       consumes:
         - multipart/form-data
@@ -143,8 +143,48 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+  /certify/uploads:
+    get:
+      tags:
+        - certification
+      summary: Get all file uploads for certification for given facility admin
+      operationId: getCertifyUploads
+      security: 
+        - hasRole: ['facility-admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /certify/uploads/{uploadId}/errors:
+    get:
+      tags:
+        - certification
+      summary: Get all the error rows associated with given uploadId
+      operationId: getCertifyUploadErrors
+      security:
+        - hasRole: ['facility-admin']
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: certify upload for given uploadID not found
+        '403':
+          description: Forbidden for user
   /programs/current:
     get:
       tags:
@@ -204,84 +244,38 @@ paths:
           description: OK
           schema:
             type: object
-  /symptoms:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms
-      operationId: getSymptoms
-      security: []
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-    post:
-      tags:
-        - symptoms
-      summary: Create symptoms
-      operationId: createSymptoms
-      security:
-        - hasRole: ["admin"]
-      parameters:
-        - in: body
-          name: body
-          schema:
-            type: array
-            items:
-              type: object
-              $ref: '#/definitions/Symptoms'
-          description: Symptoms data
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid input
-        '401':
-          description: Unauthorized
-  /instructions:
-    get:
-      tags:
-        - symptoms
-      summary: Get symptoms instructions
-      security: []
-      operationId: getInstructions
-      responses:
-        '200':
-          description: OK
-          schema:
-            type: object
   /sideEffects:
     get:
       tags:
         - sideEffects
-      summary: Get Side Effects
-      security:
-        - hasRole: ["admin"]
-      operationId: getSideEffects
+      summary: Get Side Effects Metadata
+      security: []
+      operationId: getSideEffectsMetadata
       responses:
         '200':
           description: OK
           schema:
             type: object
+  /report-side-effects:
     post:
       tags:
-        - sideEffects
-      summary: Post side effects
-      security: []
-      operationId: createSideEffects
+        - reportSideEffects
+      summary: Create reported side effects
+      security:
+        - hasRole: ["recipient"]
+      operationId: createReportedSideEffects
       parameters:
         - in: body
           name: body
           schema:
             type: object
             properties:
-              sideEffects:
-                type: object
-                $ref: '#/definitions/SideEffects'
+              certificateId:
+                type: string
+              sideEffectsResponse:
+                type: array
+                items:
+                  $ref: '../registry/RecipientSideEffects.json#/definitions/SideEffectsResponse'
       responses:
         '200':
           description: OK
@@ -536,6 +530,16 @@ definitions:
         type: string
       extra:
         type: object
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message
 host: divoc.xiv.in
 schemes:
   - https

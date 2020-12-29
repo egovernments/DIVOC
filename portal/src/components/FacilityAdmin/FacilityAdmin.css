@@ -1,0 +1,27 @@
+.btn-template {
+    border-radius: 6px;
+    border: none;
+    color: #FFFFFF;
+    background: #88C6A9;
+    text-align: center;
+    padding-top: 10px;
+}
+
+.btn-template h6 {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    margin: 0;
+    padding: 5px;
+}
+
+.btn-template a {
+    padding: 0;
+    margin: 0;
+}
+
+.btn-template img {
+    width: 25px;
+    height: 25px;
+    padding: 4px;
+}

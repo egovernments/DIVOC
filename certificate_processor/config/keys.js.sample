@@ -1,8 +1,9 @@
 const publicKeyPem = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1CsY56YBsAS0bO5zxXW7\nkKdhJ9UHjB3kCA9UDZPti7lWEss/F4sI9IcAtxidTIdORprYnGKCQLBPlAHtAPPm\nLCr4q4N9K3NrMQoG7Co0y9U71XuvNxQm5IQXNxxcQbaBH2hE3Ywd0NcEbKN8DNNa\n/z8SsQyrHHlmmv2yvl+hMX3G+VJjvRvvI0cUMpHVie37ak+jTDQ91wG3R9t2lxk8\n4B4zG+QQFGZTZJWlXjdp5kwraqu1YVdbJoTvcad9I5KYox2bjdzjeaVOpoEVvEkx\nbIsXZWuUN54Zy4ktAI/y9sziS7o1AB8+pTh+Vf9OK5wr361H9acURxvpywfIqxV6\nzwIDAQAB\n-----END PUBLIC KEY-----\n';
 // eslint-disable-next-line max-len
 const privateKeyPem = '-----BEGIN RSA PRIVATE KEY-----\nMII....DKA==\n-----END RSA PRIVATE KEY-----\n';
-
+const smsAuthKey = "";
 module.exports = {
   publicKeyPem,
-  privateKeyPem
+  privateKeyPem,
+  smsAuthKey
 };

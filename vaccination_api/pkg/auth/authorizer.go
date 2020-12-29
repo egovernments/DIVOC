@@ -9,14 +9,17 @@ import (
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 // 	"io/ioutil"
+	"io/ioutil"
+	"net/http"
 	"strings"
 )
 
 const (
-	clientId       = "vaccination_api"
-	admin          = "admin"
-	facilityAdmin  = "facility_admin"
-	portalClientId = "facility-admin-portal"
+	clientId            = "vaccination_api"
+	admin               = "admin"
+	facilityAdmin       = "facility_admin"
+	portalClientId      = "facility-admin-portal"
+	certificateClientId = "certificate-login"
 )
 
 var (
@@ -46,15 +49,26 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaim
 	if err != nil {
 		return nil, err
 	}
-	for _, role := range expectedRole {
-		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
-			return claimBody, err
-		}
-		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
-			return claimBody, err
-		}
+	isAuthorized := AuthorizeRole(expectedRole, claimBody)
+	if isAuthorized {
+		return claimBody, err
 	}
 	return nil, errors.New("unauthorized")
+}
+
+func AuthorizeRole(expectedRole []string, claimBody *models.JWTClaimBody) bool {
+	for _, role := range expectedRole {
+		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
+			return true
+		}
+		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
+			return true
+		}
+		if contains(claimBody.ResourceAccess[certificateClientId].Roles, role) {
+			return true
+		}
+	}
+	return false
 }
 
 func UserAuthorizer(bearerHeader string) (interface{}, error) {
@@ -135,4 +149,14 @@ func GetToken(bearerHeader string) (string, error) {
 	}
 	bearerToken := bearerTokenArr[1]
 	return bearerToken, nil
+}
+
+func ExtractClaimBodyFromHeader(params *http.Request) *models.JWTClaimBody {
+	authHeader := params.Header.Get("Authorization")
+	if authHeader != "" {
+		bearerToken, _ := GetToken(authHeader)
+		claimBody, _ := GetClaimBody(bearerToken)
+		return claimBody
+	}
+	return nil
 }

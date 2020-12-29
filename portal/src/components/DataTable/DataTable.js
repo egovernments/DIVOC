@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './DataTable.css';
 
 
@@ -8,10 +8,18 @@ function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificate
         setSelectedData({name : data,count: 0});
     };
 
+    useEffect(()=>{
+        if(selectedData.name){
+            document.getElementById(selectedData.name).scrollIntoView()
+        }
+        
+    },[selectedData])
+
     const getTableData = () => {
         return data.map((state) => {
             return (
                 <tr
+                    id={state}
                     style={
                         selectedData.name === state
                             ? { background: "#CEE5FF" }
@@ -33,7 +41,8 @@ function DataTable({title,selectedData,setSelectedData,data,stateWiseCertificate
         >
             <thead>
                 <tr>
-                    <td >{title}{total ? <span className="second-word-formatting"/> : ''}{total}</td>
+                    <td >{title}</td>
+                    <td>{total}</td>
                 </tr>
             </thead>
             <tbody>{getTableData()}</tbody>

@@ -5,8 +5,6 @@
 .side-effect-container {
     padding: 3rem 5rem;
     height: 100%;
-    overflow: auto;
-    text-align:center;
 }
 
 .symptoms-container {
@@ -146,6 +144,10 @@
 }
 .instructions-container::-webkit-scrollbar-track-piece, .symptoms-container::-webkit-scrollbar-track-piece {
     background-color: #F8F8F8;
+}
+
+.side-effects-input-box input {
+    padding: 1.5rem 1rem;
 }
 
 @media (max-width: 961px) {
