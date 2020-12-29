@@ -48,7 +48,6 @@ var Config = struct {
 	}
 	Keycloak struct {
 		Url           string `env:"KEYCLOAK_URL"`
-		PubkeyPath string `default:"config/local_rsa.pub"`
 		Pubkey        string `env:"PUBLIC_KEY"`
 		Realm string `default:"divoc"`
 		AuthHeader string

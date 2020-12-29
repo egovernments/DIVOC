@@ -9,7 +9,6 @@ import (
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 // 	"io/ioutil"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
