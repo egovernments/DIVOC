@@ -1,6 +1,5 @@
 import {appIndexDb} from "../AppDatabase";
 
-const BASE_URL = "https://divoc.xiv.in/divoc/api/v1"
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
 const VACCINATORS = "/divoc/api/v1/vaccinators"
