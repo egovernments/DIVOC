@@ -1,5 +1,3 @@
 
-
-
 docker:
-	docker build -t nginx .
+	docker build -t dockerhub/nginx .
