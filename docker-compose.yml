@@ -1,0 +1,148 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  registry:
+    image: dockerhub/open-saber
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
+      - connectionInfo_username=postgres
+      - connectionInfo_password=postgres
+    #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
+    volumes:
+      - ./registry:/home/opensaber/config/public/_schemas
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+  keycloak:
+    image: dockerhub/keycloak
+    environment:
+      - DB_VENDOR=postgres
+      - DB_ADDR=db
+      - DB_PORT=5432
+      - DB_DATABASE=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_IMPORT=/config/divoc-realm.json
+    volumes:
+      - ./keycloak:/config
+    #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    depends_on:
+      - db
+  flagr:
+    image: checkr/flagr
+    environment:
+      FLAGR_DB_DBDRIVER: postgres
+      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+      HOST: 0.0.0.0
+      FLAGR_WEB_PREFIX: /config
+    ports:
+      - "18000:18000"
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9094:9092"
+    environment:
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9092,OUTSIDE://localhost:9094"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+  #  kafka:
+  #    image: wurstmeister/kafka
+  #    ports:
+  #      - "9092:9092"
+  #    environment:
+  #      KAFKA_ADVERTISED_HOST_NAME: kafka
+  #      KAFKA_ADVERTISED_PORT: "9092"
+  #      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+  #    volumes:
+  #      - /var/run/docker.sock:/var/run/docker.sock
+  #    depends_on:
+  #      - zookeeper
+  #  zookeeper:
+  #    image: wurstmeister/zookeeper
+  #    ports:
+  #      - "2181:2181"
+  clickhouse-server:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+  vaccination_api:
+    image: dockerhub/vaccination_api
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      DB_HOST: db
+    ports:
+      - "8000:8000"
+    depends_on:
+      - kafka
+      - registry
+  portal_api:
+    image: dockerhub/portal_api
+    ports:
+      - "8001:8001"
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+    depends_on:
+      - kafka
+      - db
+      - registry
+  analytics_feed:
+    image: dockerhub/analytics_feed
+    environment:
+      CLICKHOUSE_DSN: tcp://clickhouse-server:9000?debug=true
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - clickhouse-server
+  certificate_processor:
+    image: dockerhub/certificate_processor
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      AUTH_TOKEN: "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI1aUd3ZF93WUNxLUo0QTMxUnEySG15bExTUXBUb19zOEFBcEg1bGl1dF9vIn0.eyJleHAiOjE2MjYzNzg2MTYsImlhdCI6MTYwOTA5ODYxNiwianRpIjoiMzY5NTcxZjktODZkYS00YjA0LThmOWYtMTY5YjU5Yjg4M2M2IiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdC9hdXRoL3JlYWxtcy9kaXZvYyIsImF1ZCI6WyJyZWFsbS1tYW5hZ2VtZW50IiwiYWNjb3VudCJdLCJzdWIiOiJkOWU2OGJlNC0yMDVhLTRiNDQtODMwMS0xZmVhMjU1N2YxY2YiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJhZG1pbi1hcGkiLCJzZXNzaW9uX3N0YXRlIjoiZjIwYmFiZTItMmVlMC00ZTI1LWJkZDgtN2MzYTJjYTQxZjhlIiwiYWNyIjoiMSIsImFsbG93ZWQtb3JpZ2lucyI6WyJodHRwczovL2Rpdm9jLnhpdi5pbiJdLCJyZWFsbV9hY2Nlc3MiOnsicm9sZXMiOlsib2ZmbGluZV9hY2Nlc3MiLCJ1bWFfYXV0aG9yaXphdGlvbiJdfSwicmVzb3VyY2VfYWNjZXNzIjp7InJlYWxtLW1hbmFnZW1lbnQiOnsicm9sZXMiOlsibWFuYWdlLXVzZXJzIl19LCJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJjbGllbnRJZCI6ImFkbWluLWFwaSIsImNsaWVudEhvc3QiOiIxNzIuMjIuMC4xMyIsImVtYWlsX3ZlcmlmaWVkIjpmYWxzZSwicHJlZmVycmVkX3VzZXJuYW1lIjoic2VydmljZS1hY2NvdW50LWFkbWluLWFwaSIsImNsaWVudEFkZHJlc3MiOiIxNzIuMjIuMC4xMyJ9.klKE2OIyeDGs5c5YyX5vaui92TDR726_XYp9YIw2M1F0beScG0W8VHnLCMC_ru_MAjm7fibqLgu6TRof7iKfpMhUTSoWPMLav2wVGdntWbzA2uleGkSl5Nh3BadtsXr_tWigrNDFMRDJ4MMRhJBCos5HmxRLSAiONuzqmvYEwRH4m5Kww2GJ28Vomv6IcOo862b9QLZpOMglJ5c5z4Zy3hYbt4ui-P1K2XM7yVob7kc4K5Pd3eeBpRqfEdpEiZd0YyxDE4LN7WLVfWuS3ROFDCTOOmMuFlDxKYS07CG6ATHw-KiWTolTCwyBtqR3sB922u-1w8a2MIGmO1zKpwlIwQ"
+    depends_on:
+      - registry
+  certificate_signer:
+    image: dockerhub/certificate_signer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+    depends_on:
+      - kafka
+      - registry
+  nginx:
+    image: nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - vaccination_api
+      - portal_api

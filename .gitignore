@@ -19,3 +19,4 @@ keycloak/divoc-realm.json
 certificate_processor/config/keys.js
 vaccination_api/analytics_feed
 notification-service/notification-service
+keys.js
