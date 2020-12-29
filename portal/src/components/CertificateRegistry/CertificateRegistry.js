@@ -78,17 +78,22 @@ function UploadErrors({uploadHistory}) {
 
     const fileUploadHistoryDetailsAPI = '/divoc/api/v1/certify/uploads/' + uploadHistory.id + '/errors';
     const axiosInstance = useAxios('');
-    const [uploadHistoryDetails, setUploadHistoryDetails] = useState([]);
+    const [uploadHistoryDetails, setUploadHistoryDetails] = useState({});
     useEffect(() => {
         fetchUploadHistoryDetails()
     }, [uploadHistory.id]);
 
     function fetchUploadHistoryDetails() {
+        const fakeJson = JSON.parse(fakeErrorResponse)
         axiosInstance.current.get(fileUploadHistoryDetailsAPI)
             .then(res => {
-                return res.data
+                return fakeJson
             })
-            .catch(e => [])
+            .catch(e => {
+                console.log(e);
+                return fakeJson
+            })
+
             .then((result) => {
                 setUploadHistoryDetails(result)
             });
@@ -103,7 +108,7 @@ function UploadErrors({uploadHistory}) {
             padding: "16px"
         }
     })(Paper);
-
+    console.log(uploadHistoryDetails.errorRows);
     return (
         <Card component={CustomPaper}>
             <div className="error-container">
@@ -113,7 +118,8 @@ function UploadErrors({uploadHistory}) {
                     <h5>Records<br/>Uploaded</h5>
                 </div>
                 <UploadErrorList
-                    uploadHistoryDetails={uploadHistoryDetails}
+                    columns={uploadHistoryDetails.columns}
+                    uploadHistoryDetails={uploadHistoryDetails["errorRows"]}
                     fileName={uploadHistory.fileName}/>
                 <div className="error-file-details  ml-lg-5 mb-5">
                     <p>{uploadHistory.fileName}</p>
@@ -148,5 +154,86 @@ const headerData = [
         key: "errors"
     }
 ]
+
+const fakeErrorResponse = "{\n" +
+    "    \"columns\": [\n" +
+    "        \"recipientName\",\n" +
+    "        \"recipientMobileNumber\",\n" +
+    "        \"recipientDOB\",\n" +
+    "        \"recipientGender\",\n" +
+    "        \"recipientNationality\",\n" +
+    "        \"recipientIdentity\",\n" +
+    "        \"vaccinationBatch\",\n" +
+    "        \"vaccinationDate\",\n" +
+    "        \"vaccinationEffectiveStart\",\n" +
+    "        \"vaccinationEffectiveEnd\",\n" +
+    "        \"vaccinationManufacturer\",\n" +
+    "        \"vaccinationName\",\n" +
+    "        \"vaccinatorName\",\n" +
+    "        \"facilityName\",\n" +
+    "        \"facilityAddressLine1\",\n" +
+    "        \"facilityAddressLine2\",\n" +
+    "        \"facilityDistrict\",\n" +
+    "        \"facilityState\",\n" +
+    "        \"facilityPincode\",\n" +
+    "        \"errors\"\n" +
+    "    ],\n" +
+    "    \"errorRows\": [\n" +
+    "        {\n" +
+    "            \"ID\": 6,\n" +
+    "            \"CreatedAt\": \"2020-12-24T10:49:27.541736Z\",\n" +
+    "            \"UpdatedAt\": \"2020-12-24T10:49:27.541736Z\",\n" +
+    "            \"DeletedAt\": null,\n" +
+    "            \"CertifyUploadID\": 7,\n" +
+    "            \"errors\": \"RecipientMobileNumber is missing,RecipientName is missing\",\n" +
+    "            \"recipientName\": \"\",\n" +
+    "            \"recipientMobileNumber\": \"\",\n" +
+    "            \"recipientDOB\": \"1994-11-30\",\n" +
+    "            \"recipientGender\": \"Male\",\n" +
+    "            \"recipientNationality\": \"Indian\",\n" +
+    "            \"recipientIdentity\": \"did:in.gov.uidai.aadhaar:2342343334\",\n" +
+    "            \"vaccinationBatch\": \"MB3428BX\",\n" +
+    "            \"vaccinationDate\": \"2020-12-02T19:21:18.646Z\",\n" +
+    "            \"vaccinationEffectiveStart\": \"2020-12-02\",\n" +
+    "            \"vaccinationEffectiveEnd\": \"2025-12-02\",\n" +
+    "            \"vaccinationManufacturer\": \"COVPharma\",\n" +
+    "            \"vaccinationName\": \"CoVax\",\n" +
+    "            \"vaccinatorName\": \"Sooraj Singh\",\n" +
+    "            \"facilityName\": \"ABC Medical Center\",\n" +
+    "            \"facilityAddressLine1\": \"123, Koramangala\",\n" +
+    "            \"facilityAddressLine2\": \"\",\n" +
+    "            \"facilityDistrict\": \"Bengaluru South\",\n" +
+    "            \"facilityState\": \"Karnataka\",\n" +
+    "            \"facilityPincode\": 560034\n" +
+    "        },\n" +
+    "        {\n" +
+    "            \"ID\": 7,\n" +
+    "            \"CreatedAt\": \"2020-12-24T10:49:27.550217Z\",\n" +
+    "            \"UpdatedAt\": \"2020-12-24T10:49:27.550217Z\",\n" +
+    "            \"DeletedAt\": null,\n" +
+    "            \"CertifyUploadID\": 7,\n" +
+    "            \"errors\": \"RecipientName is missing\",\n" +
+    "            \"recipientName\": \"\",\n" +
+    "            \"recipientMobileNumber\": \"1111111303\",\n" +
+    "            \"recipientDOB\": \"1983-03-03\",\n" +
+    "            \"recipientGender\": \"Male\",\n" +
+    "            \"recipientNationality\": \"Indian\",\n" +
+    "            \"recipientIdentity\": \"did:in.gov.uidai.aadhaar:123546577357\",\n" +
+    "            \"vaccinationBatch\": \"12345\",\n" +
+    "            \"vaccinationDate\": \"2020-12-02T09:44:03.802Z\",\n" +
+    "            \"vaccinationEffectiveStart\": \"2020-12-02\",\n" +
+    "            \"vaccinationEffectiveEnd\": \"2020-12-02\",\n" +
+    "            \"vaccinationManufacturer\": \"string\",\n" +
+    "            \"vaccinationName\": \"COVID-19\",\n" +
+    "            \"vaccinatorName\": \"Nayan A\",\n" +
+    "            \"facilityName\": \"Awesome Hospital\",\n" +
+    "            \"facilityAddressLine1\": \"\",\n" +
+    "            \"facilityAddressLine2\": \"\",\n" +
+    "            \"facilityDistrict\": \"\",\n" +
+    "            \"facilityState\": \"\",\n" +
+    "            \"facilityPincode\": 0\n" +
+    "        }\n" +
+    "    ]\n" +
+    "}";
 
 export default Certificates;
