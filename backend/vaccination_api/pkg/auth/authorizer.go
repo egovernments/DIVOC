@@ -8,8 +8,6 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
-// 	"io/ioutil"
-	"io/ioutil"
 	"net/http"
 	"strings"
 )
