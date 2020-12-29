@@ -21,6 +21,7 @@ RUN cd portal_api && GOFLAGS=" -tags=musl" SPEC_FILE="../interfaces/admin-portal
 
 # Start fresh from a smaller image
 FROM alpine:3.9 as vaccination_api
+LABEL name=vaccination_api
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/divoc-server /app/divoc-server
 COPY vaccination_api/config /config
@@ -28,12 +29,14 @@ EXPOSE 8000
 CMD ["/app/divoc-server", "--scheme", "http", "--port", "8000", "--host", "0.0.0.0"]
 
 FROM alpine:3.9 as analytics_feed
+LABEL name=analytics_feed
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/analytics_feed /app/analytics_feed
 COPY vaccination_api/config /config
 CMD ["/app/analytics_feed"]
 
 FROM alpine:3.9 as certificate_processor
+LABEL name=certificate_processor
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/certificate_processor /app/certificate_processor
 COPY vaccination_api/config /config
@@ -41,6 +44,7 @@ CMD ["/app/certificate_processor"]
 
 #portal api
 FROM alpine:3.9 as portal_api
+LABEL name=portal_api
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/portal_api/divoc-portal-api-server /app/divoc-portal-api-server
 COPY portal_api/config /config
