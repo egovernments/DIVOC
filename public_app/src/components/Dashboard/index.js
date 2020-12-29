@@ -11,19 +11,20 @@ import ReportView from '../ReportView/ReportView';
 function Dashboard() {
 
     return(
-        <Tabs className="text-center pt-3">
-            <TabList vertical >
-                <Tab><img src={Country} alt="Map" /></Tab>
-                <Tab><img src={Repo} alt="Report" /></Tab>
-            </TabList>
+        // <Tabs className="text-center pt-3">
+        //     <TabList vertical >
+        //         <Tab><img src={Country} alt="Map" /></Tab>
+        //         <Tab><img src={Repo} alt="Report" /></Tab>
+        //     </TabList>
 
-            <TabPanel >
-                <MapView />
-            </TabPanel>
-            <TabPanel>
-                <ReportView />
-            </TabPanel>
-        </Tabs>
+        //     <TabPanel >
+        //         <MapView />
+        //     </TabPanel>
+        //     <TabPanel>
+        //         <ReportView />
+        //     </TabPanel>
+        // </Tabs>
+        <MapView />
     );
 
 
