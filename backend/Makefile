@@ -6,3 +6,4 @@ docker:
   		echo $$image;\
   		docker tag `docker images --filter=label=name=$$image --format "{{.ID}}"|head -1` $$image;\
 	done
+	$(MAKE) -C certificate_processor
