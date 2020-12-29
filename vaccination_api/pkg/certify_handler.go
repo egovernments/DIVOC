@@ -19,10 +19,10 @@ var messages = make(chan string)
 var events = make(chan []byte)
 
 type Event struct {
-	Date time.Time `json:"date"`
-	Source string `json:"source"`
-	TypeOfMessage string `json:"type"`
-	ExtraInfo interface{}  `json:"extra"`
+	Date          time.Time   `json:"date"`
+	Source        string      `json:"source"`
+	TypeOfMessage string      `json:"type"`
+	ExtraInfo     interface{} `json:"extra"`
 }
 
 func InitializeKafka() {
@@ -41,7 +41,7 @@ func InitializeKafka() {
 	go func() {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
-			msg := <- messages
+			msg := <-messages
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          []byte(msg),
@@ -54,7 +54,7 @@ func InitializeKafka() {
 	go func() {
 		topic := config.Config.Kafka.EventsTopic
 		for {
-			msg := <- events
+			msg := <-events
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
@@ -207,25 +207,24 @@ func validateErrors(data *db.CertifyUploadFields) []string {
 
 func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 	return &db.CertifyUploadFields{
-		RecipientName: data.Text("recipientName"),
-		RecipientMobileNumber: data.Text("recipientMobileNumber"),
-		RecipientDOB: data.Text("recipientDOB"),
-		RecipientGender: data.Text("recipientGender"),
-		RecipientNationality: data.Text("recipientNationality"),
-		RecipientIdentity: data.Text("recipientIdentity"),
-		VaccinationBatch: data.Text("vaccinationBatch"),
-		VaccinationDate: data.Text("vaccinationDate"),
+		RecipientName:             data.Text("recipientName"),
+		RecipientMobileNumber:     data.Text("recipientMobileNumber"),
+		RecipientDOB:              data.Text("recipientDOB"),
+		RecipientGender:           data.Text("recipientGender"),
+		RecipientNationality:      data.Text("recipientNationality"),
+		RecipientIdentity:         data.Text("recipientIdentity"),
+		VaccinationBatch:          data.Text("vaccinationBatch"),
+		VaccinationDate:           data.Text("vaccinationDate"),
 		VaccinationEffectiveStart: data.Text("vaccinationEffectiveStart"),
-		VaccinationEffectiveEnd: data.Text("vaccinationEffectiveEnd"),
-		VaccinationManufacturer: data.Text("vaccinationManufacturer"),
-		VaccinationName: data.Text("vaccinationName"),
-		VaccinatorName: data.Text("vaccinatorName"),
-		FacilityName: data.Text("facilityName"),
-		FacilityAddressLine1: data.Text("facilityAddressLine1"),
-		FacilityAddressLine2: data.Text("facilityAddressLine2"),
-		FacilityDistrict: data.Text("facilityDistrict"),
-		FacilityState: data.Text("facilityState"),
-		FacilityPincode: data.int64("facilityPincode"),
-
+		VaccinationEffectiveEnd:   data.Text("vaccinationEffectiveEnd"),
+		VaccinationManufacturer:   data.Text("vaccinationManufacturer"),
+		VaccinationName:           data.Text("vaccinationName"),
+		VaccinatorName:            data.Text("vaccinatorName"),
+		FacilityName:              data.Text("facilityName"),
+		FacilityAddressLine1:      data.Text("facilityAddressLine1"),
+		FacilityAddressLine2:      data.Text("facilityAddressLine2"),
+		FacilityDistrict:          data.Text("facilityDistrict"),
+		FacilityState:             data.Text("facilityState"),
+		FacilityPincode:           data.int64("facilityPincode"),
 	}
 }
