@@ -27,12 +27,35 @@ const RowTableCell = withStyles({
     }
 })(TableCell);
 
-export function UploadErrorList({uploadHistoryDetails, fileName}) {
+export function UploadErrorList({uploadHistoryDetails, columns, fileName}) {
+    console.log(uploadHistoryDetails);
     if (!uploadHistoryDetails) {
         return <div>Something went wrong</div>
     }
 
     const isErrorFound = uploadHistoryDetails.length > 0;
+
+    function mapToHeaderInGiveColumnOrder() {
+        return uploadHistoryDetails.map((item, index) => {
+            const newObject = {}
+            for (let i = 0; i < columns.length; i++) {
+                const columnName = columns[i];
+                newObject[columnName] = item[columnName];
+            }
+            return newObject;
+        });
+    }
+
+    function downloadFile(csv) {
+        const blob = new Blob([csv]);
+        const a = window.document.createElement('a');
+        a.href = window.URL.createObjectURL(blob);
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
     return (
 
         <div className="error-list d-flex flex-column justify-content-between">
@@ -49,27 +72,23 @@ export function UploadErrorList({uploadHistoryDetails, fileName}) {
                 {isErrorFound ? <Table component={CustomPaper}>
                     <TableBody>
                         {
-                            uploadHistoryDetails.map((item, index) =>
-                                <TableRow>
+                            uploadHistoryDetails.map((item, index) => {
+                                const errorsItem = item.hasOwnProperty("errors") ? item["errors"] : ""
+                                return <TableRow>
                                     <TableCell
                                         component={RowTableCell}>Row {index + 1} :
-                                        Errors {item["Errors"].length ?? 0}
+                                        Errors {errorsItem.split(",").length}
                                     </TableCell>
-                                </TableRow>)
+                                </TableRow>
+                            })
                         }
                     </TableBody>
                 </Table> : <p>No Error Found</p>}
             </div>
             {isErrorFound && <Button variant="danger" className="m-4" onClick={() => {
-                const csv = Papa.unparse(uploadHistoryDetails)
-                console.log(JSON.stringify(csv))
-                const blob = new Blob([csv]);
-                const a = window.document.createElement('a');
-                a.href = window.URL.createObjectURL(blob);
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+                const orderColumns = mapToHeaderInGiveColumnOrder()
+                const csv = Papa.unparse(orderColumns)
+                downloadFile(csv);
             }}>Download Error CSV</Button>}
         </div>
     );
