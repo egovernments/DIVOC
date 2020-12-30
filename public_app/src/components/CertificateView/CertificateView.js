@@ -11,9 +11,9 @@ import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
 import {Certificate} from "../Certificate";
 import {useDispatch} from "react-redux";
-import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
+import JSZip from "jszip";
 
 const certificateDetailsPaths = {
     ...CertificateDetailsPaths,
@@ -52,11 +52,29 @@ function CertificateView() {
 
 
     const getCertificate = async () => {
-        const response = await axios
+        let response = await axios
             .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
             .then((res) => {
                 return res.data;
             });
+        for (let i = 0; i < response.length; i++) {
+            const zip = new JSZip();
+            const cert = JSON.stringify(response[i].certificate);
+            zip.file("Hello.txt", cert, {
+                compression: "DEFLATE",
+                compressionOptions: {
+                    level: 9
+                }
+            });
+            const zippedData = await zip.generateAsync({type: "blob"})
+                .then(function (content) {
+                    // console.log(content)
+                    return content;
+                });
+            const zippedText = await zippedData.text();
+            response[i].compressedData = zippedText
+        }
+
         console.log(response);
         setCertificateList(response);
         if (response.length === 1) {
@@ -87,7 +105,7 @@ function CertificateView() {
 
     const formatIdentity = (id) => {
         try {
-            let arr = id.split(":")
+            let arr = id.split(":");
             return arr[arr.length - 1];
         } catch (e) {
             return "";
@@ -107,7 +125,7 @@ function CertificateView() {
                 </div>
 
                 <Certificate
-                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
+                    qrCode={<QRCode size={256} renderAs={"svg"} value={certificateData.compressedData}/>}
                     vaccination={extractData(certificateData, "Vaccination")}
                     manufacturer={extractData(certificateData, "Manufacturer")}
                     certificateId={extractData(certificateData, "Certificate ID")}
@@ -127,7 +145,7 @@ function CertificateView() {
     };
 
     const handleClick = () => {
-        console.log(certificateData)
+        console.log(certificateData);
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(certificateData));
         var dlAnchorElem = document.createElement('a');
         dlAnchorElem.setAttribute("href", dataStr);
@@ -141,7 +159,7 @@ function CertificateView() {
                 console.log(dataUrl);
                 download(dataUrl, "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + '.svg');
             });
-    }
+    };
 
     const downloadAsImage = () => {
         toPng(document.getElementById('certificate'))
@@ -149,7 +167,7 @@ function CertificateView() {
                 console.log(dataUrl);
                 download(dataUrl, "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + '.png');
             });
-    }
+    };
 
     const singleCertificateView = () => {
         if (certificateList.length === 1) {
