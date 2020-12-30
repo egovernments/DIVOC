@@ -9,7 +9,7 @@ import {TotalRecords} from "../TotalRecords";
 function VaccinatorsRegistry() {
     const {keycloak} = useKeycloak();
     const [vaccinators, setVaccinators] = useState([]);
-    const fileUploadAPI = 'divoc/admin/api/v1/vaccinators';
+    const fileUploadAPI = '/divoc/admin/api/v1/vaccinators';
     const axiosInstance = useAxios('');
     useEffect(() => {
         fetchVaccinators()

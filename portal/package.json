@@ -1,6 +1,7 @@
 {
   "name": "portal",
   "version": "0.1.0",
+  "homepage": "http://divox.xiv.in/portal/",
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.11.0",

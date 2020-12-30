@@ -13,6 +13,7 @@ import {LatestUpdateCard} from "../LatestUpdateCard";
 import {Link, useHistory} from "react-router-dom";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
+import config from "../../config"
 
 export default function Home() {
     const {keycloak} = useKeycloak();
@@ -20,16 +21,16 @@ export default function Home() {
 
     useEffect(() => {
         if (keycloak.authenticated) {
-            let redirectUrl = "/";
+            let redirectUrl = config.urlPath;
             if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/admin";
+                redirectUrl = config.urlPath + "/admin";
                 history.push(redirectUrl)
             } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/facility_admin";
+                redirectUrl = config.urlPath + "/facility_admin";
                 history.push(redirectUrl)
             }
         } else {
-            history.push("/login");
+            history.push(config.urlPath + "/login");
         }
     }, [keycloak]);
     return (

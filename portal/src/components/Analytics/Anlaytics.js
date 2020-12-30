@@ -8,7 +8,7 @@ import {CertificateQueryAnalysis} from "../CertificateQueryAnalysis";
 
 export function Analytics() {
     const [analytics, setAnalytics] = useState(null);
-    const getAnalyticsPath = 'divoc/admin/api/v1/analytics';
+    const getAnalyticsPath = '/divoc/admin/api/v1/analytics';
     const axiosInstance = useAxios('');
     useEffect(() => {
         axiosInstance.current.get(getAnalyticsPath)

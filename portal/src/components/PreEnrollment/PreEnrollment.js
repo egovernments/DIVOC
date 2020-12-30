@@ -7,7 +7,7 @@ import {SampleCSV} from "../../utils/constants";
 
 function PreEnrollment() {
     const [enrollments, setEnrollments] = useState([]);
-    const fileUploadAPI = 'divoc/admin/api/v1/enrollments';
+    const fileUploadAPI = '/divoc/admin/api/v1/enrollments';
     const axiosInstance = useAxios('');
     useEffect(() => {
         fetchEnrollment()

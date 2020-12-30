@@ -12,7 +12,7 @@ import {Button, Col, Row} from "react-bootstrap";
 export default function FacilityAdmin() {
     const {keycloak} = useKeycloak();
     const [vaccinators, setVaccinators] = useState([]);
-    const getVaccinatorPath = 'divoc/admin/api/v1/vaccinators';
+    const getVaccinatorPath = '/divoc/admin/api/v1/vaccinators';
     const axiosInstance = useAxios('');
 
     useEffect(() => {
