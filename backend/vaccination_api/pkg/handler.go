@@ -223,7 +223,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			publishCertifyMessage(jsonRequestString)
+			publishCertifyMessage(jsonRequestString, nil, nil)
 		}
 	}
 	return certification.NewCertifyOK()
@@ -260,9 +260,11 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry.TotalErrorRows = 0
 	db.CreateCertifyUpload(&uploadEntry)
 
+	rowId := -1
 	// Creating Certificates
 	for data.Scan() {
-		createCertificate(&data, &uploadEntry)
+		rowId = rowId + 1
+		createCertificate(&data, &uploadEntry, rowId)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()

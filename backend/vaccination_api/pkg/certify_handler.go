@@ -15,7 +15,7 @@ import (
 
 var producer *kafka.Producer
 
-var messages = make(chan string)
+var messages = make(chan Message)
 var events = make(chan []byte)
 
 type Event struct {
@@ -23,6 +23,12 @@ type Event struct {
 	Source        string      `json:"source"`
 	TypeOfMessage string      `json:"type"`
 	ExtraInfo     interface{} `json:"extra"`
+}
+
+type Message struct {
+	UploadId []byte
+	rowId    []byte
+	payload  string
 }
 
 func InitializeKafka() {
@@ -44,7 +50,11 @@ func InitializeKafka() {
 			msg := <-messages
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          []byte(msg),
+				Value:          []byte(msg.payload),
+				Headers: []kafka.Header{
+					{Key: "uploadId", Value: msg.UploadId},
+					{Key: "rowId", Value: msg.rowId},
+				},
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
 			}
@@ -80,8 +90,13 @@ func InitializeKafka() {
 	}()
 }
 
-func publishCertifyMessage(message []byte) {
-	messages <- string(message)
+// uploadId, rowId to be specified in case if its file upload
+func publishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
+	messages <- Message{
+		UploadId: uploadId,
+		rowId:    rowId,
+		payload:  string(message),
+	}
 }
 
 func publishSimpleEvent(source string, event string) {
@@ -100,7 +115,7 @@ func publishEvent(event Event) {
 	}
 }
 
-func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
+func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId int) error {
 
 	uploadDetails.TotalRecords = uploadDetails.TotalRecords + 1
 
@@ -187,7 +202,9 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
-		publishCertifyMessage(jsonRequestString)
+		uploadId, _ := json.Marshal(uploadDetails.ID)
+		jrowId, _ := json.Marshal(rowId)
+		publishCertifyMessage(jsonRequestString, uploadId, jrowId)
 	} else {
 		return err
 	}

@@ -20,6 +20,8 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
     eachMessage: async ({topic, partition, message}) => {
       console.log({
         value: message.value.toString(),
+        uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
+        rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
       try {
         jsonMessage = JSON.parse(message.value.toString());
