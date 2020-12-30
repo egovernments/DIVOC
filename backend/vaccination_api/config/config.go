@@ -1,10 +1,10 @@
 package config
 
-import "github.com/jinzhu/configor"
 import(
-log "github.com/sirupsen/logrus"
-"github.com/imroc/req"
-"errors"
+	"github.com/jinzhu/configor"
+	log "github.com/sirupsen/logrus"
+	"github.com/imroc/req"
+	"errors"
 )
 
 func Initialize() {

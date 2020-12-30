@@ -25,21 +25,13 @@ var (
 )
 
 func Init() {
-// 	log.Infof("Using the public from %s", config.Config.Keycloak.PubkeyPath)
-// 	verifyBytes, err := ioutil.ReadFile(config.Config.Keycloak.PubkeyPath)
-// 	if err != nil {
-// 		log.Errorf("", err)
-// 	}
-
 	verifyBytes := ([]byte)("-----BEGIN PUBLIC KEY-----\n" + config.Config.Keycloak.Pubkey + "\n-----END PUBLIC KEY-----\n")
     log.Infof("Using the public key %s", string(verifyBytes))
-	//fatal(err)
     var err error
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
 		log.Print(err)
 	}
-	//fatal(err)
 }
 
 func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaimBody, error) {
@@ -123,6 +115,11 @@ func contains(arr []string, str string) bool {
 }
 
 func GetClaimBody(bearerToken string) (*models.JWTClaimBody, error) {
+
+	if verifyKey == nil {
+		Init()
+	}
+
 	token, err := jwt.ParseWithClaims(bearerToken, &models.JWTClaimBody{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("error decoding token")

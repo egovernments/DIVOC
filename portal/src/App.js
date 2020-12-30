@@ -15,6 +15,7 @@ import FacilityController from "./components/FacilityController/FacilityControll
 import PrintCertificate from "./components/PrintCertificate/PrintCertificate";
 import {Analytics} from "./components/Analytics/Anlaytics";
 import MapView from "./components/MapView/MapView"
+import config from "./config"
 
 
 export default function App() {
@@ -30,16 +31,16 @@ export default function App() {
                 <Header/>
                 <div className="body-section">
                     <Switch>
-                        <Route exact path="/" component={Home}/>
-                        <Route exact path="/login" component={Login}/>
-                        <Route exact path="/analytics/map" component={MapView}/>
-                        <PrivateRoute exact path="/dashboard" component={Dashboard}/>
-                        <PrivateRoute exact path="/about" component={About}/>
-                        <PrivateRoute exact path="/admin" component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
-                        <PrivateRoute exact path="/analytics" component={Analytics} role={CONSTANTS.MONITORING} clientId={CONSTANTS.PORTAL_CLIENT}/>
-                        <PrivateRoute exact path="/facility_admin" component={FacilityAdmin} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
-                        <PrivateRoute exact path="/facility_controller" component={FacilityController} role={CONSTANTS.ROLE_CONTROLLER} clientId={CONSTANTS.PORTAL_CLIENT}/>
-                        <PrivateRoute exact path="/facility" component={PrintCertificate} role={CONSTANTS.FACILITY_PRINT_STAFF} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <Route exact path={config.urlPath + "/"}  component={Home}/>
+                        <Route exact path={config.urlPath + "/login"} component={Login}/>
+                        <Route exact path={config.urlPath + "/analytics/map"} component={MapView}/>
+                        <PrivateRoute exact path={config.urlPath + "/dashboard"} component={Dashboard}/>
+                        <PrivateRoute exact path={config.urlPath + "/about"} component={About}/>
+                        <PrivateRoute exact path={config.urlPath + "/admin"} component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <PrivateRoute exact path={config.urlPath + "/analytics"} component={Analytics} role={CONSTANTS.MONITORING} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <PrivateRoute exact path={config.urlPath + "/facility_admin"} component={FacilityAdmin} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <PrivateRoute exact path={config.urlPath + "/facility_controller"} component={FacilityController} role={CONSTANTS.ROLE_CONTROLLER} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                        <PrivateRoute exact path={config.urlPath + "/facility"} component={PrintCertificate} role={CONSTANTS.FACILITY_PRINT_STAFF} clientId={CONSTANTS.PORTAL_CLIENT}/>
                     </Switch>
                 </div>
             </Router>

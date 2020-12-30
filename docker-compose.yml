@@ -140,7 +140,7 @@ services:
       - kafka
       - registry
   nginx:
-    image: nginx
+    image: dockerhub/nginx
     ports:
       - "80:80"
     depends_on:
