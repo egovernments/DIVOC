@@ -41,6 +41,17 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
           messages: [{key:null, value:message.value.toString()}]});
       } catch (e) {
         console.error("ERROR: " + e.message)
+        producer.send({
+          topic: 'certify_ack',
+          messages: [{
+            key: null,
+            value: JSON.stringify({
+              uploadId: uploadId,
+              rowId: rowId,
+              status: 'FAILED',
+              errorMsg: e.message
+            })}]})
+
       }
     },
   })
