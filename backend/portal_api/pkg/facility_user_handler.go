@@ -16,7 +16,7 @@ func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
 	if claimBody.FacilityCode == "" {
 		return nil, errors.New("unauthorized")
 	}
-	users, err := getFacilityUsers(claimBody.FacilityCode, authHeader)
+	users, err := getFacilityUsers(claimBody.FacilityCode)
 
 	return users, err
 }
@@ -38,16 +38,16 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 			FacilityCode: claimBody.FacilityCode,
 		},
 	}
-	resp, err := CreateKeycloakUser(userRequest, authHeader)
+	resp, err := CreateKeycloakUser(userRequest)
 	log.Info("Created keycloak user ", resp.Response().StatusCode, " ", resp.String())
 	if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 		log.Errorf("Error while creating keycloak user : %s", user.MobileNumber)
 		return err
 	} else {
 		log.Info("Setting up roles for the user ", user.MobileNumber)
-		keycloakUserId := getKeycloakUserId(resp, userRequest, authHeader)
+		keycloakUserId := getKeycloakUserId(resp, userRequest)
 		if keycloakUserId != "" {
-			_ = addUserToGroup(keycloakUserId, user.Groups[0].ID, authHeader)
+			_ = addUserToGroup(keycloakUserId, user.Groups[0].ID)
 		} else {
 			log.Error("Unable to map keycloak user id for ", user.MobileNumber)
 		}
@@ -55,6 +55,6 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	return nil
 }
 
-func GetFacilityGroups(authHeader string) ([]*models.UserGroup, error) {
-	return getUserGroups("facility", authHeader)
+func GetFacilityGroups() ([]*models.UserGroup, error) {
+	return getUserGroups("facility")
 }

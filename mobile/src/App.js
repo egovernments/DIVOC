@@ -8,7 +8,7 @@ function App() {
     const {keycloak, initialized} = useKeycloak();
     const [isDBInit, setDBInit] = useState(false);
     useEffect(() => {
-        if (initialized) {
+        if (initialized && keycloak.authenticated) {
             localStorage.setItem("token", keycloak.token)
             SyncFacade.pull().then(value => {
                 setDBInit(true)
@@ -18,7 +18,7 @@ function App() {
             });
         }
     }, [initialized])
-    if (!initialized || !isDBInit) {
+    if (!initialized) {
         return <div>Loading...</div>
     }
 

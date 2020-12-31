@@ -70,6 +70,7 @@ type CertifyMessage struct {
 func main() {
 	config.Initialize()
 	log.Infof("Starting certificate processor")
+	log.Infof("Using kafka %s", config.Config.Kafka.BootstrapServers)
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certificate_processor",

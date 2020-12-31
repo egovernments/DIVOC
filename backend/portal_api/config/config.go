@@ -19,6 +19,7 @@ var Config = struct {
 	Keycloak struct {
 		Pubkey 	      string `env:"PUBLIC_KEY"`
 		Url           string `env:"KEYCLOAK_URL"`
+		AdminApiClientSecret   string `env:"ADMIN_API_CLIENT_SECRET"`
 		Realm         string `env:"KEYCLOAK_REALM"`
 		FacilityAdmin struct {
 			RoleName string `yaml:"roleName"`
@@ -66,6 +67,7 @@ func updatePublicKeyFromKeycloak() error {
 	if err := resp.ToJSON(&responseObject); err == nil {
 		if publicKey, ok := responseObject["public_key"].(string); ok {
 			Config.Keycloak.Pubkey = publicKey
+			return nil
 		}
 	}
 	return errors.New("Unable to get public key from keycloak")

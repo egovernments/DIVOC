@@ -18,24 +18,27 @@ import {ConfirmFlow} from "../ConfirmVaccination";
 import {useLocation} from "react-router";
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {WalkEnrollmentFlow} from "../components/WalkEnrollments";
+import config from "../config";
+import { createBrowserHistory } from 'history';
 
 Dashboard.propTypes = {};
 
+const history = createBrowserHistory({ basename: '/facility_app' });
 function Dashboard(props) {
     return (
-        <Router>
+        <Router history={history}>
             <div className={"dashboard-container"}>
                 <div className={"host-container"}>
 
                     <Switch>
-                        <PrivateRoute path="/" exact component={Home}/>
-                        <PrivateRoute path="/language" exact component={SelectLanguage}/>
-                        <PrivateRoute path="/queue" exact component={Queue}/>
-                        <PrivateRoute path="/logout" exact component={Logout}/>
-                        <PrivateRoute path="/preEnroll/:pageName" component={PreEnrollmentFlow}/>
-                        <PrivateRoute path='/walkInEnroll/:pageName' component={WalkEnrollmentFlow}/>
-                        <PrivateRoute path="/confirm/vaccination/:recipient_id/:pageName" component={ConfirmFlow}/>
-                        <Route path="/login" exact component={LoginComponent}/>
+                        <PrivateRoute path={config.urlPath + "/"} exact component={Home}/>
+                        <PrivateRoute path={config.urlPath + "/language"} exact component={SelectLanguage}/>
+                        <PrivateRoute path={config.urlPath + "/queue"} exact component={Queue}/>
+                        <PrivateRoute path={config.urlPath + "/logout"} exact component={Logout}/>
+                        <PrivateRoute path={config.urlPath + "/preEnroll/:pageName"} component={PreEnrollmentFlow}/>
+                        <PrivateRoute path={config.urlPath + "/walkInEnroll/:pageName"} component={WalkEnrollmentFlow}/>
+                        <PrivateRoute path={config.urlPath + "/confirm/vaccination/:recipient_id/:pageName"} component={ConfirmFlow}/>
+                        <Route path={config.urlPath + "/login"} exact component={LoginComponent}/>
                     </Switch>
                     <Footer/>
                 </div>
@@ -51,15 +54,15 @@ const Footer = () => {
     const location = useLocation();
     return (
         <div className="bottom-bar d-flex justify-content-around">
-            <BottomItem currentLocation={location.pathname} src={home} href={"/"}
+            <BottomItem currentLocation={location.pathname} src={home} href={config.urlPath +"/"}
                         title={getMessageComponent(LANGUAGE_KEYS.HOME)}/>
-            <BottomItem currentLocation={location.pathname} src={language} href={"/language"}
+            <BottomItem currentLocation={location.pathname} src={language} href={config.urlPath + "/language"}
                         title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
-            <BottomItem currentLocation={location.pathname} src={queue} href={"/queue"}
+            <BottomItem currentLocation={location.pathname} src={queue} href={config.urlPath + "/queue"}
                         title={getMessageComponent(LANGUAGE_KEYS.QUEUE)}/>
-            <BottomItem currentLocation={location.pathname} src={help} href={"/logout"}
+            <BottomItem currentLocation={location.pathname} src={help} href={config.urlPath + "/help"}
                         title={getMessageComponent(LANGUAGE_KEYS.HELP)}/>
-            <BottomItem currentLocation={location.pathname} src={logout} href={"/logout"}
+            <BottomItem currentLocation={location.pathname} src={logout} href={config.urlPath + "/logout"}
                         title={getMessageComponent(LANGUAGE_KEYS.LOGOUT)}/>
         </div>
     )

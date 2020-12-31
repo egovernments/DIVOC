@@ -48,6 +48,7 @@ var Config = struct {
 	}
 	Keycloak struct {
 		Url           string `env:"KEYCLOAK_URL"`
+		AdminApiClientSecret   string `env:"ADMIN_API_CLIENT_SECRET"`
 		Pubkey        string `env:"PUBLIC_KEY"`
 		Realm string `default:"divoc"`
 		AuthHeader string `env:"AUTH_TOKEN"`

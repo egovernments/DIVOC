@@ -82,15 +82,16 @@ func createFacility(data *Scanner, authHeader string) error {
 				FacilityCode: facility.FacilityCode,
 			},
 		}
-		resp, err := CreateKeycloakUser(userRequest, authHeader)
-		log.Info("Created keycloak user ", resp.Response().StatusCode, " ", resp.String())
+		
+		resp, err := CreateKeycloakUser(userRequest)
+		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 			log.Errorf("Error while creating keycloak user : %s", mobile)
 		} else {
 			log.Info("Setting up roles for the user ", mobile)
-			keycloakUserId := getKeycloakUserId(resp, userRequest, authHeader)
+			keycloakUserId := getKeycloakUserId(resp, userRequest)
 			if keycloakUserId != "" {
-				_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.FacilityAdmin.GroupId, authHeader)
+				_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.FacilityAdmin.GroupId)
 			} else {
 				log.Error("Unable to map keycloak user id for ", mobile)
 			}
