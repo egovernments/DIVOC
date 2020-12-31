@@ -37,6 +37,15 @@ func InitializeKafka() {
 	if err != nil {
 		panic(err)
 	}
+	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  servers,
+		"group.id":           "certify_ack",
+		"auto.offset.reset":  "earliest",
+		"enable.auto.commit": "false",
+	})
+	if err != nil {
+		panic(err)
+	}
 	log.Infof("Connected to kafka on %s", servers)
 
 	//defer func() {
@@ -70,6 +79,24 @@ func InitializeKafka() {
 				Value:          msg,
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
+	go func() {
+		consumer.SubscribeTopics([]string{"certify_ack"}, nil)
+		for  {
+			msg, err := consumer.ReadMessage(-1)
+			if err == nil {
+				var message interface{}
+				json.Unmarshal([]byte(string(msg.Value)), &message)
+				// check the status
+				// update that status to certifyErrorRows db
+				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
+				consumer.CommitMessage(msg)
+			} else {
+				// The client will automatically try to recover from all errors.
+				log.Infof("Consumer error: %v \n", err)
 			}
 		}
 	}()
