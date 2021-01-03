@@ -228,17 +228,12 @@ paths:
           description: OK
         '206':
           description: Need OTP
-  /certificates/{phone}:
+  /certificates:
     get:
       summary: Get certificate json
       security:
         - hasRole: ["recipient"]
       operationId: getCertificate
-      parameters:
-        - name: phone
-          in: path
-          required: true
-          type: string
       responses:
         '200':
           description: OK

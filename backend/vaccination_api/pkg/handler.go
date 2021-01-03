@@ -101,7 +101,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			"eq": typeId,
 		},
 		"contact": map[string]interface{}{
-			"contains": "tel:" + params.Phone,
+			"contains": "tel:" + principal.PreferredUsername,
 		},
 	}
 	if response, err := services.QueryRegistry(typeId, filter); err != nil {

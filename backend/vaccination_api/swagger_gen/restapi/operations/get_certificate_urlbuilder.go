@@ -9,16 +9,11 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
-	"strings"
 )
 
 // GetCertificateURL generates an URL for the get certificate operation
 type GetCertificateURL struct {
-	Phone string
-
 	_basePath string
-	// avoid unkeyed usage
-	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -40,14 +35,7 @@ func (o *GetCertificateURL) SetBasePath(bp string) {
 func (o *GetCertificateURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/certificates/{phone}"
-
-	phone := o.Phone
-	if phone != "" {
-		_path = strings.Replace(_path, "{phone}", phone, -1)
-	} else {
-		return nil, errors.New("phone is required on GetCertificateURL")
-	}
+	var _path = "/certificates"
 
 	_basePath := o._basePath
 	if _basePath == "" {

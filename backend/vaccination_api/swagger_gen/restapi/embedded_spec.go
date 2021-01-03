@@ -114,7 +114,7 @@ func init() {
         }
       }
     },
-    "/certificates/{phone}": {
+    "/certificates": {
       "get": {
         "security": [
           {
@@ -125,14 +125,6 @@ func init() {
         ],
         "summary": "Get certificate json",
         "operationId": "getCertificate",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "phone",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -929,7 +921,7 @@ func init() {
         }
       }
     },
-    "/certificates/{phone}": {
+    "/certificates": {
       "get": {
         "security": [
           {
@@ -940,14 +932,6 @@ func init() {
         ],
         "summary": "Get certificate json",
         "operationId": "getCertificate",
-        "parameters": [
-          {
-            "type": "string",
-            "name": "phone",
-            "in": "path",
-            "required": true
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
