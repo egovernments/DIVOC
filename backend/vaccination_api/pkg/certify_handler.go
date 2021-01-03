@@ -152,12 +152,14 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId in
 	var certifyUploadErrors db.CertifyUploadErrors
 	certifyUploadErrors.CertifyUploadID = uploadDetails.ID
 	certifyUploadErrors.CertifyUploadFields = *certifyData
+	certifyUploadErrors.Status = db.CERTIFY_UPLOAD_PROCESSING_STATUS
+	db.CreateCertifyUploadError(&certifyUploadErrors)
 	// validating data errors
 	errorMsgs := validateErrors(certifyData)
 	if len(errorMsgs) > 0 {
-		uploadDetails.TotalErrorRows = uploadDetails.TotalErrorRows + 1
 		certifyUploadErrors.Errors = strings.Join(errorMsgs, ",")
-		e := db.CreateCertifyUploadError(&certifyUploadErrors)
+		certifyUploadErrors.Status = db.CERTIFY_UPLOAD_FAILED_STATUS
+		e := db.UpdateCertifyUploadError(&certifyUploadErrors)
 		return e
 	}
 

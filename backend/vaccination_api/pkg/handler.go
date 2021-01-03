@@ -255,9 +255,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry := db.CertifyUploads{}
 	uploadEntry.Filename = fileName
 	uploadEntry.UserID = preferredUsername
-	uploadEntry.Status = "Processing"
 	uploadEntry.TotalRecords = 0
-	uploadEntry.TotalErrorRows = 0
 	db.CreateCertifyUpload(&uploadEntry)
 
 	rowId := -1
@@ -268,12 +266,6 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
-
-	if uploadEntry.TotalErrorRows > 0 {
-		uploadEntry.Status = "Failed"
-	} else {
-		uploadEntry.Status = "Success"
-	}
 
 	db.UpdateCertifyUpload(&uploadEntry)
 
@@ -303,12 +295,48 @@ func getUserName(params *http.Request) string {
 }
 
 func getCertifyUploads(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	var result []interface{}
 	preferredUsername := principal.PreferredUsername
 	certifyUploads, err := db.GetCertifyUploadsForUser(preferredUsername)
 	if err == nil {
-		return NewGenericJSONResponse(certifyUploads)
+		// get the error rows associated with it
+		// if present update status as "Failed"
+		for _, c := range certifyUploads {
+			totalErrorRows := 0
+			statuses, err := db.GetCertifyUploadErrorsStatusForUploadId(c.ID)
+			if err == nil {
+				for _, status := range statuses {
+					if status == db.CERTIFY_UPLOAD_FAILED_STATUS {
+						totalErrorRows = totalErrorRows + 1
+					}
+				}
+			}
+			overallStatus := getOverallStatus(statuses)
+
+			// construct return value and append
+			var cmap map[string]interface{}
+			if jc, e := json.Marshal(c); e == nil {
+				if e = json.Unmarshal(jc, &cmap); e == nil {
+					cmap["Status"] = overallStatus
+					cmap["TotalErrorRows"] = totalErrorRows
+				}
+			}
+			result = append(result, cmap)
+
+		}
+		return NewGenericJSONResponse(result)
 	}
 	return NewGenericServerError()
+}
+
+func getOverallStatus(statuses []string) string {
+	if contains(statuses, db.CERTIFY_UPLOAD_PROCESSING_STATUS) {
+		return db.CERTIFY_UPLOAD_PROCESSING_STATUS
+	} else if contains(statuses, db.CERTIFY_UPLOAD_FAILED_STATUS) {
+		return db.CERTIFY_UPLOAD_FAILED_STATUS
+	} else {
+		return db.CERTIFY_UPLOAD_SUCCESS_STATUS
+	}
 }
 
 func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
