@@ -151,7 +151,8 @@ async function signAndSave(certificate) {
     name : name,
     contact: contact,
     certificateId: certificateId,
-    certificate: JSON.stringify(signedCertificate)
+    certificate: JSON.stringify(signedCertificate),
+    meta: certificate["meta"]
   };
   registry.saveCertificate(signedCertificateForDB)
 }

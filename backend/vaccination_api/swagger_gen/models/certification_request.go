@@ -343,6 +343,9 @@ type CertificationRequestVaccination struct {
 	// Format: date-time
 	Date strfmt.DateTime `json:"date,omitempty"`
 
+	// Dose number for example 1 for first dose of 2 doses
+	Dose float64 `json:"dose,omitempty"`
+
 	// effective start
 	// Format: date
 	EffectiveStart strfmt.Date `json:"effectiveStart,omitempty"`
@@ -356,6 +359,9 @@ type CertificationRequestVaccination struct {
 
 	// name
 	Name string `json:"name,omitempty"`
+
+	// Total number of doses required for this vaccination.
+	TotalDoses float64 `json:"totalDoses,omitempty"`
 }
 
 // Validate validates this certification request vaccination

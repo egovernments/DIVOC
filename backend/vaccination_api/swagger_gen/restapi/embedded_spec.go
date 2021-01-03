@@ -587,6 +587,11 @@ func init() {
               "type": "string",
               "format": "date-time"
             },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "example": 1
+            },
             "effectiveStart": {
               "type": "string",
               "format": "date"
@@ -600,6 +605,11 @@ func init() {
             },
             "name": {
               "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "example": 2
             }
           }
         },
@@ -771,62 +781,6 @@ func init() {
                   "oral",
                   "nasal"
                 ]
-              }
-            }
-          }
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "SideEffects": {
-      "type": "object",
-      "properties": {
-        "recipientIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "symptoms": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "additionalDetails": {
-                "type": "string"
-              },
-              "id": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
-    },
-    "Symptoms": {
-      "type": "object",
-      "properties": {
-        "instructions": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "imageURL": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "messages": {
-                "type": "array",
-                "items": {
-                  "type": "string"
-                }
-              },
-              "title": {
-                "type": "string"
               }
             }
           }
@@ -1448,6 +1402,11 @@ func init() {
               "type": "string",
               "format": "date-time"
             },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "example": 1
+            },
             "effectiveStart": {
               "type": "string",
               "format": "date"
@@ -1461,6 +1420,11 @@ func init() {
             },
             "name": {
               "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "example": 2
             }
           }
         },
@@ -1562,6 +1526,11 @@ func init() {
           "type": "string",
           "format": "date-time"
         },
+        "dose": {
+          "description": "Dose number for example 1 for first dose of 2 doses",
+          "type": "number",
+          "example": 1
+        },
         "effectiveStart": {
           "type": "string",
           "format": "date"
@@ -1575,6 +1544,11 @@ func init() {
         },
         "name": {
           "type": "string"
+        },
+        "totalDoses": {
+          "description": "Total number of doses required for this vaccination.",
+          "type": "number",
+          "example": 2
         }
       }
     },
@@ -1764,68 +1738,6 @@ func init() {
         },
         "repeatTimes": {
           "type": "integer"
-        }
-      }
-    },
-    "SideEffects": {
-      "type": "object",
-      "properties": {
-        "recipientIds": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "symptoms": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SideEffectsSymptomsItems0"
-          }
-        }
-      }
-    },
-    "SideEffectsSymptomsItems0": {
-      "type": "object",
-      "properties": {
-        "additionalDetails": {
-          "type": "string"
-        },
-        "id": {
-          "type": "string"
-        }
-      }
-    },
-    "Symptoms": {
-      "type": "object",
-      "properties": {
-        "instructions": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/SymptomsInstructionsItems0"
-          }
-        },
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "SymptomsInstructionsItems0": {
-      "type": "object",
-      "properties": {
-        "imageURL": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "messages": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "title": {
-          "type": "string"
         }
       }
     },
