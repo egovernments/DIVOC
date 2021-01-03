@@ -116,6 +116,8 @@ function transformW3(cert, certificateId) {
       "date": cert.vaccination.date,
       "effectiveStart": cert.vaccination.effectiveStart,
       "effectiveUntil": cert.vaccination.effectiveUntil,
+      "dose":cert.vaccination.doses,
+      "totalDoses":cert.vaccination.totalDoses,
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
         "name": cert.vaccinator.name,
