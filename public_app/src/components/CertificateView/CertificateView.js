@@ -8,7 +8,7 @@ import download from 'downloadjs'
 import {Dropdown} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
-import {CertificateDetailsPaths} from "../../constants";
+import {CERTIFICATE_FILE, CertificateDetailsPaths} from "../../constants";
 import {Certificate} from "../Certificate";
 import {useDispatch} from "react-redux";
 import digilocker from "../../assets/img/digilocker.png"
@@ -60,19 +60,18 @@ function CertificateView() {
         for (let i = 0; i < response.length; i++) {
             const zip = new JSZip();
             const cert = JSON.stringify(response[i].certificate);
-            zip.file("Hello.txt", cert, {
+            zip.file(CERTIFICATE_FILE, cert, {
                 compression: "DEFLATE",
                 compressionOptions: {
                     level: 9
                 }
             });
-            const zippedData = await zip.generateAsync({type: "blob"})
+            const zippedData = await zip.generateAsync({type: "binarystring"})
                 .then(function (content) {
                     // console.log(content)
                     return content;
                 });
-            const zippedText = await zippedData.text();
-            response[i].compressedData = zippedText
+            response[i].compressedData = zippedData
         }
 
         console.log(response);

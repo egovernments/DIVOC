@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import './index.css';
 import {scanImageData} from "zbar.wasm";
 
-const SCAN_PERIOD_MS = 800;
+const SCAN_PERIOD_MS = 100;
 
 function hasGetUserMedia() {
     return !!(
