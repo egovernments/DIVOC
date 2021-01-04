@@ -95,20 +95,25 @@ func InitializeKafka() {
 				// check the status
 				// update that status to certifyErrorRows db
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
-				rowId, e := strconv.ParseUint(message["rowId"], 10, 64)
-				if e != nil {
-					log.Errorf("Error occurred wile parsing rowId as int - %s", message["rowId"])
-				} else {
-					if message["status"] == "SUCCESS" {
-						// if certificate created successfully
-						// delete that row => as we no longer require that row
-						db.DeleteCertifyUploadError(uint(rowId))
-					} else if message["status"] == "FAILED" {
-						// if certificate creation fails
-						// update the status of the row to Failed
-						db.UpdateCertifyUploadErrorStatus(uint(rowId), message["status"])
-					}
+				if message["rowId"] == "" {
+					// ignoring rows which doesnt have rowId
 					consumer.CommitMessage(msg)
+				} else {
+					rowId, e := strconv.ParseUint(message["rowId"], 10, 64)
+					if e != nil {
+						log.Errorf("Error occurred wile parsing rowId as int - %s", message["rowId"])
+					} else {
+						if message["status"] == "SUCCESS" {
+							// if certificate created successfully
+							// delete that row => as we no longer require that row
+							db.DeleteCertifyUploadError(uint(rowId))
+						} else if message["status"] == "FAILED" {
+							// if certificate creation fails
+							// update the status of the row to Failed
+							db.UpdateCertifyUploadErrorStatusAndErrorMsg(uint(rowId), message["status"], message["errorMsg"])
+						}
+						consumer.CommitMessage(msg)
+					}
 				}
 			} else {
 				// The client will automatically try to recover from all errors.

@@ -175,10 +175,14 @@ func DeleteCertifyUploadError(id uint) error {
 	return nil
 }
 
-func UpdateCertifyUploadErrorStatus(id uint, status string) error {
-	if result := db.Model(&CertifyUploadErrors{}).Where("id = ?", id).Update("status", status); result.Error != nil {
-		log.Errorf("Error occurred while updating status %s to CertifyUploadErrors with id %d %v", status, id, result.Error)
-		return errors.New("error occurred while updating status in certifyUploadErrors")
+func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg string) error {
+	certifyUploadErrors := &CertifyUploadErrors{}
+	if result := db.First(&certifyUploadErrors, "certify_upload_id = ?", id); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", id)
+		return errors.New("error occurred while retrieving certifyUploads")
 	}
-	return nil
+	certifyUploadErrors.Status = status
+	certifyUploadErrors.Errors = certifyUploadErrors.Errors + "," + errorMsg
+	return UpdateCertifyUploadError(certifyUploadErrors)
+
 }
