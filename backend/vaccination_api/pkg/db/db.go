@@ -165,3 +165,20 @@ func UpdateCertifyUploadError(data *CertifyUploadErrors) error {
 	}
 	return nil
 }
+
+func DeleteCertifyUploadError(id uint) error {
+	if result := db.Unscoped().Delete(&CertifyUploadErrors{}, id); result.Error != nil {
+		log.Error("Error occurred while deleting CertifyUploadErrors with id ", id, result.Error)
+		return errors.New("error occurred while deleting certifyUploadErrors")
+	}
+	log.Info("Deleted certifyUploadError for ID - ", id)
+	return nil
+}
+
+func UpdateCertifyUploadErrorStatus(id uint, status string) error {
+	if result := db.Model(&CertifyUploadErrors{}).Where("id = ?", id).Update("status", status); result.Error != nil {
+		log.Errorf("Error occurred while updating status %s to CertifyUploadErrors with id %d %v", status, id, result.Error)
+		return errors.New("error occurred while updating status in certifyUploadErrors")
+	}
+	return nil
+}

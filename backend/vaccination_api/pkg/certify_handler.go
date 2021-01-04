@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"strconv"
 	"strings"
 	"time"
 
@@ -85,15 +86,30 @@ func InitializeKafka() {
 
 	go func() {
 		consumer.SubscribeTopics([]string{"certify_ack"}, nil)
+
 		for  {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
-				var message interface{}
-				json.Unmarshal([]byte(string(msg.Value)), &message)
+				var message map[string]string
+				json.Unmarshal(msg.Value, &message)
 				// check the status
 				// update that status to certifyErrorRows db
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
-				consumer.CommitMessage(msg)
+				rowId, e := strconv.ParseUint(message["rowId"], 10, 64)
+				if e != nil {
+					log.Errorf("Error occurred wile parsing rowId as int - %s", message["rowId"])
+				} else {
+					if message["status"] == "SUCCESS" {
+						// if certificate created successfully
+						// delete that row => as we no longer require that row
+						db.DeleteCertifyUploadError(uint(rowId))
+					} else if message["status"] == "FAILED" {
+						// if certificate creation fails
+						// update the status of the row to Failed
+						db.UpdateCertifyUploadErrorStatus(uint(rowId), message["status"])
+					}
+					consumer.CommitMessage(msg)
+				}
 			} else {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
@@ -232,7 +248,7 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId in
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
 		uploadId, _ := json.Marshal(uploadDetails.ID)
-		jrowId, _ := json.Marshal(rowId)
+		jrowId, _ := json.Marshal(certifyUploadErrors.ID)
 		publishCertifyMessage(jsonRequestString, uploadId, jrowId)
 	} else {
 		return err
