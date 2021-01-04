@@ -185,5 +185,4 @@ func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg 
 	certifyUploadErrors.Status = status
 	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors,errorMsg}, ",")
 	return UpdateCertifyUploadError(certifyUploadErrors)
-
 }
