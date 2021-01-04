@@ -1,0 +1,6 @@
+vaccination_api/divoc-server
+vaccination_api/certificate_processor
+vaccination_api/analytics_feed
+portal_api/divoc-portal-api-server
+**/node_modules
+**/build

@@ -7,12 +7,14 @@ import {SampleCSV} from "../../utils/constants";
 import DownloadImg from "../../assets/img/download.svg"
 import "./FacilityAdmin.css"
 import {Button, Col, Row} from "react-bootstrap";
+import {RoleSetup} from "../RoleSetup"
+import VaccinatorList from "../facility/VaccinatorList/VaccinatorList"
 
 
 export default function FacilityAdmin() {
     const {keycloak} = useKeycloak();
     const [vaccinators, setVaccinators] = useState([]);
-    const getVaccinatorPath = 'divoc/admin/api/v1/vaccinators';
+    const getVaccinatorPath = '/divoc/admin/api/v1/vaccinators';
     const axiosInstance = useAxios('');
 
     useEffect(() => {
@@ -38,9 +40,9 @@ export default function FacilityAdmin() {
                     </Col>
                 </Button>
             },
-            // {title: "Role Setup", component: <RoleSetup/>},
-            // {title: "Vaccinator Details", component: <VaccinatorList/>},
-            // {title: "Program Overview", component: <span>Program Overview</span>},
+            {title: "Role Setup", component: <RoleSetup/>},
+            {title: "Vaccinator Details", component: <VaccinatorList/>},
+            {title: "Program Overview", component: <span>Program Overview</span>},
 
         ]}/>
     );

@@ -214,8 +214,12 @@ function CertificateView() {
                         </Dropdown.Toggle>
 
                         <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
-                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker}
+                                                                                         className={styles["export-icon"]}></img>to
+                                DigiLocker</Dropdown.Item>
+                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}
+                                                                                     className={styles["common-pass"]}></img>to
+                                CommonPass</Dropdown.Item>
                         </Dropdown.Menu>
                     </Dropdown>
                 </div>
@@ -249,7 +253,7 @@ function CertificateView() {
 
 
     return (
-        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top" }>
+        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
             <div className="col-12 d-flex d-flex justify-content-center">
                 <div className={styles["container"]}>
                     <div className={styles["no-print"]}>

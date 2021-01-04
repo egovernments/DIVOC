@@ -78,7 +78,7 @@ function UploadErrors({uploadHistory}) {
 
     const fileUploadHistoryDetailsAPI = '/divoc/api/v1/certify/uploads/' + uploadHistory.id + '/errors';
     const axiosInstance = useAxios('');
-    const [uploadHistoryDetails, setUploadHistoryDetails] = useState([]);
+    const [uploadHistoryDetails, setUploadHistoryDetails] = useState({});
     useEffect(() => {
         fetchUploadHistoryDetails()
     }, [uploadHistory.id]);
@@ -86,9 +86,12 @@ function UploadErrors({uploadHistory}) {
     function fetchUploadHistoryDetails() {
         axiosInstance.current.get(fileUploadHistoryDetailsAPI)
             .then(res => {
-                return res.data
+                return res.data;
             })
-            .catch(e => [])
+            .catch(e => {
+                return []
+            })
+
             .then((result) => {
                 setUploadHistoryDetails(result)
             });
@@ -113,7 +116,8 @@ function UploadErrors({uploadHistory}) {
                     <h5>Records<br/>Uploaded</h5>
                 </div>
                 <UploadErrorList
-                    uploadHistoryDetails={uploadHistoryDetails}
+                    columns={uploadHistoryDetails.columns}
+                    uploadHistoryDetails={uploadHistoryDetails["errorRows"]}
                     fileName={uploadHistory.fileName}/>
                 <div className="error-file-details  ml-lg-5 mb-5">
                     <p>{uploadHistory.fileName}</p>

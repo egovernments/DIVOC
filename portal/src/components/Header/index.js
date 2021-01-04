@@ -6,6 +6,7 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
+import config from "../../config";
 
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
@@ -23,11 +24,11 @@ export const Header = (props) => {
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav className="">
                     {/*{!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}*/}
-                    <Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>
+                    {/*<Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>*/}
                     {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
                     < Nav.Link href="/analytics">ANALYTICS</Nav.Link>}
                     {keycloak.authenticated && <Nav.Link onClick={() => {
-                        keycloak.logout({redirectUri: window.location.origin + "/"});
+                        keycloak.logout({redirectUri: window.location.origin + config.urlPath});
                     }}>LOGOUT</Nav.Link>}
                     {/*{!keycloak.authenticated &&*/}
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
