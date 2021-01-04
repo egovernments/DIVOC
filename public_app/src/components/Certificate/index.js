@@ -40,18 +40,17 @@ export const Certificate = function ({
     if (error) {
         return <div>Failed to load certificate. Please try again</div>
     }
-    return <div id={"certificate"} className={"certificate-container"}>
-        <table className={"certificate"}>
+    return <div id={"certificate"} className={"certificate-container table-responsive"}>
+        <div className="row">
+            <div valign={"top"} className="col-lg-6 col-sm-6"><img src={logo} className={"logo"}/></div>
+            <div className="col-lg-6 col-sm-12 d-flex justify-content-center">
+                {
+                    qrCode
+                }
+            </div>
+        </div>
+        <table className={"certificate table table-borderless"}>
             <tbody>
-            <tr>
-                <td valign={"top"}><img src={logo} className={"logo"}/></td>
-                {/*<td align={"right"}><img src={qrcode}></img></td>*/}
-                <td align={"right"}>
-                    {
-                        qrCode
-                    }
-                </td>
-            </tr>
             <tr>
                 <td colSpan={2}>
                     <h4><b>{labelConfig.title.en}</b></h4>
@@ -123,7 +122,8 @@ export const Certificate = function ({
             </tr>
             <tr>
                 <td>
-                    <b>{labelConfig.dateOfVaccination.en} / {labelConfig.dateOfVaccination.alt}</b></td>
+                    <b>{labelConfig.dateOfVaccination.en} <br/>
+                    / {labelConfig.dateOfVaccination.alt}</b></td>
                 <td><span>{dateOfVaccination}</span></td>
 
             </tr>
