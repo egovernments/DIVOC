@@ -6,6 +6,7 @@ import QRCodeImg from "../../assets/img/qr-code.svg"
 import {CertificateStatus} from "../CertificateStatus";
 import {set} from "ramda";
 import {CustomButton} from "../CustomButton";
+import QRScanner from "../QRScanner";
 
 export const VerifyCertificate = () => {
     const [result, setResult] = useState("");
@@ -34,12 +35,8 @@ export const VerifyCertificate = () => {
                     </>}
                     {showScanner &&
                     <>
-                        <QrReader
-                            className="qr-camera"
-                            delay={100}
-                            onError={handleError}
-                            onScan={handleScan}
-                        />
+                        <QRScanner onError={handleError}
+                                   onScan={handleScan}/>
                         <CustomButton className="green-btn" onClick={() => setShowScanner(false)}>BACK</CustomButton>
                     </>
                     }

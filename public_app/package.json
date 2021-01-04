@@ -35,7 +35,8 @@
     "react-tabs": "^3.1.1",
     "redux": "^4.0.5",
     "vaccination-context": "^1.0.1",
-    "web-vitals": "^0.2.4"
+    "web-vitals": "^0.2.4",
+    "zbar.wasm": "^2.0.3"
   },
   "scripts": {
     "start": "react-scripts start",
