@@ -1,6 +1,7 @@
 {
   "name": "divoc",
   "version": "0.1.0",
+  "homepage": "https://divoc.xiv.in/facility_app/",
   "private": true,
   "dependencies": {
     "@react-keycloak/web": "^3.4.0",

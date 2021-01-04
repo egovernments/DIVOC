@@ -14,6 +14,7 @@ import Row from "react-bootstrap/Row";
 import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
+import config from "../config"
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -144,14 +145,14 @@ export function useHome() {
     const [state, dispatch] = context;
 
     const goToVerifyRecipient = function () {
-        history.push('preEnroll/' + FORM_PRE_ENROLL_CODE)
+        history.push(config.urlPath + '/preEnroll/' + FORM_PRE_ENROLL_CODE)
     }
 
     const goToQueue = function () {
-        history.push(`/queue`)
+        history.push(`${config.urlPath}/queue`)
     };
     const goToNewEnroll = function () {
-        history.push('/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM)
+        history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM)
     };
 
     return {

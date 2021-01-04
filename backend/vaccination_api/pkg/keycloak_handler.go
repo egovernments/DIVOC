@@ -6,8 +6,12 @@ import (
 	"github.com/divoc/api/config"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
+	cache "github.com/patrickmn/go-cache"
 	"strings"
+	"time"
 )
+
+var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
 
 type KeyCloakUserRequest struct {
 	Username   string                 `json:"username"`
@@ -27,9 +31,9 @@ func CreateRecipientUserId(mobile string) error {
 			MobileNumber: []string{mobile},
 		},
 	}
-	authHeader := "Bearer " + config.Config.Keycloak.AuthHeader
+	authHeader := "Bearer " + getAuthToken()
 	resp, err := CreateKeycloakUser(userRequest, authHeader)
-	log.Infof("Created keycloak user %d %s", resp.Response().StatusCode, resp.String())
+	log.Infof("Create keycloak user %d %s", resp.Response().StatusCode, resp.String())
 	if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 		log.Errorf("Error while creating keycloak user : %s", mobile)
 		return errors.New("error while creating keycloak user")
@@ -44,6 +48,35 @@ func CreateRecipientUserId(mobile string) error {
 			return errors.New("unable to map keycloak user for recipient group")
 		}
 	}
+}
+
+func getAuthToken() string {
+	if authToken, found := cacheStore.Get("authToken"); found {
+		return authToken.(string)
+	}
+
+	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/protocol/openid-connect/token"
+	if resp, err := req.Post(url, req.Param{
+		"grant_type":    "client_credentials",
+		"client_id":     "admin-api",
+		"client_secret": config.Config.Keycloak.AdminApiClientSecret,
+	}); err!=nil {
+		log.Errorf("Error in getting the token from keycloak %+v", err)
+	} else {
+		log.Debugf("Response %d %+v",resp.Response().StatusCode, resp)
+		if resp.Response().StatusCode == 200 {
+			responseObject := map[string]interface{}{}
+			if err := resp.ToJSON(&responseObject); err != nil {
+				log.Errorf("Error in parsing json response from keycloak %+v", err)
+			} else {
+				token := responseObject["access_token"].(string)
+				cacheStore.Set("authToken", token, cache.DefaultExpiration)
+				return token
+			}
+		}
+	}
+
+	return config.Config.Keycloak.AuthHeader
 }
 
 func CreateKeycloakUser(user KeyCloakUserRequest, authHeader string) (*req.Resp, error) {

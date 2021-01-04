@@ -1,5 +1,5 @@
 import Keycloak from 'keycloak-js';
-
-const keycloak = Keycloak('/keycloak.json');
+import config from "../config"
+const keycloak = Keycloak(config.urlPath + '/keycloak.json');
 
 export default keycloak

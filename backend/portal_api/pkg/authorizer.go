@@ -6,13 +6,12 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/divoc/portal-api/swagger_gen/models"
-	"io/ioutil"
-	"log"
+	"github.com/divoc/portal-api/config"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
 const (
-	pubKeyPath     = "config/local_rsa.pub"
 	clientId       = "vaccination_api"
 	portalClientId = "facility-admin-portal"
 	admin          = "admin"
@@ -23,18 +22,14 @@ var (
 	verifyKey *rsa.PublicKey
 )
 
-func init() {
-	verifyBytes, err := ioutil.ReadFile(pubKeyPath)
-	if err != nil {
-		log.Print(err)
-	}
-	//fatal(err)
-
+func Init() {
+	verifyBytes := ([]byte)("-----BEGIN PUBLIC KEY-----\n" + config.Config.Keycloak.Pubkey + "\n-----END PUBLIC KEY-----\n")
+	log.Infof("Using the public key %s", string(verifyBytes))
+	var err error
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
 		log.Print(err)
 	}
-	//fatal(err)
 }
 
 func HasResourceRole(clientId string, role string, principal *models.JWTClaimBody) bool {
@@ -67,6 +62,11 @@ func contains(arr []string, str string) bool {
 }
 
 func getClaimBody(bearerToken string) (*models.JWTClaimBody, error) {
+
+	if verifyKey == nil {
+		Init()
+	}
+
 	token, err := jwt.ParseWithClaims(bearerToken, &models.JWTClaimBody{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("error decoding token")

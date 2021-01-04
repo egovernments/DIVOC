@@ -4,6 +4,7 @@ import {useHistory} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 import {CONSTANTS} from "../utils/constants";
+import config from "../config"
 
 const Login = () => {
     const {keycloak} = useKeycloak();
@@ -15,22 +16,26 @@ const Login = () => {
         }
     }, []);
 
+    const pathOf = (fragment) => {
+        return config.urlPath + fragment;
+    }
+
     useEffect(() => {
         if (keycloak.authenticated) {
-            let redirectUrl = "/";
+            let redirectUrl = pathOf("/");
             if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/admin"
+                redirectUrl = pathOf("/admin")
             } else if (keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/analytics"
+                redirectUrl = pathOf("/analytics")
             } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/facility_admin"
+                redirectUrl = pathOf("/facility_admin")
             } else if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/facility_controller"
+                redirectUrl = pathOf("/facility_controller")
             } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_PRINT_STAFF, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = "/facility"
+                redirectUrl = pathOf("/facility")
             } else {
                 alert("Unauthorized access. Contact ADMIN");
-                keycloak.logout({redirectUri: window.location.origin + "/"});
+                keycloak.logout({redirectUri: window.location.origin + config.urlPath});
             }
             history.push(redirectUrl)
         }

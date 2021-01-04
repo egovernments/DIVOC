@@ -180,7 +180,7 @@ func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal 
 }
 
 func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
-	groups, err := GetFacilityGroups(params.HTTPRequest.Header.Get("Authorization"))
+	groups, err := GetFacilityGroups()
 	if err != nil {
 		log.Error(err)
 		return operations.NewGetFacilityGroupsBadRequest()

@@ -12,6 +12,7 @@ ReactDOM.render(
     <React.StrictMode>
         <ReactKeycloakProvider
             authClient={keycloak}
+            initOptions={{"checkLoginIframe": false}}
         >
             <LocaleProvider>
                 <App/>

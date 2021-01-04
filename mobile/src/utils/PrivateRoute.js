@@ -4,6 +4,7 @@ import {Redirect, Route} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 import {CONSTANT} from "./constants";
+import config from "../config"
 
 
 export function PrivateRoute({component: Component, ...rest}) {
@@ -26,7 +27,7 @@ export function PrivateRoute({component: Component, ...rest}) {
                 ) : (
                     <Redirect
                         to={{
-                            pathname: '/login',
+                            pathname: config.urlPath + '/login',
                         }}
                     />
                 )

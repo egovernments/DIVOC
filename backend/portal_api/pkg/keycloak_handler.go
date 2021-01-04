@@ -8,7 +8,11 @@ import (
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 	"strings"
+	cache "github.com/patrickmn/go-cache"
+	"time"
 )
+
+var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
 
 type KeyCloakUserRequest struct {
 	Username   string                 `json:"username"`
@@ -23,8 +27,11 @@ type KeycloakUserAttributes struct {
 	FacilityCode string   `json:"facility_code"`
 }
 
-func CreateKeycloakUser(user KeyCloakUserRequest, authHeader string) (*req.Resp, error) {
-	return req.Post(config.Config.Keycloak.Url+"/admin/realms/divoc/users", req.BodyJSON(user),
+func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users"
+	log.Infof("creating user %s : %s, %+v", url, authHeader, user)
+	return req.Post(url, req.BodyJSON(user),
 		req.Header{"Authorization": authHeader},
 	)
 }
@@ -33,7 +40,7 @@ func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
 	return resp.Response().StatusCode == 201 || resp.Response().StatusCode == 409
 }
 
-func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest, authHeader string) string {
+func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest) string {
 	userUrl := resp.Response().Header.Get("Location") //https://divoc.xiv.in/keycloak/auth/admin/realms/divoc/users/f8c7067d-c0c8-4518-95b1-6681afbbf986
 	slices := strings.Split(userUrl, "/")
 	var keycloakUserId = ""
@@ -42,13 +49,14 @@ func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest, authHead
 		log.Info("Key cloak user id is ", keycloakUserId) //d9438bdf-68cb-4630-8093-fd36a5de5db8
 	} else {
 		log.Info("No user id in response checking with keycloak for the userid ", userRequest.Username)
-		keycloakUserId, _ = searchAndGetKeyCloakUserId(userRequest.Username, authHeader)
+		keycloakUserId, _ = searchAndGetKeyCloakUserId(userRequest.Username)
 	}
 	return keycloakUserId
 }
 
-func searchAndGetKeyCloakUserId(username string, authHeader string) (string, error) {
-	url := config.Config.Keycloak.Url + "/admin/realms/divoc/users?username=" + username + "&exact=true"
+func searchAndGetKeyCloakUserId(username string) (string, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users?username=" + username + "&exact=true"
 	log.Info("Checking with keycloak for userid mapping ", url)
 	resp, err := req.Get(url, req.Header{"Authorization": authHeader})
 	if err != nil {
@@ -68,7 +76,7 @@ func searchAndGetKeyCloakUserId(username string, authHeader string) (string, err
 
 func ensureRoleAccess(userId string, clientId string, rolePayload string, authHeader string) error {
 
-	roleUpdateUrl := config.Config.Keycloak.Url + "/admin/realms/divoc/users/" + userId + "/role-mappings/clients/" + clientId
+	roleUpdateUrl := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/role-mappings/clients/" + clientId
 
 	log.Info("POST ", roleUpdateUrl)
 	response, err := req.Post(roleUpdateUrl, req.BodyJSON(rolePayload), req.Header{"Authorization": authHeader})
@@ -84,8 +92,9 @@ func ensureRoleAccess(userId string, clientId string, rolePayload string, authHe
 	return nil
 }
 
-func addUserToGroup(userId string, groupId string, authHeader string) error {
-	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/divoc/users/" + userId + "/groups/" + groupId
+func addUserToGroup(userId string, groupId string) error {
+	authHeader := getAuthHeader()
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
 	log.Info("POST ", addUserToGroupURL)
 	payload := fmt.Sprintf(`{ 
 							"userId": "%s",
@@ -111,8 +120,9 @@ type FacilityUserResponse struct {
 	Groups     []*models.UserGroup    `json:"groups"`
 }
 
-func getFacilityUsers(facilityCode string, authHeader string) ([]*models.FacilityUser, error) {
-	url := config.Config.Keycloak.Url + "/realms/divoc/facility/" + facilityCode + "/users"
+func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/facility/" + facilityCode + "/users"
 	log.Info("Checking with keycloak for facility code mapping ", facilityCode)
 	resp, err := req.Get(url, req.Header{"Authorization": authHeader})
 	if err != nil {
@@ -159,8 +169,9 @@ func isFacilityAdmin(user FacilityUserResponse) bool {
 	}
 	return false
 }
-func getUserGroups(groupSearchKey string, authHeader string) ([]*models.UserGroup, error) {
-	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/divoc/groups?search=" + groupSearchKey
+func getUserGroups(groupSearchKey string) ([]*models.UserGroup, error) {
+	authHeader := getAuthHeader()
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/groups?search=" + groupSearchKey
 	log.Info("GET ", addUserToGroupURL)
 	resp, err := req.Get(addUserToGroupURL, req.Header{"Authorization": authHeader})
 	if err != nil {
@@ -177,4 +188,40 @@ func getUserGroups(groupSearchKey string, authHeader string) ([]*models.UserGrou
 		return userGroups, nil
 	}
 	return nil, err
+}
+
+func getAuthHeader() string {
+
+	if authToken, found := cacheStore.Get("authToken"); found {
+		return "Bearer " + authToken.(string)
+	}
+
+	if token, done := getAuthToken(); done {
+		cacheStore.Set("authToken", token, cache.DefaultExpiration)
+		return "Bearer " + token
+	}
+	return ""
+}
+
+func getAuthToken() (string, bool) {
+	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/protocol/openid-connect/token"
+	if resp, err := req.Post(url, req.Param{
+		"grant_type":    "client_credentials",
+		"client_id":     "admin-api",
+		"client_secret": config.Config.Keycloak.AdminApiClientSecret,
+	}); err != nil {
+		log.Errorf("Error in getting the token from keycloak %+v", err)
+	} else {
+		log.Debugf("Response %d %+v", resp.Response().StatusCode, resp)
+		if resp.Response().StatusCode == 200 {
+			responseObject := map[string]interface{}{}
+			if err := resp.ToJSON(&responseObject); err != nil {
+				log.Errorf("Error in parsing json response from keycloak %+v", err)
+			} else {
+				token := responseObject["access_token"].(string)
+				return token, true
+			}
+		}
+	}
+	return "", false
 }
