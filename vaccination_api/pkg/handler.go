@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/divoc/api/config"
 	"github.com/jinzhu/gorm"
 	"net/http"
 	"strings"
@@ -229,18 +230,16 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
-	requiredHeaders := []string{"recipientName", "recipientMobileNumber", "recipientDOB", "recipientGender", "recipientNationality", "recipientIdentity",
-		"vaccinationBatch", "vaccinationDate", "vaccinationEffectiveStart", "vaccinationEffectiveEnd", "vaccinationManufacturer", "vaccinationName", "vaccinatorName",
-		"facilityName", "facilityAddressLine1", "facilityAddressLine2", "facilityDistrict", "facilityState", "facilityPincode"}
+	columns := strings.Split(config.Config.Certificate.Upload.Columns, ",")
 
 	data := NewScanner(params.File)
 
 	// csv template validation
 	csvHeaders := data.GetHeaders()
-	for _, a := range requiredHeaders {
-		if !contains(csvHeaders, a) {
+	for _, c := range columns {
+		if !contains(csvHeaders, c) {
 			code := "INVALID_TEMPLATE"
-			message := a + " column doesn't exist in uploaded csv file"
+			message := c + " column doesn't exist in uploaded csv file"
 			error := &models.Error{
 				Code:    &code,
 				Message: &message,
@@ -332,18 +331,12 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 	}
 
 	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
+	columnHeaders := strings.Split(config.Config.Certificate.Upload.Columns, ",")
 	if err == nil {
-		var results []map[string]interface{}
-		inrec, _ := json.Marshal(certifyUploadErrors)
-		json.Unmarshal(inrec, &results)
-		for _, el := range results {
-			fieldsToHide := []string{"ID", "CreatedAt", "DeletedAt", "CertifyUploadID"}
-			for _, k := range fieldsToHide {
-				delete(el, k)
-			}
-			el["Errors"] = strings.Split(el["Errors"].(string), ",")
-		}
-		return NewGenericJSONResponse(results)
+		return NewGenericJSONResponse(map[string]interface{} {
+			"columns": append(columnHeaders, "errors"),
+			"errorRows": certifyUploadErrors,
+		})
 	}
 	return NewGenericServerError()
 }

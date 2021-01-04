@@ -32,4 +32,16 @@ var Config = struct {
 		CertifyTopic string `default:"certify" yaml:"certifyTopic"`
 		EventsTopic string `default:"events" yaml:"eventsTopic"`
 	}
+	Database struct {
+		Host string `default:"localhost" yaml:"host"`
+		Password string `default:"postgres" yaml:"password"`
+		User string `default:"postgres" yaml:"user"`
+		Port string `default:"5432" yaml:"port"`
+		DBName string `default:"postgres" yaml:"dbname"`
+	}
+	Certificate struct {
+		Upload struct {
+			Columns string `yaml:"columns"`
+		}
+	}
 }{}

@@ -23,7 +23,7 @@ type GetCertifyUploadErrorsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []interface{} `json:"body,omitempty"`
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewGetCertifyUploadErrorsOK creates GetCertifyUploadErrorsOK with default headers values
@@ -33,13 +33,13 @@ func NewGetCertifyUploadErrorsOK() *GetCertifyUploadErrorsOK {
 }
 
 // WithPayload adds the payload to the get certify upload errors o k response
-func (o *GetCertifyUploadErrorsOK) WithPayload(payload []interface{}) *GetCertifyUploadErrorsOK {
+func (o *GetCertifyUploadErrorsOK) WithPayload(payload interface{}) *GetCertifyUploadErrorsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get certify upload errors o k response
-func (o *GetCertifyUploadErrorsOK) SetPayload(payload []interface{}) {
+func (o *GetCertifyUploadErrorsOK) SetPayload(payload interface{}) {
 	o.Payload = payload
 }
 
@@ -48,11 +48,6 @@ func (o *GetCertifyUploadErrorsOK) WriteResponse(rw http.ResponseWriter, produce
 
 	rw.WriteHeader(200)
 	payload := o.Payload
-	if payload == nil {
-		// return empty array
-		payload = make([]interface{}, 0, 50)
-	}
-
 	if err := producer.Produce(rw, payload); err != nil {
 		panic(err) // let the recovery middleware deal with this
 	}
