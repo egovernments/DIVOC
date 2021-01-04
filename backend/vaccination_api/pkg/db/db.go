@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/divoc/api/config"
 	"github.com/jinzhu/gorm"
@@ -177,12 +178,12 @@ func DeleteCertifyUploadError(id uint) error {
 
 func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg string) error {
 	certifyUploadErrors := &CertifyUploadErrors{}
-	if result := db.First(&certifyUploadErrors, "certify_upload_id = ?", id); result.Error != nil {
-		log.Error("Error occurred while retrieving certifyUploads for user ", id)
+	if result := db.First(&certifyUploadErrors, id); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", id, result.Error)
 		return errors.New("error occurred while retrieving certifyUploads")
 	}
 	certifyUploadErrors.Status = status
-	certifyUploadErrors.Errors = certifyUploadErrors.Errors + "," + errorMsg
+	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors,errorMsg}, ",")
 	return UpdateCertifyUploadError(certifyUploadErrors)
 
 }

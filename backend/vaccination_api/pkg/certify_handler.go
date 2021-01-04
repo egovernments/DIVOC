@@ -110,7 +110,7 @@ func InitializeKafka() {
 						} else if message["status"] == "FAILED" {
 							// if certificate creation fails
 							// update the status of the row to Failed
-							db.UpdateCertifyUploadErrorStatusAndErrorMsg(uint(rowId), message["status"], message["errorMsg"])
+							db.UpdateCertifyUploadErrorStatusAndErrorMsg(uint(rowId), db.CERTIFY_UPLOAD_FAILED_STATUS, message["errorMsg"])
 						}
 						consumer.CommitMessage(msg)
 					}

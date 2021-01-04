@@ -27,37 +27,50 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
       let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
       try {
         jsonMessage = JSON.parse(message.value.toString());
-        signer.signAndSave(jsonMessage);
-
-        producer.send({
-          topic: 'certify_ack',
-          messages: [{
-            key: null,
-            value: JSON.stringify({
-              uploadId: uploadId,
-              rowId: rowId,
-              status: 'SUCCESS',
-              errorMsg: ''
-            })}]})
-
+        signer.signAndSave(jsonMessage)
+          .then(res => {
+            console.log(`statusCode: ${res.status}`);
+            console.log(res);
+            sendCertifyAck(res, uploadId, rowId);
+          })
+          .catch(error => {
+            console.error(error)
+          });
         producer.send({
           topic: config.CERTIFIED_TOPIC,
           messages: [{key:null, value:message.value.toString()}]});
       } catch (e) {
         console.error("ERROR: " + e.message)
-        producer.send({
-          topic: 'certify_ack',
-          messages: [{
-            key: null,
-            value: JSON.stringify({
-              uploadId: uploadId,
-              rowId: rowId,
-              status: 'FAILED',
-              errorMsg: e.message
-            })}]})
-
       }
     },
   })
 })();
+
+async function sendCertifyAck(res, uploadId, rowId) {
+  if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
+    if (res.data.params.status === "SUCCESSFUL") {
+      producer.send({
+        topic: 'certify_ack',
+        messages: [{
+          key: null,
+          value: JSON.stringify({
+            uploadId: uploadId,
+            rowId: rowId,
+            status: 'SUCCESS',
+            errorMsg: ''
+          })}]})
+    } else if (res.data.params.status === "UNSUCCESSFUL") {
+      producer.send({
+        topic: 'certify_ack',
+        messages: [{
+          key: null,
+          value: JSON.stringify({
+            uploadId: uploadId,
+            rowId: rowId,
+            status: 'FAILED',
+            errorMsg: res.data.params.errmsg
+          })}]})
+    }
+  }
+}
 
