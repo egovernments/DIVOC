@@ -71,6 +71,14 @@ export const CertificateDetailsPaths = {
     path: ["evidence", "0", "effectiveUntil"],
     format: (data) => (formatDate(data))
   },
+  "Dose": {
+    path: ["evidence", "0", "dose"],
+    format: (data) => (data)
+  },
+  "Total Doses": {
+    path: ["evidence", "0", "totalDoses"],
+    format: (data) => (data)
+  },
   "Vaccination Facility": {
     path: ["evidence", "0", "facility", "name"],
     format: (data) => (data)

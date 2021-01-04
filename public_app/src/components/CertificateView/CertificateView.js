@@ -9,7 +9,8 @@ import {Dropdown,DropdownButton} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
-import {Certificate} from "../Certificate";
+import {FinalCertificate} from "../Certificate/finalCertificate";
+import {ProvisionalCertificate} from "../Certificate/provisionalCertificate";
 import {useDispatch} from "react-redux";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
@@ -104,7 +105,7 @@ function CertificateView() {
                     <div className={"right"}/>
                 </div>
 
-                <Certificate
+                {(extractData(certificateData, "Dose") === extractData(certificateData, "Total Doses")) ? <FinalCertificate
                     qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
                     vaccination={extractData(certificateData, "Vaccination")}
                     manufacturer={extractData(certificateData, "Manufacturer")}
@@ -119,7 +120,28 @@ function CertificateView() {
                     dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
                     vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
                     infoUrl={extractData(certificateData, "Info Url")}
+                    dose={extractData(certificateData, "Dose")}
+                    totalDoses={extractData(certificateData, "Total Doses")}
+                /> : 
+                <ProvisionalCertificate 
+                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
+                    vaccination={extractData(certificateData, "Vaccination")}
+                    manufacturer={extractData(certificateData, "Manufacturer")}
+                    certificateId={extractData(certificateData, "Certificate ID")}
+                    issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
+                    name={extractData(certificateData, "Name")}
+                    gender={extractData(certificateData, "Gender")}
+                    identityType={"Aadhaar / आधार"}
+                    identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
+                    age={extractData(certificateData, "Age")}
+                    vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
+                    dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
+                    vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
+                    infoUrl={extractData(certificateData, "Info Url")}
+                    dose={extractData(certificateData, "Dose")}
+                    totalDoses={extractData(certificateData, "Total Doses")}
                 />
+                }
             </>
         );
     };
