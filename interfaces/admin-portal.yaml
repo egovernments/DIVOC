@@ -52,6 +52,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
     put:
@@ -95,6 +97,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
   /vaccinators:
@@ -264,6 +268,18 @@ paths:
             type: object
         '401':
           description: Unauthorized
+
+  /facility/uploads:
+    get:
+      summary: Get uploads
+      operationId: getUploadHistory
+      security: [ ]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+
 definitions:
   FacilityUpdateRequest:
     type: array
@@ -525,7 +541,17 @@ definitions:
       name:
         type: string
         title: group name
-host: divoc.xiv.in
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message
+host: 52.172.216.52
 schemes:
   - https
 basePath: /divoc/admin/api/v1

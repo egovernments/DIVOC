@@ -3,12 +3,14 @@ package pkg
 import (
 	"encoding/json"
 	"github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 )
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
@@ -142,12 +144,36 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 }
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
+	/*	data := NewScanner(params.File)
+		defer params.File.Close()
+		for data.Scan() {
+			createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
+			log.Info(data.Text("serialNum"), data.Text("facilityName"))
+		}*/
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
+	log.Println(params.File)
+
 	data := NewScanner(params.File)
-	defer params.File.Close()
+
+	// csv template validation
+	csvHeaders := data.GetHeaders()
+	for _, c := range columns {
+		if !contains(csvHeaders, c) {
+			code := "INVALID_TEMPLATE"
+			message := c + " column doesn't exist in uploaded csv file"
+			e := &models.Error{
+				Code:    &code,
+				Message: &message,
+			}
+			return operations.NewPostFacilitiesBadRequest().WithPayload(e)
+		}
+	}
+
 	for data.Scan() {
-		createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
+		_ = createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
+
 	return operations.NewPostFacilitiesOK()
 }
 

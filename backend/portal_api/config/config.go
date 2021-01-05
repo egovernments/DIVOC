@@ -1,12 +1,11 @@
 package config
 
-import(
-	log "github.com/sirupsen/logrus"
-	"github.com/jinzhu/configor"
-	"github.com/imroc/req"
+import (
 	"errors"
+	"github.com/imroc/req"
+	"github.com/jinzhu/configor"
+	log "github.com/sirupsen/logrus"
 )
-
 
 var Config = struct {
 	Registry struct {
@@ -17,11 +16,11 @@ var Config = struct {
 		ApiVersion        string `default:"1"`
 	}
 	Keycloak struct {
-		Pubkey 	      string `env:"PUBLIC_KEY"`
-		Url           string `env:"KEYCLOAK_URL"`
-		AdminApiClientSecret   string `env:"ADMIN_API_CLIENT_SECRET"`
-		Realm         string `env:"KEYCLOAK_REALM"`
-		FacilityAdmin struct {
+		Pubkey               string `env:"PUBLIC_KEY"`
+		Url                  string `env:"KEYCLOAK_URL"`
+		AdminApiClientSecret string `env:"ADMIN_API_CLIENT_SECRET"`
+		Realm                string `env:"KEYCLOAK_REALM"`
+		FacilityAdmin        struct {
 			RoleName string `yaml:"roleName"`
 			RoleId   string `yaml:"roleId"`
 			ClientId string `yaml:"clientId"`
@@ -37,12 +36,16 @@ var Config = struct {
 	Analytics struct {
 		Datasource string `yaml:"datasource" env:"CLICK_HOUSE_URL"`
 	}
+	Facility struct {
+		Upload struct {
+			Columns string `yaml:"columns"`
+		}
+	}
 }{}
 
 func Initialize() {
-	err := configor.Load(&Config, "./config/application-default.yml",
-		//"config/application.yml"
-	)
+	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+
 	if err != nil {
 		panic("Unable to read configurations")
 	}
@@ -54,13 +57,12 @@ func Initialize() {
 	}
 }
 
-
 func updatePublicKeyFromKeycloak() error {
 	url := Config.Keycloak.Url + "/realms/" + Config.Keycloak.Realm
 	log.Info("Public key url ", url)
 	resp, err := req.Get(url)
 	if err != nil {
-		return  err
+		return err
 	}
 	log.Infof("Got response %+v", resp.String())
 	responseObject := map[string]interface{}{}

@@ -33,7 +33,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -95,7 +95,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -162,7 +165,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -197,6 +203,21 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [],
+        "summary": "Get uploads",
+        "operationId": "getUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -527,6 +548,21 @@ func init() {
         }
       }
     },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "Facility": {
       "properties": {
         "address": {
@@ -839,7 +875,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -901,7 +937,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -968,7 +1007,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1003,6 +1045,21 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [],
+        "summary": "Get uploads",
+        "operationId": "getUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -1343,6 +1400,21 @@ func init() {
         "repeatTimes": {
           "description": "How many times vaccination should be taken",
           "type": "number"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
         }
       }
     },

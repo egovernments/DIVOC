@@ -4,7 +4,7 @@ registry:
   searchoperationid: search
   readoperationid: read
 keycloak:
-  url: https://divoc.xiv.in/keycloak/auth
+  url: http://52.172.216.52/keycloak/auth
   realm: divoc
   facilityAdmin:
     roleName: facility-admin
@@ -18,3 +18,6 @@ keycloak:
     groupId: 84682840-4c21-428d-b2d5-06e6298be1cc
 analytics:
   datasource: tcp://localhost:9000?debug=true
+facility:
+  upload:
+    columns: "serialNum,facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,admins,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon"
