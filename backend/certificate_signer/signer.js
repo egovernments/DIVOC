@@ -147,16 +147,22 @@ async function signAndSave(certificate) {
   const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
+  const mobile = getContactNumber(contact);
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
     name : name,
     contact: contact,
+    mobile: mobile,
     certificateId: certificateId,
     certificate: JSON.stringify(signedCertificate),
     meta: certificate["meta"]
   };
   return registry.saveCertificate(signedCertificateForDB)
+}
+
+function getContactNumber(contact) {
+  return contact.find(value => /^tel/.test(value)).split(":")[1];
 }
 
 module.exports = {
