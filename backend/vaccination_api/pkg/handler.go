@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/divoc/api/config"
-	"github.com/jinzhu/gorm"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/config"
+	"github.com/jinzhu/gorm"
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
@@ -100,8 +101,8 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 		"@type": map[string]interface{}{
 			"eq": typeId,
 		},
-		"contact": map[string]interface{}{
-			"contains": "tel:" + principal.PreferredUsername,
+		"mobile": map[string]interface{}{
+			"eq": principal.PreferredUsername,
 		},
 	}
 	if response, err := services.QueryRegistry(typeId, filter); err != nil {
@@ -333,8 +334,8 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
 	columnHeaders := strings.Split(config.Config.Certificate.Upload.Columns, ",")
 	if err == nil {
-		return NewGenericJSONResponse(map[string]interface{} {
-			"columns": append(columnHeaders, "errors"),
+		return NewGenericJSONResponse(map[string]interface{}{
+			"columns":   append(columnHeaders, "errors"),
 			"errorRows": certifyUploadErrors,
 		})
 	}
