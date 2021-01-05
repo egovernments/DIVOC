@@ -156,7 +156,7 @@ async function signAndSave(certificate) {
     certificate: JSON.stringify(signedCertificate),
     meta: certificate["meta"]
   };
-  registry.saveCertificate(signedCertificateForDB)
+  return registry.saveCertificate(signedCertificateForDB)
 }
 
 module.exports = {
