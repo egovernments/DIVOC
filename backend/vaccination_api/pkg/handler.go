@@ -4,11 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/divoc/api/config"
-	"github.com/jinzhu/gorm"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/config"
+	"github.com/jinzhu/gorm"
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
@@ -100,8 +101,8 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 		"@type": map[string]interface{}{
 			"eq": typeId,
 		},
-		"contact": map[string]interface{}{
-			"contains": "tel:" + params.Phone,
+		"mobile": map[string]interface{}{
+			"eq": principal.PreferredUsername,
 		},
 	}
 	if response, err := services.QueryRegistry(typeId, filter); err != nil {
@@ -223,7 +224,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			publishCertifyMessage(jsonRequestString)
+			publishCertifyMessage(jsonRequestString, nil, nil)
 		}
 	}
 	return certification.NewCertifyOK()
@@ -255,23 +256,17 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry := db.CertifyUploads{}
 	uploadEntry.Filename = fileName
 	uploadEntry.UserID = preferredUsername
-	uploadEntry.Status = "Processing"
 	uploadEntry.TotalRecords = 0
-	uploadEntry.TotalErrorRows = 0
 	db.CreateCertifyUpload(&uploadEntry)
 
+	rowId := -1
 	// Creating Certificates
 	for data.Scan() {
-		createCertificate(&data, &uploadEntry)
+		rowId = rowId + 1
+		createCertificate(&data, &uploadEntry, rowId)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
-
-	if uploadEntry.TotalErrorRows > 0 {
-		uploadEntry.Status = "Failed"
-	} else {
-		uploadEntry.Status = "Success"
-	}
 
 	db.UpdateCertifyUpload(&uploadEntry)
 
@@ -301,12 +296,48 @@ func getUserName(params *http.Request) string {
 }
 
 func getCertifyUploads(params certification.GetCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	var result []interface{}
 	preferredUsername := principal.PreferredUsername
 	certifyUploads, err := db.GetCertifyUploadsForUser(preferredUsername)
 	if err == nil {
-		return NewGenericJSONResponse(certifyUploads)
+		// get the error rows associated with it
+		// if present update status as "Failed"
+		for _, c := range certifyUploads {
+			totalErrorRows := 0
+			statuses, err := db.GetCertifyUploadErrorsStatusForUploadId(c.ID)
+			if err == nil {
+				for _, status := range statuses {
+					if status == db.CERTIFY_UPLOAD_FAILED_STATUS {
+						totalErrorRows = totalErrorRows + 1
+					}
+				}
+			}
+			overallStatus := getOverallStatus(statuses)
+
+			// construct return value and append
+			var cmap map[string]interface{}
+			if jc, e := json.Marshal(c); e == nil {
+				if e = json.Unmarshal(jc, &cmap); e == nil {
+					cmap["Status"] = overallStatus
+					cmap["TotalErrorRows"] = totalErrorRows
+				}
+			}
+			result = append(result, cmap)
+
+		}
+		return NewGenericJSONResponse(result)
 	}
 	return NewGenericServerError()
+}
+
+func getOverallStatus(statuses []string) string {
+	if contains(statuses, db.CERTIFY_UPLOAD_PROCESSING_STATUS) {
+		return db.CERTIFY_UPLOAD_PROCESSING_STATUS
+	} else if contains(statuses, db.CERTIFY_UPLOAD_FAILED_STATUS) {
+		return db.CERTIFY_UPLOAD_FAILED_STATUS
+	} else {
+		return db.CERTIFY_UPLOAD_SUCCESS_STATUS
+	}
 }
 
 func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -333,8 +364,8 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 	certifyUploadErrors, err := db.GetCertifyUploadErrorsForUploadID(uploadID)
 	columnHeaders := strings.Split(config.Config.Certificate.Upload.Columns, ",")
 	if err == nil {
-		return NewGenericJSONResponse(map[string]interface{} {
-			"columns": append(columnHeaders, "errors"),
+		return NewGenericJSONResponse(map[string]interface{}{
+			"columns":   append(columnHeaders, "errors"),
 			"errorRows": certifyUploadErrors,
 		})
 	}

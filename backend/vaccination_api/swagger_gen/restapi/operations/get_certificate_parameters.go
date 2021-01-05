@@ -10,7 +10,6 @@ import (
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/strfmt"
 )
 
 // NewGetCertificateParams creates a new GetCertificateParams object
@@ -28,12 +27,6 @@ type GetCertificateParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
-
-	/*
-	  Required: true
-	  In: path
-	*/
-	Phone string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -45,28 +38,8 @@ func (o *GetCertificateParams) BindRequest(r *http.Request, route *middleware.Ma
 
 	o.HTTPRequest = r
 
-	rPhone, rhkPhone, _ := route.Params.GetOK("phone")
-	if err := o.bindPhone(rPhone, rhkPhone, route.Formats); err != nil {
-		res = append(res, err)
-	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
-	return nil
-}
-
-// bindPhone binds and validates parameter Phone from path.
-func (o *GetCertificateParams) bindPhone(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	var raw string
-	if len(rawData) > 0 {
-		raw = rawData[len(rawData)-1]
-	}
-
-	// Required: true
-	// Parameter is provided by construction from the route
-
-	o.Phone = raw
-
 	return nil
 }

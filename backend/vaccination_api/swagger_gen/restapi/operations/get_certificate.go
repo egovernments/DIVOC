@@ -31,7 +31,7 @@ func NewGetCertificate(ctx *middleware.Context, handler GetCertificateHandler) *
 	return &GetCertificate{Context: ctx, Handler: handler}
 }
 
-/*GetCertificate swagger:route GET /certificates/{phone} getCertificate
+/*GetCertificate swagger:route GET /certificates getCertificate
 
 Get certificate json
 

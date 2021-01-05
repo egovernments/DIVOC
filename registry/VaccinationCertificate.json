@@ -46,6 +46,9 @@
         },
         "certificate" : {
           "type": "string"
+        },
+        "meta": {
+          "type": "object"
         }
       }
     }

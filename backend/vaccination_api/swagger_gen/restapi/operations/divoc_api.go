@@ -452,7 +452,7 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/certificates/{phone}"] = NewGetCertificate(o.context, o.GetCertificateHandler)
+	o.handlers["GET"]["/certificates"] = NewGetCertificate(o.context, o.GetCertificateHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

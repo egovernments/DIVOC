@@ -228,17 +228,12 @@ paths:
           description: OK
         '206':
           description: Need OTP
-  /certificates/{phone}:
+  /certificates:
     get:
       summary: Get certificate json
       security:
         - hasRole: ["recipient"]
       operationId: getCertificate
-      parameters:
-        - name: phone
-          in: path
-          required: true
-          type: string
       responses:
         '200':
           description: OK
@@ -310,42 +305,6 @@ paths:
         '200':
           description: OK
 definitions:
-  SideEffects:
-    type: object
-    properties:
-      symptoms:
-        type: array
-        items:
-          type: object
-          properties:
-            id:
-              type: string
-            additionalDetails:
-              type: string
-      recipientIds:
-        type: array
-        items:
-          type: string
-  Symptoms:
-    type: object
-    properties:
-      name:
-        type: string
-      instructions:
-        type: array
-        items:
-          type: object
-          properties:
-            title:
-              type: string
-            messages:
-              type: array
-              items:
-                type: string
-            imageURL:
-              type: array
-              items:
-                type: string
   LoginRequest:
     type: object
     properties:
@@ -427,6 +386,16 @@ definitions:
           effectiveUntil:
             type: string
             format: date
+          dose:
+            type: number
+            description: Dose number for example 1 for first dose of 2 doses
+            example:
+              1
+          totalDoses:
+            type: number
+            description: Total number of doses required for this vaccination.
+            example:
+              2
       vaccinator:
         type: object
         properties:
