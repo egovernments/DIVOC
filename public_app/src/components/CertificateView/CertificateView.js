@@ -5,11 +5,12 @@ import styles from "./CertificateView.module.css";
 import QRCode from 'qrcode.react';
 import {toPng, toSvg} from 'html-to-image';
 import download from 'downloadjs'
-import {Dropdown} from "react-bootstrap"
+import {Dropdown,DropdownButton} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
-import {Certificate} from "../Certificate";
+import {FinalCertificate} from "../Certificate/finalCertificate";
+import {ProvisionalCertificate} from "../Certificate/provisionalCertificate";
 import {useDispatch} from "react-redux";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
@@ -104,7 +105,7 @@ function CertificateView() {
                     <div className={"right"}/>
                 </div>
 
-                <Certificate
+                {(extractData(certificateData, "Dose") === extractData(certificateData, "Total Doses")) ? <FinalCertificate
                     qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
                     vaccination={extractData(certificateData, "Vaccination")}
                     manufacturer={extractData(certificateData, "Manufacturer")}
@@ -119,7 +120,28 @@ function CertificateView() {
                     dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
                     vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
                     infoUrl={extractData(certificateData, "Info Url")}
+                    dose={extractData(certificateData, "Dose")}
+                    totalDoses={extractData(certificateData, "Total Doses")}
+                /> : 
+                <ProvisionalCertificate 
+                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
+                    vaccination={extractData(certificateData, "Vaccination")}
+                    manufacturer={extractData(certificateData, "Manufacturer")}
+                    certificateId={extractData(certificateData, "Certificate ID")}
+                    issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
+                    name={extractData(certificateData, "Name")}
+                    gender={extractData(certificateData, "Gender")}
+                    identityType={"Aadhaar / आधार"}
+                    identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
+                    age={extractData(certificateData, "Age")}
+                    vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
+                    dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
+                    vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
+                    infoUrl={extractData(certificateData, "Info Url")}
+                    dose={extractData(certificateData, "Dose")}
+                    totalDoses={extractData(certificateData, "Total Doses")}
                 />
+                }
             </>
         );
     };
@@ -162,51 +184,37 @@ function CertificateView() {
     const selectedCertificate = (certificateData) => {
         return <>
             {showCertificatePreview(certificateData)}
-            <div className={styles["top-pad"] + " " + styles["no-print"] + " row"}>
-                <div className={"col-4"}>
+            <div className={styles["top-pad"] + " " + styles["no-print"]}>
+                <div >
                     {/*<button className={styles["button"]} onClick={handleClick}>*/}
                     {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
                     {/*<button className={styles["button"]} onClick={downloadAsImage}>*/}
                     {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
-                    <Dropdown className={styles["btn-success"]}>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic" className={"col-12"}>
-                            Download
-                        </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}>As Image</Dropdown.Item>
-                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
-                            <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <DropdownButton id="dropdown-item-button" variant="success" title="Download" className={styles["btn-success"]}>
+                        <Dropdown.Item href="#/image" onClick={downloadAsImage}>As Image</Dropdown.Item>
+                        <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
+                        <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
+                    </DropdownButton>
                 </div>
-                <div className={"col-4"}>
+                <div >
                     {/*<button className={styles["button"]} onClick={handleClick}>*/}
                     {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
                     {/*<button className={styles["button"]} onClick={downloadAsImage}>*/}
                     {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
-                    <Dropdown className={styles["btn-success"]}>
-                        <Dropdown.Toggle variant="success" id="dropdown-basic" className={"col-12"}>
-                            Export
-                        </Dropdown.Toggle>
 
-                        <Dropdown.Menu>
-                            <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker}
-                                                                                         className={styles["export-icon"]}></img>to
-                                DigiLocker</Dropdown.Item>
-                            <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}
-                                                                                     className={styles["common-pass"]}></img>to
-                                CommonPass</Dropdown.Item>
-                        </Dropdown.Menu>
-                    </Dropdown>
+                    <DropdownButton id="dropdown-item-button" variant="success" title="Export" className={styles["btn-success"]}>
+                        <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
+                        <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                    </DropdownButton>
+                    
                 </div>
-                <div className={"col-4"}>
-                    <button className={styles["button"] + " float-right col-12"} onClick={() => window.print()}>Print
-                    </button>
+                <div>
+                    <button className={styles["button"]} onClick={() => window.print()}>Print</button>
                 </div>
                 <br/>
                 <br/>
@@ -224,10 +232,8 @@ function CertificateView() {
                     <b>Please choose the certificate for </b>
                     <div>{getListOfCertificateBearers()}</div>
                 </div>
-                <div className={styles["sub-container"]}>
-                    <div>
+                <div className={styles["certificate"]}>
                         {certificateData ? selectedCertificate(certificateData) : ("")}
-                    </div>
                 </div>
             </div>);
     };
@@ -235,8 +241,8 @@ function CertificateView() {
 
     return (
         <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
-            <div className="col-12 d-flex d-flex justify-content-center">
-                <div className={styles["container"]}>
+            <div className="col-12 d-flex d-flex">
+                <div>
                     <div className={styles["no-print"]}>
                         <p>Vaccination certificate</p>
                     </div>
