@@ -1,3 +1,7 @@
 
+IMAGE:=dockerhub/certificate_signer
+
 docker:
-	@docker build -t dockerhub/certificate_signer .
+	@docker build -t $(IMAGE) .
+publish:
+	@docker push $(IMAGE)

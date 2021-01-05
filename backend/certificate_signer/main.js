@@ -5,7 +5,7 @@ const signer = require('./signer');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER)
 const kafka = new Kafka({
   clientId: 'divoc-cert',
-  brokers: [config.KAFKA_BOOTSTRAP_SERVER]
+  brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
 });
 
 const consumer = kafka.consumer({ groupId: 'certify' });

@@ -10,7 +10,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials');
-const {vaccinationContext} = require("vaccination-context")
+const {vaccinationContext} = require("vaccination-context");
 
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,

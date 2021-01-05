@@ -39,6 +39,8 @@ const vaccinationContext = {
         "date": "schema:date",
         "effectiveStart": "schema:date",
         "effectiveUntil": "schema:date",
+        "dose": "schema:doseValue",
+        "totalDoses": "schema:doseValue",
         "verifier": {
           "@id": "vac:verifier",
           "@context": {
