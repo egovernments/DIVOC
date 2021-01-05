@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/pkg/auth"
+	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
@@ -144,12 +146,6 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 }
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
-	/*	data := NewScanner(params.File)
-		defer params.File.Close()
-		for data.Scan() {
-			createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
-			log.Info(data.Text("serialNum"), data.Text("facilityName"))
-		}*/
 	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
 	log.Println(params.File)
 
@@ -174,7 +170,28 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
 
+	// Initializing FacilityUploads entity
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	uploadEntry := db.FacilityUploads{}
+	uploadEntry.Filename = fileName
+	uploadEntry.UserID = preferredUsername
+	uploadEntry.Status = "Processing"
+	uploadEntry.TotalRecords = 0
+	uploadEntry.TotalErrorRows = 0
+	db.CreateFacilityUpload(&uploadEntry)
+
 	return operations.NewPostFacilitiesOK()
+}
+
+func getUserName(params *http.Request) string {
+	preferredUsername := ""
+	claimBody := auth.ExtractClaimBodyFromHeader(params)
+	if claimBody != nil {
+		preferredUsername = claimBody.PreferredUsername
+	}
+	return preferredUsername
 }
 
 func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {

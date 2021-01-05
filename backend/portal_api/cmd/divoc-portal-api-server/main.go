@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg"
+	"github.com/divoc/portal-api/pkg/db"
 	log "github.com/sirupsen/logrus"
 	"os"
 
@@ -15,6 +16,7 @@ import (
 func main() {
 	config.Initialize()
 	pkg.InitClickHouseConnection()
+	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

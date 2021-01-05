@@ -18,6 +18,7 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
+	github.com/jinzhu/gorm v1.9.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.7.0
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
