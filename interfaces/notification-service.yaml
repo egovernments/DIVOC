@@ -39,10 +39,10 @@ definitions:
   NotificationRequest:
     type: object
     required:
-      - recepient
+      - recipient
       - message
     properties:
-      recepient:
+      recipient:
         type: string
         description: this can use address like tel:234343434 or mailto:user@example.com
       message:
