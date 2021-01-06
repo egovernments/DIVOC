@@ -8,7 +8,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   registry:
-    image: dockerhub/open-saber
+    image: dockerhub/registry
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
