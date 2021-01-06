@@ -18,7 +18,7 @@ type CSVUploads struct {
 	Filename string
 
 	// status
-	// Enum: [Success, Failed]
+	// Enum: [Success,Processing,Failed]
 	Status string
 
 	// total error rows
@@ -105,7 +105,7 @@ func GetFacilityUploadsForUser(userID string) ([]*CSVUploads, error) {
 	return facilityUploads, nil
 }
 
-func UpdateFacilityUpload(data *CSVUploads) error {
+func UpdateCSVUpload(data *CSVUploads) error {
 	if result := db.Save(data); result.Error != nil {
 		log.Error("Error occurred while saving CSVUploads with ID - ", data.ID)
 		return errors.New("error occurred while saving CSVUploads")

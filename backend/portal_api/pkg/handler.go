@@ -153,16 +153,43 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
 
-	for data.Scan() {
-		//validateRow(data)
-		_ = createFacility(&data)
-		log.Info(data.Text("serialNum"), data.Text("facilityName"))
-	}
-
-	// Initializing CSVUploads entity
 	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
 	fileName := fileHeader.Filename
 	preferredUsername := getUserName(params.HTTPRequest)
+
+	csvUploadHistory := createCsvUploadHistory(fileName, preferredUsername)
+
+	var totalRowErrors [][]string
+	var totalRecords int64 = 0
+	for data.Scan() {
+		rowError := validateRow(data)
+		if len(rowError) > 0 {
+			totalRowErrors = append(totalRowErrors, rowError)
+		}
+		totalRecords += 1
+		_ = createFacility(&data)
+		log.Info(data.Text("serialNum"), data.Text("facilityName"))
+	}
+	defer params.File.Close()
+
+	for _, rowError := range totalRowErrors {
+		log.Println(rowError)
+	}
+
+	csvUploadHistory.TotalRecords = totalRecords
+	csvUploadHistory.TotalErrorRows = int64(len(totalRowErrors))
+	if csvUploadHistory.TotalErrorRows > 0 {
+		csvUploadHistory.Status = "Failed"
+	} else {
+		csvUploadHistory.Status = "Success"
+	}
+	db.UpdateCSVUpload(&csvUploadHistory)
+
+	return operations.NewPostFacilitiesOK()
+}
+
+func createCsvUploadHistory(fileName string, preferredUsername string) db.CSVUploads {
+	// Initializing CSVUploads entity
 	uploadEntry := db.CSVUploads{}
 	uploadEntry.Filename = fileName
 	uploadEntry.UserID = preferredUsername
@@ -171,20 +198,40 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	uploadEntry.TotalRecords = 0
 	uploadEntry.TotalErrorRows = 0
 	db.CreateCSVUpload(&uploadEntry)
-
-	return operations.NewPostFacilitiesOK()
+	return uploadEntry
 }
 
-/*func validateRow(data Scanner) []string {
+func validateRow(data Scanner) []string {
 	var errorMsgs []string
-	if data.RecipientMobileNumber == "" {
-		errorMsgs = append(errorMsgs, "RecipientMobileNumber is missing")
+	if data.Text("facilityCode") == "" {
+		errorMsgs = append(errorMsgs, "FacilityCode is missing")
 	}
-	if data.RecipientName == "" {
-		errorMsgs = append(errorMsgs, "RecipientName is missing")
+	if data.Text("facilityName") == "" {
+		errorMsgs = append(errorMsgs, "FacilityName is missing")
+	}
+	if data.Text("contact") == "" {
+		errorMsgs = append(errorMsgs, "Contact is missing")
+	}
+	if data.Text("admin") == "" {
+		errorMsgs = append(errorMsgs, "Admin details is missing")
+	}
+	if data.Text("addressLine1") == "" {
+		errorMsgs = append(errorMsgs, "AddressLine1 details is missing")
+	}
+	if data.Text("addressLine1") == "" {
+		errorMsgs = append(errorMsgs, "AddressLine2 details is missing")
+	}
+	if data.Text("district") == "" {
+		errorMsgs = append(errorMsgs, "District details is missing")
+	}
+	if data.Text("state") == "" {
+		errorMsgs = append(errorMsgs, "State details is missing")
+	}
+	if data.Text("pincode") == "" {
+		errorMsgs = append(errorMsgs, "Pincode details is missing")
 	}
 	return errorMsgs
-}*/
+}
 
 func validateHeaders(columns []string, data Scanner) *models.Error {
 	// csv template validation
