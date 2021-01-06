@@ -147,22 +147,10 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
-	log.Println(params.File)
-
 	data := NewScanner(params.File)
-
-	// csv template validation
-	csvHeaders := data.GetHeaders()
-	for _, c := range columns {
-		if !contains(csvHeaders, c) {
-			code := "INVALID_TEMPLATE"
-			message := c + " column doesn't exist in uploaded csv file"
-			e := &models.Error{
-				Code:    &code,
-				Message: &message,
-			}
-			return operations.NewPostFacilitiesBadRequest().WithPayload(e)
-		}
+	headerErrors := validateHeaders(columns, data)
+	if headerErrors != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
 
 	for data.Scan() {
@@ -183,6 +171,23 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	db.CreateFacilityUpload(&uploadEntry)
 
 	return operations.NewPostFacilitiesOK()
+}
+
+func validateHeaders(columns []string, data Scanner) *models.Error {
+	// csv template validation
+	csvHeaders := data.GetHeaders()
+	for _, c := range columns {
+		if !contains(csvHeaders, c) {
+			code := "INVALID_TEMPLATE"
+			message := c + " column doesn't exist in uploaded csv file"
+			e := &models.Error{
+				Code:    &code,
+				Message: &message,
+			}
+			return e
+		}
+	}
+	return nil
 }
 
 func getUserName(params *http.Request) string {
