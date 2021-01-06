@@ -4,7 +4,7 @@ registry:
   searchoperationid: search
   readoperationid: read
 keycloak:
-  url: http://52.172.216.52/keycloak/auth
+  url: https://divoc.xiv.in/keycloak/auth
   realm: divoc
   facilityAdmin:
     roleName: facility-admin

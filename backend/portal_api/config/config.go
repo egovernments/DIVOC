@@ -40,7 +40,7 @@ var Config = struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
 		Password string `default:"postgres" yaml:"password" env:"DB_PASSWORD"`
 		User     string `default:"postgres" yaml:"user" env:"DB_USER"`
-		Port     string `default:"5430" yaml:"port" env:"DB_PORT"`
+		Port     string `default:"5432" yaml:"port" env:"DB_PORT"`
 		DBName   string `default:"postgres" yaml:"dbname"`
 	}
 	Facility struct {
