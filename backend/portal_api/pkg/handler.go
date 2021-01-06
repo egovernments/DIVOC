@@ -146,18 +146,20 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 }
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
+
 	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
 	data := NewScanner(params.File)
-	headerErrors := validateHeaders(columns, data)
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	facilityCSV := FacilityCSV{Columns: columns, Data: &data, FileName: fileName, UserName: preferredUsername}
+
+	headerErrors := facilityCSV.ValidateHeaders()
 	if headerErrors != nil {
 		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
 
-	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
-	fileName := fileHeader.Filename
-	preferredUsername := getUserName(params.HTTPRequest)
-
-	csvUploadHistory := createCsvUploadHistory(fileName, preferredUsername)
+	csvUploadHistory := facilityCSV.CreateCsvUploadHistory()
 
 	var totalRowErrors [][]string
 	var totalRecords int64 = 0
@@ -167,7 +169,7 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 			totalRowErrors = append(totalRowErrors, rowError)
 		}
 		totalRecords += 1
-		_ = createFacility(&data)
+		_ = facilityCSV.CreateCsvUpload()
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
 	defer params.File.Close()
@@ -188,19 +190,6 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	return operations.NewPostFacilitiesOK()
 }
 
-func createCsvUploadHistory(fileName string, preferredUsername string) db.CSVUploads {
-	// Initializing CSVUploads entity
-	uploadEntry := db.CSVUploads{}
-	uploadEntry.Filename = fileName
-	uploadEntry.UserID = preferredUsername
-	uploadEntry.Status = "Processing"
-	uploadEntry.UploadType = "Facility"
-	uploadEntry.TotalRecords = 0
-	uploadEntry.TotalErrorRows = 0
-	db.CreateCSVUpload(&uploadEntry)
-	return uploadEntry
-}
-
 func validateRow(data Scanner) []string {
 	var errorMsgs []string
 	if data.Text("facilityCode") == "" {
@@ -212,7 +201,7 @@ func validateRow(data Scanner) []string {
 	if data.Text("contact") == "" {
 		errorMsgs = append(errorMsgs, "Contact is missing")
 	}
-	if data.Text("admin") == "" {
+	/*if data.Text("admin") == "" {
 		errorMsgs = append(errorMsgs, "Admin details is missing")
 	}
 	if data.Text("addressLine1") == "" {
@@ -229,25 +218,8 @@ func validateRow(data Scanner) []string {
 	}
 	if data.Text("pincode") == "" {
 		errorMsgs = append(errorMsgs, "Pincode details is missing")
-	}
+	}*/
 	return errorMsgs
-}
-
-func validateHeaders(columns []string, data Scanner) *models.Error {
-	// csv template validation
-	csvHeaders := data.GetHeaders()
-	for _, c := range columns {
-		if !contains(csvHeaders, c) {
-			code := "INVALID_TEMPLATE"
-			message := c + " column doesn't exist in uploaded csv file"
-			e := &models.Error{
-				Code:    &code,
-				Message: &message,
-			}
-			return e
-		}
-	}
-	return nil
 }
 
 func getUserName(params *http.Request) string {
