@@ -31,6 +31,8 @@ paths:
     get:
       summary: get facilities
       operationId: getFacilities
+      security:
+        - hasRole: ["admin", "controller"]
       responses:
         '200':
           description: OK
