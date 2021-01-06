@@ -14,8 +14,6 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
-    volumes:
-      - ./registry:/home/opensaber/config/public/_schemas
     ports:
       - "8081:8081"
     depends_on:
@@ -31,9 +29,6 @@ services:
       - DB_PASSWORD=postgres
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-      - KEYCLOAK_IMPORT=/config/divoc-realm.json
-    volumes:
-      - ./keycloak:/config
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     ports:
       - "8080:8080"

@@ -8,13 +8,13 @@ const kafka = new Kafka({
   brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
 });
 
-const consumer = kafka.consumer({ groupId: 'certify' });
+const consumer = kafka.consumer({ groupId: 'certificate_signer' });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
 (async function() {
   await consumer.connect();
   await producer.connect();
-  await consumer.subscribe({topic: config.CERTIFY_TOPIC, fromBeginning: false});
+  await consumer.subscribe({topic: config.CERTIFY_TOPIC, fromBeginning: true});
 
   await consumer.run({
     eachMessage: async ({topic, partition, message}) => {
