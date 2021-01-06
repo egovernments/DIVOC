@@ -10,7 +10,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials');
-const {vaccinationContext} = require("vaccination-context")
+const {vaccinationContext} = require("vaccination-context");
 
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,
@@ -116,7 +116,7 @@ function transformW3(cert, certificateId) {
       "date": cert.vaccination.date,
       "effectiveStart": cert.vaccination.effectiveStart,
       "effectiveUntil": cert.vaccination.effectiveUntil,
-      "dose":cert.vaccination.doses,
+      "dose":cert.vaccination.dose,
       "totalDoses":cert.vaccination.totalDoses,
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
