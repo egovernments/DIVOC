@@ -33,7 +33,7 @@ func NewGetFacilityUploads(ctx *middleware.Context, handler GetFacilityUploadsHa
 
 /*GetFacilityUploads swagger:route GET /facility/uploads getFacilityUploads
 
-Get all file uploads for facility for given facility admin
+Get all file uploads for facilties for given facility admin
 
 */
 type GetFacilityUploads struct {

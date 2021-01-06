@@ -209,14 +209,23 @@ func init() {
     },
     "/facility/uploads": {
       "get": {
-        "security": [],
-        "summary": "Get uploads",
-        "operationId": "getUploadHistory",
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object"
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
             }
           }
         }
@@ -1051,14 +1060,23 @@ func init() {
     },
     "/facility/uploads": {
       "get": {
-        "security": [],
-        "summary": "Get uploads",
-        "operationId": "getUploadHistory",
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
         "responses": {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "object"
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
             }
           }
         }

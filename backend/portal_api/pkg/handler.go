@@ -32,6 +32,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
 	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
+	api.GetFacilityUploadsHandler = operations.GetFacilityUploadsHandlerFunc(getFacilityUploadHandler)
 }
 
 type GenericResponse struct {
@@ -260,4 +261,13 @@ func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models
 
 func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
+}
+
+func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	facilityUploads, err := db.GetFacilityUploadsForUser(preferredUsername)
+	if err == nil {
+		return NewGenericJSONResponse(facilityUploads)
+	}
+	return NewGenericServerError()
 }

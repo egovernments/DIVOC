@@ -271,14 +271,17 @@ paths:
 
   /facility/uploads:
     get:
-      summary: Get uploads
-      operationId: getUploadHistory
-      security: [ ]
+      summary: Get all file uploads for facilties for given facility admin
+      operationId: getFacilityUploads
+      security:
+        - hasRole: ['admin']
       responses:
         '200':
           description: OK
           schema:
-            type: object
+            type: array
+            items:
+              type: object
 
 definitions:
   FacilityUpdateRequest:

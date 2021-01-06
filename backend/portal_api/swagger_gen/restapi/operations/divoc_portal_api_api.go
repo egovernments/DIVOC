@@ -75,6 +75,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
 		}),
+		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
+		}),
 		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
 		}),
@@ -86,9 +89,6 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		}),
 		GetPublicAnalyticsHandler: GetPublicAnalyticsHandlerFunc(func(params GetPublicAnalyticsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPublicAnalytics has not yet been implemented")
-		}),
-		GetUploadHistoryHandler: GetUploadHistoryHandlerFunc(func(params GetUploadHistoryParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetUploadHistory has not yet been implemented")
 		}),
 		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
@@ -166,6 +166,8 @@ type DivocPortalAPIAPI struct {
 	GetFacilitiesHandler GetFacilitiesHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
+	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
+	GetFacilityUploadsHandler GetFacilityUploadsHandler
 	// GetFacilityUsersHandler sets the operation handler for the get facility users operation
 	GetFacilityUsersHandler GetFacilityUsersHandler
 	// GetMedicinesHandler sets the operation handler for the get medicines operation
@@ -174,8 +176,6 @@ type DivocPortalAPIAPI struct {
 	GetProgramsHandler GetProgramsHandler
 	// GetPublicAnalyticsHandler sets the operation handler for the get public analytics operation
 	GetPublicAnalyticsHandler GetPublicAnalyticsHandler
-	// GetUploadHistoryHandler sets the operation handler for the get upload history operation
-	GetUploadHistoryHandler GetUploadHistoryHandler
 	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	GetVaccinatorsHandler GetVaccinatorsHandler
 	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
@@ -293,6 +293,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetFacilityGroupsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityGroupsHandler")
 	}
+	if o.GetFacilityUploadsHandler == nil {
+		unregistered = append(unregistered, "GetFacilityUploadsHandler")
+	}
 	if o.GetFacilityUsersHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUsersHandler")
 	}
@@ -304,9 +307,6 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetPublicAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetPublicAnalyticsHandler")
-	}
-	if o.GetUploadHistoryHandler == nil {
-		unregistered = append(unregistered, "GetUploadHistoryHandler")
 	}
 	if o.GetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "GetVaccinatorsHandler")
@@ -457,6 +457,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/facility/uploads"] = NewGetFacilityUploads(o.context, o.GetFacilityUploadsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/facility/users"] = NewGetFacilityUsers(o.context, o.GetFacilityUsersHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -470,10 +474,6 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/public"] = NewGetPublicAnalytics(o.context, o.GetPublicAnalyticsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/facility/uploads"] = NewGetUploadHistory(o.context, o.GetUploadHistoryHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
