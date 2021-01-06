@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/divoc/api/config"
 	"github.com/jinzhu/gorm"
@@ -12,18 +13,16 @@ import (
 
 var db *gorm.DB
 
+const CERTIFY_UPLOAD_FAILED_STATUS = "Failed"
+const CERTIFY_UPLOAD_SUCCESS_STATUS = "Success"
+const CERTIFY_UPLOAD_PROCESSING_STATUS = "Processing"
+
+
 type CertifyUploads struct {
 	gorm.Model
 
 	// filename
 	Filename string
-
-	// status
-	// Enum: [Success Failed Processing]
-	Status string
-
-	// total error rows
-	TotalErrorRows int64
 
 	// total records
 	TotalRecords int64
@@ -39,6 +38,10 @@ type CertifyUploadErrors struct {
 	CertifyUploadID uint `gorm:"index"`
 
 	Errors string	`json:"errors"`
+
+	// status
+	// Enum: [Success Failed Processing]
+	Status string	`json:"status"`
 
 	CertifyUploadFields
 }
@@ -139,5 +142,48 @@ func GetCertifyUploadErrorsForUploadID(uploadId int64) ([]*CertifyUploadErrors, 
 		return nil, errors.New("error occurred while retrieving certifyUploads")
 	}
 	return certifyUploadErrors, nil
+
+}
+
+func GetCertifyUploadErrorsStatusForUploadId(uploadId uint) ([]string, error) {
+	var statuses []string
+	var certifyUploadErrors []*CertifyUploadErrors
+	if result := db.Model(&CertifyUploadErrors{}).Select("status").Find(&certifyUploadErrors, "certify_upload_id = ?", uploadId); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", uploadId)
+		return statuses, errors.New("error occurred while retrieving certifyUploads")
+	}
+	for _, c := range certifyUploadErrors {
+		statuses = append(statuses, c.Status)
+	}
+
+	return statuses, nil
+}
+
+func UpdateCertifyUploadError(data *CertifyUploadErrors) error {
+	if result := db.Save(data); result.Error != nil {
+		log.Error("Error occurred while saving certifyUploadErrors with ID - ", data.ID)
+		return errors.New("error occurred while saving certifyUploadErrors")
+	}
+	return nil
+}
+
+func DeleteCertifyUploadError(id uint) error {
+	if result := db.Unscoped().Delete(&CertifyUploadErrors{}, id); result.Error != nil {
+		log.Error("Error occurred while deleting CertifyUploadErrors with id ", id, result.Error)
+		return errors.New("error occurred while deleting certifyUploadErrors")
+	}
+	log.Info("Deleted certifyUploadError for ID - ", id)
+	return nil
+}
+
+func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg string) error {
+	certifyUploadErrors := &CertifyUploadErrors{}
+	if result := db.First(&certifyUploadErrors, id); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", id, result.Error)
+		return errors.New("error occurred while retrieving certifyUploads")
+	}
+	certifyUploadErrors.Status = status
+	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors,errorMsg}, ",")
+	return UpdateCertifyUploadError(certifyUploadErrors)
 
 }
