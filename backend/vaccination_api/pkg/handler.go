@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	eventsModel "github.com/divoc/api/pkg/models"
 	"net/http"
 	"strings"
 	"time"
@@ -277,7 +278,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 func eventsHandler(params operations.EventsParams) middleware.Responder {
 	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
-		kafkaService.PublishEvent(kafkaService.Event{
+		kafkaService.PublishEvent(eventsModel.Event{
 			Date:          time.Time(e.Date),
 			Source:        preferredUsername,
 			TypeOfMessage: e.Type,

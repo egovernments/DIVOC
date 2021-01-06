@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	eventsModel "github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	"strings"
 	"time"
@@ -15,7 +16,7 @@ import (
 // uploadId, rowId to be specified in case if its file upload
 
 func publishSimpleEvent(source string, event string) {
-	services.PublishEvent(services.Event{
+	services.PublishEvent(eventsModel.Event{
 		Date:          time.Now(),
 		Source:        source,
 		TypeOfMessage: "download",

@@ -5,10 +5,9 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
-	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/api/pkg/models"
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"time"
 )
 
 var producer *kafka.Producer
@@ -17,20 +16,10 @@ var messages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
-type Event struct {
-	Date          time.Time   `json:"date"`
-	Source        string      `json:"source"`
-	TypeOfMessage string      `json:"type"`
-	ExtraInfo     interface{} `json:"extra"`
-}
 type Message struct {
 	UploadId []byte
 	rowId    []byte
 	payload  string
-}
-type ReportedSideEffectsEvent struct {
-	models.SideEffectsResponse
-	RecipientCertificateId string `json:"recipientCertificateId"`
 }
 
 func InitializeKafka() {
@@ -160,7 +149,7 @@ func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
 	}
 }
 
-func PublishEvent(event Event) {
+func PublishEvent(event models.Event) {
 	if messageJson, err := json.Marshal(event); err != nil {
 		log.Errorf("Error in getting json of event %+v", event)
 	} else {
@@ -168,7 +157,7 @@ func PublishEvent(event Event) {
 	}
 }
 
-func PublishReportedSideEffects(event ReportedSideEffectsEvent) {
+func PublishReportedSideEffects(event models.ReportedSideEffectsEvent) {
 	log.Infof("Publishing reported side effects")
 	if messageJson, err := json.Marshal(event); err != nil {
 		log.Errorf("Error in getting json of event %+v", event)
