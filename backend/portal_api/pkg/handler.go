@@ -154,24 +154,37 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	}
 
 	for data.Scan() {
-		_ = createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
+		//validateRow(data)
+		_ = createFacility(&data)
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
 
-	// Initializing FacilityUploads entity
+	// Initializing CSVUploads entity
 	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
 	fileName := fileHeader.Filename
 	preferredUsername := getUserName(params.HTTPRequest)
-	uploadEntry := db.FacilityUploads{}
+	uploadEntry := db.CSVUploads{}
 	uploadEntry.Filename = fileName
 	uploadEntry.UserID = preferredUsername
 	uploadEntry.Status = "Processing"
+	uploadEntry.UploadType = "Facility"
 	uploadEntry.TotalRecords = 0
 	uploadEntry.TotalErrorRows = 0
-	db.CreateFacilityUpload(&uploadEntry)
+	db.CreateCSVUpload(&uploadEntry)
 
 	return operations.NewPostFacilitiesOK()
 }
+
+/*func validateRow(data Scanner) []string {
+	var errorMsgs []string
+	if data.RecipientMobileNumber == "" {
+		errorMsgs = append(errorMsgs, "RecipientMobileNumber is missing")
+	}
+	if data.RecipientName == "" {
+		errorMsgs = append(errorMsgs, "RecipientName is missing")
+	}
+	return errorMsgs
+}*/
 
 func validateHeaders(columns []string, data Scanner) *models.Error {
 	// csv template validation

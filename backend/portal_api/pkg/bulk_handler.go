@@ -38,7 +38,7 @@ func createVaccinator(data *Scanner) error {
 	return nil
 }
 
-func createFacility(data *Scanner, authHeader string) error {
+func createFacility(data *Scanner) error {
 	//todo: pass it to queue and then process.
 	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
@@ -82,7 +82,7 @@ func createFacility(data *Scanner, authHeader string) error {
 				FacilityCode: facility.FacilityCode,
 			},
 		}
-		
+
 		resp, err := CreateKeycloakUser(userRequest)
 		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {

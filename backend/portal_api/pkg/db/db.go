@@ -11,14 +11,14 @@ import (
 
 var db *gorm.DB
 
-type FacilityUploads struct {
+type CSVUploads struct {
 	gorm.Model
 
 	// filename
 	Filename string
 
 	// status
-	// Enum: [Success Failed]
+	// Enum: [Success, Failed]
 	Status string
 
 	// total error rows
@@ -29,12 +29,16 @@ type FacilityUploads struct {
 
 	// user Id
 	UserID string
+
+	// uploadType
+	// Enum: [Facility, Vaccinator,PreEnrollment]
+	UploadType string
 }
 
 type FacilityUploadErrors struct {
 	gorm.Model
 
-	// ID of FacilityUploads
+	// ID of CSVUploads
 	FacilityUploadID uint `gorm:"index"`
 
 	Errors string `json:"errors"`
@@ -78,33 +82,33 @@ func Init() {
 		panic("failed to connect to database")
 	}
 
-	db.AutoMigrate(&FacilityUploads{})
+	db.AutoMigrate(&CSVUploads{})
 }
 
-// CreateFacilityUpload - Create new Facility upload entry in DB
-func CreateFacilityUpload(data *FacilityUploads) error {
+// CreateCSVUpload - Create new Facility upload entry in DB
+func CreateCSVUpload(data *CSVUploads) error {
 	if result := db.Create(&data); result.Error != nil {
 		log.Error("Error occurred while creating FacilityUpload for ", data, result.Error)
 		return errors.New("error occurred while saving FacilityUpload")
 	}
-	log.Info("Created FacilityUploads for file ", data.Filename)
+	log.Info("Created CSVUploads for file ", data.Filename)
 	return nil
 }
 
 // GetFacilityUploadsForUser - Get all Facility file uploads for giver user
-func GetFacilityUploadsForUser(userID string) ([]*FacilityUploads, error) {
-	var facilityUploads []*FacilityUploads
+func GetFacilityUploadsForUser(userID string) ([]*CSVUploads, error) {
+	var facilityUploads []*CSVUploads
 	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ?", userID); result.Error != nil {
-		log.Error("Error occurred while retrieving FacilityUploads for user ", userID)
-		return nil, errors.New("error occurred while retrieving FacilityUploads")
+		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
+		return nil, errors.New("error occurred while retrieving CSVUploads")
 	}
 	return facilityUploads, nil
 }
 
-func UpdateFacilityUpload(data *FacilityUploads) error {
+func UpdateFacilityUpload(data *CSVUploads) error {
 	if result := db.Save(data); result.Error != nil {
-		log.Error("Error occurred while saving FacilityUploads with ID - ", data.ID)
-		return errors.New("error occurred while saving FacilityUploads")
+		log.Error("Error occurred while saving CSVUploads with ID - ", data.ID)
+		return errors.New("error occurred while saving CSVUploads")
 	}
 	return nil
 }
@@ -118,10 +122,10 @@ func CreateFacilityUploadError(data *FacilityUploadErrors) error {
 	return nil
 }
 
-func GetFacilityUploadsForID(id uint) (*FacilityUploads, error) {
-	facilityUpload := &FacilityUploads{}
+func GetFacilityUploadsForID(id uint) (*CSVUploads, error) {
+	facilityUpload := &CSVUploads{}
 	if result := db.First(&facilityUpload, "id = ?", id); result.Error != nil {
-		log.Error("Error occurred while retrieving FacilityUploads for ID ", id, result.Error)
+		log.Error("Error occurred while retrieving CSVUploads for ID ", id, result.Error)
 		return nil, result.Error
 	}
 	return facilityUpload, nil
@@ -131,8 +135,8 @@ func GetFacilityUploadsForID(id uint) (*FacilityUploads, error) {
 func GetFacilityUploadErrorsForUploadID(uploadId int64) ([]*FacilityUploadErrors, error) {
 	var facilityUploadErrors []*FacilityUploadErrors
 	if result := db.Find(&facilityUploadErrors, "Facility_upload_id = ?", uploadId); result.Error != nil {
-		log.Error("Error occurred while retrieving FacilityUploads for user ", uploadId)
-		return nil, errors.New("error occurred while retrieving FacilityUploads")
+		log.Error("Error occurred while retrieving CSVUploads for user ", uploadId)
+		return nil, errors.New("error occurred while retrieving CSVUploads")
 	}
 	return facilityUploadErrors, nil
 }
