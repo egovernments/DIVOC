@@ -47,6 +47,39 @@ func (facilityCsv FacilityCSV) CreateCsvUploadHistory() db.CSVUploads {
 	return uploadEntry
 }
 
+func (facilityCsv FacilityCSV) ValidateRow() []string {
+	data := facilityCsv.Data
+	var errorMsgs []string
+	if data.Text("facilityCode") == "" {
+		errorMsgs = append(errorMsgs, "FacilityCode is missing")
+	}
+	if data.Text("facilityName") == "" {
+		errorMsgs = append(errorMsgs, "FacilityName is missing")
+	}
+	if data.Text("contact") == "" {
+		errorMsgs = append(errorMsgs, "Contact is missing")
+	}
+	/*if data.Text("admin") == "" {
+		errorMsgs = append(errorMsgs, "Admin details is missing")
+	}
+	if data.Text("addressLine1") == "" {
+		errorMsgs = append(errorMsgs, "AddressLine1 details is missing")
+	}
+	if data.Text("addressLine1") == "" {
+		errorMsgs = append(errorMsgs, "AddressLine2 details is missing")
+	}
+	if data.Text("district") == "" {
+		errorMsgs = append(errorMsgs, "District details is missing")
+	}
+	if data.Text("state") == "" {
+		errorMsgs = append(errorMsgs, "State details is missing")
+	}
+	if data.Text("pincode") == "" {
+		errorMsgs = append(errorMsgs, "Pincode details is missing")
+	}*/
+	return errorMsgs
+}
+
 func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	data := facilityCsv.Data
 	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)

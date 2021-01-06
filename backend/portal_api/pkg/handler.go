@@ -164,7 +164,7 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	var totalRowErrors [][]string
 	var totalRecords int64 = 0
 	for data.Scan() {
-		rowError := validateRow(data)
+		rowError := facilityCSV.ValidateRow()
 		if len(rowError) > 0 {
 			totalRowErrors = append(totalRowErrors, rowError)
 		}
@@ -188,38 +188,6 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	db.UpdateCSVUpload(&csvUploadHistory)
 
 	return operations.NewPostFacilitiesOK()
-}
-
-func validateRow(data Scanner) []string {
-	var errorMsgs []string
-	if data.Text("facilityCode") == "" {
-		errorMsgs = append(errorMsgs, "FacilityCode is missing")
-	}
-	if data.Text("facilityName") == "" {
-		errorMsgs = append(errorMsgs, "FacilityName is missing")
-	}
-	if data.Text("contact") == "" {
-		errorMsgs = append(errorMsgs, "Contact is missing")
-	}
-	/*if data.Text("admin") == "" {
-		errorMsgs = append(errorMsgs, "Admin details is missing")
-	}
-	if data.Text("addressLine1") == "" {
-		errorMsgs = append(errorMsgs, "AddressLine1 details is missing")
-	}
-	if data.Text("addressLine1") == "" {
-		errorMsgs = append(errorMsgs, "AddressLine2 details is missing")
-	}
-	if data.Text("district") == "" {
-		errorMsgs = append(errorMsgs, "District details is missing")
-	}
-	if data.Text("state") == "" {
-		errorMsgs = append(errorMsgs, "State details is missing")
-	}
-	if data.Text("pincode") == "" {
-		errorMsgs = append(errorMsgs, "Pincode details is missing")
-	}*/
-	return errorMsgs
 }
 
 func getUserName(params *http.Request) string {
