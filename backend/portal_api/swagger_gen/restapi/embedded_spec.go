@@ -557,6 +557,10 @@ func init() {
           "type": "string",
           "title": "Contact number"
         },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
         "facilityCode": {
           "type": "string",
           "title": "Facility Code"
@@ -1375,6 +1379,10 @@ func init() {
         "contact": {
           "type": "string",
           "title": "Contact number"
+        },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
         },
         "facilityCode": {
           "type": "string",

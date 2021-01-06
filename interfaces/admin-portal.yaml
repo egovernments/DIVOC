@@ -352,6 +352,9 @@ definitions:
       contact:
         type: string
         title: Contact number
+      email:
+        type: string
+        title: Facility Email
       operatingHourStart:
         type: integer
         title: Operating hours start of day

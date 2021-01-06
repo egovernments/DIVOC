@@ -18,3 +18,6 @@ keycloak:
     groupId: 84682840-4c21-428d-b2d5-06e6298be1cc
 analytics:
   datasource: tcp://localhost:9000?debug=true
+kafka:
+  bootstrapServers: localhost:9092
+  notifyTopic: notify

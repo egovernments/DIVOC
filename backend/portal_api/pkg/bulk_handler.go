@@ -1,13 +1,24 @@
 package pkg
 
 import (
+	"bytes"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
+	kafkaServices "github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
+	"text/template"
 )
+
+const facilityRegisteredTemplateString = `
+Welcome {{.FacilityName}}.
+Your facility has been registered under divoc. 
+You can login at https://divoc.xiv.in/portal using {{.Admins}} contact numbers.
+`
+
+var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 
 func createVaccinator(data *Scanner) error {
 	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
@@ -69,8 +80,10 @@ func createFacility(data *Scanner, authHeader string) error {
 			State:        &state,
 			Pincode:      &pincode,
 		},
+		Email: data.Text("email"),
 	}
 	services.MakeRegistryCreateRequest(facility, "Facility")
+	sendFacilityRegisteredNotification(facility)
 	for _, mobile := range facility.Admins {
 		//create keycloak user for
 		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
@@ -82,7 +95,7 @@ func createFacility(data *Scanner, authHeader string) error {
 				FacilityCode: facility.FacilityCode,
 			},
 		}
-		
+
 		resp, err := CreateKeycloakUser(userRequest)
 		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
@@ -99,4 +112,12 @@ func createFacility(data *Scanner, authHeader string) error {
 
 	}
 	return nil
+}
+
+func sendFacilityRegisteredNotification(facility models.Facility) {
+	buf := bytes.Buffer{}
+	err := facilityRegisteredTemplate.Execute(&buf, facility)
+	if err == nil {
+		kafkaServices.PublishNotificationMessage("mailto:"+facility.Email, "DIVOC - Facility registration", buf.String())
+	}
 }

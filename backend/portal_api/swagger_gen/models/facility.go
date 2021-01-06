@@ -37,6 +37,9 @@ type Facility struct {
 	// Contact number
 	Contact string `json:"contact,omitempty"`
 
+	// Facility Email
+	Email string `json:"email,omitempty"`
+
 	// Facility Code
 	FacilityCode string `json:"facilityCode,omitempty"`
 

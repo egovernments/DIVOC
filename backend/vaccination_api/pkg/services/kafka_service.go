@@ -2,11 +2,11 @@ package services
 
 import (
 	"encoding/json"
-	"github.com/confluentinc/confluent-kafka-go/kafka"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
 )
 
