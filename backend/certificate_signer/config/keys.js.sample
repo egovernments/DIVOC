@@ -7,3 +7,9 @@ module.exports = {
   privateKeyPem,
   smsAuthKey
 };
+
+/*
+// openssl genrsa -out key.pem; cat key.pem;
+// openssl rsa -in key.pem -pubout -out pubkey.pem;
+// cat pubkey.pem; rm key.pem pubkey.pem
+*/
