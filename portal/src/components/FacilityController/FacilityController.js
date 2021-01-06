@@ -2,6 +2,7 @@ import React from "react";
 import { TabPanels } from "../TabPanel/TabPanel";
 import FacilityActivation from "../FacilityActivation/FacilityActivation";
 import FacilityAdjustingRate from "../FacilityAdjustingRate/FacilityAdjustingRate";
+import FacilityDetails from "../FacilityDetails/FacilityDetails";
 
 function FacilityController() {
     const PROGRAMS = ["C-19 Program"];
@@ -97,6 +98,16 @@ function FacilityController() {
                     title: "Adjusting Rate",
                     component: (
                         <FacilityAdjustingRate
+                            districtList={DISTRICT_NAMES}
+                            stateList={STATE_NAMES}
+                            program={PROGRAMS}
+                        />
+                    ),
+                },
+                {
+                    title: "All Facilities",
+                    component: (
+                        <FacilityDetails
                             districtList={DISTRICT_NAMES}
                             stateList={STATE_NAMES}
                             program={PROGRAMS}
