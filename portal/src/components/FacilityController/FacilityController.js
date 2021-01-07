@@ -1,11 +1,30 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { TabPanels } from "../TabPanel/TabPanel";
 import FacilityActivation from "../FacilityActivation/FacilityActivation";
 import FacilityAdjustingRate from "../FacilityAdjustingRate/FacilityAdjustingRate";
 import FacilityDetails from "../FacilityDetails/FacilityDetails";
+import {useAxios} from "../../utils/useAxios";
 
 function FacilityController() {
+    const fileUploadAPI = '/divoc/admin/api/v1/facilities';
+    const axiosInstance = useAxios('');
     const PROGRAMS = ["C-19 Program"];
+    const [facilities,setFacilities] = useState([]);
+
+    useEffect(() => {
+        fetchFacilities()
+    }, []);
+
+    function fetchFacilities() {
+        axiosInstance.current.get(fileUploadAPI)
+            .then(res => {
+                res.data.forEach(item => {
+                    Object.assign(item, {status: 'Inactive', isChecked: false});       
+                })
+                setFacilities(res.data)
+            });
+    }
+
 
     const STATE_NAMES = {
         AP: "Andhra Pradesh",
@@ -91,6 +110,7 @@ function FacilityController() {
                             districtList={DISTRICT_NAMES}
                             stateList={STATE_NAMES}
                             program={PROGRAMS}
+                            facilities={facilities}
                         />
                     ),
                 },
@@ -101,6 +121,7 @@ function FacilityController() {
                             districtList={DISTRICT_NAMES}
                             stateList={STATE_NAMES}
                             program={PROGRAMS}
+                            facilities={facilities}
                         />
                     ),
                 },
@@ -111,6 +132,7 @@ function FacilityController() {
                             districtList={DISTRICT_NAMES}
                             stateList={STATE_NAMES}
                             program={PROGRAMS}
+                            facilities={facilities}
                         />
                     ),
                 },
