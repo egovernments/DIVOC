@@ -11,6 +11,9 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'certificate_signer' });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
+const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
+const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
+
 (async function() {
   await consumer.connect();
   await producer.connect();
@@ -31,14 +34,22 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
           .then(res => {
             console.log(`statusCode: ${res.status}`);
             console.log(res);
-            sendCertifyAck(res, uploadId, rowId);
+            let errMsg;
+            if (res.status === 200) {
+              sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
+              producer.send({
+                topic: config.CERTIFIED_TOPIC,
+                messages: [{key: null, value: message.value.toString()}]
+              });
+            } else {
+              errMsg = "error occurred while signing/saving of certificate - " + res.status;
+              sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
+            }
           })
           .catch(error => {
             console.error(error)
+            sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
           });
-        producer.send({
-          topic: config.CERTIFIED_TOPIC,
-          messages: [{key:null, value:message.value.toString()}]});
       } catch (e) {
         console.error("ERROR: " + e.message)
       }
@@ -46,9 +57,9 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
   })
 })();
 
-async function sendCertifyAck(res, uploadId, rowId) {
+async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
-    if (res.data.params.status === "SUCCESSFUL") {
+    if (status === REGISTRY_SUCCESS_STATUS) {
       producer.send({
         topic: 'certify_ack',
         messages: [{
@@ -59,7 +70,7 @@ async function sendCertifyAck(res, uploadId, rowId) {
             status: 'SUCCESS',
             errorMsg: ''
           })}]})
-    } else if (res.data.params.status === "UNSUCCESSFUL") {
+    } else if (status === REGISTRY_FAILED_STATUS) {
       producer.send({
         topic: 'certify_ack',
         messages: [{
@@ -68,7 +79,7 @@ async function sendCertifyAck(res, uploadId, rowId) {
             uploadId: uploadId,
             rowId: rowId,
             status: 'FAILED',
-            errorMsg: res.data.params.errmsg
+            errorMsg: errMsg
           })}]})
     }
   }
