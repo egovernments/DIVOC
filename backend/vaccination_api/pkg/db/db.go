@@ -55,6 +55,8 @@ type CertifyUploadFields struct {
 	RecipientIdentity         string	`json:"recipientIdentity"`
 	VaccinationBatch          string	`json:"vaccinationBatch"`
 	VaccinationDate           string	`json:"vaccinationDate"`
+	VaccinationDose           string	`json:"vaccinationDose"`
+	VaccinationTotalDoses     string	`json:"vaccinationTotalDoses"`
 	VaccinationEffectiveStart string	`json:"vaccinationEffectiveStart"`
 	VaccinationEffectiveEnd   string	`json:"vaccinationEffectiveEnd"`
 	VaccinationManufacturer   string	`json:"vaccinationManufacturer"`
@@ -185,5 +187,4 @@ func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg 
 	certifyUploadErrors.Status = status
 	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors,errorMsg}, ",")
 	return UpdateCertifyUploadError(certifyUploadErrors)
-
 }
