@@ -34,17 +34,19 @@ func (facilityCsv FacilityCSV) ValidateHeaders() *models.Error {
 	return nil
 }
 
-func (facilityCsv FacilityCSV) CreateCsvUploadHistory() db.CSVUploads {
+func (facilityCsv FacilityCSV) CreateCsvUploadHistory() *db.CSVUploads {
+	headers := strings.Join(facilityCsv.Data.GetHeaders(), ",")
 	// Initializing CSVUploads entity
 	uploadEntry := db.CSVUploads{}
 	uploadEntry.Filename = facilityCsv.FileName
 	uploadEntry.UserID = facilityCsv.UserName
+	uploadEntry.FileHeaders = headers
 	uploadEntry.Status = "Processing"
 	uploadEntry.UploadType = "Facility"
 	uploadEntry.TotalRecords = 0
 	uploadEntry.TotalErrorRows = 0
-	db.CreateCSVUpload(&uploadEntry)
-	return uploadEntry
+	_ = db.CreateCSVUpload(&uploadEntry)
+	return &uploadEntry
 }
 
 func (facilityCsv FacilityCSV) ValidateRow() []string {
@@ -139,4 +141,12 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 
 	}
 	return nil
+}
+
+func (facilityCsv FacilityCSV) saveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
+	csvUploadErrors := db.CSVUploadErrors{}
+	csvUploadErrors.Errors = strings.Join(rowErrors, ",")
+	csvUploadErrors.CSVUploadID = csvUploadHistoryId
+	csvUploadErrors.RowData = strings.Join(facilityCsv.Data.Row, ",")
+	_ = db.CreateCSVUploadError(&csvUploadErrors)
 }

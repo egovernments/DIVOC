@@ -162,31 +162,29 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 
 	csvUploadHistory := facilityCSV.CreateCsvUploadHistory()
 
-	var totalRowErrors [][]string
+	var totalRowErrors int64 = 0
 	var totalRecords int64 = 0
 	for data.Scan() {
-		rowError := facilityCSV.ValidateRow()
-		if len(rowError) > 0 {
-			totalRowErrors = append(totalRowErrors, rowError)
+		rowErrors := facilityCSV.ValidateRow()
+		if len(rowErrors) > 0 {
+			totalRowErrors += 1
+			facilityCSV.saveCsvErrors(rowErrors, csvUploadHistory.ID)
+		} else {
+			_ = facilityCSV.CreateCsvUpload()
 		}
 		totalRecords += 1
-		_ = facilityCSV.CreateCsvUpload()
 		log.Info(data.Text("serialNum"), data.Text("facilityName"))
 	}
 	defer params.File.Close()
 
-	for _, rowError := range totalRowErrors {
-		log.Println(rowError)
-	}
-
 	csvUploadHistory.TotalRecords = totalRecords
-	csvUploadHistory.TotalErrorRows = int64(len(totalRowErrors))
+	csvUploadHistory.TotalErrorRows = totalRowErrors
 	if csvUploadHistory.TotalErrorRows > 0 {
 		csvUploadHistory.Status = "Failed"
 	} else {
 		csvUploadHistory.Status = "Success"
 	}
-	db.UpdateCSVUpload(&csvUploadHistory)
+	db.UpdateCSVUpload(csvUploadHistory)
 
 	return operations.NewPostFacilitiesOK()
 }

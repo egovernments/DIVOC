@@ -17,6 +17,9 @@ type CSVUploads struct {
 	// filename
 	Filename string
 
+	// file header
+	FileHeaders string
+
 	// status
 	// Enum: [Success,Processing,Failed]
 	Status string
@@ -35,35 +38,15 @@ type CSVUploads struct {
 	UploadType string
 }
 
-type FacilityUploadErrors struct {
+type CSVUploadErrors struct {
 	gorm.Model
 
 	// ID of CSVUploads
-	FacilityUploadID uint `gorm:"index"`
+	CSVUploadID uint `gorm:"index"`
 
 	Errors string `json:"errors"`
 
-	FacilityUploadFields
-}
-
-type FacilityUploadFields struct {
-	SerialNum          string `json:"serialNum"`
-	FacilityCode       string `json:"facilityCode"`
-	FacilityName       string `json:"facilityName"`
-	Contact            string `json:"contact"`
-	OperatingHourStart string `json:"operatingHourStart"`
-	OperatingHourEnd   string `json:"operatingHourEnd"`
-	Category           string `json:"category"`
-	Type               string `json:"type"`
-	Status             string `json:"status"`
-	Admins             string `json:"admins"`
-	AddressLine1       string `json:"addressLine1"`
-	AddressLine2       string `json:"addressLine2"`
-	District           string `json:"district"`
-	State              string `json:"state"`
-	Pincode            string `json:"pincode"`
-	GeoLocationLat     string `json:"geoLocationLat"`
-	GeoLocationLon     string `json:"geoLocationLon"`
+	RowData string
 }
 
 func Init() {
@@ -83,6 +66,7 @@ func Init() {
 	}
 
 	db.AutoMigrate(&CSVUploads{})
+	db.AutoMigrate(&CSVUploadErrors{})
 }
 
 // CreateCSVUpload - Create new Facility upload entry in DB
@@ -98,7 +82,7 @@ func CreateCSVUpload(data *CSVUploads) error {
 // GetFacilityUploadsForUser - Get all Facility file uploads for giver user
 func GetFacilityUploadsForUser(userID string) ([]*CSVUploads, error) {
 	var facilityUploads []*CSVUploads
-	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ?", userID); result.Error != nil {
+	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, "Facility"); result.Error != nil {
 		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
 		return nil, errors.New("error occurred while retrieving CSVUploads")
 	}
@@ -113,16 +97,16 @@ func UpdateCSVUpload(data *CSVUploads) error {
 	return nil
 }
 
-func CreateFacilityUploadError(data *FacilityUploadErrors) error {
+func CreateCSVUploadError(data *CSVUploadErrors) error {
 	if result := db.Create(&data); result.Error != nil {
-		log.Error("Error occurred while creating FacilityUploadErrors for ", data, result.Error)
+		log.Error("Error occurred while creating CSVUploadErrors for ", data, result.Error)
 		return errors.New("error occurred while saving FacilityUpload")
 	}
-	log.Info("Created FacilityUploadError for fileUploadID - ", data.FacilityUploadID)
+	log.Info("Created FacilityUploadError for fileUploadID - ", data.CSVUploadID)
 	return nil
 }
 
-func GetFacilityUploadsForID(id uint) (*CSVUploads, error) {
+func GetCSVUploadsForID(id uint) (*CSVUploads, error) {
 	facilityUpload := &CSVUploads{}
 	if result := db.First(&facilityUpload, "id = ?", id); result.Error != nil {
 		log.Error("Error occurred while retrieving CSVUploads for ID ", id, result.Error)
@@ -132,8 +116,8 @@ func GetFacilityUploadsForID(id uint) (*CSVUploads, error) {
 
 }
 
-func GetFacilityUploadErrorsForUploadID(uploadId int64) ([]*FacilityUploadErrors, error) {
-	var facilityUploadErrors []*FacilityUploadErrors
+func GetCSVUploadErrorsForUploadID(uploadId int64) ([]*CSVUploadErrors, error) {
+	var facilityUploadErrors []*CSVUploadErrors
 	if result := db.Find(&facilityUploadErrors, "Facility_upload_id = ?", uploadId); result.Error != nil {
 		log.Error("Error occurred while retrieving CSVUploads for user ", uploadId)
 		return nil, errors.New("error occurred while retrieving CSVUploads")
