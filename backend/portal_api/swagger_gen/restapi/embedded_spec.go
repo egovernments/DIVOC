@@ -231,6 +231,42 @@ func init() {
         }
       }
     },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
+          }
+        }
+      }
+    },
     "/facility/users": {
       "get": {
         "security": [
@@ -1078,6 +1114,42 @@ func init() {
                 "type": "object"
               }
             }
+          }
+        }
+      }
+    },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
           }
         }
       }

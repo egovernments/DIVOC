@@ -61,7 +61,7 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 	if data.Text("contact") == "" {
 		errorMsgs = append(errorMsgs, "Contact is missing")
 	}
-	/*if data.Text("admin") == "" {
+	if data.Text("admin") == "" {
 		errorMsgs = append(errorMsgs, "Admin details is missing")
 	}
 	if data.Text("addressLine1") == "" {
@@ -78,7 +78,7 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 	}
 	if data.Text("pincode") == "" {
 		errorMsgs = append(errorMsgs, "Pincode details is missing")
-	}*/
+	}
 	return errorMsgs
 }
 

@@ -78,6 +78,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
 		}),
+		GetFacilityUploadsErrorsHandler: GetFacilityUploadsErrorsHandlerFunc(func(params GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityUploadsErrors has not yet been implemented")
+		}),
 		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
 		}),
@@ -168,6 +171,8 @@ type DivocPortalAPIAPI struct {
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
 	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
 	GetFacilityUploadsHandler GetFacilityUploadsHandler
+	// GetFacilityUploadsErrorsHandler sets the operation handler for the get facility uploads errors operation
+	GetFacilityUploadsErrorsHandler GetFacilityUploadsErrorsHandler
 	// GetFacilityUsersHandler sets the operation handler for the get facility users operation
 	GetFacilityUsersHandler GetFacilityUsersHandler
 	// GetMedicinesHandler sets the operation handler for the get medicines operation
@@ -295,6 +300,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetFacilityUploadsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUploadsHandler")
+	}
+	if o.GetFacilityUploadsErrorsHandler == nil {
+		unregistered = append(unregistered, "GetFacilityUploadsErrorsHandler")
 	}
 	if o.GetFacilityUsersHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUsersHandler")
@@ -458,6 +466,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/facility/uploads"] = NewGetFacilityUploads(o.context, o.GetFacilityUploadsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/uploads/{uploadId}/errors"] = NewGetFacilityUploadsErrors(o.context, o.GetFacilityUploadsErrorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

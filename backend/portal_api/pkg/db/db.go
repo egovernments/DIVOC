@@ -117,10 +117,10 @@ func GetCSVUploadsForID(id uint) (*CSVUploads, error) {
 }
 
 func GetCSVUploadErrorsForUploadID(uploadId int64) ([]*CSVUploadErrors, error) {
-	var facilityUploadErrors []*CSVUploadErrors
-	if result := db.Find(&facilityUploadErrors, "Facility_upload_id = ?", uploadId); result.Error != nil {
+	var csvUploadErrors []*CSVUploadErrors
+	if result := db.Find(&csvUploadErrors, "csv_upload_id = ?", uploadId); result.Error != nil {
 		log.Error("Error occurred while retrieving CSVUploads for user ", uploadId)
 		return nil, errors.New("error occurred while retrieving CSVUploads")
 	}
-	return facilityUploadErrors, nil
+	return csvUploadErrors, nil
 }
