@@ -259,11 +259,9 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry.TotalRecords = 0
 	db.CreateCertifyUpload(&uploadEntry)
 
-	rowId := -1
 	// Creating Certificates
 	for data.Scan() {
-		rowId = rowId + 1
-		createCertificate(&data, &uploadEntry, rowId)
+		createCertificate(&data, &uploadEntry)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
