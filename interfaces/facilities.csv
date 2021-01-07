@@ -1,4 +1,4 @@
-serialNum, facilityCode,facilityName,contact,email,operatingHourStart, operatingHourEnd, category, type, status, admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
-4,DEL002,Awesome Hospital,9809989981,awesome@mailinator.com,9,18,GOVT,Fixed,Active,"1111111112,1111111113",No 23,Road,Delhi,Delhi,100001,28,77
-5,BLR341,Aolo Hospital,9876543210,aolo@mailinator.com,10,17,PRIVATE,Fixed,Active,"1111111122,1111111123",,Some other road,Bengaluru,Karnataka,560001,13,75
-6,MOB2341,Mobile Vaccination Center,9879879879,mobile@mailinator.com,8,18,GOVT,Mobile,Active,1111111132,,,Bengaluru,,5600001,,
+serialNum,facilityCode,facilityName,contact,email,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,websiteURL,totalAdmins,admin1Code,admin1NationalIdentifier,admin1Name,admin1Mobile,admin2Code,admin2NationalIdentifier,admin2Name,admin2Mobile
+4,DEL002,Awesome Hospital,9809989981,awesome@mailinator.com,9,18,GOVT,Fixed location,Active,No 23,Road,Delhi,Delhi,100001,28,77,www.awesome.com	,2,1,123412341234,suresh,1111111111,2,123412341234,ganesh,1111111111
+5,BLR341,Aolo Hospital,9876543210,aolo@mailinator.com,10,17,PRIVATE,Fixed location,Active,,Some other road,Bengaluru,Karnataka,560001,13,75,www.aolo.com,1,1,123412341234,ramesh,1111111121,,,,
+6,MOB2341,Mobile Vaccination Center,9879879879,mobile@mailinator.com,8,18,GOVT,Mobile,Active,,,Bengaluru,,5600001,,,www.mobile.com,1,1,123412341234,mahesh,1111111131,,,,

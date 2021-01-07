@@ -21,7 +21,6 @@
         "facilityName",
         "address",
         "geoLocation",
-        "websiteUrl",
         "contact",
         "operatingHourStart",
         "operatingHourEnd",

@@ -536,7 +536,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {
@@ -1359,7 +1359,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {

@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	kafkaServices "github.com/divoc/portal-api/pkg/services"
@@ -62,9 +63,34 @@ func createFacility(data *Scanner, authHeader string) error {
 	district := data.Text("district")
 	state := data.Text("state")
 	pincode := data.int64("pincode")
+	var admins []*models.Vaccinator
+	var index int64
+	facilityCode := data.Text("facilityCode")
+	adminStatus := "Active"
+	for index = 1; index <= data.int64("totalAdmins"); index++ {
+		adminPrefix := fmt.Sprintf("%s%d", "admin", index)
+		code := data.Text(adminPrefix + "Code")
+		nationalIdentifier := data.Text(adminPrefix + "NationalIdentifier")
+		name := data.Text(adminPrefix + "Name")
+		mobileNumber := data.Text(adminPrefix + "Mobile")
+		averageRating := 0.0
+		trainingCertificate := ""
+		admins = append(admins, &models.Vaccinator{
+			SerialNum:           &index,
+			Code:                &code,
+			NationalIdentifier:  &nationalIdentifier,
+			Name:                &name,
+			FacilityIds:         []string{facilityCode},
+			MobileNumber:        &mobileNumber,
+			Status:              &adminStatus,
+			AverageRating:       &averageRating,
+			Signatures:          []*models.Signature{},
+			TrainingCertificate: &trainingCertificate,
+		})
+	}
 	facility := models.Facility{
 		SerialNum:          serialNum,
-		FacilityCode:       data.Text("facilityCode"),
+		FacilityCode:       facilityCode,
 		FacilityName:       data.Text("facilityName"),
 		Contact:            data.Text("contact"),
 		OperatingHourStart: data.int64("operatingHourStart"),
@@ -72,7 +98,7 @@ func createFacility(data *Scanner, authHeader string) error {
 		Category:           data.Text("category"),
 		Type:               data.Text("type"),
 		Status:             data.Text("status"),
-		Admins:             strings.Split(data.Text("admins"), ","),
+		Admins:             admins,
 		Address: &models.Address{
 			AddressLine1: &addressline1,
 			AddressLine2: &addressline2,
@@ -80,7 +106,9 @@ func createFacility(data *Scanner, authHeader string) error {
 			State:        &state,
 			Pincode:      &pincode,
 		},
-		Email: data.Text("email"),
+		Email:       data.Text("email"),
+		GeoLocation: data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
+		WebsiteURL:  data.Text("websiteURL"),
 	}
 	services.MakeRegistryCreateRequest(facility, "Facility")
 	sendFacilityRegisteredNotification(facility)
@@ -88,10 +116,10 @@ func createFacility(data *Scanner, authHeader string) error {
 		//create keycloak user for
 		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
 		userRequest := KeyCloakUserRequest{
-			Username: mobile,
+			Username: *mobile.MobileNumber,
 			Enabled:  "true",
 			Attributes: KeycloakUserAttributes{
-				MobileNumber: []string{mobile},
+				MobileNumber: []string{*mobile.MobileNumber},
 				FacilityCode: facility.FacilityCode,
 			},
 		}

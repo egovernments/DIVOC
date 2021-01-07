@@ -389,7 +389,7 @@ definitions:
       admins:
         type: array
         items:
-          type: string
+          "$ref": "#/definitions/Vaccinator"
       stamp:
         type: string
   Address:
