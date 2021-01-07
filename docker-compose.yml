@@ -65,6 +65,12 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
   #  kafka:
   #    image: wurstmeister/kafka
   #    ports:
@@ -133,8 +139,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
     depends_on:
-      - kafka
-      - registry
+      kafka:
+          condition: service_healthy
   nginx:
     image: dockerhub/nginx
     ports:
