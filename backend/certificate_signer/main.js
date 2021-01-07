@@ -30,7 +30,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
       let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
       try {
         jsonMessage = JSON.parse(message.value.toString());
-        signer.signAndSave(jsonMessage)
+        await signer.signAndSave(jsonMessage)
           .then(res => {
             console.log(`statusCode: ${res.status}`);
             console.log(res);
