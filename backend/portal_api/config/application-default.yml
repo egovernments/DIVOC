@@ -21,3 +21,6 @@ analytics:
 facility:
   upload:
     columns: "serialNum,facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,admins,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon"
+preenrollment:
+  upload:
+    columns: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"

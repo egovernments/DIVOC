@@ -140,12 +140,30 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
+	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
+	log.Println(columns)
 	data := NewScanner(params.File)
-	defer params.File.Close()
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+	headerErrors := preEnrollmentCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostEnrollmentsBadRequest().WithPayload(headerErrors)
+	}
+
 	for data.Scan() {
 		createEnrollment(&data)
 		log.Info(data.Text("mobile"), data.Text("name"))
 	}
+
 	return operations.NewPostEnrollmentsOK()
 }
 
