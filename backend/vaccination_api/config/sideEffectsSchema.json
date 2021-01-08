@@ -34,14 +34,6 @@
         "title": "Muscle/Joint Pain",
         "enumNames": ["Yes", "No"]
       },
-      "Pain Scale": {
-        "type": "number",
-        "title": "Pain Scale",
-        "minimum": 0,
-        "maximum": 10,
-        "multipleOf": 1,
-        "unit": ""
-      },
       "Chills": {
         "type": "boolean",
         "title": "Chills",
@@ -76,12 +68,31 @@
         "type": "boolean",
         "title": "Swollen Glands",
         "enumNames": ["Yes", "No"]
-      },
-      "Other": {
-        "className": "feedback-input-box",
-        "type": "string"
       }
-
+    },
+    "dependencies": {
+      "Muscle/Joint Pain": {
+        "oneOf": [
+          {
+            "properties": {
+              "Muscle/Joint Pain": {"enum": [false]}
+            }
+          },
+          {
+            "properties": {
+              "Muscle/Joint Pain": {"enum": [true]},
+              "Pain Scale": {
+                "type": "number",
+                "title": "Pain Scale",
+                "minimum": 0,
+                "maximum": 10,
+                "multipleOf": 1,
+                "unit": ""
+              }
+            }
+          }
+        ]
+      }
     }
   },
   "uiSchema": {
@@ -93,11 +104,6 @@
       "ui:options": {"label": false},
       "ui:widget": "range"
     },
-    "Other": {
-      "classNames": ["side-effects-input-box"],
-      "ui:options": {"label": false},
-      "ui:placeholder": "Type to enter any other conditions"
-    },
-    "ui:order": ["*", "Other"]
+    "ui:order": ["Temperature","*","Muscle/Joint Pain","Pain Scale"]
   }
 }
