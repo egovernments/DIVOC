@@ -12,13 +12,14 @@ const dummyTableData = [
         "contact": [
             "tel:9880414887"
         ],
-        "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Aditi Musunur\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.6   46Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
+        "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Aditi Musunur\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.6   46Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
         "_osUpdatedBy": "",
         "_osCreatedAt": "2020-12-02T14:41:49.497Z",
         "name": "Aditi Musunur",
         "gender":"Female",
         "receiptId": 1,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1990-11-30",
         "osid": "1-4370f6c9-350a-4287-afed-9a1c57479d8c",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:41:49.497Z"
@@ -30,13 +31,14 @@ const dummyTableData = [
         "contact": [
             "tel:9880414887"
         ],
-        "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Savitri Morar\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
+        "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Savitri Morar\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
         "_osUpdatedBy": "",
         "_osCreatedAt": "2020-12-02T14:40:18.971Z",
         "name": "Savitri Morar",
         "gender":"Female",
         "receiptId": 2,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1990-11-30",
         "osid": "1-e41597a4-43bb-4de3-b1d0-55faf4c65849",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:40:18.971Z"
@@ -55,6 +57,7 @@ const dummyTableData = [
         "gender":"Female",
         "receiptId": 3,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1990-11-30",
         "osid": "1-06380349-819b-468e-816a-e7994c6dad98",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:42:22.571Z"
@@ -73,6 +76,7 @@ const dummyTableData = [
         "gender":"Male",
         "receiptId": 4,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1995-11-30",
         "osid": "1-5d012f81-122a-4271-ba32-f23b7edd204b",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T12:02:44.541Z"
@@ -91,6 +95,7 @@ const dummyTableData = [
         "gender":"Female",
         "receiptId": 5,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1990-11-30",
         "osid": "1-b8cd331d-239d-4fbc-bba0-6595cbda7c33",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T14:45:45.141Z"
@@ -109,6 +114,7 @@ const dummyTableData = [
         "gender":"Male",
         "receiptId": 6,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1990-11-30",
         "osid": "1-9381e683-45bb-424c-a5d9-26cb2bbbc0cc",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-02T15:20:59.712Z"
@@ -127,6 +133,7 @@ const dummyTableData = [
         "gender":"Female",
         "receiptId": 7,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1980-05-01",
         "osid": "1-463abb24-1c63-4cc3-b18e-f23c7b9efd13",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-03T07:44:41.179Z"
@@ -145,6 +152,7 @@ const dummyTableData = [
         "gender":"Female",
         "receiptId": 8,
         "date":"2020-12-02T19:21:18.6",
+        "dob":"1980-05-01",
         "osid": "1-11979d36-1119-4123-b2bb-9784a87e994e",
         "_osCreatedBy": "",
         "_osUpdatedAt": "2020-12-03T07:46:34.187Z"
@@ -161,6 +169,7 @@ function PrintCertificate() {
     const [tableData,setTableData] = React.useState(dummyTableData);
     const receiptRef = React.useRef();
     const certificateRef = React.useRef();
+    const [startDate, setStartDate] = React.useState(new Date());
 
     const handleChange = (data,dataList,setDataList) => {
         let newData=dataList;
@@ -181,6 +190,7 @@ function PrintCertificate() {
                 <td>{data.osid}</td>
                 <td>{data.name}</td>
                 <td>{data.gender}</td>
+                <td>{data.dob}</td>
                 <td>
                 <div className={`form-check ${styles['input-container']}`}>
                         <label
@@ -217,13 +227,22 @@ function PrintCertificate() {
     
     const showFilterOptions = () => {
         return(
-            <div >
-                <label htmlFor="name">Name</label>
-                <input type="text" id="name" name="name" onChange={(evt) => {
-                    const newTableData = dummyTableData.filter( data => data.name.toLowerCase().includes(evt.target.value.toLowerCase())) 
-                    setTableData(newTableData)
-                }}/>
-            </div>
+            <div className="d-flex flex-row">
+                <div className="p-2">
+                    <label htmlFor="name">Name</label>
+                    <input type="text" id="name" name="name" onChange={(evt) => {
+                        const newTableData = dummyTableData.filter( data => data.name.toLowerCase().includes(evt.target.value.toLowerCase())) 
+                        setTableData(newTableData)
+                    }}/>
+                </div>    
+                <div className=" p-2">
+                    <label htmlFor="date">Date</label>
+                    <input type="date" id="date" name="date" placeholder="yyyy/MM/dd" onChange={(evt) => {
+                        const newTableData = dummyTableData.filter( data => data.dob === evt.target.value) 
+                        setTableData(newTableData)
+                    }}/>
+                </div>
+            </div>    
         )
     }
 
@@ -241,6 +260,7 @@ function PrintCertificate() {
                             <th>Enrolment ID</th>
                             <th>Name</th>
                             <th>Gender</th>
+                            <th>Date of birth</th>
                             <th>Print certificate</th>
                         </tr>
                     </thead>
