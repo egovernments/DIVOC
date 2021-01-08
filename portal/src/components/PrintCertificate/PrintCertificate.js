@@ -182,33 +182,6 @@ function PrintCertificate() {
                 <td>{data.name}</td>
                 <td>{data.gender}</td>
                 <td>
-                    <div className={`form-check ${styles['input-container']}`}>
-                        <label
-                            className="form-check-label"
-                            htmlFor={data.osid + "receipt"}
-                        >
-                            <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={data.osid + "receipt"}
-                                onChange={() => handleChange(data,selectedReceipt,setSelectedReceipt) }
-                            />
-                            <div
-                                className={styles["wrapper"]}
-                                style={{
-                                    backgroundColor:
-                                    selectedReceipt.some(receipt => receipt.osid===data.osid)
-                                            ? "#5C9EF8"
-                                            : "",
-                                }}
-                            >
-                                &nbsp;
-                            </div>
-                        
-                        </label>
-                    </div>
-                </td>
-                <td>
                 <div className={`form-check ${styles['input-container']}`}>
                         <label
                             className="form-check-label"
@@ -268,7 +241,6 @@ function PrintCertificate() {
                             <th>Enrolment ID</th>
                             <th>Name</th>
                             <th>Gender</th>
-                            <th>Print receipt</th>
                             <th>Print certificate</th>
                         </tr>
                     </thead>
@@ -285,15 +257,6 @@ function PrintCertificate() {
                     </div>
                 </div>
                 <div className="d-flex flex-row">
-                    <div className="mr-auto p-2">
-                        {selectedReceipt.length>0 ? <ReactToPrint
-                            trigger={() => <button className={styles['button']}>Print Receipt</button> }
-                            content={() => receiptRef.current}
-                        /> : ''}
-                        <div style={{ display: "none" }}>
-                            <CustomPrint ref={receiptRef} dataToPrint={selectedReceipt} title="Receipt"/>
-                        </div>
-                    </div>
                     <div className="p-2"> 
                         {selectedCertificate.length>0 ? <ReactToPrint
                             trigger={() => <button className={styles['button']}>Print Certificate</button> }
