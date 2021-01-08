@@ -156,38 +156,26 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
 	fileName := fileHeader.Filename
 	preferredUsername := getUserName(params.HTTPRequest)
-	facilityCSV := FacilityCSV{Columns: columns, Data: &data, FileName: fileName, UserName: preferredUsername}
+	facilityCSV := CSVUpload{FacilityCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
 
 	headerErrors := facilityCSV.ValidateHeaders()
 	if headerErrors != nil {
 		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
 
-	csvUploadHistory := facilityCSV.CreateCsvUploadHistory()
-
-	var totalRowErrors int64 = 0
-	var totalRecords int64 = 0
-	for data.Scan() {
-		rowErrors := facilityCSV.ValidateRow()
-		if len(rowErrors) > 0 {
-			totalRowErrors += 1
-			facilityCSV.saveCsvErrors(rowErrors, csvUploadHistory.ID)
-		} else {
-			_ = facilityCSV.CreateCsvUpload()
-		}
-		totalRecords += 1
-		log.Info(data.Text("serialNum"), data.Text("facilityName"))
-	}
+	processError := ProcessCSV(facilityCSV, &data)
 	defer params.File.Close()
 
-	csvUploadHistory.TotalRecords = totalRecords
-	csvUploadHistory.TotalErrorRows = totalRowErrors
-	if csvUploadHistory.TotalErrorRows > 0 {
-		csvUploadHistory.Status = "Failed"
-	} else {
-		csvUploadHistory.Status = "Success"
+	if processError != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(processError)
 	}
-	db.UpdateCSVUpload(csvUploadHistory)
 
 	return operations.NewPostFacilitiesOK()
 }

@@ -11,42 +11,11 @@ import (
 )
 
 type FacilityCSV struct {
-	Data     *Scanner
-	Columns  []string
-	FileName string
-	UserName string
-}
-
-func (facilityCsv FacilityCSV) ValidateHeaders() *models.Error {
-	// csv template validation
-	csvHeaders := facilityCsv.Data.GetHeaders()
-	for _, c := range facilityCsv.Columns {
-		if !contains(csvHeaders, c) {
-			code := "INVALID_TEMPLATE"
-			message := c + " column doesn't exist in uploaded csv file"
-			e := &models.Error{
-				Code:    &code,
-				Message: &message,
-			}
-			return e
-		}
-	}
-	return nil
+	CSVMetadata
 }
 
 func (facilityCsv FacilityCSV) CreateCsvUploadHistory() *db.CSVUploads {
-	headers := strings.Join(facilityCsv.Data.GetHeaders(), ",")
-	// Initializing CSVUploads entity
-	uploadEntry := db.CSVUploads{}
-	uploadEntry.Filename = facilityCsv.FileName
-	uploadEntry.UserID = facilityCsv.UserName
-	uploadEntry.FileHeaders = headers
-	uploadEntry.Status = "Processing"
-	uploadEntry.UploadType = "Facility"
-	uploadEntry.TotalRecords = 0
-	uploadEntry.TotalErrorRows = 0
-	_ = db.CreateCSVUpload(&uploadEntry)
-	return &uploadEntry
+	return facilityCsv.CSVMetadata.CreateCsvUploadHistory("Facility")
 }
 
 func (facilityCsv FacilityCSV) ValidateRow() []string {
@@ -61,24 +30,24 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 	if data.Text("contact") == "" {
 		errorMsgs = append(errorMsgs, "Contact is missing")
 	}
-	if data.Text("admin") == "" {
-		errorMsgs = append(errorMsgs, "Admin details is missing")
-	}
-	if data.Text("addressLine1") == "" {
-		errorMsgs = append(errorMsgs, "AddressLine1 details is missing")
-	}
-	if data.Text("addressLine1") == "" {
-		errorMsgs = append(errorMsgs, "AddressLine2 details is missing")
-	}
-	if data.Text("district") == "" {
-		errorMsgs = append(errorMsgs, "District details is missing")
-	}
-	if data.Text("state") == "" {
-		errorMsgs = append(errorMsgs, "State details is missing")
-	}
-	if data.Text("pincode") == "" {
-		errorMsgs = append(errorMsgs, "Pincode details is missing")
-	}
+	/*	if data.Text("admin") == "" {
+			errorMsgs = append(errorMsgs, "Admin details is missing")
+		}
+		if data.Text("addressLine1") == "" {
+			errorMsgs = append(errorMsgs, "AddressLine1 details is missing")
+		}
+		if data.Text("addressLine1") == "" {
+			errorMsgs = append(errorMsgs, "AddressLine2 details is missing")
+		}
+		if data.Text("district") == "" {
+			errorMsgs = append(errorMsgs, "District details is missing")
+		}
+		if data.Text("state") == "" {
+			errorMsgs = append(errorMsgs, "State details is missing")
+		}
+		if data.Text("pincode") == "" {
+			errorMsgs = append(errorMsgs, "Pincode details is missing")
+		}*/
 	return errorMsgs
 }
 
@@ -143,10 +112,6 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	return nil
 }
 
-func (facilityCsv FacilityCSV) saveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	csvUploadErrors := db.CSVUploadErrors{}
-	csvUploadErrors.Errors = strings.Join(rowErrors, ",")
-	csvUploadErrors.CSVUploadID = csvUploadHistoryId
-	csvUploadErrors.RowData = strings.Join(facilityCsv.Data.Row, ",")
-	_ = db.CreateCSVUploadError(&csvUploadErrors)
+func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
+	facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
 }
