@@ -23,8 +23,8 @@ function PreEnrollment() {
     return (
         <div>
             <div className="d-flex mt-3">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchEnrollment}
-                           sampleCSV={SampleCSV.PRE_ENROLLMENT}
+                <UploadCSV fileUploadAPI={fileUploadAPI}
+                           onUploadComplete={fetchEnrollment}
                 />
                 <TotalRecords
                     title={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
