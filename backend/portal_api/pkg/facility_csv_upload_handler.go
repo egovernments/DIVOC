@@ -5,6 +5,7 @@ import (
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
@@ -81,7 +82,19 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 			Pincode:      &pincode,
 		},
 	}
-	services.MakeRegistryCreateRequest(facility, "Facility")
+	err = services.CreateNewRegistry(facility, "Facility")
+	if err != nil {
+		errmsg := err.Error()
+		if strings.Contains(errmsg, "Detail:") {
+			split := strings.Split(errmsg, "Detail:")
+			if len(split) > 0 {
+				m1 := split[len(split)-1]
+				return errors.New(m1)
+			}
+		}
+		return errors.New(errmsg)
+	}
+
 	for _, mobile := range facility.Admins {
 		//create keycloak user for
 		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
@@ -98,6 +111,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 			log.Errorf("Error while creating keycloak user : %s", mobile)
+			return errors.New("Error while creating keycloak user : " + mobile)
 		} else {
 			log.Info("Setting up roles for the user ", mobile)
 			keycloakUserId := getKeycloakUserId(resp, userRequest)
@@ -105,6 +119,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 				_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.FacilityAdmin.GroupId)
 			} else {
 				log.Error("Unable to map keycloak user id for ", mobile)
+				return errors.New("Unable to map keycloak user id for " + mobile)
 			}
 		}
 

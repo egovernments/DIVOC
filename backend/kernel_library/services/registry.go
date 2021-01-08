@@ -44,7 +44,8 @@ type RegistryRequest struct {
 	Request map[string]interface{} `json:"request"`
 }
 
-func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middleware.Responder { //todo: change signature to return non http specific type
+//todo: change signature to return non http specific type. Created alternate CreateNewRegistry
+func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middleware.Responder {
 	requestJson := CreateEntityRegistryRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -82,6 +83,44 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 		return model.NewGenericServerError()
 	}
 	return model.NewGenericStatusOk()
+}
+
+func CreateNewRegistry(requestMap interface{}, objectId string) error {
+	requestJson := CreateEntityRegistryRequest{
+		ID:  "open-saber.registry.create",
+		Ver: config.Config.Registry.ApiVersion,
+		Ets: "",
+		Params: struct {
+			Did   string `json:"did"`
+			Key   string `json:"key"`
+			Msgid string `json:"msgid"`
+		}{},
+		Request: map[string]interface{}{objectId: requestMap},
+	}
+	url := registryUrl(config.Config.Registry.AddOperationId)
+	log.Info("Using registry url ", url)
+	log.Infof("Request >> %+v", requestJson)
+	resp, err := req.Post(url, req.BodyJSON(requestJson))
+
+	if resp == nil || err != nil {
+		log.Error("Failed to request registry ", url, " ", err)
+		return errors.New("Failed to request registry")
+	}
+	if resp.Response().StatusCode != 200 {
+		log.Error("Registry response is ", resp.Response().StatusCode, url)
+		println(resp.Response().Status)
+		log.Error("Next R Error" + string(resp.Response().Status))
+		return errors.New("Registry response is " + string(resp.Response().StatusCode))
+	}
+	respStr, _ := resp.ToString()
+	log.Infof("Response from registry %+v", respStr)
+	var registryResponse = RegistryResponse{}
+	err = json.Unmarshal(resp.Bytes(), &registryResponse)
+	log.Info("Got response from registry ", registryResponse.Params.Status)
+	if registryResponse.Params.Status != "SUCCESSFUL" {
+		return errors.New(registryResponse.Params.Errmsg)
+	}
+	return nil
 }
 
 func registryUrl(operationId string) string {

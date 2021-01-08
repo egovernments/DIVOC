@@ -74,9 +74,15 @@ func ProcessCSV(baseCsv BaseCSV, data *Scanner) *models.Error {
 		rowErrors := baseCsv.ValidateRow()
 		if len(rowErrors) > 0 {
 			totalRowErrors += 1
-			baseCsv.SaveCsvErrors(rowErrors, csvUploadHistory.ID)
 		} else {
-			_ = baseCsv.CreateCsvUpload()
+			err := baseCsv.CreateCsvUpload()
+			if err != nil {
+				rowErrors = append(rowErrors, err.Error())
+				totalRowErrors += 1
+			}
+		}
+		if len(rowErrors) > 0 {
+			baseCsv.SaveCsvErrors(rowErrors, csvUploadHistory.ID)
 		}
 		totalRecords += 1
 	}
