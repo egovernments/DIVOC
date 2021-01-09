@@ -107,6 +107,38 @@ func init() {
       "get": {
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -917,6 +949,38 @@ func init() {
       "get": {
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",

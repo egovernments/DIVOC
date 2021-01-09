@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/kernel_library/model"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
@@ -9,7 +10,14 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 )
+
+const StateKey = "address.state"
+const DistrictKey = "address.district"
+const TypeKey = "category"
+const ProgramIdKey = "programs.id"
+const ProgramStatusKey = "programs.status"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -95,8 +103,72 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 	}
 }
 
+func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
+	filter := map[string]interface{}{}
+	if params.State != nil && !strings.EqualFold(*params.State, "ALL") {
+		states := strings.Split(strings.ToLower(*params.State), ",")
+
+		filter[StateKey] = map[string]interface{}{
+			"or": states,
+		}
+	}
+	if params.District != nil && !strings.EqualFold(*params.District, "ALL") {
+		districts := strings.Split(strings.ToLower(*params.District), ",")
+
+		filter[DistrictKey] = map[string]interface{}{
+			"or": districts,
+		}
+	}
+	if params.Type != nil && !strings.EqualFold(*params.Type, "ALL") {
+		types := strings.Split(strings.ToLower(*params.Type), ",")
+
+		filter[TypeKey] = map[string]interface{}{
+			"or": types,
+		}
+	}
+	if params.ProgramID != nil && !strings.EqualFold(*params.ProgramID, "ALL") {
+		programIds := strings.Split(strings.ToLower(*params.ProgramID), ",")
+
+		filter[ProgramIdKey] = map[string]interface{}{
+			"or": programIds,
+		}
+	}
+	if params.ProgramStatus != nil && !strings.EqualFold(*params.ProgramStatus, "ALL") {
+		programStatus := strings.Split(strings.ToLower(*params.ProgramStatus), ",")
+
+		filter[ProgramStatusKey] = map[string]interface{}{
+			"or": programStatus,
+		}
+	}
+
+	return filter
+}
+
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
-	return services.GetEntityType("Facility")
+	entityTypeId := "Facility"
+	filter := createFilterObject(params)
+	response, err := services.QueryRegistry(entityTypeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	//if program status is inactive, query registry to get all entities without having program id.
+	// Bcz initially a facility will not have a program id mapped
+	responseArr := response[entityTypeId]
+	if params.ProgramStatus != nil && strings.Contains(strings.ToLower(*params.ProgramStatus), "inactive") {
+		filter[ProgramIdKey] = map[string]interface{}{
+			"neq": params.ProgramID,
+		}
+		delete(filter, ProgramStatusKey)
+		response, err = services.QueryRegistry(entityTypeId, filter)
+		if err != nil {
+			log.Errorf("Error in querying registry", err)
+			return model.NewGenericServerError()
+		}
+		resp := response[entityTypeId]
+		responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
+	}
+	return model.NewGenericJSONResponse(responseArr)
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {

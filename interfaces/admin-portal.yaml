@@ -31,6 +31,27 @@ paths:
     get:
       summary: get facilities
       operationId: getFacilities
+      parameters:
+        - in: query
+          name: state
+          type: string
+          description: Facility State
+        - in: query
+          name: district
+          type: string
+          description: Facility District
+        - in: query
+          name: type
+          type: string
+          description: Facility Type
+        - in: query
+          name: programId
+          type: string
+          description: Program
+        - in: query
+          name: programStatus
+          type: string
+          description: Program Status
       responses:
         '200':
           description: OK
