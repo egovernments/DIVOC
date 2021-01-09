@@ -9,8 +9,9 @@ import {Card} from "@material-ui/core";
 import ProgramActive from "../../assets/img/program-active.svg";
 import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
 import "./UploadHistory.css"
+import {TotalRecords} from "../TotalRecords";
 
-const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI}) => {
+const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI, infoTitle}) => {
     const axiosInstance = useAxios('');
     const [uploadHistory, setUploadHistory] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null)
@@ -55,7 +56,12 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
                     fetchUploadHistory()
                 }}/>
             </div>
-            <div className="total"/>
+            <div className="total">
+                {infoTitle && <TotalRecords
+                    title={infoTitle}
+                    count={uploadHistory.length}
+                />}
+            </div>
             <div className="upload-history">
                 <UploadHistoryTable
                     data={uploadHistory}

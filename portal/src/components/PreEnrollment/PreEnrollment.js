@@ -44,6 +44,7 @@ function PreEnrollment() {
         fileUploadAPI={fileUploadAPI}
         fileUploadHistoryAPI={fileUploadHistoryAPI}
         fileUploadErrorsAPI={fileUploadErrorsAPI}
+        infoTitle={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
     />
 }
 
