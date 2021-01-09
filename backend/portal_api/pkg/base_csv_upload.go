@@ -3,6 +3,7 @@ package pkg
 import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -72,6 +73,7 @@ func ProcessCSV(baseCsv BaseCSV, data *Scanner) *models.Error {
 	var totalRecords int64 = 0
 	for data.Scan() {
 		rowErrors := baseCsv.ValidateRow()
+		log.Error(rowErrors)
 		if len(rowErrors) > 0 {
 			totalRowErrors += 1
 		} else {

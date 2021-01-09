@@ -106,6 +106,63 @@ func init() {
         }
       }
     },
+    "/enrollments/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Enrollments uploads",
+        "operationId": "getEnrollmentUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/enrollments/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getEnrollmentsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "enrollments upload for given uploadID not found"
+          }
+        }
+      }
+    },
     "/facilities": {
       "get": {
         "summary": "get facilities",
@@ -989,6 +1046,63 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/enrollments/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Enrollments uploads",
+        "operationId": "getEnrollmentUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/enrollments/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getEnrollmentsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "enrollments upload for given uploadID not found"
           }
         }
       }

@@ -66,8 +66,14 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
 		}),
+		GetEnrollmentUploadHistoryHandler: GetEnrollmentUploadHistoryHandlerFunc(func(params GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetEnrollmentUploadHistory has not yet been implemented")
+		}),
 		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetEnrollments has not yet been implemented")
+		}),
+		GetEnrollmentsUploadsErrorsHandler: GetEnrollmentsUploadsErrorsHandlerFunc(func(params GetEnrollmentsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetEnrollmentsUploadsErrors has not yet been implemented")
 		}),
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
@@ -163,8 +169,12 @@ type DivocPortalAPIAPI struct {
 	CreateProgramHandler CreateProgramHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
 	GetAnalyticsHandler GetAnalyticsHandler
+	// GetEnrollmentUploadHistoryHandler sets the operation handler for the get enrollment upload history operation
+	GetEnrollmentUploadHistoryHandler GetEnrollmentUploadHistoryHandler
 	// GetEnrollmentsHandler sets the operation handler for the get enrollments operation
 	GetEnrollmentsHandler GetEnrollmentsHandler
+	// GetEnrollmentsUploadsErrorsHandler sets the operation handler for the get enrollments uploads errors operation
+	GetEnrollmentsUploadsErrorsHandler GetEnrollmentsUploadsErrorsHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
@@ -289,8 +299,14 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetAnalyticsHandler")
 	}
+	if o.GetEnrollmentUploadHistoryHandler == nil {
+		unregistered = append(unregistered, "GetEnrollmentUploadHistoryHandler")
+	}
 	if o.GetEnrollmentsHandler == nil {
 		unregistered = append(unregistered, "GetEnrollmentsHandler")
+	}
+	if o.GetEnrollmentsUploadsErrorsHandler == nil {
+		unregistered = append(unregistered, "GetEnrollmentsUploadsErrorsHandler")
 	}
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
@@ -453,7 +469,15 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/enrollments/uploads"] = NewGetEnrollmentUploadHistory(o.context, o.GetEnrollmentUploadHistoryHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/enrollments"] = NewGetEnrollments(o.context, o.GetEnrollmentsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/enrollments/uploads/{uploadId}/errors"] = NewGetEnrollmentsUploadsErrors(o.context, o.GetEnrollmentsUploadsErrorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
