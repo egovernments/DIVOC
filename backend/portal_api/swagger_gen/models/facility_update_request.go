@@ -124,6 +124,9 @@ type FacilityUpdateRequestItems0ProgramsItems0 struct {
 	// id
 	ID string `json:"id,omitempty"`
 
+	// osid
+	Osid string `json:"osid,omitempty"`
+
 	// rate
 	Rate float64 `json:"rate,omitempty"`
 

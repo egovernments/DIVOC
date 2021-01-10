@@ -18,7 +18,7 @@ function FacilityController() {
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedProgram, setSelectedProgram] = useState("");
     const [facilityType, setFacilityType] = useState("GOVT");
-    const [status, setStatus] = useState("Inactive");
+    const [status, setStatus] = useState("");
     const stateList = [{value: "ALL", label: "ALL"}].concat(Object.values(state_and_districts['states']).map(obj => ({value: obj.name, label: obj.name})));
 
     useEffect(() => {
@@ -43,7 +43,6 @@ function FacilityController() {
             .then(res => {
                 res.data.forEach(item => {
                     Object.assign(item, {isChecked: false});
-                    debugger
                     if (!("programs" in item)) {
                         Object.assign(item, {programs: []});
                     }
@@ -101,10 +100,21 @@ function FacilityController() {
                     title: "Adjusting Rate",
                     component: (
                         <FacilityAdjustingRate
-                            districtList={[]}
                             stateList={stateList}
-                            program={PROGRAMS}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
                             facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
                         />
                     ),
                 },

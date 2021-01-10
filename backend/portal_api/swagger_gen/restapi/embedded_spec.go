@@ -686,6 +686,9 @@ func init() {
                 "id": {
                   "type": "string"
                 },
+                "osid": {
+                  "type": "string"
+                },
                 "rate": {
                   "type": "number"
                 },
@@ -1598,6 +1601,9 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
+          "type": "string"
+        },
+        "osid": {
           "type": "string"
         },
         "rate": {

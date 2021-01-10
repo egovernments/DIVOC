@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import styles from "./FacilityActivation.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import {useAxios} from "../../utils/useAxios";
@@ -7,11 +7,14 @@ import {API_URL} from "../../utils/constants";
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                 setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                status, setStatus,fetchFacilities
+                                status, setStatus, fetchFacilities
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios('');
+    useEffect(() => {
+        setStatus("Inactive")
+    }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
     };
@@ -33,7 +36,7 @@ function FacilityActivation({
     };
 
     const getFacilityStatusForProgram = (facility) => {
-        if ("programs" in facility){
+        if ("programs" in facility) {
             const program = facility.programs.find(obj => obj.id === selectedProgram);
             if (program) {
                 return program.status;
@@ -82,7 +85,11 @@ function FacilityActivation({
                         }
                     })
                 } else {
-                    programs = facility.programs.concat({id: selectedProgram, status: status !== "Active" ? "ACTIVE" : "INACTIVE", rate: 0})
+                    programs = facility.programs.concat({
+                        id: selectedProgram,
+                        status: status !== "Active" ? "ACTIVE" : "INACTIVE",
+                        rate: 0
+                    })
                 }
                 updateFacilities.push({osid: facility.osid, programs})
             });
