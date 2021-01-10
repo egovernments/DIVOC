@@ -155,7 +155,7 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 	//if program status is inactive, query registry to get all entities without having program id.
 	// Bcz initially a facility will not have a program id mapped
 	responseArr := response[entityTypeId]
-	if params.ProgramStatus != nil && strings.Contains(strings.ToLower(*params.ProgramStatus), "inactive") {
+	if params.ProgramID != nil && params.ProgramStatus != nil && strings.Contains(strings.ToLower(*params.ProgramStatus), "inactive") {
 		filter[ProgramIdKey] = map[string]interface{}{
 			"neq": params.ProgramID,
 		}
@@ -166,7 +166,9 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			return model.NewGenericServerError()
 		}
 		resp := response[entityTypeId]
-		responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
+		if resp != nil {
+			responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
+		}
 	}
 	return model.NewGenericJSONResponse(responseArr)
 }

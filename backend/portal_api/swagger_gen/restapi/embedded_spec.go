@@ -105,6 +105,14 @@ func init() {
     },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
         "parameters": [
@@ -354,7 +362,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "user"
+              "user",
+              "controller"
             ]
           }
         ],
@@ -613,6 +622,23 @@ func init() {
           "type": "integer",
           "title": "Operating hours start of day"
         },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "serialNum": {
           "type": "integer",
           "title": "Serial Number"
@@ -651,6 +677,23 @@ func init() {
         "properties": {
           "osid": {
             "type": "object"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "rate": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "status": {
             "type": "string"
@@ -947,6 +990,14 @@ func init() {
     },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
         "parameters": [
@@ -1196,6 +1247,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "controller",
               "user"
             ]
           }
@@ -1468,6 +1520,12 @@ func init() {
           "type": "integer",
           "title": "Operating hours start of day"
         },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityProgramsItems0"
+          }
+        },
         "serialNum": {
           "type": "integer",
           "title": "Serial Number"
@@ -1499,6 +1557,20 @@ func init() {
         }
       }
     },
+    "FacilityProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "FacilityUpdateRequest": {
       "type": "array",
       "items": {
@@ -1510,6 +1582,26 @@ func init() {
       "properties": {
         "osid": {
           "type": "object"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityUpdateRequestItems0ProgramsItems0"
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityUpdateRequestItems0ProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
         },
         "status": {
           "type": "string"

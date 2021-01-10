@@ -121,11 +121,7 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 }
 
 func GetEntityType(entityTypeId string) middleware.Responder {
-	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": entityTypeId,
-		},
-	}
+	filter := map[string]interface{}{}
 	response, err := QueryRegistry(entityTypeId, filter)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)

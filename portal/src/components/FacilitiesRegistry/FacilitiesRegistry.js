@@ -2,12 +2,12 @@ import React, {useEffect, useState} from 'react';
 import UploadCSV from '../UploadCSV/UploadCSV';
 import {useAxios} from "../../utils/useAxios";
 import {TotalRecords} from "../TotalRecords";
-import {SampleCSV} from "../../utils/constants";
+import {API_URL, SampleCSV} from "../../utils/constants";
 import {CustomTable} from "../CustomTable";
 
 function Facilities() {
     const [facilities, setFacilities] = useState([]);
-    const fileUploadAPI = '/divoc/admin/api/v1/facilities';
+    const fileUploadAPI = API_URL.FACILITY_API;
     const axiosInstance = useAxios('');
 
     useEffect(() => {

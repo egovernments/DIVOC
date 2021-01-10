@@ -56,5 +56,5 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "https://divoc.xiv.in"
+  "proxy": "http://localhost:8001"
 }

@@ -157,6 +157,7 @@ paths:
         - hasRole:
             - admin
             - user
+            - controller
       responses:
         '200':
             description: OK
@@ -297,6 +298,17 @@ definitions:
           type: object
         status:
           type: string
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+              rate:
+                type: number
   ProgramRequest:
     type: object
     properties:
@@ -415,6 +427,17 @@ definitions:
           "$ref": "#/definitions/Vaccinator"
       stamp:
         type: string
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            rate:
+              type: number
   Address:
     type: object
     title: Address
