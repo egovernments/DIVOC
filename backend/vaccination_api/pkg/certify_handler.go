@@ -23,7 +23,7 @@ func publishSimpleEvent(source string, event string) {
 	})
 }
 
-func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId int) error {
+func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 
 	uploadDetails.TotalRecords = uploadDetails.TotalRecords + 1
 
@@ -75,6 +75,14 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId in
 	if terr != nil {
 		log.Info("error while parsing effectiveUntil ", certifyData.VaccinationEffectiveEnd)
 	}
+	dose, terr := strconv.ParseFloat(certifyData.VaccinationDose, 64)
+	if terr != nil {
+		log.Info("error while parsing dose ", certifyData.VaccinationDose)
+	}
+	totalDoses, terr := strconv.ParseFloat(certifyData.VaccinationTotalDoses, 64)
+	if terr != nil {
+		log.Info("error while parsing totalDoses ", certifyData.VaccinationTotalDoses)
+	}
 	vaccination := &models.CertificationRequestVaccination{
 		Batch:          certifyData.VaccinationBatch,
 		Date:           strfmt.DateTime(vaccinationDate),
@@ -82,6 +90,8 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads, rowId in
 		EffectiveUntil: strfmt.Date(effectiveUntil),
 		Manufacturer:   certifyData.VaccinationManufacturer,
 		Name:           certifyData.VaccinationName,
+		Dose:           dose,
+		TotalDoses:     totalDoses,
 	}
 
 	vaccinator := &models.CertificationRequestVaccinator{
@@ -142,6 +152,8 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		RecipientIdentity:         data.Text("recipientIdentity"),
 		VaccinationBatch:          data.Text("vaccinationBatch"),
 		VaccinationDate:           data.Text("vaccinationDate"),
+		VaccinationDose:           data.Text("vaccinationDose"),
+		VaccinationTotalDoses:     data.Text("vaccinationTotalDoses"),
 		VaccinationEffectiveStart: data.Text("vaccinationEffectiveStart"),
 		VaccinationEffectiveEnd:   data.Text("vaccinationEffectiveEnd"),
 		VaccinationManufacturer:   data.Text("vaccinationManufacturer"),

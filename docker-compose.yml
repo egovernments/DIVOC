@@ -30,6 +30,12 @@ services:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://localhost:9990"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
     ports:
       - "8080:8080"
       - "9990:9990"
@@ -65,6 +71,12 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
   #  kafka:
   #    image: wurstmeister/kafka
   #    ports:
@@ -96,8 +108,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - kafka
-      - registry
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   portal_api:
     image: dockerhub/portal_api
     ports:
@@ -108,9 +122,10 @@ services:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
     depends_on:
-      - kafka
-      - db
-      - registry
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
@@ -133,8 +148,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
     depends_on:
-      - kafka
-      - registry
+      kafka:
+          condition: service_healthy
   nginx:
     image: dockerhub/nginx
     ports:

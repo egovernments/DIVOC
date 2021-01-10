@@ -259,13 +259,19 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	uploadEntry.Filename = fileName
 	uploadEntry.UserID = preferredUsername
 	uploadEntry.TotalRecords = 0
-	db.CreateCertifyUpload(&uploadEntry)
+	if err := db.CreateCertifyUpload(&uploadEntry); err != nil {
+		code := "DATABASE_ERROR"
+		message := err.Error()
+		error := &models.Error{
+			Code:    &code,
+			Message: &message,
+		}
+		return certification.NewBulkCertifyBadRequest().WithPayload(error)
+	}
 
-	rowId := -1
 	// Creating Certificates
 	for data.Scan() {
-		rowId = rowId + 1
-		createCertificate(&data, &uploadEntry, rowId)
+		createCertificate(&data, &uploadEntry)
 		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
 	}
 	defer params.File.Close()
