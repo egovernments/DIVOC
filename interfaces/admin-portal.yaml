@@ -52,6 +52,8 @@ paths:
           name: programStatus
           type: string
           description: Program Status
+      security:
+        - hasRole: ["admin", "controller"]
       responses:
         '200':
           description: OK
