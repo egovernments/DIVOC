@@ -116,10 +116,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+      - kafka
+      - keycloak
   portal_api:
     image: dockerhub/portal_api
     ports:
@@ -130,10 +128,8 @@ services:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
     depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+      - kafka
+      - keycloak
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
@@ -156,8 +152,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
     depends_on:
-      kafka:
-          condition: service_healthy
+      - kafka
   nginx:
     image: dockerhub/nginx
     ports:
