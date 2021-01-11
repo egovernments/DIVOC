@@ -109,6 +109,7 @@ func createFacility(data *Scanner, authHeader string) error {
 		Email:       data.Text("email"),
 		GeoLocation: data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
 		WebsiteURL:  data.Text("websiteURL"),
+		Programs:    []*models.FacilityProgramsItems0{},
 	}
 	services.MakeRegistryCreateRequest(facility, "Facility")
 	sendFacilityRegisteredNotification(facility)
