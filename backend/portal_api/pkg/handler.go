@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/pkg/auth"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
@@ -183,7 +182,7 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	data := NewScanner(params.File)
 	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
 	fileName := fileHeader.Filename
-	preferredUsername := getUserName(params.HTTPRequest)
+	preferredUsername := principal.PreferredUsername
 	facilityCSV := CSVUpload{FacilityCSV{
 		CSVMetadata{
 			Columns:  columns,
@@ -206,15 +205,6 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 	}
 
 	return operations.NewPostFacilitiesOK()
-}
-
-func getUserName(params *http.Request) string {
-	preferredUsername := ""
-	claimBody := auth.ExtractClaimBodyFromHeader(params)
-	if claimBody != nil {
-		preferredUsername = claimBody.PreferredUsername
-	}
-	return preferredUsername
 }
 
 func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {

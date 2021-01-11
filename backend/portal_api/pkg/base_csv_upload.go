@@ -39,6 +39,16 @@ func (baseCsv CSVMetadata) ValidateHeaders() *models.Error {
 	return nil
 }
 
+func (baseCsv CSVMetadata) ValidateRow(requireHeader []string) []string {
+	var errorMsgs []string
+	for _, headerKey := range requireHeader {
+		if baseCsv.Data.Text(headerKey) == "" {
+			errorMsgs = append(errorMsgs, headerKey+" is missing")
+		}
+	}
+	return errorMsgs
+}
+
 func (baseCsv CSVMetadata) CreateCsvUploadHistory(uploadType string) *db.CSVUploads {
 	headers := strings.Join(baseCsv.Data.GetHeaders(), ",")
 	// Initializing CSVUploads entity

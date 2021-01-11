@@ -45,7 +45,8 @@ var Config = struct {
 	}
 	Facility struct {
 		Upload struct {
-			Columns string `yaml:"columns"`
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
 		}
 	}
 	PreEnrollment struct {
