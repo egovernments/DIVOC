@@ -20,7 +20,6 @@ type CSVUploads struct {
 	// file header
 	FileHeaders string
 
-	// status
 	// Enum: [Success,Processing,Failed]
 	Status string
 
