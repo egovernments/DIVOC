@@ -90,6 +90,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
 		}),
+		NotifyFacilitiesHandler: NotifyFacilitiesHandlerFunc(func(params NotifyFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation NotifyFacilities has not yet been implemented")
+		}),
 		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilities has not yet been implemented")
 		}),
@@ -173,6 +176,8 @@ type DivocPortalAPIAPI struct {
 	GetPublicAnalyticsHandler GetPublicAnalyticsHandler
 	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	GetVaccinatorsHandler GetVaccinatorsHandler
+	// NotifyFacilitiesHandler sets the operation handler for the notify facilities operation
+	NotifyFacilitiesHandler NotifyFacilitiesHandler
 	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -302,6 +307,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "GetVaccinatorsHandler")
+	}
+	if o.NotifyFacilitiesHandler == nil {
+		unregistered = append(unregistered, "NotifyFacilitiesHandler")
 	}
 	if o.UpdateFacilitiesHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilitiesHandler")
@@ -466,6 +474,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/vaccinators"] = NewGetVaccinators(o.context, o.GetVaccinatorsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/facilities/notify"] = NewNotifyFacilities(o.context, o.NotifyFacilitiesHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

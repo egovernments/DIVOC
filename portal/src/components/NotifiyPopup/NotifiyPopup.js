@@ -30,7 +30,7 @@ function NotifyPopup(props) {
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={props.onHide}>CANCEL</Button>
-                    <Button onClick={props.onHide}>SEND</Button>
+                    <Button onClick={props.onSend}>SEND</Button>
                 </Modal.Footer>
             </Modal>
         </div>

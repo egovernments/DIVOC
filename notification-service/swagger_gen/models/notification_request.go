@@ -23,7 +23,7 @@ type NotificationRequest struct {
 
 	// this can use address like tel:234343434 or mailto:user@example.com
 	// Required: true
-	Recepient *string `json:"recepient"`
+	Recipient *string `json:"recipient"`
 
 	// subject
 	Subject string `json:"subject,omitempty"`
@@ -37,7 +37,7 @@ func (m *NotificationRequest) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateRecepient(formats); err != nil {
+	if err := m.validateRecipient(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -56,9 +56,9 @@ func (m *NotificationRequest) validateMessage(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *NotificationRequest) validateRecepient(formats strfmt.Registry) error {
+func (m *NotificationRequest) validateRecipient(formats strfmt.Registry) error {
 
-	if err := validate.Required("recepient", "body", m.Recepient); err != nil {
+	if err := validate.Required("recipient", "body", m.Recipient); err != nil {
 		return err
 	}
 

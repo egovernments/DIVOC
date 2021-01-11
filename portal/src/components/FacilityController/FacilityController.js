@@ -1,104 +1,74 @@
-import React, { useState, useEffect } from "react";
-import { TabPanels } from "../TabPanel/TabPanel";
+import React, {useEffect, useState} from "react";
+import {TabPanels} from "../TabPanel/TabPanel";
 import FacilityActivation from "../FacilityActivation/FacilityActivation";
 import FacilityAdjustingRate from "../FacilityAdjustingRate/FacilityAdjustingRate";
 import FacilityDetails from "../FacilityDetails/FacilityDetails";
 import {useAxios} from "../../utils/useAxios";
+import state_and_districts from '../../utils/state_and_districts.json';
+import {equals, reject} from "ramda";
+import {API_URL} from "../../utils/constants";
 
 function FacilityController() {
-    const fileUploadAPI = '/divoc/admin/api/v1/facilities';
-    const axiosInstance = useAxios('');
     const PROGRAMS = ["C-19 Program"];
-    const [facilities,setFacilities] = useState([]);
+    const axiosInstance = useAxios('');
+    const [facilities, setFacilities] = useState([]);
+    const [programs, setPrograms] = useState([]);
+    const [selectedState, setSelectedState] = useState("");
+    const [districts, setDistricts] = useState([]);
+    const [selectedDistrict, setSelectedDistrict] = useState("");
+    const [selectedProgram, setSelectedProgram] = useState("");
+    const [facilityType, setFacilityType] = useState("GOVT");
+    const [status, setStatus] = useState("");
+    const stateList = [{value: "ALL", label: "ALL"}].concat(Object.values(state_and_districts['states']).map(obj => ({value: obj.name, label: obj.name})));
 
     useEffect(() => {
-        fetchFacilities()
+        fetchPrograms();
     }, []);
 
+    useEffect(() => {
+        fetchFacilities();
+    }, [selectedProgram, selectedState, selectedDistrict, facilityType, status]);
+
     function fetchFacilities() {
-        axiosInstance.current.get(fileUploadAPI)
+        let params = {
+            programId: selectedProgram,
+            state: selectedState,
+            district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
+            programStatus: status,
+            type: facilityType,
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+        axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
             .then(res => {
                 res.data.forEach(item => {
-                    Object.assign(item, {status: 'Inactive', isChecked: false});       
-                })
+                    Object.assign(item, {isChecked: false});
+                    if (!("programs" in item)) {
+                        Object.assign(item, {programs: []});
+                    }
+                });
                 setFacilities(res.data)
             });
     }
 
+    function fetchPrograms() {
+        axiosInstance.current.get(API_URL.PROGRAM_API)
+            .then(res => {
+                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                setPrograms(programs)
+            });
+    }
 
-    const STATE_NAMES = {
-        AP: "Andhra Pradesh",
-        AR: "Arunachal Pradesh",
-        AS: "Assam",
-        BR: "Bihar",
-        CT: "Chhattisgarh",
-        GA: "Goa",
-        GJ: "Gujarat",
-        HR: "Haryana",
-        HP: "Himachal Pradesh",
-        JH: "Jharkhand",
-        KA: "Karnataka",
-        KL: "Kerala",
-        MP: "Madhya Pradesh",
-        MH: "Maharashtra",
-        MN: "Manipur",
-        ML: "Meghalaya",
-        MZ: "Mizoram",
-        NL: "Nagaland",
-        OR: "Odisha",
-        PB: "Punjab",
-        RJ: "Rajasthan",
-        SK: "Sikkim",
-        TN: "Tamil Nadu",
-        TG: "Telangana",
-        TR: "Tripura",
-        UT: "Uttarakhand",
-        UP: "Uttar Pradesh",
-        WB: "West Bengal",
-        AN: "Andaman and Nicobar Islands",
-        CH: "Chandigarh",
-        DN: "Dadra and Nagar Haveli and Daman and Diu",
-        DL: "Delhi",
-        JK: "Jammu and Kashmir",
-        LA: "Ladakh",
-        LD: "Lakshadweep",
-        PY: "Puducherry",
-        TT: "All of India",
-    };
+    function onStateSelected(stateSelected) {
+        setSelectedState(stateSelected);
+        const stateObj = Object.values(state_and_districts['states']).find(obj => obj.name === stateSelected);
+        if(stateObj) {
+            setDistricts(stateObj.districts)
+        } else {
+            setDistricts([])
+        }
+    }
 
-    const DISTRICT_NAMES = {
-        Bagalkote: 5,
-        Ballari: 2,
-        Belagavi: 4,
-        "Bengaluru Rural": 3,
-        "Bengaluru Urban": 2,
-        Bidar: 1,
-        Chamarajanagara: 4,
-        Chikkaballapura: 5,
-        Chikkamagaluru: 3,
-        Chitradurga: 6,
-        "Dakshina Kannada": 2,
-        Davanagere: 3,
-        Dharwad: 5,
-        Gadag: 1,
-        Hassan: 2,
-        Haveri: 4,
-        Kalaburagi: 3,
-        Kodagu: 2,
-        Kolar: 1,
-        Koppal: 4,
-        Mandya: 2,
-        Mysuru: 7,
-        "Other State": 3,
-        Raichur: 6,
-        Ramanagara: 5,
-        Shivamogga: 7,
-        Tumakuru: 3,
-        Udupi: 6,
-        "Uttara Kannada	": 2,
-        " Vijayapura": 8,
-        Yadgir: 2,
-    };
 
     return (
         <TabPanels
@@ -107,10 +77,22 @@ function FacilityController() {
                     title: "Facility Activation",
                     component: (
                         <FacilityActivation
-                            districtList={DISTRICT_NAMES}
-                            stateList={STATE_NAMES}
-                            program={PROGRAMS}
+                            stateList={stateList}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
                             facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            status={status}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
                         />
                     ),
                 },
@@ -118,10 +100,21 @@ function FacilityController() {
                     title: "Adjusting Rate",
                     component: (
                         <FacilityAdjustingRate
-                            districtList={DISTRICT_NAMES}
-                            stateList={STATE_NAMES}
-                            program={PROGRAMS}
+                            stateList={stateList}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
                             facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
                         />
                     ),
                 },
@@ -129,10 +122,22 @@ function FacilityController() {
                     title: "All Facilities",
                     component: (
                         <FacilityDetails
-                            districtList={DISTRICT_NAMES}
-                            stateList={STATE_NAMES}
-                            program={PROGRAMS}
+                            stateList={stateList}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
                             facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            status={status}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
                         />
                     ),
                 },

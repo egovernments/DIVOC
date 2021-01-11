@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	eventsModel "github.com/divoc/api/pkg/models"
 	"net/http"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
+	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
@@ -224,7 +226,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			publishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
 		}
 	}
 	return certification.NewCertifyOK()
@@ -282,7 +284,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 func eventsHandler(params operations.EventsParams) middleware.Responder {
 	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
-		publishEvent(Event{
+		kafkaService.PublishEvent(eventsModel.Event{
 			Date:          time.Time(e.Date),
 			Source:        preferredUsername,
 			TypeOfMessage: e.Type,

@@ -105,8 +105,48 @@ func init() {
     },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -120,6 +160,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -166,6 +214,60 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "contact": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "facilityId": {
+                    "type": "string"
+                  },
+                  "pendingTasks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -322,7 +424,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "user"
+              "user",
+              "controller"
             ]
           }
         ],
@@ -536,7 +639,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {
@@ -557,6 +660,10 @@ func init() {
           "type": "string",
           "title": "Contact number"
         },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
         "facilityCode": {
           "type": "string",
           "title": "Facility Code"
@@ -576,6 +683,23 @@ func init() {
         "operatingHourStart": {
           "type": "integer",
           "title": "Operating hours start of day"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
         },
         "serialNum": {
           "type": "integer",
@@ -615,6 +739,26 @@ func init() {
         "properties": {
           "osid": {
             "type": "object"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "osid": {
+                  "type": "string"
+                },
+                "rate": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "status": {
             "type": "string"
@@ -911,8 +1055,48 @@ func init() {
     },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -926,6 +1110,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -972,6 +1164,43 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NotifyFacilitiesParamsBodyItems0"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -1128,6 +1357,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "controller",
               "user"
             ]
           }
@@ -1355,7 +1585,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {
@@ -1376,6 +1606,10 @@ func init() {
           "type": "string",
           "title": "Contact number"
         },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
         "facilityCode": {
           "type": "string",
           "title": "Facility Code"
@@ -1395,6 +1629,12 @@ func init() {
         "operatingHourStart": {
           "type": "integer",
           "title": "Operating hours start of day"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityProgramsItems0"
+          }
         },
         "serialNum": {
           "type": "integer",
@@ -1427,6 +1667,20 @@ func init() {
         }
       }
     },
+    "FacilityProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "FacilityUpdateRequest": {
       "type": "array",
       "items": {
@@ -1438,6 +1692,29 @@ func init() {
       "properties": {
         "osid": {
           "type": "object"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityUpdateRequestItems0ProgramsItems0"
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityUpdateRequestItems0ProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "osid": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
         },
         "status": {
           "type": "string"
@@ -1467,6 +1744,26 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
+        }
+      }
+    },
+    "NotifyFacilitiesParamsBodyItems0": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "facilityId": {
+          "type": "string"
+        },
+        "pendingTasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

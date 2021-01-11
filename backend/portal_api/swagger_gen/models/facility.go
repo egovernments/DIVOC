@@ -7,6 +7,7 @@ package models
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -23,7 +24,7 @@ type Facility struct {
 	Address *Address `json:"address,omitempty"`
 
 	// admins
-	Admins []string `json:"admins"`
+	Admins []*Vaccinator `json:"admins"`
 
 	// Average Rating
 	//
@@ -36,6 +37,9 @@ type Facility struct {
 
 	// Contact number
 	Contact string `json:"contact,omitempty"`
+
+	// Facility Email
+	Email string `json:"email,omitempty"`
 
 	// Facility Code
 	FacilityCode string `json:"facilityCode,omitempty"`
@@ -51,6 +55,9 @@ type Facility struct {
 
 	// Operating hours start of day
 	OperatingHourStart int64 `json:"operatingHourStart,omitempty"`
+
+	// programs
+	Programs []*FacilityProgramsItems0 `json:"programs"`
 
 	// Serial Number
 	SerialNum int64 `json:"serialNum,omitempty"`
@@ -78,7 +85,15 @@ func (m *Facility) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateAdmins(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateCategory(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrograms(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -109,6 +124,31 @@ func (m *Facility) validateAddress(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *Facility) validateAdmins(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Admins) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Admins); i++ {
+		if swag.IsZero(m.Admins[i]) { // not required
+			continue
+		}
+
+		if m.Admins[i] != nil {
+			if err := m.Admins[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("admins" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -152,6 +192,31 @@ func (m *Facility) validateCategory(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateCategoryEnum("category", "body", m.Category); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Facility) validatePrograms(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Programs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Programs); i++ {
+		if swag.IsZero(m.Programs[i]) { // not required
+			continue
+		}
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -260,6 +325,44 @@ func (m *Facility) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Facility) UnmarshalBinary(b []byte) error {
 	var res Facility
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// FacilityProgramsItems0 facility programs items0
+//
+// swagger:model FacilityProgramsItems0
+type FacilityProgramsItems0 struct {
+
+	// id
+	ID string `json:"id,omitempty"`
+
+	// rate
+	Rate float64 `json:"rate,omitempty"`
+
+	// status
+	Status string `json:"status,omitempty"`
+}
+
+// Validate validates this facility programs items0
+func (m *FacilityProgramsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *FacilityProgramsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *FacilityProgramsItems0) UnmarshalBinary(b []byte) error {
+	var res FacilityProgramsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

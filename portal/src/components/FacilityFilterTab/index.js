@@ -12,21 +12,21 @@ export const FacilityFilterTab = ({
     };
 
     const showDistrictList = () => {
-        return Object.keys(districtList).map((district) => {
+        return districtList.map((district) => {
             return (
                 <tr>
                     <td className="filter-header">
                         <CheckboxItem
-                            text={district}
-                            checked={selectedDistrict && district === selectedDistrict}
+                            text={district.name}
+                            checked={selectedDistrict.includes(district.name)}
                             onSelect={(event) =>
                                 handleChange(
-                                    district,
+                                    district.name,
                                     setSelectedDistrict
                                 )
                             }/>
                     </td>
-                    <td>{districtList[district]}</td>
+                    {/*<td>{districtList[district]}</td>*/}
                 </tr>
             );
         });
@@ -69,8 +69,8 @@ export const FacilityFilterTab = ({
                 <div className="m-3">
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"Government"}
-                            checked={facilityType === "Government"}
+                            text={"GOVT"}
+                            checked={facilityType === "GOVT"}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,
@@ -81,8 +81,8 @@ export const FacilityFilterTab = ({
                     </div>
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"Private"}
-                            checked={facilityType === "Private"}
+                            text={"PRIVATE"}
+                            checked={facilityType === "PRIVATE"}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,

@@ -1,75 +1,57 @@
 import React, {useEffect, useState} from "react";
 import styles from "./FacilityActivation.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
+import {useAxios} from "../../utils/useAxios";
+import {API_URL} from "../../utils/constants";
 
-function FacilityActivation({districtList, stateList, program}) {
-    const [programs, setPrograms] = useState(program);
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState();
-    const [facilityType, setFacilityType] = useState("Government");
+function FacilityActivation({
+                                facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
+                                setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
+                                status, setStatus, fetchFacilities
+                            }) {
 
-    const [listOfStates, setListOfStates] = useState([]);
-    const [status, setStatus] = useState("Inactive");
-    const [allChecked, setAllChecked] = useState(false)
-    const [rowCount, setRowCount] = useState(0);
-    const [faclitiesList, setFacilitiesList] = useState([
-        {id: 1, name: "Centre 1", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
-        {id: 2, name: "Centre 2", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
-        {id: 3, name: "Centre 3", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
-        {id: 4, name: "Centre 4", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
-        {id: 5, name: "Centre 5", stations: 100, vaccinators: 100, status: 'Inactive', isChecked: false},
-    ]);
-
-    const [inactiveFacilities, setInactiveFacilities] = useState([]);
-
+    const [allChecked, setAllChecked] = useState(false);
+    const axiosInstance = useAxios('');
     useEffect(() => {
-        normalize();
+        setStatus("Inactive")
     }, []);
-
-    useEffect(() => {
-        const selectedFacilitiesIdx = faclitiesList.map((fac, index) => ({
-            ...fac,
-            index
-        })).filter(facility => facility.isChecked && facility.status === "Inactive").map(fac => fac.index);
-        setInactiveFacilities(selectedFacilitiesIdx);
-    }, [faclitiesList]);
-
-    const normalize = () => {
-        const statesList = Object.keys(stateList).map((state) => ({value: state, label: stateList[state]}));
-        setStates(statesList);
-    };
-
     const handleChange = (value, setValue) => {
         setValue(value);
     };
 
-
     const handleAllCheck = (e) => {
-        let list = [...faclitiesList];
+        let list = [...facilities];
         setAllChecked(e.target.checked);
         list = list.map((ele) => ({
             ...ele,
             isChecked: e.target.checked
         }));
-        setFacilitiesList(list);
+        setFacilities(list);
     };
 
     const updateFacility = (index, key, value) => {
-        const facilityData = [...faclitiesList];
+        const facilityData = [...facilities];
         facilityData[index][key] = value;
-        setFacilitiesList(facilityData);
+        setFacilities(facilityData);
+    };
+
+    const getFacilityStatusForProgram = (facility) => {
+        if ("programs" in facility) {
+            const program = facility.programs.find(obj => obj.id === selectedProgram);
+            if (program) {
+                return program.status;
+            }
+        }
+        return "Inactive";
     };
 
     const getFacilityList = () => {
-        return faclitiesList.filter(fac => fac.status === status).map((facility, index) => (
+        return facilities.map((facility, index) => (
             <tr>
-                <td>{facility['id']}</td>
-                <td>{facility['name']}</td>
-                <td>{facility['stations']}</td>
-                <td>{facility['vaccinators']}</td>
-                <td>{facility['status']}</td>
+                <td>{facility['facilityCode']}</td>
+                <td>{facility['facilityName']}</td>
+                <td>{facility['category']}</td>
+                <td>{getFacilityStatusForProgram(facility)}</td>
                 <td>
                     <CheckboxItem
                         text={facility['id']}
@@ -85,20 +67,40 @@ function FacilityActivation({districtList, stateList, program}) {
         ));
 
     };
+    const selectedFacilities = facilities.filter(facility => facility.isChecked);
 
     const handleActiveClick = () => {
-        let facilityData = [...faclitiesList];
-        facilityData = facilityData.map((facility, idx) => {
-            if(inactiveFacilities.includes(idx)) {
-                facility.status = "Active";
-            }
-            facility.isChecked = false;
-            return facility;
-        });
-        setFacilitiesList(facilityData);
         setAllChecked(false);
-        setInactiveFacilities([]);
+        if (selectedProgram && selectedFacilities.length > 0) {
+            let updateFacilities = [];
+            selectedFacilities.forEach(facility => {
+                let programs = [];
+                const program = facility.programs.find(program => program.id === selectedProgram);
+                if (program) {
+                    programs = facility.programs.map(program => {
+                        if (program.id === selectedProgram) {
+                            return {...program, status: status !== "Active" ? "ACTIVE" : "INACTIVE"};
+                        } else {
+                            return program;
+                        }
+                    })
+                } else {
+                    programs = facility.programs.concat({
+                        id: selectedProgram,
+                        status: status !== "Active" ? "ACTIVE" : "INACTIVE",
+                        rate: 0
+                    })
+                }
+                updateFacilities.push({osid: facility.osid, programs})
+            });
+            axiosInstance.current.put(API_URL.FACILITY_API, updateFacilities)
+                .then(res => {
+                    //registry update in ES happening async, so calling search immediately will not get back actual data
+                    setTimeout(() => fetchFacilities(), 1000)
+                });
+        }
     };
+
 
     return (
         <div className={`row ${styles["container"]}`}>
@@ -106,8 +108,8 @@ function FacilityActivation({districtList, stateList, program}) {
                 <FacilityFilterTab
                     programs={programs}
                     setSelectedProgram={setSelectedProgram}
-                    states={states}
-                    setSelectedState={setSelectedState}
+                    states={stateList}
+                    setSelectedState={onStateSelected}
                     selectedState={selectedState}
                     districtList={districtList}
                     selectedDistrict={selectedDistrict}
@@ -145,11 +147,10 @@ function FacilityActivation({districtList, stateList, program}) {
                 <table className={`table table-hover ${styles["table-data"]}`}>
                     <thead>
                     <tr>
-                        <th>CENTRE ID</th>
-                        <th>CENTRE NAME</th>
-                        <th>VACCINATION STATIONS</th>
-                        <th>CERTIFIED VACCINATORS</th>
-                        <th>C19 program STATUS</th>
+                        <th>CODE</th>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>PROGRAM STATUS</th>
                         <th>
                             <CheckboxItem
                                 text={"checkAll"}
@@ -162,22 +163,22 @@ function FacilityActivation({districtList, stateList, program}) {
                         </th>
                     </tr>
                     </thead>
-                    <tbody>{selectedState && selectedDistrict ? getFacilityList() : ''}</tbody>
+                    <tbody>{getFacilityList()}</tbody>
 
                 </table>
             </div>
             <div className="col-sm-2 container">
                 <div className={`card ${styles["card-continer"]}`}>
                     <div className="card-body text-center">
-                        {/*{faclitiesList.length > 0 ? '' : <p>Success</p>}*/}
+                        {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
-                            Make {inactiveFacilities.length} facilities active for the {selectedProgram}
+                            Make {selectedFacilities.length} facilities active for the {selectedProgram}
                         </p>
                         <button
                             onClick={handleActiveClick}
                             className={styles["button"]}
                         >
-                            MAKE ACTIVE
+                            MAKE {status !== "Active" ? "ACTIVE" : "INACTIVE"}
                         </button>
                     </div>
                 </div>
