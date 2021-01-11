@@ -21,7 +21,6 @@
         "facilityName",
         "address",
         "geoLocation",
-        "websiteUrl",
         "contact",
         "operatingHourStart",
         "operatingHourEnd",
@@ -60,6 +59,11 @@
           "$id": "#/properties/websiteUrl",
           "type": "string",
           "title": "Website URL"
+        },
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "title": "Facility Email"
         },
         "contact": {
           "$id": "#/properties/contact",

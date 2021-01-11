@@ -7,6 +7,12 @@ export const CONSTANTS = Object.freeze({
     PORTAL_CLIENT: "facility-admin-portal",
 });
 
+export const API_URL = Object.freeze({
+    FACILITY_API: "/divoc/admin/api/v1/facilities",
+    FACILITY_NOTIFY_API: "/divoc/admin/api/v1/facilities/notify",
+    PROGRAM_API: "/divoc/admin/api/v1/programs",
+});
+
 export class SampleCSV {
     static FACILITY_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/facilities.csv"
     static VACCINATOR_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/vaccinators.csv"

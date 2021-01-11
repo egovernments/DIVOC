@@ -13,7 +13,15 @@ import (
 
 // GetFacilitiesURL generates an URL for the get facilities operation
 type GetFacilitiesURL struct {
+	District      *string
+	ProgramID     *string
+	ProgramStatus *string
+	State         *string
+	Type          *string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -42,6 +50,50 @@ func (o *GetFacilitiesURL) Build() (*url.URL, error) {
 		_basePath = "/divoc/admin/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var districtQ string
+	if o.District != nil {
+		districtQ = *o.District
+	}
+	if districtQ != "" {
+		qs.Set("district", districtQ)
+	}
+
+	var programIDQ string
+	if o.ProgramID != nil {
+		programIDQ = *o.ProgramID
+	}
+	if programIDQ != "" {
+		qs.Set("programId", programIDQ)
+	}
+
+	var programStatusQ string
+	if o.ProgramStatus != nil {
+		programStatusQ = *o.ProgramStatus
+	}
+	if programStatusQ != "" {
+		qs.Set("programStatus", programStatusQ)
+	}
+
+	var stateQ string
+	if o.State != nil {
+		stateQ = *o.State
+	}
+	if stateQ != "" {
+		qs.Set("state", stateQ)
+	}
+
+	var typeVarQ string
+	if o.Type != nil {
+		typeVarQ = *o.Type
+	}
+	if typeVarQ != "" {
+		qs.Set("type", typeVarQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

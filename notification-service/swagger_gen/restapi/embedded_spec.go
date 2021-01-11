@@ -64,14 +64,14 @@ func init() {
     "NotificationRequest": {
       "type": "object",
       "required": [
-        "recepient",
+        "recipient",
         "message"
       ],
       "properties": {
         "message": {
           "type": "string"
         },
-        "recepient": {
+        "recipient": {
           "description": "this can use address like tel:234343434 or mailto:user@example.com",
           "type": "string"
         },
@@ -142,14 +142,14 @@ func init() {
     "NotificationRequest": {
       "type": "object",
       "required": [
-        "recepient",
+        "recipient",
         "message"
       ],
       "properties": {
         "message": {
           "type": "string"
         },
-        "recepient": {
+        "recipient": {
           "description": "this can use address like tel:234343434 or mailto:user@example.com",
           "type": "string"
         },

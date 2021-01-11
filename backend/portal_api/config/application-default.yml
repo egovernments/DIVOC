@@ -22,3 +22,6 @@ facility:
   upload:
     columns: "serialNum,facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,admins,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon"
     required: "facilityCode,facilityName,contact,admin,addressLine1,addressLine1,district,state,pincode"
+kafka:
+  bootstrapServers: localhost:9092
+  notifyTopic: notify
