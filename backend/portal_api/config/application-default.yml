@@ -25,3 +25,4 @@ facility:
 preenrollment:
   upload:
     columns: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"
+    required: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"

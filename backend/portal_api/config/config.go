@@ -51,13 +51,14 @@ var Config = struct {
 	}
 	PreEnrollment struct {
 		Upload struct {
-			Columns string `yaml:"columns"`
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
 		}
 	}
 }{}
 
 func Initialize() {
-	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
 	if err != nil {
 		panic("Unable to read configurations")

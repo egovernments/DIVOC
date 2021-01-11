@@ -152,7 +152,7 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 	data := NewScanner(params.File)
 	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
 	fileName := fileHeader.Filename
-	preferredUsername := getUserName(params.HTTPRequest)
+	preferredUsername := principal.PreferredUsername
 	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
 		CSVMetadata{
 			Columns:  columns,

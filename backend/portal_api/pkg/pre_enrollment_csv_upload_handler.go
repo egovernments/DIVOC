@@ -3,6 +3,7 @@ package pkg
 import (
 	"errors"
 	"github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"strings"
 )
@@ -16,30 +17,8 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUploadHistory() *db.CSVUploads
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) ValidateRow() []string {
-	data := preEnrollmentCsv.Data
-	var errorMsgs []string
-	if data.Text("phone") == "" {
-		errorMsgs = append(errorMsgs, "Phone is missing")
-	}
-	if data.Text("enrollmentScopeId") == "" {
-		errorMsgs = append(errorMsgs, "Facility code is missing")
-	}
-	if data.Text("nationalId") == "" {
-		errorMsgs = append(errorMsgs, "National Id is missing")
-	}
-	if data.Text("dob") == "" {
-		errorMsgs = append(errorMsgs, "DOB details is missing")
-	}
-	if data.Text("gender") == "" {
-		errorMsgs = append(errorMsgs, "Gender details is missing")
-	}
-	if data.Text("name") == "" {
-		errorMsgs = append(errorMsgs, "Name is missing")
-	}
-	if data.Text("email") == "" {
-		errorMsgs = append(errorMsgs, "Email details is missing")
-	}
-	return errorMsgs
+	requiredHeaders := strings.Split(config.Config.PreEnrollment.Upload.Required, ",")
+	return preEnrollmentCsv.CSVMetadata.ValidateRow(requiredHeaders)
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
