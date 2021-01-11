@@ -1,49 +1,21 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import "./FacilityDetails.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import NotifyPopup from "../NotifiyPopup/NotifiyPopup";
 import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
+import {API_URL} from "../../utils/constants";
+import {useAxios} from "../../utils/useAxios";
 
-function FacilityDetails({districtList, stateList, program,facilities}){
-    const [programs, setPrograms] = useState(program);
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState();
-    const [facilityType, setFacilityType] = useState("Government");
+function FacilityDetails({
+                             facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
+                             setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
+                             status, setStatus, fetchFacilities
+                         }) {
+    const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
 
-    const [listOfStates, setListOfStates] = useState([]);
-    const [status, setStatus] = useState("Inactive");
-    const [allChecked, setAllChecked] = useState(false)
-    const [rowCount, setRowCount] = useState(0);
-    const [faclitiesList, setFacilitiesList] = useState([
-        {id: 1, name: "Centre 1", stations: 100, vaccinators: 100, seal: true, roleSetup: false, status: 'Inactive', isChecked: false},
-        {id: 2, name: "Centre 2", stations: 100, vaccinators: 100, seal: false, roleSetup: false, status: 'Inactive', isChecked: false},
-        {id: 3, name: "Centre 3", stations: 100, vaccinators: 100, seal: true, roleSetup: true, status: 'Inactive', isChecked: false},
-        {id: 4, name: "Centre 4", stations: 100, vaccinators: 100, seal: false, roleSetup: true, status: 'Inactive', isChecked: false},
-        {id: 5, name: "Centre 5", stations: 100, vaccinators: 100, seal: true, roleSetup: false, status: 'Inactive', isChecked: false},
-    ]);
-
-    const [inactiveFacilities, setInactiveFacilities] = useState([]);
-
-    useEffect(() => {
-        normalize();
-    }, []);
-
-    useEffect(() => {
-        const selectedFacilitiesIdx = faclitiesList.map((fac, index) => ({
-            ...fac,
-            index
-        })).filter(facility => facility.isChecked && facility.status === "Inactive").map(fac => fac.index);
-        setInactiveFacilities(selectedFacilitiesIdx);
-    }, [faclitiesList]);
-
-    const normalize = () => {
-        const statesList = Object.keys(stateList).map((state) => ({value: state, label: stateList[state]}));
-        setStates(statesList);
-    };
+    const [allChecked, setAllChecked] = useState(false);
 
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -51,28 +23,28 @@ function FacilityDetails({districtList, stateList, program,facilities}){
 
 
     const handleAllCheck = (e) => {
-        let list = [...faclitiesList];
+        let list = [...facilities];
         setAllChecked(e.target.checked);
         list = list.map((ele) => ({
             ...ele,
             isChecked: e.target.checked
         }));
-        setFacilitiesList(list);
+        setFacilities(list);
     };
 
     const updateFacility = (index, key, value) => {
-        const facilityData = [...faclitiesList];
+        const facilityData = [...facilities];
         facilityData[index][key] = value;
-        setFacilitiesList(facilityData);
+        setFacilities(facilityData);
     };
 
     const getFacilityList = () => {
-        return faclitiesList.filter(fac => fac.status === status).map((facility, index) => (
+        return facilities.map((facility, index) => (
             <tr>
-                <td>{facility.id}</td>
-                <td>{facility.name}</td>
-                <td>{facility.vaccinators ? <img src={check} /> : <img src={info}/>}</td>
-                <td>{facility.seal ? <img src={check}/> : <img src={info}/> }</td>
+                <td>{facility.facilityCode}</td>
+                <td>{facility.facilityName}</td>
+                <td>{facility.admins ? <img src={check}/> : <img src={info}/>}</td>
+                <td>{facility.seal ? <img src={check}/> : <img src={info}/>}</td>
                 <td>{facility.roleSetup ? <img src={check}/> : <img src={info}/>}</td>
                 <td>
                     <CheckboxItem
@@ -90,30 +62,45 @@ function FacilityDetails({districtList, stateList, program,facilities}){
 
     };
 
-    const handleActiveClick = () => {
-        let facilityData = [...faclitiesList];
-        facilityData = facilityData.map((facility, idx) => {
-            if(inactiveFacilities.includes(idx)) {
-                facility.status = "Active";
-            }
-            facility.isChecked = false;
-            return facility;
-        });
-        setFacilitiesList(facilityData);
+    const handleNotifyClick = () => {
         setAllChecked(false);
-        setInactiveFacilities([]);
         setModalShow(true);
     };
 
-
+    const sendNotification = () => {
+        const selectedFacilities = facilities.filter(facility => facility.isChecked);
+        const notifyRequest = selectedFacilities.map(facility => {
+            let req = {
+                facilityId: facility.osid,
+                contact: facility.contact,
+                email: facility.email,
+                pendingTasks: []
+            };
+            if(!facility.admins) {
+                req.pendingTasks.push("vaccinators")
+            }
+            if(!facility.seal) {
+                req.pendingTasks.push("seal")
+            }
+            if(!facility.roleSetup) {
+                req.pendingTasks.push("roles")
+            }
+            return req
+        });
+        axiosInstance.current.post(API_URL.FACILITY_NOTIFY_API, notifyRequest)
+            .then(res => {
+                //registry update in ES happening async, so calling search immediately will not get back actual data
+                // setTimeout(() => fetchFacilities(), 1000)
+            });
+    }
     return (
         <div className={"row container"}>
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
                     setSelectedProgram={setSelectedProgram}
-                    states={states}
-                    setSelectedState={setSelectedState}
+                    states={stateList}
+                    setSelectedState={onStateSelected}
                     selectedState={selectedState}
                     districtList={districtList}
                     selectedDistrict={selectedDistrict}
@@ -168,26 +155,32 @@ function FacilityDetails({districtList, stateList, program,facilities}){
                         </th>
                     </tr>
                     </thead>
-                    <tbody>{selectedState && selectedDistrict ? getFacilityList() : ''}</tbody>
+                    <tbody>{getFacilityList()}</tbody>
 
                 </table>
             </div>
-            
+
             <div className="col-sm-2 container">
                 <div className={"card card-continer"}>
                     <div className="card-body text-center">
                         <p>
-                            Notify {inactiveFacilities.length} facilities for the {selectedProgram}
+                            Notify {facilities.filter(facility => facility.isChecked).length} facilities for the {selectedProgram}
                         </p>
                         <button
-                            onClick={()=> handleActiveClick()}
+                            onClick={() => handleNotifyClick()}
                             className={"button"}
                         >
-                           NOTIFY
+                            NOTIFY
                         </button>
-                        <NotifyPopup 
+                        <NotifyPopup
                             show={modalShow}
-                            onHide={() => setModalShow(false)}
+                            onHide={() => {
+                                setModalShow(false)
+                            }}
+                            onSend={()=>{
+                                setModalShow(false)
+                                sendNotification()
+                            }}
                         />
                     </div>
                 </div>

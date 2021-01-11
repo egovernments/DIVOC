@@ -160,6 +160,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -206,6 +214,60 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "contact": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "facilityId": {
+                    "type": "string"
+                  },
+                  "pendingTasks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -1048,6 +1110,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -1094,6 +1164,43 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NotifyFacilitiesParamsBodyItems0"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -1637,6 +1744,26 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
+        }
+      }
+    },
+    "NotifyFacilitiesParamsBodyItems0": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "facilityId": {
+          "type": "string"
+        },
+        "pendingTasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

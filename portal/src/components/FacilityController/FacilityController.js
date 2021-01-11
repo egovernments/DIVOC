@@ -122,10 +122,22 @@ function FacilityController() {
                     title: "All Facilities",
                     component: (
                         <FacilityDetails
-                            districtList={[]}
                             stateList={stateList}
-                            program={PROGRAMS}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
                             facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            status={status}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
                         />
                     ),
                 },
