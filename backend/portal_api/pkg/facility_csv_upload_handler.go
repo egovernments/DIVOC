@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"errors"
-	"fmt"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
@@ -28,7 +27,7 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	data := facilityCsv.Data
 	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
-	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
+	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon,adminName,adminMobile
 	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
 	if err != nil {
 		return err
@@ -42,7 +41,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	var index int64
 	facilityCode := data.Text("facilityCode")
 	adminStatus := "Active"
-	for index = 1; index <= data.int64("totalAdmins"); index++ {
+	/*for index = 1; index <= data.int64("totalAdmins"); index++ {
 		adminPrefix := fmt.Sprintf("%s%d", "admin", index)
 		code := data.Text(adminPrefix + "Code")
 		nationalIdentifier := data.Text(adminPrefix + "NationalIdentifier")
@@ -62,7 +61,27 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 			Signatures:          []*models.Signature{},
 			TrainingCertificate: &trainingCertificate,
 		})
-	}
+	}*/
+	index = 1
+	code := ""
+	nationalIdentifier := ""
+	name := data.Text("adminName")
+	mobileNumber := data.Text("adminMobile")
+	averageRating := 0.0
+	trainingCertificate := ""
+	admins = append(admins, &models.Vaccinator{
+		SerialNum:           &index,
+		Code:                &code,
+		NationalIdentifier:  &nationalIdentifier,
+		Name:                &name,
+		FacilityIds:         []string{facilityCode},
+		MobileNumber:        &mobileNumber,
+		Status:              &adminStatus,
+		AverageRating:       &averageRating,
+		Signatures:          []*models.Signature{},
+		TrainingCertificate: &trainingCertificate,
+	})
+
 	facility := models.Facility{
 		SerialNum:          serialNum,
 		FacilityCode:       facilityCode,
@@ -85,6 +104,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		GeoLocation: data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
 		WebsiteURL:  data.Text("websiteURL"),
 	}
+	//services.MakeRegistryCreateRequest(facility, "Facility")
 	err = services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
 		errmsg := err.Error()

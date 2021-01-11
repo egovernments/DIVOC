@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/divoc/kernel_library/model"
-	"github.com/divoc/portal-api/pkg/services"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
+	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
@@ -349,34 +349,51 @@ func getFacilityUploadErrors(params operations.GetFacilityUploadsErrorsParams, p
 
 	csvUploadErrors, err := db.GetCSVUploadErrorsForUploadID(uploadID)
 	fileHeader := strings.Split(csvUpload.FileHeaders, ",")
-	columnHeaders := strings.Split(config.Config.Facility.Upload.Columns, ",")
 
 	if err == nil {
-		var csvRows []map[string]string = nil
+		erroredString := getErrorRows(csvUpload.FileHeaders, csvUploadErrors)
 		if len(csvUploadErrors) > 0 {
-			for _, uploadError := range csvUploadErrors {
-				newMap := make(map[string]string)
-				rowData := uploadError.RowData
-				rowValue := strings.Split(rowData, ",")
-				for i, header := range fileHeader {
-					newMap[header] = rowValue[i]
-				}
-				newMap["errors"] = uploadError.Errors
-				csvRows = append(csvRows, newMap)
-			}
-		}
-		columnHeaders = append(columnHeaders, "errors")
-		if len(csvRows) > 0 {
+			columnHeaders, errorRows := getErrorRowForResponse(erroredString, fileHeader)
 			return NewGenericJSONResponse(map[string]interface{}{
 				"columns":   columnHeaders,
-				"errorRows": csvRows,
+				"errorRows": errorRows,
 			})
 		} else {
 			return NewGenericJSONResponse(map[string]interface{}{
-				"columns":   columnHeaders,
+				"columns":   []map[string]string{},
 				"errorRows": []map[string]string{},
 			})
 		}
 	}
 	return NewGenericServerError()
+}
+
+func getErrorRowForResponse(erroredString string, fileHeader []string) ([]string, []map[string]string) {
+	columnHeaders := strings.Split(config.Config.Facility.Upload.Columns, ",")
+	reader := strings.NewReader(erroredString)
+	scanner := NewScanner(reader)
+	columnHeaders = append(columnHeaders, "errors")
+
+	var errorRows []map[string]string
+	for scanner.Scan() {
+		newErrorRow := make(map[string]string)
+		for _, head := range fileHeader {
+			newErrorRow[head] = scanner.Text(head)
+		}
+		newErrorRow["errors"] = scanner.Text("errors")
+		errorRows = append(errorRows, newErrorRow)
+	}
+	return columnHeaders, errorRows
+}
+
+func getErrorRows(headers string, csvUploadErrors []*db.CSVUploadErrors) string {
+	var erroredString strings.Builder
+	erroredString.WriteString(headers + ",errors")
+	erroredString.WriteString("\n")
+	for _, uploadError := range csvUploadErrors {
+		erroredString.WriteString(uploadError.RowData)
+		erroredString.WriteString(",\"" + uploadError.Errors + "\"")
+		erroredString.WriteString("\n")
+	}
+	return erroredString.String()
 }
