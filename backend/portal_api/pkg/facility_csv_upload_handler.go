@@ -37,51 +37,11 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	district := data.Text("district")
 	state := data.Text("state")
 	pincode := data.int64("pincode")
-	var admins []*models.Vaccinator
-	var index int64
-	facilityCode := data.Text("facilityCode")
-	adminStatus := "Active"
-	/*for index = 1; index <= data.int64("totalAdmins"); index++ {
-		adminPrefix := fmt.Sprintf("%s%d", "admin", index)
-		code := data.Text(adminPrefix + "Code")
-		nationalIdentifier := data.Text(adminPrefix + "NationalIdentifier")
-		name := data.Text(adminPrefix + "Name")
-		mobileNumber := data.Text(adminPrefix + "Mobile")
-		averageRating := 0.0
-		trainingCertificate := ""
-		admins = append(admins, &models.Vaccinator{
-			SerialNum:           &index,
-			Code:                &code,
-			NationalIdentifier:  &nationalIdentifier,
-			Name:                &name,
-			FacilityIds:         []string{facilityCode},
-			MobileNumber:        &mobileNumber,
-			Status:              &adminStatus,
-			AverageRating:       &averageRating,
-			Signatures:          []*models.Signature{},
-			TrainingCertificate: &trainingCertificate,
-		})
-	}*/
-	index = 1
-	code := ""
-	nationalIdentifier := ""
-	name := data.Text("adminName")
-	mobileNumber := data.Text("adminMobile")
-	averageRating := 0.0
-	trainingCertificate := ""
-	admins = append(admins, &models.Vaccinator{
-		SerialNum:           &index,
-		Code:                &code,
-		NationalIdentifier:  &nationalIdentifier,
-		Name:                &name,
-		FacilityIds:         []string{facilityCode},
-		MobileNumber:        &mobileNumber,
-		Status:              &adminStatus,
-		AverageRating:       &averageRating,
-		Signatures:          []*models.Signature{},
-		TrainingCertificate: &trainingCertificate,
-	})
 
+	var admins []*models.Vaccinator
+	admins = append(admins, buildVaccinator(data))
+
+	facilityCode := data.Text("facilityCode")
 	facility := models.Facility{
 		SerialNum:          serialNum,
 		FacilityCode:       facilityCode,
@@ -146,6 +106,30 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 
 	}
 	return nil
+}
+
+func buildVaccinator(data *Scanner) *models.Vaccinator {
+	adminStatus := "Active"
+	index := int64(1)
+	code := ""
+	nationalIdentifier := ""
+	name := data.Text("adminName")
+	mobileNumber := data.Text("adminMobile")
+	averageRating := 0.0
+	trainingCertificate := ""
+	facilityCode := data.Text("facilityCode")
+	return &models.Vaccinator{
+		SerialNum:           &index,
+		Code:                &code,
+		NationalIdentifier:  &nationalIdentifier,
+		Name:                &name,
+		FacilityIds:         []string{facilityCode},
+		MobileNumber:        &mobileNumber,
+		Status:              &adminStatus,
+		AverageRating:       &averageRating,
+		Signatures:          []*models.Signature{},
+		TrainingCertificate: &trainingCertificate,
+	}
 }
 
 func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
