@@ -68,7 +68,11 @@ func (baseCsv CSVMetadata) SaveCsvErrors(rowErrors []string, csvUploadHistoryId 
 	csvUploadErrors := db.CSVUploadErrors{}
 	csvUploadErrors.Errors = strings.Join(rowErrors, ",")
 	csvUploadErrors.CSVUploadID = csvUploadHistoryId
-	csvUploadErrors.RowData = strings.Join(baseCsv.Data.Row, ",")
+	var row []string
+	for _, item := range baseCsv.Data.Row {
+		row = append(row, "\""+item+"\"")
+	}
+	csvUploadErrors.RowData = strings.Join(row, ",")
 	_ = db.CreateCSVUploadError(&csvUploadErrors)
 }
 
