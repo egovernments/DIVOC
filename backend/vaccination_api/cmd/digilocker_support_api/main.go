@@ -165,7 +165,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			if certBundle != nil {
 				response.DocDetails.URI = certBundle.Uri
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getPdfCertificate(certBundle.signedJson); err != nil {
+					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
 						log.Errorf("Error in creating certificate pdf")
 					} else {
 						pdfContent := pdfBytes // todo get pdf
@@ -346,7 +346,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 			certificateObj := certificateArr[0].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
-			if pdfBytes, err := getPdfCertificate(signedJson); err != nil {
+			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
 				log.Errorf("Error in creating certificate pdf")
 			} else {
 				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
