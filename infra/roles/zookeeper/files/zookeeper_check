@@ -1,0 +1,41 @@
+#!/bin/bash
+
+ZOOPORT="2181"
+STAT=$(echo stat | nc localhost $ZOOPORT|grep "Connections:"| cut -f2 -d ":"| sed 's/\ //')
+ZOOSTAT=$(echo stat | nc localhost $ZOOPORT)
+MNTR=$(echo mntr | nc localhost $ZOOPORT|grep "zk_num_alive_connections"|tail -c 2)
+ZOOMNTR=$(echo mntr | nc localhost $ZOOPORT)
+
+main() {
+	zkMntr
+	zkStat
+}
+
+zkMntr() {
+	if [ -z $MNTR ] || [ $MNTR == "0" ]; then
+		echo "Zookeeper is not ready"
+		service zookeeper restart
+		sleep 30s
+		echo $ZOOMNTR
+	else
+		echo "Number of connections:" $MNTR
+		echo "Zookeeper shows alive connetions"
+		echo $ZOOMNTR
+	fi
+}
+
+zkStat() {
+	if [ -z $STAT ] || [ $STAT == "0" ]; then
+		echo "Zookeeper is not ready"
+		service zookeeper restart
+		sleep 30s
+		echo $ZOOSTAT
+		zkMntr
+	else
+		echo "Number of connections: $STAT"
+		echo "Zookeeper shows stats"
+		echo $ZOOSTAT
+	fi
+}
+
+main

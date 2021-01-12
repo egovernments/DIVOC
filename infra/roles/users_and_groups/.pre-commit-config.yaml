@@ -1,0 +1,26 @@
+---
+
+- repo: https://github.com/willthames/ansible-lint.git
+  sha: v3.4.17
+  hooks:
+    - id: ansible-lint
+      types: [yaml]
+      exclude: >
+        (?x)^(
+          \.travis\.yml|
+          molecule/.*/\.molecule/.*|
+          molecule/.*/create\.yml
+        )$
+    - id: ansible-lint
+      files: \.travis\.yml
+      args: [-x, ANSIBLE0008]
+    - id: ansible-lint
+      files: molecule/.*/create\.yml
+      args: [-x, ANSIBLE0016]
+
+- repo: git://github.com/pre-commit/pre-commit-hooks
+  sha: v0.9.1
+  hooks:
+    - id: check-json
+    - id: flake8
+    - id: trailing-whitespace

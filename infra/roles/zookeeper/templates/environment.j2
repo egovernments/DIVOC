@@ -1,0 +1,21 @@
+
+# Modified from http://packages.ubuntu.com/saucy/zookeeperd
+NAME=zookeeper
+ZOOCFGDIR={{ sansible_zookeeper_conf_dir }}
+ZOODIR={{ sansible_zookeeper_install_dir }}
+
+CLASSPATH="$ZOOCFGDIR:$ZOODIR/zookeeper-{{ sansible_zookeeper_version }}.jar:{{ sansible_zookeeper_classpath | default('$ZOODIR/lib/*') }}"
+
+ZOOCFG="$ZOOCFGDIR/zoo.cfg"
+ZOO_LOG_DIR={{ sansible_zookeeper_log_dir }}
+USER={{ sansible_zookeeper_user }}
+GROUP={{ sansible_zookeeper_group }}
+PIDDIR=/var/run/$NAME
+PIDFILE=$PIDDIR/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+JAVA=/usr/bin/java
+ZOOMAIN="org.apache.zookeeper.server.quorum.QuorumPeerMain"
+ZOO_LOG4J_PROP="INFO,ROLLINGFILE"
+JMXLOCALONLY=false
+JAVA_OPTS="{{ sansible_zookeeper_java_opts | default('') }}"
+MAX_OPEN_FILES="{{ sansible_zookeeper_max_open_files }}"

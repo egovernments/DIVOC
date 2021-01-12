@@ -1,0 +1,66 @@
+---
+
+- name: Create Zookeeper directories
+  become: yes
+  file:
+    group: "{{ sansible_zookeeper_group }}"
+    owner: "{{ sansible_zookeeper_user }}"
+    path: "{{ item }}"
+    state: directory
+  with_items:
+    - "/home/{{ sansible_zookeeper_user }}/bin"
+    - "{{ sansible_zookeeper_conf_dir }}"
+    - "{{ sansible_zookeeper_data_dir }}"
+    - "{{ sansible_zookeeper_log_dir }}"
+
+- name: Download ZooKeeper
+  become: yes
+  become_user: "{{ sansible_zookeeper_user }}"
+  get_url:
+    url: "{{ sansible_zookeeper_download_url }}"
+    dest: "/home/{{ sansible_zookeeper_user }}/apache-zookeeper-{{ sansible_zookeeper_version }}.tar.gz"
+
+- name: Unpack Zookeeper
+  become: yes
+  become_user: "{{ sansible_zookeeper_user }}"
+  unarchive:
+    copy: no
+    creates: "/home/{{ sansible_zookeeper_user }}/apache-zookeeper-{{ sansible_zookeeper_version }}-bin"
+    dest: "/home/{{ sansible_zookeeper_user }}"
+    src: "/home/{{ sansible_zookeeper_user }}/apache-zookeeper-{{ sansible_zookeeper_version }}.tar.gz"
+
+- name: Link to Zookeeper Directory
+  become: yes
+  become_user: "{{ sansible_zookeeper_user }}"
+  file:
+    dest: "{{ sansible_zookeeper_install_dir }}"
+    src: "/home/{{ sansible_zookeeper_user }}/apache-zookeeper-{{ sansible_zookeeper_version }}-bin"
+    state: link
+
+- name: Create Zookeeper service
+  become: yes
+  template:
+    dest: /etc/init.d/zookeeper
+    mode: 0755
+    owner: root
+    src: zookeeper_sysv.j2
+
+- name: create systemd service
+  become: yes
+  template:
+    dest: /etc/systemd/system/zookeeper.service
+    mode: 0755
+    owner: root
+    src: zookeeper.service.j2
+- name: Ensure Kafka is enabled for SystemD
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: zookeeper
+    enabled: yes
+- name: Create zookeeper startup links
+  become: yes
+  command: update-rc.d zookeeper defaults
+  args:
+    creates: "/etc/rc0.d/K??zookeeper"
+  when: ansible_distribution_release == "bionic"

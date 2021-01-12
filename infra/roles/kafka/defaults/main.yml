@@ -1,0 +1,29 @@
+---
+
+sansible_kafka_apache_mirror: https://archive.apache.org/dist/
+sansible_kafka_authorizer_log_level: ERROR
+sansible_kafka_aws_cluster_assigned_id_enabled: no
+sansible_kafka_aws_cluster_assigned_id_tag_name: instanceindex
+sansible_kafka_conf_dir: /home/kafka/etc
+sansible_kafka_environment_vars: []
+sansible_kafka_group: kafka
+sansible_kafka_heap_opts: "-Xmx{{ (ansible_memtotal_mb / 2) | int }}m -Xms{{ (ansible_memtotal_mb / 2) | int }}m"
+sansible_kafka_interface_advertise: ~
+sansible_kafka_interface_bind: ~
+sansible_kafka_java_vendor: openjdk
+sansible_kafka_java_version: 8
+sansible_kafka_jmx_port: 9999
+sansible_kafka_log_dir: /home/kafka/log
+sansible_kafka_log_level: WARN
+sansible_kafka_max_open_files: 4098
+sansible_kafka_port: 9092
+sansible_kafka_server_properties: {}
+sansible_kafka_tarball_location: /home/kafka/tmp
+sansible_kafka_user: kafka
+sansible_kafka_version_kafka: 2.7.0
+sansible_kafka_version_scala: 2.12
+sansible_kafka_wait_for_delay: 30
+sansible_kafka_wait_for_kafka_port: 120
+sansible_kafka_zookeeper_connection_timeout_ms: 1000000
+sansible_kafka_zookeeper_hosts:
+  - localhost:2181

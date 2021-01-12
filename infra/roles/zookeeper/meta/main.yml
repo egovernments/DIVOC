@@ -1,0 +1,24 @@
+---
+
+galaxy_info:
+  description: "Install Apache Zookeeper."
+  license: MIT
+  min_ansible_version: 2.2
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+  categories:
+    - development
+
+dependencies:
+  - role: users_and_groups
+    sansible_users_and_groups_groups:
+      - name: "{{ sansible_zookeeper_group }}"
+    sansible_users_and_groups_users:
+      - name: "{{ sansible_zookeeper_user }}"
+        group: "{{ sansible_zookeeper_group }}"
+
+  - role: java

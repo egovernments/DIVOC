@@ -1,0 +1,6 @@
+##
+# {{ ansible_managed }}
+
+{% for key, value in server_properties.items()  | list %}
+{{ key }}={{ value }}
+{% endfor %}
