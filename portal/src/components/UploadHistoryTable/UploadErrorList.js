@@ -30,7 +30,8 @@ const RowTableCell = withStyles({
 export function UploadErrorList({uploadHistoryDetails, columns, fileName}) {
     console.log(uploadHistoryDetails);
     if (!uploadHistoryDetails) {
-        return <div>Something went wrong</div>
+        uploadHistoryDetails = []
+        //return <div>Something went wrong</div>
     }
 
     const isErrorFound = uploadHistoryDetails.length > 0;

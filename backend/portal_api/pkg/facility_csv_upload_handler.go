@@ -63,8 +63,8 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		Email:       data.Text("email"),
 		GeoLocation: data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
 		WebsiteURL:  data.Text("websiteURL"),
+		Programs:    []*models.FacilityProgramsItems0{},
 	}
-	//services.MakeRegistryCreateRequest(facility, "Facility")
 	err = services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
 		errmsg := err.Error()
