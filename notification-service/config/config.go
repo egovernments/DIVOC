@@ -19,7 +19,7 @@ var Config = struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic     string `default:"certify" yaml:"certifyTopic"`
 		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
-		EventsTopic      string `default:"events" yaml:"eventsTopic"`
+		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
 	}
 	SmsAPI struct {
 		URL     string `default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`

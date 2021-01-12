@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // PostVaccinatorsOKCode is the HTTP code returned for type PostVaccinatorsOK
@@ -43,6 +45,11 @@ const PostVaccinatorsBadRequestCode int = 400
 swagger:response postVaccinatorsBadRequest
 */
 type PostVaccinatorsBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewPostVaccinatorsBadRequest creates PostVaccinatorsBadRequest with default headers values
@@ -51,12 +58,27 @@ func NewPostVaccinatorsBadRequest() *PostVaccinatorsBadRequest {
 	return &PostVaccinatorsBadRequest{}
 }
 
+// WithPayload adds the payload to the post vaccinators bad request response
+func (o *PostVaccinatorsBadRequest) WithPayload(payload *models.Error) *PostVaccinatorsBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the post vaccinators bad request response
+func (o *PostVaccinatorsBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *PostVaccinatorsBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 // PostVaccinatorsUnauthorizedCode is the HTTP code returned for type PostVaccinatorsUnauthorized

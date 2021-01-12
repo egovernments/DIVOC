@@ -33,7 +33,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -95,7 +95,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -103,10 +106,107 @@ func init() {
         }
       }
     },
+    "/enrollments/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Enrollments uploads",
+        "operationId": "getEnrollmentUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/enrollments/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getEnrollmentsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "enrollments upload for given uploadID not found"
+          }
+        }
+      }
+    },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -120,6 +220,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -162,10 +270,67 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "contact": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "facilityId": {
+                    "type": "string"
+                  },
+                  "pendingTasks": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -197,6 +362,66 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
           }
         }
       }
@@ -322,7 +547,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "user"
+              "user",
+              "controller"
             ]
           }
         ],
@@ -426,10 +652,72 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Vaccinators uploads",
+        "operationId": "getVaccinatorsUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getVaccinatorsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "vaccinators upload for given uploadID not found"
           }
         }
       }
@@ -527,6 +815,21 @@ func init() {
         }
       }
     },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "Facility": {
       "properties": {
         "address": {
@@ -536,7 +839,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {
@@ -557,6 +860,10 @@ func init() {
           "type": "string",
           "title": "Contact number"
         },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
         "facilityCode": {
           "type": "string",
           "title": "Facility Code"
@@ -576,6 +883,23 @@ func init() {
         "operatingHourStart": {
           "type": "integer",
           "title": "Operating hours start of day"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "status": {
+                "type": "string"
+              }
+            }
+          }
         },
         "serialNum": {
           "type": "integer",
@@ -615,6 +939,26 @@ func init() {
         "properties": {
           "osid": {
             "type": "object"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "osid": {
+                  "type": "string"
+                },
+                "rate": {
+                  "type": "number"
+                },
+                "status": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "status": {
             "type": "string"
@@ -839,7 +1183,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -901,7 +1245,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -909,10 +1256,107 @@ func init() {
         }
       }
     },
+    "/enrollments/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Enrollments uploads",
+        "operationId": "getEnrollmentUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/enrollments/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getEnrollmentsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "enrollments upload for given uploadID not found"
+          }
+        }
+      }
+    },
     "/facilities": {
       "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "get facilities",
         "operationId": "getFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility State",
+            "name": "state",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility District",
+            "name": "district",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Program Status",
+            "name": "programStatus",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -926,6 +1370,14 @@ func init() {
         }
       },
       "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
         "summary": "Update facility",
         "operationId": "updateFacilities",
         "parameters": [
@@ -968,10 +1420,50 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facilities/notify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "notify facilities",
+        "operationId": "notifyFacilities",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/NotifyFacilitiesParamsBodyItems0"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
           }
         }
       }
@@ -1003,6 +1495,66 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
           }
         }
       }
@@ -1128,6 +1680,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "controller",
               "user"
             ]
           }
@@ -1232,10 +1785,72 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get Vaccinators uploads",
+        "operationId": "getVaccinatorsUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getVaccinatorsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "vaccinators upload for given uploadID not found"
           }
         }
       }
@@ -1346,6 +1961,21 @@ func init() {
         }
       }
     },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    },
     "Facility": {
       "properties": {
         "address": {
@@ -1355,7 +1985,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "type": "string"
+            "$ref": "#/definitions/Vaccinator"
           }
         },
         "averageRating": {
@@ -1376,6 +2006,10 @@ func init() {
           "type": "string",
           "title": "Contact number"
         },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
         "facilityCode": {
           "type": "string",
           "title": "Facility Code"
@@ -1395,6 +2029,12 @@ func init() {
         "operatingHourStart": {
           "type": "integer",
           "title": "Operating hours start of day"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityProgramsItems0"
+          }
         },
         "serialNum": {
           "type": "integer",
@@ -1427,6 +2067,20 @@ func init() {
         }
       }
     },
+    "FacilityProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "FacilityUpdateRequest": {
       "type": "array",
       "items": {
@@ -1438,6 +2092,29 @@ func init() {
       "properties": {
         "osid": {
           "type": "object"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityUpdateRequestItems0ProgramsItems0"
+          }
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityUpdateRequestItems0ProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "osid": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
         },
         "status": {
           "type": "string"
@@ -1467,6 +2144,26 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
+        }
+      }
+    },
+    "NotifyFacilitiesParamsBodyItems0": {
+      "type": "object",
+      "properties": {
+        "contact": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "facilityId": {
+          "type": "string"
+        },
+        "pendingTasks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
