@@ -1,4 +1,4 @@
-IMAGES:=portal_api vaccination_api certificate_processor analytics_feed
+IMAGES:=portal_api vaccination_api certificate_processor analytics_feed notification-service
 
 docker:
 	@mkdir dockerdeps || true
