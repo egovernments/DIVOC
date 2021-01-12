@@ -1,24 +1,25 @@
-
 package main
 
 import (
-	"bufio"
 	"bytes"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/xml"
-	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/kernel_library/services"
+	"github.com/gorilla/mux"
+	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-	"github.com/signintech/gopdf"
-	"github.com/skip2/go-qrcode"
 )
+
+const CertificateEntity = "VaccinationCertificate"
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -32,7 +33,7 @@ type Certificate struct {
 		Nationality string `json:"nationality"`
 	} `json:"credentialSubject"`
 	Issuer       string    `json:"issuer"`
-	IssuanceDate time.Time `json:"issuanceDate"`
+	IssuanceDate string `json:"issuanceDate"`
 	Evidence     []struct {
 		ID             string    `json:"id"`
 		FeedbackURL    string    `json:"feedbackUrl"`
@@ -118,7 +119,6 @@ type PullURIResponse struct {
 	} `xml:"DocDetails"`
 }
 
-
 func ValidMAC(message, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
 	mac.Write(message)
@@ -130,7 +130,7 @@ func ValidMAC(message, messageMAC, key []byte) bool {
 }
 func uriRequest(w http.ResponseWriter, req *http.Request) {
 	log.Info("Got request ")
-	requestBuffer := make([]byte ,2048)
+	requestBuffer := make([]byte, 2048)
 	n, _ := req.Body.Read(requestBuffer)
 	log.Infof("Read %d bytes ", n)
 	request := string(requestBuffer)
@@ -140,7 +140,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
 	if e != nil {
 		w.WriteHeader(500)
-		_, _ = w.Write([]byte("Error in verifying request signature"));
+		_, _ = w.Write([]byte("Error in verifying request signature"))
 		return
 	}
 
@@ -162,58 +162,80 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 
 			certBundle := getCertificate(xmlRequest.DocDetails.FullName, xmlRequest.DocDetails.DOB,
 				xmlRequest.DocDetails.UID, xmlRequest.DocDetails.UDF1)
+			if certBundle != nil {
+				response.DocDetails.URI = certBundle.Uri
+				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
+					if pdfBytes, err := getPdfCertificate(certBundle.signedJson); err != nil {
+						log.Errorf("Error in creating certificate pdf")
+					} else {
+						pdfContent := pdfBytes // todo get pdf
+						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfContent)
+					}
+				}
+				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
+					certificateId := certBundle.certificateId
+					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
+					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
+				}
 
-			response.DocDetails.URI = certBundle.Uri
-			if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-				pdfContent := certBundle.pdf // todo get pdf
-				response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfContent)
-			}
-			if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
-				certificateId:= certBundle.certificateId
-				xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
-				response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
-			}
-
-			if responseBytes, err := xml.Marshal(response); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(responseBytes)
-				return
+				if responseBytes, err := xml.Marshal(response); err != nil {
+					log.Errorf("Error while serializing xml")
+				} else {
+					w.WriteHeader(200)
+					_, _ = w.Write(responseBytes)
+					return
+				}
 			}
 			w.WriteHeader(500)
 		}
 	} else {
 		w.WriteHeader(401)
-		_, _ = w.Write([]byte("Unauthorized"));
+		_, _ = w.Write([]byte("Unauthorized"))
 	}
 
 }
 
 type VaccinationCertificateBundle struct {
 	certificateId string
-	Uri string
-	signedJson string
-	pdf [] byte
+	Uri           string
+	signedJson    string
+	pdf           []byte
 }
 
-func getCertificate(fullName string, dob string, aadhaar string, phoneNumber string) (* VaccinationCertificateBundle) {
-	var cert VaccinationCertificateBundle
-	cert.certificateId = "234234"
-	cert.Uri = "https://moh.india.gov/vc/233423"
-	cert.signedJson = `{"@context":["https://www.w3.org/2018/credentials/v1","https://www.who.int/2020/credentials/vaccination/v1"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:in.gov.uidai.aadhaar:2342343334","name":"Bhaya Mitra","gender":"Male","age":27,"nationality":"Indian"},"issuer":"https://nha.gov.in/","issuanceDate":"2021-01-06T08:31:25.574Z","evidence":[{"id":"https://nha.gov.in/evidence/vaccine/123","feedbackUrl":"https://divoc.xiv.in/feedback/123","infoUrl":"https://divoc.xiv.in/learn/123","type":["Vaccination"],"batch":"MB3428BX","vaccine":"CoVax","manufacturer":"COVPharma","date":"2020-12-02T19:21:18.646Z","effectiveStart":"2020-12-02","effectiveUntil":"2025-12-02","verifier":{"name":"Sooraj Singh"},"facility":{"name":"ABC Medical Center","address":{"streetAddress":"123, Koramangala","streetAddress2":"","district":"Bengaluru South","city":"Bengaluru","addressRegion":"Karnataka","addressCountry":"IN"}}}],"nonTransferable":"true","proof":{"type":"Ed25519Signature2018","created":"2021-01-10T14:43:59Z","verificationMethod":"did:example:123456#key1","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJFZERTQSIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..xmNN4m4okKtHumXcpHe3L8PNGg5q5VBul49NwhBYOo1z_lKMlGCRDdhmLaD5Rs1mBfPvSet5qBfYW2T3UhBgAw"}}`
-	if pdfBytes, err := getCertificateAsPdf(cert.signedJson); err != nil {
-		log.Errorf("Error in creating certificate pdf")
-	} else {
-		cert.pdf = pdfBytes
+func fetchCertificateFromRegistry(filter map[string]interface{}) (map[string]interface{}, error) {
+	return services.QueryRegistry(CertificateEntity, filter)
+}
+
+func getCertificate(fullName string, dob string, aadhaar string, phoneNumber string) *VaccinationCertificateBundle {
+	filter := map[string]interface{}{
+		"name": map[string]interface{}{
+			"eq": fullName,
+		},
+		"mobile": map[string]interface{}{
+			"eq": phoneNumber,
+		},
 	}
-	return &cert
+	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[0].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			var cert VaccinationCertificateBundle
+			cert.certificateId = certificateObj["certificateId"].(string)
+			cert.Uri = "https://moh.india.gov/vc/233423"
+			cert.signedJson = certificateObj["certificate"].(string)
+			return &cert
+		}
+	}
+	return nil
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
-		fmt.Println(err)
+		log.Error(err)
+		return nil, err
 	}
 
 	pdf := gopdf.GoPdf{}
@@ -221,7 +243,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
 
-	if err := pdf.AddTTFFont("wts11", "./Roboto-Light.ttf"); err != nil {
+	if err := pdf.AddTTFFont("wts11", "./Roboto-Medium.ttf"); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
@@ -252,7 +274,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		"",
 		"", //blank line
 		certificate.Evidence[0].Vaccine,
-		fomratDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch+ ")",
+		fomratDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		"To be taken 28 days after 1st Dose",
 		"",
 		formatFacilityAddress(certificate),
@@ -308,9 +330,42 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	return nil
 }
 
-func main(){
+func getPDFHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	w.WriteHeader(http.StatusOK)
+	preEnrollmentCode := vars["preEnrollmentCode"]
+	filter := map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[0].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			signedJson := certificateObj["certificate"].(string)
+			if pdfBytes, err := getPdfCertificate(signedJson); err != nil {
+				log.Errorf("Error in creating certificate pdf")
+			} else {
+				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+				//w.Header().Set("Content-Length", string(len(pdfBytes)))
+				w.WriteHeader(200)
+				_, _ = w.Write(pdfBytes)
+				return
+			}
+		}
+	}
+}
+
+func main() {
 	config.Initialize()
 	log.Info("Running digilocker support api")
-	http.HandleFunc("/pullUriRequest", uriRequest)
+	r := mux.NewRouter()
+	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
+	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }

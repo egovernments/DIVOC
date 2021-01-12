@@ -8,7 +8,7 @@ import (
 )
 
 func Initialize() {
-	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
 	if err != nil {
 		panic("Unable to read configurations")
@@ -75,6 +75,6 @@ var Config = struct {
 	Digilocker struct {
 		AuthKeyName string `env:"DIGILOCKER_AUTHKEYNAME" default:"x-digilocker-hmac"`
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
-		DocType string `env:DIGILOCKER_DOCTYPE`
+		DocType     string `env:DIGILOCKER_DOCTYPE`
 	}
 }{}

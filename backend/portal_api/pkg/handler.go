@@ -2,11 +2,11 @@ package pkg
 
 import (
 	"encoding/json"
-	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
+	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
