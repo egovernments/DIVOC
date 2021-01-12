@@ -20,7 +20,9 @@ require (
 	github.com/jinzhu/configor v1.2.1
 	github.com/jinzhu/gorm v1.9.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
+	github.com/signintech/gopdf v0.9.12
 	github.com/sirupsen/logrus v1.7.0
+	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
