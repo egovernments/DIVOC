@@ -52,12 +52,49 @@ type FacilityUpdateRequestItems0 struct {
 	// osid
 	Osid interface{} `json:"osid,omitempty"`
 
+	// programs
+	Programs []*FacilityUpdateRequestItems0ProgramsItems0 `json:"programs"`
+
 	// status
 	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this facility update request items0
 func (m *FacilityUpdateRequestItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validatePrograms(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0) validatePrograms(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Programs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Programs); i++ {
+		if swag.IsZero(m.Programs[i]) { // not required
+			continue
+		}
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
 	return nil
 }
 
@@ -72,6 +109,47 @@ func (m *FacilityUpdateRequestItems0) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *FacilityUpdateRequestItems0) UnmarshalBinary(b []byte) error {
 	var res FacilityUpdateRequestItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// FacilityUpdateRequestItems0ProgramsItems0 facility update request items0 programs items0
+//
+// swagger:model FacilityUpdateRequestItems0ProgramsItems0
+type FacilityUpdateRequestItems0ProgramsItems0 struct {
+
+	// id
+	ID string `json:"id,omitempty"`
+
+	// osid
+	Osid string `json:"osid,omitempty"`
+
+	// rate
+	Rate float64 `json:"rate,omitempty"`
+
+	// status
+	Status string `json:"status,omitempty"`
+}
+
+// Validate validates this facility update request items0 programs items0
+func (m *FacilityUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *FacilityUpdateRequestItems0ProgramsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *FacilityUpdateRequestItems0ProgramsItems0) UnmarshalBinary(b []byte) error {
+	var res FacilityUpdateRequestItems0ProgramsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

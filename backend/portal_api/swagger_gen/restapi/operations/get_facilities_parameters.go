@@ -9,7 +9,9 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/errors"
+	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
 )
 
 // NewGetFacilitiesParams creates a new GetFacilitiesParams object
@@ -27,6 +29,27 @@ type GetFacilitiesParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
+
+	/*Facility District
+	  In: query
+	*/
+	District *string
+	/*Program
+	  In: query
+	*/
+	ProgramID *string
+	/*Program Status
+	  In: query
+	*/
+	ProgramStatus *string
+	/*Facility State
+	  In: query
+	*/
+	State *string
+	/*Facility Type
+	  In: query
+	*/
+	Type *string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -38,8 +61,125 @@ func (o *GetFacilitiesParams) BindRequest(r *http.Request, route *middleware.Mat
 
 	o.HTTPRequest = r
 
+	qs := runtime.Values(r.URL.Query())
+
+	qDistrict, qhkDistrict, _ := qs.GetOK("district")
+	if err := o.bindDistrict(qDistrict, qhkDistrict, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qProgramID, qhkProgramID, _ := qs.GetOK("programId")
+	if err := o.bindProgramID(qProgramID, qhkProgramID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qProgramStatus, qhkProgramStatus, _ := qs.GetOK("programStatus")
+	if err := o.bindProgramStatus(qProgramStatus, qhkProgramStatus, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qState, qhkState, _ := qs.GetOK("state")
+	if err := o.bindState(qState, qhkState, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qType, qhkType, _ := qs.GetOK("type")
+	if err := o.bindType(qType, qhkType, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// bindDistrict binds and validates parameter District from query.
+func (o *GetFacilitiesParams) bindDistrict(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.District = &raw
+
+	return nil
+}
+
+// bindProgramID binds and validates parameter ProgramID from query.
+func (o *GetFacilitiesParams) bindProgramID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.ProgramID = &raw
+
+	return nil
+}
+
+// bindProgramStatus binds and validates parameter ProgramStatus from query.
+func (o *GetFacilitiesParams) bindProgramStatus(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.ProgramStatus = &raw
+
+	return nil
+}
+
+// bindState binds and validates parameter State from query.
+func (o *GetFacilitiesParams) bindState(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.State = &raw
+
+	return nil
+}
+
+// bindType binds and validates parameter Type from query.
+func (o *GetFacilitiesParams) bindType(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.Type = &raw
+
 	return nil
 }

@@ -31,6 +31,29 @@ paths:
     get:
       summary: get facilities
       operationId: getFacilities
+      parameters:
+        - in: query
+          name: state
+          type: string
+          description: Facility State
+        - in: query
+          name: district
+          type: string
+          description: Facility District
+        - in: query
+          name: type
+          type: string
+          description: Facility Type
+        - in: query
+          name: programId
+          type: string
+          description: Program
+        - in: query
+          name: programStatus
+          type: string
+          description: Program Status
+      security:
+        - hasRole: ["admin", "controller"]
       responses:
         '200':
           description: OK
@@ -59,6 +82,8 @@ paths:
     put:
       summary: Update facility
       operationId: updateFacilities
+      security:
+        - hasRole: ["admin", "controller"]
       parameters:
         - in: body
           name: body
@@ -72,6 +97,37 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /facilities/notify:
+    post:
+      summary: notify facilities
+      operationId: notifyFacilities
+      security:
+        - hasRole: ["admin", "controller"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                facilityId:
+                  type: string
+                email:
+                  type: string
+                contact:
+                  type: string
+                pendingTasks:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
   /enrollments:
     get:
       summary: get enrollments
@@ -138,6 +194,7 @@ paths:
         - hasRole:
             - admin
             - user
+            - controller
       responses:
         '200':
             description: OK
@@ -346,6 +403,19 @@ definitions:
           type: object
         status:
           type: string
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+              osid:
+                type: string
+              rate:
+                type: number
   ProgramRequest:
     type: object
     properties:
@@ -424,6 +494,9 @@ definitions:
       contact:
         type: string
         title: Contact number
+      email:
+        type: string
+        title: Facility Email
       operatingHourStart:
         type: integer
         title: Operating hours start of day
@@ -458,9 +531,20 @@ definitions:
       admins:
         type: array
         items:
-          type: string
+          "$ref": "#/definitions/Vaccinator"
       stamp:
         type: string
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+            status:
+              type: string
+            rate:
+              type: number
   Address:
     type: object
     title: Address

@@ -2,7 +2,9 @@ package pkg
 
 import (
 	"encoding/json"
-	"github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/pkg/services"
+	"github.com/divoc/kernel_library/model"
+	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
@@ -13,6 +15,12 @@ import (
 	"net/http"
 	"strings"
 )
+
+const StateKey = "address.state"
+const DistrictKey = "address.district"
+const TypeKey = "category"
+const ProgramIdKey = "programs.id"
+const ProgramStatusKey = "programs.status"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -35,6 +43,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetFacilityUploadsErrorsHandler = operations.GetFacilityUploadsErrorsHandlerFunc(getFacilityUploadErrorsHandler)
 	api.GetEnrollmentUploadHistoryHandler = operations.GetEnrollmentUploadHistoryHandlerFunc(getEnrollmentUploadHandler)
 	api.GetEnrollmentsUploadsErrorsHandler = operations.GetEnrollmentsUploadsErrorsHandlerFunc(getPreEnrollmentUploadErrorsHandler)
+	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 }
 
 type GenericResponse struct {
@@ -82,27 +91,27 @@ func NewGenericForbiddenError() middleware.Responder {
 }
 
 func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
-	return services.GetEntityType("Enrollment")
+	return kernelService.GetEntityType("Enrollment")
 }
 
 func getProgramsHandler(params operations.GetProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
-	return services.GetEntityType("Program")
+	return kernelService.GetEntityType("Program")
 }
 
 func getMedicinesHandler(params operations.GetMedicinesParams, principal *models.JWTClaimBody) middleware.Responder {
-	return services.GetEntityType("Medicine")
+	return kernelService.GetEntityType("Medicine")
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	if HasResourceRole(portalClientId, "admin", principal) {
-		return services.GetEntityType("Vaccinator")
+		return kernelService.GetEntityType("Vaccinator")
 	}
 	facilityCode := principal.FacilityCode
 	if facilityCode == "" {
 		log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
 		return NewGenericServerError()
 	}
-	if vaccinators, err := services.GetVaccinatorsForTheFacility(facilityCode); err != nil {
+	if vaccinators, err := kernelService.GetVaccinatorsForTheFacility(facilityCode); err != nil {
 		log.Errorf("Error in getting vaccinators list")
 		return NewGenericServerError()
 	} else {
@@ -110,8 +119,74 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 	}
 }
 
+func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
+	filter := map[string]interface{}{}
+	if params.State != nil && !strings.EqualFold(*params.State, "ALL") {
+		states := strings.Split(strings.ToLower(*params.State), ",")
+
+		filter[StateKey] = map[string]interface{}{
+			"or": states,
+		}
+	}
+	if params.District != nil && !strings.EqualFold(*params.District, "ALL") {
+		districts := strings.Split(strings.ToLower(*params.District), ",")
+
+		filter[DistrictKey] = map[string]interface{}{
+			"or": districts,
+		}
+	}
+	if params.Type != nil && !strings.EqualFold(*params.Type, "ALL") {
+		types := strings.Split(strings.ToLower(*params.Type), ",")
+
+		filter[TypeKey] = map[string]interface{}{
+			"or": types,
+		}
+	}
+	if params.ProgramID != nil && !strings.EqualFold(*params.ProgramID, "ALL") {
+		programIds := strings.Split(strings.ToLower(*params.ProgramID), ",")
+
+		filter[ProgramIdKey] = map[string]interface{}{
+			"or": programIds,
+		}
+	}
+	if params.ProgramStatus != nil && !strings.EqualFold(*params.ProgramStatus, "ALL") {
+		programStatus := strings.Split(strings.ToLower(*params.ProgramStatus), ",")
+
+		filter[ProgramStatusKey] = map[string]interface{}{
+			"or": programStatus,
+		}
+	}
+
+	return filter
+}
+
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
-	return services.GetEntityType("Facility")
+	entityTypeId := "Facility"
+	filter := createFilterObject(params)
+	response, err := kernelService.QueryRegistry(entityTypeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	//if program status is inactive, query registry to get all entities without having program id.
+	// Bcz initially a facility will not have a program id mapped
+	responseArr := response[entityTypeId]
+	if params.ProgramID != nil && params.ProgramStatus != nil && strings.Contains(strings.ToLower(*params.ProgramStatus), "inactive") {
+		filter[ProgramIdKey] = map[string]interface{}{
+			"neq": params.ProgramID,
+		}
+		delete(filter, ProgramStatusKey)
+		response, err = kernelService.QueryRegistry(entityTypeId, filter)
+		if err != nil {
+			log.Errorf("Error in querying registry", err)
+			return model.NewGenericServerError()
+		}
+		resp := response[entityTypeId]
+		if resp != nil {
+			responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
+		}
+	}
+	return model.NewGenericJSONResponse(responseArr)
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -127,7 +202,7 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal *mo
 		log.Info(err)
 		return NewGenericServerError()
 	}
-	return services.MakeRegistryCreateRequest(requestMap, objectId)
+	return kernelService.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
 func createProgramHandler(params operations.CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -143,7 +218,7 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 		log.Info(err)
 		return NewGenericServerError()
 	}
-	return services.MakeRegistryCreateRequest(requestMap, objectId)
+	return kernelService.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -252,7 +327,7 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 		}
 		requestMap := make(map[string]interface{})
 		err = json.Unmarshal(requestBody, &requestMap)
-		resp, err := services.UpdateRegistry("Facility", requestMap)
+		resp, err := kernelService.UpdateRegistry("Facility", requestMap)
 		if err != nil {
 			log.Error(err)
 		} else {

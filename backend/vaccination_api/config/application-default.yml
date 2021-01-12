@@ -11,6 +11,7 @@ kafka:
   bootstrapServers: localhost:9092
   certifyTopic: certify
   eventsTopic: events
+  reportedSideEffectsTopic: reported_side_effects
 database:
   host: localhost
   port: 5432
@@ -19,6 +20,6 @@ database:
   password: postgres
 certificate:
   upload:
-   columns: "recipientName,recipientMobileNumber,recipientDOB,recipientGender,recipientNationality,recipientIdentity,vaccinationBatch,vaccinationDate,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,vaccinatorName,facilityName,facilityAddressLine1,facilityAddressLine2,facilityDistrict,facilityState,facilityPincode"
+     columns: "recipientName,recipientMobileNumber,recipientDOB,recipientGender,recipientNationality,recipientIdentity,vaccinationBatch,vaccinationDate,vaccinationDose,vaccinationTotalDoses,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,vaccinatorName,facilityName,facilityAddressLine1,facilityAddressLine2,facilityDistrict,facilityState,facilityPincode"
 clickhouse:
   dsn: tcp://127.0.0.1:9000?debug=true

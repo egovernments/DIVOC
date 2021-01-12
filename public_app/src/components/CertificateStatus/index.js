@@ -20,7 +20,7 @@ const {RSAKeyPair} = require('crypto-ld');
 const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
-const {credentialsv1} = require('../../utils/credentials');
+const credentialsv1 = require('../../utils/credentials.json');
 const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {

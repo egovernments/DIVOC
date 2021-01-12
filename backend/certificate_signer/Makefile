@@ -1,3 +1,8 @@
 
+IMAGE:=dockerhub/certificate_signer
+
 docker:
-	@docker build -t dockerhub/certificate_signer .
+	@cp config/keys.js.sample config/keys.js
+	@docker build -t $(IMAGE) .
+publish:
+	@docker push $(IMAGE)

@@ -1,18 +1,28 @@
 import React, {useState} from "react";
-import QrReader from 'react-qr-reader'
 import "./index.css";
 import VerifyCertificateImg from "../../assets/img/verify-certificate.png"
 import QRCodeImg from "../../assets/img/qr-code.svg"
 import {CertificateStatus} from "../CertificateStatus";
-import {set} from "ramda";
 import {CustomButton} from "../CustomButton";
+import QRScanner from "../QRScanner";
+import JSZip from "jszip";
+import {CERTIFICATE_FILE} from "../../constants";
 
 export const VerifyCertificate = () => {
     const [result, setResult] = useState("");
     const [showScanner, setShowScanner] = useState(false);
     const handleScan = data => {
         if (data) {
-            setResult(data)
+            const zip = new JSZip();
+            zip.loadAsync(data).then((contents) => {
+                return contents.files[CERTIFICATE_FILE].async('text')
+            }).then(function (contents) {
+                setResult(contents)
+            }).catch(err => {
+                    setResult(data)
+                }
+            );
+
         }
     };
     const handleError = err => {
@@ -34,12 +44,8 @@ export const VerifyCertificate = () => {
                     </>}
                     {showScanner &&
                     <>
-                        <QrReader
-                            className="qr-camera"
-                            delay={100}
-                            onError={handleError}
-                            onScan={handleScan}
-                        />
+                        <QRScanner onError={handleError}
+                                   onScan={handleScan}/>
                         <CustomButton className="green-btn" onClick={() => setShowScanner(false)}>BACK</CustomButton>
                     </>
                     }

@@ -26,3 +26,6 @@ preenrollment:
   upload:
     columns: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"
     required: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"
+kafka:
+  bootstrapServers: localhost:9092
+  notifyTopic: notify

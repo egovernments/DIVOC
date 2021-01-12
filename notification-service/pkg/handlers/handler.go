@@ -16,14 +16,14 @@ func SetupHandlers(api *operations.NotificationServiceAPI) {
 func postNotificationHandler(params notification.PostNotificationParams) middleware.Responder {
 	requestBody := params.Body
 
-	if mobileNumber, err := services.GetMobileNumber(*requestBody.Recepient); err == nil {
+	if mobileNumber, err := services.GetMobileNumber(*requestBody.Recipient); err == nil {
 		if response, err := services.SendSMS(mobileNumber, *requestBody.Message); err == nil {
 			log.Infof("Successfully sent SMS %+v", response)
 		} else {
 			log.Errorf("Failed sending SMS %+v", err)
 		}
 	}
-	if emailId, err := services.GetEmailId(*requestBody.Recepient); err == nil {
+	if emailId, err := services.GetEmailId(*requestBody.Recipient); err == nil {
 		if err := services.SendEmail(emailId, requestBody.Subject, *requestBody.Message); err == nil {
 			log.Infof("Successfully sent Email %+v")
 		} else {
