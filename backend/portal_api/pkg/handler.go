@@ -382,12 +382,12 @@ func getFacilityUploadErrorsHandler(params operations.GetFacilityUploadsErrorsPa
 	preferredUsername := principal.PreferredUsername
 	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
 
-	preEnrollmentUpload := GetCSVUpload{
+	facilityUpload := GetCSVUpload{
 		UploadType: "Facility",
 		UserId:     preferredUsername,
 		Columns:    columns,
 	}
-	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
+	return facilityUpload.GetCSVUploadErrors(uploadID)
 }
 
 func getEnrollmentUploadHandler(params operations.GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -423,12 +423,12 @@ func getVaccinatorUploadHandler(params operations.GetVaccinatorsUploadHistoryPar
 	preferredUsername := principal.PreferredUsername
 	columns := strings.Split(config.Config.Vaccinator.Upload.Columns, ",")
 
-	preEnrollmentUpload := GetCSVUpload{
+	vaccinatorUpload := GetCSVUpload{
 		UploadType: "Vaccinator",
 		UserId:     preferredUsername,
 		Columns:    columns,
 	}
-	csvUpload, err := preEnrollmentUpload.GetCSVUploadsForUser()
+	csvUpload, err := vaccinatorUpload.GetCSVUploadsForUser()
 	if err == nil {
 		return NewGenericJSONResponse(csvUpload)
 	}
@@ -440,10 +440,10 @@ func getVaccinatorUploadErrorsHandler(params operations.GetVaccinatorsUploadsErr
 	preferredUsername := principal.PreferredUsername
 	columns := strings.Split(config.Config.Vaccinator.Upload.Columns, ",")
 
-	preEnrollmentUpload := GetCSVUpload{
+	vaccinatorUpload := GetCSVUpload{
 		UploadType: "Vaccinator",
 		UserId:     preferredUsername,
 		Columns:    columns,
 	}
-	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
+	return vaccinatorUpload.GetCSVUploadErrors(uploadID)
 }
