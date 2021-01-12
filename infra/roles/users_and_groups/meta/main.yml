@@ -1,0 +1,17 @@
+---
+
+allow_duplicates: yes
+dependencies: []
+
+galaxy_info:
+  description: Users and Groups Management Made Simple
+  license: MIT
+  min_ansible_version: 2.5
+  platforms:
+    - name: Ubuntu
+      versions:
+        - trusty
+        - xenial
+        - bionic
+  categories:
+    - system

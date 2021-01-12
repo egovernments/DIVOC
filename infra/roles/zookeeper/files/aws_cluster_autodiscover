@@ -1,0 +1,136 @@
+#!/bin/bash
+
+set -o nounset
+
+# Gaffa tape script that uses AWS tags to pick an available ID/Index from a list of hostnames
+# This ID can be used to assign then pick the hostname and machine ID for services that require such a setting
+# such as Kafka or Zookeeper.
+#
+# NOTE In the future we should replace this with Consul.
+#
+# Usage:
+# aws_cluster_autodiscover [Max number of machines in cluster] [AWS hostedzone ID] "[AWS ec2 describe-instances filter]" [Name of tag used to store id]
+# eg.
+# ./bin/aws_cluster_autodiscover "01.zookeeper.app.internal,02.zookeeper.app.internal,03.zookeeper.app.internal" "Z8LHX0FIHPY9F" "Name=tag:Environment,Values=dev Name=tag:Role,Values=zookeeper" "ZookeeperID"
+#
+# Returns:
+# Json array detaling the claimed ID and hostname
+# eg.
+# {"id": "1", "id_index0": "0", "hostname": "01.zookeeper.app.internal", "info": "Machine had no ID, claimed ID and R53 entry" }
+
+function die {
+	echo -e "\033[1;31mError: $1\033[0m"
+	exit 1
+}
+
+function output {
+	local -i CLAIMED_ID=$1
+	local CLAIMED_HOST=$2
+	local INFO=$3
+	local -i CLAIMED_ID_INDEX0=$((CLAIMED_ID - 1 ))
+	echo "{\"id\": \"${CLAIMED_ID}\", \"id_index0\": \"${CLAIMED_ID_INDEX0}\", \"hostname\": \"${CLAIMED_HOST}\", \"info\": \"${INFO}\" }"
+	exit 0
+}
+
+function main {
+	# Arguments
+	if [ "$#" -ne 4 ]; then
+		die "This script takes 4 parameters, only $# given"
+	fi
+	local HOSTS=(${1//,/ })
+	local HOSTED_ZONE_ID=$2
+	local LOOKUP_FILTER=$3
+	local ID_TAG_NAME=$4
+
+	# Initialise vars before usage since local always returns 0
+	local MAX_HOSTS=${#HOSTS[@]}
+	local CLAIMED_ID=""
+	local CLAIMED_HOST=""
+	local INSTANCE_ID=""
+	local INSTANCE_IP=""
+	local INSTANCE_REGION=""
+	local AVAILABLE_IDS=( )
+	local CLAIMED_IDS=( )
+	local UNCLAIMED_IDS=( )
+	local ID_CHECK=""
+
+	# Hacky random sleep in an attempt to avoid id clashes in a cluster
+	sleep $[ ( $RANDOM % 60 )  + 1 ]s
+
+	INSTANCE_ID=$( curl -f -s http://169.254.169.254/latest/meta-data/instance-id/ )
+	INSTANCE_IP=$( curl -f -s http://169.254.169.254/latest/meta-data/local-ipv4/ )
+	INSTANCE_REGION=$( curl -f -s http://169.254.169.254/latest/meta-data/placement/availability-zone | sed -e '$s/.$//' )
+	if [[ -z ${INSTANCE_ID} || -z ${INSTANCE_IP} || -z ${INSTANCE_REGION} ]]; then
+		die "Could not grab instance ID or IP, are you running outside of EC2?"
+	fi
+
+	# Check to see if this machine has an ID tag already
+	CLAIMED_ID=$( aws ec2 describe-tags \
+		--region ${INSTANCE_REGION} \
+		--filter "Name=resource-id,Values=${INSTANCE_ID}" \
+		--output text "Name=key,Values=${ID_TAG_NAME}" \
+		--query "Tags[*].Value" )
+	if [[ -n ${CLAIMED_ID} ]]; then
+		output "${CLAIMED_ID}" "${HOSTS[$CLAIMED_ID - 1]}" "Machine already has an ID"
+	fi
+
+	# Figure out which ID and host to claim
+	AVAILABLE_IDS=( $(seq 1 "${MAX_HOSTS}") )
+	CLAIMED_IDS=( $( aws ec2 describe-instances \
+		--region ${INSTANCE_REGION} \
+		--filters ${LOOKUP_FILTER} Name=instance-state-name,Values=running \
+		--output text \
+		--query "Reservations[*].Instances[*].Tags[*] | [] | [] | [?Key=='${ID_TAG_NAME}'] | [*].Value" ) )
+
+	if [[ "${#CLAIMED_IDS[@]}" -gt 0 ]]; then
+		# Use comm to diff the ID arrays
+		UNCLAIMED_IDS=( $( comm -13 \
+			<(for X in "${CLAIMED_IDS[@]}"; do echo "${X}"; done | sort) \
+			<(for X in "${AVAILABLE_IDS[@]}"; do echo "${X}"; done | sort) ) )
+
+		if [ ${#UNCLAIMED_IDS[@]} -eq 0 ]; then
+			# No free IDs, throw an error
+			die "No free IDs found, aborting"
+		fi
+
+		# Claim the first free ID
+		CLAIMED_ID="${UNCLAIMED_IDS[0]}"
+	else
+		# No IDs have been claimed, grab the first one
+		CLAIMED_ID="1"
+	fi
+
+	# Double check that ID is still free, if not fail so caller can retry if desired
+	ID_CHECK=$( aws ec2 describe-instances \
+		--region ${INSTANCE_REGION} \
+		--filters ${LOOKUP_FILTER} \
+			Name=instance-state-name,Values=running \
+			Name=tag:${ID_TAG_NAME},Values=${CLAIMED_ID} \
+		--output text \
+		--query "Reservations[*].Instances[*].InstanceId" )
+	if [[ -n "${ID_CHECK}" ]]; then
+		die "Attempted to claim ID but it was taken during discovery"
+	fi
+
+	# Claim the ID
+	aws ec2 create-tags \
+		--region ${INSTANCE_REGION} \
+		--resources ${INSTANCE_ID} \
+		--tags Key=${ID_TAG_NAME},Value=${CLAIMED_ID} \
+		> /dev/null 2>&1 \
+		|| die "Failed to update Tag entry for with ID ${CLAIMED_ID}"
+
+	CLAIMED_HOST="${HOSTS[$CLAIMED_ID - 1]}"
+
+	# Claim the hostname
+	aws route53 change-resource-record-sets \
+		--region ${INSTANCE_REGION} \
+		--hosted-zone-id ${HOSTED_ZONE_ID} \
+		--change-batch "{ \"Changes\": [ { \"Action\": \"UPSERT\", \"ResourceRecordSet\": { \"Name\": \"${CLAIMED_HOST}\", \"Type\": \"A\", \"TTL\": 300, \"ResourceRecords\": [ { \"Value\": \"${INSTANCE_IP}\" } ] } } ] }" \
+		> /dev/null 2>&1 \
+		|| die "Failed to update R53 entry for ${CLAIMED_HOST}"
+
+	output "${CLAIMED_ID}" "${CLAIMED_HOST}" "Machine had no ID, claimed ID and R53 entry"
+}
+
+main "$@"

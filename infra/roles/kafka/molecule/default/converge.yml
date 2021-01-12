@@ -1,0 +1,19 @@
+---
+
+- name: Converge
+  hosts: all
+
+  # Take a look at hosts vars in molecule.yml as well
+  vars:
+    sansible_kafka_environment_vars:
+      - "NEWRELIC_OPTS=\"-javaagent:/home/{{ sansible_kafka_user }}/newrelic/newrelic.jar\""
+      - "export TEST_KAFKA_OPTS=\"${KAFKA_OPTS} ${NEWRELIC_OPTS}\""
+    sansible_kafka_server_properties:
+      listeners: "PLAINTEXT://127.0.0.1:9092"
+      broker.id: 11
+
+  roles:
+    - role: sansible.zookeeper
+      sansible_zookeeper_version: 3.4.14
+
+    - role: kafka

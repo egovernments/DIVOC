@@ -1,0 +1,41 @@
+---
+# See https://molecule.readthedocs.io/en/latest/configuration.html# for details.
+
+driver:
+  name: docker
+
+provisioner:
+  name: ansible
+
+platforms:
+  - name: sansible_kafka-xenial
+    image: solita/ubuntu-systemd:xenial
+    command: /sbin/init
+    capabilities:
+      - SYS_ADMIN
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+  - name: sansible_kafka-bionic
+    image: solita/ubuntu-systemd:bionic
+    command: /sbin/init
+    capabilities:
+      - SYS_ADMIN
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+  flake8 molecule/
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: True
+    role-file: requirements.yml
+
+scenario:
+  name: default
+
+verifier:
+  name: testinfra

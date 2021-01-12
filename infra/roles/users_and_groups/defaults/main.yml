@@ -1,0 +1,30 @@
+---
+
+sansible_users_and_groups_authorized_keys_dir: ~
+# Directory in which authorized SSH public keys are to be found, e. g.
+# /etc/ssh/authorized_keys.
+# Files must be owned by the corresponding user and only accessible by them.
+# Defaults to $HOME/.ssh, in which case the key file will be named
+# authorized_keys.
+
+sansible_users_and_groups_groups: []
+#   - gid: YYY
+#     name: mygroup
+#     system: yes/no
+
+sansible_users_and_groups_sudoers: []
+#   - name: ipsum
+#     user: "%ipsum"
+#     runas: "ALL=(ALL)"
+#     commands: "NOPASSWD: ALL"
+
+sansible_users_and_groups_users: []
+#   - name: my.username
+#     groups:
+#       - wheel
+#       - users
+#     system: yes/no
+#     uid: YYY
+
+sansible_users_and_groups_whitelist_groups: []
+# If defined, only users in these groups will be created.
