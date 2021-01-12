@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/ClickHouse/clickhouse-go v1.4.3
+	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
 	github.com/go-openapi/errors v0.19.7
@@ -24,6 +25,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/sys v0.0.0-20201116194326-cc9327a14d48 // indirect
+	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
 
 replace github.com/divoc/kernel_library => ../kernel_library

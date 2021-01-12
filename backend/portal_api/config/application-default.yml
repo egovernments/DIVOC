@@ -30,3 +30,6 @@ vaccinator:
   upload:
     columns: "serialNum,code,name,nationalIdentifier,mobileNumber,status,facilityIds"
     required: "serialNum,code,name,nationalIdentifier,mobileNumber,status,facilityIds"
+kafka:
+  bootstrapServers: localhost:9092
+  notifyTopic: notify

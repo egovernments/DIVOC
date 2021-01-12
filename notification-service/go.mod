@@ -3,7 +3,7 @@ module github.com/divoc/notification-service
 go 1.15
 
 require (
-	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
+	github.com/confluentinc/confluent-kafka-go v1.5.2
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/go-openapi/errors v0.19.9
 	github.com/go-openapi/loads v0.20.0
@@ -16,7 +16,6 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
-	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.4.2
 	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2

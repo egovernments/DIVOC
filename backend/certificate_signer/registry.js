@@ -12,16 +12,10 @@ const saveCertificate = (certificate) => {
     }
   };
 
-  axios.post(
+  return axios.post(
     config.REGISTRY_URL + "/add",
     certificateRequest
-  ).then(res => {
-    console.log(`statusCode: ${res.status}`);
-    console.log(res)
-  })
-    .catch(error => {
-      console.error(error)
-    })
+  )
 };
 
 module.exports = {

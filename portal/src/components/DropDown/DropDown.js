@@ -7,7 +7,7 @@ import styles from './DropDown.module.css';
 function DropDown({setSelectedOption, placeholder, options}) {
 
     const handleChange = (selectedItemFromDropdown) => {
-        setSelectedOption(selectedItemFromDropdown.label)
+        setSelectedOption(selectedItemFromDropdown.value)
     };
     return (
         <div className="m-3">
