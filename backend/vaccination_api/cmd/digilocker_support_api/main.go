@@ -14,7 +14,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -29,7 +28,7 @@ type Certificate struct {
 		ID          string `json:"id"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         int    `json:"age"`
+		Age         string    `json:"age"`
 		Nationality string `json:"nationality"`
 	} `json:"credentialSubject"`
 	Issuer       string    `json:"issuer"`
@@ -87,6 +86,7 @@ type PullURIRequest struct {
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
 		Photo        string `xml:"Photo"`
+		TrackingId         string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
 		UDF2         string `xml:"UDF2"`
 		UDF3         string `xml:"UDF3"`
@@ -111,8 +111,8 @@ type PullURIResponse struct {
 		UID          string `xml:"UID"`
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
+		TrackingId         string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
-		UDF2         string `xml:"UDF2"`
 		URI          string `xml:"URI"`
 		DocContent   string `xml:"DocContent"`
 		DataContent  string `xml:"DataContent"`
@@ -124,12 +124,17 @@ func ValidMAC(message, messageMAC, key []byte) bool {
 	mac.Write(message)
 	expectedMAC := mac.Sum(nil)
 	if log.IsLevelEnabled(log.InfoLevel) {
-		log.Infof("Expected mac %s but got %s", base64.StdEncoding.EncodeToString(expectedMAC), base64.StdEncoding.EncodeToString(messageMAC))
+		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(expectedMAC), base64.StdEncoding.EncodeToString(messageMAC))
 	}
-	return hmac.Equal(messageMAC, expectedMAC)
+	return !hmac.Equal(messageMAC, expectedMAC)
 }
 func uriRequest(w http.ResponseWriter, req *http.Request) {
 	log.Info("Got request ")
+	for name, values := range req.Header {
+		for _, value := range values {
+			log.Infof("%s:%s", name, value)
+		}
+	}
 	requestBuffer := make([]byte, 2048)
 	n, _ := req.Body.Read(requestBuffer)
 	log.Infof("Read %d bytes ", n)
@@ -154,22 +159,22 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response := PullURIResponse{}
 			response.ResponseStatus.Ts = xmlRequest.Ts
 			response.ResponseStatus.Txn = xmlRequest.Txn
-			response.ResponseStatus.Status = "1"
+			response.ResponseStatus.Status = "0"
 			response.DocDetails.DocType = config.Config.Digilocker.DocType
 			response.DocDetails.DigiLockerId = xmlRequest.DocDetails.DigiLockerId
 			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
-			certBundle := getCertificate(xmlRequest.DocDetails.FullName, xmlRequest.DocDetails.DOB,
-				xmlRequest.DocDetails.UID, xmlRequest.DocDetails.UDF1)
+
+			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB)
 			if certBundle != nil {
 				response.DocDetails.URI = certBundle.Uri
+				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getPdfCertificate(certBundle.signedJson); err != nil {
+					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
 						log.Errorf("Error in creating certificate pdf")
 					} else {
-						pdfContent := pdfBytes // todo get pdf
-						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfContent)
+						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
 					}
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
@@ -178,13 +183,14 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
 
-				if responseBytes, err := xml.Marshal(response); err != nil {
-					log.Errorf("Error while serializing xml")
-				} else {
-					w.WriteHeader(200)
-					_, _ = w.Write(responseBytes)
-					return
-				}
+
+			}
+			if responseBytes, err := xml.Marshal(response); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(responseBytes)
+				return
 			}
 			w.WriteHeader(500)
 		}
@@ -206,16 +212,17 @@ func fetchCertificateFromRegistry(filter map[string]interface{}) (map[string]int
 	return services.QueryRegistry(CertificateEntity, filter)
 }
 
-func getCertificate(fullName string, dob string, aadhaar string, phoneNumber string) *VaccinationCertificateBundle {
-	filter := map[string]interface{}{
+func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
+	/* filter := map[string]interface{}{
 		"name": map[string]interface{}{
 			"eq": fullName,
 		},
 		"mobile": map[string]interface{}{
 			"eq": phoneNumber,
 		},
-	}
-	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	}  */
+	//certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		if len(certificateArr) > 0 {
@@ -223,7 +230,7 @@ func getCertificate(fullName string, dob string, aadhaar string, phoneNumber str
 			log.Infof("certificate resp %v", certificateObj)
 			var cert VaccinationCertificateBundle
 			cert.certificateId = certificateObj["certificateId"].(string)
-			cert.Uri = "https://moh.india.gov/vc/233423"
+			cert.Uri = "in.gov.covin-DPMLC-" + cert.certificateId
 			cert.signedJson = certificateObj["certificate"].(string)
 			return &cert
 		}
@@ -267,7 +274,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	offsetX := 280.0
 	offsetY := 361.0
 	displayLabels := []string{certificate.CredentialSubject.Name,
-		strconv.Itoa(certificate.CredentialSubject.Age) + " Years",
+		certificate.CredentialSubject.Age + " Years",
 		certificate.CredentialSubject.Gender,
 		"234234298374293",
 		formatId(certificate.CredentialSubject.ID),
@@ -332,21 +339,16 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	w.WriteHeader(http.StatusOK)
+	//w.WriteHeader(http.StatusOK)
 	preEnrollmentCode := vars["preEnrollmentCode"]
-	filter := map[string]interface{}{
-		"preEnrollmentCode": map[string]interface{}{
-			"eq": preEnrollmentCode,
-		},
-	}
-	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[0].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
-			if pdfBytes, err := getPdfCertificate(signedJson); err != nil {
+			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
 				log.Errorf("Error in creating certificate pdf")
 			} else {
 				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
@@ -358,6 +360,16 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 	}
+}
+
+func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	return certificateFromRegistry, err
 }
 
 func main() {
