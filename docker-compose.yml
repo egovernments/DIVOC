@@ -173,3 +173,7 @@ services:
       SENDER_PASSWORD: xxxx
     depends_on:
       - kafka
+  digilocker_support_api:
+    image: dockerhub/digilocker_support_api
+    environment:
+      ENABLE_KEYCLOAK: "false"
