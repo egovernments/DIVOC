@@ -105,6 +105,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetVaccinatorsUploadHistoryHandler: GetVaccinatorsUploadHistoryHandlerFunc(func(params GetVaccinatorsUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinatorsUploadHistory has not yet been implemented")
 		}),
+		GetVaccinatorsUploadsErrorsHandler: GetVaccinatorsUploadsErrorsHandlerFunc(func(params GetVaccinatorsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetVaccinatorsUploadsErrors has not yet been implemented")
+		}),
 		NotifyFacilitiesHandler: NotifyFacilitiesHandlerFunc(func(params NotifyFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation NotifyFacilities has not yet been implemented")
 		}),
