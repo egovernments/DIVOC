@@ -33,7 +33,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -95,7 +95,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -210,7 +213,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -299,6 +305,66 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
           }
         }
       }
@@ -627,6 +693,21 @@ func init() {
             "oral",
             "nasal"
           ]
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
         }
       }
     },
@@ -983,7 +1064,7 @@ func init() {
     "title": "Divoc Portal API",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "52.172.216.52",
   "basePath": "/divoc/admin/api/v1",
   "paths": {
     "/analytics": {
@@ -1045,7 +1126,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1160,7 +1244,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1232,6 +1319,66 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all file uploads for facilties for given facility admin",
+        "operationId": "getFacilityUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/facility/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getFacilityUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "facility upload for given uploadID not found"
           }
         }
       }
@@ -1573,6 +1720,21 @@ func init() {
         "repeatTimes": {
           "description": "How many times vaccination should be taken",
           "type": "number"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
         }
       }
     },

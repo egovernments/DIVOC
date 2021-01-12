@@ -2,13 +2,17 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
@@ -37,6 +41,8 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
 	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
+	api.GetFacilityUploadsHandler = operations.GetFacilityUploadsHandlerFunc(getFacilityUploadHandler)
+	api.GetFacilityUploadsErrorsHandler = operations.GetFacilityUploadsErrorsHandlerFunc(getFacilityUploadErrors)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 }
 
@@ -218,12 +224,33 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 }
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
+
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
 	data := NewScanner(params.File)
-	defer params.File.Close()
-	for data.Scan() {
-		createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
-		log.Info(data.Text("serialNum"), data.Text("facilityName"))
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := principal.PreferredUsername
+	facilityCSV := CSVUpload{FacilityCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+
+	headerErrors := facilityCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
+
+	processError := ProcessCSV(facilityCSV, &data)
+	defer params.File.Close()
+
+	if processError != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(processError)
+	}
+
 	return operations.NewPostFacilitiesOK()
 }
 
@@ -288,4 +315,85 @@ func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models
 
 func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
+}
+
+func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	facilityUploads, err := db.GetFacilityUploadsForUser(preferredUsername)
+	if err == nil {
+		return NewGenericJSONResponse(facilityUploads)
+	}
+	return NewGenericServerError()
+}
+
+func getFacilityUploadErrors(params operations.GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+
+	// check if user has permission to get errors
+	preferredUsername := principal.PreferredUsername
+	csvUpload, err := db.GetCSVUploadsForID(uint(uploadID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// csvUpload itself not there
+			// then throw 404 error
+			return operations.NewGetFacilityUploadsErrorsNotFound()
+		}
+		return NewGenericServerError()
+	}
+
+	// user in csvUpload doesnt match preferredUsername
+	// then throw 403 error
+	if csvUpload.UserID != preferredUsername {
+		return operations.NewGetFacilityUploadsErrorsForbidden()
+	}
+
+	csvUploadErrors, err := db.GetCSVUploadErrorsForUploadID(uploadID)
+	fileHeader := strings.Split(csvUpload.FileHeaders, ",")
+
+	if err == nil {
+		erroredString := getErrorRows(csvUpload.FileHeaders, csvUploadErrors)
+		if len(csvUploadErrors) > 0 {
+			columnHeaders, errorRows := getErrorRowForResponse(erroredString, fileHeader)
+			return NewGenericJSONResponse(map[string]interface{}{
+				"columns":   columnHeaders,
+				"errorRows": errorRows,
+			})
+		} else {
+			return NewGenericJSONResponse(map[string]interface{}{
+				"columns":   []map[string]string{},
+				"errorRows": []map[string]string{},
+			})
+		}
+	}
+	return NewGenericServerError()
+}
+
+func getErrorRowForResponse(erroredString string, fileHeader []string) ([]string, []map[string]string) {
+	columnHeaders := strings.Split(config.Config.Facility.Upload.Columns, ",")
+	reader := strings.NewReader(erroredString)
+	scanner := NewScanner(reader)
+	columnHeaders = append(columnHeaders, "errors")
+
+	var errorRows []map[string]string
+	for scanner.Scan() {
+		newErrorRow := make(map[string]string)
+		for _, head := range fileHeader {
+			newErrorRow[head] = scanner.Text(head)
+		}
+		newErrorRow["errors"] = scanner.Text("errors")
+		errorRows = append(errorRows, newErrorRow)
+	}
+	return columnHeaders, errorRows
+}
+
+func getErrorRows(headers string, csvUploadErrors []*db.CSVUploadErrors) string {
+	var erroredString strings.Builder
+	erroredString.WriteString(headers + ",errors")
+	erroredString.WriteString("\n")
+	for _, uploadError := range csvUploadErrors {
+		erroredString.WriteString(uploadError.RowData)
+		erroredString.WriteString(",\"" + uploadError.Errors + "\"")
+		erroredString.WriteString("\n")
+	}
+	return erroredString.String()
 }
