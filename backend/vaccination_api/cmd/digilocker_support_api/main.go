@@ -269,8 +269,10 @@ func getPdfCertificate(certificateText string) ([]byte, error) {
 	}
 
 	//pdf.Image("qr.png", 200, 50, nil)
-	pdf.WritePdf("certificate.pdf")
-	return nil, nil
+	//pdf.WritePdf("certificate.pdf")
+	var b bytes.Buffer
+	pdf.Write(&b)
+	return b.Bytes(), nil
 }
 
 func formatFacilityAddress(certificate Certificate) string {
