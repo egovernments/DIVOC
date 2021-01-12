@@ -210,7 +210,7 @@ func getCertificate(fullName string, dob string, aadhaar string, phoneNumber str
 	return &cert
 }
 
-func getPdfCertificate(certificateText string) ([]byte, error) {
+func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
 		fmt.Println(err)
