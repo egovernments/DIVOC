@@ -55,6 +55,12 @@ var Config = struct {
 			Required string `yaml:"required"`
 		}
 	}
+	Vaccinator struct {
+		Upload struct {
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
+		}
+	}
 }{}
 
 func Initialize() {

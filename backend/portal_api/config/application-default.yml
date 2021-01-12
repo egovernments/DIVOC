@@ -26,3 +26,7 @@ preenrollment:
   upload:
     columns: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"
     required: "phone,enrollmentScopeId,nationalId,dob,gender,name,email"
+vaccinator:
+  upload:
+    columns: "serialNum,code,name,nationalIdentifier,mobileNumber,status,facilityIds"
+    required: "serialNum,code,name,nationalIdentifier,mobileNumber,status,facilityIds"
