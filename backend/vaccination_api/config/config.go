@@ -13,7 +13,7 @@ func Initialize() {
 	if err != nil {
 		panic("Unable to read configurations")
 	}
-	if Config.Keycloak.Pubkey == "" {
+	if Config.Keycloak.Enable && Config.Keycloak.Pubkey == "" {
 		updatePublicKeyFromKeycloak()
 	}
 }
@@ -50,6 +50,7 @@ var Config = struct {
 		Realm                string `default:"divoc"`
 		AuthHeader           string `env:"AUTH_TOKEN"`
 		RecipientGroupId     string `default:"recipient"`
+		Enable               bool   `env:"ENABLE_KEYCLOAK" default:"true"`
 	}
 	Kafka struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
