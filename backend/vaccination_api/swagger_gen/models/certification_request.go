@@ -263,6 +263,9 @@ func (m *CertificationRequestFacilityAddress) UnmarshalBinary(b []byte) error {
 // swagger:model CertificationRequestRecipient
 type CertificationRequestRecipient struct {
 
+	// address
+	Address *CertificationRequestRecipientAddress `json:"address,omitempty"`
+
 	// age
 	Age string `json:"age,omitempty"`
 
@@ -290,6 +293,10 @@ type CertificationRequestRecipient struct {
 func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDob(formats); err != nil {
 		res = append(res, err)
 	}
@@ -297,6 +304,24 @@ func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateAddress(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Address) { // not required
+		return nil
+	}
+
+	if m.Address != nil {
+		if err := m.Address.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("recipient" + "." + "address")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -324,6 +349,50 @@ func (m *CertificationRequestRecipient) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *CertificationRequestRecipient) UnmarshalBinary(b []byte) error {
 	var res CertificationRequestRecipient
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// CertificationRequestRecipientAddress certification request recipient address
+//
+// swagger:model CertificationRequestRecipientAddress
+type CertificationRequestRecipientAddress struct {
+
+	// address line1
+	AddressLine1 string `json:"addressLine1,omitempty"`
+
+	// address line2
+	AddressLine2 string `json:"addressLine2,omitempty"`
+
+	// district
+	District string `json:"district,omitempty"`
+
+	// pincode
+	Pincode int64 `json:"pincode,omitempty"`
+
+	// state
+	State string `json:"state,omitempty"`
+}
+
+// Validate validates this certification request recipient address
+func (m *CertificationRequestRecipientAddress) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *CertificationRequestRecipientAddress) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *CertificationRequestRecipientAddress) UnmarshalBinary(b []byte) error {
+	var res CertificationRequestRecipientAddress
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

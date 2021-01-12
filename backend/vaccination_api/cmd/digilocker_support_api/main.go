@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 	"github.com/signintech/gopdf"
 	"github.com/skip2/go-qrcode"
@@ -209,66 +210,100 @@ func getCertificate(fullName string, dob string, aadhaar string, phoneNumber str
 	return &cert
 }
 
-func getCertificateAsPdf(certificateText string) ([]byte, error) {
-	pdf := gopdf.GoPdf{}
-	pdf.Start(gopdf.Config{ PageSize: *gopdf.PageSizeA4 })
-	pdf.AddPage()
-	err := pdf.AddTTFFont("wts11", "./Roboto-Medium.ttf")
-	if err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}
-	​
-	tpl1 := pdf.ImportPage("template.pdf", 1, "/MediaBox")
-	​
-	// Draw pdf onto page
-	pdf.UseImportedTemplate(tpl1, 0, 0, 900, 0)
-	​
-	err = pdf.SetFont("wts11", "", 14)
-	if err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}
-	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
-	imageBytes, err := qrCode.PNG(-3)
-	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	pdf.ImageByHolder(holder, 320,130,nil)
+func getPdfCertificate(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
 		fmt.Println(err)
 	}
-	const offsetX = 350
-	const offsetY = 440
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY)
-	pdf.Cell(nil,certificate.IssuanceDate.Format("2006-01-02"))
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +69)
-	pdf.Cell(nil,certificate.CredentialSubject.Name)
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +105)
-	pdf.Cell(nil,certificate.CredentialSubject.Gender)
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +130)
-	pdf.Cell(nil,strconv.Itoa(certificate.CredentialSubject.Age))
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +158)
-	pdf.Cell(nil,certificate.Evidence[0].Facility.Name)
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +198)
-	pdf.Cell(nil,certificate.Evidence[0].Manufacturer)
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +255)
-	pdf.Cell(nil,certificate.Evidence[0].Date.Format("2006-01-02"))
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +280)
-	pdf.Cell(nil,strconv.Itoa(1))
-	pdf.SetX(offsetX)
-	pdf.SetY(offsetY +300)
-	pdf.Cell(nil,certificate.Evidence[0].EffectiveUntil)
-	var b bytes.Buffer
-	pdf.Write(&b)
-	return b.Bytes(), nil
+
+	pdf := gopdf.GoPdf{}
+	//pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: 595.28, H: 841.89}}) //595.28, 841.89 = A4
+	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
+	pdf.AddPage()
+
+	if err := pdf.AddTTFFont("wts11", "./Roboto-Light.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	/* if err := pdf.AddTTFFont("arapey", "./Arapey-Italic.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	} */
+	tpl1 := pdf.ImportPage("Certificate provisional_Final_11 Jan(4).pdf", 1, "/MediaBox")
+	// Draw pdf onto page
+	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
+
+	if err := pdf.SetFont("wts11", "", 10); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	/*if err := pdf.SetFont("arapey", "", 14); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}*/
+	offsetX := 280.0
+	offsetY := 361.0
+	displayLabels := []string{certificate.CredentialSubject.Name,
+		strconv.Itoa(certificate.CredentialSubject.Age) + " Years",
+		certificate.CredentialSubject.Gender,
+		"234234298374293",
+		formatId(certificate.CredentialSubject.ID),
+		"",
+		"", //blank line
+		certificate.Evidence[0].Vaccine,
+		fomratDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch+ ")",
+		"To be taken 28 days after 1st Dose",
+		"",
+		formatFacilityAddress(certificate),
+		certificate.Evidence[0].Verifier.Name,
+	}
+	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
+	for i := 0; i < len(displayLabels); i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*22.0)
+		pdf.Cell(nil, displayLabels[i])
+	}
+
+	e := pasteQrCodeOnPage(certificateText, &pdf)
+	if e != nil {
+		return nil, e
+	}
+
+	//pdf.Image("qr.png", 200, 50, nil)
+	pdf.WritePdf("certificate.pdf")
+	return nil, nil
+}
+
+func formatFacilityAddress(certificate Certificate) string {
+	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", " + certificate.Evidence[0].Facility.Address.AddressRegion
+}
+
+func fomratDate(date time.Time) string {
+	return date.Format("02 Jan 2006")
+}
+
+func formatId(identity string) string {
+	split := strings.Split(identity, ":")
+	lastFragment := split[len(split)-1]
+	if strings.Contains(identity, "aadhaar") {
+		return "XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
+	}
+	return lastFragment
+}
+
+func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
+	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
+	if err != nil {
+		return err
+	}
+	imageBytes, err := qrCode.PNG(-2)
+	holder, err := gopdf.ImageHolderByBytes(imageBytes)
+	err = pdf.ImageByHolder(holder, 400, 30, nil)
+	if err != nil {
+		log.Errorf("Error while creating QR code")
+	}
+	return nil
 }
 
 func main(){
