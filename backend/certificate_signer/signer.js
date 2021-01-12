@@ -103,7 +103,7 @@ function transformW3(cert, certificateId) {
       nationality: cert.recipient.nationality
     },
     issuer: "https://nha.gov.in/",
-    issuanceDate: new Date().toISOString().toLowerCase(),
+    issuanceDate: new Date().toISOString(),
     evidence: [{
       "id": "https://nha.gov.in/evidence/vaccine/"+certificateId,
       "feedbackUrl":"https://divoc.xiv.in/feedback/" + certificateId,
@@ -148,12 +148,14 @@ async function signAndSave(certificate) {
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
+  const preEnrollmentCode = certificate.preEnrollmentCode;
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
     name : name,
     contact: contact,
     mobile: mobile,
+    preEnrollmentCode : preEnrollmentCode,
     certificateId: certificateId,
     certificate: JSON.stringify(signedCertificate),
     meta: certificate["meta"]
