@@ -88,6 +88,24 @@ func GetFacilityUploadsForUser(userID string) ([]*CSVUploads, error) {
 	return facilityUploads, nil
 }
 
+func GetEnrollmentUploadsForUser(userID string) ([]*CSVUploads, error) {
+	var facilityUploads []*CSVUploads
+	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, "PreEnrollment"); result.Error != nil {
+		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
+		return nil, errors.New("error occurred while retrieving CSVUploads")
+	}
+	return facilityUploads, nil
+}
+
+func GetCSVUploadsForUser(userID string, uploadType string) ([]*CSVUploads, error) {
+	var facilityUploads []*CSVUploads
+	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, uploadType); result.Error != nil {
+		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
+		return nil, errors.New("error occurred while retrieving CSVUploads")
+	}
+	return facilityUploads, nil
+}
+
 func UpdateCSVUpload(data *CSVUploads) error {
 	if result := db.Save(data); result.Error != nil {
 		log.Error("Error occurred while saving CSVUploads with ID - ", data.ID)
@@ -105,7 +123,7 @@ func CreateCSVUploadError(data *CSVUploadErrors) error {
 	return nil
 }
 
-func GetCSVUploadsForID(id uint) (*CSVUploads, error) {
+func GetCSVUploadsForID(id int64) (*CSVUploads, error) {
 	facilityUpload := &CSVUploads{}
 	if result := db.First(&facilityUpload, "id = ?", id); result.Error != nil {
 		log.Error("Error occurred while retrieving CSVUploads for ID ", id, result.Error)

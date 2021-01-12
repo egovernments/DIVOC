@@ -2,17 +2,15 @@ package pkg
 
 import (
 	"encoding/json"
-	"errors"
+	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
-	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
@@ -42,7 +40,9 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
 	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
 	api.GetFacilityUploadsHandler = operations.GetFacilityUploadsHandlerFunc(getFacilityUploadHandler)
-	api.GetFacilityUploadsErrorsHandler = operations.GetFacilityUploadsErrorsHandlerFunc(getFacilityUploadErrors)
+	api.GetFacilityUploadsErrorsHandler = operations.GetFacilityUploadsErrorsHandlerFunc(getFacilityUploadErrorsHandler)
+	api.GetEnrollmentUploadHistoryHandler = operations.GetEnrollmentUploadHistoryHandlerFunc(getEnrollmentUploadHandler)
+	api.GetEnrollmentsUploadsErrorsHandler = operations.GetEnrollmentsUploadsErrorsHandlerFunc(getPreEnrollmentUploadErrorsHandler)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 }
 
@@ -80,6 +80,14 @@ func NewGenericJSONResponse(body interface{}) middleware.Responder {
 
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
+}
+
+func NewGenericNotFoundError() middleware.Responder {
+	return &GenericResponse{statusCode: 404}
+}
+
+func NewGenericForbiddenError() middleware.Responder {
+	return &GenericResponse{statusCode: 403}
 }
 
 func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -214,12 +222,32 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
+	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
+	log.Println(columns)
 	data := NewScanner(params.File)
-	defer params.File.Close()
-	for data.Scan() {
-		createEnrollment(&data)
-		log.Info(data.Text("mobile"), data.Text("name"))
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := principal.PreferredUsername
+	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+	headerErrors := preEnrollmentCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostEnrollmentsBadRequest().WithPayload(headerErrors)
 	}
+
+	processError := ProcessCSV(preEnrollmentCSV, &data)
+	defer params.File.Close()
+
+	if processError != nil {
+		return operations.NewPostEnrollmentsBadRequest().WithPayload(processError)
+	}
+
 	return operations.NewPostEnrollmentsOK()
 }
 
@@ -326,74 +354,44 @@ func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, princi
 	return NewGenericServerError()
 }
 
-func getFacilityUploadErrors(params operations.GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+func getFacilityUploadErrorsHandler(params operations.GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	uploadID := params.UploadID
-
-	// check if user has permission to get errors
 	preferredUsername := principal.PreferredUsername
-	csvUpload, err := db.GetCSVUploadsForID(uint(uploadID))
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// csvUpload itself not there
-			// then throw 404 error
-			return operations.NewGetFacilityUploadsErrorsNotFound()
-		}
-		return NewGenericServerError()
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "Facility",
+		UserId:     preferredUsername,
+		Columns:    columns,
 	}
+	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
+}
 
-	// user in csvUpload doesnt match preferredUsername
-	// then throw 403 error
-	if csvUpload.UserID != preferredUsername {
-		return operations.NewGetFacilityUploadsErrorsForbidden()
+func getEnrollmentUploadHandler(params operations.GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "PreEnrollment",
+		UserId:     preferredUsername,
+		Columns:    columns,
 	}
-
-	csvUploadErrors, err := db.GetCSVUploadErrorsForUploadID(uploadID)
-	fileHeader := strings.Split(csvUpload.FileHeaders, ",")
-
+	csvUpload, err := preEnrollmentUpload.GetCSVUploadsForUser()
 	if err == nil {
-		erroredString := getErrorRows(csvUpload.FileHeaders, csvUploadErrors)
-		if len(csvUploadErrors) > 0 {
-			columnHeaders, errorRows := getErrorRowForResponse(erroredString, fileHeader)
-			return NewGenericJSONResponse(map[string]interface{}{
-				"columns":   columnHeaders,
-				"errorRows": errorRows,
-			})
-		} else {
-			return NewGenericJSONResponse(map[string]interface{}{
-				"columns":   []map[string]string{},
-				"errorRows": []map[string]string{},
-			})
-		}
+		return NewGenericJSONResponse(csvUpload)
 	}
 	return NewGenericServerError()
 }
 
-func getErrorRowForResponse(erroredString string, fileHeader []string) ([]string, []map[string]string) {
-	columnHeaders := strings.Split(config.Config.Facility.Upload.Columns, ",")
-	reader := strings.NewReader(erroredString)
-	scanner := NewScanner(reader)
-	columnHeaders = append(columnHeaders, "errors")
+func getPreEnrollmentUploadErrorsHandler(params operations.GetEnrollmentsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
 
-	var errorRows []map[string]string
-	for scanner.Scan() {
-		newErrorRow := make(map[string]string)
-		for _, head := range fileHeader {
-			newErrorRow[head] = scanner.Text(head)
-		}
-		newErrorRow["errors"] = scanner.Text("errors")
-		errorRows = append(errorRows, newErrorRow)
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "PreEnrollment",
+		UserId:     preferredUsername,
+		Columns:    columns,
 	}
-	return columnHeaders, errorRows
-}
-
-func getErrorRows(headers string, csvUploadErrors []*db.CSVUploadErrors) string {
-	var erroredString strings.Builder
-	erroredString.WriteString(headers + ",errors")
-	erroredString.WriteString("\n")
-	for _, uploadError := range csvUploadErrors {
-		erroredString.WriteString(uploadError.RowData)
-		erroredString.WriteString(",\"" + uploadError.Errors + "\"")
-		erroredString.WriteString("\n")
-	}
-	return erroredString.String()
+	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
 }

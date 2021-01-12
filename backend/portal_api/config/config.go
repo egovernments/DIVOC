@@ -49,6 +49,12 @@ var Config = struct {
 			Required string `yaml:"required"`
 		}
 	}
+	PreEnrollment struct {
+		Upload struct {
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
+		}
+	}
 	Kafka struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`

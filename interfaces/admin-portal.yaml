@@ -360,6 +360,38 @@ paths:
           description: facility upload for given uploadID not found
         '403':
           description: Forbidden for user
+  /enrollments/uploads:
+    get:
+      summary: Get Enrollments uploads
+      operationId: getEnrollmentUploadHistory
+      security:
+        - hasRole: ['admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /enrollments/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getEnrollmentsUploadsErrors
+      security:
+        - hasRole: [ 'admin' ]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: enrollments upload for given uploadID not found
+        '403':
+          description: Forbidden for user
 
 definitions:
   FacilityUpdateRequest:
