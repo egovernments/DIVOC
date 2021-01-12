@@ -227,17 +227,17 @@ func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *
 	}}
 	headerErrors := vaccinatorCSV.ValidateHeaders()
 	if headerErrors != nil {
-		return operations.NewPostEnrollmentsBadRequest().WithPayload(headerErrors)
+		return operations.NewPostVaccinatorsBadRequest().WithPayload(headerErrors)
 	}
 
 	processError := ProcessCSV(vaccinatorCSV, &data)
 	defer params.File.Close()
 
 	if processError != nil {
-		return operations.NewPostEnrollmentsBadRequest().WithPayload(processError)
+		return operations.NewPostVaccinatorsBadRequest().WithPayload(processError)
 	}
 
-	return operations.NewPostEnrollmentsOK()
+	return operations.NewPostVaccinatorsOK()
 }
 
 func createFacilityUserHandler(params operations.CreateFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {

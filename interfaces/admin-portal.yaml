@@ -128,6 +128,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
   /programs:

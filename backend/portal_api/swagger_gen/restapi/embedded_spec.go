@@ -549,7 +549,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -1552,7 +1555,10 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
