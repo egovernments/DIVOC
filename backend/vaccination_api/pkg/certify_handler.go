@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	eventsModel "github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
+	"strconv"
 	"strings"
 	"time"
 
