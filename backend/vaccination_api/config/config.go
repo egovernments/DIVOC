@@ -8,7 +8,7 @@ import (
 )
 
 func Initialize() {
-	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
 	if err != nil {
 		panic("Unable to read configurations")
@@ -71,5 +71,10 @@ var Config = struct {
 	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`
+	}
+	Digilocker struct {
+		AuthKeyName string `env:"DIGILOCKER_AUTHKEYNAME" default:"x-digilocker-hmac"`
+		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
+		DocType     string `env:DIGILOCKER_DOCTYPE`
 	}
 }{}

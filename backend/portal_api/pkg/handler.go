@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
@@ -37,6 +39,12 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
 	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
+	api.GetFacilityUploadsHandler = operations.GetFacilityUploadsHandlerFunc(getFacilityUploadHandler)
+	api.GetFacilityUploadsErrorsHandler = operations.GetFacilityUploadsErrorsHandlerFunc(getFacilityUploadErrorsHandler)
+	api.GetEnrollmentUploadHistoryHandler = operations.GetEnrollmentUploadHistoryHandlerFunc(getEnrollmentUploadHandler)
+	api.GetEnrollmentsUploadsErrorsHandler = operations.GetEnrollmentsUploadsErrorsHandlerFunc(getPreEnrollmentUploadErrorsHandler)
+	api.GetVaccinatorsUploadHistoryHandler = operations.GetVaccinatorsUploadHistoryHandlerFunc(getVaccinatorUploadHandler)
+	api.GetVaccinatorsUploadsErrorsHandler = operations.GetVaccinatorsUploadsErrorsHandlerFunc(getVaccinatorUploadErrorsHandler)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 }
 
@@ -74,6 +82,14 @@ func NewGenericJSONResponse(body interface{}) middleware.Responder {
 
 func NewGenericServerError() middleware.Responder {
 	return &GenericResponse{statusCode: 500}
+}
+
+func NewGenericNotFoundError() middleware.Responder {
+	return &GenericResponse{statusCode: 404}
+}
+
+func NewGenericForbiddenError() middleware.Responder {
+	return &GenericResponse{statusCode: 403}
 }
 
 func getEnrollmentsHandler(params operations.GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -208,33 +224,95 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
+	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
+	log.Println(columns)
 	data := NewScanner(params.File)
-	defer params.File.Close()
-	for data.Scan() {
-		createEnrollment(&data)
-		log.Info(data.Text("mobile"), data.Text("name"))
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := principal.PreferredUsername
+	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+	headerErrors := preEnrollmentCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostEnrollmentsBadRequest().WithPayload(headerErrors)
 	}
+
+	processError := ProcessCSV(preEnrollmentCSV, &data)
+	defer params.File.Close()
+
+	if processError != nil {
+		return operations.NewPostEnrollmentsBadRequest().WithPayload(processError)
+	}
+
 	return operations.NewPostEnrollmentsOK()
 }
 
 func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
+
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
 	data := NewScanner(params.File)
-	defer params.File.Close()
-	for data.Scan() {
-		createFacility(&data, params.HTTPRequest.Header.Get("Authorization"))
-		log.Info(data.Text("serialNum"), data.Text("facilityName"))
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := principal.PreferredUsername
+	facilityCSV := CSVUpload{FacilityCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+
+	headerErrors := facilityCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
+
+	processError := ProcessCSV(facilityCSV, &data)
+	defer params.File.Close()
+
+	if processError != nil {
+		return operations.NewPostFacilitiesBadRequest().WithPayload(processError)
+	}
+
 	return operations.NewPostFacilitiesOK()
 }
 
 func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+
+	columns := strings.Split(config.Config.Vaccinator.Upload.Columns, ",")
+	log.Println(columns)
 	data := NewScanner(params.File)
-	defer params.File.Close()
-	for data.Scan() {
-		createVaccinator(&data)
-		log.Info("Created ", data.Text("serialNum"), data.Text("facilityName"))
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := principal.PreferredUsername
+	vaccinatorCSV := CSVUpload{VaccinatorCSV{
+		CSVMetadata{
+			Columns:  columns,
+			Data:     &data,
+			FileName: fileName,
+			UserName: preferredUsername,
+		},
+	}}
+	headerErrors := vaccinatorCSV.ValidateHeaders()
+	if headerErrors != nil {
+		return operations.NewPostVaccinatorsBadRequest().WithPayload(headerErrors)
 	}
-	return operations.NewPostFacilitiesOK()
+
+	processError := ProcessCSV(vaccinatorCSV, &data)
+	defer params.File.Close()
+
+	if processError != nil {
+		return operations.NewPostVaccinatorsBadRequest().WithPayload(processError)
+	}
+
+	return operations.NewPostVaccinatorsOK()
 }
 
 func createFacilityUserHandler(params operations.CreateFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -288,4 +366,84 @@ func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models
 
 func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
+}
+
+func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	facilityUploads, err := db.GetFacilityUploadsForUser(preferredUsername)
+	if err == nil {
+		return NewGenericJSONResponse(facilityUploads)
+	}
+	return NewGenericServerError()
+}
+
+func getFacilityUploadErrorsHandler(params operations.GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "Facility",
+		UserId:     preferredUsername,
+		Columns:    columns,
+	}
+	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
+}
+
+func getEnrollmentUploadHandler(params operations.GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.Facility.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "PreEnrollment",
+		UserId:     preferredUsername,
+		Columns:    columns,
+	}
+	csvUpload, err := preEnrollmentUpload.GetCSVUploadsForUser()
+	if err == nil {
+		return NewGenericJSONResponse(csvUpload)
+	}
+	return NewGenericServerError()
+}
+
+func getPreEnrollmentUploadErrorsHandler(params operations.GetEnrollmentsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "PreEnrollment",
+		UserId:     preferredUsername,
+		Columns:    columns,
+	}
+	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
+}
+
+func getVaccinatorUploadHandler(params operations.GetVaccinatorsUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.Vaccinator.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "Vaccinator",
+		UserId:     preferredUsername,
+		Columns:    columns,
+	}
+	csvUpload, err := preEnrollmentUpload.GetCSVUploadsForUser()
+	if err == nil {
+		return NewGenericJSONResponse(csvUpload)
+	}
+	return NewGenericServerError()
+}
+
+func getVaccinatorUploadErrorsHandler(params operations.GetVaccinatorsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+	preferredUsername := principal.PreferredUsername
+	columns := strings.Split(config.Config.Vaccinator.Upload.Columns, ",")
+
+	preEnrollmentUpload := GetCSVUpload{
+		UploadType: "Vaccinator",
+		UserId:     preferredUsername,
+		Columns:    columns,
+	}
+	return preEnrollmentUpload.GetCSVUploadErrors(uploadID)
 }

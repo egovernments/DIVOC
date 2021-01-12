@@ -75,6 +75,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
     put:
@@ -151,6 +153,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
   /vaccinators:
@@ -180,6 +184,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
   /programs:
@@ -321,6 +327,107 @@ paths:
             type: object
         '401':
           description: Unauthorized
+
+  /facility/uploads:
+    get:
+      summary: Get all file uploads for facilties for given facility admin
+      operationId: getFacilityUploads
+      security:
+        - hasRole: ['admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /facility/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getFacilityUploadsErrors
+      security:
+        - hasRole: [ 'admin' ]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: facility upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+  /enrollments/uploads:
+    get:
+      summary: Get Enrollments uploads
+      operationId: getEnrollmentUploadHistory
+      security:
+        - hasRole: ['admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /enrollments/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getEnrollmentsUploadsErrors
+      security:
+        - hasRole: [ 'admin' ]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: enrollments upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+  /vaccinators/uploads:
+    get:
+      summary: Get Vaccinators uploads
+      operationId: getVaccinatorsUploadHistory
+      security:
+        - hasRole: ["facility-admin", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /vaccinators/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getVaccinatorsUploadsErrors
+      security:
+        - hasRole: ["facility-admin", "admin"]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: vaccinators upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+
+
 definitions:
   FacilityUpdateRequest:
     type: array
@@ -609,7 +716,17 @@ definitions:
       name:
         type: string
         title: group name
-host: divoc.xiv.in
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message
+host: 52.172.216.52
 schemes:
   - https
 basePath: /divoc/admin/api/v1

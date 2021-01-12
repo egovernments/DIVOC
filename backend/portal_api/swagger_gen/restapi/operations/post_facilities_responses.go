@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // PostFacilitiesOKCode is the HTTP code returned for type PostFacilitiesOK
@@ -43,6 +45,11 @@ const PostFacilitiesBadRequestCode int = 400
 swagger:response postFacilitiesBadRequest
 */
 type PostFacilitiesBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewPostFacilitiesBadRequest creates PostFacilitiesBadRequest with default headers values
@@ -51,12 +58,27 @@ func NewPostFacilitiesBadRequest() *PostFacilitiesBadRequest {
 	return &PostFacilitiesBadRequest{}
 }
 
+// WithPayload adds the payload to the post facilities bad request response
+func (o *PostFacilitiesBadRequest) WithPayload(payload *models.Error) *PostFacilitiesBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the post facilities bad request response
+func (o *PostFacilitiesBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *PostFacilitiesBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 // PostFacilitiesUnauthorizedCode is the HTTP code returned for type PostFacilitiesUnauthorized

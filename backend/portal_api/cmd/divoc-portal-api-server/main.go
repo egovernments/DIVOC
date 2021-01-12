@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg"
+	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -17,6 +18,7 @@ func main() {
 	config.Initialize()
 	services.InitializeKafka()
 	pkg.InitClickHouseConnection()
+	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

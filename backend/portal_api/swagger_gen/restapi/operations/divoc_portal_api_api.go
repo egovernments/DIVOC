@@ -66,14 +66,26 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
 		}),
+		GetEnrollmentUploadHistoryHandler: GetEnrollmentUploadHistoryHandlerFunc(func(params GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetEnrollmentUploadHistory has not yet been implemented")
+		}),
 		GetEnrollmentsHandler: GetEnrollmentsHandlerFunc(func(params GetEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetEnrollments has not yet been implemented")
+		}),
+		GetEnrollmentsUploadsErrorsHandler: GetEnrollmentsUploadsErrorsHandlerFunc(func(params GetEnrollmentsUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetEnrollmentsUploadsErrors has not yet been implemented")
 		}),
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
 		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
+		}),
+		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
+		}),
+		GetFacilityUploadsErrorsHandler: GetFacilityUploadsErrorsHandlerFunc(func(params GetFacilityUploadsErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityUploadsErrors has not yet been implemented")
 		}),
 		GetFacilityUsersHandler: GetFacilityUsersHandlerFunc(func(params GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUsers has not yet been implemented")
@@ -89,6 +101,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		}),
 		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
+		}),
+		GetVaccinatorsUploadHistoryHandler: GetVaccinatorsUploadHistoryHandlerFunc(func(params GetVaccinatorsUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetVaccinatorsUploadHistory has not yet been implemented")
 		}),
 		NotifyFacilitiesHandler: NotifyFacilitiesHandlerFunc(func(params NotifyFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation NotifyFacilities has not yet been implemented")
@@ -160,12 +175,20 @@ type DivocPortalAPIAPI struct {
 	CreateProgramHandler CreateProgramHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
 	GetAnalyticsHandler GetAnalyticsHandler
+	// GetEnrollmentUploadHistoryHandler sets the operation handler for the get enrollment upload history operation
+	GetEnrollmentUploadHistoryHandler GetEnrollmentUploadHistoryHandler
 	// GetEnrollmentsHandler sets the operation handler for the get enrollments operation
 	GetEnrollmentsHandler GetEnrollmentsHandler
+	// GetEnrollmentsUploadsErrorsHandler sets the operation handler for the get enrollments uploads errors operation
+	GetEnrollmentsUploadsErrorsHandler GetEnrollmentsUploadsErrorsHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
+	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
+	GetFacilityUploadsHandler GetFacilityUploadsHandler
+	// GetFacilityUploadsErrorsHandler sets the operation handler for the get facility uploads errors operation
+	GetFacilityUploadsErrorsHandler GetFacilityUploadsErrorsHandler
 	// GetFacilityUsersHandler sets the operation handler for the get facility users operation
 	GetFacilityUsersHandler GetFacilityUsersHandler
 	// GetMedicinesHandler sets the operation handler for the get medicines operation
@@ -176,6 +199,10 @@ type DivocPortalAPIAPI struct {
 	GetPublicAnalyticsHandler GetPublicAnalyticsHandler
 	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	GetVaccinatorsHandler GetVaccinatorsHandler
+	// GetVaccinatorsUploadHistoryHandler sets the operation handler for the get vaccinators upload history operation
+	GetVaccinatorsUploadHistoryHandler GetVaccinatorsUploadHistoryHandler
+	// GetVaccinatorsUploadsErrorsHandler sets the operation handler for the get vaccinators uploads errors operation
+	GetVaccinatorsUploadsErrorsHandler GetVaccinatorsUploadsErrorsHandler
 	// NotifyFacilitiesHandler sets the operation handler for the notify facilities operation
 	NotifyFacilitiesHandler NotifyFacilitiesHandler
 	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
@@ -284,14 +311,26 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetAnalyticsHandler")
 	}
+	if o.GetEnrollmentUploadHistoryHandler == nil {
+		unregistered = append(unregistered, "GetEnrollmentUploadHistoryHandler")
+	}
 	if o.GetEnrollmentsHandler == nil {
 		unregistered = append(unregistered, "GetEnrollmentsHandler")
+	}
+	if o.GetEnrollmentsUploadsErrorsHandler == nil {
+		unregistered = append(unregistered, "GetEnrollmentsUploadsErrorsHandler")
 	}
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
 	}
 	if o.GetFacilityGroupsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityGroupsHandler")
+	}
+	if o.GetFacilityUploadsHandler == nil {
+		unregistered = append(unregistered, "GetFacilityUploadsHandler")
+	}
+	if o.GetFacilityUploadsErrorsHandler == nil {
+		unregistered = append(unregistered, "GetFacilityUploadsErrorsHandler")
 	}
 	if o.GetFacilityUsersHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUsersHandler")
@@ -307,6 +346,12 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "GetVaccinatorsHandler")
+	}
+	if o.GetVaccinatorsUploadHistoryHandler == nil {
+		unregistered = append(unregistered, "GetVaccinatorsUploadHistoryHandler")
+	}
+	if o.GetVaccinatorsUploadsErrorsHandler == nil {
+		unregistered = append(unregistered, "GetVaccinatorsUploadsErrorsHandler")
 	}
 	if o.NotifyFacilitiesHandler == nil {
 		unregistered = append(unregistered, "NotifyFacilitiesHandler")
@@ -445,7 +490,15 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/enrollments/uploads"] = NewGetEnrollmentUploadHistory(o.context, o.GetEnrollmentUploadHistoryHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/enrollments"] = NewGetEnrollments(o.context, o.GetEnrollmentsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/enrollments/uploads/{uploadId}/errors"] = NewGetEnrollmentsUploadsErrors(o.context, o.GetEnrollmentsUploadsErrorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -454,6 +507,14 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/facility/groups"] = NewGetFacilityGroups(o.context, o.GetFacilityGroupsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/uploads"] = NewGetFacilityUploads(o.context, o.GetFacilityUploadsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/uploads/{uploadId}/errors"] = NewGetFacilityUploadsErrors(o.context, o.GetFacilityUploadsErrorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -474,6 +535,14 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/vaccinators"] = NewGetVaccinators(o.context, o.GetVaccinatorsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/vaccinators/uploads"] = NewGetVaccinatorsUploadHistory(o.context, o.GetVaccinatorsUploadHistoryHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/vaccinators/uploads/{uploadId}/errors"] = NewGetVaccinatorsUploadsErrors(o.context, o.GetVaccinatorsUploadsErrorsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

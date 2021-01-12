@@ -2,12 +2,9 @@ package pkg
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/divoc/kernel_library/services"
-	"github.com/divoc/portal-api/config"
 	kafkaServices "github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
-	log "github.com/sirupsen/logrus"
 	"strconv"
 	"strings"
 	"text/template"

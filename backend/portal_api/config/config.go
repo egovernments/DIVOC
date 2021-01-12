@@ -36,6 +36,31 @@ var Config = struct {
 	Analytics struct {
 		Datasource string `yaml:"datasource" env:"CLICK_HOUSE_URL"`
 	}
+	Database struct {
+		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
+		Password string `default:"postgres" yaml:"password" env:"DB_PASSWORD"`
+		User     string `default:"postgres" yaml:"user" env:"DB_USER"`
+		Port     string `default:"5432" yaml:"port" env:"DB_PORT"`
+		DBName   string `default:"postgres" yaml:"dbname"`
+	}
+	Facility struct {
+		Upload struct {
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
+		}
+	}
+	PreEnrollment struct {
+		Upload struct {
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
+		}
+	}
+	Vaccinator struct {
+		Upload struct {
+			Columns  string `yaml:"columns"`
+			Required string `yaml:"required"`
+		}
+	}
 	Kafka struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
@@ -43,7 +68,7 @@ var Config = struct {
 }{}
 
 func Initialize() {
-	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
 	if err != nil {
 		panic("Unable to read configurations")
