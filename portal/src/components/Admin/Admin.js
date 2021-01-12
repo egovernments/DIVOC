@@ -29,9 +29,13 @@ export default function Admin() {
                 component: <FacilitiesRegistry/>,
                 rightTabContent: renderDownloadTemplateButton(SampleCSV.FACILITY_REGISTRY)
             },
-            {title: 'Vaccinators', component: <VaccinatorsRegistry/>},
+            {
+                title: 'Vaccinators',
+                component: <VaccinatorsRegistry/>,
+                rightTabContent: renderDownloadTemplateButton(SampleCSV.VACCINATOR_REGISTRY)
+            },
             {title: 'Vaccine Programs', component: <ProgramRegistration/>},
-            {title: 'Vaccines', component: <VaccineRegistration/>},
+            {title: 'Vaccines', component: <VaccineRegistration/>,},
             {
                 title: 'Pre-Enrollment',
                 component: <PreEnrollment/>,

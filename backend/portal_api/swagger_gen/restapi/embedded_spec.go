@@ -652,10 +652,72 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get Vaccinators uploads",
+        "operationId": "getVaccinatorsUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getVaccinatorsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "vaccinators upload for given uploadID not found"
           }
         }
       }
@@ -1723,10 +1785,72 @@ func init() {
             "description": "OK"
           },
           "400": {
-            "description": "Invalid input"
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get Vaccinators uploads",
+        "operationId": "getVaccinatorsUploadHistory",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/vaccinators/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getVaccinatorsUploadsErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "vaccinators upload for given uploadID not found"
           }
         }
       }
