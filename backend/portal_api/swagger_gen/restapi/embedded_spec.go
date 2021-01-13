@@ -450,6 +450,38 @@ func init() {
           }
         }
       },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Facility User",
+        "operationId": "updateFacilityUser",
+        "parameters": [
+          {
+            "description": "Update facility user data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -1580,6 +1612,38 @@ func init() {
                 "$ref": "#/definitions/FacilityUser"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Facility User",
+        "operationId": "updateFacilityUser",
+        "parameters": [
+          {
+            "description": "Update facility user data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },

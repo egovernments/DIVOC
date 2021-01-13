@@ -284,6 +284,24 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+    put:
+      summary: Update Facility User
+      operationId: updateFacilityUser
+      security:
+          - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityUser'
+          description: Update facility user data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /facility/groups:
     get:
       summary: Get facility groups

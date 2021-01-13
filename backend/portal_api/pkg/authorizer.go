@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
-	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -50,15 +50,6 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaim
 		}
 	}
 	return nil, errors.New("unauthorized")
-}
-
-func contains(arr []string, str string) bool {
-	for _, a := range arr {
-		if a == str {
-			return true
-		}
-	}
-	return false
 }
 
 func getClaimBody(bearerToken string) (*models.JWTClaimBody, error) {

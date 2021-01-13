@@ -46,6 +46,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetVaccinatorsUploadHistoryHandler = operations.GetVaccinatorsUploadHistoryHandlerFunc(getVaccinatorUploadHandler)
 	api.GetVaccinatorsUploadsErrorsHandler = operations.GetVaccinatorsUploadsErrorsHandlerFunc(getVaccinatorUploadErrorsHandler)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
+	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 }
 
 type GenericResponse struct {
@@ -446,4 +447,13 @@ func getVaccinatorUploadErrorsHandler(params operations.GetVaccinatorsUploadsErr
 		Columns:    columns,
 	}
 	return vaccinatorUpload.GetCSVUploadErrors(uploadID)
+}
+
+func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder  {
+	err := UpdateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateFacilityUserBadRequest()
+	}
+	return operations.NewUpdateFacilityUserOK()
 }
