@@ -28,6 +28,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilitiesHandler = operations.UpdateFacilitiesHandlerFunc(updateFacilitiesHandler)
 	api.GetAnalyticsHandler = operations.GetAnalyticsHandlerFunc(getAnalyticsHandler)
 	api.GetPublicAnalyticsHandler = operations.GetPublicAnalyticsHandlerFunc(getPublicAnalyticsHandler)
+	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 }
 
 type GenericResponse struct {
@@ -212,4 +213,13 @@ func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models
 
 func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middleware.Responder {
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
+}
+
+func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder  {
+	err := UpdateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateFacilityUserBadRequest()
+	}
+	return operations.NewUpdateFacilityUserOK()
 }

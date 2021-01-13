@@ -36,6 +36,15 @@ func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
 	)
 }
 
+func UpdateKeycloakUser(keycloakUserId string, user KeyCloakUserRequest) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId
+	log.Infof("Updating user %s : %s, %+v", url, authHeader, user)
+	return req.Put(url, req.BodyJSON(user),
+		req.Header{"Authorization": authHeader},
+	)
+}
+
 func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
 	return resp.Response().StatusCode == 201 || resp.Response().StatusCode == 409
 }
@@ -95,7 +104,7 @@ func ensureRoleAccess(userId string, clientId string, rolePayload string, authHe
 func addUserToGroup(userId string, groupId string) error {
 	authHeader := getAuthHeader()
 	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
-	log.Info("POST ", addUserToGroupURL)
+	log.Info("PUT ", addUserToGroupURL)
 	payload := fmt.Sprintf(`{ 
 							"userId": "%s",
 							"groupId": "%s", 
@@ -109,6 +118,27 @@ func addUserToGroup(userId string, groupId string) error {
 	if response.Response().StatusCode != 204 {
 		log.Errorf("Error while adding user to group, status code %s", response.Response().StatusCode)
 		return errors.New("Error while adding user to group for " + userId + "" + groupId)
+	}
+	return nil
+}
+
+func deleteUserFromGroup(userId string, groupId string) error {
+	authHeader := getAuthHeader()
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
+	log.Info("DELETE ", addUserToGroupURL)
+	payload := fmt.Sprintf(`{ 
+							"userId": "%s",
+							"groupId": "%s", 
+							"realm": "%s" }`, userId, groupId, config.Config.Keycloak.Realm)
+	response, err := req.Delete(addUserToGroupURL, req.BodyJSON(payload), req.Header{"Authorization": authHeader})
+	if err != nil {
+		log.Errorf("Error while deleting user %s to group %s", userId, groupId)
+		return errors.New("Error while deleting user to group")
+	}
+	log.Infof("Deleted user to group on keycloak %d : %s", response.Response().StatusCode, response.String())
+	if response.Response().StatusCode != 204 {
+		log.Errorf("Error while deleting user to group, status code %s", response.Response().StatusCode)
+		return errors.New("Error while deleting user to group for " + userId + "" + groupId)
 	}
 	return nil
 }
