@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/kernel_library/services"
 	"github.com/gorilla/mux"
 	"github.com/signintech/gopdf"
@@ -19,7 +20,10 @@ import (
 	"time"
 )
 
+const ApiRole = "api"
 const CertificateEntity = "VaccinationCertificate"
+const PreEnrollmentCode = "preEnrollmentCode"
+const BeneficiaryId = "beneficiaryId"
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -29,10 +33,10 @@ type Certificate struct {
 		ID          string `json:"id"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         string    `json:"age"`
+		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
 	} `json:"credentialSubject"`
-	Issuer       string    `json:"issuer"`
+	Issuer       string `json:"issuer"`
 	IssuanceDate string `json:"issuanceDate"`
 	Evidence     []struct {
 		ID             string    `json:"id"`
@@ -87,7 +91,7 @@ type PullURIRequest struct {
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
 		Photo        string `xml:"Photo"`
-		TrackingId         string `xml:"tracking_id"`
+		TrackingId   string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
 		UDF2         string `xml:"UDF2"`
 		UDF3         string `xml:"UDF3"`
@@ -112,7 +116,7 @@ type PullURIResponse struct {
 		UID          string `xml:"UID"`
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
-		TrackingId         string `xml:"tracking_id"`
+		TrackingId   string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
 		URI          string `xml:"URI"`
 		DocContent   string `xml:"DocContent"`
@@ -124,7 +128,7 @@ func ValidMAC(message string, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(message))
 	expectedMAC := mac.Sum(nil)
-	hexMac := ([]byte) (hex.EncodeToString(expectedMAC))
+	hexMac := ([]byte)(hex.EncodeToString(expectedMAC))
 	if log.IsLevelEnabled(log.InfoLevel) {
 		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
 	}
@@ -168,7 +172,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
-
 			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB)
 			if certBundle != nil {
 				response.DocDetails.URI = certBundle.Uri
@@ -185,7 +188,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
-
 
 			}
 			if responseBytes, err := xml.Marshal(response); err != nil {
@@ -209,10 +211,6 @@ type VaccinationCertificateBundle struct {
 	Uri           string
 	signedJson    string
 	pdf           []byte
-}
-
-func fetchCertificateFromRegistry(filter map[string]interface{}) (map[string]interface{}, error) {
-	return services.QueryRegistry(CertificateEntity, filter)
 }
 
 func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
@@ -342,7 +340,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	preEnrollmentCode := vars["preEnrollmentCode"]
+	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
@@ -367,12 +365,62 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 
 func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
-		"preEnrollmentCode": map[string]interface{}{
+		PreEnrollmentCode: map[string]interface{}{
 			"eq": preEnrollmentCode,
 		},
 	}
-	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	return certificateFromRegistry, err
+}
+
+func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
+	urlParams := request.URL.Query()
+	filter := map[string]interface{}{}
+	preEnrollmentCode := urlParams.Get(PreEnrollmentCode)
+	if preEnrollmentCode != "" {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": preEnrollmentCode,
+		}
+	}
+	beneficiaryId := urlParams.Get(BeneficiaryId)
+	if beneficiaryId != "" {
+		filter[BeneficiaryId] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if beneficiaryId == "" && preEnrollmentCode == "" {
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[0].(map[string]interface{})
+			if responseBytes, err := xml.Marshal(certificateObj); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(responseBytes)
+				return
+			}
+		}
+	}
+}
+
+func authorize(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		claimBody := auth.ExtractClaimBodyFromHeader(r)
+		if claimBody != nil {
+			isAuthorized := auth.AuthorizeRole([]string{ApiRole}, claimBody)
+			if isAuthorized {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		http.Error(w, "Forbidden", http.StatusForbidden)
+	}
 }
 
 func main() {
@@ -380,7 +428,8 @@ func main() {
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }

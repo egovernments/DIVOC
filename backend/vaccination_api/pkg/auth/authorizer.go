@@ -26,8 +26,8 @@ var (
 
 func Init() {
 	verifyBytes := ([]byte)("-----BEGIN PUBLIC KEY-----\n" + config.Config.Keycloak.Pubkey + "\n-----END PUBLIC KEY-----\n")
-    log.Infof("Using the public key %s", string(verifyBytes))
-    var err error
+	log.Infof("Using the public key %s", string(verifyBytes))
+	var err error
 	verifyKey, err = jwt.ParseRSAPublicKeyFromPEM(verifyBytes)
 	if err != nil {
 		log.Print(err)
@@ -48,14 +48,10 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaim
 
 func AuthorizeRole(expectedRole []string, claimBody *models.JWTClaimBody) bool {
 	for _, role := range expectedRole {
-		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
-			return true
-		}
-		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
-			return true
-		}
-		if contains(claimBody.ResourceAccess[certificateClientId].Roles, role) {
-			return true
+		for _, client := range claimBody.ResourceAccess {
+			if contains(client.Roles, role) {
+				return true
+			}
 		}
 	}
 	return false
