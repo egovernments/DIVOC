@@ -45,12 +45,7 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 }
 
 func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
-	// get the user from keycloak
-	keycloakUserId, err := searchAndGetKeyCloakUserId(user.MobileNumber)
-	if err != nil {
-		log.Errorf("Error while getting userId with username %s from keycloak", user.MobileNumber)
-		return err
-	}
+	keycloakUserId := user.ID
 
 	// update user in keycloak with newer user details
 	userRequest, e := getKeycloakUserRepFromFacilityUserModel(authHeader, user)
@@ -58,11 +53,11 @@ func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
 		return e
 	}
 	resp, err := UpdateKeycloakUser(keycloakUserId, userRequest)
-	log.Info("Updated keycloak user ", resp.Response().StatusCode, " ", resp.Response().Body)
 	if err != nil {
 		log.Errorf("Error while updating user %s", user.MobileNumber)
 		return err
 	} else {
+		log.Infof("Updated keycloak user %s %+v ", resp.Response().StatusCode, resp.Response().Body)
 		if resp.Response().StatusCode == http.StatusNoContent {
 			// get groups for the user
 			var responseObject []*models.UserGroup
@@ -76,6 +71,8 @@ func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
 					updateUserGroupForUser(keycloakUserId, responseObject, user.Groups)
 				}
 			}
+		} else {
+			return errors.New("update keycloak user call doesn't responded with 204 status")
 		}
 	}
 	return nil

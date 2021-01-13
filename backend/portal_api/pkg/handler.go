@@ -370,6 +370,10 @@ func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middl
 }
 
 func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+	if params.Body.ID == "" {
+		log.Error("userId is not present in the body")
+		return operations.NewUpdateFacilityUserBadRequest()
+	}
 	err := UpdateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		log.Error(err)
