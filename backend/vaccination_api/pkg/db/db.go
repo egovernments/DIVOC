@@ -75,6 +75,7 @@ func Init() {
 		config.Config.Database.Host, config.Config.Database.Port,
 		config.Config.Database.User, config.Config.Database.Password, config.Config.Database.DBName,
 	)
+	log.Infof("Using db %s", dbPath)
 	db, e = gorm.Open("postgres", dbPath)
 
 	// No need to close the connection

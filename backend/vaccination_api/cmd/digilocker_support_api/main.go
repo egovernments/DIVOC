@@ -5,6 +5,7 @@ import (
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
 	"github.com/divoc/api/config"
@@ -119,14 +120,15 @@ type PullURIResponse struct {
 	} `xml:"DocDetails"`
 }
 
-func ValidMAC(message, messageMAC, key []byte) bool {
+func ValidMAC(message string, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
-	mac.Write(message)
+	mac.Write([]byte(message))
 	expectedMAC := mac.Sum(nil)
+	hexMac := ([]byte) (hex.EncodeToString(expectedMAC))
 	if log.IsLevelEnabled(log.InfoLevel) {
-		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(expectedMAC), base64.StdEncoding.EncodeToString(messageMAC))
+		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
 	}
-	return !hmac.Equal(messageMAC, expectedMAC)
+	return hmac.Equal(messageMAC, hexMac)
 }
 func uriRequest(w http.ResponseWriter, req *http.Request) {
 	log.Info("Got request ")
@@ -137,9 +139,10 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 	}
 	requestBuffer := make([]byte, 2048)
 	n, _ := req.Body.Read(requestBuffer)
+	requestString := string(requestBuffer[:n])
 	log.Infof("Read %d bytes ", n)
-	request := string(requestBuffer)
-	log.Infof("Request body %s", request)
+	println(requestString)
+	log.Infof("Request body %s", requestString)
 
 	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
 	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
@@ -149,7 +152,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if ValidMAC(requestBuffer, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
+	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
 
 		xmlRequest := PullURIRequest{}
 		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
@@ -250,7 +253,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
 
-	if err := pdf.AddTTFFont("wts11", "./Roboto-Medium.ttf"); err != nil {
+	if err := pdf.AddTTFFont("wts11", "config/Roboto-Medium.ttf"); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
@@ -258,7 +261,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	} */
-	tpl1 := pdf.ImportPage("Certificate provisional_Final_11 Jan(4).pdf", 1, "/MediaBox")
+	tpl1 := pdf.ImportPage("config/certificate_template_20200112.pdf", 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
 
@@ -339,11 +342,11 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	//w.WriteHeader(http.StatusOK)
 	preEnrollmentCode := vars["preEnrollmentCode"]
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[0].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
