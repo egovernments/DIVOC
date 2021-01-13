@@ -59,6 +59,8 @@ services:
       FLAGR_WEB_PREFIX: /config
     ports:
       - "18000:18000"
+    depends_on:
+      - db
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:

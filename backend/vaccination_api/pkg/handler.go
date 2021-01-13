@@ -100,9 +100,7 @@ func vaccinationGetLoggedInUserInfoHandler(params vaccination.GetLoggedInUserInf
 func getCertificate(params operations.GetCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
+
 		"mobile": map[string]interface{}{
 			"eq": principal.PreferredUsername,
 		},

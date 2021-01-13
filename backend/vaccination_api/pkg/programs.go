@@ -26,9 +26,7 @@ type ProgramsRegistryResponse struct {
 func findProgramsForFacility(facilityCode string) []*models.Program {
 	typeId := "Program"
 	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
+
 		"startDate": map[string]interface{}{
 			"gt": "2020-12-12", //todo: temporary filter
 		},
