@@ -6,11 +6,13 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"encoding/json"
 	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // FacilityUser facility user
@@ -20,6 +22,10 @@ type FacilityUser struct {
 
 	// Facility User Id
 	EmployeeID string `json:"employeeId,omitempty"`
+
+	// enable/disable user
+	// Enum: [true false]
+	Enabled string `json:"enabled,omitempty"`
 
 	// groups
 	Groups []*UserGroup `json:"groups"`
@@ -38,6 +44,10 @@ type FacilityUser struct {
 func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateEnabled(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateGroups(formats); err != nil {
 		res = append(res, err)
 	}
@@ -45,6 +55,49 @@ func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+var facilityUserTypeEnabledPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["true","false"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		facilityUserTypeEnabledPropEnum = append(facilityUserTypeEnabledPropEnum, v)
+	}
+}
+
+const (
+
+	// FacilityUserEnabledTrue captures enum value "true"
+	FacilityUserEnabledTrue string = "true"
+
+	// FacilityUserEnabledFalse captures enum value "false"
+	FacilityUserEnabledFalse string = "false"
+)
+
+// prop value enum
+func (m *FacilityUser) validateEnabledEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, facilityUserTypeEnabledPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *FacilityUser) validateEnabled(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Enabled) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateEnabledEnum("enabled", "body", m.Enabled); err != nil {
+		return err
+	}
+
 	return nil
 }
 
