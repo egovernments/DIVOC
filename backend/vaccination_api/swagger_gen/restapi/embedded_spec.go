@@ -542,6 +542,26 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
             "age": {
               "type": "string"
             },
@@ -1349,6 +1369,26 @@ func init() {
         "recipient": {
           "type": "object",
           "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
             "age": {
               "type": "string"
             },
@@ -1473,6 +1513,26 @@ func init() {
     "CertificationRequestRecipient": {
       "type": "object",
       "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
         "age": {
           "type": "string"
         },
@@ -1496,6 +1556,26 @@ func init() {
           "type": "string"
         },
         "nationality": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestRecipientAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
           "type": "string"
         }
       }

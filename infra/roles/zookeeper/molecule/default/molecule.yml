@@ -1,0 +1,42 @@
+---
+
+driver:
+  name: docker
+
+platforms:
+  - name: sansible_zookeeper-trusty
+    image: ubuntu:trusty
+  - name: sansible_zookeeper-xenial
+    image: ubuntu:xenial
+  - name: sansible_zookeeper-bionic
+    image: ubuntu:bionic
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+
+lint:
+  name: yamllint
+  options:
+    config-data:
+      extends: default
+      ignore: .venv_ansible*
+      rules:
+        line-length:
+          max: 280
+        truthy: disable
+
+dependency:
+  name: galaxy
+  options:
+    ignore-certs: True
+    role-file: requirements.yml
+
+scenario:
+  name: default
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

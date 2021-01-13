@@ -1,121 +1,57 @@
 import React, {useEffect, useState} from "react";
 import styles from "./FacilityAdjustingRate.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
-
-const MONTH_NAMES = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-
-function FacilityAdjustingRate({districtList, stateList, program}) {
-    const [programs, setPrograms] = useState(program);
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [states, setStates] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
-    const [selectedDistrict, setSelectedDistrict] = useState();
-    const [facilityType, setFacilityType] = useState("Government");
+import {API_URL} from "../../utils/constants";
+import {useAxios} from "../../utils/useAxios";
 
 
+function FacilityAdjustingRate({
+                                   facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
+                                   setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
+                                   setStatus, fetchFacilities
+                               }) {
     const [lastAdjustedOn, setLastAdjustedOn] = useState("Week");
-
-
+    const [rateWiseFacilities, setRateWiseFacilities] = useState({});
     const [allChecked, setAllChecked] = useState(false);
-    const [selectedRate, setSelectedRate] = useState({});
-
-    const [submit, setSubmit] = useState(false);
-    const [faclitiesList, setFacilitiesList] = useState([
-        {
-            id: 1,
-            name: "Centre 1",
-            stations: 100,
-            vaccinators: 100,
-            rate: 100,
-            last_adjusted_on: '01/DEC/2020',
-            isChecked: false
-        },
-        {
-            id: 2,
-            name: "Centre 2",
-            stations: 100,
-            vaccinators: 100,
-            rate: 100,
-            last_adjusted_on: '01/DEC/2020',
-            isChecked: false
-        },
-        {
-            id: 3,
-            name: "Centre 3",
-            stations: 100,
-            vaccinators: 100,
-            rate: 300,
-            last_adjusted_on: '01/DEC/2020',
-            isChecked: false
-        },
-        {
-            id: 4,
-            name: "Centre 4",
-            stations: 100,
-            vaccinators: 100,
-            rate: 300,
-            last_adjusted_on: '01/DEC/2020',
-            isChecked: false
-        },
-        {
-            id: 5,
-            name: "Centre 5",
-            stations: 100,
-            vaccinators: 100,
-            rate: 400,
-            last_adjusted_on: '01/DEC/2020',
-            isChecked: false
-        },
-    ]);
-
-    const [rateWiseFacility, setRateWiseFacility] = useState({});
+    const axiosInstance = useAxios('');
 
     useEffect(() => {
-        normalize();
+        setStatus("")
     }, []);
 
     useEffect(() => {
-        const selectedFacilities = faclitiesList.map((fac, index) => ({
-            ...fac,
-            index
-        })).filter(facility => facility.isChecked);
-        const rateWiseFacilities = {};
-        selectedFacilities.forEach(facility => {
-            const rate = facility.rate;
-            if (rate in rateWiseFacilities) {
-                rateWiseFacilities[rate].facilities = [...rateWiseFacilities[rate].facilities, facility.index];
-            } else {
-                rateWiseFacilities[rate] = {facilities: [facility.index], currentRate: rate, newRate: rate};
-            }
-        });
-        setRateWiseFacility(rateWiseFacilities);
-    }, [faclitiesList]);
+        groupFacilityByRate();
+    }, [facilities]);
 
-    const normalize = () => {
-        const statesList = Object.keys(stateList).map((state) => ({value: state, label: stateList[state]}));
-        setStates(statesList);
-    };
 
     const handleChange = (value, setValue) => {
         setValue(value);
     };
 
     const updateFacility = (index, key, value) => {
-        const facilityData = [...faclitiesList];
+        const facilityData = [...facilities];
         facilityData[index][key] = value;
-        setFacilitiesList(facilityData);
+        setFacilities(facilityData);
+
     };
 
+    const getFacilityProgram = (facility) => {
+        if ("programs" in facility) {
+            const program = facility.programs.find(obj => obj.id === selectedProgram);
+            if (program) {
+                return program;
+            }
+        }
+        return {rate: 0};
+    };
 
     const getFacilityList = () => {
-        return faclitiesList.map((facility, index) => (
+        return facilities.map((facility, index) => (
             <tr>
-                <td>{facility['id']}</td>
-                <td>{facility['name']}</td>
-                <td>{facility['stations']}</td>
-                <td>{facility['vaccinators']}</td>
-                <td>{facility['rate']}</td>
-                <td>{facility['last_adjusted_on']}</td>
+                <td>{facility['facilityCode']}</td>
+                <td>{facility['facilityName']}</td>
+                <td>{facility['category']}</td>
+                <td>{getFacilityProgram(facility).rate}</td>
                 <td>
                     <CheckboxItem
                         text={facility['id']}
@@ -133,25 +69,45 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
     };
 
     const handleAllCheck = (e) => {
-        let list = [...faclitiesList];
+        let list = [...facilities];
         setAllChecked(e.target.checked);
         list = list.map((ele) => ({
             ...ele,
             isChecked: e.target.checked
         }));
-        setFacilitiesList(list);
+        setFacilities(list);
     };
 
+
     const updateRateWiseFacility = (currentRate, newRate) => {
-        const rateWiseData = {...rateWiseFacility};
+        const rateWiseData = {...rateWiseFacilities};
         rateWiseData[currentRate].newRate = newRate;
-        setRateWiseFacility(rateWiseData);
-    }
+        setRateWiseFacilities(rateWiseData);
+    };
+    const groupFacilityByRate = () => {
+        const selectedFacilities = facilities.filter(facility => facility.isChecked);
+        const rateWiseData = {};
+        selectedFacilities.forEach(facility => {
+            const facilityProgram = getFacilityProgram(facility);
+            if ("rate" in facilityProgram && facilityProgram.rate in rateWiseData) {
+                rateWiseData[facilityProgram.rate].count++;
+                rateWiseData[facilityProgram.rate].facilityIds.push(facility.osid);
+            } else {
+                rateWiseData[facilityProgram.rate || 0] = {
+                    count: 1,
+                    facilityIds: [facility.osid],
+                    newRate: facilityProgram.rate
+                }
+            }
+
+        });
+        setRateWiseFacilities(rateWiseData)
+    };
 
     const getRatesData = () => {
-        return Object.keys(rateWiseFacility).map((rate) => {
-            const rateWiseFacilityElement = rateWiseFacility[rate];
-            const facilityCount = rateWiseFacilityElement.facilities.length;
+        return Object.keys(rateWiseFacilities).map((rate) => {
+            const rateWiseFacilityElement = rateWiseFacilities[rate];
+            const facilityCount = rateWiseFacilityElement.count;
             return (<tr>
                 <td className="p-1">
                     <RadioItem
@@ -166,28 +122,52 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
                 <td className="p-1">{rate}</td>
                 <td className="p-1"><input type="number" style={{width: "60px"}} size="4"
                                            value={rateWiseFacilityElement.newRate}
-                                           onChange={(evt) => updateRateWiseFacility(parseInt(rate), evt.target.value)}/>
+                                           onChange={(evt) => updateRateWiseFacility(parseInt(rate), parseInt(evt.target.value))}/>
                 </td>
             </tr>);
         });
     };
 
     const onSubmitBtnClick = () => {
-        const today = new Date();
-        const todayDate = `${today.getDate()}/${MONTH_NAMES[today.getMonth()]}/${today.getFullYear()}`;
-        let facilityData = [...faclitiesList];
-        for (let rate in rateWiseFacility) {
-            const data = rateWiseFacility[rate];
-            data.facilities.forEach(facilityIndex => {
-                facilityData[facilityIndex].rate = data.newRate;
-                facilityData[facilityIndex].last_adjusted_on = todayDate;
-            })
-        }
-        facilityData = facilityData.map(fac => ({...fac, isChecked: false}));
-        setFacilitiesList(facilityData);
-        setRateWiseFacility({});
         setAllChecked(false);
+        if (selectedProgram && Object.keys(rateWiseFacilities).length > 0) {
+            let updateFacilities = [];
+            Object.keys(rateWiseFacilities).forEach((rate) => {
+                const facilityIds = rateWiseFacilities[rate].facilityIds;
+                facilityIds.forEach((facilityId) => {
+                    const facility = facilities.find(facility => facility.osid === facilityId);
+                    if (facility) {
+                        let programs = [];
+                        const program = facility.programs.find(program => program.id === selectedProgram);
+                        if (program) {
+                            programs = facility.programs.map(program => {
+                                if (program.id === selectedProgram) {
+                                    return {...program, rate: rateWiseFacilities[rate].newRate};
+                                } else {
+                                    return program;
+                                }
+                            })
+                        } else {
+                            programs = facility.programs.concat({
+                                id: selectedProgram,
+                                status: "ACTIVE",
+                                rate: rateWiseFacilities[rate].newRate
+                            })
+                        }
+                        updateFacilities.push({osid: facility.osid, programs})
+                    }
+                });
+
+
+            });
+            axiosInstance.current.put(API_URL.FACILITY_API, updateFacilities)
+                .then(res => {
+                    //registry update in ES happening async, so calling search immediately will not get back actual data
+                    setTimeout(() => fetchFacilities(), 1000)
+                });
+        }
     };
+
 
     return (
         <div className={`row ${styles['container']}`}>
@@ -195,8 +175,8 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
                 <FacilityFilterTab
                     programs={programs}
                     setSelectedProgram={setSelectedProgram}
-                    states={states}
-                    setSelectedState={setSelectedState}
+                    states={stateList}
+                    setSelectedState={onStateSelected}
                     selectedState={selectedState}
                     districtList={districtList}
                     selectedDistrict={selectedDistrict}
@@ -242,12 +222,10 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
                 <table className={`table table-hover ${styles['table-data']}`}>
                     <thead>
                     <tr>
-                        <th>CENTRE ID</th>
-                        <th>CENTRE NAME</th>
-                        <th>VACCINATION STATIONS</th>
-                        <th>CERTIFIED VACCINATORS</th>
-                        <th>CURRENT RATE</th>
-                        <th>LAST ADJUSTED</th>
+                        <th>CODE</th>
+                        <th>NAME</th>
+                        <th>TYPE</th>
+                        <th>PROGRAM RATE</th>
                         <th>
                             <CheckboxItem
                                 text={"checkAll"}
@@ -257,17 +235,15 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
                                 }}
                                 showText={false}
                             />
-
-
                         </th>
                     </tr>
                     </thead>
-                    <tbody>{selectedDistrict && selectedState ? getFacilityList() : ''}</tbody>
+                    <tbody>{getFacilityList()}</tbody>
                 </table>
             </div>
             <div className="col-sm-3 container">
                 <div className={styles['highlight']}>Set Rate</div>
-                {Object.keys(rateWiseFacility).length > 0 && <div>
+                {selectedProgram && Object.keys(rateWiseFacilities).length > 0 && <div>
                     <div
                         className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}`}>
                         <table className="table table-borderless table-hover">
@@ -288,7 +264,7 @@ function FacilityAdjustingRate({districtList, stateList, program}) {
                             RATES
                         </button>
                     </div>
-                    {submit ? <div>All rates set successfully</div> : ''}
+                    {/*{submit ? <div>All rates set successfully</div> : ''}*/}
                 </div>}
             </div>
         </div>

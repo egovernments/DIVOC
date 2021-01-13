@@ -17,7 +17,6 @@ const CERTIFY_UPLOAD_FAILED_STATUS = "Failed"
 const CERTIFY_UPLOAD_SUCCESS_STATUS = "Success"
 const CERTIFY_UPLOAD_PROCESSING_STATUS = "Processing"
 
-
 type CertifyUploads struct {
 	gorm.Model
 
@@ -37,37 +36,37 @@ type CertifyUploadErrors struct {
 	// ID of CertifyUploads
 	CertifyUploadID uint `gorm:"index"`
 
-	Errors string	`json:"errors"`
+	Errors string `json:"errors"`
 
 	// status
 	// Enum: [Success Failed Processing]
-	Status string	`json:"status"`
+	Status string `json:"status"`
 
 	CertifyUploadFields
 }
 
 type CertifyUploadFields struct {
-	RecipientName             string	`json:"recipientName"`
-	RecipientMobileNumber     string	`json:"recipientMobileNumber"`
-	RecipientDOB              string	`json:"recipientDOB"`
-	RecipientGender           string	`json:"recipientGender"`
-	RecipientNationality      string	`json:"recipientNationality"`
-	RecipientIdentity         string	`json:"recipientIdentity"`
-	VaccinationBatch          string	`json:"vaccinationBatch"`
-	VaccinationDate           string	`json:"vaccinationDate"`
-	VaccinationDose           string	`json:"vaccinationDose"`
-	VaccinationTotalDoses     string	`json:"vaccinationTotalDoses"`
-	VaccinationEffectiveStart string	`json:"vaccinationEffectiveStart"`
-	VaccinationEffectiveEnd   string	`json:"vaccinationEffectiveEnd"`
-	VaccinationManufacturer   string	`json:"vaccinationManufacturer"`
-	VaccinationName           string	`json:"vaccinationName"`
-	VaccinatorName            string	`json:"vaccinatorName"`
-	FacilityName              string	`json:"facilityName"`
-	FacilityAddressLine1      string	`json:"facilityAddressLine1"`
-	FacilityAddressLine2      string	`json:"facilityAddressLine2"`
-	FacilityDistrict          string	`json:"facilityDistrict"`
-	FacilityState             string	`json:"facilityState"`
-	FacilityPincode           int64		`json:"facilityPincode"`
+	RecipientName             string `json:"recipientName"`
+	RecipientMobileNumber     string `json:"recipientMobileNumber"`
+	RecipientDOB              string `json:"recipientDOB"`
+	RecipientGender           string `json:"recipientGender"`
+	RecipientNationality      string `json:"recipientNationality"`
+	RecipientIdentity         string `json:"recipientIdentity"`
+	VaccinationBatch          string `json:"vaccinationBatch"`
+	VaccinationDate           string `json:"vaccinationDate"`
+	VaccinationDose           string `json:"vaccinationDose"`
+	VaccinationTotalDoses     string `json:"vaccinationTotalDoses"`
+	VaccinationEffectiveStart string `json:"vaccinationEffectiveStart"`
+	VaccinationEffectiveEnd   string `json:"vaccinationEffectiveEnd"`
+	VaccinationManufacturer   string `json:"vaccinationManufacturer"`
+	VaccinationName           string `json:"vaccinationName"`
+	VaccinatorName            string `json:"vaccinatorName"`
+	FacilityName              string `json:"facilityName"`
+	FacilityAddressLine1      string `json:"facilityAddressLine1"`
+	FacilityAddressLine2      string `json:"facilityAddressLine2"`
+	FacilityDistrict          string `json:"facilityDistrict"`
+	FacilityState             string `json:"facilityState"`
+	FacilityPincode           int64  `json:"facilityPincode"`
 }
 
 func Init() {
@@ -185,6 +184,6 @@ func UpdateCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg 
 		return errors.New("error occurred while retrieving certifyUploads")
 	}
 	certifyUploadErrors.Status = status
-	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors,errorMsg}, ",")
+	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors, errorMsg}, ",")
 	return UpdateCertifyUploadError(certifyUploadErrors)
 }

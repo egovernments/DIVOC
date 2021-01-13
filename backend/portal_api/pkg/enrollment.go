@@ -1,11 +1,22 @@
 package pkg
 
 import (
-	"github.com/divoc/kernel_library/services"
+	"bytes"
+	kernelService "github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
+	"text/template"
 )
+
+const preEnrollmentTemplateString = `
+{{.Name}}, you have been registered to receive C-19 vaccine. Please proceed to the nearest vaccination center:
+Location: 
+Please show the Pre Enrollment Code: {{.Code}} to the center admin.
+`
+
+var preEnrollmentTemplate = template.Must(template.New("").Parse(preEnrollmentTemplateString))
 
 //mobile,enrollmentScopeId,nationalId,dob,gender,name,email
 type Enrollment struct {
@@ -33,7 +44,7 @@ func createEnrollment(data *Scanner) error {
 		Email:             data.Text("email"),
 		Code:              generateEnrollmentCode(),
 	}
-	services.MakeRegistryCreateRequest(enrollment, "Enrollment")
+	kernelService.MakeRegistryCreateRequest(enrollment, "Enrollment")
 	err := notifyRecipient(enrollment)
 	return err
 }
@@ -43,10 +54,22 @@ func generateEnrollmentCode() string {
 }
 
 func notifyRecipient(enrollment Enrollment) error {
-	//todo on successful enrollment send text message   call notification service?
-	recepient := "sms:" + enrollment.Phone
+	//TODO : fetch facility and add facility info to message
+	recipient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
-	log.Infof("Sending SMS %s %s", recepient, message)
-	//notificationService.SendNotification(recepient, message) //TODO: wire it up with actual notification service.
+	log.Infof("Sending SMS %s %s", recipient, message)
+	buf := bytes.Buffer{}
+	err := preEnrollmentTemplate.Execute(&buf, enrollment)
+	if err == nil {
+		subject := "DIVOC - Pre-Enrollment"
+		if len(enrollment.Phone) > 0 {
+			services.PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
+		}
+		if len(enrollment.Email) > 0 {
+			services.PublishNotificationMessage("mailto:"+enrollment.Email, subject, buf.String())
+		}
+	} else {
+		return err
+	}
 	return nil
 }

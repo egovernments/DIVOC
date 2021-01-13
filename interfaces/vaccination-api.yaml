@@ -368,6 +368,19 @@ definitions:
             type: array
             items:
               type: string
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: integer
       vaccination:
         type: object
         properties:

@@ -1,0 +1,16 @@
+---
+
+- name: Prepare
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Install required packages
+      become: yes
+      apt:
+        name:
+          - apt-transport-https
+          - gnupg
+          - lsb-release
+          - net-tools
+        update_cache: yes

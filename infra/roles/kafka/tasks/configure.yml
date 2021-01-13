@@ -1,0 +1,120 @@
+---
+
+- name: Assigned ID EC2 fact hunt
+  action: ec2_metadata_facts
+  register: ec2_vars
+  until: ec2_vars is successful
+  retries: 3
+  delay: 5
+  when: sansible_kafka_aws_cluster_assigned_id_enabled
+
+- name: Assigned ID grab tags from EC2 instance
+  ec2_tag:
+    region: "{{ ansible_ec2_placement_region }}"
+    resource: "{{ ansible_ec2_instance_id }}"
+    state: list
+  register: assigned_id_instance_tags
+  when: ansible_ec2_instance_id is defined
+    and sansible_kafka_aws_cluster_assigned_id_enabled
+  retries: 3
+  delay: 5
+  until: assigned_id_instance_tags is successful
+
+- name: Assigned ID set Broker ID
+  set_fact:
+    sansible_kafka_server_properties: "{{ {} | combine(sansible_kafka_server_properties, {
+        'broker.id': assigned_id_instance_tags.tags[
+          sansible_kafka_aws_cluster_assigned_id_tag_name
+        ]
+      }) }}"
+  when: ansible_ec2_instance_id is defined
+    and sansible_kafka_aws_cluster_assigned_id_enabled
+
+- name: Grab local facts for looking up interfaces
+  setup: {}
+  register: local_facts
+  when: sansible_kafka_interface_bind is not none
+    or sansible_kafka_interface_advertise is not none
+
+- name: Set default sansible_kafka_listen_address fact
+  set_fact:
+    sansible_kafka_listen_address: 127.0.0.1
+  when: sansible_kafka_interface_bind is none
+
+- name: Set sansible_kafka_listen_address fact if interface bind set
+  set_fact:
+    sansible_kafka_listen_address: "{{ local_facts.ansible_facts['ansible_' + sansible_kafka_interface_bind]['ipv4']['address'] }}"
+  when: sansible_kafka_interface_bind is not none
+
+- name: Set listen_address if interface bind set
+  set_fact:
+    sansible_kafka_server_properties: "{{ {} | combine(sansible_kafka_server_properties, {
+        'listeners': 'PLAINTEXT://' + sansible_kafka_listen_address + ':' + sansible_kafka_port|string
+      }) }}"
+  when: sansible_kafka_interface_bind is not none
+
+- name: Set advertised_host_name if interface advertise set
+  set_fact:
+    sansible_kafka_server_properties: "{{ {} | combine(sansible_kafka_server_properties, {
+        'advertised.listeners': 'PLAINTEXT://' + local_facts.ansible_facts[
+          'ansible_' + sansible_kafka_interface_advertise
+        ]['ipv4']['address'] + ':' + sansible_kafka_port|string
+      }) }}"
+  when: sansible_kafka_interface_advertise is not none
+
+- name: Setup environment config
+  become: yes
+  become_user: "{{ sansible_kafka_user }}"
+  template:
+    dest: "/home/{{ sansible_kafka_user }}/etc/environment"
+    mode: 0644
+    src: environment.j2
+  notify:
+    - restart kafka
+
+- name: Create log4j.properties
+  become: yes
+  become_user: "{{ sansible_kafka_user }}"
+  template:
+    dest: "/home/{{ sansible_kafka_user }}/etc/log4j.properties"
+    mode: 0644
+    src: log4j.properties.j2
+  notify:
+    - restart kafka
+
+- name: Create server.properties
+  become: yes
+  become_user: "{{ sansible_kafka_user }}"
+  template:
+    dest: "/home/{{ sansible_kafka_user }}/etc/server.properties"
+    mode: 0640
+    src: server.properties.j2
+  vars:
+    server_properties: "{{ {} | combine(
+        sansible_kafka_server_properties_defaults,
+        sansible_kafka_server_properties
+      ) }}"
+  notify:
+    - restart kafka
+
+- name: Flush handlers to ensure Kafka is up to date
+  meta: flush_handlers
+
+- name: Ensure Kafka is running
+  become: yes
+  service:
+    enabled: yes
+    name: kafka
+    state: started
+
+- name: Wait for Kafka port
+  wait_for:
+    host: "{{ sansible_kafka_listen_address }}"
+    port: "{{ sansible_kafka_port }}"
+    state: started
+    timeout: "{{ sansible_kafka_wait_for_kafka_port }}"
+  loop:
+    - Initial check
+    - Second check
+  loop_control:
+    pause: "{{ sansible_kafka_wait_for_delay }}"

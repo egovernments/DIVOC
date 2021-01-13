@@ -1,0 +1,115 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          kafka
+# Required-Start:    $remote_fs
+# Required-Stop:     $remote_fs
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: start kafka
+### END INIT INFO
+
+set -e
+
+PATH=/usr/bin:/usr/sbin:/bin:/sbin
+DESC="kafka stream-processing software"
+NAME=kafka
+DAEMON=/home/{{ sansible_kafka_user }}/kafka/bin/kafka-server-start.sh
+DAEMON_ARGS=/home/{{ sansible_kafka_user }}/kafka/config/server.properties
+PIDFILE=/var/run/$NAME.pid
+SCRIPTNAME=/etc/init.d/$NAME
+
+[ -x "$DAEMON" ] || exit 0
+
+[ -r /home/{{ sansible_kafka_user }}/etc/environment ] && . /home/{{ sansible_kafka_user }}/etc/environment
+
+. /lib/lsb/init-functions
+if [ -f /etc/default/rcS ]; then
+    . /etc/default/rcS
+fi
+
+do_start()
+{
+    if [ -e ${PIDFILE} ]; then
+        # Check the actual status of process
+        status_of_proc -p $PIDFILE java "$NAME" && status="0" || status="$?"
+        # If the status is successfull, no need to start again.
+        [ ${status} = "0" ] && exit 0
+    fi
+
+    if [ -n "$MAX_OPEN_FILES" ]; then
+        ulimit -n $MAX_OPEN_FILES
+    fi
+
+    KAFKA_HEAP_OPTS="${KAFKA_HEAP_OPTS}" JMX_PORT="${JMX_PORT}" \
+        exec start-stop-daemon --start --quiet \
+            --chuid ${USER}:${GROUP}  \
+            --background \
+            --pidfile $PIDFILE \
+            --make-pidfile \
+            --exec $DAEMON -- \
+            $DAEMON_ARGS \
+        || return 2
+}
+
+
+do_stop () {
+    if [ -e ${PIDFILE} ]; then
+        status_of_proc -p $PIDFILE java "$NAME" && status="0" || status="$?"
+        if [ "$status" = "0" ]; then
+            start-stop-daemon --chuid ${USER}:${GROUP} --start  --quiet \
+                --pidfile $PIDFILE \
+                --exec /home/{{ sansible_kafka_user }}/kafka/bin/kafka-server-stop.sh
+            RETVAL="$?"
+            [ "$RETVAL" = 2 ] && return 2
+
+            # Many daemons don't delete their pidfiles when they exit.
+            [ "$RETVAL" = 0 ] && rm -f $PIDFILE
+
+            return "$RETVAL"
+        fi
+    fi
+    return 0
+}
+
+case "$1" in
+    start)
+        if [ "$VERBOSE" != no ]; then
+            log_begin_msg "Starting $NAME..."
+        fi
+        do_start
+        if [ "$VERBOSE" != no ]; then
+            log_end_msg 0
+        fi
+        ;;
+
+    restart)
+        if [ "$VERBOSE" != no ]; then
+            log_begin_msg "Restarting $NAME..."
+        fi
+        do_stop
+        do_start
+        if [ "$VERBOSE" != no ]; then
+            log_end_msg 0
+        fi  ;;
+
+    stop)
+        if [ "$VERBOSE" != no ]; then
+            log_begin_msg "Stopping $NAME..."
+        fi
+        do_stop
+        if [ "$VERBOSE" != no ]; then
+            log_end_msg 0
+        fi
+        ;;
+
+    status)
+        status_of_proc -p $PIDFILE java "$NAME" && status="0" || status="$?"
+        ;;
+
+    *)
+        log_success_msg "Usage: $SCRIPTNAME {start|stop|status|restart}"
+        exit 1
+        ;;
+esac
+
+exit 0

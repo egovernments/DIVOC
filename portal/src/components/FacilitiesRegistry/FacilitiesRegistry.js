@@ -1,39 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import UploadCSV from '../UploadCSV/UploadCSV';
-import {useAxios} from "../../utils/useAxios";
-import {TotalRecords} from "../TotalRecords";
-import {SampleCSV} from "../../utils/constants";
-import {CustomTable} from "../CustomTable";
+import React from 'react';
+import {API_URL} from "../../utils/constants";
+import UploadHistory from "../UploadHistory/UploadHistory";
 
 function Facilities() {
-    const [facilities, setFacilities] = useState([]);
-    const fileUploadAPI = '/divoc/admin/api/v1/facilities';
-    const axiosInstance = useAxios('');
+    const fileUploadHistoryAPI = '/divoc/admin/api/v1/facility/uploads'
+    const fileUploadErrorsAPI = '/divoc/admin/api/v1/facility/uploads/:id/errors'
+    const fileUploadAPI = API_URL.FACILITY_API;
 
-    useEffect(() => {
-        fetchFacilities()
-    }, []);
-
-    function fetchFacilities() {
-        axiosInstance.current.get(fileUploadAPI)
-            .then(res => {
-                setFacilities(res.data)
-            });
-    }
-
-    return (
-        <div>
-            <div className="d-flex mt-3">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={fetchFacilities}
-                           sampleCSV={SampleCSV.FACILITY_REGISTRY}/>
-                <TotalRecords
-                    title={"Total # of Records in the\n DIVOC Facility Registry"}
-                    count={facilities.length}
-                />
-            </div>
-            <CustomTable data={facilities} fields={["serialNum", "facilityName", "admins", "status"]}/>
-        </div>
-    );
+    return <UploadHistory
+        fileUploadAPI={fileUploadAPI}
+        fileUploadHistoryAPI={fileUploadHistoryAPI}
+        fileUploadErrorsAPI={fileUploadErrorsAPI}
+    />
 }
 
 export default Facilities;

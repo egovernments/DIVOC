@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
-	"github.com/divoc/api/pkg"
+	"github.com/divoc/api/pkg/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
@@ -22,7 +22,7 @@ type CertifyMessage struct {
 			AddressLine1 string `json:"addressLine1"`
 			District     string `json:"district"`
 			State        string `json:"state"`
-			Pincode      int32 `json:"pincode"`
+			Pincode      int32  `json:"pincode"`
 		} `json:"address"`
 		Name string `json:"name"`
 	} `json:"facility"`
@@ -86,10 +86,22 @@ type String
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = connect.Exec(`
+CREATE TABLE IF NOT EXISTS reportedSideEffectsV1 (
+certificateId String,
+symptom String,
+response String,
+dt Date
+) engine = MergeTree() order by dt
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
 	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic)
+	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic)
 	wg.Wait()
 }
 
@@ -151,7 +163,7 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 }
 
 func saveAnalyticsEvent(connect *sql.DB, msg string) error {
-	event := pkg.Event{}
+	event := models.Event{}
 	if err := json.Unmarshal([]byte(msg), &event); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
@@ -172,6 +184,40 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) error {
 		event.Date,
 		event.Source,
 		event.TypeOfMessage,
+	); err != nil {
+		log.Errorf("Error in saving %+v", err)
+	}
+
+	defer stmt.Close()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func saveReportedSideEffects(connect *sql.DB, msg string) error {
+	event := models.ReportedSideEffectsEvent{}
+	if err := json.Unmarshal([]byte(msg), &event); err != nil {
+		log.Errorf("Kafka message unmarshalling error %+v", err)
+		return errors.New("kafka message unmarshalling failed")
+	}
+	// push to click house - todo: batch it
+	var (
+		tx, _     = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO reportedSideEffectsV1 
+	(  certificateId,
+	symptom,
+	response,dt ) 
+	VALUES (?,?,?,?)`)
+	)
+	if err != nil {
+		log.Infof("Error in preparing stmt %+v", err)
+	}
+	if _, err := stmt.Exec(
+		event.RecipientCertificateId,
+		event.Symptom,
+		event.Response,
+		event.Date,
 	); err != nil {
 		log.Errorf("Error in saving %+v", err)
 	}
@@ -219,7 +265,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
 	if age == 0 {
 		if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob); err == nil {
-			if (dobTime.Year()>1900) {
+			if (dobTime.Year() > 1900) {
 				age = time.Now().Year() - dobTime.Year()
 			}
 		}

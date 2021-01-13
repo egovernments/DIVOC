@@ -1,0 +1,63 @@
+---
+
+- name: Converge
+  hosts: all
+
+  roles:
+    - role: users_and_groups
+      sansible_users_and_groups_groups:
+        - name: test_basic
+      sansible_users_and_groups_users:
+        - name: test_basic
+          group: test_basic
+          ssh_key: test_basic.pub
+      sansible_users_and_groups_sudoers:
+        - name: test_basic
+          user: "%test_basic"
+          runas: "ALL=(ALL)"
+          commands: "NOPASSWD: ALL"
+
+    - role: users_and_groups
+      sansible_users_and_groups_authorized_keys_dir: /etc/ssh/authorized_keys/
+
+      sansible_users_and_groups_groups:
+        - name: test_one
+
+        - name: test_two
+          system: yes
+
+        - name: test_three
+          gid: 3333
+
+        - name: whitelist
+
+      sansible_users_and_groups_users:
+        - name: john
+          groups:
+            - test_one
+            - test_two
+            - whitelist
+          ssh_key: john.pub
+
+        - name: jane
+          group: test_two
+          groups:
+            - whitelist
+
+        - name: james
+          group: test_three
+          groups:
+            - whitelist
+          home: /home/james_home/
+          uid: 3333
+
+        - name: notinwhitelist
+
+      sansible_users_and_groups_sudoers:
+        - name: test_sudoers
+          user: "%john"
+          runas: "ALL=(ALL)"
+          commands: "NOPASSWD: ALL"
+
+      sansible_users_and_groups_whitelist_groups:
+        - whitelist
