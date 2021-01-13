@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"encoding/xml"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/kernel_library/services"
 	"github.com/gorilla/mux"
 	"github.com/signintech/gopdf"
@@ -19,6 +20,7 @@ import (
 	"time"
 )
 
+const ApiRole = "api"
 const CertificateEntity = "VaccinationCertificate"
 
 type Certificate struct {
@@ -29,10 +31,10 @@ type Certificate struct {
 		ID          string `json:"id"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         string    `json:"age"`
+		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
 	} `json:"credentialSubject"`
-	Issuer       string    `json:"issuer"`
+	Issuer       string `json:"issuer"`
 	IssuanceDate string `json:"issuanceDate"`
 	Evidence     []struct {
 		ID             string    `json:"id"`
@@ -87,7 +89,7 @@ type PullURIRequest struct {
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
 		Photo        string `xml:"Photo"`
-		TrackingId         string `xml:"tracking_id"`
+		TrackingId   string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
 		UDF2         string `xml:"UDF2"`
 		UDF3         string `xml:"UDF3"`
@@ -112,7 +114,7 @@ type PullURIResponse struct {
 		UID          string `xml:"UID"`
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
-		TrackingId         string `xml:"tracking_id"`
+		TrackingId   string `xml:"tracking_id"`
 		UDF1         string `xml:"UDF1"`
 		URI          string `xml:"URI"`
 		DocContent   string `xml:"DocContent"`
@@ -124,7 +126,7 @@ func ValidMAC(message string, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(message))
 	expectedMAC := mac.Sum(nil)
-	hexMac := ([]byte) (hex.EncodeToString(expectedMAC))
+	hexMac := ([]byte)(hex.EncodeToString(expectedMAC))
 	if log.IsLevelEnabled(log.InfoLevel) {
 		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
 	}
@@ -168,7 +170,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
-
 			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB)
 			if certBundle != nil {
 				response.DocDetails.URI = certBundle.Uri
@@ -185,7 +186,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
-
 
 			}
 			if responseBytes, err := xml.Marshal(response); err != nil {
@@ -380,7 +380,21 @@ func main() {
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
+}
+
+func authorize(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		claimBody := auth.ExtractClaimBodyFromHeader(r)
+		if claimBody != nil {
+			isAuthorized := auth.AuthorizeRole([]string{ApiRole}, claimBody)
+			if isAuthorized {
+				next.ServeHTTP(w, r)
+				return
+			}
+		}
+		http.Error(w, "Forbidden", http.StatusForbidden)
+	}
 }
