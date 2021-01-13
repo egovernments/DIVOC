@@ -87,7 +87,7 @@ func getKeycloakUserRepFromFacilityUserModel(authHeader string, user *models.Fac
 	}
 	userRequest := KeyCloakUserRequest{
 		Username: user.MobileNumber,
-		Enabled:  "true",
+		Enabled:  user.Enabled,
 		Attributes: KeycloakUserAttributes{
 			MobileNumber: []string{user.MobileNumber},
 			EmployeeID:   user.EmployeeID,

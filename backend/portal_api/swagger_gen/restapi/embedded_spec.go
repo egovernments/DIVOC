@@ -1004,6 +1004,14 @@ func init() {
           "type": "string",
           "title": "Facility User Id"
         },
+        "enabled": {
+          "type": "string",
+          "title": "enable/disable user",
+          "enum": [
+            "true",
+            "false"
+          ]
+        },
         "groups": {
           "type": "array",
           "items": {
@@ -2190,6 +2198,14 @@ func init() {
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
+        },
+        "enabled": {
+          "type": "string",
+          "title": "enable/disable user",
+          "enum": [
+            "true",
+            "false"
+          ]
         },
         "groups": {
           "type": "array",
