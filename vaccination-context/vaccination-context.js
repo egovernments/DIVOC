@@ -5,7 +5,7 @@ const vaccinationContext = {
     "id": "@id",
     "type": "@type",
     "schema": "https://schema.org/",
-    "vac": "https://www.who.int/2020/credentials/vaccination/v1",
+    "vac": "https://cowin.mofw.gov.in/credentials/vaccination/v1",
     "ProofOfVaccinationCredential":{
       "@id": "schema:ProofOfVaccinationCredential",
       "@context": {
@@ -22,7 +22,21 @@ const vaccinationContext = {
         "name": "schema:name",
         "age": "schema:Number",
         "gender": "schema:gender",
-        "nationality": "schema:nationality"
+        "nationality": "schema:nationality",
+        "address": {
+          "@id": "schema:PostalAddress",
+          "@context": {
+            "@version": 1.1,
+            "@protected": true,
+            "streetAddress": "schema:streetAddress",
+            "streetAddress2": "vac:addressLine2",
+            "city": "vac:city",
+            "district": "vac:district",
+            "addressRegion": "schema:addressRegion",
+            "postalCode": "schema:postalCode",
+            "addressCountry": "schema:addressCountry"
+          }
+        }
       }
     },
     "Vaccination": {
@@ -77,8 +91,8 @@ const vaccinationContext = {
       }
     }
   }
-}
+};
 
 module.exports = {
   vaccinationContext
-}
+};
