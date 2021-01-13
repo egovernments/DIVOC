@@ -8,6 +8,10 @@ docker:
 	docker build -t dockerhub/nginx .
 	$(MAKE) -C backend
 	$(MAKE) -C registry
+test:
+	echo "Starting services in e2e testing mode"
+	docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up -d
+	cd e2e && python e2e_test.py
 run:
 	docker-compose up -d
 publish:

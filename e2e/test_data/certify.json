@@ -1,0 +1,35 @@
+[{
+	"preEnrollmentCode": "1234",
+    "facility": {
+        "address": {
+            "addressLine1": "123, Koramangala",
+            "district": "Bengaluru South",
+            "pincode": 560034,
+            "state": "Karnataka"
+        },
+        "name": "ABC Medical Center"
+    },
+    "recipient": {
+        "contact": [
+            "tel:9880414889"
+        ],
+        "dob": "1994-11-30",
+        "gender": "Male",
+        "identity": "did:in.gov.uidai.aadhaar:2342343334",
+        "name": "Bhaya Mitra",
+        "nationality": "Indian"
+    },
+    "vaccination": {
+        "batch": "MB3428BX",
+        "date": "2020-12-02T19:21:18.646Z",
+        "dose": 1,
+        "effectiveStart": "2020-12-02",
+        "effectiveUntil": "2025-12-02",
+        "manufacturer": "COVPharma",
+        "name": "CoVax",
+        "totalDoses": 2
+    },
+    "vaccinator": {
+        "name": "Sooraj Singh"
+    }
+}]
