@@ -9,7 +9,7 @@ log = logging.getLogger();
 log.setLevel(logging.DEBUG);
 log.addHandler(logging.StreamHandler(sys.stdout));
 
-VACCINATION_API = test_utils.BASE_URL + "/divoc/api/v1/"
+VACCINATION_API = "http://vaccination_api:8000" + "/divoc/api/v1/"
 CERTIFY_REQUEST_BODY = "test_data/certify.json"
 GET_CERTIFICATE_BODY = "test_data/get_certificate.json"
 
@@ -37,7 +37,7 @@ def test_certify():
     log.info("Cerify request sent")
     
     new_certs = []
-    max_tries = 3
+    max_tries = 5
     for i in range(max_tries):
         log.info("Fetching certificates...., try no : %s", i+1)
         new_certs = test_utils.fetch_certificates(GET_CERTIFICATE_BODY)
@@ -54,7 +54,7 @@ def test_certify():
 def run_tests():
     test_certify()
 
-ping_retries = 5
+ping_retries = 10
 for i in range(ping_retries):
     log.info("Trying to ping...., try no : %s", i+1)
     if(service_check()):
@@ -62,7 +62,7 @@ for i in range(ping_retries):
         run_tests()
         break
     log.info("Ping failed. Services not ready")
-    time.sleep(3)
+    time.sleep(5)
 
 
 

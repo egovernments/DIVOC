@@ -1,9 +1,8 @@
 import requests as r
 
-BASE_URL = "http://localhost"
-KEYCLOAK_URL = "http://localhost/auth"
+KEYCLOAK_URL = "http://keycloak:8080/auth"
 TOKEN_URL = KEYCLOAK_URL + "/realms/divoc/protocol/openid-connect/token"
-REGISTRY_SEARCH = BASE_URL + ":8081/search"
+REGISTRY_SEARCH = "http://registry:8081/search"
 
 def fetch_auth_token():
     headers = {
