@@ -2,7 +2,7 @@ const jsigs = require('jsonld-signatures');
 const config = require('./config/config');
 const registry = require('./registry');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
-
+const R = require('ramda');
 const {RsaSignature2018} = jsigs.suites;
 const {AssertionProofPurpose} = jsigs.purposes;
 const {RSAKeyPair} = require('crypto-ld');
@@ -28,7 +28,7 @@ const customLoader = url => {
     "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
     'https://www.w3.org/2018/credentials#': credentialsv1,
     "https://www.w3.org/2018/credentials/v1": credentialsv1
-    , "https://www.who.int/2020/credentials/vaccination/v1": vaccinationContext
+    , "https://cowin.mofw.gov.in/credentials/vaccination/v1": vaccinationContext
   };
   let context = c[url];
   if (context === undefined) {
@@ -82,7 +82,7 @@ async function signJSON(certificate) {
 
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
-  if (recipient.dob && new Date(recipient.dob).getFullYear()>1900)
+  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
     return (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
   return "";
 }
@@ -91,7 +91,7 @@ function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
-      "https://www.who.int/2020/credentials/vaccination/v1"
+      "https://cowin.mofw.gov.in/credentials/vaccination/v1"
     ],
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
@@ -100,14 +100,23 @@ function transformW3(cert, certificateId) {
       name: cert.recipient.name,
       gender: cert.recipient.gender,
       age: ageOfRecipient(cert.recipient), //from dob
-      nationality: cert.recipient.nationality
+      nationality: cert.recipient.nationality,
+      address: {
+        "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),
+        "streetAddress2": R.pathOr('', ['recipient', 'address', 'addressLine2'], cert),
+        "district": R.pathOr('', ['recipient', 'address', 'district'], cert),
+        "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
+        "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
+        "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
+        "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
+      }
     },
     issuer: "https://nha.gov.in/",
     issuanceDate: new Date().toISOString(),
     evidence: [{
-      "id": "https://nha.gov.in/evidence/vaccine/"+certificateId,
-      "feedbackUrl":"https://divoc.xiv.in/feedback/" + certificateId,
-      "infoUrl":"https://divoc.xiv.in/learn/" + certificateId,
+      "id": "https://nha.gov.in/evidence/vaccine/" + certificateId,
+      "feedbackUrl": "https://divoc.xiv.in/feedback/" + certificateId,
+      "infoUrl": "https://divoc.xiv.in/learn/" + certificateId,
       "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": cert.vaccination.batch,
@@ -116,8 +125,8 @@ function transformW3(cert, certificateId) {
       "date": cert.vaccination.date,
       "effectiveStart": cert.vaccination.effectiveStart,
       "effectiveUntil": cert.vaccination.effectiveUntil,
-      "dose":cert.vaccination.dose,
-      "totalDoses":cert.vaccination.totalDoses,
+      "dose": cert.vaccination.dose,
+      "totalDoses": cert.vaccination.totalDoses,
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
         "name": cert.vaccinator.name,
@@ -132,7 +141,7 @@ function transformW3(cert, certificateId) {
           "district": cert.facility.address.district,
           "city": cert.facility.address.city,
           "addressRegion": cert.facility.address.state,
-          "addressCountry": cert.facility.address.country?cert.facility.address.country:"IN",
+          "addressCountry": cert.facility.address.country ? cert.facility.address.country : "IN",
           "postalCode": cert.facility.address.pincode
         },
         // "seal-image": "..."
@@ -152,10 +161,10 @@ async function signAndSave(certificate) {
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
-    name : name,
+    name: name,
     contact: contact,
     mobile: mobile,
-    preEnrollmentCode : preEnrollmentCode,
+    preEnrollmentCode: preEnrollmentCode,
     certificateId: certificateId,
     certificate: JSON.stringify(signedCertificate),
     meta: certificate["meta"]

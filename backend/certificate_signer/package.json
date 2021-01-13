@@ -14,7 +14,8 @@
     "jsonld-signatures": "^6.0.0",
     "kafkajs": "^1.15.0",
     "nodemailer": "^6.4.17",
-    "vaccination-context": "^1.0.2"
+    "ramda": "^0.27.1",
+    "vaccination-context": "^1.0.5"
   },
   "devDependencies": {
     "jest": "^26.6.3"
