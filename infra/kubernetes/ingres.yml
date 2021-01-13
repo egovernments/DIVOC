@@ -14,3 +14,11 @@ spec:
         backend:
           serviceName: vaccination-api
           servicePort: 8000
+      - path: /auth
+        backend:
+          serviceName: keycloak-service
+          servicePort: 8080
+      - path: /cert
+        backend:
+          serviceName: digilocker-support-api
+          servicePort: 8003
