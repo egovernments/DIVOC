@@ -1,0 +1,8 @@
+[kafka]
+13.7.58.82  ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu broker_id=1 adv_ip=172.31.27.143
+113.234.56.137 ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu broker_id=2 adv_ip=172.31.26.101
+165.1.13.233 ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu broker_id=3 adv_ip=172.31.18.124
+165.1.13.231 ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu broker_id=4 adv_ip=172.31.18.123
+165.1.13.232 ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu broker_id=5 adv_ip=172.31.18.122
+[pg]
+113.235.214.67 ansible_ssh_private_key_file=~/.ssh/divoc.pem ansible_ssh_user=ubuntu ip=172.31.25.17
