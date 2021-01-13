@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
 func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
@@ -57,20 +58,22 @@ func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
 		return e
 	}
 	resp, err := UpdateKeycloakUser(keycloakUserId, userRequest)
-	log.Info("Updated keycloak user ", resp.Response().StatusCode, " ", resp.String())
+	log.Info("Updated keycloak user ", resp.Response().StatusCode, " ", resp.Response().Body)
 	if err != nil {
 		log.Errorf("Error while updating user %s", user.MobileNumber)
 		return err
 	} else {
-		if resp.Response().StatusCode == 200 {
-			var responseObject FacilityUserResponse
-			if err := resp.ToJSON(&responseObject); err != nil {
+		if resp.Response().StatusCode == http.StatusNoContent {
+			// get groups for the user
+			var responseObject []*models.UserGroup
+			r, _ := getUserGroups(keycloakUserId)
+			if err := r.ToJSON(&responseObject); err != nil {
 				log.Errorf("Error in parsing json response from keycloak %+v", err)
 			} else {
 				// check if group has changed, if yes, delete the old and update the new
-				if hasUserGroupChanged(user.Groups, responseObject.Groups) {
+				if hasUserGroupChanged(user.Groups, responseObject) {
 					log.Info("Updating roles for the user ", user.MobileNumber)
-					updateUserGroupForUser(responseObject.ID, user.Groups, responseObject.Groups)
+					updateUserGroupForUser(keycloakUserId, responseObject, user.Groups)
 				}
 			}
 		}
@@ -133,5 +136,5 @@ func hasUserGroupChanged(newGroups []*models.UserGroup, existingGroups []*models
 }
 
 func GetFacilityGroups() ([]*models.UserGroup, error) {
-	return getUserGroups("facility")
+	return getKeycloakGroups("facility")
 }
