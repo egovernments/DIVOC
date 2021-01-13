@@ -22,6 +22,8 @@ import (
 
 const ApiRole = "api"
 const CertificateEntity = "VaccinationCertificate"
+const PreEnrollmentCode = "preEnrollmentCode"
+const BeneficiaryId = "beneficiaryId"
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -211,10 +213,6 @@ type VaccinationCertificateBundle struct {
 	pdf           []byte
 }
 
-func fetchCertificateFromRegistry(filter map[string]interface{}) (map[string]interface{}, error) {
-	return services.QueryRegistry(CertificateEntity, filter)
-}
-
 func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
 	/* filter := map[string]interface{}{
 		"name": map[string]interface{}{
@@ -342,7 +340,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	preEnrollmentCode := vars["preEnrollmentCode"]
+	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
@@ -367,22 +365,48 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 
 func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
-		"preEnrollmentCode": map[string]interface{}{
+		PreEnrollmentCode: map[string]interface{}{
 			"eq": preEnrollmentCode,
 		},
 	}
-	certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	return certificateFromRegistry, err
 }
 
-func main() {
-	config.Initialize()
-	log.Info("Running digilocker support api")
-	r := mux.NewRouter()
-	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
-	http.Handle("/", r)
-	_ = http.ListenAndServe(":8003", nil)
+func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
+	urlParams := request.URL.Query()
+	filter := map[string]interface{}{}
+	preEnrollmentCode := urlParams.Get(PreEnrollmentCode)
+	if preEnrollmentCode != "" {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": preEnrollmentCode,
+		}
+	}
+	beneficiaryId := urlParams.Get(BeneficiaryId)
+	if beneficiaryId != "" {
+		filter[BeneficiaryId] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if beneficiaryId == "" && preEnrollmentCode == "" {
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[0].(map[string]interface{})
+			if responseBytes, err := xml.Marshal(certificateObj); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(responseBytes)
+				return
+			}
+		}
+	}
 }
 
 func authorize(next http.HandlerFunc) http.HandlerFunc {
@@ -397,4 +421,15 @@ func authorize(next http.HandlerFunc) http.HandlerFunc {
 		}
 		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
+}
+
+func main() {
+	config.Initialize()
+	log.Info("Running digilocker support api")
+	r := mux.NewRouter()
+	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
+	http.Handle("/", r)
+	_ = http.ListenAndServe(":8003", nil)
 }
