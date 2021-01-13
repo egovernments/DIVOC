@@ -302,6 +302,23 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /facility/users/{userId}:
+    delete:
+      summary: Delete Facility User
+      operationId: deleteFacilityUser
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: Id of facility user to delete
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
   /facility/groups:
     get:
       summary: Get facility groups

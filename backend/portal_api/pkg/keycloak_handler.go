@@ -45,6 +45,13 @@ func UpdateKeycloakUser(keycloakUserId string, user KeyCloakUserRequest) (*req.R
 	)
 }
 
+func DeleteKeycloakUser(keycloakUserId string) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId
+	log.Infof("Deleting user %s ", url)
+	return req.Delete(url, req.Header{"Authorization": authHeader}, )
+}
+
 func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
 	return resp.Response().StatusCode == 201 || resp.Response().StatusCode == 409
 }

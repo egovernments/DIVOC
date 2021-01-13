@@ -47,6 +47,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetVaccinatorsUploadsErrorsHandler = operations.GetVaccinatorsUploadsErrorsHandlerFunc(getVaccinatorUploadErrorsHandler)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
+	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
 }
 
 type GenericResponse struct {
@@ -460,4 +461,13 @@ func getVaccinatorUploadErrorsHandler(params operations.GetVaccinatorsUploadsErr
 		Columns:    columns,
 	}
 	return vaccinatorUpload.GetCSVUploadErrors(uploadID)
+}
+
+func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+	err := DeleteFacilityUser(params.UserID)
+	if err != nil {
+		log.Error(err)
+		return operations.NewDeleteFacilityUserBadRequest()
+	}
+	return operations.NewDeleteFacilityUserOK()
 }
