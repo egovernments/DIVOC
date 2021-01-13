@@ -2,6 +2,7 @@ import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
 import {FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS} from "./index";
 import {appIndexDb} from "../../AppDatabase";
+import config from "config.json"
 
 export const WALK_IN_ROUTE = "walkInEnroll"
 
@@ -50,9 +51,9 @@ export function useWalkInEnrollment() {
         dispatch({type: current, payload: payload})
         if (next) {
             if (next === '/') {
-                history.replace("/", null)
+                history.replace(config.urlPath, null)
             } else {
-                history.push('/' + WALK_IN_ROUTE + '/' + next)
+                history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + next)
             }
         }
     }

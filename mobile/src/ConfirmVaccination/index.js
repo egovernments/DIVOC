@@ -4,9 +4,9 @@ import {BaseFormCard} from "../components/BaseFormCard";
 import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
-import Button from "react-bootstrap/Button";
 import {BatchCodeForm} from "../components/BatchCodeForm";
 import {appIndexDb} from "../AppDatabase";
+import config from "config.json"
 
 export function ConfirmFlow(props) {
     return (
@@ -27,7 +27,7 @@ export function ConfirmVaccination(props) {
             case CONSTANT.BATCH_CODE:
                 return <BatchCodeForm/>;
             default:
-                return <Redirect to="/queue"/>
+                return <Redirect to={config.urlPath + '/queue'}/>
         }
     }
 
@@ -92,7 +92,7 @@ export function useConfirmVaccine() {
         payload.currentForm = current;
         dispatch({type: current, payload: payload})
         if (next) {
-            history.push(next)
+            history.push(config.urlPath + next)
         }
     }
 

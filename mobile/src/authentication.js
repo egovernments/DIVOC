@@ -1,5 +1,6 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
+import config from "config.json"
 
 export const ACTION_LOGGED_IN = 'login';
 export const ACTION_LOGGED_OUT = 'logout';
@@ -45,7 +46,7 @@ export function useAuthorizedUser() {
 
     const logout = function () {
         dispatch({type: ACTION_LOGGED_OUT});
-        history.replace(`/`)
+        history.replace(config.urlPath)
     }
 
     return {
