@@ -515,6 +515,36 @@ func init() {
         }
       }
     },
+    "/facility/users/{userId}": {
+      "delete": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Delete Facility User",
+        "operationId": "deleteFacilityUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility user to delete",
+            "name": "userId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -1684,6 +1714,36 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/users/{userId}": {
+      "delete": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Delete Facility User",
+        "operationId": "deleteFacilityUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility user to delete",
+            "name": "userId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }

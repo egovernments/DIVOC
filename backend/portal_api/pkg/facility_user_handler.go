@@ -78,6 +78,20 @@ func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	return nil
 }
 
+func DeleteFacilityUser(keycloakUserId string) error {
+	resp, err := DeleteKeycloakUser(keycloakUserId)
+	if err != nil {
+		log.Errorf("Error while deleting user %s", keycloakUserId)
+		return err
+	} else {
+		log.Infof("Deleted keycloak user %s %+v ", resp.Response().StatusCode, resp.Response().Body)
+		if resp.Response().StatusCode != http.StatusNoContent {
+			return errors.New("delete keycloak user call doesn't responded with 204 status")
+		}
+	}
+	return nil
+}
+
 func getKeycloakUserRepFromFacilityUserModel(authHeader string, user *models.FacilityUser) (KeyCloakUserRequest, error) {
 	bearerToken, err := getToken(authHeader)
 	claimBody, err := getClaimBody(bearerToken)
