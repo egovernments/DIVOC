@@ -18,6 +18,7 @@ import {ConfirmFlow} from "../ConfirmVaccination";
 import {useLocation} from "react-router";
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {WalkEnrollmentFlow} from "../components/WalkEnrollments";
+import {Help} from "../components/Help";
 import config from "../config";
 import { createBrowserHistory } from 'history';
 
@@ -35,6 +36,7 @@ function Dashboard(props) {
                         <PrivateRoute path={config.urlPath + "/language"} exact component={SelectLanguage}/>
                         <PrivateRoute path={config.urlPath + "/queue"} exact component={Queue}/>
                         <PrivateRoute path={config.urlPath + "/logout"} exact component={Logout}/>
+                        <PrivateRoute path={config.urlPath + "/help"} exact component={Help}/>
                         <PrivateRoute path={config.urlPath + "/preEnroll/:pageName"} component={PreEnrollmentFlow}/>
                         <PrivateRoute path={config.urlPath + "/walkInEnroll/:pageName"} component={WalkEnrollmentFlow}/>
                         <PrivateRoute path={config.urlPath + "/confirm/vaccination/:recipient_id/:pageName"} component={ConfirmFlow}/>

@@ -32,7 +32,7 @@ export const RecipientQueueTable = () => {
                         <tr key={index} onClick={() => {
                             history.push(`/confirm/vaccination/${data.enrollCode}/${CONSTANT.SELECT_VACCINATOR}`)
                         }}>
-                            <td>{index}</td>
+                            <td>{index+1}</td>
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>
