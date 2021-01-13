@@ -31,10 +31,8 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
+      - es
+      - db
   keycloak:
     image: dockerhub/keycloak
     environment:
@@ -110,10 +108,8 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+      - kafka
+      - keycloak
   portal_api:
     image: dockerhub/portal_api
     ports:
@@ -126,10 +122,8 @@ services:
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+      - kafka
+      - keycloak
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
@@ -152,8 +146,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
     depends_on:
-      kafka:
-        condition: service_healthy
+      - kafka
   nginx:
     image: dockerhub/nginx
     ports:

@@ -54,15 +54,16 @@ def test_certify():
 def run_tests():
     test_certify()
 
+tests_ran = False
 ping_retries = 10
 for i in range(ping_retries):
     log.info("Trying to ping...., try no : %s", i+1)
     if(service_check()):
         log.info("Ping successful. Starting tests")
         run_tests()
+        tests_ran = True
         break
     log.info("Ping failed. Services not ready")
     time.sleep(5)
-
-
-
+if(not tests_ran):
+    exit(1)
