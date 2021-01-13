@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2021-01-05T19:47:34Z"
+  name: divoc-config
+  namespace: divoc
+  selfLink: /api/v1/namespaces/divoc/configmaps/divoc-config
+  uid: 332a131b-bd4b-4967-8ab8-683da6aa1cec
+data:
+  DB_HOST: 172.31.25.17
+  ENABLE_CERTIFY_ACKNOWLEDGEMENT: ''
+  KAFKA_BOOTSTRAP_SERVERS: 172.31.27.143:9092,172.31.26.101:9092,172.31.18.124:9092
+  KEYCLOAK_URL: 'http://keycloak:8080/auth'
+  PUBLIC_KEY: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA4KcsJPsyqXFn1Wzbd1dMA7zn7vQmIjav8EDAsue3ma1R93RuIfr9v4kWRC5IxIx9NEm+h884T1S59Pr5Izxd7S2WqTtTrc/BJD+sLkI9PMTji/aKP+j1wFru7dqnwU7UtHdd4L3K83C2AWgv92/xGPDWrOyxUUhx1C6d9xd1LQ45hUlhHGMe0Ni7uRZp6ERU/PZyl8UddB9XfPOtuRRnfcoHIU9LOwnbzSO/KemvkWTTVeaCGAFYZwcr7jMDfu36lSFlIbXa3nT9se6PTWr3zaSKOJ80OigxUjOLvnQKcgrn1hOBQrhYL8dkMJ8EXj4HMvqRRhzVB2plb2CdnliBgQIDAQAB
+  REGISTRY_URL: http://registry:8081
+  DISABLE_REGISTRY_CALL: ""

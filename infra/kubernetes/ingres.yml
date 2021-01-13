@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-vaccination-api
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: "perf-divoc.xiv.in"
+    http:
+      paths:
+      - path: /divoc
+        backend:
+          serviceName: vaccination-api
+          servicePort: 8000
