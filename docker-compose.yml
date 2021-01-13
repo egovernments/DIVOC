@@ -179,6 +179,5 @@ services:
   digilocker_support_api:
     image: dockerhub/digilocker_support_api
     environment:
-      ENABLE_KEYCLOAK: "false"
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
