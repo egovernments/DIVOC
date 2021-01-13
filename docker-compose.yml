@@ -21,6 +21,7 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
+      - search_provider=io.opensaber.registry.service.ElasticSearchService
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
     ports:
       - "8081:8081"
@@ -58,6 +59,8 @@ services:
       FLAGR_WEB_PREFIX: /config
     ports:
       - "18000:18000"
+    depends_on:
+      - db
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:

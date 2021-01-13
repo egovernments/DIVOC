@@ -72,7 +72,8 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 			split := strings.Split(errmsg, "Detail:")
 			if len(split) > 0 {
 				m1 := split[len(split)-1]
-				return errors.New(m1)
+				errmsg = strings.ReplaceAll(m1, "\"", "")
+				errmsg = strings.ReplaceAll(errmsg, "'", "")
 			}
 		}
 		return errors.New(errmsg)
