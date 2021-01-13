@@ -73,7 +73,7 @@ async function signJSON(certificate) {
     purpose: new AssertionProofPurpose({
       controller: controller
     }),
-    compactProof: true
+    compactProof: false
   });
 
   console.info("Signed cert " + JSON.stringify(signed));
@@ -97,6 +97,7 @@ function transformW3(cert, certificateId) {
     credentialSubject: {
       type: "Person",
       id: cert.recipient.identity,
+      refId: cert.preEnrollmentCode,
       name: cert.recipient.name,
       gender: cert.recipient.gender,
       age: ageOfRecipient(cert.recipient), //from dob

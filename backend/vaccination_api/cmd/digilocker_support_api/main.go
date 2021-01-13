@@ -31,10 +31,19 @@ type Certificate struct {
 	CredentialSubject struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
+		RefId  		string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
+		Address struct {
+			StreetAddress  string `json:"streetAddress"`
+			StreetAddress2 string `json:"streetAddress2"`
+			District       string `json:"district"`
+			City           string `json:"city"`
+			AddressRegion  string `json:"addressRegion"`
+			AddressCountry string `json:"addressCountry"`
+		} `json:"address"`
 	} `json:"credentialSubject"`
 	Issuer       string `json:"issuer"`
 	IssuanceDate string `json:"issuanceDate"`
@@ -49,6 +58,8 @@ type Certificate struct {
 		Date           time.Time `json:"date"`
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
+        Dose           int       `json:"dose"`
+        TotalDoses     int       `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`
@@ -239,6 +250,46 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 	return nil
 }
 
+
+func showLabelsAsPerTemplate(certificate Certificate) []string {
+	if(!isFinal(certificate)){
+		return []string{certificate.CredentialSubject.Name,
+			certificate.CredentialSubject.Age,
+			certificate.CredentialSubject.Gender,
+			formatId(certificate.CredentialSubject.ID),
+			certificate.CredentialSubject.RefId,
+			formatRecipientAddress(certificate),
+			certificate.Evidence[0].Vaccine,
+			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+			"To be taken 28 days after 1st Dose",
+			certificate.Evidence[0].Verifier.Name,
+			formatFacilityAddress(certificate),
+		}
+	}
+	return []string{certificate.CredentialSubject.Name,
+		certificate.CredentialSubject.Age,
+		certificate.CredentialSubject.Gender,
+		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.RefId,
+		formatRecipientAddress(certificate),
+		certificate.Evidence[0].Vaccine,
+		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+		certificate.Evidence[0].Verifier.Name,
+		formatFacilityAddress(certificate),
+	}
+}
+
+func isFinal(certificate Certificate) bool {
+	return certificate.Evidence[0].Dose == certificate.Evidence[0].TotalDoses
+}
+
+func templateType(certificate Certificate) string {
+	if(isFinal(certificate)){
+		return "config/final.pdf"
+	}
+	return "config/provisional.pdf"
+}
+
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
@@ -259,7 +310,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	} */
-	tpl1 := pdf.ImportPage("config/certificate_template_20200112.pdf", 1, "/MediaBox")
+	tpl1 := pdf.ImportPage(templateType(certificate), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
 
@@ -272,6 +323,105 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	}*/
+	offsetX := 53.0
+	offsetY := 390.0
+	offsetNewX := 300.0
+	offsetNewY := 90.0
+	rowSize := 6
+	displayLabels := showLabelsAsPerTemplate(certificate)
+	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
+	for i := 0; i < rowSize; i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*50.0)
+		pdf.Cell(nil, displayLabels[i])
+	}
+	for i := rowSize; i < len(displayLabels); i++ {
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY + float64(i)*50.0)
+		pdf.Cell(nil, displayLabels[i])
+	}
+
+	e := pasteQrCodeOnPage(certificateText, &pdf)
+	if e != nil {
+		return nil, e
+	}
+
+	//pdf.Image("qr.png", 200, 50, nil)
+	//pdf.WritePdf("certificate.pdf")
+	var b bytes.Buffer
+	_ = pdf.Write(&b)
+	return b.Bytes(), nil
+}
+
+func formatFacilityAddress(certificate Certificate) string {
+	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", " + certificate.Evidence[0].Facility.Address.AddressRegion
+}
+
+func formatRecipientAddress(certificate Certificate) string {
+	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", " + certificate.CredentialSubject.Address.AddressRegion
+}
+
+func formatDate(date time.Time) string {
+	return date.Format("02 Jan 2006")
+}
+
+func formatId(identity string) string {
+	split := strings.Split(identity, ":")
+	lastFragment := split[len(split)-1]
+	if strings.Contains(identity, "aadhaar") {
+		return "XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
+	}
+	return lastFragment
+}
+
+func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
+	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
+	if err != nil {
+		return err
+	}
+	imageBytes, err := qrCode.PNG(-2)
+	holder, err := gopdf.ImageHolderByBytes(imageBytes)
+	err = pdf.ImageByHolder(holder, 350, 50, nil)
+	if err != nil {
+		log.Errorf("Error while creating QR code")
+	}
+	return nil
+}
+
+/*
+func getCertificateAsPdf(certificateText string) ([]byte, error) {
+	var certificate Certificate
+	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
+		log.Error(err)
+		return nil, err
+	}
+
+	pdf := gopdf.GoPdf{}
+	//pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: 595.28, H: 841.89}}) //595.28, 841.89 = A4
+	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
+	pdf.AddPage()
+
+	if err := pdf.AddTTFFont("wts11", "config/Roboto-Medium.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	/* if err := pdf.AddTTFFont("arapey", "./Arapey-Italic.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	} * /
+	tpl1 := pdf.ImportPage("config/certificate_template_20200112.pdf", 1, "/MediaBox")
+	// Draw pdf onto page
+	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
+
+	if err := pdf.SetFont("wts11", "", 10); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	/*if err := pdf.SetFont("arapey", "", 14); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}* /
 	offsetX := 280.0
 	offsetY := 361.0
 	displayLabels := []string{certificate.CredentialSubject.Name,
@@ -282,7 +432,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		"",
 		"", //blank line
 		certificate.Evidence[0].Vaccine,
-		fomratDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		"To be taken 28 days after 1st Dose",
 		"",
 		formatFacilityAddress(certificate),
@@ -311,7 +461,7 @@ func formatFacilityAddress(certificate Certificate) string {
 	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", " + certificate.Evidence[0].Facility.Address.AddressRegion
 }
 
-func fomratDate(date time.Time) string {
+func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
 }
 
@@ -337,6 +487,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	}
 	return nil
 }
+*/
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -346,7 +497,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[0].(map[string]interface{})
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
 			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
@@ -359,7 +510,11 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 				_, _ = w.Write(pdfBytes)
 				return
 			}
+		} else {
+			w.WriteHeader(404)
 		}
+	} else {
+		log.Infof("Error %+v", err)
 	}
 }
 
@@ -428,7 +583,9 @@ func main() {
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
 	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
