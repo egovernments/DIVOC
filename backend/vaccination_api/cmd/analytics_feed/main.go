@@ -106,19 +106,23 @@ dt Date
 }
 
 func initClickhouse() *sql.DB {
-	connect, err := sql.Open("clickhouse", config.Config.Clickhouse.Dsn)
+	dbConnectionInfo := config.Config.Clickhouse.Dsn
+	log.Infof("Using the db %s", dbConnectionInfo)
+	connect, err := sql.Open("clickhouse", dbConnectionInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
 	if err := connect.Ping(); err != nil {
+		log.Errorf("Error in pinging the server %s", err)
 		if exception, ok := err.(*clickhouse.Exception); ok {
-			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+			log.Errorf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 
 		} else {
-			fmt.Println(err)
+			log.Error(err)
 		}
-		return nil
+		panic("Error in pinging the database")
 	}
+	log.Infof("%+v", connect)
 	return connect
 }
 
