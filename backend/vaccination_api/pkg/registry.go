@@ -9,9 +9,7 @@ func getUserInfo(facilityCode string) interface{} {
 	response := map[string]interface{}{}
 	typeId := "Facility"
 	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
+
 		"facilityCode": map[string]interface{}{
 			"eq": facilityCode,
 		},
@@ -38,11 +36,7 @@ func getUserInfo(facilityCode string) interface{} {
 
 func getVaccinatorsForFacility(facilityCode string) interface{} {
 	typeId := "Vaccinator"
-	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
-	}
+	filter := map[string]interface{}{}
 	response, err := services.QueryRegistry(typeId, filter)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)

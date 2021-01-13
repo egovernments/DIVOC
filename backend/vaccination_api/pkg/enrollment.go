@@ -12,9 +12,6 @@ import (
 func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollment, error) {
 	typeId := "Enrollment"
 	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
 		"enrollmentScopeId": map[string]interface{}{
 			"eq": scopeId,
 		},
@@ -48,9 +45,6 @@ func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollm
 func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, error) {
 	typeId := "Enrollment"
 	filter := map[string]interface{}{
-		"@type": map[string]interface{}{
-			"eq": typeId,
-		},
 		"enrollmentScopeId": map[string]interface{}{
 			"eq": facilityCode,
 		},
