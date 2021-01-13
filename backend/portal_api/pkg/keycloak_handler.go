@@ -39,7 +39,7 @@ func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
 func UpdateKeycloakUser(keycloakUserId string, user KeyCloakUserRequest) (*req.Resp, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId
-	log.Infof("Updating user %s : %s, %+v", url, authHeader, user)
+	log.Infof("Updating user %s body:  %+v", url, user)
 	return req.Put(url, req.BodyJSON(user),
 		req.Header{"Authorization": authHeader},
 	)
@@ -122,6 +122,13 @@ func addUserToGroup(userId string, groupId string) error {
 	return nil
 }
 
+func getUserGroups(keycloakUserId string) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId + "/groups"
+	log.Infof("Updating user %s ", url)
+	return req.Get(url, req.Header{"Authorization": authHeader})
+}
+
 func deleteUserFromGroup(userId string, groupId string) error {
 	authHeader := getAuthHeader()
 	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
@@ -199,7 +206,7 @@ func isFacilityAdmin(user FacilityUserResponse) bool {
 	}
 	return false
 }
-func getUserGroups(groupSearchKey string) ([]*models.UserGroup, error) {
+func getKeycloakGroups(groupSearchKey string) ([]*models.UserGroup, error) {
 	authHeader := getAuthHeader()
 	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/groups?search=" + groupSearchKey
 	log.Info("GET ", addUserToGroupURL)
