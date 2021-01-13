@@ -8,6 +8,11 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+        interval: 30s
+        timeout: 10s
+        retries: 4
   db:
     image: postgres
     environment:
@@ -26,7 +31,10 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - db
+      es:
+        condition: service_healthy
+      db:
+        condition: service_started
   keycloak:
     image: dockerhub/keycloak
     environment:
@@ -102,8 +110,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - kafka
-      - keycloak
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   portal_api:
     image: dockerhub/portal_api
     ports:
@@ -116,8 +126,10 @@ services:
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - kafka
-      - keycloak
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
@@ -140,7 +152,8 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
   nginx:
     image: dockerhub/nginx
     ports:
