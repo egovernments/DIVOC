@@ -6,6 +6,7 @@ import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
 import {API_URL} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
+import DetailsCard from "../DetailsCard/DetailsCard";
 
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
@@ -14,6 +15,8 @@ function FacilityDetails({
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
+    const [showCard, setShowCard] = useState(false);
+    const [selectedRow, setSelectedRow] = useState([]);
 
     const [allChecked, setAllChecked] = useState(false);
 
@@ -42,7 +45,10 @@ function FacilityDetails({
         return facilities.map((facility, index) => (
             <tr>
                 <td>{facility.facilityCode}</td>
-                <td>{facility.facilityName}</td>
+                <td  role="button" onClick={() => {
+                    setShowCard(!showCard);
+                    setSelectedRow(facility)
+                }}>{facility.facilityName}</td>
                 <td>{facility.admins ? <img src={check}/> : <img src={info}/>}</td>
                 <td>{facility.seal ? <img src={check}/> : <img src={info}/>}</td>
                 <td>{facility.roleSetup ? <img src={check}/> : <img src={info}/>}</td>
@@ -132,32 +138,39 @@ function FacilityDetails({
             </div>
 
             <div className={"col-sm-6 container table"}>
-                <p className={"highlight"}>
-                    {selectedDistrict} facilties
-                </p>
-                <table className={"table table-hover table-data"}>
-                    <thead>
-                    <tr>
-                        <th>CENTRE ID</th>
-                        <th>CENTRE NAME</th>
-                        <th>VACCINATOR DETAILS</th>
-                        <th>FACILITY SEAL</th>
-                        <th>ROLE SETUP</th>
-                        <th>
-                            <CheckboxItem
-                                text={"checkAll"}
-                                checked={allChecked}
-                                onSelect={(e) => {
-                                    handleAllCheck(e)
-                                }}
-                                showText={false}
-                            />
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>{getFacilityList()}</tbody>
+                {!showCard ? 
+                <div>
+                    <p className={"highlight"}>{selectedDistrict} facilties</p>
+                    <table className={"table table-hover table-data"}>
+                        <thead>
+                        <tr>
+                            <th>CENTRE ID</th>
+                            <th>CENTRE NAME</th>
+                            <th>VACCINATOR DETAILS</th>
+                            <th>FACILITY SEAL</th>
+                            <th>ROLE SETUP</th>
+                            <th>
+                                <CheckboxItem
+                                    text={"checkAll"}
+                                    checked={allChecked}
+                                    onSelect={(e) => {
+                                        handleAllCheck(e)
+                                    }}
+                                    showText={false}
+                                />
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>{getFacilityList()}</tbody>
 
-                </table>
+                    </table>
+                </div>
+                 : ""}
+                <DetailsCard
+                    showCard={showCard}
+                    setShowCard={setShowCard}
+                    data={selectedRow}
+                />
             </div>
 
             <div className="col-sm-3 container">
