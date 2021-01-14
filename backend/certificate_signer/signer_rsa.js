@@ -1,40 +1,30 @@
 const jsigs = require('jsonld-signatures');
 const config = require('./config/config');
 const registry = require('./registry');
-const {publicKeyBase58, privateKeyBase58} = require('./config/keys');
+const {publicKeyPem, privateKeyPem} = require('./config/keys');
 const R = require('ramda');
-const {Ed25519Signature2018} = jsigs.suites;
-const {Ed25519KeyPair} = require('crypto-ld');
+const {RsaSignature2018} = jsigs.suites;
 const {AssertionProofPurpose} = jsigs.purposes;
+const {RSAKeyPair} = require('crypto-ld');
 const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials.json');
 const {vaccinationContext} = require("vaccination-context");
-const vc = require('vc-js');
-
-
-const authorityId = 'did:india:moh#id';
-const key = new Ed25519KeyPair(
-  {
-    publicKeyBase58: publicKeyBase58,
-    privateKeyBase58: privateKeyBase58,
-    id: authorityId
-  }
-);
 
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,
-  id: authorityId,
-  type: 'Ed25519VerificationKey2018',
-  controller: 'https://cowin.mohfw.gov.in/vaccine',
+  id: 'did:india',
+  type: 'RsaVerificationKey2018',
+  controller: 'https://example.com/i/india',
+  publicKeyPem
 };
 
 const customLoader = url => {
   console.log("checking " + url);
   const c = {
     "did:india": publicKey,
-    "https://cowin.mohfw.gov.in/vaccine": publicKey,
+    "https://example.com/i/india": publicKey,
     "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
     'https://www.w3.org/2018/credentials#': credentialsv1,
     "https://www.w3.org/2018/credentials/v1": credentialsv1
@@ -60,22 +50,29 @@ const customLoader = url => {
 
 async function signJSON(certificate) {
 
+  const publicKey = {
+    '@context': jsigs.SECURITY_CONTEXT_URL,
+    id: 'did:india',
+    type: 'RsaVerificationKey2018',
+    controller: 'https://example.com/i/india',
+    publicKeyPem
+  };
   const controller = {
     '@context': jsigs.SECURITY_CONTEXT_URL,
-    id: 'https://cowin.mohfw.gov.in/vaccine',
+    id: 'https://example.com/i/india',
     publicKey: [publicKey],
     // this authorizes this key to be used for making assertions
     assertionMethod: [publicKey.id]
   };
 
-  const purpose = new AssertionProofPurpose({
-    controller: controller
-  });
+  const key = new RSAKeyPair({...publicKey, privateKeyPem});
 
-  const signed = await vc.issue({credential: certificate,
-    suite: new Ed25519Signature2018({key, verificationMethod:'did:example:123456#key1'}),
-    purpose: purpose,
+  const signed = await jsigs.sign(certificate, {
     documentLoader: customLoader,
+    suite: new RsaSignature2018({key}),
+    purpose: new AssertionProofPurpose({
+      controller: controller
+    }),
     compactProof: false
   });
 
@@ -86,7 +83,7 @@ async function signJSON(certificate) {
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
   if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return (new Date().getFullYear() - new Date(recipient.dob).getFullYear());
+    return (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
   return "";
 }
 
