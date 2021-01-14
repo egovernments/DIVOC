@@ -140,7 +140,7 @@ function FacilityActivation({
                 </FacilityFilterTab>
             </div>
 
-            <div className={`col-sm-7 container ${styles["table"]}`}>
+            <div className={`col-sm-6 container ${styles["table"]}`}>
                 <p className={styles["highlight"]}>
                     {selectedDistrict} facilties
                 </p>
@@ -167,7 +167,7 @@ function FacilityActivation({
 
                 </table>
             </div>
-            <div className="col-sm-2 container">
+            <div className="col-sm-3 container">
                 <div className={`card ${styles["card-continer"]}`}>
                     <div className="card-body text-center">
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}

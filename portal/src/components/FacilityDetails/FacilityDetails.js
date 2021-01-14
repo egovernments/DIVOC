@@ -94,7 +94,7 @@ function FacilityDetails({
             });
     }
     return (
-        <div className={"row container"}>
+        <div className={"row"}>
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
@@ -131,7 +131,7 @@ function FacilityDetails({
                 </FacilityFilterTab>
             </div>
 
-            <div className={"col-sm-7 container table"}>
+            <div className={"col-sm-6 container table"}>
                 <p className={"highlight"}>
                     {selectedDistrict} facilties
                 </p>
@@ -160,7 +160,7 @@ function FacilityDetails({
                 </table>
             </div>
 
-            <div className="col-sm-2 container">
+            <div className="col-sm-3 container">
                 <div className={"card card-continer"}>
                     <div className="card-body text-center">
                         <p>
