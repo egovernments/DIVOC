@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {makeStyles} from '@material-ui/core/styles';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
@@ -66,6 +66,7 @@ export class HeaderData {
 
 export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
 
+    const [selectedHistory, setSelectedHistory] = useState()
     const classes = useStyles();
 
     return (
@@ -96,11 +97,17 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
                         <TableBody>
                             {
                                 data.map((row) => (
-                                    <TableRow onClick={() => {
-                                        if (onCellClicked) {
-                                            onCellClicked(row)
-                                        }
-                                    }}>
+                                    <TableRow
+                                        selected={selectedHistory && selectedHistory.id === row["id"]}
+                                        style={{
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={() => {
+                                            setSelectedHistory(row)
+                                            if (onCellClicked) {
+                                                onCellClicked(row)
+                                            }
+                                        }}>
                                         {
                                             headerData.map((field, index) => (
                                                 <TableCell
