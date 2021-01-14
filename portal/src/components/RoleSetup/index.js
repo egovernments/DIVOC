@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import {useAxios} from "../../utils/useAxios";
 import AddUserImg from "../../assets/img/add-user.svg";
 import "./index.css"
+import Switch from "@material-ui/core/Switch/Switch";
 
 const useStyles = makeStyles({
     table: {
@@ -137,6 +138,19 @@ export const RoleSetup = () => {
     );
 };
 
+const CustomSwitch = withStyles({
+    switchBase: {
+        '&$checked': {
+            color: "#88C6A9",
+        },
+        '&$checked + $track': {
+            backgroundColor: "#88C6A9",
+        },
+    },
+    checked: {},
+    track: {},
+})(Switch);
+
 const StaffRow = ({key, staff, groups, updateStaff, saveStaff, deleteStaff}) => {
     function onRoleChange(evt) {
         if (staff.groups.length > 0) {
@@ -151,6 +165,12 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff, deleteStaff}) => 
     function onValueChange(evt, field) {
         staff.edited = true;
         staff[field] = evt.target.value;
+        updateStaff(staff)
+    }
+
+    function onEnabledChange(value) {
+        staff.edited = true;
+        staff.enabled = value;
         updateStaff(staff)
     }
 
@@ -190,6 +210,13 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff, deleteStaff}) => 
             <BorderLessTableCell>
                 <TextField value={staff.employeeId} onChange={(evt) => onValueChange(evt, "employeeId")}
                            label="Employee ID" variant="outlined"/>
+            </BorderLessTableCell>
+            <BorderLessTableCell>
+                <CustomSwitch
+                    checked={staff.enabled || false}
+                    onChange={() => onEnabledChange(!staff.enabled)}
+                    color="primary"
+                />
             </BorderLessTableCell>
             <BorderLessTableCell>
                 {staff.type === NEW_USER &&

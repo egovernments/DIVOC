@@ -46,7 +46,7 @@ public class FacilityUserRestProvider implements RealmResourceProvider {
     }
     private UserDetails toUserDetail(UserModel um) {
         List<UserGroup> userGroups = um.getGroups().stream().map(this::toUserGroup).collect(Collectors.toList());
-        return new UserDetails(um.getId(), um.getUsername(), um.getFirstName(), um.getLastName(), um.getAttributes(), userGroups);
+        return new UserDetails(um.getId(), um.getUsername(), um.getFirstName(), um.getLastName(), um.isEnabled(), um.getAttributes(), userGroups);
     }
     private UserGroup toUserGroup(GroupModel groupModel) {
         return new UserGroup(groupModel.getId(), groupModel.getName());

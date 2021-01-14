@@ -740,11 +740,8 @@ definitions:
         type: string
         title: Facility User Id
       enabled:
-        type: string
+        type: boolean
         title: enable/disable user
-        enum:
-          - "true"
-          - "false"
       groups:
         type: array
         items:

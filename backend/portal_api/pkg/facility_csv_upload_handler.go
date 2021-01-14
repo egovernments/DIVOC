@@ -83,7 +83,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
 		userRequest := KeyCloakUserRequest{
 			Username: *mobile.MobileNumber,
-			Enabled:  "true",
+			Enabled:  true,
 			Attributes: KeycloakUserAttributes{
 				MobileNumber: []string{*mobile.MobileNumber},
 				FacilityCode: facility.FacilityCode,
