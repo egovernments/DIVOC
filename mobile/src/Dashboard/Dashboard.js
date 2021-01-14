@@ -60,8 +60,8 @@ const Footer = () => {
                         title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
             <BottomItem currentLocation={location.pathname} src={queue} href={config.urlPath + "/queue"}
                         title={getMessageComponent(LANGUAGE_KEYS.QUEUE)}/>
-            <BottomItem currentLocation={location.pathname} src={help} href={config.urlPath + "/help"}
-                        title={getMessageComponent(LANGUAGE_KEYS.HELP)}/>
+           {/* <BottomItem currentLocation={location.pathname} src={help} href={config.urlPath + "/help"}
+                        title={getMessageComponent(LANGUAGE_KEYS.HELP)}/>*/}
             <BottomItem currentLocation={location.pathname} src={logout} href={config.urlPath + "/logout"}
                         title={getMessageComponent(LANGUAGE_KEYS.LOGOUT)}/>
         </div>
