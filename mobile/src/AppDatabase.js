@@ -25,7 +25,6 @@ export class AppDatabase {
         }
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
             upgrade(database, oldVersion, newVersion) {
-                debugger
                 if (oldVersion === 0 || newVersion === 5) {
                     database.createObjectStore(PATIENTS, {keyPath: "code"});
                     database.createObjectStore(QUEUE, {keyPath: "code"});

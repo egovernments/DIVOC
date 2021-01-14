@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import App from './App';
+import App, {FacilityApp} from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
 import {ReactKeycloakProvider} from '@react-keycloak/web'
@@ -10,14 +10,12 @@ import {LocaleProvider} from "./lang/LocaleContext";
 
 ReactDOM.render(
     <React.StrictMode>
-        <ReactKeycloakProvider
+        <FacilityApp/>
+        {/*<ReactKeycloakProvider
             authClient={keycloak}
-            initOptions={{"checkLoginIframe": false}}
-        >
-            <LocaleProvider>
-                <App/>
-            </LocaleProvider>
-        </ReactKeycloakProvider>
+            initOptions={{"checkLoginIframe": false}}>
+
+        </ReactKeycloakProvider>*/}
     </React.StrictMode>,
     document.getElementById('root')
 );

@@ -52,12 +52,6 @@ function EnrollmentTypes() {
     </>;
 }
 
-EnrolmentItems.propTypes = {
-    icon: ProtoType.string.isRequired,
-    title: ProtoType.string.isRequired,
-    onClick: ProtoType.func
-};
-
 function EnrolmentItems({icon, title, onClick}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
@@ -71,11 +65,6 @@ function EnrolmentItems({icon, title, onClick}) {
     );
 }
 
-
-StatisticsItem.propTypes = {
-    value: ProtoType.string.isRequired,
-    title: ProtoType.string.isRequired
-};
 
 function StatisticsItem({title, value}) {
     return (
