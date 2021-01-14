@@ -1035,12 +1035,8 @@ func init() {
           "title": "Facility User Id"
         },
         "enabled": {
-          "type": "string",
-          "title": "enable/disable user",
-          "enum": [
-            "true",
-            "false"
-          ]
+          "type": "boolean",
+          "title": "enable/disable user"
         },
         "groups": {
           "type": "array",
@@ -2260,12 +2256,8 @@ func init() {
           "title": "Facility User Id"
         },
         "enabled": {
-          "type": "string",
-          "title": "enable/disable user",
-          "enum": [
-            "true",
-            "false"
-          ]
+          "type": "boolean",
+          "title": "enable/disable user"
         },
         "groups": {
           "type": "array",

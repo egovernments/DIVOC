@@ -16,7 +16,7 @@ var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
 
 type KeyCloakUserRequest struct {
 	Username   string                 `json:"username"`
-	Enabled    string                 `json:"enabled"`
+	Enabled    bool                   `json:"enabled"`
 	Attributes KeycloakUserAttributes `json:"attributes"`
 }
 
@@ -162,6 +162,7 @@ type FacilityUserResponse struct {
 	UserName   string                 `json:"userName"`
 	Attributes map[string]interface{} `json:"attributes"`
 	Groups     []*models.UserGroup    `json:"groups"`
+	Enabled    bool                   `json:"enabled"`
 }
 
 func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
@@ -195,6 +196,7 @@ func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
 					MobileNumber: mobileNumber,
 					Name:         fullName,
 					Groups:       user.Groups,
+					Enabled:      user.Enabled,
 				})
 			}
 		}
