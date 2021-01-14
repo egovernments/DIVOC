@@ -49,7 +49,7 @@ export const RoleSetup = () => {
     function fetchUsers() {
         axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
             .then(res => {
-                setStaffs(res.data.map(d => ({...d, type: OLD_USER})))
+                setStaffs(res.data.map(d => ({...d, type: OLD_USER, edited: false})))
             });
     }
 
@@ -89,13 +89,28 @@ export const RoleSetup = () => {
     function saveStaff(index) {
         const staff = staffs[index];
         if(isStaffValid(staff)) {
-            axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
-                .then(res => {
-                    fetchUsers()
-                });
+            if (staff.type === OLD_USER) {
+                axiosInstance.current.put('/divoc/admin/api/v1/facility/users', staff)
+                    .then(res => {
+                        fetchUsers()
+                    });
+            } else {
+                axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
+                    .then(res => {
+                        fetchUsers()
+                    });
+            }
         } else {
             alert("Please fill all the values!")
         }
+    }
+
+    function deleteStaff(index) {
+        const staff = staffs[index];
+        axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/'+staff.id)
+            .then(res => {
+                fetchUsers()
+            });
     }
 
     return (
@@ -111,6 +126,7 @@ export const RoleSetup = () => {
                                 groups={groups}
                                 updateStaff={(staff) => updateStaff(index, staff)}
                                 saveStaff={() => saveStaff(index)}
+                                deleteStaff={() => deleteStaff(index)}
                             />
                         ))}
                     </TableBody>
@@ -121,17 +137,19 @@ export const RoleSetup = () => {
     );
 };
 
-const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
+const StaffRow = ({key, staff, groups, updateStaff, saveStaff, deleteStaff}) => {
     function onRoleChange(evt) {
         if (staff.groups.length > 0) {
             staff.groups[0].id = evt.target.value
         } else {
             staff.groups = [{id: evt.target.value}]
         }
+        staff.edited = true;
         updateStaff(staff)
     }
 
     function onValueChange(evt, field) {
+        staff.edited = true;
         staff[field] = evt.target.value;
         updateStaff(staff)
     }
@@ -166,7 +184,7 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
                            variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.mobileNumber} onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
+                <TextField disabled={staff.type === OLD_USER} value={staff.mobileNumber} onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
                            label="Mobile Number" variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
@@ -181,10 +199,10 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
                 }
                 {staff.type === OLD_USER &&
                 <>
-                    <Button variant="outlined" disabled>
+                    <Button variant="outlined" onClick={saveStaff} disabled={!staff.edited}>
                         EDIT
                     </Button>
-                    <Button variant="outlined" disabled>
+                    <Button variant="outlined" onClick={deleteStaff}>
                         DELETE
                     </Button>
                 </>
