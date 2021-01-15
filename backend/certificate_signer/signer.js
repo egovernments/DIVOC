@@ -73,7 +73,7 @@ async function signJSON(certificate) {
     purpose: new AssertionProofPurpose({
       controller: controller
     }),
-    compactProof: true
+    compactProof: false
   });
 
   console.info("Signed cert " + JSON.stringify(signed));
@@ -83,7 +83,7 @@ async function signJSON(certificate) {
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
   if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
+    return "" + (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
   return "";
 }
 

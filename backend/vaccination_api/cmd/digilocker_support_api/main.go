@@ -261,7 +261,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 			formatRecipientAddress(certificate),
 			certificate.Evidence[0].Vaccine,
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
-			"To be taken 28 days after 1st Dose",
+			"after 28 days",
 			certificate.Evidence[0].Verifier.Name,
 			formatFacilityAddress(certificate),
 		}
@@ -283,11 +283,18 @@ func isFinal(certificate Certificate) bool {
 	return certificate.Evidence[0].Dose == certificate.Evidence[0].TotalDoses
 }
 
+func checkIdType(identity string) string {
+	if strings.Contains(identity, "aadhaar") {
+		return "config/provisional-with-aadhaar.pdf"
+	}
+	return "config/provisional-with-other.pdf"
+}
+
 func templateType(certificate Certificate) string {
 	if(isFinal(certificate)){
 		return "config/final.pdf"
 	}
-	return "config/provisional.pdf"
+	return checkIdType(certificate.CredentialSubject.ID)
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
@@ -302,7 +309,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
 
-	if err := pdf.AddTTFFont("wts11", "config/Roboto-Medium.ttf"); err != nil {
+	if err := pdf.AddTTFFont("wts11", "config/Roboto-Light.ttf"); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
@@ -323,23 +330,33 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	}*/
-	offsetX := 53.0
-	offsetY := 390.0
-	offsetNewX := 300.0
-	offsetNewY := 90.0
+	offsetX := 51.0
+    offsetY := 382.0
+
+    offsetNewX := 301.0
+    offsetNewY := 80.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplate(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
-	for i := 0; i < rowSize; i++ {
+	i := 0
+    for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*50.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
-	for i := rowSize; i < len(displayLabels); i++ {
+    pdf.SetX(offsetX)
+    pdf.SetY(offsetY + float64(i)*44.0)
+    pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
+
+    for i = rowSize ; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY + float64(i)*50.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
+    pdf.SetX(offsetNewX)
+    pdf.SetY(offsetNewY + float64(i)*47)
+    pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
+
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
 	if e != nil {
@@ -354,11 +371,11 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 }
 
 func formatFacilityAddress(certificate Certificate) string {
-	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", " + certificate.Evidence[0].Facility.Address.AddressRegion
+	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", "
 }
 
 func formatRecipientAddress(certificate Certificate) string {
-	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", " + certificate.CredentialSubject.Address.AddressRegion
+	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", "
 }
 
 func formatDate(date time.Time) string {
@@ -369,7 +386,25 @@ func formatId(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
 	if strings.Contains(identity, "aadhaar") {
-		return "XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
+		return "Aadhaar # XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
+	}
+	if strings.Contains(identity,"driverlicense"){
+	    return "Driver’s License # " + lastFragment
+	}
+	if strings.Contains(identity,"MNREGA"){
+        return "MNREGA Job Card # " + lastFragment
+    }
+    if strings.Contains(identity,"pan"){
+        return "PAN Card # " + lastFragment
+    }
+    if strings.Contains(identity,"passbook"){
+        return "Passbook # " + lastFragment
+    }
+    if strings.Contains(identity,"passport"){
+        return "Passport # " + lastFragment
+    }
+    if strings.Contains(identity,"pension"){
+        return "Pension Document # " + lastFragment
 	}
 	return lastFragment
 }
@@ -381,113 +416,12 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	}
 	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 280, 50, nil)
+	err = pdf.ImageByHolder(holder, 280, 30, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
 	return nil
 }
-
-/*
-func getCertificateAsPdf(certificateText string) ([]byte, error) {
-	var certificate Certificate
-	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
-		log.Error(err)
-		return nil, err
-	}
-
-	pdf := gopdf.GoPdf{}
-	//pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: 595.28, H: 841.89}}) //595.28, 841.89 = A4
-	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
-	pdf.AddPage()
-
-	if err := pdf.AddTTFFont("wts11", "config/Roboto-Medium.ttf"); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}
-	/* if err := pdf.AddTTFFont("arapey", "./Arapey-Italic.ttf"); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	} * /
-	tpl1 := pdf.ImportPage("config/certificate_template_20200112.pdf", 1, "/MediaBox")
-	// Draw pdf onto page
-	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
-
-	if err := pdf.SetFont("wts11", "", 10); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}
-
-	/*if err := pdf.SetFont("arapey", "", 14); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}* /
-	offsetX := 280.0
-	offsetY := 361.0
-	displayLabels := []string{certificate.CredentialSubject.Name,
-		certificate.CredentialSubject.Age + " Years",
-		certificate.CredentialSubject.Gender,
-		"234234298374293",
-		formatId(certificate.CredentialSubject.ID),
-		"",
-		"", //blank line
-		certificate.Evidence[0].Vaccine,
-		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
-		"To be taken 28 days after 1st Dose",
-		"",
-		formatFacilityAddress(certificate),
-		certificate.Evidence[0].Verifier.Name,
-	}
-	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
-	for i := 0; i < len(displayLabels); i++ {
-		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*22.0)
-		pdf.Cell(nil, displayLabels[i])
-	}
-
-	e := pasteQrCodeOnPage(certificateText, &pdf)
-	if e != nil {
-		return nil, e
-	}
-
-	//pdf.Image("qr.png", 200, 50, nil)
-	//pdf.WritePdf("certificate.pdf")
-	var b bytes.Buffer
-	pdf.Write(&b)
-	return b.Bytes(), nil
-}
-
-func formatFacilityAddress(certificate Certificate) string {
-	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", " + certificate.Evidence[0].Facility.Address.AddressRegion
-}
-
-func formatDate(date time.Time) string {
-	return date.Format("02 Jan 2006")
-}
-
-func formatId(identity string) string {
-	split := strings.Split(identity, ":")
-	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "aadhaar") {
-		return "XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
-	}
-	return lastFragment
-}
-
-func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
-	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
-	if err != nil {
-		return err
-	}
-	imageBytes, err := qrCode.PNG(-2)
-	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 400, 30, nil)
-	if err != nil {
-		log.Errorf("Error while creating QR code")
-	}
-	return nil
-}
-*/
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -552,7 +486,7 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[0].(map[string]interface{})
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			if responseBytes, err := xml.Marshal(certificateObj); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
@@ -580,12 +514,13 @@ func authorize(next http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	config.Initialize()
+
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
 	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
 	r.HandleFunc("/cert/api/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
 	http.Handle("/", r)
