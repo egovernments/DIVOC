@@ -31,22 +31,38 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
             })
             .then((result) => {
                 return result.map((item, index) => {
-                    const uploadedDate = new Date(item["CreatedAt"])
-                    const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                    const uploadLocalDate = formatDate(uploadedDate)
-                    return {
-                        id: item["ID"],
-                        fileName: item["Filename"],
-                        date: uploadLocalDate,
-                        time: uploadLocalTime,
-                        records: item["TotalRecords"],
-                        errors: item["TotalErrorRows"]
-                    };
-                })
+                        const uploadedDate = new Date(item["CreatedAt"])
+                        const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
+                        const uploadLocalDate = formatDate(uploadedDate)
+                        return {
+                            id: item["ID"],
+                            fileName: item["Filename"],
+                            date: uploadLocalDate,
+                            time: uploadLocalTime,
+                            success: getSuccessRecords(item),
+                            errors: item["TotalErrorRows"]
+                        };
+                    }
+                )
             })
             .then((result) => {
                 setUploadHistory(result)
             });
+    }
+
+    function getSuccessRecords(item) {
+        if (!isNaN(item["TotalRecords"]) && !isNaN(item["TotalErrorRows"])) {
+            return item["TotalRecords"] - item["TotalErrorRows"]
+        }
+        return 0
+    }
+
+    function getTotalSuccessUploadCount() {
+        let sum = 0;
+        for (let i = 0; i < uploadHistory.length; i++) {
+            sum += uploadHistory[i].success
+        }
+        return sum;
     }
 
     return (
@@ -59,7 +75,7 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
             <div className="total">
                 {infoTitle && <TotalRecords
                     title={infoTitle}
-                    count={uploadHistory.length}
+                    count={getTotalSuccessUploadCount()}
                 />}
             </div>
             <div className="upload-history">
@@ -117,7 +133,7 @@ function UploadErrors({uploadHistory, fileUploadHistoryDetailsAPI}) {
             <div className="error-container">
                 <div className="error-count ml-lg-5 mt-5">
                     <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
-                    <h3>{uploadHistory.records}</h3>
+                    <h3>{uploadHistory.success}</h3>
                     <h5>Records<br/>Uploaded</h5>
                 </div>
                 <UploadErrorList
@@ -149,8 +165,8 @@ const headerData = [
         key: "time"
     },
     {
-        title: "RECORDS",
-        key: "records"
+        title: "SUCCESS",
+        key: "success"
     },
     {
         title: "ERRORS",
