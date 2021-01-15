@@ -49,18 +49,18 @@ test('Sign the json', async () => {
 });
 
 test('Verify the signed json', async () => {
-  const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Bhaya Mitra\",\"gender\":\"Male\",\"age\":27,\"nationality\":\"Indian\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\"}},\"issuer\":\"https://nha.gov.in/\",\"issuanceDate\":\"2021-01-06T08:31:25.574Z\",\"evidence\":[{\"id\":\"https://nha.gov.in/evidence/vaccine/123\",\"feedbackUrl\":\"https://divoc.xiv.in/feedback/123\",\"infoUrl\":\"https://divoc.xiv.in/learn/123\",\"type\":[\"Vaccination\"],\"batch\":\"MB3428BX\",\"vaccine\":\"CoVax\",\"manufacturer\":\"COVPharma\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"verifier\":{\"name\":\"Sooraj Singh\"},\"facility\":{\"name\":\"ABC Medical Center\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"Bengaluru\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\"}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"http://purl.org/dc/terms/created\":{\"type\":\"http://www.w3.org/2001/XMLSchema#dateTime\",\"@value\":\"2021-01-15T04:31:12Z\"},\"https://w3id.org/security#jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..RlgHnGWxvKyZusSl6natEk_Nbz3RU1bqGMgyO8mpHDO_dolqB_1zpBv3ruy_PZNDUh1fWqht3vH8q8wSrf77ClS_FeQUPcIaKwrQzno7ZvoOPq3z7vtUlYzR67LSb173tH1h5BV2v2GPgOMW-fE4zXnoTOnRLj7ejT8e1zzqeRvrniSt38P_wASx8JwKgAdw9CfZ5cFBByJwg4-1b6-tnQh0oofe_0GGEJGQUsW-Qkr2CPTzItkIO4MQsJyGR6U4pr6YwA3DGWJF1P2YHZQseu79Ly0iRnZsXFoEjjO6wzi_GIi8DlJcB1Xva71uKeyM6mDWZOZ-KItbRFmk0d0hxg\",\"https://w3id.org/security#proofPurpose\":{\"id\":\"https://w3id.org/security#assertionMethod\"},\"https://w3id.org/security#verificationMethod\":{\"id\":\"did:india\"}}}";
+  const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:2342343334\",\"refId\":\"12346\",\"name\":\"Bhaya Mitra\",\"gender\":\"Male\",\"age\":\"27\",\"nationality\":\"Indian\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"\",\"city\":\"\",\"addressRegion\":\"\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}},\"issuer\":\"https://cowin.gov.in/\",\"issuanceDate\":\"2021-01-15T17:21:13.117Z\",\"evidence\":[{\"id\":\"https://cowin.gov.in/vaccine/undefined\",\"feedbackUrl\":\"https://cowin.gov.in/?undefined\",\"infoUrl\":\"https://cowin.gov.in/?undefined\",\"type\":[\"Vaccination\"],\"batch\":\"MB3428BX\",\"vaccine\":\"CoVax\",\"manufacturer\":\"COVPharma\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"dose\":\"\",\"totalDoses\":\"\",\"verifier\":{\"name\":\"Sooraj Singh\"},\"facility\":{\"name\":\"ABC Medical Center\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"Bengaluru\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-01-15T17:21:13Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..mJlHZZRD7VQwVJchfI21ZavjxNKglbf3LSaF1SAjELOWn9MARALkugsmOzG0mBon9R7zXSVPkPM8EDbUZxR4FsRlAFFszFv-0BjyAeIqRv-9MRnlm4cScQi8aCBgBnvsWfNIE175cGNbPUluVv5n6G66tVinioL5IL6uCZNQnSGp4jJrEAZa0t5s3jXfq7soHz1LTfQbLs7cH5-fDi3JW1-WeF4_ELy_9l_OxAc2CoACqYLOLJB-NnPsnz2bwAvH8yXHsjZJphzaBNqpn8DmJvcRHzhz7OjpGfhyouiOyGo_XncadFmftqwfilJkC1EISkSb6QVsyhHLOudY4PTTaA\"}}";
   const {publicKeyPem} = require('../config/keys');
   const publicKey = {
     '@context': jsigs.SECURITY_CONTEXT_URL,
     id: 'did:india',
     type: 'RsaVerificationKey2018',
-    controller: 'https://example.com/i/india',
+    controller: 'https://cowin.gov.in/',
     publicKeyPem
   };
   const controller = {
     '@context': jsigs.SECURITY_CONTEXT_URL,
-    id: 'https://example.com/i/india',
+    id: 'https://cowin.gov.in/',
     publicKey: [publicKey],
     // this authorizes this key to be used for making assertions
     assertionMethod: [publicKey.id]
@@ -70,6 +70,7 @@ test('Verify the signed json', async () => {
   const result = await jsigs.verify(signed, {
     suite: new RsaSignature2018({key}),
     purpose: new AssertionProofPurpose({controller}),
+    compactProof: false,
     documentLoader: customLoader
   });
   console.log(result);
