@@ -138,7 +138,6 @@ type PullURIResponse struct {
 	} `xml:"DocDetails"`
 }
 
-
 type PullDocRequest struct {
 	XMLName    xml.Name `xml:"PullDocRequest"`
 	Text       string   `xml:",chardata"`
@@ -174,7 +173,6 @@ type PullDocResponse struct {
 		DataContent string `xml:"DataContent"`
 	} `xml:"DocDetails"`
 }
-
 
 func ValidMAC(message string, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
@@ -385,18 +383,18 @@ func isFinal(certificate Certificate) bool {
 	return certificate.Evidence[0].Dose == certificate.Evidence[0].TotalDoses
 }
 
-func checkIdType(identity string) string {
+func checkIdType(identity string, aadhaarPDF string, otherPDF string) string {
 	if strings.Contains(identity, "aadhaar") {
-		return "config/provisional-with-aadhaar.pdf"
+		return aadhaarPDF
 	}
-	return "config/provisional-with-other.pdf"
+	return otherPDF
 }
 
 func templateType(certificate Certificate) string {
 	if isFinal(certificate) {
-		return "config/final.pdf"
+		return checkIdType(certificate.CredentialSubject.ID, "config/final-with-aadhaar.pdf", "config/final-with-other.pdf")
 	}
-	return checkIdType(certificate.CredentialSubject.ID)
+	return checkIdType(certificate.CredentialSubject.ID, "config/provisional-with-aadhaar.pdf", "config/provisional-with-other.pdf")
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
@@ -432,31 +430,31 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	}*/
-	offsetX := 51.0
-	offsetY := 382.0
 
-	offsetNewX := 301.0
-	offsetNewY := 80.0
+	offsetX := 58.0
+	offsetY := 330.0
+	offsetNewX := 300.0
+	offsetNewY := 60.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplate(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
 	for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*50.0)
+		pdf.SetY(offsetY + float64(i)*45.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
 	pdf.SetX(offsetX)
-	pdf.SetY(offsetY + float64(i)*44.0)
+	pdf.SetY(offsetY + float64(i)*40.0)
 	pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
 
 	for i = rowSize; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY + float64(i)*50.0)
+		pdf.SetY(offsetNewY + float64(i)*45.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
 	pdf.SetX(offsetNewX)
-	pdf.SetY(offsetNewY + float64(i)*47)
+	pdf.SetY(offsetNewY + float64(i)*42)
 	pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
@@ -542,9 +540,9 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	if err != nil {
 		return err
 	}
-	imageBytes, err := qrCode.PNG(-3)
+	imageBytes, err := qrCode.PNG(-2)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 280, 30, nil)
+	err = pdf.ImageByHolder(holder, 290, 30, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
@@ -591,7 +589,6 @@ func getCertificateFromRegistryByCertificateId(certificateId string) (map[string
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	return certificateFromRegistry, err
 }
-
 
 func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
