@@ -21,8 +21,10 @@ import (
 )
 
 const ApiRole = "api"
+const ArogyaSetuRole = "arogyasetu"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
+const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
 
 type Certificate struct {
@@ -162,6 +164,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
 	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
 	if e != nil {
+		log.Errorf("Error in verifying request signature")
 		w.WriteHeader(500)
 		_, _ = w.Write([]byte("Error in verifying request signature"))
 		return
@@ -211,6 +214,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(500)
 		}
 	} else {
+		log.Errorf("Unauthorized access")
 		w.WriteHeader(401)
 		_, _ = w.Write([]byte("Unauthorized"))
 	}
@@ -245,6 +249,8 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 			cert.Uri = "in.gov.covin-DPMLC-" + cert.certificateId
 			cert.signedJson = certificateObj["certificate"].(string)
 			return &cert
+		} else {
+			log.Errorf("No certificates found for req %v", preEnrollmentCode)
 		}
 	}
 	return nil
@@ -291,7 +297,7 @@ func checkIdType(identity string) string {
 }
 
 func templateType(certificate Certificate) string {
-	if(isFinal(certificate)){
+	if isFinal(certificate) {
 		return "config/final.pdf"
 	}
 	return checkIdType(certificate.CredentialSubject.ID)
@@ -300,7 +306,7 @@ func templateType(certificate Certificate) string {
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
-		log.Error(err)
+		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
 
@@ -360,6 +366,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
 	if e != nil {
+		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
 	}
 
@@ -378,9 +385,11 @@ func formatRecipientAddress(certificate Certificate) string {
 	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", "
 }
 
+
 func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
 }
+
 
 func formatId(identity string) string {
 	split := strings.Split(identity, ":")
@@ -389,22 +398,22 @@ func formatId(identity string) string {
 		return "Aadhaar # XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
 	}
 	if strings.Contains(identity,"driverlicense"){
-	    return "Driver’s License # " + lastFragment
+		return "Driver’s License # " + lastFragment
 	}
 	if strings.Contains(identity,"MNREGA"){
-        return "MNREGA Job Card # " + lastFragment
-    }
-    if strings.Contains(identity,"pan"){
-        return "PAN Card # " + lastFragment
-    }
-    if strings.Contains(identity,"passbook"){
-        return "Passbook # " + lastFragment
-    }
-    if strings.Contains(identity,"passport"){
-        return "Passport # " + lastFragment
-    }
-    if strings.Contains(identity,"pension"){
-        return "Pension Document # " + lastFragment
+		return "MNREGA Job Card # " + lastFragment
+	}
+	if strings.Contains(identity,"pan"){
+		return "PAN Card # " + lastFragment
+	}
+	if strings.Contains(identity,"passbook"){
+		return "Passbook # " + lastFragment
+	}
+	if strings.Contains(identity,"passport"){
+		return "Passport # " + lastFragment
+	}
+	if strings.Contains(identity,"pension"){
+		return "Pension Document # " + lastFragment
 	}
 	return lastFragment
 }
@@ -424,6 +433,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 }
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET PDF HANDLER REQUEST")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
@@ -445,6 +455,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		} else {
+			log.Errorf("No certificates found for request %v", preEnrollmentCode)
 			w.WriteHeader(404)
 		}
 	} else {
@@ -463,6 +474,7 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 }
 
 func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATE JSON REQUEST")
 	urlParams := request.URL.Query()
 	filter := map[string]interface{}{}
 	preEnrollmentCode := urlParams.Get(PreEnrollmentCode)
@@ -478,6 +490,7 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 		}
 	}
 	if beneficiaryId == "" && preEnrollmentCode == "" {
+		log.Errorf("Get certificates json doesnt contain required fields %v", urlParams.Encode())
 		w.WriteHeader(400)
 		return
 	}
@@ -487,7 +500,7 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			if responseBytes, err := xml.Marshal(certificateObj); err != nil {
+			if responseBytes, err := json.Marshal(certificateObj); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
 				w.WriteHeader(200)
@@ -495,14 +508,109 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 				return
 			}
 		}
+	} else {
+		log.Errorf("No certificates found for request %v", filter)
 	}
 }
 
-func authorize(next http.HandlerFunc) http.HandlerFunc {
+func getCertificates(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
+	var requestBody map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&requestBody)
+	mobile, found := requestBody[Mobile]
+	filter := map[string]interface{}{}
+	if found {
+		filter[Mobile] = map[string]interface{}{
+			"eq": mobile,
+		}
+	}
+	beneficiaryId, found := requestBody[BeneficiaryId]
+	if found {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if mobile == nil && beneficiaryId == nil {
+		log.Errorf("get certificates requested with no parameters, %v", requestBody)
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificates := map[string]interface{}{
+				"certificates": certificateArr,
+			}
+			if responseBytes, err := json.Marshal(certificates); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(responseBytes)
+				w.Header().Set("Content-Type", "application/json")
+				return
+			}
+		}
+	} else {
+		log.Errorf("No certificates found for request %v", filter)
+	}
+}
+
+func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET PDF HANDLER REQUEST")
+	var requestBody map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	mobile, found := requestBody[Mobile]
+	filter := map[string]interface{}{}
+	if found {
+		filter[Mobile] = map[string]interface{}{
+			"eq": mobile,
+		}
+	}
+	beneficiaryId, found := requestBody[BeneficiaryId]
+	if found {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if mobile == nil && beneficiaryId == nil {
+		log.Errorf("get certificates requested with no parameters, %v", requestBody)
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			signedJson := certificateObj["certificate"].(string)
+			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+				log.Errorf("Error in creating certificate pdf")
+			} else {
+				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+				//w.Header().Set("Content-Length", string(len(pdfBytes)))
+				w.WriteHeader(200)
+				_, _ = w.Write(pdfBytes)
+				return
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", filter)
+			w.WriteHeader(404)
+		}
+	} else {
+		log.Infof("Error %+v", err)
+	}
+}
+
+func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
 		if claimBody != nil {
-			isAuthorized := auth.AuthorizeRole([]string{ApiRole}, claimBody)
+			isAuthorized := auth.AuthorizeRole(roles, claimBody)
 			if isAuthorized {
 				next.ServeHTTP(w, r)
 				return
@@ -514,15 +622,17 @@ func authorize(next http.HandlerFunc) http.HandlerFunc {
 
 func main() {
 	config.Initialize()
-
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
-	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
+	//integration
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
-	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
-	r.HandleFunc("/cert/api/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
+	//internal
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
+	//external
+	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
+	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
+
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }
