@@ -37,7 +37,7 @@ type Certificate struct {
 		RefId       string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         string  `json:"age"`
+		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
 		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
@@ -343,7 +343,7 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 			log.Infof("certificate resp %v", certificateObj)
 			var cert VaccinationCertificateBundle
 			cert.certificateId = certificateObj["certificateId"].(string)
-			cert.Uri = "in.gov.covin-DPMLC-" + cert.certificateId
+			cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
 			cert.signedJson = certificateObj["certificate"].(string)
 			return &cert
 		} else {
