@@ -20,7 +20,8 @@
       "type": "string",
       "enum": [
         "Male",
-        "Female"
+        "Female",
+        "Other"
       ]
     },
     "nationalId": {
@@ -28,7 +29,8 @@
       "type": "string",
       "$id": "#/properties/nationalId",
       "enum": [
-        "Indian"
+        "Indian",
+        "Other"
       ],
       "default": "Indian"
     },

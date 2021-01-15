@@ -5,6 +5,7 @@ import {Redirect, useHistory} from "react-router";
 import {appIndexDb} from "../../AppDatabase";
 import {PreEnrollmentDetails} from "../../components/PreEnrollmentDetail";
 import "./PreEnrollmentFlow.scss";
+import config from "config.json"
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode";
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails";
@@ -47,7 +48,7 @@ function PreEnrollmentRouteCheck({pageName}) {
     }
     return <Redirect
         to={{
-            pathname: '/preEnroll/' + FORM_PRE_ENROLL_CODE,
+            pathname: config.urlPath + '/preEnroll/' + FORM_PRE_ENROLL_CODE,
         }}
     />
 }
@@ -112,9 +113,9 @@ export function usePreEnrollment() {
         dispatch({type: current, payload: payload});
         if (next) {
             if (next === '/') {
-                history.replace("/", null)
+                history.replace(config.urlPath + "/", null)
             } else {
-                history.push('/preEnroll/' + next)
+                history.push(config.urlPath + '/preEnroll/' + next)
             }
         }
     };

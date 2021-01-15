@@ -8,6 +8,7 @@ import {CONSTANT} from "../../utils/constants";
 import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
 import Col from "react-bootstrap/Col";
 import "./index.scss"
+import config from "config.json"
 
 
 export const RecipientQueueTable = () => {
@@ -30,9 +31,9 @@ export const RecipientQueueTable = () => {
                 {
                     queueData.map((data, index) => (
                         <tr key={index} onClick={() => {
-                            history.push(`/confirm/vaccination/${data.enrollCode}/${CONSTANT.SELECT_VACCINATOR}`)
+                            history.push(config.urlPath + `/confirm/vaccination/${data.enrollCode}/${CONSTANT.SELECT_VACCINATOR}`)
                         }}>
-                            <td>{index}</td>
+                            <td>{index+1}</td>
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>

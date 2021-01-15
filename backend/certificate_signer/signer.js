@@ -96,12 +96,12 @@ function transformW3(cert, certificateId) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: cert.recipient.identity,
-      refId: cert.preEnrollmentCode,
-      name: cert.recipient.name,
-      gender: cert.recipient.gender,
+      id: R.pathOr('', ['recipient', 'identity'], cert),
+      refId: R.pathOr('', ['preEnrollmentCode'], cert),
+      name: R.pathOr('', ['recipient', 'name'], cert),
+      gender: R.pathOr('', ['recipient', 'gender'], cert),
       age: ageOfRecipient(cert.recipient), //from dob
-      nationality: cert.recipient.nationality,
+      nationality: R.pathOr('', ['recipient', 'nationality'], cert),
       address: {
         "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),
         "streetAddress2": R.pathOr('', ['recipient', 'address', 'addressLine2'], cert),
@@ -120,30 +120,30 @@ function transformW3(cert, certificateId) {
       "infoUrl": "https://divoc.xiv.in/learn/" + certificateId,
       "certificateId": certificateId,
       "type": ["Vaccination"],
-      "batch": cert.vaccination.batch,
-      "vaccine": cert.vaccination.name,
-      "manufacturer": cert.vaccination.manufacturer,
-      "date": cert.vaccination.date,
-      "effectiveStart": cert.vaccination.effectiveStart,
-      "effectiveUntil": cert.vaccination.effectiveUntil,
-      "dose": cert.vaccination.dose,
-      "totalDoses": cert.vaccination.totalDoses,
+      "batch": R.pathOr('', ['vaccination', 'batch'], cert),
+      "vaccine": R.pathOr('', ['vaccination', 'name'], cert),
+      "manufacturer": R.pathOr('', ['vaccination', 'manufacturer'], cert),
+      "date": R.pathOr('', ['vaccination', 'date'], cert),
+      "effectiveStart": R.pathOr('', ['vaccination', 'effectiveStart'], cert),
+      "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
+      "dose": R.pathOr('', ['vaccination', 'dose'], cert),
+      "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
-        "name": cert.vaccinator.name,
+        "name": R.pathOr('', ['vaccinator', 'name'], cert),
         // "sign-image": "..."
       },
       "facility": {
         // "id": "https://nha.gov.in/evidence/facilities/" + cert.facility.id,
-        "name": cert.facility.name,
+        "name": R.pathOr('', ['facility', 'name'], cert),
         "address": {
-          "streetAddress": cert.facility.address.addressLine1,
-          "streetAddress2": cert.facility.address.addressLine2,
-          "district": cert.facility.address.district,
-          "city": cert.facility.address.city,
-          "addressRegion": cert.facility.address.state,
-          "addressCountry": cert.facility.address.country ? cert.facility.address.country : "IN",
-          "postalCode": cert.facility.address.pincode
+          "streetAddress": R.pathOr('', ['facility', 'address', 'addressLine1'], cert),
+          "streetAddress2": R.pathOr('', ['facility', 'address', 'addressLine2'], cert),
+          "district": R.pathOr('', ['facility', 'address', 'district'], cert),
+          "city": R.pathOr('', ['facility', 'address', 'city'], cert),
+          "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
+          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
         // "seal-image": "..."
       }

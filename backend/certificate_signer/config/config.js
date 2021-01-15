@@ -2,6 +2,7 @@ const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost
 const CERTIFY_TOPIC = 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
 const CERTIFIED_TOPIC = 'certified';
+const ERROR_CERTIFICATE_TOPIC = 'error_certificate';
 const SMS_GATEWAY_URL = 'https://api.msg91.com/api/v2/sendsms';
 const ENABLE_SMS_NOTIFICATION = false;
 const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMENT || true;
@@ -12,5 +13,6 @@ module.exports = {
   CERTIFIED_TOPIC,
   SMS_GATEWAY_URL,
   ENABLE_SMS_NOTIFICATION,
-  ENABLE_CERTIFY_ACKNOWLEDGEMENT
+  ENABLE_CERTIFY_ACKNOWLEDGEMENT,
+  ERROR_CERTIFICATE_TOPIC
 };

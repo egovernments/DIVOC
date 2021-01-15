@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import schema from '../../jsonSchema/walk_in_form.json';
 import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
+import config from "config.json"
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -36,7 +37,7 @@ function WalkInEnrollmentRouteCheck({pageName}) {
     }
     return <Redirect
         to={{
-            pathname: '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM
+            pathname: config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM
         }}
     />
 }
