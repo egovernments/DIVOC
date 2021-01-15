@@ -49,9 +49,14 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           .catch(error => {
             console.error(error)
             sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
+            throw error
           });
       } catch (e) {
         console.error("ERROR: " + e.message)
+        await producer.send({
+          topic: config.ERROR_CERTIFICATE_TOPIC,
+          messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: e.message})}]
+        });
       }
     },
   })
