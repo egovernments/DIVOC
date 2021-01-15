@@ -1,7 +1,9 @@
 package main
 
 import (
+	"archive/zip"
 	"bytes"
+	"compress/flate"
 	"crypto/hmac"
 	"crypto/sha256"
 	"encoding/base64"
@@ -15,7 +17,9 @@ import (
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
+	"io"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -536,17 +540,63 @@ func formatId(identity string) string {
 }
 
 func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
-	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
+	buf, err := compress(certificateText)
+	if err != nil {
+		log.Error("Error compressing certificate data", err)
+		return err
+	}
+	qrCode, err := qrcode.New(buf.String(), qrcode.Medium)
 	if err != nil {
 		return err
 	}
-	imageBytes, err := qrCode.PNG(-2)
+
+	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
 	err = pdf.ImageByHolder(holder, 290, 30, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
 	return nil
+}
+
+func decompress(buf *bytes.Buffer, err error, ) {
+	r, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
+	if err != nil {
+		log.Error(err)
+	}
+	for _, f := range r.File {
+		log.Infof("Contents of %s:\n", f.Name)
+		rc, err := f.Open()
+		if err != nil {
+			log.Error(err)
+		}
+		_, err = io.CopyN(os.Stdout, rc, int64(buf.Len()))
+		if err != nil {
+			log.Fatal(err)
+		}
+		rc.Close()
+	}
+}
+
+func compress(certificateText string) (*bytes.Buffer, error) {
+	buf := new(bytes.Buffer)
+	w := zip.NewWriter(buf)
+	w.RegisterCompressor(zip.Deflate, func(out io.Writer) (io.WriteCloser, error) {
+		return flate.NewWriter(out, flate.BestCompression)
+	})
+	f, err := w.Create("certificate.json")
+	if err != nil {
+		log.Error(err)
+	}
+	_, err = f.Write([]byte(certificateText))
+	if err != nil {
+		log.Error(err)
+	}
+	err = w.Close()
+	if err != nil {
+		log.Error(err)
+	}
+	return buf, err
 }
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
