@@ -1,8 +1,11 @@
 const { Kafka } = require('kafkajs');
 const config = require('./config/config');
 const signer = require('./signer');
+const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
-console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER)
+console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
+console.log('Using ' + publicKeyPem);
+
 const kafka = new Kafka({
   clientId: 'divoc-cert',
   brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
