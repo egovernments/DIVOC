@@ -1,16 +1,13 @@
 import React from 'react';
 import UploadHistory from "../UploadHistory/UploadHistory";
+import {API_URL} from "../../utils/constants";
 
 function VaccinatorsRegistry() {
 
-    const fileUploadAPI = '/divoc/admin/api/v1/vaccinators';
-    const fileUploadHistoryAPI = '/divoc/admin/api/v1/vaccinators/uploads'
-    const fileUploadErrorsAPI = '/divoc/admin/api/v1/vaccinators/uploads/:id/errors'
-
     return <UploadHistory
-        fileUploadAPI={fileUploadAPI}
-        fileUploadHistoryAPI={fileUploadHistoryAPI}
-        fileUploadErrorsAPI={fileUploadErrorsAPI}
+        fileUploadAPI={API_URL.VACCINATOR_FILE_UPLOAD_API}
+        fileUploadHistoryAPI={API_URL.VACCINATOR_FILE_UPLOAD_HISTORY_API}
+        fileUploadErrorsAPI={API_URL.VACCINATOR_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Total # of Records in the\nDIVOC Vaccinators Registry"}
     />
 }
