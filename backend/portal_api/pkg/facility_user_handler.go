@@ -17,7 +17,7 @@ func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
 	if claimBody.FacilityCode == "" {
 		return nil, errors.New("unauthorized")
 	}
-	users, err := getFacilityUsers(claimBody.FacilityCode)
+	users, err := getFacilityUsers(claimBody.FacilityCode, claimBody.PreferredUsername)
 
 	return users, err
 }
