@@ -379,9 +379,9 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	if err != nil {
 		return err
 	}
-	imageBytes, err := qrCode.PNG(-2)
+	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 350, 50, nil)
+	err = pdf.ImageByHolder(holder, 280, 50, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
@@ -587,6 +587,7 @@ func main() {
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
 	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
+	r.HandleFunc("/cert/api/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }

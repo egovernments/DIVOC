@@ -83,6 +83,7 @@ func Init() {
 	// defer db.Close()
 
 	if e != nil {
+		log.Errorf("Error %+v", e)
 		panic("failed to connect to database")
 	}
 
