@@ -21,6 +21,7 @@ import (
 )
 
 const ApiRole = "api"
+const ArogyaSetuRole = "arogyasetu"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
 const Mobile = "mobile"
@@ -32,12 +33,12 @@ type Certificate struct {
 	CredentialSubject struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
-		RefId  		string `json:"refId"`
+		RefId       string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
-		Address struct {
+		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
 			StreetAddress2 string `json:"streetAddress2"`
 			District       string `json:"district"`
@@ -59,8 +60,8 @@ type Certificate struct {
 		Date           time.Time `json:"date"`
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
-        Dose           int       `json:"dose"`
-        TotalDoses     int       `json:"totalDoses"`
+		Dose           int       `json:"dose"`
+		TotalDoses     int       `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`
@@ -255,9 +256,8 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 	return nil
 }
 
-
 func showLabelsAsPerTemplate(certificate Certificate) []string {
-	if(!isFinal(certificate)){
+	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
@@ -289,7 +289,7 @@ func isFinal(certificate Certificate) bool {
 }
 
 func templateType(certificate Certificate) string {
-	if(isFinal(certificate)){
+	if isFinal(certificate) {
 		return "config/final.pdf"
 	}
 	return "config/provisional.pdf"
@@ -298,7 +298,7 @@ func templateType(certificate Certificate) string {
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
-		log.Error("Unable to parse certificate string",err)
+		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
 
@@ -364,7 +364,7 @@ func formatFacilityAddress(certificate Certificate) string {
 }
 
 func formatRecipientAddress(certificate Certificate) string {
-	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", " + certificate.CredentialSubject.Address.AddressRegion
+	return certificate.CredentialSubject.Address.StreetAddress + "," + certificate.CredentialSubject.Address.District + ", " + certificate.CredentialSubject.Address.AddressRegion
 }
 
 func formatDate(date time.Time) string {
@@ -621,11 +621,60 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func authorize(next http.HandlerFunc) http.HandlerFunc {
+func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET PDF HANDLER REQUEST")
+	var requestBody map[string]interface{}
+	err := json.NewDecoder(r.Body).Decode(&requestBody)
+	mobile, found := requestBody[Mobile]
+	filter := map[string]interface{}{}
+	if found {
+		filter[Mobile] = map[string]interface{}{
+			"eq": mobile,
+		}
+	}
+	beneficiaryId, found := requestBody[BeneficiaryId]
+	if found {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if mobile == nil && beneficiaryId == nil {
+		log.Errorf("get certificates requested with no parameters, %v", requestBody)
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			signedJson := certificateObj["certificate"].(string)
+			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+				log.Errorf("Error in creating certificate pdf")
+			} else {
+				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+				//w.Header().Set("Content-Length", string(len(pdfBytes)))
+				w.WriteHeader(200)
+				_, _ = w.Write(pdfBytes)
+				return
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", filter)
+			w.WriteHeader(404)
+		}
+	} else {
+		log.Infof("Error %+v", err)
+	}
+}
+
+func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
 		if claimBody != nil {
-			isAuthorized := auth.AuthorizeRole([]string{ApiRole}, claimBody)
+			isAuthorized := auth.AuthorizeRole(roles, claimBody)
 			if isAuthorized {
 				next.ServeHTTP(w, r)
 				return
@@ -641,10 +690,12 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
-	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
-	r.HandleFunc("/cert/api/certificates", authorize(getCertificates)).Methods("POST")
+	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON, []string{ApiRole})).Methods("GET")
+
+	r.HandleFunc("/cert/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificate/pdf", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }
