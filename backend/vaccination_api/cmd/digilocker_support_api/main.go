@@ -540,9 +540,9 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	if err != nil {
 		return err
 	}
-	imageBytes, err := qrCode.PNG(-3)
+	imageBytes, err := qrCode.PNG(-2)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 290, 5, nil)
+	err = pdf.ImageByHolder(holder, 290, 30, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
@@ -757,7 +757,7 @@ func main() {
 	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
 	//external
 	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
