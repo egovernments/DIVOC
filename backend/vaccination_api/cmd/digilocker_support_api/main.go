@@ -431,7 +431,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		return nil, err
 	}*/
 
-	offsetX := 56.0
+	offsetX := 58.0
 	offsetY := 330.0
 	offsetNewX := 300.0
 	offsetNewY := 60.0
@@ -757,7 +757,7 @@ func main() {
 	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
 	//external
 	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
