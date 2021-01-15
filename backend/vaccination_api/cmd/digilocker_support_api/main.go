@@ -23,6 +23,7 @@ import (
 const ApiRole = "api"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
+const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
 
 type Certificate struct {
@@ -553,11 +554,52 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[0].(map[string]interface{})
-			if responseBytes, err := xml.Marshal(certificateObj); err != nil {
+			if responseBytes, err := json.Marshal(certificateObj); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
 				w.WriteHeader(200)
 				_, _ = w.Write(responseBytes)
+				return
+			}
+		}
+	}
+}
+
+func getCertificates(w http.ResponseWriter, request *http.Request) {
+	var requestBody map[string]interface{}
+	err := json.NewDecoder(request.Body).Decode(&requestBody)
+	mobile, found := requestBody[Mobile]
+	filter := map[string]interface{}{}
+	if found {
+		filter[Mobile] = map[string]interface{}{
+			"eq": mobile,
+		}
+	}
+	beneficiaryId, found := requestBody[BeneficiaryId]
+	if found {
+		filter[PreEnrollmentCode] = map[string]interface{}{
+			"eq": beneficiaryId,
+		}
+	}
+	if mobile == nil && beneficiaryId == nil {
+		log.Errorf("get certificates requested with no parameters, %v", requestBody)
+		w.WriteHeader(400)
+		return
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificates := map[string]interface{}{
+				"certificates": certificateArr,
+			}
+			if responseBytes, err := json.Marshal(certificates); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(responseBytes)
+				w.Header().Set("Content-Type", "application/json")
 				return
 			}
 		}
@@ -587,6 +629,7 @@ func main() {
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler)).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
 	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON)).Methods("GET")
+	r.HandleFunc("/cert/api/certificates", authorize(getCertificates)).Methods("POST")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
 }
