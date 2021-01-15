@@ -33,12 +33,12 @@ type Certificate struct {
 	CredentialSubject struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
-		RefId  		string `json:"refId"`
+		RefId       string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         string `json:"age"`
+		Age         string  `json:"age"`
 		Nationality string `json:"nationality"`
-		Address struct {
+		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
 			StreetAddress2 string `json:"streetAddress2"`
 			District       string `json:"district"`
@@ -60,8 +60,8 @@ type Certificate struct {
 		Date           time.Time `json:"date"`
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
-        Dose           int       `json:"dose"`
-        TotalDoses     int       `json:"totalDoses"`
+		Dose           int       `json:"dose"`
+		TotalDoses     int       `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`
@@ -256,9 +256,8 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 	return nil
 }
 
-
 func showLabelsAsPerTemplate(certificate Certificate) []string {
-	if(!isFinal(certificate)){
+	if (!isFinal(certificate)) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
@@ -337,32 +336,31 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		return nil, err
 	}*/
 	offsetX := 51.0
-    offsetY := 382.0
+	offsetY := 382.0
 
-    offsetNewX := 301.0
-    offsetNewY := 80.0
+	offsetNewX := 301.0
+	offsetNewY := 80.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplate(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
-    for i = 0; i < rowSize; i++ {
+	for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*50.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
-    pdf.SetX(offsetX)
-    pdf.SetY(offsetY + float64(i)*44.0)
-    pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
+	pdf.SetX(offsetX)
+	pdf.SetY(offsetY + float64(i)*44.0)
+	pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
 
-    for i = rowSize ; i < len(displayLabels); i++ {
+	for i = rowSize; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY + float64(i)*50.0)
 		pdf.Cell(nil, displayLabels[i])
 	}
-    pdf.SetX(offsetNewX)
-    pdf.SetY(offsetNewY + float64(i)*47)
-    pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
-
+	pdf.SetX(offsetNewX)
+	pdf.SetY(offsetNewY + float64(i)*47)
+	pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
 	if e != nil {
@@ -378,18 +376,39 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 }
 
 func formatFacilityAddress(certificate Certificate) string {
-	return certificate.Evidence[0].Facility.Name + ", " + certificate.Evidence[0].Facility.Address.District + ", "
+	return concatenateReadableString(certificate.Evidence[0].Facility.Name,
+		certificate.Evidence[0].Facility.Address.District)
 }
 
 func formatRecipientAddress(certificate Certificate) string {
-	return certificate.CredentialSubject.Address.StreetAddress + "," +  certificate.CredentialSubject.Address.District + ", "
+	return concatenateReadableString(certificate.CredentialSubject.Address.StreetAddress,
+		certificate.CredentialSubject.Address.District)
 }
 
+func concatenateReadableString(a string, b string) string {
+	address := ""
+	address = appendCommaIfNotEmpty(address, a)
+	address = appendCommaIfNotEmpty(address, b)
+	if len(address) > 0 {
+		return address
+	}
+	return "NA"
+}
+
+func appendCommaIfNotEmpty(address string, suffix string) string {
+	if len(strings.TrimSpace(address)) > 0 {
+		if len(strings.TrimSpace(suffix)) > 0 {
+			return address + ", " + suffix
+		} else {
+			return address
+		}
+	}
+	return suffix
+}
 
 func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
 }
-
 
 func formatId(identity string) string {
 	split := strings.Split(identity, ":")
@@ -397,23 +416,26 @@ func formatId(identity string) string {
 	if strings.Contains(identity, "aadhaar") {
 		return "Aadhaar # XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
 	}
-	if strings.Contains(identity,"driverlicense"){
+	if strings.Contains(identity, "Driving") {
 		return "Driver’s License # " + lastFragment
 	}
-	if strings.Contains(identity,"MNREGA"){
+	if strings.Contains(identity, "MNREGA") {
 		return "MNREGA Job Card # " + lastFragment
 	}
-	if strings.Contains(identity,"pan"){
+	if strings.Contains(identity, "PAN") {
 		return "PAN Card # " + lastFragment
 	}
-	if strings.Contains(identity,"passbook"){
+	if strings.Contains(identity, "Passbooks") {
 		return "Passbook # " + lastFragment
 	}
-	if strings.Contains(identity,"passport"){
+	if strings.Contains(identity, "Passport") {
 		return "Passport # " + lastFragment
 	}
-	if strings.Contains(identity,"pension"){
+	if strings.Contains(identity, "Pension") {
 		return "Pension Document # " + lastFragment
+	}
+	if strings.Contains(identity, "Voter") {
+		return "Voter ID # " + lastFragment
 	}
 	return lastFragment
 }
@@ -554,6 +576,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 		}
 	} else {
 		log.Errorf("No certificates found for request %v", filter)
+		w.WriteHeader(500)
 	}
 }
 
