@@ -694,7 +694,7 @@ func main() {
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", getPDFHandler).Methods("GET")
 	r.HandleFunc("/certificateJSON", authorize(getCertificateJSON, []string{ApiRole})).Methods("GET")
 
-	r.HandleFunc("/cert/external/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
