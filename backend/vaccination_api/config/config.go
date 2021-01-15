@@ -76,6 +76,6 @@ var Config = struct {
 	Digilocker struct {
 		AuthKeyName string `env:"DIGILOCKER_AUTHKEYNAME" default:"x-digilocker-hmac"`
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
-		DocType     string `env:DIGILOCKER_DOCTYPE`
+		DocType     string `env:"DIGILOCKER_DOCTYPE"`
 	}
 }{}

@@ -5,7 +5,7 @@ const vaccinationContext = {
     "id": "@id",
     "type": "@type",
     "schema": "https://schema.org/",
-    "vac": "https://cowin.mofw.gov.in/credentials/vaccination/v1",
+    "vac": "https://cowin.gov.in/credentials/vaccination/v1",
     "ProofOfVaccinationCredential":{
       "@id": "schema:ProofOfVaccinationCredential",
       "@context": {

@@ -1,6 +1,6 @@
 {
   "name": "vaccination-context",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Vaccination context for verifiable certificate",
   "main": "vaccination-context.js",
   "scripts": {
