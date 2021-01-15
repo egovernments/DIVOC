@@ -165,7 +165,7 @@ type FacilityUserResponse struct {
 	Enabled    bool                   `json:"enabled"`
 }
 
-func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
+func getFacilityUsers(facilityCode string, username string) ([]*models.FacilityUser, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/facility/" + facilityCode + "/users"
 	log.Info("Checking with keycloak for facility code mapping ", facilityCode)
@@ -179,7 +179,7 @@ func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
 	if err := resp.ToJSON(&responseObject); err == nil {
 		var facilityUsers []*models.FacilityUser
 		for _, user := range responseObject {
-			if !isFacilityAdmin(user) {
+			if username != user.UserName {
 				var employeeId, fullName, mobileNumber string
 				if v, ok := user.Attributes["employee_id"]; ok {
 					employeeId = v.([]interface{})[0].(string)
