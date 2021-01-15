@@ -542,7 +542,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	}
 	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 280, 30, nil)
+	err = pdf.ImageByHolder(holder, 290, 5, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
