@@ -163,6 +163,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
 	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
 	if e != nil {
+		log.Errorf("Error in verifying request signature")
 		w.WriteHeader(500)
 		_, _ = w.Write([]byte("Error in verifying request signature"))
 		return
@@ -212,6 +213,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			w.WriteHeader(500)
 		}
 	} else {
+		log.Errorf("Unauthorized access")
 		w.WriteHeader(401)
 		_, _ = w.Write([]byte("Unauthorized"))
 	}
@@ -246,6 +248,8 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 			cert.Uri = "in.gov.covin-DPMLC-" + cert.certificateId
 			cert.signedJson = certificateObj["certificate"].(string)
 			return &cert
+		} else {
+			log.Errorf("No certificates found for req %v", preEnrollmentCode)
 		}
 	}
 	return nil
@@ -294,7 +298,7 @@ func templateType(certificate Certificate) string {
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	var certificate Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
-		log.Error(err)
+		log.Error("Unable to parse certificate string",err)
 		return nil, err
 	}
 
@@ -344,6 +348,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
 	if e != nil {
+		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
 	}
 
@@ -378,6 +383,7 @@ func formatId(identity string) string {
 func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	qrCode, err := qrcode.New(certificateText, qrcode.Medium)
 	if err != nil {
+		log.Errorf("Error in creating QR Code Object", err)
 		return err
 	}
 	imageBytes, err := qrCode.PNG(-2)
@@ -491,6 +497,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 */
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET PDF HANDLER REQUEST")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
@@ -512,6 +519,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 				return
 			}
 		} else {
+			log.Errorf("No certificates found for request %v", preEnrollmentCode)
 			w.WriteHeader(404)
 		}
 	} else {
@@ -530,6 +538,7 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 }
 
 func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATE JSON REQUEST")
 	urlParams := request.URL.Query()
 	filter := map[string]interface{}{}
 	preEnrollmentCode := urlParams.Get(PreEnrollmentCode)
@@ -545,6 +554,7 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 		}
 	}
 	if beneficiaryId == "" && preEnrollmentCode == "" {
+		log.Errorf("Get certificates json doesnt contain required fields %v", urlParams.Encode())
 		w.WriteHeader(400)
 		return
 	}
@@ -562,10 +572,13 @@ func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
 				return
 			}
 		}
+	} else {
+		log.Errorf("No certificates found for request %v", filter)
 	}
 }
 
 func getCertificates(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
 	var requestBody map[string]interface{}
 	err := json.NewDecoder(request.Body).Decode(&requestBody)
 	mobile, found := requestBody[Mobile]
@@ -603,6 +616,8 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 				return
 			}
 		}
+	} else {
+		log.Errorf("No certificates found for request %v", filter)
 	}
 }
 
