@@ -24,6 +24,7 @@ const ApiRole = "api"
 const ArogyaSetuRole = "arogyasetu"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
+const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
 
@@ -137,6 +138,44 @@ type PullURIResponse struct {
 	} `xml:"DocDetails"`
 }
 
+
+type PullDocRequest struct {
+	XMLName    xml.Name `xml:"PullDocRequest"`
+	Text       string   `xml:",chardata"`
+	Ns2        string   `xml:"ns2,attr"`
+	Ver        string   `xml:"ver,attr"`
+	Ts         string   `xml:"ts,attr"`
+	Txn        string   `xml:"txn,attr"`
+	OrgId      string   `xml:"orgId,attr"`
+	Format     string   `xml:"format,attr"`
+	DocDetails struct {
+		Text         string `xml:",chardata"`
+		URI          string `xml:"URI"`
+		DigiLockerId string `xml:"DigiLockerId"`
+		UID          string `xml:"UID"`
+		FullName     string `xml:"FullName"`
+		DOB          string `xml:"DOB"`
+	} `xml:"DocDetails"`
+}
+
+type PullDocResponse struct {
+	XMLName        xml.Name `xml:"PullDocResponse"`
+	Text           string   `xml:",chardata"`
+	Ns2            string   `xml:"ns2,attr"`
+	ResponseStatus struct {
+		Text   string `xml:",chardata"`
+		Status string `xml:"Status,attr"`
+		Ts     string `xml:"ts,attr"`
+		Txn    string `xml:"txn,attr"`
+	} `xml:"ResponseStatus"`
+	DocDetails struct {
+		Text        string `xml:",chardata"`
+		DocContent  string `xml:"DocContent"`
+		DataContent string `xml:"DataContent"`
+	} `xml:"DocDetails"`
+}
+
+
 func ValidMAC(message string, messageMAC, key []byte) bool {
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(message))
@@ -145,28 +184,60 @@ func ValidMAC(message string, messageMAC, key []byte) bool {
 	if log.IsLevelEnabled(log.InfoLevel) {
 		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
 	}
-	return hmac.Equal(messageMAC, hexMac)
+	return !hmac.Equal(messageMAC, hexMac)
 }
-func uriRequest(w http.ResponseWriter, req *http.Request) {
-	log.Info("Got request ")
-	for name, values := range req.Header {
-		for _, value := range values {
-			log.Infof("%s:%s", name, value)
+
+func docRequest(w http.ResponseWriter, req *http.Request) {
+	log.Info("Got document request ")
+	requestBuffer, requestString, hmacSignByteArray, done := preProcessRequest(req, w)
+	if done {
+		return
+	}
+
+	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
+		xmlRequest := PullDocRequest{}
+		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
+			log.Errorf("Error in marshalling request from the digilocker %+v", err)
+		} else {
+
+			response := PullDocResponse{}
+			response.ResponseStatus.Ts = xmlRequest.Ts
+			response.ResponseStatus.Txn = xmlRequest.Txn
+			response.ResponseStatus.Status = "0"
+			certBundle := getCertificateByUri(xmlRequest.DocDetails.URI, xmlRequest.DocDetails.DOB)
+			if certBundle != nil {
+				response.ResponseStatus.Status = "1"
+				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
+					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
+						log.Errorf("Error in creating certificate pdf %+v", err)
+					} else {
+						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+					}
+				}
+				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
+					certificateId := certBundle.certificateId
+					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
+					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
+				}
+
+			}
+			if responseBytes, err := xml.Marshal(response); err != nil {
+				log.Errorf("Error while serializing xml")
+			} else {
+				w.Header().Set("Content-Type", "application/xml")
+				w.WriteHeader(200)
+
+				_, _ = w.Write(responseBytes)
+				return
+			}
+			w.WriteHeader(500)
 		}
 	}
-	requestBuffer := make([]byte, 2048)
-	n, _ := req.Body.Read(requestBuffer)
-	requestString := string(requestBuffer[:n])
-	log.Infof("Read %d bytes ", n)
-	println(requestString)
-	log.Infof("Request body %s", requestString)
+}
 
-	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
-	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
-	if e != nil {
-		log.Errorf("Error in verifying request signature")
-		w.WriteHeader(500)
-		_, _ = w.Write([]byte("Error in verifying request signature"))
+func uriRequest(w http.ResponseWriter, req *http.Request) {
+	requestBuffer, requestString, hmacSignByteArray, done := preProcessRequest(req, w)
+	if done {
 		return
 	}
 
@@ -221,6 +292,30 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 
 }
 
+func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string, []byte, bool) {
+	log.Info("Got request ")
+	for name, values := range req.Header {
+		for _, value := range values {
+			log.Infof("%s:%s", name, value)
+		}
+	}
+	requestBuffer := make([]byte, 2048)
+	n, _ := req.Body.Read(requestBuffer)
+	requestString := string(requestBuffer[:n])
+	log.Infof("Read %d bytes ", n)
+	println(requestString)
+	log.Infof("Request body %s", requestString)
+	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
+	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
+	if e != nil {
+		log.Errorf("Error in verifying request signature")
+		w.WriteHeader(500)
+		_, _ = w.Write([]byte("Error in verifying request signature"))
+		return nil, "", nil, true
+	}
+	return requestBuffer, requestString, hmacSignByteArray, false
+}
+
 type VaccinationCertificateBundle struct {
 	certificateId string
 	Uri           string
@@ -228,21 +323,23 @@ type VaccinationCertificateBundle struct {
 	pdf           []byte
 }
 
+func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
+	slice := strings.Split(uri, "-")
+	certificateId := slice[len(slice)-1]
+	certificateFromRegistry, err := getCertificateFromRegistryByCertificateId(certificateId)
+	return returnLatestCertificate(err, certificateFromRegistry, certificateId)
+}
+
 func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
-	/* filter := map[string]interface{}{
-		"name": map[string]interface{}{
-			"eq": fullName,
-		},
-		"mobile": map[string]interface{}{
-			"eq": phoneNumber,
-		},
-	}  */
-	//certificateFromRegistry, err := fetchCertificateFromRegistry(filter)
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
+	return returnLatestCertificate(err, certificateFromRegistry, preEnrollmentCode)
+}
+
+func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[0].(map[string]interface{})
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
 			var cert VaccinationCertificateBundle
 			cert.certificateId = certificateObj["certificateId"].(string)
@@ -250,7 +347,7 @@ func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificat
 			cert.signedJson = certificateObj["certificate"].(string)
 			return &cert
 		} else {
-			log.Errorf("No certificates found for req %v", preEnrollmentCode)
+			log.Errorf("No certificates found for req %v", referenceId)
 		}
 	}
 	return nil
@@ -485,6 +582,17 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getCertificateFromRegistryByCertificateId(certificateId string) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		CertificateId: map[string]interface{}{
+			"eq": certificateId,
+		},
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	return certificateFromRegistry, err
+}
+
+
 func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
 		PreEnrollmentCode: map[string]interface{}{
@@ -649,6 +757,7 @@ func main() {
 	r := mux.NewRouter()
 	//integration
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
+	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
