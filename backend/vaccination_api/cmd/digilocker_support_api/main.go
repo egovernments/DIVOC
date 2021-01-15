@@ -541,6 +541,10 @@ func formatId(identity string) string {
 
 func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	buf, err := compress(certificateText)
+	if err != nil {
+		log.Error("Error compressing certificate data", err)
+		return err
+	}
 	qrCode, err := qrcode.New(buf.String(), qrcode.Medium)
 	if err != nil {
 		return err
@@ -558,20 +562,19 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 func decompress(buf *bytes.Buffer, err error, ) {
 	r, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
 	if err != nil {
-		log.Fatal(err)
+		log.Error(err)
 	}
 	for _, f := range r.File {
-		log.Printf("Contents of %s:\n", f.Name)
+		log.Infof("Contents of %s:\n", f.Name)
 		rc, err := f.Open()
 		if err != nil {
-			log.Fatal(err)
+			log.Error(err)
 		}
 		_, err = io.CopyN(os.Stdout, rc, int64(buf.Len()))
 		if err != nil {
 			log.Fatal(err)
 		}
 		rc.Close()
-		log.Println()
 	}
 }
 
