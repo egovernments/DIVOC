@@ -7,6 +7,7 @@ import {SyncFacade} from "../SyncFacade";
 import {useKeycloak} from "@react-keycloak/web";
 import * as PropTypes from "prop-types";
 import {AuthSafeComponent} from "../utils/keycloak";
+import {Messages} from "../Base/Constants";
 
 function AuthSafeLogout({keycloak}) {
     return <BaseCard>
@@ -18,6 +19,11 @@ function AuthSafeLogout({keycloak}) {
                     .then((value => {
                         keycloak.logout();
                     }))
+                    .catch(e => {
+                        if (!navigator.onLine) {
+                            alert(Messages.NO_INTERNET_CONNECTION)
+                        }
+                    })
             }}>Logout</Button>{" "}
         </div>
     </BaseCard>;

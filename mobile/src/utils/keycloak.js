@@ -2,6 +2,7 @@ import Keycloak from 'keycloak-js';
 import config from "../config"
 import React from "react";
 import {useKeycloak} from "@react-keycloak/web";
+import {Messages} from "../Base/Constants";
 
 const keycloak = Keycloak(config.urlPath + '/keycloak.json');
 
@@ -65,10 +66,10 @@ export function WithoutKeyCloakComponent({children}) {
             keycloak: {
                 authenticated: true,
                 login: function (path) {
-                    alert("Failed to login.No internet connection found. Please check your connectivity")
+                    alert(Messages.NO_INTERNET_CONNECTION)
                 },
                 logout: function () {
-                    alert("Failed to logout.No internet connection found. Please check your connectivity")
+                    alert(Messages.NO_INTERNET_CONNECTION)
                 },
                 hasResourceRole: function () {
                     return true
