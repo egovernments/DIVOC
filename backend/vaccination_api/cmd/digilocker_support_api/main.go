@@ -186,7 +186,7 @@ func ValidMAC(message string, messageMAC, key []byte) bool {
 	if log.IsLevelEnabled(log.InfoLevel) {
 		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
 	}
-	return !hmac.Equal(messageMAC, hexMac)
+	return hmac.Equal(messageMAC, hexMac)
 }
 
 func docRequest(w http.ResponseWriter, req *http.Request) {
@@ -280,6 +280,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			if responseBytes, err := xml.Marshal(response); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
+				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(200)
 				_, _ = w.Write(responseBytes)
 				return
