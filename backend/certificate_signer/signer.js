@@ -12,6 +12,9 @@ const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials.json');
 const {vaccinationContext} = require("vaccination-context");
 
+const UNSUCCESSFUL = "UNSUCCESSFUL";
+const DUPLICATE_MSG = "duplicate key value violates unique constraint";
+
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,
   id: 'did:india',
@@ -153,7 +156,7 @@ function transformW3(cert, certificateId) {
   return certificateFromTemplate;
 }
 
-async function signAndSave(certificate) {
+async function signAndSave(certificate, retryCount = 0) {
   const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
@@ -170,7 +173,17 @@ async function signAndSave(certificate) {
     certificate: JSON.stringify(signedCertificate),
     meta: certificate["meta"]
   };
-  return registry.saveCertificate(signedCertificateForDB)
+  const resp = await registry.saveCertificate(signedCertificateForDB);
+  if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
+    if (retryCount <= config.CERTIFICATE_RETRY_COUNT) {
+      console.error("Duplicate certificate id found, retrying attempt " + retryCount + " of " + config.CERTIFICATE_RETRY_COUNT);
+      return await signAndSave(certificate, retryCount + 1)
+    } else {
+      console.error("Max retry attempted");
+      throw new Error(resp.data.params.errmsg)
+    }
+  }
+  return resp;
 }
 
 function getContactNumber(contact) {
