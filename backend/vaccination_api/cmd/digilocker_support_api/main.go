@@ -707,7 +707,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 			"eq": beneficiaryId,
 		}
 	}
-	if mobile == nil && beneficiaryId == nil {
+	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
 		return
@@ -752,7 +752,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 			"eq": beneficiaryId,
 		}
 	}
-	if mobile == nil && beneficiaryId == nil {
+	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
 		return
