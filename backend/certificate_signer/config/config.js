@@ -1,5 +1,5 @@
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
-const KAFKA_CONSUMER_SESSION_TIMEOUT = 300000; // in ms
+const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
 const CERTIFY_TOPIC = 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
 const CERTIFIED_TOPIC = 'certified';
