@@ -11,8 +11,10 @@ const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const {credentialsv1} = require('./credentials.json');
 const {vaccinationContext} = require("vaccination-context");
+const redis = require('./redis');
 
 const UNSUCCESSFUL = "UNSUCCESSFUL";
+const SUCCESSFUL = "SUCCESSFUL";
 const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 const publicKey = {
@@ -182,6 +184,9 @@ async function signAndSave(certificate, retryCount = 0) {
       console.error("Max retry attempted");
       throw new Error(resp.data.params.errmsg)
     }
+  }
+  if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
+    redis.storeKeyWithExpiry(preEnrollmentCode, certificateId)
   }
   return resp;
 }

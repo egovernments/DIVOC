@@ -1,5 +1,5 @@
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
-const KAFKA_CONSUMER_SESSION_TIMEOUT = 300000; // in ms
+const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
 const CERTIFY_TOPIC = 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
 const CERTIFIED_TOPIC = 'certified';
@@ -8,6 +8,8 @@ const SMS_GATEWAY_URL = 'https://api.msg91.com/api/v2/sendsms';
 const ENABLE_SMS_NOTIFICATION = false;
 const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMENT || true;
 const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
+const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
+const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
 module.exports = {
   KAFKA_BOOTSTRAP_SERVER,
   CERTIFY_TOPIC,
@@ -18,5 +20,7 @@ module.exports = {
   ENABLE_CERTIFY_ACKNOWLEDGEMENT,
   ERROR_CERTIFICATE_TOPIC,
   CERTIFICATE_RETRY_COUNT,
-  KAFKA_CONSUMER_SESSION_TIMEOUT
+  KAFKA_CONSUMER_SESSION_TIMEOUT,
+  REDIS_URL,
+  REDIS_KEY_EXPIRE
 };
