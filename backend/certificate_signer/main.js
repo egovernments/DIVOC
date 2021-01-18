@@ -2,7 +2,6 @@ const { Kafka } = require('kafkajs');
 const config = require('./config/config');
 const signer = require('./signer');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
-const redis = require('./redis');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -34,37 +33,27 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
       let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
       try {
         jsonMessage = JSON.parse(message.value.toString());
-        const preEnrollmentCode = jsonMessage.preEnrollmentCode;
-        const isSigned = await redis.checkIfKeyExists(preEnrollmentCode);
-        if (!isSigned) {
-          await signer.signAndSave(jsonMessage)
-            .then(res => {
-              console.log(`statusCode: ${res.status}`);
-              console.log(res);
-              let errMsg;
-              if (res.status === 200) {
-                sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
-                producer.send({
-                  topic: config.CERTIFIED_TOPIC,
-                  messages: [{key: null, value: message.value.toString()}]
-                });
-              } else {
-                errMsg = "error occurred while signing/saving of certificate - " + res.status;
-                sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
-              }
-            })
-            .catch(error => {
-              console.error(error)
-              sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
-              throw error
-            });
-        } else {
-          console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
-          await producer.send({
-            topic: config.ERROR_CERTIFICATE_TOPIC,
-            messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: "Duplicate pre-enrollment code"})}]
+        await signer.signAndSave(jsonMessage)
+          .then(res => {
+            console.log(`statusCode: ${res.status}`);
+            console.log(res);
+            let errMsg;
+            if (res.status === 200) {
+              sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
+              producer.send({
+                topic: config.CERTIFIED_TOPIC,
+                messages: [{key: null, value: message.value.toString()}]
+              });
+            } else {
+              errMsg = "error occurred while signing/saving of certificate - " + res.status;
+              sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
+            }
+          })
+          .catch(error => {
+            console.error(error)
+            sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
+            throw error
           });
-        }
       } catch (e) {
         console.error("ERROR: " + e.message)
         await producer.send({
