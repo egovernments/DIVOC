@@ -10,6 +10,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/kernel_library/services"
@@ -31,6 +32,12 @@ const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
+
+
+type ErrorResponse struct {
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -704,11 +711,6 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 	err := json.NewDecoder(request.Body).Decode(&requestBody)
 	mobile, found := requestBody[Mobile]
 	filter := map[string]interface{}{}
-	if found {
-		filter[Mobile] = map[string]interface{}{
-			"eq": mobile,
-		}
-	}
 	beneficiaryId, found := requestBody[BeneficiaryId]
 	if found {
 		filter[PreEnrollmentCode] = map[string]interface{}{
@@ -725,17 +727,40 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificates := map[string]interface{}{
-				"certificates": certificateArr,
+			certificatesForThisMobile := []map[string]interface{}{}
+			for i:=0; i<len(certificateArr); i++ {
+				certificateObj := certificateArr[i].(map[string]interface{})
+				if certificateObj["mobile"] == mobile {
+					certificatesForThisMobile = append(certificatesForThisMobile, certificateObj)
+				}
 			}
-			if responseBytes, err := json.Marshal(certificates); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(responseBytes)
-				w.Header().Set("Content-Type", "application/json")
-				return
+			if len(certificatesForThisMobile) > 0 {
+				certificates := map[string]interface{}{
+					"certificates": certificatesForThisMobile,
+				}
+				if responseBytes, err := json.Marshal(certificates); err != nil {
+					log.Errorf("Error while serializing xml")
+				} else {
+					w.WriteHeader(200)
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write(responseBytes)
+					return
+				}
+			} else { //no certificate found for this mobile --
+				errorResponse := ErrorResponse{
+					Status:  "not_found",
+					Message: "Mobile number is not matching for the given beneficiary Id",
+				}
+				writeResponse(w, 404, errorResponse)
 			}
+		} else {
+			log.Errorf("No certificates found for request %v", filter)
+			payload := fmt.Sprintf(`No certificate found for the given beneficiary Id %s`, beneficiaryId)
+			errorResponse := ErrorResponse{
+				Status:  "not_found",
+				Message: payload,
+			}
+			writeResponse(w, 404, errorResponse)
 		}
 	} else {
 		log.Errorf("No certificates found for request %v", filter)
@@ -749,11 +774,6 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	mobile, found := requestBody[Mobile]
 	filter := map[string]interface{}{}
-	if found {
-		filter[Mobile] = map[string]interface{}{
-			"eq": mobile,
-		}
-	}
 	beneficiaryId, found := requestBody[BeneficiaryId]
 	if found {
 		filter[PreEnrollmentCode] = map[string]interface{}{
@@ -772,23 +792,52 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
-			signedJson := certificateObj["certificate"].(string)
-			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
-				log.Errorf("Error in creating certificate pdf")
-			} else {
-				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
-				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-				//w.Header().Set("Content-Length", string(len(pdfBytes)))
-				w.WriteHeader(200)
-				_, _ = w.Write(pdfBytes)
+			mobileOnCert := certificateObj["mobile"].(string)
+			if mobile != mobileOnCert {
+				statusCode := 404
+				payload := ErrorResponse{
+					Status:  "not_found",
+					Message: `Mobile number is not matching for the given beneficiary Id`,
+				}
+				writeResponse(w, statusCode, payload)
 				return
+			} else {
+				signedJson := certificateObj["certificate"].(string)
+				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+					log.Errorf("Error in creating certificate pdf")
+				} else {
+					//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+					//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+					//w.Header().Set("Content-Length", string(len(pdfBytes)))
+					w.WriteHeader(200)
+					_, _ = w.Write(pdfBytes)
+					return
+				}
 			}
 		} else {
 			log.Errorf("No certificates found for request %v", filter)
-			w.WriteHeader(404)
+			payload := fmt.Sprintf(`No certificate found for the given beneficiary Id %s`, beneficiaryId)
+			errorResponse := ErrorResponse{
+				Status:  "not_found",
+				Message: payload,
+			}
+			writeResponse(w, 404, errorResponse)
 		}
 	} else {
 		log.Infof("Error %+v", err)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, statusCode int, payload ErrorResponse) {
+
+	if payloadBytes, err := json.Marshal(payload); err == nil {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(statusCode)
+		_, _ = w.Write(payloadBytes)
+	} else {
+		log.Errorf("Error in converting response to json %+v", err)
+		w.WriteHeader(500)
+		_, _ = w.Write([]byte("Internal error"))
 	}
 }
 
