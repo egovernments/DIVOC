@@ -947,4 +947,5 @@ func initializeKafka() {
 		panic(err)
 	}
 	kafkaService.StartEventProducer(producer)
+	kafkaService.LogProducerEvents(producer)
 }
