@@ -110,6 +110,7 @@ type PullURIRequest struct {
 		DOB          string `xml:"DOB"`
 		Photo        string `xml:"Photo"`
 		TrackingId   string `xml:"tracking_id"`
+		Mobile       string `xml:"Mobile"`
 		UDF1         string `xml:"UDF1"`
 		UDF2         string `xml:"UDF2"`
 		UDF3         string `xml:"UDF3"`
@@ -135,6 +136,7 @@ type PullURIResponse struct {
 		FullName     string `xml:"FullName"`
 		DOB          string `xml:"DOB"`
 		TrackingId   string `xml:"tracking_id"`
+		Mobile       string `xml:"Mobile"`
 		UDF1         string `xml:"UDF1"`
 		URI          string `xml:"URI"`
 		DocContent   string `xml:"DocContent"`
@@ -178,7 +180,11 @@ type PullDocResponse struct {
 	} `xml:"DocDetails"`
 }
 
-func ValidMAC(message string, messageMAC, key []byte) bool {
+func ValidMAC(message string, messageMAC [] byte, keyString string) bool {
+	if keyString == "ignore" {
+		return true
+	}
+	key := ([]byte)(keyString)
 	mac := hmac.New(sha256.New, key)
 	mac.Write([]byte(message))
 	expectedMAC := mac.Sum(nil)
@@ -196,7 +202,7 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
+	if ValidMAC(requestString, hmacSignByteArray, config.Config.Digilocker.AuthHMACKey) {
 		xmlRequest := PullDocRequest{}
 		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
 			log.Errorf("Error in marshalling request from the digilocker %+v", err)
@@ -243,7 +249,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
+	if ValidMAC(requestString, hmacSignByteArray, config.Config.Digilocker.AuthHMACKey) {
 
 		xmlRequest := PullURIRequest{}
 		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
@@ -259,8 +265,8 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
-			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB)
-			if certBundle != nil {
+			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB, xmlRequest.DocDetails.Mobile)
+			if certBundle != nil && certBundle.mobile == xmlRequest.DocDetails.Mobile {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
@@ -323,7 +329,7 @@ type VaccinationCertificateBundle struct {
 	certificateId string
 	Uri           string
 	signedJson    string
-	pdf           []byte
+	mobile    string
 }
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
@@ -333,7 +339,7 @@ func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 	return returnLatestCertificate(err, certificateFromRegistry, certificateId)
 }
 
-func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
+func getCertificate(preEnrollmentCode string, dob string, mobile string) *VaccinationCertificateBundle {
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	return returnLatestCertificate(err, certificateFromRegistry, preEnrollmentCode)
 }
@@ -348,6 +354,7 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 			cert.certificateId = certificateObj["certificateId"].(string)
 			cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
 			cert.signedJson = certificateObj["certificate"].(string)
+			cert.mobile = certificateObj["mobile"].(string)
 			return &cert
 		} else {
 			log.Errorf("No certificates found for req %v", referenceId)
