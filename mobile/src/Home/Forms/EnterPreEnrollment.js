@@ -1,22 +1,13 @@
-import {FormCard} from "../../Base/Base";
 import {Button} from "react-bootstrap";
 import React, {useState} from "react";
 import {FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from "./PreEnrollmentFlow";
-import InputGroup from "react-bootstrap/InputGroup";
 import Form from "react-bootstrap/Form";
 import {PHONE_NUMBER_MAX} from "../../Login/EnterPhoneNumberComponent";
 import "./EnterPreEnrollment.scss"
 import {BaseFormCard} from "../../components/BaseFormCard";
 
 export function PreEnrollmentCode(props) {
-    const {goBack} = usePreEnrollment()
-    // return (
-    //     <FormCard onBack={() => {
-    //         goBack()
-    //     }} content={<EnterPreEnrollmentContent/>} title={"Verify Recipient"}/>
-    // );
     return (
-
         <BaseFormCard title={"Verify Recipient"}>
             <EnterPreEnrollmentContent/>
         </BaseFormCard>

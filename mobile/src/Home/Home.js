@@ -9,7 +9,6 @@ import vaccineBanner from "../assets/img/home-banner.svg"
 import enrollRecipient from "./enroll_recipient.png"
 import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
-import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
 import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";

@@ -4,7 +4,6 @@ import {BaseCard} from "../Base/Base";
 import "./Logout.scss"
 import {appIndexDb} from "../AppDatabase";
 import {SyncFacade} from "../SyncFacade";
-import {useKeycloak} from "@react-keycloak/web";
 import * as PropTypes from "prop-types";
 import {AuthSafeComponent} from "../utils/keycloak";
 import {Messages} from "../Base/Constants";

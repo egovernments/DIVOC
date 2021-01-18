@@ -25,7 +25,9 @@ function App({keycloak, initialized}) {
                 }
             }
         }
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
+
     if (!initialized || !isDBInit) {
         return <div>Loading...</div>
     }

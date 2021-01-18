@@ -1,21 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.scss';
-import App, {FacilityApp} from './App';
+import {FacilityApp} from './App';
 import * as serviceWorkerRegistration from './serviceWorkerRegistration';
 import reportWebVitals from './reportWebVitals';
-import {ReactKeycloakProvider} from '@react-keycloak/web'
-import keycloak from "./utils/keycloak";
-import {LocaleProvider} from "./lang/LocaleContext";
 
 ReactDOM.render(
     <React.StrictMode>
         <FacilityApp/>
-        {/*<ReactKeycloakProvider
-            authClient={keycloak}
-            initOptions={{"checkLoginIframe": false}}>
-
-        </ReactKeycloakProvider>*/}
     </React.StrictMode>,
     document.getElementById('root')
 );
