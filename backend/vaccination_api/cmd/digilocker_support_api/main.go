@@ -12,12 +12,16 @@ import (
 	"encoding/xml"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
+	"github.com/divoc/api/pkg/models"
+	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
 	"github.com/gorilla/mux"
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
 	"net/http"
 	"os"
@@ -32,7 +36,12 @@ const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
-
+const DigilockerSuccessEvent = "digilocker-success"
+const DigilockerFailedEvent = "digilocker-failed"
+const InternalSuccessEvent = "internal-success"
+const InternalFailedEvent = "internal-failed"
+const ExternalSuccessEvent = "external-success"
+const ExternalFailedEvent = "external-failed"
 
 type ErrorResponse struct {
 	Status  string `json:"status"`
@@ -225,6 +234,13 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
 					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
 						log.Errorf("Error in creating certificate pdf %+v", err)
+						go kafkaService.PublishEvent(models.Event{
+							Date:          time.Time{},
+							Source:        "" + xmlRequest.DocDetails.URI,
+							TypeOfMessage: "internal_error",
+							ExtraInfo:     nil,
+						})
+						w.WriteHeader(500)
 					} else {
 						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
 					}
@@ -235,10 +251,23 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
 
+			} else {
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        xmlRequest.DocDetails.URI,
+					TypeOfMessage: DigilockerFailedEvent,
+					ExtraInfo:     "Certificate not found",
+				})
 			}
 			if responseBytes, err := xml.Marshal(response); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        xmlRequest.DocDetails.URI,
+					TypeOfMessage: DigilockerSuccessEvent,
+					ExtraInfo:     "Certificate found",
+				})
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(200)
 
@@ -247,6 +276,16 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 			}
 			w.WriteHeader(500)
 		}
+	} else {
+		log.Errorf("Unauthorized access")
+		w.WriteHeader(401)
+		_, _ = w.Write([]byte("Unauthorized"))
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: DigilockerFailedEvent,
+			ExtraInfo:     "invalid hmac",
+		})
 	}
 }
 
@@ -289,10 +328,23 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
 
+			} else {
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        xmlRequest.DocDetails.TrackingId,
+					TypeOfMessage: DigilockerFailedEvent,
+					ExtraInfo:     "Certificate not found",
+				})
 			}
 			if responseBytes, err := xml.Marshal(response); err != nil {
 				log.Errorf("Error while serializing xml")
 			} else {
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        xmlRequest.DocDetails.TrackingId,
+					TypeOfMessage: DigilockerSuccessEvent,
+					ExtraInfo:     "Certificate found",
+				})
 				w.Header().Set("Content-Type", "application/xml")
 				w.WriteHeader(200)
 				_, _ = w.Write(responseBytes)
@@ -304,6 +356,12 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 		log.Errorf("Unauthorized access")
 		w.WriteHeader(401)
 		_, _ = w.Write([]byte("Unauthorized"))
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: DigilockerFailedEvent,
+			ExtraInfo:     "Invalid hmac",
+		})
 	}
 
 }
@@ -327,6 +385,12 @@ func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string
 		log.Errorf("Error in verifying request signature")
 		w.WriteHeader(500)
 		_, _ = w.Write([]byte("Error in verifying request signature"))
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: DigilockerFailedEvent,
+			ExtraInfo:     "invalid hmac signature",
+		})
 		return nil, "", nil, true
 	}
 	return requestBuffer, requestString, hmacSignByteArray, false
@@ -336,7 +400,7 @@ type VaccinationCertificateBundle struct {
 	certificateId string
 	Uri           string
 	signedJson    string
-	mobile    string
+	mobile        string
 }
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
@@ -634,6 +698,12 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 				//w.Header().Set("Content-Length", string(len(pdfBytes)))
 				w.WriteHeader(200)
 				_, _ = w.Write(pdfBytes)
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        preEnrollmentCode,
+					TypeOfMessage: InternalSuccessEvent,
+					ExtraInfo:     "Certificate found",
+				})
 				return
 			}
 		} else {
@@ -643,6 +713,12 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Infof("Error %+v", err)
 	}
+	go kafkaService.PublishEvent(models.Event{
+		Date:          time.Now(),
+		Source:        preEnrollmentCode,
+		TypeOfMessage: InternalFailedEvent,
+		ExtraInfo:     "Certificate not found",
+	})
 }
 
 func getCertificateFromRegistryByCertificateId(certificateId string) (map[string]interface{}, error) {
@@ -720,6 +796,12 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: ExternalFailedEvent,
+			ExtraInfo:     "Invalid parameters",
+		})
 		return
 	}
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
@@ -728,7 +810,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificatesForThisMobile := []map[string]interface{}{}
-			for i:=0; i<len(certificateArr); i++ {
+			for i := 0; i < len(certificateArr); i++ {
 				certificateObj := certificateArr[i].(map[string]interface{})
 				if certificateObj["mobile"] == mobile {
 					certificatesForThisMobile = append(certificatesForThisMobile, certificateObj)
@@ -744,6 +826,12 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write(responseBytes)
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        pkg.ToString(beneficiaryId),
+						TypeOfMessage: ExternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
 					return
 				}
 			} else { //no certificate found for this mobile --
@@ -766,6 +854,12 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 		log.Errorf("No certificates found for request %v", filter)
 		w.WriteHeader(500)
 	}
+	go kafkaService.PublishEvent(models.Event{
+		Date:          time.Now(),
+		Source:        pkg.ToString(beneficiaryId),
+		TypeOfMessage: ExternalFailedEvent,
+		ExtraInfo:     "Certificate not found",
+	})
 }
 
 func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
@@ -783,6 +877,12 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: ExternalFailedEvent,
+			ExtraInfo:     "Invalid parameters",
+		})
 		return
 	}
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
@@ -811,7 +911,12 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 					//w.Header().Set("Content-Length", string(len(pdfBytes)))
 					w.WriteHeader(200)
 					_, _ = w.Write(pdfBytes)
-					return
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        pkg.ToString(beneficiaryId),
+						TypeOfMessage: ExternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
 				}
 			}
 		} else {
@@ -826,6 +931,12 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Infof("Error %+v", err)
 	}
+	go kafkaService.PublishEvent(models.Event{
+		Date:          time.Now(),
+		Source:        pkg.ToString(beneficiaryId),
+		TypeOfMessage: ExternalFailedEvent,
+		ExtraInfo:     "Certificate not found",
+	})
 }
 
 func writeResponse(w http.ResponseWriter, statusCode int, payload ErrorResponse) {
@@ -841,7 +952,7 @@ func writeResponse(w http.ResponseWriter, statusCode int, payload ErrorResponse)
 	}
 }
 
-func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
+func authorize(next http.HandlerFunc, roles []string, eventType string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
 		if claimBody != nil {
@@ -851,24 +962,41 @@ func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
 				return
 			}
 		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: eventType,
+			ExtraInfo:     "Unauthorized access",
+		})
 		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
 }
 
 func main() {
 	config.Initialize()
+	initializeKafka()
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	//integration
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
 	//external
-	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
-	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent)).Methods("POST")
+	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent)).Methods("POST")
 
 	http.Handle("/", r)
 	_ = http.ListenAndServe(":8003", nil)
+}
+
+func initializeKafka() {
+	servers := config.Config.Kafka.BootstrapServers
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	if err != nil {
+		panic(err)
+	}
+	kafkaService.StartEventProducer(producer)
+	kafkaService.LogProducerEvents(producer)
 }

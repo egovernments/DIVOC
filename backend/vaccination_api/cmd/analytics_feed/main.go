@@ -97,6 +97,12 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = connect.Exec(`
+ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
@@ -178,16 +184,23 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) error {
 		stmt, err = tx.Prepare(`INSERT INTO eventsv1 
 	(  dt,
 	source,
-	type ) 
-	VALUES (?,?,?)`)
+	type,
+	info
+	 ) 
+	VALUES (?,?,?,?)`)
 	)
 	if err != nil {
 		log.Infof("Error in preparing stmt %+v", err)
+	}
+	info, ok := event.ExtraInfo.(string)
+	if !ok {
+		info = ""
 	}
 	if _, err := stmt.Exec(
 		event.Date,
 		event.Source,
 		event.TypeOfMessage,
+		info,
 	); err != nil {
 		log.Errorf("Error in saving %+v", err)
 	}

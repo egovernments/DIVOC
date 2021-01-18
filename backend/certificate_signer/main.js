@@ -11,7 +11,7 @@ const kafka = new Kafka({
   brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
 });
 
-const consumer = kafka.consumer({ groupId: 'certificate_signer' });
+const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
