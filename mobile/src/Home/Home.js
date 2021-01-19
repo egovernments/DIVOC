@@ -96,15 +96,29 @@ function Statistics() {
 export function VaccineProgram() {
     return <div className={"home-container"}>
         <ProgramHeader/>
+        <SyncData/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_NUMBERS)} content={<Statistics/>}/>
     </div>;
 }
 
+function SyncData(props) {
+    const [isSynced, setSynced] = useState()
+    useEffect(() => {
+        SyncFacade.isSyncedIn24Hours()
+            .then((result) => setSynced(result))
+            .catch(e => console.log(e.message))
+    }, [])
+    return (
+        <div>Synced : {isSynced ? "true" : "false"} </div>
+    );
+}
+
 export function Home(props) {
     useEffect(() => {
         SyncFacade.push()
-            .then(() => {})
+            .then(() => {
+            })
             .catch((e) => console.log("Sync Failed"))
     }, [])
     return (

@@ -12,17 +12,21 @@ function AuthSafeLogout({keycloak}) {
     return <BaseCard>
         <div className={"logout-container"}>
             <Button variant="success" onClick={() => {
-                SyncFacade
-                    .push()
-                    .then((value => {
-                        return keycloak.logout();
-                    }))
-                    .then(() => appIndexDb.clearEverything())
-                    .catch(e => {
-                        if (!navigator.onLine) {
-                            alert(Messages.NO_INTERNET_CONNECTION)
-                        }
-                    })
+                if (navigator.onLine) {
+                    SyncFacade
+                        .push()
+                        .then((value => {
+                            return keycloak.logout();
+                        }))
+                        .then(() => appIndexDb.clearEverything())
+                        .catch(e => {
+                            if (!navigator.onLine) {
+                                alert(Messages.NO_INTERNET_CONNECTION)
+                            }
+                        })
+                } else {
+                    alert(Messages.NO_INTERNET_CONNECTION)
+                }
             }}>Logout</Button>{" "}
         </div>
     </BaseCard>;
