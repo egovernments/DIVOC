@@ -54,7 +54,7 @@ function CertificateView() {
 
     const getCertificate = async () => {
         let response = await axios
-            .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
+            .get("/divoc/api/v1/certificates", config)
             .then((res) => {
                 return res.data;
             });
@@ -261,7 +261,7 @@ function CertificateView() {
 
     return (
         <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
-            <div className="col-12 d-flex d-flex">
+            <div className="col-12 d-flex d-flex justify-content-center">
                 <div>
                     <div className={styles["no-print"]}>
                         <p>Vaccination certificate</p>
