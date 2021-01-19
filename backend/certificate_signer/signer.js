@@ -164,6 +164,7 @@ async function signAndSave(certificate, retryCount = 0) {
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
   const preEnrollmentCode = certificate.preEnrollmentCode;
+  const currentDose = certificate.vaccination.dose;
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
@@ -186,7 +187,7 @@ async function signAndSave(certificate, retryCount = 0) {
     }
   }
   if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
-    redis.storeKeyWithExpiry(preEnrollmentCode, certificateId)
+    redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, certificateId)
   }
   return resp;
 }

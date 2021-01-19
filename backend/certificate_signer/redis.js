@@ -11,11 +11,15 @@ async function checkIfKeyExists(key) {
   return existsAsync(key)
 }
 
-function storeKeyWithExpiry(key, value) {
-  client.set(key, value, "EX", config.REDIS_KEY_EXPIRE, "NX")
+function storeKeyWithExpiry(key, value, expiry = config.REDIS_KEY_EXPIRE) {
+  client.set(key, value, "EX", expiry)
 }
 
+function deleteKey(key) {
+  client.del(key)
+}
 module.exports = {
   checkIfKeyExists,
-  storeKeyWithExpiry
+  storeKeyWithExpiry,
+  deleteKey
 };

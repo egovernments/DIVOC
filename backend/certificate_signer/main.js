@@ -1,9 +1,9 @@
-const { Kafka } = require('kafkajs');
+const {Kafka} = require('kafkajs');
 const config = require('./config/config');
 const signer = require('./signer');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 const redis = require('./redis');
-
+const R = require('ramda');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
@@ -32,11 +32,17 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
       });
       let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
       let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
+      let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());
-        const preEnrollmentCode = jsonMessage.preEnrollmentCode;
-        const isSigned = await redis.checkIfKeyExists(preEnrollmentCode);
+        const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
+        const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
+        if (preEnrollmentCode === "" || currentDose === "") {
+          throw Error("Required parameters not available")
+        }
+        const isSigned = await redis.checkIfKeyExists(`${preEnrollmentCode}-${currentDose}`);
         if (!isSigned) {
+          redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, 'pending', 5 * 60);
           await signer.signAndSave(jsonMessage)
             .then(res => {
               console.log(`statusCode: ${res.status}`);
@@ -66,6 +72,11 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           });
         }
       } catch (e) {
+        const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
+        const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
+        if (preEnrollmentCode !== "" && currentDose !== "") {
+          redis.deleteKey(`${preEnrollmentCode}-${currentDose}`)
+        }
         console.error("ERROR: " + e.message)
         await producer.send({
           topic: config.ERROR_CERTIFICATE_TOPIC,
