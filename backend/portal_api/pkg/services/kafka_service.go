@@ -5,6 +5,7 @@ import (
 	"github.com/divoc/portal-api/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"strings"
 )
 
 type NotificationRequest struct {
@@ -23,7 +24,7 @@ func InitializeKafka() {
 	}
 
 	log.Infof("Connected to kafka on %s", servers)
-
+	StartCertifiedConsumer()
 	go func() {
 		topic := config.Config.Kafka.NotifyTopic
 		for {
@@ -64,4 +65,69 @@ func PublishNotificationMessage(recipient string, subject string, message string
 	} else {
 		notifications <- messageJson
 	}
+}
+
+func StartCertifiedConsumer() {
+	servers := config.Config.Kafka.BootstrapServers
+	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  servers,
+		"group.id":           "pre-enrollment-certified",
+		"auto.offset.reset":  "earliest",
+		"enable.auto.commit": "false",
+	})
+	if err != nil {
+		panic(err)
+	}
+	go func() {
+		err := consumer.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
+		if err != nil {
+			panic(err)
+		}
+		for {
+			msg, err := consumer.ReadMessage(-1)
+			if err == nil {
+				var message map[string]interface{}
+				json.Unmarshal(msg.Value, &message)
+				// check the status
+				// update that status to certifyErrorRows db
+				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
+				preEnrollmentCode, ok := message["preEnrollmentCode"].(string)
+				if !ok {
+					log.Error("preEnrollmentCode not found to mark pre-enrolled user certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
+				recipient, ok := message["recipient"].(map[string]interface{})
+				if !ok {
+					log.Error("recipient not found to mark pre-enrolled user certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
+				name, ok := recipient["name"].(string)
+				if !ok {
+					log.Error("name not found to mark pre-enrolled user certified %v", message)
+					continue
+				}
+				contacts, ok := recipient["contact"].([]interface{})
+				if !ok {
+					log.Error("contacts not found to mark pre-enrolled user certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
+				for _, contactObject := range contacts {
+					contact, ok := contactObject.(string)
+					if ok && strings.Contains(contact, "tel") {
+						mobileNumber := strings.ReplaceAll(contact, "tel:", "")
+						markPreEnrolledUserCertified(preEnrollmentCode, mobileNumber, name)
+						break
+					}
+				}
+
+			} else {
+				// The client will automatically try to recover from all errors.
+				log.Infof("Consumer error: %v \n", err)
+			}
+			consumer.CommitMessage(msg)
+		}
+	}()
 }

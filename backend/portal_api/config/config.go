@@ -64,6 +64,7 @@ var Config = struct {
 	Kafka struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
+		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
 	}
 }{}
 
