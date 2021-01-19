@@ -14,10 +14,10 @@ function AuthSafeLogout({keycloak}) {
             <Button variant="success" onClick={() => {
                 SyncFacade
                     .push()
-                    .then(() => appIndexDb.clearEverything())
                     .then((value => {
-                        keycloak.logout();
+                        return keycloak.logout();
                     }))
+                    .then(() => appIndexDb.clearEverything())
                     .catch(e => {
                         if (!navigator.onLine) {
                             alert(Messages.NO_INTERNET_CONNECTION)

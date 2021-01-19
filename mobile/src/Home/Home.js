@@ -14,6 +14,7 @@ import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/Lo
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
+import {SyncFacade} from "../SyncFacade";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -101,6 +102,11 @@ export function VaccineProgram() {
 }
 
 export function Home(props) {
+    useEffect(() => {
+        SyncFacade.push()
+            .then(() => {})
+            .catch((e) => console.log("Sync Failed"))
+    }, [])
     return (
         <HomeProvider>
             <VaccineProgram/>
