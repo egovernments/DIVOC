@@ -182,6 +182,7 @@ export class AppDatabase {
         const deleteVaccinators = this.db.clear(VACCINATORS);
         const deleteEvents = await this.db.clear(EVENTS);
         const deleteQueue = await this.db.clear(QUEUE);
+        localStorage.clear()
         return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
     }
 
