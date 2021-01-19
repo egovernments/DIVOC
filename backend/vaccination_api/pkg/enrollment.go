@@ -48,6 +48,9 @@ func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, erro
 		"enrollmentScopeId": map[string]interface{}{
 			"eq": facilityCode,
 		},
+		"certified": map[string]interface{}{
+			"eq": false,
+		},
 	}
 	if enrollmentsJson, err := services.QueryRegistry(typeId, filter); err == nil {
 		log.Info("Response ", enrollmentsJson)
