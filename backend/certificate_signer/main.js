@@ -4,6 +4,7 @@ const signer = require('./signer');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 const redis = require('./redis');
 const R = require('ramda');
+
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
