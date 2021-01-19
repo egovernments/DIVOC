@@ -16,6 +16,8 @@ const kafka = new Kafka({
 const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
+const INPROGRESS_KEY_EXPIRY_SECS = 5 * 60;
+const CERTIFICATE_INPROGRESS = "INPROGRESS";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
 
@@ -43,7 +45,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         }
         const isSigned = await redis.checkIfKeyExists(`${preEnrollmentCode}-${currentDose}`);
         if (!isSigned) {
-          redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, 'pending', 5 * 60);
+          redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {
               console.log(`statusCode: ${res.status}`);
