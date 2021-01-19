@@ -1,0 +1,35 @@
+[
+  {
+    "preEnrollmentCode": "12346",
+    "recipient": {
+      "name": "Sneha K",
+      "dob": "1957-01-30",
+      "age":"63",
+      "gender": "Female",
+      "nationality": "Indian",
+      "identity": "did:in.gov.uidai.aadhaar:111122223344",
+      "contact": ["tel:1111111303"]
+    },
+    "vaccination": {
+      "name": "COVAXIN",
+      "batch": "MB3428BX",
+      "manufacturer": "Bharat Biotech",
+      "date": "2020-12-02T19:21:19.646Z",
+      "effectiveStart": "2020-12-15",
+      "effectiveUntil": "2021-01-15"
+    },
+    "vaccinator": {
+      "name": "Sooraj Singh"
+    },
+    "facility": {
+      "name": "ABC Medical Center",
+      "address": {
+        "addressLine1" : "123, Koramangala",
+        "addressLine2" :"",
+        "district": "Bengaluru South",
+        "state":"Karnataka",
+        "pin" :560034
+      }
+    }
+  }
+]
