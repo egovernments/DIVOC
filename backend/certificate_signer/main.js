@@ -28,6 +28,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
 
   await consumer.run({
     eachMessage: async ({topic, partition, message}) => {
+      console.time("certify");
       console.log({
         value: message.value.toString(),
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
@@ -48,8 +49,10 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {
-              console.log(`statusCode: ${res.status}`);
-              console.log(res);
+              console.log(`${referrenceId} | statusCode: ${res.status} `);
+              if (process.env.DEBUG) {
+                 console.log(res);
+              }
               let errMsg;
               if (res.status === 200) {
                 sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
@@ -86,6 +89,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: e.message})}]
         });
       }
+      console.timeEnd("certify");
     },
   })
 })();
