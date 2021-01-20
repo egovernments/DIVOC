@@ -5,7 +5,6 @@ import (
 	"github.com/divoc/portal-api/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strings"
 )
 
 type NotificationRequest struct {
@@ -97,31 +96,19 @@ func StartCertifiedConsumer() {
 					consumer.CommitMessage(msg)
 					continue
 				}
-				recipient, ok := message["recipient"].(map[string]interface{})
+				name, ok := message["name"].(string)
 				if !ok {
-					log.Error("recipient not found to mark pre-enrolled user certified %v", message)
+					log.Error("name not found to mark pre-enrolled user certified %v", message)
 					consumer.CommitMessage(msg)
 					continue
 				}
-				name, ok := recipient["name"].(string)
-				if !ok {
-					log.Error("name not found to mark pre-enrolled user certified %v", message)
-					continue
-				}
-				contacts, ok := recipient["contact"].([]interface{})
+				contact, ok := message["mobile"].(string)
 				if !ok {
 					log.Error("contacts not found to mark pre-enrolled user certified %v", message)
 					consumer.CommitMessage(msg)
 					continue
 				}
-				for _, contactObject := range contacts {
-					contact, ok := contactObject.(string)
-					if ok && strings.Contains(contact, "tel") {
-						mobileNumber := strings.ReplaceAll(contact, "tel:", "")
-						markPreEnrolledUserCertified(preEnrollmentCode, mobileNumber, name)
-						break
-					}
-				}
+				markPreEnrolledUserCertified(preEnrollmentCode, contact, name)
 
 			} else {
 				// The client will automatically try to recover from all errors.

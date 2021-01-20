@@ -183,6 +183,7 @@ async function signAndSave(certificate, retryCount = 0) {
       throw new Error(resp.data.params.errmsg)
     }
   }
+  resp.signedCertificate = signedCertificateForDB;
   return resp;
 }
 

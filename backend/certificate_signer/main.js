@@ -42,7 +42,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
               sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
               producer.send({
                 topic: config.CERTIFIED_TOPIC,
-                messages: [{key: null, value: message.value.toString()}]
+                messages: [{key: null, value: JSON.stringify(res.signedCertificate)}]
               });
             } else {
               errMsg = "error occurred while signing/saving of certificate - " + res.status;
