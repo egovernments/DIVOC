@@ -63,6 +63,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
+		DeleteFacilityUserHandler: DeleteFacilityUserHandlerFunc(func(params DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteFacilityUser has not yet been implemented")
+		}),
 		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
 		}),
@@ -113,6 +116,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		}),
 		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilities has not yet been implemented")
+		}),
+		UpdateFacilityUserHandler: UpdateFacilityUserHandlerFunc(func(params UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateFacilityUser has not yet been implemented")
 		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
@@ -176,6 +182,8 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// DeleteFacilityUserHandler sets the operation handler for the delete facility user operation
+	DeleteFacilityUserHandler DeleteFacilityUserHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
 	GetAnalyticsHandler GetAnalyticsHandler
 	// GetEnrollmentUploadHistoryHandler sets the operation handler for the get enrollment upload history operation
@@ -210,6 +218,8 @@ type DivocPortalAPIAPI struct {
 	NotifyFacilitiesHandler NotifyFacilitiesHandler
 	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
+	// UpdateFacilityUserHandler sets the operation handler for the update facility user operation
+	UpdateFacilityUserHandler UpdateFacilityUserHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -311,6 +321,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
 	}
+	if o.DeleteFacilityUserHandler == nil {
+		unregistered = append(unregistered, "DeleteFacilityUserHandler")
+	}
 	if o.GetAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetAnalyticsHandler")
 	}
@@ -361,6 +374,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.UpdateFacilitiesHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilitiesHandler")
+	}
+	if o.UpdateFacilityUserHandler == nil {
+		unregistered = append(unregistered, "UpdateFacilityUserHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -486,6 +502,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/facility/users/{userId}"] = NewDeleteFacilityUser(o.context, o.DeleteFacilityUserHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
@@ -554,6 +574,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/facilities"] = NewUpdateFacilities(o.context, o.UpdateFacilitiesHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/facility/users"] = NewUpdateFacilityUser(o.context, o.UpdateFacilityUserHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

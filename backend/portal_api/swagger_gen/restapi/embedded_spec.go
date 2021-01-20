@@ -450,6 +450,38 @@ func init() {
           }
         }
       },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Facility User",
+        "operationId": "updateFacilityUser",
+        "parameters": [
+          {
+            "description": "Update facility user data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -479,6 +511,36 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/users/{userId}": {
+      "delete": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Delete Facility User",
+        "operationId": "deleteFacilityUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility user to delete",
+            "name": "userId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }
@@ -971,6 +1033,10 @@ func init() {
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enable/disable user"
         },
         "groups": {
           "type": "array",
@@ -1583,6 +1649,38 @@ func init() {
           }
         }
       },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Facility User",
+        "operationId": "updateFacilityUser",
+        "parameters": [
+          {
+            "description": "Update facility user data",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityUser"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -1612,6 +1710,36 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/users/{userId}": {
+      "delete": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Delete Facility User",
+        "operationId": "deleteFacilityUser",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility user to delete",
+            "name": "userId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }
@@ -2126,6 +2254,10 @@ func init() {
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
+        },
+        "enabled": {
+          "type": "boolean",
+          "title": "enable/disable user"
         },
         "groups": {
           "type": "array",

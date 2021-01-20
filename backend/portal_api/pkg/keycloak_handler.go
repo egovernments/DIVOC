@@ -16,7 +16,7 @@ var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
 
 type KeyCloakUserRequest struct {
 	Username   string                 `json:"username"`
-	Enabled    string                 `json:"enabled"`
+	Enabled    bool                   `json:"enabled"`
 	Attributes KeycloakUserAttributes `json:"attributes"`
 }
 
@@ -34,6 +34,22 @@ func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
 	return req.Post(url, req.BodyJSON(user),
 		req.Header{"Authorization": authHeader},
 	)
+}
+
+func UpdateKeycloakUser(keycloakUserId string, user KeyCloakUserRequest) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId
+	log.Infof("Updating user %s body:  %+v", url, user)
+	return req.Put(url, req.BodyJSON(user),
+		req.Header{"Authorization": authHeader},
+	)
+}
+
+func DeleteKeycloakUser(keycloakUserId string) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId
+	log.Infof("Deleting user %s ", url)
+	return req.Delete(url, req.Header{"Authorization": authHeader}, )
 }
 
 func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
@@ -95,7 +111,7 @@ func ensureRoleAccess(userId string, clientId string, rolePayload string, authHe
 func addUserToGroup(userId string, groupId string) error {
 	authHeader := getAuthHeader()
 	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
-	log.Info("POST ", addUserToGroupURL)
+	log.Info("PUT ", addUserToGroupURL)
 	payload := fmt.Sprintf(`{ 
 							"userId": "%s",
 							"groupId": "%s", 
@@ -113,14 +129,43 @@ func addUserToGroup(userId string, groupId string) error {
 	return nil
 }
 
+func getUserGroups(keycloakUserId string) (*req.Resp, error) {
+	authHeader := getAuthHeader()
+	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + keycloakUserId + "/groups"
+	log.Infof("Updating user %s ", url)
+	return req.Get(url, req.Header{"Authorization": authHeader})
+}
+
+func deleteUserFromGroup(userId string, groupId string) error {
+	authHeader := getAuthHeader()
+	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users/" + userId + "/groups/" + groupId
+	log.Info("DELETE ", addUserToGroupURL)
+	payload := fmt.Sprintf(`{ 
+							"userId": "%s",
+							"groupId": "%s", 
+							"realm": "%s" }`, userId, groupId, config.Config.Keycloak.Realm)
+	response, err := req.Delete(addUserToGroupURL, req.BodyJSON(payload), req.Header{"Authorization": authHeader})
+	if err != nil {
+		log.Errorf("Error while deleting user %s to group %s", userId, groupId)
+		return errors.New("Error while deleting user to group")
+	}
+	log.Infof("Deleted user to group on keycloak %d : %s", response.Response().StatusCode, response.String())
+	if response.Response().StatusCode != 204 {
+		log.Errorf("Error while deleting user to group, status code %s", response.Response().StatusCode)
+		return errors.New("Error while deleting user to group for " + userId + "" + groupId)
+	}
+	return nil
+}
+
 type FacilityUserResponse struct {
 	ID         string                 `json:"id"`
 	UserName   string                 `json:"userName"`
 	Attributes map[string]interface{} `json:"attributes"`
 	Groups     []*models.UserGroup    `json:"groups"`
+	Enabled    bool                   `json:"enabled"`
 }
 
-func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
+func getFacilityUsers(facilityCode string, username string) ([]*models.FacilityUser, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/facility/" + facilityCode + "/users"
 	log.Info("Checking with keycloak for facility code mapping ", facilityCode)
@@ -134,7 +179,7 @@ func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
 	if err := resp.ToJSON(&responseObject); err == nil {
 		var facilityUsers []*models.FacilityUser
 		for _, user := range responseObject {
-			if !isFacilityAdmin(user) {
+			if username != user.UserName {
 				var employeeId, fullName, mobileNumber string
 				if v, ok := user.Attributes["employee_id"]; ok {
 					employeeId = v.([]interface{})[0].(string)
@@ -151,6 +196,7 @@ func getFacilityUsers(facilityCode string) ([]*models.FacilityUser, error) {
 					MobileNumber: mobileNumber,
 					Name:         fullName,
 					Groups:       user.Groups,
+					Enabled:      user.Enabled,
 				})
 			}
 		}
@@ -169,7 +215,7 @@ func isFacilityAdmin(user FacilityUserResponse) bool {
 	}
 	return false
 }
-func getUserGroups(groupSearchKey string) ([]*models.UserGroup, error) {
+func getKeycloakGroups(groupSearchKey string) ([]*models.UserGroup, error) {
 	authHeader := getAuthHeader()
 	addUserToGroupURL := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/groups?search=" + groupSearchKey
 	log.Info("GET ", addUserToGroupURL)

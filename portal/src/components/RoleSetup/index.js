@@ -16,6 +16,7 @@ import Button from "@material-ui/core/Button";
 import {useAxios} from "../../utils/useAxios";
 import AddUserImg from "../../assets/img/add-user.svg";
 import "./index.css"
+import Switch from "@material-ui/core/Switch/Switch";
 
 const useStyles = makeStyles({
     table: {
@@ -49,7 +50,7 @@ export const RoleSetup = () => {
     function fetchUsers() {
         axiosInstance.current.get('/divoc/admin/api/v1/facility/users')
             .then(res => {
-                setStaffs(res.data.map(d => ({...d, type: OLD_USER})))
+                setStaffs(res.data.map(d => ({...d, type: OLD_USER, edited: false})))
             });
     }
 
@@ -89,13 +90,28 @@ export const RoleSetup = () => {
     function saveStaff(index) {
         const staff = staffs[index];
         if(isStaffValid(staff)) {
-            axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
-                .then(res => {
-                    fetchUsers()
-                });
+            if (staff.type === OLD_USER) {
+                axiosInstance.current.put('/divoc/admin/api/v1/facility/users', staff)
+                    .then(res => {
+                        fetchUsers()
+                    });
+            } else {
+                axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
+                    .then(res => {
+                        fetchUsers()
+                    });
+            }
         } else {
             alert("Please fill all the values!")
         }
+    }
+
+    function deleteStaff(index) {
+        const staff = staffs[index];
+        axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/'+staff.id)
+            .then(res => {
+                fetchUsers()
+            });
     }
 
     return (
@@ -111,6 +127,7 @@ export const RoleSetup = () => {
                                 groups={groups}
                                 updateStaff={(staff) => updateStaff(index, staff)}
                                 saveStaff={() => saveStaff(index)}
+                                deleteStaff={() => deleteStaff(index)}
                             />
                         ))}
                     </TableBody>
@@ -121,18 +138,39 @@ export const RoleSetup = () => {
     );
 };
 
-const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
+const CustomSwitch = withStyles({
+    switchBase: {
+        '&$checked': {
+            color: "#88C6A9",
+        },
+        '&$checked + $track': {
+            backgroundColor: "#88C6A9",
+        },
+    },
+    checked: {},
+    track: {},
+})(Switch);
+
+const StaffRow = ({key, staff, groups, updateStaff, saveStaff, deleteStaff}) => {
     function onRoleChange(evt) {
         if (staff.groups.length > 0) {
             staff.groups[0].id = evt.target.value
         } else {
             staff.groups = [{id: evt.target.value}]
         }
+        staff.edited = true;
         updateStaff(staff)
     }
 
     function onValueChange(evt, field) {
+        staff.edited = true;
         staff[field] = evt.target.value;
+        updateStaff(staff)
+    }
+
+    function onEnabledChange(value) {
+        staff.edited = true;
+        staff.enabled = value;
         updateStaff(staff)
     }
 
@@ -166,12 +204,19 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
                            variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.mobileNumber} onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
+                <TextField disabled={staff.type === OLD_USER} value={staff.mobileNumber} onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
                            label="Mobile Number" variant="outlined"/>
             </BorderLessTableCell>
             <BorderLessTableCell>
                 <TextField value={staff.employeeId} onChange={(evt) => onValueChange(evt, "employeeId")}
                            label="Employee ID" variant="outlined"/>
+            </BorderLessTableCell>
+            <BorderLessTableCell>
+                <CustomSwitch
+                    checked={staff.enabled || false}
+                    onChange={() => onEnabledChange(!staff.enabled)}
+                    color="primary"
+                />
             </BorderLessTableCell>
             <BorderLessTableCell>
                 {staff.type === NEW_USER &&
@@ -181,10 +226,10 @@ const StaffRow = ({key, staff, groups, updateStaff, saveStaff}) => {
                 }
                 {staff.type === OLD_USER &&
                 <>
-                    <Button variant="outlined" disabled>
+                    <Button variant="outlined" onClick={saveStaff} disabled={!staff.edited}>
                         EDIT
                     </Button>
-                    <Button variant="outlined" disabled>
+                    <Button variant="outlined" onClick={deleteStaff}>
                         DELETE
                     </Button>
                 </>

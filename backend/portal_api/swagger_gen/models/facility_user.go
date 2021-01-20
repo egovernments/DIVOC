@@ -21,6 +21,9 @@ type FacilityUser struct {
 	// Facility User Id
 	EmployeeID string `json:"employeeId,omitempty"`
 
+	// enable/disable user
+	Enabled bool `json:"enabled,omitempty"`
+
 	// groups
 	Groups []*UserGroup `json:"groups"`
 

@@ -46,6 +46,8 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetVaccinatorsUploadHistoryHandler = operations.GetVaccinatorsUploadHistoryHandlerFunc(getVaccinatorUploadHandler)
 	api.GetVaccinatorsUploadsErrorsHandler = operations.GetVaccinatorsUploadsErrorsHandlerFunc(getVaccinatorUploadErrorsHandler)
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
+	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
+	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
 }
 
 type GenericResponse struct {
@@ -368,6 +370,19 @@ func getPublicAnalyticsHandler(params operations.GetPublicAnalyticsParams) middl
 	return NewGenericJSONResponse(getPublicAnalyticsInfo())
 }
 
+func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+	if params.Body.ID == "" {
+		log.Error("userId is not present in the body")
+		return operations.NewUpdateFacilityUserBadRequest()
+	}
+	err := UpdateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateFacilityUserBadRequest()
+	}
+	return operations.NewUpdateFacilityUserOK()
+}
+
 func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 	preferredUsername := principal.PreferredUsername
 	facilityUploads, err := db.GetFacilityUploadsForUser(preferredUsername)
@@ -446,4 +461,13 @@ func getVaccinatorUploadErrorsHandler(params operations.GetVaccinatorsUploadsErr
 		Columns:    columns,
 	}
 	return vaccinatorUpload.GetCSVUploadErrors(uploadID)
+}
+
+func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
+	err := DeleteFacilityUser(params.UserID)
+	if err != nil {
+		log.Error(err)
+		return operations.NewDeleteFacilityUserBadRequest()
+	}
+	return operations.NewDeleteFacilityUserOK()
 }

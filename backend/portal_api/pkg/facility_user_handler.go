@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
+	"net/http"
 )
 
 func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
@@ -16,27 +17,15 @@ func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
 	if claimBody.FacilityCode == "" {
 		return nil, errors.New("unauthorized")
 	}
-	users, err := getFacilityUsers(claimBody.FacilityCode)
+	users, err := getFacilityUsers(claimBody.FacilityCode, claimBody.PreferredUsername)
 
 	return users, err
 }
 
 func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
-	bearerToken, err := getToken(authHeader)
-	claimBody, err := getClaimBody(bearerToken)
-	if err != nil {
-		log.Errorf("Error while parsing token : %s", bearerToken)
-		return err
-	}
-	userRequest := KeyCloakUserRequest{
-		Username: user.MobileNumber,
-		Enabled:  "true",
-		Attributes: KeycloakUserAttributes{
-			MobileNumber: []string{user.MobileNumber},
-			EmployeeID:   user.EmployeeID,
-			FullName:     user.Name,
-			FacilityCode: claimBody.FacilityCode,
-		},
+	userRequest, e := getKeycloakUserRepFromFacilityUserModel(authHeader, user)
+	if e != nil {
+		return e
 	}
 	resp, err := CreateKeycloakUser(userRequest)
 	log.Info("Created keycloak user ", resp.Response().StatusCode, " ", resp.String())
@@ -55,6 +44,108 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	return nil
 }
 
+func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
+	keycloakUserId := user.ID
+
+	// update user in keycloak with newer user details
+	userRequest, e := getKeycloakUserRepFromFacilityUserModel(authHeader, user)
+	if e != nil {
+		return e
+	}
+	resp, err := UpdateKeycloakUser(keycloakUserId, userRequest)
+	if err != nil {
+		log.Errorf("Error while updating user %s", user.MobileNumber)
+		return err
+	} else {
+		log.Infof("Updated keycloak user %s %+v ", resp.Response().StatusCode, resp.Response().Body)
+		if resp.Response().StatusCode == http.StatusNoContent {
+			// get groups for the user
+			var responseObject []*models.UserGroup
+			r, _ := getUserGroups(keycloakUserId)
+			if err := r.ToJSON(&responseObject); err != nil {
+				log.Errorf("Error in parsing json response from keycloak %+v", err)
+			} else {
+				// check if group has changed, if yes, delete the old and update the new
+				if hasUserGroupChanged(user.Groups, responseObject) {
+					log.Info("Updating roles for the user ", user.MobileNumber)
+					updateUserGroupForUser(keycloakUserId, responseObject, user.Groups)
+				}
+			}
+		} else {
+			return errors.New("update keycloak user call doesn't responded with 204 status")
+		}
+	}
+	return nil
+}
+
+func DeleteFacilityUser(keycloakUserId string) error {
+	resp, err := DeleteKeycloakUser(keycloakUserId)
+	if err != nil {
+		log.Errorf("Error while deleting user %s", keycloakUserId)
+		return err
+	} else {
+		log.Infof("Deleted keycloak user %s %+v ", resp.Response().StatusCode, resp.Response().Body)
+		if resp.Response().StatusCode != http.StatusNoContent {
+			return errors.New("delete keycloak user call doesn't responded with 204 status")
+		}
+	}
+	return nil
+}
+
+func getKeycloakUserRepFromFacilityUserModel(authHeader string, user *models.FacilityUser) (KeyCloakUserRequest, error) {
+	bearerToken, err := getToken(authHeader)
+	claimBody, err := getClaimBody(bearerToken)
+	if err != nil {
+		log.Errorf("Error while parsing token : %s", bearerToken)
+		return KeyCloakUserRequest{}, err
+	}
+	userRequest := KeyCloakUserRequest{
+		Username: user.MobileNumber,
+		Enabled:  user.Enabled,
+		Attributes: KeycloakUserAttributes{
+			MobileNumber: []string{user.MobileNumber},
+			EmployeeID:   user.EmployeeID,
+			FullName:     user.Name,
+			FacilityCode: claimBody.FacilityCode,
+		},
+	}
+	return userRequest, nil
+}
+
+func updateUserGroupForUser(keycloakUserId string, existingUserGroups []*models.UserGroup, newUserGroups []*models.UserGroup) {
+	// delete user from existing groups
+	for _, g := range existingUserGroups {
+		_ = deleteUserFromGroup(keycloakUserId, g.ID)
+	}
+
+	// add user to new groups
+	for _, g := range newUserGroups {
+		_ = addUserToGroup(keycloakUserId, g.ID)
+	}
+}
+
+func hasUserGroupChanged(newGroups []*models.UserGroup, existingGroups []*models.UserGroup) bool {
+	if (newGroups == nil) != (existingGroups == nil) {
+		return false
+	}
+
+	var newGroupIds []string
+	var existingGroupIds []string
+	for _, g := range newGroups {
+		if g != nil {
+			newGroupIds = append(newGroupIds, g.ID)
+		}
+	}
+	for _, g := range existingGroups {
+		if g != nil{
+			existingGroupIds = append(existingGroupIds, g.ID)
+		}
+	}
+
+	return !isEqual(newGroupIds, existingGroupIds)
+
+}
+
 func GetFacilityGroups() ([]*models.UserGroup, error) {
-	return getUserGroups("facility")
+	return getKeycloakGroups("facility")
 }
