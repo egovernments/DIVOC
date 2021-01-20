@@ -17,7 +17,6 @@ export function ConfirmFlow(props) {
 }
 
 export function ConfirmVaccination(props) {
-    const {goNext} = useConfirmVaccine();
     const {pageName, recipient_id} = props.match.params;
 
     function getForm() {

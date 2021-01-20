@@ -9,12 +9,12 @@ import vaccineBanner from "../assets/img/home-banner.svg"
 import enrollRecipient from "./enroll_recipient.png"
 import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
-import * as ProtoType from "prop-types";
 import Row from "react-bootstrap/Row";
 import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
+import {SyncFacade} from "../SyncFacade";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -52,12 +52,6 @@ function EnrollmentTypes() {
     </>;
 }
 
-EnrolmentItems.propTypes = {
-    icon: ProtoType.string.isRequired,
-    title: ProtoType.string.isRequired,
-    onClick: ProtoType.func
-};
-
 function EnrolmentItems({icon, title, onClick}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
@@ -71,11 +65,6 @@ function EnrolmentItems({icon, title, onClick}) {
     );
 }
 
-
-StatisticsItem.propTypes = {
-    value: ProtoType.string.isRequired,
-    title: ProtoType.string.isRequired
-};
 
 function StatisticsItem({title, value}) {
     return (
@@ -113,6 +102,11 @@ export function VaccineProgram() {
 }
 
 export function Home(props) {
+    useEffect(() => {
+        SyncFacade.push()
+            .then(() => {})
+            .catch((e) => console.log("Sync Failed"))
+    }, [])
     return (
         <HomeProvider>
             <VaccineProgram/>

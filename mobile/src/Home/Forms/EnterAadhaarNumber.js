@@ -1,4 +1,3 @@
-import {FormCard} from "../../Base/Base";
 import {Button} from "react-bootstrap";
 import React, {useState} from "react";
 import {FORM_AADHAAR_NUMBER, FORM_AADHAAR_OTP, usePreEnrollment} from "./PreEnrollmentFlow";

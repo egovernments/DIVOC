@@ -1,24 +1,16 @@
 import {
     FORM_AADHAAR_NUMBER,
-    FORM_PRE_ENROLL_CODE,
     FORM_PRE_ENROLL_DETAILS,
     usePreEnrollment
 } from "../../Home/Forms/PreEnrollmentFlow";
 import React, {useEffect, useState} from "react";
 import {Button, Col} from "react-bootstrap";
-import {FormCard} from "../../Base/Base";
 import "./index.scss"
 import * as PropTypes from "prop-types";
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 export function PreEnrollmentDetails(props) {
-    const {goBack} = usePreEnrollment()
-    // return (
-    //     <FormCard onBack={() => {
-    //         goBack();
-    //     }} content={<PatientDetails/>} title={"Verify Recipient"}/>
-    // );
     return (
 
         <BaseFormCard title={"Verify Vaccination Recipient"}>
@@ -45,6 +37,7 @@ function PatientDetails(props) {
             .then((patient) => {
                 setPatientDetails(patient)
             })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.enrollCode])
     if (!patientDetails) {
         return <div className={"no-details"}>No Patient Details Found</div>
