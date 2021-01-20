@@ -28,6 +28,9 @@ type Vaccinator struct {
 	// Required: true
 	Code *string `json:"code"`
 
+	// vaccinator email
+	Email string `json:"email,omitempty"`
+
 	// facility ids
 	// Required: true
 	FacilityIds []string `json:"facilityIds"`
@@ -47,8 +50,10 @@ type Vaccinator struct {
 	NationalIdentifier *string `json:"nationalIdentifier"`
 
 	// serial num
-	// Required: true
-	SerialNum *int64 `json:"serialNum"`
+	SerialNum int64 `json:"serialNum,omitempty"`
+
+	// signature string
+	SignatureString string `json:"signatureString,omitempty"`
 
 	// signatures
 	Signatures []*Signature `json:"signatures"`
@@ -88,10 +93,6 @@ func (m *Vaccinator) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNationalIdentifier(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateSerialNum(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -169,15 +170,6 @@ func (m *Vaccinator) validateName(formats strfmt.Registry) error {
 func (m *Vaccinator) validateNationalIdentifier(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalIdentifier", "body", m.NationalIdentifier); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Vaccinator) validateSerialNum(formats strfmt.Registry) error {
-
-	if err := validate.Required("serialNum", "body", m.SerialNum); err != nil {
 		return err
 	}
 

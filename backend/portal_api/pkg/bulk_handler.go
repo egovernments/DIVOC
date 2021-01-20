@@ -35,7 +35,7 @@ func createVaccinator(data *Scanner) error {
 	averageRating := 0.0
 	trainingCertificate := ""
 	vaccinator := models.Vaccinator{
-		SerialNum:           &serialNum,
+		SerialNum:           serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
 		Code:                &code,
@@ -76,7 +76,7 @@ func createFacility(data *Scanner, authHeader string) error {
 		averageRating := 0.0
 		trainingCertificate := ""
 		admins = append(admins, &models.Vaccinator{
-			SerialNum:           &index,
+			SerialNum:           index,
 			Code:                &code,
 			NationalIdentifier:  &nationalIdentifier,
 			Name:                &name,

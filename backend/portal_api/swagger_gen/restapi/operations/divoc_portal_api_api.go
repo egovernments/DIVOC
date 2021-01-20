@@ -63,6 +63,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
+		CreateVaccinatorHandler: CreateVaccinatorHandlerFunc(func(params CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation CreateVaccinator has not yet been implemented")
+		}),
 		DeleteFacilityUserHandler: DeleteFacilityUserHandlerFunc(func(params DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteFacilityUser has not yet been implemented")
 		}),
@@ -182,6 +185,8 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// CreateVaccinatorHandler sets the operation handler for the create vaccinator operation
+	CreateVaccinatorHandler CreateVaccinatorHandler
 	// DeleteFacilityUserHandler sets the operation handler for the delete facility user operation
 	DeleteFacilityUserHandler DeleteFacilityUserHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
@@ -320,6 +325,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
+	}
+	if o.CreateVaccinatorHandler == nil {
+		unregistered = append(unregistered, "CreateVaccinatorHandler")
 	}
 	if o.DeleteFacilityUserHandler == nil {
 		unregistered = append(unregistered, "DeleteFacilityUserHandler")
@@ -502,6 +510,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/vaccinator"] = NewCreateVaccinator(o.context, o.CreateVaccinatorHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}

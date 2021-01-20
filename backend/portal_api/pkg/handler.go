@@ -48,6 +48,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
+	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
 }
 
 type GenericResponse struct {
@@ -470,4 +471,13 @@ func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, princ
 		return operations.NewDeleteFacilityUserBadRequest()
 	}
 	return operations.NewDeleteFacilityUserOK()
+}
+
+func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
+	err := kernelService.CreateNewRegistry(params.Body, "Vaccinator")
+	if err != nil {
+		log.Error(err)
+		return operations.NewCreateVaccinatorBadRequest()
+	}
+	return operations.NewCreateVaccinatorOK()
 }

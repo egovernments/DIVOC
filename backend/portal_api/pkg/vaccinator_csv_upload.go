@@ -38,7 +38,7 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 	averageRating := 0.0
 	trainingCertificate := ""
 	vaccinator := models.Vaccinator{
-		SerialNum:           &serialNum,
+		SerialNum:           serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
 		Code:                &code,

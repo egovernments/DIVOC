@@ -672,6 +672,37 @@ func init() {
         }
       }
     },
+    "/vaccinator": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Create vaccinator user",
+        "operationId": "createVaccinator",
+        "parameters": [
+          {
+            "description": "Vaccinator Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Vaccinator"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/vaccinators": {
       "get": {
         "security": [
@@ -1156,7 +1187,6 @@ func init() {
       "type": "object",
       "title": "The Vaccinator Schema",
       "required": [
-        "serialNum",
         "code",
         "nationalIdentifier",
         "name",
@@ -1172,6 +1202,10 @@ func init() {
         },
         "code": {
           "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "title": "vaccinator email"
         },
         "facilityIds": {
           "type": "array",
@@ -1193,6 +1227,9 @@ func init() {
         },
         "serialNum": {
           "type": "integer"
+        },
+        "signatureString": {
+          "type": "string"
         },
         "signatures": {
           "type": "array",
@@ -1871,6 +1908,37 @@ func init() {
         }
       }
     },
+    "/vaccinator": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Create vaccinator user",
+        "operationId": "createVaccinator",
+        "parameters": [
+          {
+            "description": "Vaccinator Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Vaccinator"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/vaccinators": {
       "get": {
         "security": [
@@ -2397,7 +2465,6 @@ func init() {
       "type": "object",
       "title": "The Vaccinator Schema",
       "required": [
-        "serialNum",
         "code",
         "nationalIdentifier",
         "name",
@@ -2413,6 +2480,10 @@ func init() {
         },
         "code": {
           "type": "string"
+        },
+        "email": {
+          "type": "string",
+          "title": "vaccinator email"
         },
         "facilityIds": {
           "type": "array",
@@ -2434,6 +2505,9 @@ func init() {
         },
         "serialNum": {
           "type": "integer"
+        },
+        "signatureString": {
+          "type": "string"
         },
         "signatures": {
           "type": "array",

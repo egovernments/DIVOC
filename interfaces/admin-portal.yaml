@@ -188,6 +188,23 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+  /vaccinator:
+    post:
+      summary: Create vaccinator user
+      operationId: createVaccinator
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Vaccinator'
+          description: Vaccinator Details
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
   /programs:
     get:
       summary: get program list
@@ -650,7 +667,6 @@ definitions:
     type: object
     title: The Vaccinator Schema
     required:
-      - serialNum
       - code
       - nationalIdentifier
       - name
@@ -664,6 +680,8 @@ definitions:
         type: array
         items:
           "$ref": Signature.json#/definitions/Signature
+      signatureString:
+        type: string
       serialNum:
         type: integer
       code:
@@ -673,6 +691,9 @@ definitions:
       name:
         type: string
         title: Full name
+      email:
+        type: string
+        title: vaccinator email
       facilityIds:
         type: array
         items:
