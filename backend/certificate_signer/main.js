@@ -17,7 +17,7 @@ const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout:
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
 const INPROGRESS_KEY_EXPIRY_SECS = 5 * 60;
-const CERTIFICATE_INPROGRESS = "INPROGRESS";
+const CERTIFICATE_INPROGRESS = "P";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
 
@@ -49,7 +49,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {
-              console.log(`${referrenceId} | statusCode: ${res.status} `);
+              console.log(`${preEnrollmentCode} | statusCode: ${res.status} `);
               if (process.env.DEBUG) {
                  console.log(res);
               }
@@ -73,16 +73,16 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         } else {
           console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
           await producer.send({
-            topic: config.ERROR_CERTIFICATE_TOPIC,
+            topic: config.DUPLICATE_CERTIFICATE_TOPIC,
             messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: "Duplicate pre-enrollment code"})}]
           });
         }
       } catch (e) {
-        const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
-        const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
-        if (preEnrollmentCode !== "" && currentDose !== "") {
-          redis.deleteKey(`${preEnrollmentCode}-${currentDose}`)
-        }
+        // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
+        // const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
+        // if (preEnrollmentCode !== "" && currentDose !== "") {
+        //   redis.deleteKey(`${preEnrollmentCode}-${currentDose}`) //if retry fails it clears the key -
+        // }
         console.error("ERROR: " + e.message)
         await producer.send({
           topic: config.ERROR_CERTIFICATE_TOPIC,
