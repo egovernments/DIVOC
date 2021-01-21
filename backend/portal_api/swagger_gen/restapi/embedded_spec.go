@@ -1225,9 +1225,6 @@ func init() {
         "nationalIdentifier": {
           "type": "string"
         },
-        "serialNum": {
-          "type": "integer"
-        },
         "signatureString": {
           "type": "string"
         },
@@ -2502,9 +2499,6 @@ func init() {
         },
         "nationalIdentifier": {
           "type": "string"
-        },
-        "serialNum": {
-          "type": "integer"
         },
         "signatureString": {
           "type": "string"

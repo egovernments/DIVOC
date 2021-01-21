@@ -474,7 +474,10 @@ func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, princ
 }
 
 func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
-	err := kernelService.CreateNewRegistry(params.Body, "Vaccinator")
+	facilityCode := principal.FacilityCode
+	vaccinator := params.Body
+	vaccinator.FacilityIds = []string{facilityCode}
+	err := kernelService.CreateNewRegistry(vaccinator, "Vaccinator")
 	if err != nil {
 		log.Error(err)
 		return operations.NewCreateVaccinatorBadRequest()

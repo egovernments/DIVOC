@@ -682,8 +682,6 @@ definitions:
           "$ref": Signature.json#/definitions/Signature
       signatureString:
         type: string
-      serialNum:
-        type: integer
       code:
         type: string
       nationalIdentifier:

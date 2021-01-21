@@ -111,7 +111,6 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 
 func buildVaccinator(data *Scanner) *models.Vaccinator {
 	adminStatus := "Active"
-	index := int64(1)
 	code := ""
 	nationalIdentifier := ""
 	name := data.Text("adminName")
@@ -120,7 +119,6 @@ func buildVaccinator(data *Scanner) *models.Vaccinator {
 	trainingCertificate := ""
 	facilityCode := data.Text("facilityCode")
 	return &models.Vaccinator{
-		SerialNum:           index,
 		Code:                &code,
 		NationalIdentifier:  &nationalIdentifier,
 		Name:                &name,

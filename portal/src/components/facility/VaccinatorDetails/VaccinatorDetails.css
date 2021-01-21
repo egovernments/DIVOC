@@ -1,0 +1,43 @@
+.search-img {
+    background-color: #5C9EF8;
+    border-radius: 4px;
+    border: none;
+    width: 55px;
+    height: 55px;
+    margin-left: 5px;
+}
+
+.search-img > img {
+    size: 4px;
+}
+
+.search-div {
+    padding-top: 50px;
+}
+
+.personal-details-div {
+    background: #ffffff;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    width: 70%;
+    margin-right: 1rem;
+    margin-top: 3rem;
+    align-items: center;
+}
+
+.personal-details-div > div {
+    margin: 30px;
+}
+
+.personal-details-div .MuiOutlinedInput-root, .search-div .MuiOutlinedInput-root {
+    width: 350px;
+}
+
+.personal-details-div > h3 {
+    margin: 30px;
+}
+
+.saved-success {
+    font-weight: bold;
+    font-size: 10px;
+}

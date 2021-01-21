@@ -49,9 +49,6 @@ type Vaccinator struct {
 	// Required: true
 	NationalIdentifier *string `json:"nationalIdentifier"`
 
-	// serial num
-	SerialNum int64 `json:"serialNum,omitempty"`
-
 	// signature string
 	SignatureString string `json:"signatureString,omitempty"`
 
