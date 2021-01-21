@@ -1,6 +1,18 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 
+const LAST_SYNC_KEY = "lastSyncedDate";
+
+export const is24hoursAgo = (date) => {
+
+    const numberOfDays = 1
+    // ---------------------- day hour  min  sec  msec
+    const oneDayIntoMillis = numberOfDays * 24 * 60 * 60 * 1000
+    const currentDateInMillis = new Date().getTime()
+    const oneDayDiff = currentDateInMillis - date.getTime();
+    return oneDayDiff >= oneDayIntoMillis
+}
+
 export class SyncFacade {
 
     static async pull() {
@@ -19,6 +31,53 @@ export class SyncFacade {
         if (certifyPatients.length > 0) {
             await ApiServices.certify(certifyPatients);
         }
+        localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
         await appIndexDb.cleanUp()
+    }
+
+
+    static async isSyncedIn24Hours() {
+        await appIndexDb.initDb();
+        const events = await appIndexDb.getAllEvents();
+        if (events) {
+            if (events.length && events.length > 0) {
+                const lastSyncedDate = localStorage.getItem(LAST_SYNC_KEY);
+                const date = new Date(lastSyncedDate)
+                return is24hoursAgo(date)
+            }
+        }
+        return false;
+    }
+
+    static lastSyncedOn() {
+        const lastSyncDate = localStorage.getItem(LAST_SYNC_KEY);
+        const lastSyncTime = new Date(lastSyncDate).getTime()
+        const currentTime = new Date().getTime()
+        return relativeTimeDifference(currentTime, lastSyncTime)
+    }
+}
+
+function relativeTimeDifference(current, previous) {
+
+    const msPerMinute = 60 * 1000;
+    const msPerHour = msPerMinute * 60;
+    const msPerDay = msPerHour * 24;
+    const msPerMonth = msPerDay * 30;
+    const msPerYear = msPerDay * 365;
+
+    const elapsed = current - previous;
+
+    if (elapsed < msPerMinute) {
+        return Math.round(elapsed / 1000) + ' seconds ago';
+    } else if (elapsed < msPerHour) {
+        return Math.round(elapsed / msPerMinute) + ' minutes ago';
+    } else if (elapsed < msPerDay) {
+        return Math.round(elapsed / msPerHour) + ' hours ago';
+    } else if (elapsed < msPerMonth) {
+        return Math.round(elapsed / msPerDay) + ' days ago';
+    } else if (elapsed < msPerYear) {
+        return Math.round(elapsed / msPerMonth) + ' months ago';
+    } else {
+        return Math.round(elapsed / msPerYear) + ' years ago';
     }
 }

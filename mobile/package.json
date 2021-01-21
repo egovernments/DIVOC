@@ -60,7 +60,9 @@
     ]
   },
   "devDependencies": {
-    "sass": "^1.29.0"
+    "mockdate": "^3.0.2",
+    "sass": "^1.29.0",
+    "chai": "^4.2.0"
   },
   "proxy": "https://divoc.xiv.in"
 }

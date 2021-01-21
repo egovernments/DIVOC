@@ -40,9 +40,6 @@ export const SelectVaccinator = (props) => {
                                 <td>
                                     <span>{data.name}</span>
                                 </td>
-                                <td>
-                                    <img src={data.signatureImg || SampleSignatureImg} alt=""/>
-                                </td>
                             </tr>
                         ))
                     }

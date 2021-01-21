@@ -15,6 +15,7 @@ import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
+import NoNetworkImg from "assets/img/no_network.svg"
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -94,17 +95,53 @@ function Statistics() {
 }
 
 export function VaccineProgram() {
+    const [isNotSynced, setNotSynced] = useState(false)
+    useEffect(() => {
+        SyncFacade.isSyncedIn24Hours()
+            .then((result) => setNotSynced(result))
+            .catch(e => console.log(e.message))
+    }, [])
     return <div className={"home-container"}>
         <ProgramHeader/>
+        {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_NUMBERS)} content={<Statistics/>}/>
     </div>;
 }
 
+function SyncData({onSyncDone}) {
+    const [loading, setLoading] = useState(false)
+    const lastSyncedDate = SyncFacade.lastSyncedOn();
+    return (
+        <div className="mt-3">
+            <BaseCard>
+                <div className="d-flex pl-3">
+                    <img src={NoNetworkImg} alt={"no_network"} width="25px"/>
+                    <div className="p-3">Last synced {lastSyncedDate}</div>
+                    <div className="p-3" style={{color: "#5C9EF8"}} onClick={() => {
+                        if (!loading) {
+                            setLoading(true)
+                            SyncFacade.push()
+                                .then((result) => {
+                                    setLoading(false)
+                                    if (onSyncDone != null) {
+                                        onSyncDone()
+                                    }
+                                })
+                                .catch((e) => setLoading(false))
+                        }
+                    }}>{loading ? "Syncing..." : <u>Sync now</u>}</div>
+                </div>
+            </BaseCard>
+        </div>
+    );
+}
+
 export function Home(props) {
     useEffect(() => {
         SyncFacade.push()
-            .then(() => {})
+            .then(() => {
+            })
             .catch((e) => console.log("Sync Failed"))
     }, [])
     return (
