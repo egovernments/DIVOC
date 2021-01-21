@@ -15,5 +15,6 @@
   "app.certificateIssued": "प्रमाणपत्र जारी करना",
   "app.enterIdentityNumber": "आधार नंबर दर्ज करें",
   "app.registerIdentityNumber": "आधार के साथ रजिस्टर करें",
-  "app.scanIdentityNumber": "आधार के साथ स्कैन"
+  "app.scanIdentityNumber": "आधार के साथ स्कैन",
+  "app.enrollmentToday": "आज नामांकन"
 }

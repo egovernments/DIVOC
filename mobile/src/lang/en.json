@@ -15,5 +15,6 @@
   "app.certificateIssued": "Certificate Issued",
   "app.enterIdentityNumber": "Enter Aadhaar Number",
   "app.registerIdentityNumber": "Register with Aadhaar",
-  "app.scanIdentityNumber": "SCAN AADHAAR"
+  "app.scanIdentityNumber": "SCAN AADHAAR",
+  "app.enrollmentToday": "Enrollments Today"
 }

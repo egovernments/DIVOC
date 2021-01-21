@@ -15,6 +15,7 @@ import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
+import {VaccinationStatus} from "./VaccinationStatus";
 
 function ProgramHeader() {
     return <div className={"program-header"}>
@@ -97,7 +98,7 @@ export function VaccineProgram() {
     return <div className={"home-container"}>
         <ProgramHeader/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_NUMBERS)} content={<Statistics/>}/>
+        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY)} content={<VaccinationStatus/>}/>
     </div>;
 }
 

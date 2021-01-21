@@ -73,6 +73,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     LOGOUT: "app.logout",
     ACTIONS: "app.actionTitle",
     RECIPIENT_NUMBERS: "app.recipientDetailsTitle",
+    ENROLLMENT_TODAY: "app.enrollmentToday",
     SELECT_LANGUAGE: "app.selectLanguage",
     VERIFY_RECIPIENT: "app.verifyRecipient",
     ENROLL_RECIPIENT: "app.enrollRecipient",
