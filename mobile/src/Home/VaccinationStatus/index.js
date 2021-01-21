@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {BaseCard} from "../../Base/Base";
 import "./index.scss"
 import {appIndexDb} from "../../AppDatabase";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 
 export function VaccinationStatus() {
@@ -24,17 +25,24 @@ export function VaccinationStatus() {
     function renderStatusMessage() {
         const message = vaccinationStatus.message
         const exceedCount = vaccinationStatus.isExceed ? vaccinationStatus.exceedVaccinations : ""
-        return <h5>{message} {exceedCount ? (<span className="exceed">{exceedCount}</span>) : ""}</h5>;
+        return (
+            <div className="pl-4">
+                <h5>{message} {exceedCount ? (<span>(<span className="exceed">{exceedCount}</span>)</span>) : ""}
+                </h5>
+            </div>
+        );
     }
 
     return (
         <div className="vaccination-status mt-2 text-center">
             <BaseCard>
-                <div className="d-flex justify-content-between pt-3 pb-3 pl-4 pr-4">
+                <div className="d-flex justify-content-start pt-3 pb-3 pl-4 pr-4">
                     {renderProgressStatus()}
                     {renderStatusMessage()}
                 </div>
             </BaseCard>
+            {vaccinationStatus.isLimitToReach &&
+            <p className="mt-2">{getMessageComponent(LANGUAGE_KEYS.LIMIT_REACH_MESSAGE)}</p>}
         </div>
     )
 }
@@ -45,17 +53,25 @@ async function getVaccinationStatus() {
     const recipientDetails = await appIndexDb.recipientDetails()
     const certificateIssue = recipientDetails[1].value
     const isExceed = certificateIssue > programRate
+    const remainingCertificate = programRate - certificateIssue
+    console.log(remainingCertificate);
+    const isLimitToReach = remainingCertificate >= 0 && remainingCertificate <= 10;
     return new VaccinationDetails(
         certificateIssue,
-        userDetails["covid19_rate"],
+        programRate,
         isExceed ? (certificateIssue - programRate) : 0,
         isExceed,
-        isExceed ? "Exceed Limits" : "Recipients Enrolled"
+        isExceed ? "Exceed Limits" : "Recipients Enrolled",
+        isLimitToReach
     );
 }
 
 
 class VaccinationDetails {
+
+    get isLimitToReach() {
+        return this._isLimitToReach;
+    }
 
     get vaccinationDone() {
         return this._vaccinationDone;
@@ -77,11 +93,12 @@ class VaccinationDetails {
         return this._message;
     }
 
-    constructor(vaccinationDone, allowVaccination, exceedVaccinations, isExceed, message) {
+    constructor(vaccinationDone, allowVaccination, exceedVaccinations, isExceed, message, isLimitToReach) {
         this._vaccinationDone = vaccinationDone;
         this._allowVaccination = allowVaccination;
         this._exceedVaccinations = exceedVaccinations;
         this._isExceed = isExceed;
         this._message = message;
+        this._isLimitToReach = isLimitToReach;
     }
 }

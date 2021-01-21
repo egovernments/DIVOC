@@ -16,5 +16,6 @@
   "app.enterIdentityNumber": "Enter Aadhaar Number",
   "app.registerIdentityNumber": "Register with Aadhaar",
   "app.scanIdentityNumber": "SCAN AADHAAR",
-  "app.enrollmentToday": "Enrollments Today"
+  "app.enrollmentToday": "Enrollments Today",
+  "app.limitReachMessage": "Please Note: You are reaching the daily enrolment limit."
 }

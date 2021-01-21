@@ -83,5 +83,6 @@ export const LANGUAGE_KEYS = Object.freeze({
     CERTIFICATE_ISSUED: "app.certificateIssued",
     ENTER_IDENTITY_NUMBER: "app.enterIdentityNumber",
     REGISTER_IDENTITY_NUMBER: "app.registerIdentityNumber",
-    SCAN_IDENTITY_NUMBER: "app.scanIdentityNumber"
+    SCAN_IDENTITY_NUMBER: "app.scanIdentityNumber",
+    LIMIT_REACH_MESSAGE: "app.limitReachMessage"
 });
