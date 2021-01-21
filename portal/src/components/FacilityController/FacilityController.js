@@ -6,20 +6,21 @@ import FacilityDetails from "../FacilityDetails/FacilityDetails";
 import {useAxios} from "../../utils/useAxios";
 import state_and_districts from '../../utils/state_and_districts.json';
 import {equals, reject} from "ramda";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 
 function FacilityController() {
     const PROGRAMS = ["C-19 Program"];
     const axiosInstance = useAxios('');
     const [facilities, setFacilities] = useState([]);
     const [programs, setPrograms] = useState([]);
-    const [selectedState, setSelectedState] = useState("");
+    const [selectedState, setSelectedState] = useState("All");
     const [districts, setDistricts] = useState([]);
     const [selectedDistrict, setSelectedDistrict] = useState("");
     const [selectedProgram, setSelectedProgram] = useState("");
     const [facilityType, setFacilityType] = useState("GOVT");
     const [status, setStatus] = useState("");
     const stateList = [{value: "ALL", label: "ALL"}].concat(Object.values(state_and_districts['states']).map(obj => ({value: obj.name, label: obj.name})));
+    const [lastAdjustedOn, setLastAdjustedOn] = useState("");
 
     useEffect(() => {
         fetchPrograms();
@@ -27,15 +28,33 @@ function FacilityController() {
 
     useEffect(() => {
         fetchFacilities();
-    }, [selectedProgram, selectedState, selectedDistrict, facilityType, status]);
+    }, [selectedProgram, selectedState, selectedDistrict, facilityType, status, lastAdjustedOn]);
 
     function fetchFacilities() {
+        let rateUpdatedFrom = "", rateUpdatedTo = "";
+        if (lastAdjustedOn !== "") {
+            let fromDate = new Date();
+            let toDate = new Date();
+            if(lastAdjustedOn === CONSTANTS.WEEK) {
+                fromDate.setDate(fromDate.getDate() - 7);
+                rateUpdatedFrom =  fromDate.toISOString().substr(0,10);
+                rateUpdatedTo = toDate.toISOString().substr(0,10);
+            } else if (lastAdjustedOn === CONSTANTS.MONTH) {
+                fromDate.setDate(fromDate.getDate() - 30);
+                rateUpdatedFrom =  fromDate.toISOString().substr(0,10);
+                rateUpdatedTo = toDate.toISOString().substr(0,10);
+            } else {
+                rateUpdatedFrom = rateUpdatedTo = lastAdjustedOn;
+            }
+        }
         let params = {
             programId: selectedProgram,
             state: selectedState,
             district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
             programStatus: status,
             type: facilityType,
+            rateUpdatedTo,
+            rateUpdatedFrom
         };
         params = reject(equals(''))(params);
         const queryParams = new URLSearchParams(params);
@@ -56,6 +75,9 @@ function FacilityController() {
             .then(res => {
                 const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
                 setPrograms(programs)
+                if(programs.length > 0) {
+                    setSelectedProgram(programs[0].value)
+                }
             });
     }
 
@@ -115,6 +137,8 @@ function FacilityController() {
                             setFacilityType={setFacilityType}
                             setStatus={setStatus}
                             fetchFacilities={fetchFacilities}
+                            lastAdjustedOn={lastAdjustedOn}
+                            setLastAdjustedOn={setLastAdjustedOn}
                         />
                     ),
                 },

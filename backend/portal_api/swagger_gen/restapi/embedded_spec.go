@@ -205,6 +205,16 @@ func init() {
             "description": "Program Status",
             "name": "programStatus",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedTo",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1016,7 +1026,13 @@ func init() {
                 "rate": {
                   "type": "number"
                 },
+                "rateUpdatedAt": {
+                  "type": "string"
+                },
                 "status": {
+                  "type": "string"
+                },
+                "statusUpdatedAt": {
                   "type": "string"
                 }
               }
@@ -1420,6 +1436,16 @@ func init() {
             "type": "string",
             "description": "Program Status",
             "name": "programStatus",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedTo",
             "in": "query"
           }
         ],
@@ -2244,7 +2270,13 @@ func init() {
         "rate": {
           "type": "number"
         },
+        "rateUpdatedAt": {
+          "type": "string"
+        },
         "status": {
+          "type": "string"
+        },
+        "statusUpdatedAt": {
           "type": "string"
         }
       }

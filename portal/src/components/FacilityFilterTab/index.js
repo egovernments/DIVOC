@@ -3,7 +3,7 @@ import "./index.scss";
 import DropDown from "../DropDown/DropDown";
 
 export const FacilityFilterTab = ({
-                                      programs, setSelectedProgram, states, setSelectedState, selectedState, districtList,
+                                      programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
                                       selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children
                                   }) => {
 
@@ -36,6 +36,7 @@ export const FacilityFilterTab = ({
         <div className="filter-tab-container">
             <div className="select-program-wrapper">
                 <DropDown
+                    selectedOption={selectedProgram}
                     options={programs}
                     placeholder="Select Program"
                     setSelectedOption={setSelectedProgram}
@@ -44,6 +45,7 @@ export const FacilityFilterTab = ({
             <div>
                 <span className="filter-header">All of India</span>
                 <DropDown
+                    selectedOption={selectedState}
                     options={states}
                     placeholder="Please select State"
                     setSelectedOption={setSelectedState}

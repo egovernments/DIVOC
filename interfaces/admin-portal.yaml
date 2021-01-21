@@ -52,6 +52,12 @@ paths:
           name: programStatus
           type: string
           description: Program Status
+        - in: query
+          name: rateUpdatedFrom
+          type: string
+        - in: query
+          name: rateUpdatedTo
+          type: string
       security:
         - hasRole: ["admin", "controller"]
       responses:
@@ -486,6 +492,10 @@ definitions:
                 type: string
               rate:
                 type: number
+              statusUpdatedAt:
+                type: string
+              rateUpdatedAt:
+                type: string
   ProgramRequest:
     type: object
     properties:

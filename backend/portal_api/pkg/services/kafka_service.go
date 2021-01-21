@@ -109,12 +109,12 @@ func StartCertifiedConsumer() {
 					continue
 				}
 				markPreEnrolledUserCertified(preEnrollmentCode, contact, name)
-
+				consumer.CommitMessage(msg)
 			} else {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
 			}
-			consumer.CommitMessage(msg)
+
 		}
 	}()
 }

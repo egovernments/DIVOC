@@ -79,7 +79,7 @@ function FacilityActivation({
                 if (program) {
                     programs = facility.programs.map(program => {
                         if (program.id === selectedProgram) {
-                            return {...program, status: status !== "Active" ? "ACTIVE" : "INACTIVE"};
+                            return {...program, status: status !== "Active" ? "ACTIVE" : "INACTIVE", statusUpdatedAt: new Date().toISOString()};
                         } else {
                             return program;
                         }
@@ -88,7 +88,8 @@ function FacilityActivation({
                     programs = facility.programs.concat({
                         id: selectedProgram,
                         status: status !== "Active" ? "ACTIVE" : "INACTIVE",
-                        rate: 0
+                        rate: 0,
+                        statusUpdatedAt: new Date().toISOString()
                     })
                 }
                 updateFacilities.push({osid: facility.osid, programs})
@@ -107,6 +108,7 @@ function FacilityActivation({
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
+                    selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
                     states={stateList}
                     setSelectedState={onStateSelected}

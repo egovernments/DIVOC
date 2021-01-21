@@ -130,8 +130,14 @@ type FacilityUpdateRequestItems0ProgramsItems0 struct {
 	// rate
 	Rate float64 `json:"rate,omitempty"`
 
+	// rate updated at
+	RateUpdatedAt string `json:"rateUpdatedAt,omitempty"`
+
 	// status
 	Status string `json:"status,omitempty"`
+
+	// status updated at
+	StatusUpdatedAt string `json:"statusUpdatedAt,omitempty"`
 }
 
 // Validate validates this facility update request items0 programs items0

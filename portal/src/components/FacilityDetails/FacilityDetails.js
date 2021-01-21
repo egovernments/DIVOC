@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./FacilityDetails.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import NotifyPopup from "../NotifiyPopup/NotifiyPopup";
@@ -16,7 +16,9 @@ function FacilityDetails({
     const [modalShow, setModalShow] = useState(false);
 
     const [allChecked, setAllChecked] = useState(false);
-
+    useEffect(() => {
+        setStatus("Inactive")
+    }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
     };
@@ -94,10 +96,11 @@ function FacilityDetails({
             });
     }
     return (
-        <div className={"row container"}>
+        <div className={"row"}>
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
+                    selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
                     states={stateList}
                     setSelectedState={onStateSelected}

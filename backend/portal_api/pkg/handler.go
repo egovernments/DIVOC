@@ -21,6 +21,7 @@ const DistrictKey = "address.district"
 const TypeKey = "category"
 const ProgramIdKey = "programs.id"
 const ProgramStatusKey = "programs.status"
+const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -125,43 +126,26 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 
 func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
 	filter := map[string]interface{}{}
-	if params.State != nil && !strings.EqualFold(*params.State, "ALL") {
-		states := strings.Split(strings.ToLower(*params.State), ",")
-
-		filter[StateKey] = map[string]interface{}{
-			"or": states,
+	addQueryParamToFilter(params.State, filter, StateKey)
+	addQueryParamToFilter(params.District, filter, DistrictKey)
+	addQueryParamToFilter(params.Type, filter, TypeKey)
+	addQueryParamToFilter(params.ProgramID, filter, ProgramIdKey)
+	addQueryParamToFilter(params.ProgramStatus, filter, ProgramStatusKey)
+	if params.RateUpdatedFrom != nil && params.RateUpdatedTo != nil {
+		filter[ProgramRateUpdatedAtKey] = map[string]interface{}{
+			"between": []string{*params.RateUpdatedFrom, *params.RateUpdatedTo},
 		}
 	}
-	if params.District != nil && !strings.EqualFold(*params.District, "ALL") {
-		districts := strings.Split(strings.ToLower(*params.District), ",")
-
-		filter[DistrictKey] = map[string]interface{}{
-			"or": districts,
-		}
-	}
-	if params.Type != nil && !strings.EqualFold(*params.Type, "ALL") {
-		types := strings.Split(strings.ToLower(*params.Type), ",")
-
-		filter[TypeKey] = map[string]interface{}{
-			"or": types,
-		}
-	}
-	if params.ProgramID != nil && !strings.EqualFold(*params.ProgramID, "ALL") {
-		programIds := strings.Split(strings.ToLower(*params.ProgramID), ",")
-
-		filter[ProgramIdKey] = map[string]interface{}{
-			"or": programIds,
-		}
-	}
-	if params.ProgramStatus != nil && !strings.EqualFold(*params.ProgramStatus, "ALL") {
-		programStatus := strings.Split(strings.ToLower(*params.ProgramStatus), ",")
-
-		filter[ProgramStatusKey] = map[string]interface{}{
-			"or": programStatus,
-		}
-	}
-
 	return filter
+}
+
+func addQueryParamToFilter(param *string, filter map[string]interface{}, filterKey string) {
+	if param != nil && !strings.EqualFold(*param, "ALL") {
+		values := strings.Split(strings.ToLower(*param), ",")
+		filter[filterKey] = map[string]interface{}{
+			"or": values,
+		}
+	}
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
