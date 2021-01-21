@@ -42,8 +42,8 @@ const ExternalFailedEvent = "external-failed"
 
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
-		Name: "http_request_histogram",
-		Help: "The total number of service requests created",
+		Name: "http_request_duration_milliseconds",
+		Help: "Request duration time in milliseconds",
 	})
 )
 
@@ -446,14 +446,6 @@ func authorize(next http.HandlerFunc, roles []string, eventType string) http.Han
 
 var addr = flag.String("listen-address", ":8003", "The address to listen on for HTTP requests.")
 
-var rpcDurations = prometheus.NewSummaryVec(
-prometheus.SummaryOpts{
-Name:       "rpc_durations_seconds",
-Help:       "RPC latency distributions.",
-Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-},
-[]string{"service"},
-)
 func main() {
 	config.Initialize()
 	initializeKafka()
@@ -467,8 +459,8 @@ func main() {
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
 	//external
-	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent)).Methods("POST")
-	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent)).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
+	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
 
 	http.Handle("/", r)
 	_ = http.ListenAndServe(*addr, nil)
