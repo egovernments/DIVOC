@@ -10,7 +10,6 @@
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "bootstrap": "^4.5.3",
-    "chai": "^4.2.0",
     "idb": "^5.0.7",
     "keycloak-js": "^11.0.3",
     "prop-types": "latest",
@@ -62,7 +61,8 @@
   },
   "devDependencies": {
     "mockdate": "^3.0.2",
-    "sass": "^1.29.0"
+    "sass": "^1.29.0",
+    "chai": "^4.2.0"
   },
   "proxy": "https://divoc.xiv.in"
 }

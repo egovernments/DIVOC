@@ -1,4 +1,3 @@
-/*
 import {expect} from 'chai'
 import {reset, set} from 'mockdate'
 import {is24hoursAgo} from "./SyncFacade";
@@ -40,4 +39,3 @@ describe('Testing Sync Date', () => {
         expect(isNeedToSynced).to.equal(false)
     })
 })
-*/
