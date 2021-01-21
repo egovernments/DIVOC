@@ -5,12 +5,16 @@ import (
 	"bytes"
 	"compress/flate"
 	"encoding/json"
+	"flag"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
@@ -35,6 +39,13 @@ const InternalSuccessEvent = "internal-success"
 const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
+
+var (
+	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "http_request_histogram",
+		Help: "The total number of service requests created",
+	})
+)
 
 
 type Certificate struct {
@@ -406,6 +417,13 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 }
 
 
+func timed(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+		next.ServeHTTP(w, r)
+		requestHistogram.Observe(float64(time.Since(startTime).Milliseconds()))
+	}
+}
 func authorize(next http.HandlerFunc, roles []string, eventType string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
@@ -426,11 +444,22 @@ func authorize(next http.HandlerFunc, roles []string, eventType string) http.Han
 	}
 }
 
+var addr = flag.String("listen-address", ":8003", "The address to listen on for HTTP requests.")
+
+var rpcDurations = prometheus.NewSummaryVec(
+prometheus.SummaryOpts{
+Name:       "rpc_durations_seconds",
+Help:       "RPC latency distributions.",
+Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+},
+[]string{"service"},
+)
 func main() {
 	config.Initialize()
 	initializeKafka()
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
+	r.Handle("/metrics", promhttp.Handler())
 	//integration
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
@@ -442,7 +471,7 @@ func main() {
 	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent)).Methods("POST")
 
 	http.Handle("/", r)
-	_ = http.ListenAndServe(":8003", nil)
+	_ = http.ListenAndServe(*addr, nil)
 }
 
 func initializeKafka() {
