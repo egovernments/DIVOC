@@ -114,6 +114,7 @@ export class AppDatabase {
     }
 
     async saveUserDetails(userDetails) {
+        await this.db.clear(USER_DETAILS)
         return this.db.put(USER_DETAILS, userDetails, USER_DETAILS);
     }
 

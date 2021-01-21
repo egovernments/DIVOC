@@ -9,9 +9,6 @@ export class SyncFacade {
         await appIndexDb.saveVaccinators(vaccinators);
         const preEnrollments = await ApiServices.fetchPreEnrollments();
         await appIndexDb.saveEnrollments(preEnrollments);
-        const userDetails = await ApiServices.getUserDetails();
-        await appIndexDb.saveUserDetails(userDetails);
-
     }
 
     static async push() {

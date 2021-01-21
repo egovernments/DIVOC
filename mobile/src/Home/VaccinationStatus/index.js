@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {BaseCard} from "../../Base/Base";
 import "./index.scss"
+import {appIndexDb} from "../../AppDatabase";
 
 
 export function VaccinationStatus() {
@@ -39,14 +40,18 @@ export function VaccinationStatus() {
 }
 
 async function getVaccinationStatus() {
-    const dummyVaccination = new VaccinationDetails(
-        225,
-        200,
-        25,
-        true,
-        "Exceed Limits"
-    )
-    return dummyVaccination
+    const userDetails = await appIndexDb.getUserDetails()
+    const programRate = userDetails["covid19_rate"] ?? 0
+    const recipientDetails = await appIndexDb.recipientDetails()
+    const certificateIssue = recipientDetails[1].value
+    const isExceed = certificateIssue > programRate
+    return new VaccinationDetails(
+        certificateIssue,
+        userDetails["covid19_rate"],
+        isExceed ? (certificateIssue - programRate) : 0,
+        isExceed,
+        isExceed ? "Exceed Limits" : "Recipients Enrolled"
+    );
 }
 
 
