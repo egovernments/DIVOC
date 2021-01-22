@@ -187,6 +187,9 @@ export class AppDatabase {
         return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
     }
 
+    async getAllEvents() {
+        return await this.db.getAll(EVENTS) || [];
+    }
 }
 
 export const appIndexDb = new AppDatabase();
