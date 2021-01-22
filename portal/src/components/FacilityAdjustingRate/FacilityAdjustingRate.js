@@ -9,7 +9,7 @@ import {formatDate} from "../../utils/dateutil";
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn
+                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -17,7 +17,7 @@ function FacilityAdjustingRate({
     const axiosInstance = useAxios('');
 
     useEffect(() => {
-        setStatus("")
+        resetFilter()
     }, []);
 
     useEffect(() => {
@@ -153,7 +153,7 @@ function FacilityAdjustingRate({
                         } else {
                             programs = facility.programs.concat({
                                 id: selectedProgram,
-                                status: "ACTIVE",
+                                status: CONSTANTS.ACTIVE,
                                 rate: rateWiseFacilities[rate].newRate,
                                 rateUpdatedAt: new Date().toISOString()
                             })

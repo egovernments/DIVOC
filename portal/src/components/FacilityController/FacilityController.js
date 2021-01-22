@@ -8,19 +8,26 @@ import state_and_districts from '../../utils/state_and_districts.json';
 import {equals, reject} from "ramda";
 import {API_URL, CONSTANTS} from "../../utils/constants";
 
+const defaultState = {
+    selectedProgram: "",
+    selectedState: CONSTANTS.ALL,
+    selectedDistrict: "",
+    facilityType: CONSTANTS.GOVT,
+    status: CONSTANTS.ACTIVE,
+    lastAdjustedOn: ""
+};
+
 function FacilityController() {
-    const PROGRAMS = ["C-19 Program"];
     const axiosInstance = useAxios('');
     const [facilities, setFacilities] = useState([]);
     const [programs, setPrograms] = useState([]);
-    const [selectedState, setSelectedState] = useState("All");
     const [districts, setDistricts] = useState([]);
-    const [selectedDistrict, setSelectedDistrict] = useState("");
-    const [selectedProgram, setSelectedProgram] = useState("");
-    const [facilityType, setFacilityType] = useState("GOVT");
-    const [status, setStatus] = useState("");
-    const stateList = [{value: "ALL", label: "ALL"}].concat(Object.values(state_and_districts['states']).map(obj => ({value: obj.name, label: obj.name})));
-    const [lastAdjustedOn, setLastAdjustedOn] = useState("");
+    const stateList = [{
+        value: CONSTANTS.ALL,
+        label: CONSTANTS.ALL
+    }].concat(Object.values(state_and_districts['states']).map(obj => ({value: obj.name, label: obj.name})));
+
+    const [filter, setFilter] = useState(defaultState);
 
     useEffect(() => {
         fetchPrograms();
@@ -28,21 +35,72 @@ function FacilityController() {
 
     useEffect(() => {
         fetchFacilities();
-    }, [selectedProgram, selectedState, selectedDistrict, facilityType, status, lastAdjustedOn]);
+    }, [filter]);
+
+    function resetFilter() {
+        setFilter(defaultState)
+    }
+
+    function setSelectedState(value) {
+        setFilter({
+            ...filter,
+            selectedState: value
+        })
+    }
+
+    function setSelectedDistrict(value) {
+        setFilter({
+            ...filter,
+            selectedDistrict: value
+        })
+    }
+
+    function setSelectedProgram(value) {
+        setFilter({
+            ...filter,
+            selectedProgram: value
+        })
+
+    }
+
+    function setFacilityType(value) {
+        setFilter({
+            ...filter,
+            facilityType: value
+        })
+
+    }
+
+    function setStatus(value) {
+        setFilter({
+            ...filter,
+            status: value
+        })
+
+    }
+
+    function setLastAdjustedOn(value) {
+        setFilter({
+            ...filter,
+            lastAdjustedOn: value
+        })
+
+    }
 
     function fetchFacilities() {
+        const {lastAdjustedOn, selectedProgram, selectedState, selectedDistrict, status, facilityType} = filter;
         let rateUpdatedFrom = "", rateUpdatedTo = "";
         if (lastAdjustedOn !== "") {
             let fromDate = new Date();
             let toDate = new Date();
-            if(lastAdjustedOn === CONSTANTS.WEEK) {
+            if (lastAdjustedOn === CONSTANTS.WEEK) {
                 fromDate.setDate(fromDate.getDate() - 7);
-                rateUpdatedFrom =  fromDate.toISOString().substr(0,10);
-                rateUpdatedTo = toDate.toISOString().substr(0,10);
+                rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
+                rateUpdatedTo = toDate.toISOString().substr(0, 10);
             } else if (lastAdjustedOn === CONSTANTS.MONTH) {
                 fromDate.setDate(fromDate.getDate() - 30);
-                rateUpdatedFrom =  fromDate.toISOString().substr(0,10);
-                rateUpdatedTo = toDate.toISOString().substr(0,10);
+                rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
+                rateUpdatedTo = toDate.toISOString().substr(0, 10);
             } else {
                 rateUpdatedFrom = rateUpdatedTo = lastAdjustedOn;
             }
@@ -75,7 +133,7 @@ function FacilityController() {
             .then(res => {
                 const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
                 setPrograms(programs)
-                if(programs.length > 0) {
+                if (programs.length > 0) {
                     setSelectedProgram(programs[0].value)
                 }
             });
@@ -84,14 +142,14 @@ function FacilityController() {
     function onStateSelected(stateSelected) {
         setSelectedState(stateSelected);
         const stateObj = Object.values(state_and_districts['states']).find(obj => obj.name === stateSelected);
-        if(stateObj) {
+        if (stateObj) {
             setDistricts(stateObj.districts)
         } else {
             setDistricts([])
         }
     }
 
-
+    const {lastAdjustedOn, selectedProgram, selectedState, selectedDistrict, status, facilityType} = filter;
     return (
         <TabPanels
             tabs={[
@@ -115,6 +173,7 @@ function FacilityController() {
                             status={status}
                             setStatus={setStatus}
                             fetchFacilities={fetchFacilities}
+                            resetFilter={resetFilter}
                         />
                     ),
                 },
@@ -139,6 +198,7 @@ function FacilityController() {
                             fetchFacilities={fetchFacilities}
                             lastAdjustedOn={lastAdjustedOn}
                             setLastAdjustedOn={setLastAdjustedOn}
+                            resetFilter={resetFilter}
                         />
                     ),
                 },
@@ -162,6 +222,7 @@ function FacilityController() {
                             status={status}
                             setStatus={setStatus}
                             fetchFacilities={fetchFacilities}
+                            resetFilter={resetFilter}
                         />
                     ),
                 },

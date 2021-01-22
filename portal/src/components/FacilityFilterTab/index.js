@@ -1,6 +1,7 @@
 import React from "react";
 import "./index.scss";
 import DropDown from "../DropDown/DropDown";
+import {CONSTANTS} from "../../utils/constants";
 
 export const FacilityFilterTab = ({
                                       programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
@@ -71,8 +72,8 @@ export const FacilityFilterTab = ({
                 <div className="m-3">
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"GOVT"}
-                            checked={facilityType === "GOVT"}
+                            text={CONSTANTS.GOVT}
+                            checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,
@@ -83,8 +84,8 @@ export const FacilityFilterTab = ({
                     </div>
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"PRIVATE"}
-                            checked={facilityType === "PRIVATE"}
+                            text={CONSTANTS.PRIVATE}
+                            checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,

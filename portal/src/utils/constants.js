@@ -6,7 +6,12 @@ export const CONSTANTS = Object.freeze({
     FACILITY_ADMIN_ROLE: "facility-admin",
     PORTAL_CLIENT: "facility-admin-portal",
     WEEK: "Week",
-    MONTH: "Month"
+    MONTH: "Month",
+    ALL: "All",
+    GOVT: "Govt",
+    PRIVATE: "Private",
+    ACTIVE: "Active",
+    IN_ACTIVE: "Inactive"
 });
 
 export const API_URL = Object.freeze({

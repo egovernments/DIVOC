@@ -4,20 +4,20 @@ import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import NotifyPopup from "../NotifiyPopup/NotifiyPopup";
 import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
 
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, fetchFacilities
+                             status, setStatus, resetFilter
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
 
     const [allChecked, setAllChecked] = useState(false);
     useEffect(() => {
-        setStatus("Inactive")
+        resetFilter()
     }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -115,15 +115,15 @@ function FacilityDetails({
                         <span className={"filter-header"}>Status</span>
                         <div className="m-3">
                             <RadioItem
-                                text={"Active"}
-                                checked={status === "Active"}
+                                text={CONSTANTS.ACTIVE}
+                                checked={status === CONSTANTS.ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
                             />
                             <RadioItem
-                                text={"Inactive"}
-                                checked={status === "Inactive"}
+                                text={CONSTANTS.IN_ACTIVE}
+                                checked={status === CONSTANTS.IN_ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }

@@ -2,18 +2,18 @@ import React, {useEffect, useState} from "react";
 import styles from "./FacilityActivation.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import {useAxios} from "../../utils/useAxios";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                 setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                status, setStatus, fetchFacilities
+                                status, setStatus, fetchFacilities, resetFilter
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios('');
     useEffect(() => {
-        setStatus("Inactive")
+        resetFilter()
     }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -42,7 +42,7 @@ function FacilityActivation({
                 return program.status;
             }
         }
-        return "Inactive";
+        return CONSTANTS.IN_ACTIVE;
     };
 
     const getFacilityList = () => {
@@ -79,7 +79,11 @@ function FacilityActivation({
                 if (program) {
                     programs = facility.programs.map(program => {
                         if (program.id === selectedProgram) {
-                            return {...program, status: status !== "Active" ? "ACTIVE" : "INACTIVE", statusUpdatedAt: new Date().toISOString()};
+                            return {
+                                ...program,
+                                status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE,
+                                statusUpdatedAt: new Date().toISOString()
+                            };
                         } else {
                             return program;
                         }
@@ -87,7 +91,7 @@ function FacilityActivation({
                 } else {
                     programs = facility.programs.concat({
                         id: selectedProgram,
-                        status: status !== "Active" ? "ACTIVE" : "INACTIVE",
+                        status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE,
                         rate: 0,
                         statusUpdatedAt: new Date().toISOString()
                     })
@@ -123,15 +127,15 @@ function FacilityActivation({
                         <span className={"filter-header"}>Status</span>
                         <div className="m-3">
                             <RadioItem
-                                text={"Active"}
-                                checked={status === "Active"}
+                                text={CONSTANTS.ACTIVE}
+                                checked={status === CONSTANTS.ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
                             />
                             <RadioItem
-                                text={"Inactive"}
-                                checked={status === "Inactive"}
+                                text={CONSTANTS.IN_ACTIVE}
+                                checked={status === CONSTANTS.IN_ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
@@ -180,7 +184,7 @@ function FacilityActivation({
                             onClick={handleActiveClick}
                             className={styles["button"]}
                         >
-                            MAKE {status !== "Active" ? "ACTIVE" : "INACTIVE"}
+                            MAKE {status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE}
                         </button>
                     </div>
                 </div>
