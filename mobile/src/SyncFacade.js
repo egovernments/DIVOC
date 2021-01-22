@@ -17,10 +17,14 @@ export class SyncFacade {
 
     static async pull() {
         await appIndexDb.initDb();
-        const vaccinators = await ApiServices.fetchVaccinators();
-        await appIndexDb.saveVaccinators(vaccinators);
         const preEnrollments = await ApiServices.fetchPreEnrollments();
         await appIndexDb.saveEnrollments(preEnrollments);
+
+        const programs = await ApiServices.fetchPrograms();
+        await appIndexDb.savePrograms(programs)
+
+        const vaccinators = await ApiServices.fetchVaccinators();
+        await appIndexDb.saveVaccinators(vaccinators);
     }
 
     static async push() {

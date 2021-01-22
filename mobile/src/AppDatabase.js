@@ -2,8 +2,9 @@ import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 9;
+const DATABASE_VERSION = 10;
 const PATIENTS = "patients";
+const PROGRAMS = "programs";
 const QUEUE = "queue";
 const EVENTS = "events";
 const VACCINATORS = "vaccinators";
@@ -31,8 +32,11 @@ export class AppDatabase {
                     database.createObjectStore(VACCINATORS, {keyPath: "osid"});
                     database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
                 }
-                if (oldVersion === 0 || newVersion === 6) {
+                if (oldVersion === 0 || newVersion === 6 || newVersion === 10) {
                     database.createObjectStore(USER_DETAILS);
+                }
+                if (oldVersion === 0 || newVersion === 10) {
+                    database.createObjectStore(PROGRAMS, {keyPath: "name"});
                 }
             }
         });
@@ -111,6 +115,18 @@ export class AppDatabase {
 
     async saveEvent(event) {
         return this.db.add(EVENTS, event)
+    }
+
+
+    async savePrograms(programs) {
+        const programList = programs || [];
+        const facilityProgram = programList.map((item, index) => this.db.put(PROGRAMS, item));
+        return Promise.all(facilityProgram)
+    }
+
+
+    async getPrograms() {
+        return this.db.getAll(PROGRAMS);
     }
 
     async saveUserDetails(userDetails) {

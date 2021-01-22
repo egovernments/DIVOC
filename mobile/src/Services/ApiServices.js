@@ -2,6 +2,7 @@ import {appIndexDb} from "../AppDatabase";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
+const PROGRAMS = "/divoc/api/v1/programs/current"
 const VACCINATORS = "/divoc/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
@@ -37,6 +38,15 @@ export class ApiServices {
             headers: {'accept': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem("token")}
         };
         return fetch(PRE_ENROLLMENT, requestOptions)
+            .then(response => response.json())
+    }
+
+    static async fetchPrograms() {
+        const requestOptions = {
+            method: 'GET',
+            headers: {'accept': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem("token")}
+        };
+        return fetch(PROGRAMS, requestOptions)
             .then(response => response.json())
     }
 

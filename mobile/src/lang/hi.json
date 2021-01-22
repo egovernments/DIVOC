@@ -17,5 +17,7 @@
   "app.registerIdentityNumber": "आधार के साथ रजिस्टर करें",
   "app.scanIdentityNumber": "आधार के साथ स्कैन",
   "app.enrollmentToday": "आज नामांकन",
-  "app.limitReachMessage": "कृपया ध्यान दें: आप दैनिक नामांकन सीमा तक पहुंच रहे हैं।"
+  "app.limitReachMessage": "कृपया ध्यान दें: आप दैनिक नामांकन सीमा तक पहुंच रहे हैं।",
+  "app.program": "कार्यक्रम",
+  "app.selectProgram": "Select Program"
 }
