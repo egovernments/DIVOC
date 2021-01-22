@@ -36,6 +36,7 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 			EmployeeID:   user.EmployeeID,
 			FullName:     user.Name,
 			FacilityCode: claimBody.FacilityCode,
+			VaccinationRateLimits: user.VaccinationRateLimits,
 		},
 	}
 	resp, err := CreateKeycloakUser(userRequest)
