@@ -4,6 +4,7 @@ import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
+import DetailsCard from "../DetailsCard/DetailsCard";
 
 
 function FacilityAdjustingRate({
@@ -15,6 +16,8 @@ function FacilityAdjustingRate({
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios('');
+    const [showCard, setShowCard] = useState(false);
+    const [selectedRow, setSelectedRow] = useState([]);
 
     useEffect(() => {
         resetFilter({lastAdjustedOn: CONSTANTS.WEEK})
@@ -51,7 +54,10 @@ function FacilityAdjustingRate({
             let rateUpdatedAt = getFacilityProgram(facility).rateUpdatedAt;
             return <tr>
                 <td>{facility['facilityCode']}</td>
-                <td>{facility['facilityName']}</td>
+                <td role="button" onClick={() => {
+                    setShowCard(!showCard);
+                    setSelectedRow(facility)
+                }}>{facility['facilityName']}</td>
                 <td>{facility['category']}</td>
                 <td>{getFacilityProgram(facility).rate || '-'}</td>
                 <td>{rateUpdatedAt ? formatDate(rateUpdatedAt) : 'DD/MMM/YYYY'}</td>
@@ -210,29 +216,38 @@ function FacilityAdjustingRate({
                 </FacilityFilterTab>
             </div>
             <div className={`col-sm-6 container ${styles['table']}`}>
-                <p className={styles['highlight']}>{selectedDistrict} facilties</p>
-                <table className={`table table-hover ${styles['table-data']}`}>
-                    <thead>
-                    <tr>
-                        <th>CODE</th>
-                        <th>NAME</th>
-                        <th>TYPE</th>
-                        <th>PROGRAM RATE</th>
-                        <th>LAST ADJUSTED</th>
+                {!showCard ?
+                <>
+                    <p className={styles['highlight']}>{selectedDistrict} facilties</p>
+                    <table className={`table table-hover ${styles['table-data']}`}>
+                        <thead>
+                        <tr>
+                            <th>CODE</th>
+                            <th>NAME</th>
+                            <th>TYPE</th>
+                            <th>PROGRAM RATE</th>
+                            <th>LAST ADJUSTED</th>
                         <th>
-                            <CheckboxItem
-                                text={"checkAll"}
-                                checked={allChecked}
-                                onSelect={(e) => {
-                                    handleAllCheck(e)
-                                }}
-                                showText={false}
-                            />
-                        </th>
-                    </tr>
-                    </thead>
-                    <tbody>{getFacilityList()}</tbody>
-                </table>
+                                <CheckboxItem
+                                    text={"checkAll"}
+                                    checked={allChecked}
+                                    onSelect={(e) => {
+                                        handleAllCheck(e)
+                                    }}
+                                    showText={false}
+                                />
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>{getFacilityList()}</tbody>
+                    </table>
+                </>
+                 : ""}
+                <DetailsCard
+                    showCard={showCard}
+                    setShowCard={setShowCard}
+                    data={selectedRow}
+                />
             </div>
             <div className="col-sm-3 container">
                 <div className={styles['highlight']}>Set Rate</div>

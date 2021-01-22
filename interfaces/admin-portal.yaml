@@ -742,10 +742,22 @@ definitions:
       enabled:
         type: boolean
         title: enable/disable user
+      vaccinationRateLimits:
+        type: array
+        items:
+          "$ref": "#/definitions/VaccinationRateLimit"
       groups:
         type: array
         items:
           "$ref": "#/definitions/UserGroup"
+  VaccinationRateLimit:
+    properties:
+      programName:
+        type: string
+        title: Program Name
+      rateLimit:
+        type: integer
+        title: Maximum rate of vaccination
   UserGroup:
     properties:
       id:
