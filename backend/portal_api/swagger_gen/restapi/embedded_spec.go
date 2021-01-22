@@ -312,12 +312,6 @@ func init() {
               "items": {
                 "type": "object",
                 "properties": {
-                  "contact": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  },
                   "facilityId": {
                     "type": "string"
                   },
@@ -2296,12 +2290,6 @@ func init() {
     "NotifyFacilitiesParamsBodyItems0": {
       "type": "object",
       "properties": {
-        "contact": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
         "facilityId": {
           "type": "string"
         },

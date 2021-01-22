@@ -119,10 +119,6 @@ paths:
               properties:
                 facilityId:
                   type: string
-                email:
-                  type: string
-                contact:
-                  type: string
                 pendingTasks:
                   type: array
                   items:

@@ -65,8 +65,11 @@ function FacilityDetails({
     };
 
     const handleNotifyClick = () => {
-        setAllChecked(false);
-        setModalShow(true);
+        const selectedFacilities = facilities.filter(facility => facility.isChecked);
+        if (selectedFacilities.length > 0) {
+            setAllChecked(false);
+            setModalShow(true);
+        }
     };
 
     const sendNotification = () => {
@@ -74,8 +77,6 @@ function FacilityDetails({
         const notifyRequest = selectedFacilities.map(facility => {
             let req = {
                 facilityId: facility.osid,
-                contact: facility.contact,
-                email: facility.email,
                 pendingTasks: []
             };
             if(!facility.admins) {

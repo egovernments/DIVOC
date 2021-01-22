@@ -35,20 +35,35 @@ func GetFacilityByCode(facilityCode string) (map[string]interface{}, error) {
 
 func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, claimBody *models.JWTClaimBody) middleware.Responder {
 	for _, facilityNotifyRequest := range params.Body {
-		log.Infof("Notifying facility %s", facilityNotifyRequest.FacilityID)
-		buf := bytes.Buffer{}
-		err := pendingTasksTemplate.Execute(&buf, facilityNotifyRequest)
-		if err == nil {
-			subject := "DIVOC - Facility Pending Tasks"
-			if len(facilityNotifyRequest.Contact) > 0 {
-				PublishNotificationMessage("tel:"+facilityNotifyRequest.Contact, subject, buf.String())
-			}
-			if len(facilityNotifyRequest.Email) > 0 {
-				PublishNotificationMessage("mailto:"+facilityNotifyRequest.Email, subject, buf.String())
-			}
-		} else {
-			return operations.NewGetFacilityGroupsBadRequest()
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": facilityNotifyRequest.FacilityID,
+			},
 		}
+		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		if err == nil {
+			facilities := searchRespone["Facility"].([]interface{})
+			if len(facilities) > 0 {
+				facility := facilities[0].(map[string]interface{})
+				log.Infof("Notifying facility %s", facilityNotifyRequest.FacilityID)
+				buf := bytes.Buffer{}
+				err := pendingTasksTemplate.Execute(&buf, facilityNotifyRequest)
+				if err == nil {
+					subject := "DIVOC - Facility Pending Tasks"
+					contact := facility["contact"].(string)
+					email := facility["email"].(string)
+					if len(contact) > 0 {
+						PublishNotificationMessage("tel:"+contact, subject, buf.String())
+					}
+					if len(email) > 0 {
+						PublishNotificationMessage("mailto:"+email, subject, buf.String())
+					}
+				} else {
+					return operations.NewGetFacilityGroupsBadRequest()
+				}
+			}
+		}
+
 	}
 	return operations.NewNotifyFacilitiesOK()
 }
