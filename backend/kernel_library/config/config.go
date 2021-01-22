@@ -4,7 +4,7 @@ import "github.com/jinzhu/configor"
 
 func init() {
 	print("kernel config initialization")
-	err := configor.Load(&Config, "./config/application-default.yml")//"config/application.yml"
+	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
 	if err != nil {
 		panic("Unable to read configurations")
@@ -35,5 +35,9 @@ var Config = struct {
 			ClientId string `yaml:"clientId"`
 			GroupId  string `yaml:"groupId"`
 		} `yaml:"facilityStaff"`
+	}
+	Flagr struct {
+		Url                 string `env:"FLAGR_URL"`
+		NotificationFlagKey string `default:"notification_templates"`
 	}
 }{}

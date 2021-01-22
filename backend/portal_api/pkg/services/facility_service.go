@@ -11,18 +11,8 @@ import (
 )
 
 const FacilityEntity string = "Facility"
-
-const pendingTasksTemplateString = `
-Your facility is still pending to complete certain tasks ({{.PendingTasks}}). Please do the needful.
-`
-
-var pendingTasksTemplate = template.Must(template.New("").Parse(pendingTasksTemplateString))
-
-const facilityUpdateTemplateString = `
-Your facility's' {{.field}} is been updated to {{.value}}.
-`
-
-var facilityUpdateTemplate = template.Must(template.New("").Parse(facilityUpdateTemplateString))
+const FacilityPendingTasks string = "facilityPendingTasks"
+const FacilityUpdate string = "facilityUpdate"
 
 func GetFacilityByCode(facilityCode string) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
@@ -34,6 +24,10 @@ func GetFacilityByCode(facilityCode string) (map[string]interface{}, error) {
 }
 
 func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, claimBody *models.JWTClaimBody) middleware.Responder {
+	pendingTasksTemplateString := kernelService.FlagrConfigs.NotificationTemplates[FacilityPendingTasks].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[FacilityPendingTasks].Subject
+	var pendingTasksTemplate = template.Must(template.New("").Parse(pendingTasksTemplateString))
+
 	for _, facilityNotifyRequest := range params.Body {
 		searchFilter := map[string]interface{}{
 			"osid": map[string]interface{}{
@@ -49,7 +43,6 @@ func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, clai
 				buf := bytes.Buffer{}
 				err := pendingTasksTemplate.Execute(&buf, facilityNotifyRequest)
 				if err == nil {
-					subject := "DIVOC - Facility Pending Tasks"
 					contact := facility["contact"].(string)
 					email := facility["email"].(string)
 					if len(contact) > 0 {
@@ -69,6 +62,11 @@ func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, clai
 }
 
 func NotifyFacilityUpdate(field string, value string, mobile string, email string) {
+	facilityUpdateTemplateString := kernelService.FlagrConfigs.NotificationTemplates[FacilityUpdate].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[FacilityUpdate].Subject
+
+	var facilityUpdateTemplate = template.Must(template.New("").Parse(facilityUpdateTemplateString))
+
 	updateObj := map[string]interface{}{
 		"field": field,
 		"value": value,
@@ -76,7 +74,6 @@ func NotifyFacilityUpdate(field string, value string, mobile string, email strin
 	buf := bytes.Buffer{}
 	err := facilityUpdateTemplate.Execute(&buf, updateObj)
 	if err == nil {
-		subject := "DIVOC - Facility Update"
 		if len(mobile) > 0 {
 			PublishNotificationMessage("tel:"+mobile, subject, buf.String())
 		}
