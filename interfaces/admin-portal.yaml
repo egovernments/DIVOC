@@ -704,10 +704,22 @@ definitions:
       employeeId:
         type: string
         title: Facility User Id
+      vaccinationRateLimits:
+        type: array
+        items:
+          "$ref": "#/definitions/VaccinationRateLimit"
       groups:
         type: array
         items:
           "$ref": "#/definitions/UserGroup"
+  VaccinationRateLimit:
+    properties:
+      programName:
+        type: string
+        title: Program Name
+      rateLimit:
+        type: integer
+        title: Maximum rate of vaccination
   UserGroup:
     properties:
       id:
