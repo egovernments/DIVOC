@@ -1,8 +1,10 @@
 import Keycloak from 'keycloak-js';
 import config from "../config"
-import React from "react";
+import React, {useEffect} from "react";
 import {useKeycloak} from "@react-keycloak/web";
 import {Messages} from "../Base/Constants";
+import {appIndexDb} from "../AppDatabase";
+import {ApiServices} from "../Services/ApiServices";
 
 const keycloak = Keycloak(config.urlPath + '/keycloak.json');
 
@@ -19,6 +21,17 @@ export function AuthSafeComponent({children}) {
 
 export function WithKeyCloakComponent({children}) {
     const {keycloak, initialized} = useKeycloak()
+    useEffect(() => {
+        if (initialized || keycloak.authenticated) {
+            keycloak.loadUserProfile()
+                .then(res => {
+                    return saveUserAttributes(res["attributes"]);
+                })
+                .catch((e) => {
+                    console.log(e.message)
+                })
+        }
+    }, [initialized]);
     if (!keycloak || !children) {
         return <div>
             Loading...
@@ -47,6 +60,19 @@ export function WithKeyCloakComponent({children}) {
             }
         )
     }
+}
+
+async function saveUserAttributes(attributes) {
+    await appIndexDb.initDb()
+    let userDetails = await appIndexDb.getUserDetails();
+    if (userDetails) {
+        userDetails = await ApiServices.getUserDetails()
+    }
+    for (let attributesKey in attributes) {
+        userDetails[attributesKey] = attributes[attributesKey][0]
+    }
+    const id = await appIndexDb.saveUserDetails(userDetails)
+    console.log(id)
 }
 
 export function WithoutKeyCloakComponent({children}) {
