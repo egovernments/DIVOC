@@ -383,6 +383,20 @@ definitions:
                 type: string
               pincode:
                 type: integer
+            required:
+              - addressLine1
+              - district
+              - state
+              - pincode
+        required:
+          - name
+          - dob
+          - age
+          - gender
+          - nationality
+          - identity
+          - contact
+          - address
       vaccination:
         type: object
         properties:
@@ -411,11 +425,21 @@ definitions:
             description: Total number of doses required for this vaccination.
             example:
               2
+        required:
+          - name
+          - manufacturer
+          - date
+          - effectiveStart
+          - effectiveUntil
+          - dose
+          - totalDoses
       vaccinator:
         type: object
         properties:
           name:
             type: string
+        required:
+          - name
       facility:
         type: object
         properties:
@@ -434,8 +458,22 @@ definitions:
                 type: string
               pincode:
                 type: integer
+            required:
+              - addressLine1
+              - district
+              - state
+              - pincode
+        required:
+          - name
+          - address
       meta:
         type: object
+    required:
+      - preEnrollmentCode
+      - recipient
+      - vaccination
+      - vaccinator
+      - facility
   Program:
     type: object
     properties:
