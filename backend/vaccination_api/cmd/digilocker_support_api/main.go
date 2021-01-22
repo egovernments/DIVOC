@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
@@ -28,6 +29,7 @@ import (
 
 const ApiRole = "api"
 const ArogyaSetuRole = "arogyasetu"
+const Recipient = "recipient"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
@@ -46,7 +48,6 @@ var (
 		Help: "Request duration time in milliseconds",
 	})
 )
-
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -107,7 +108,6 @@ type Certificate struct {
 		Jws                string    `json:"jws"`
 	} `json:"proof"`
 }
-
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
 	if (!isFinal(certificate)) {
@@ -353,6 +353,122 @@ func compress(certificateText string) (*bytes.Buffer, error) {
 	return buf, err
 }
 
+func getCertificateList(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
+	claimBody := auth.ExtractClaimBodyFromHeader(request)
+	if claimBody != nil {
+		filter := map[string]interface{}{}
+		filter[Mobile] = map[string]interface{}{
+			"eq": claimBody.PreferredUsername,
+		}
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		if err == nil {
+			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			log.Infof("Certificate query return %d records", len(certificateArr))
+			if len(certificateArr) > 0 {
+				certificates := map[string]interface{}{
+					"certificates": certificateArr,
+				}
+				if responseBytes, err := json.Marshal(certificates); err != nil {
+					log.Errorf("Error while serializing xml")
+				} else {
+					w.WriteHeader(200)
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write(responseBytes)
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        pkg.ToString(claimBody.PreferredUsername),
+						TypeOfMessage: InternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
+					return
+				}
+			} else {
+				log.Errorf("No certificates found for request %v", filter)
+				writeResponse(w, 404, mobileNumberMismatchError())
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", filter)
+			w.WriteHeader(500)
+		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        claimBody.PreferredUsername,
+			TypeOfMessage: InternalFailedEvent,
+			ExtraInfo:     "Certificate not found",
+		})
+	} else {
+		payload := ErrorResponse{
+			Status:    "Forbidden",
+			ErrorCode: 0,
+			Message:   `Invalid token`,
+		}
+		writeResponse(w, http.StatusForbidden, payload)
+	}
+}
+
+func getCertificatePDF(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
+	claimBody := auth.ExtractClaimBodyFromHeader(r)
+	if claimBody != nil {
+		log.Info("GET PDF HANDLER REQUEST")
+		vars := mux.Vars(r)
+		certificateId := vars[CertificateId]
+		filter := map[string]interface{}{}
+		filter[Mobile] = map[string]interface{}{
+			"eq": claimBody.PreferredUsername,
+		}
+		filter[CertificateId] = map[string]interface{}{
+			"eq": certificateId,
+		}
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		if err == nil {
+			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			log.Infof("Certificate query return %d records", len(certificateArr))
+			if len(certificateArr) > 0 {
+				certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+				log.Infof("certificate resp %v", certificateObj)
+				signedJson := certificateObj["certificate"].(string)
+				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+					log.Errorf("Error in creating certificate pdf")
+				} else {
+					//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+					//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+					//w.Header().Set("Content-Length", string(len(pdfBytes)))
+					w.WriteHeader(200)
+					_, _ = w.Write(pdfBytes)
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        certificateId,
+						TypeOfMessage: InternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
+					return
+				}
+			} else {
+				log.Errorf("No certificates found for request %v", certificateId)
+				w.WriteHeader(404)
+			}
+		} else {
+			log.Infof("Error %+v", err)
+		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        certificateId,
+			TypeOfMessage: InternalFailedEvent,
+			ExtraInfo:     "Certificate not found",
+		})
+	} else {
+		payload := ErrorResponse{
+			Status:    "Forbidden",
+			ErrorCode: 0,
+			Message:   `Invalid token`,
+		}
+		writeResponse(w, http.StatusForbidden, payload)
+	}
+
+}
+
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("GET PDF HANDLER REQUEST")
 	vars := mux.Vars(r)
@@ -416,7 +532,6 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 	return certificateFromRegistry, err
 }
 
-
 func timed(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
@@ -458,6 +573,10 @@ func main() {
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
+	r.HandleFunc("/cert/api/certificates", timed(authorize(getCertificateList, []string{Recipient}, InternalFailedEvent))).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF", timed(authorize(getCertificatePDF, []string{Recipient}, InternalFailedEvent))).
+		Methods("GET").
+		Queries("certificateId", "{certificateId}")
 	//external
 	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
