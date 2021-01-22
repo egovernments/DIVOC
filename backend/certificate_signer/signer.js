@@ -9,10 +9,12 @@ const {RSAKeyPair} = require('crypto-ld');
 const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
-const {credentialsv1} = require('./credentials.json');
+const credentialsv1 = require('./credentials.json');
 const {vaccinationContext} = require("vaccination-context");
+const redis = require('./redis');
 
 const UNSUCCESSFUL = "UNSUCCESSFUL";
+const SUCCESSFUL = "SUCCESSFUL";
 const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 const publicKey = {
@@ -30,8 +32,8 @@ const customLoader = url => {
     "https://example.com/i/india": publicKey,
     "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
     'https://www.w3.org/2018/credentials#': credentialsv1,
-    "https://www.w3.org/2018/credentials/v1": credentialsv1
-    , "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext
+    "https://www.w3.org/2018/credentials/v1": credentialsv1,
+    "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext,
   };
   let context = c[url];
   if (context === undefined) {
@@ -47,6 +49,7 @@ const customLoader = url => {
   if (url.startsWith("{")) {
     return JSON.parse(url);
   }
+  console.log("Fallback url lookup for document :" + url)
   return documentLoader()(url);
 };
 
@@ -162,6 +165,7 @@ async function signAndSave(certificate, retryCount = 0) {
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
   const preEnrollmentCode = certificate.preEnrollmentCode;
+  const currentDose = certificate.vaccination.dose;
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
@@ -184,6 +188,9 @@ async function signAndSave(certificate, retryCount = 0) {
     }
   }
   resp.signedCertificate = signedCertificateForDB;
+  if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
+    redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, certificateId)
+  }
   return resp;
 }
 
