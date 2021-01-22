@@ -476,7 +476,7 @@ definitions:
       type: object
       properties:
         osid:
-          type: object
+          type: string
         status:
           type: string
         programs:
@@ -488,14 +488,8 @@ definitions:
                 type: string
               status:
                 type: string
-              osid:
-                type: string
               rate:
                 type: number
-              statusUpdatedAt:
-                type: string
-              rateUpdatedAt:
-                type: string
   ProgramRequest:
     type: object
     properties:

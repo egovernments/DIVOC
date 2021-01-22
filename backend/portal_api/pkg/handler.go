@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const StateKey = "address.state"
@@ -330,17 +331,64 @@ func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principa
 
 func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
-		requestBody, err := json.Marshal(updateRequest)
-		if err != nil {
-			return operations.NewUpdateFacilitiesBadRequest()
+		if updateRequest.Osid == "" {
+			log.Errorf("Facility update request without OSID %v", updateRequest)
+			continue
 		}
-		requestMap := make(map[string]interface{})
-		err = json.Unmarshal(requestBody, &requestMap)
-		resp, err := kernelService.UpdateRegistry("Facility", requestMap)
-		if err != nil {
-			log.Error(err)
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": updateRequest.Osid,
+			},
+		}
+		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		if err == nil {
+			facilities := searchRespone["Facility"].([]interface{})
+			if len(facilities) > 0 {
+				facility := facilities[0].(map[string]interface{})
+				currentPrograms := facility["programs"].([]interface{})
+				var updatePrograms []map[string]interface{}
+				updateFacility := map[string]interface{}{
+					"osid":     updateRequest.Osid,
+					"programs": []interface{}{},
+				}
+				if len(currentPrograms) == 0 {
+					for _, program := range updateRequest.Programs {
+						updatePrograms = append(updatePrograms, map[string]interface{}{
+							"id":              program.ID,
+							"status":          program.Status,
+							"rate":            program.Rate,
+							"statusUpdatedAt": time.Now().Format(time.RFC3339),
+							"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+						})
+					}
+				} else {
+					for _, updateProgram := range updateRequest.Programs {
+						for _, obj := range currentPrograms {
+							facilityProgram := obj.(map[string]interface{})
+							if updateProgram.ID == facilityProgram["id"].(string) {
+								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string){
+									facilityProgram["status"] = updateProgram.Status
+									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+									facilityProgram["rate"] = updateProgram.Rate
+									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+							}
+							updatePrograms = append(updatePrograms, facilityProgram)
+						}
+					}
+				}
+				updateFacility["programs"] = updatePrograms
+				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Print(resp)
+				}
+			}
 		} else {
-			log.Print(resp)
+			log.Errorf("Finding facility for id %s failed", updateRequest.Osid, err)
 		}
 	}
 	return operations.NewUpdateFacilitiesOK()

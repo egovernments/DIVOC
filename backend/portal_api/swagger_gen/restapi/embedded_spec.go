@@ -1010,7 +1010,7 @@ func init() {
         "type": "object",
         "properties": {
           "osid": {
-            "type": "object"
+            "type": "string"
           },
           "programs": {
             "type": "array",
@@ -1020,19 +1020,10 @@ func init() {
                 "id": {
                   "type": "string"
                 },
-                "osid": {
-                  "type": "string"
-                },
                 "rate": {
                   "type": "number"
                 },
-                "rateUpdatedAt": {
-                  "type": "string"
-                },
                 "status": {
-                  "type": "string"
-                },
-                "statusUpdatedAt": {
                   "type": "string"
                 }
               }
@@ -2245,7 +2236,7 @@ func init() {
       "type": "object",
       "properties": {
         "osid": {
-          "type": "object"
+          "type": "string"
         },
         "programs": {
           "type": "array",
@@ -2264,19 +2255,10 @@ func init() {
         "id": {
           "type": "string"
         },
-        "osid": {
-          "type": "string"
-        },
         "rate": {
           "type": "number"
         },
-        "rateUpdatedAt": {
-          "type": "string"
-        },
         "status": {
-          "type": "string"
-        },
-        "statusUpdatedAt": {
           "type": "string"
         }
       }
