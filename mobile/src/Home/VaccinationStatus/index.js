@@ -26,10 +26,9 @@ export function VaccinationStatus() {
         const message = vaccinationStatus.message
         const exceedCount = vaccinationStatus.isExceed ? vaccinationStatus.exceedVaccinations : ""
         return (
-            <div className="pl-4">
-                <h5>{message} {exceedCount ? (<span>(<span className="exceed">{exceedCount}</span>)</span>) : ""}
+                <h5 className="status-message pl-4 pt-1 text-center">{message} {exceedCount ? (
+                    <span>(<span className="exceed">{exceedCount}</span>)</span>) : ""}
                 </h5>
-            </div>
         );
     }
 
@@ -42,7 +41,7 @@ export function VaccinationStatus() {
                 </div>
             </BaseCard>
             {vaccinationStatus.isLimitToReach &&
-            <p className="mt-2">{getMessageComponent(LANGUAGE_KEYS.LIMIT_REACH_MESSAGE)}</p>}
+            <p className="limit-message mt-2">{getMessageComponent(LANGUAGE_KEYS.LIMIT_REACH_MESSAGE)}</p>}
         </div>
     )
 }
