@@ -6,6 +6,7 @@ import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
 import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
+import {getNotificationTemplates} from "../../utils/config";
 
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
@@ -14,10 +15,15 @@ function FacilityDetails({
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
+    const [notificationTemplate, setNotificationTemplate] = useState('');
 
     const [allChecked, setAllChecked] = useState(false);
     useEffect(() => {
-        resetFilter({status: CONSTANTS.ACTIVE})
+        resetFilter({status: CONSTANTS.ACTIVE});
+        getNotificationTemplates()
+            .then(res => {
+                setNotificationTemplate(res.facilityPendingTasks.html)
+            })
     }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -177,6 +183,7 @@ function FacilityDetails({
                             NOTIFY
                         </button>
                         <NotifyPopup
+                            message={notificationTemplate}
                             show={modalShow}
                             onHide={() => {
                                 setModalShow(false)
