@@ -13,7 +13,7 @@ const defaultState = {
     selectedState: CONSTANTS.ALL,
     selectedDistrict: "",
     facilityType: CONSTANTS.GOVT,
-    status: CONSTANTS.ACTIVE,
+    status: "",
     lastAdjustedOn: ""
 };
 
@@ -37,8 +37,12 @@ function FacilityController() {
         fetchFacilities();
     }, [filter]);
 
-    function resetFilter() {
-        setFilter(defaultState)
+    function resetFilter(state = {}) {
+        if (programs.length > 0) {
+            state.selectedProgram = programs[0].value
+        }
+        setFilter({...defaultState, ...state})
+        setFacilities([])
     }
 
     function setSelectedState(value) {
@@ -89,43 +93,45 @@ function FacilityController() {
 
     function fetchFacilities() {
         const {lastAdjustedOn, selectedProgram, selectedState, selectedDistrict, status, facilityType} = filter;
-        let rateUpdatedFrom = "", rateUpdatedTo = "";
-        if (lastAdjustedOn !== "") {
-            let fromDate = new Date();
-            let toDate = new Date();
-            if (lastAdjustedOn === CONSTANTS.WEEK) {
-                fromDate.setDate(fromDate.getDate() - 7);
-                rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
-                rateUpdatedTo = toDate.toISOString().substr(0, 10);
-            } else if (lastAdjustedOn === CONSTANTS.MONTH) {
-                fromDate.setDate(fromDate.getDate() - 30);
-                rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
-                rateUpdatedTo = toDate.toISOString().substr(0, 10);
-            } else {
-                rateUpdatedFrom = rateUpdatedTo = lastAdjustedOn;
+        if (selectedProgram) {
+            let rateUpdatedFrom = "", rateUpdatedTo = "";
+            if (lastAdjustedOn !== "") {
+                let fromDate = new Date();
+                let toDate = new Date();
+                if (lastAdjustedOn === CONSTANTS.WEEK) {
+                    fromDate.setDate(fromDate.getDate() - 7);
+                    rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
+                    rateUpdatedTo = toDate.toISOString().substr(0, 10);
+                } else if (lastAdjustedOn === CONSTANTS.MONTH) {
+                    fromDate.setDate(fromDate.getDate() - 30);
+                    rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
+                    rateUpdatedTo = toDate.toISOString().substr(0, 10);
+                } else {
+                    rateUpdatedFrom = rateUpdatedTo = lastAdjustedOn;
+                }
             }
-        }
-        let params = {
-            programId: selectedProgram,
-            state: selectedState,
-            district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
-            programStatus: status,
-            type: facilityType,
-            rateUpdatedTo,
-            rateUpdatedFrom
-        };
-        params = reject(equals(''))(params);
-        const queryParams = new URLSearchParams(params);
-        axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
-            .then(res => {
-                res.data.forEach(item => {
-                    Object.assign(item, {isChecked: false});
-                    if (!("programs" in item)) {
-                        Object.assign(item, {programs: []});
-                    }
+            let params = {
+                programId: selectedProgram,
+                state: selectedState,
+                district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
+                programStatus: status,
+                type: facilityType,
+                rateUpdatedTo,
+                rateUpdatedFrom
+            };
+            params = reject(equals(''))(params);
+            const queryParams = new URLSearchParams(params);
+            axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
+                .then(res => {
+                    res.data.forEach(item => {
+                        Object.assign(item, {isChecked: false});
+                        if (!("programs" in item)) {
+                            Object.assign(item, {programs: []});
+                        }
+                    });
+                    setFacilities(res.data)
                 });
-                setFacilities(res.data)
-            });
+        }
     }
 
     function fetchPrograms() {

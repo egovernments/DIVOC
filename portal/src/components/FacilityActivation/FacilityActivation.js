@@ -13,7 +13,7 @@ function FacilityActivation({
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios('');
     useEffect(() => {
-        resetFilter()
+        resetFilter({status: CONSTANTS.ACTIVE})
     }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -74,34 +74,16 @@ function FacilityActivation({
         if (selectedProgram && selectedFacilities.length > 0) {
             let updateFacilities = [];
             selectedFacilities.forEach(facility => {
-                let programs = [];
-                const program = facility.programs.find(program => program.id === selectedProgram);
-                if (program) {
-                    programs = facility.programs.map(program => {
-                        if (program.id === selectedProgram) {
-                            return {
-                                ...program,
-                                status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE,
-                                statusUpdatedAt: new Date().toISOString()
-                            };
-                        } else {
-                            return program;
-                        }
-                    })
-                } else {
-                    programs = facility.programs.concat({
-                        id: selectedProgram,
-                        status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE,
-                        rate: 0,
-                        statusUpdatedAt: new Date().toISOString()
-                    })
-                }
+                let programs = [{
+                    id: selectedProgram,
+                    status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE
+                }];
                 updateFacilities.push({osid: facility.osid, programs})
             });
             axiosInstance.current.put(API_URL.FACILITY_API, updateFacilities)
                 .then(res => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 1000)
+                    setTimeout(() => fetchFacilities(), 2000)
                 });
         }
     };
@@ -175,7 +157,7 @@ function FacilityActivation({
             </div>
             <div className="col-sm-2 container">
                 <div className={`card ${styles["card-continer"]}`}>
-                    <div className="card-body text-center">
+                    {selectedProgram && <div className="card-body text-center">
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
                             Make {selectedFacilities.length} facilities active for the {selectedProgram}
@@ -187,6 +169,7 @@ function FacilityActivation({
                             MAKE {status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE}
                         </button>
                     </div>
+                    }
                 </div>
             </div>
         </div>

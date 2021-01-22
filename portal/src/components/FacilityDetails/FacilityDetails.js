@@ -17,7 +17,7 @@ function FacilityDetails({
 
     const [allChecked, setAllChecked] = useState(false);
     useEffect(() => {
-        resetFilter()
+        resetFilter({status: CONSTANTS.ACTIVE})
     }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
@@ -165,7 +165,7 @@ function FacilityDetails({
 
             <div className="col-sm-2 container">
                 <div className={"card card-continer"}>
-                    <div className="card-body text-center">
+                    {selectedProgram && <div className="card-body text-center">
                         <p>
                             Notify {facilities.filter(facility => facility.isChecked).length} facilities for the {selectedProgram}
                         </p>
@@ -185,7 +185,7 @@ function FacilityDetails({
                                 sendNotification()
                             }}
                         />
-                    </div>
+                    </div>}
                 </div>
             </div>
         </div>

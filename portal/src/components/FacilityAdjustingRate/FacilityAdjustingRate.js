@@ -17,7 +17,7 @@ function FacilityAdjustingRate({
     const axiosInstance = useAxios('');
 
     useEffect(() => {
-        resetFilter()
+        resetFilter({lastAdjustedOn: CONSTANTS.WEEK})
     }, []);
 
     useEffect(() => {
@@ -138,28 +138,11 @@ function FacilityAdjustingRate({
             Object.keys(rateWiseFacilities).forEach((rate) => {
                 const facilityIds = rateWiseFacilities[rate].facilityIds;
                 facilityIds.forEach((facilityId) => {
-                    const facility = facilities.find(facility => facility.osid === facilityId);
-                    if (facility) {
-                        let programs = [];
-                        const program = facility.programs.find(program => program.id === selectedProgram);
-                        if (program) {
-                            programs = facility.programs.map(program => {
-                                if (program.id === selectedProgram) {
-                                    return {...program, rate: rateWiseFacilities[rate].newRate, rateUpdatedAt: new Date().toISOString()};
-                                } else {
-                                    return program;
-                                }
-                            })
-                        } else {
-                            programs = facility.programs.concat({
-                                id: selectedProgram,
-                                status: CONSTANTS.ACTIVE,
-                                rate: rateWiseFacilities[rate].newRate,
-                                rateUpdatedAt: new Date().toISOString()
-                            })
-                        }
-                        updateFacilities.push({osid: facility.osid, programs})
-                    }
+                    let programs = [{
+                        id: selectedProgram,
+                        rate: rateWiseFacilities[rate].newRate
+                    }];
+                    updateFacilities.push({osid: facilityId, programs})
                 });
 
 
@@ -167,7 +150,7 @@ function FacilityAdjustingRate({
             axiosInstance.current.put(API_URL.FACILITY_API, updateFacilities)
                 .then(res => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 1000)
+                    setTimeout(() => fetchFacilities(), 2000)
                 });
         }
     };
