@@ -107,6 +107,7 @@ func getKeycloakUserRepFromFacilityUserModel(authHeader string, user *models.Fac
 			EmployeeID:   user.EmployeeID,
 			FullName:     user.Name,
 			FacilityCode: claimBody.FacilityCode,
+			VaccinationRateLimits: user.VaccinationRateLimits,
 		},
 	}
 	return userRequest, nil
