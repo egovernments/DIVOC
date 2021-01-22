@@ -25,7 +25,6 @@ export function WithKeyCloakComponent({children}) {
         if (initialized || keycloak.authenticated) {
             keycloak.loadUserProfile()
                 .then(res => {
-                    console.log("Fetch", res)
                     return saveUserAttributes(res["attributes"]);
                 })
                 .catch((e) => {
@@ -64,7 +63,7 @@ export function WithKeyCloakComponent({children}) {
 }
 
 async function saveUserAttributes(attributes) {
-   // await appIndexDb.initDb()
+    await appIndexDb.initDb()
     let userDetails = await appIndexDb.getUserDetails();
     if (userDetails) {
         userDetails = await ApiServices.getUserDetails()
