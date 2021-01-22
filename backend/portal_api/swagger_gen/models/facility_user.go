@@ -35,6 +35,9 @@ type FacilityUser struct {
 
 	// Facility User Name
 	Name string `json:"name,omitempty"`
+
+	// vaccination rate limits
+	VaccinationRateLimits []*VaccinationRateLimit `json:"vaccinationRateLimits"`
 }
 
 // Validate validates this facility user
@@ -42,6 +45,10 @@ func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateGroups(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVaccinationRateLimits(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -66,6 +73,30 @@ func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
 			if err := m.Groups[i].Validate(formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("groups" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *FacilityUser) validateVaccinationRateLimits(formats strfmt.Registry) error {
+	if swag.IsZero(m.VaccinationRateLimits) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.VaccinationRateLimits); i++ {
+		if swag.IsZero(m.VaccinationRateLimits[i]) { // not required
+			continue
+		}
+
+		if m.VaccinationRateLimits[i] != nil {
+			if err := m.VaccinationRateLimits[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("vaccinationRateLimits" + "." + strconv.Itoa(i))
 				}
 				return err
 			}
