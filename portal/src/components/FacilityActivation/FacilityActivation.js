@@ -166,7 +166,7 @@ function FacilityActivation({
                             onClick={handleActiveClick}
                             className={styles["button"]}
                         >
-                            MAKE {status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE}
+                            MAKE {(status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE).toUpperCase()}
                         </button>
                     </div>
                     }

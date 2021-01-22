@@ -366,13 +366,17 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						for _, obj := range currentPrograms {
 							facilityProgram := obj.(map[string]interface{})
 							if updateProgram.ID == facilityProgram["id"].(string) {
-								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string){
+								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
 									facilityProgram["status"] = updateProgram.Status
 									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("status", updateProgram.Status,
+										facility["contact"].(string), facility["email"].(string))
 								}
 								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
 									facilityProgram["rate"] = updateProgram.Rate
 									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
+										facility["contact"].(string), facility["email"].(string))
 								}
 							}
 							updatePrograms = append(updatePrograms, facilityProgram)
