@@ -106,7 +106,7 @@ export const SubmitSymptomsForm = (props) => {
             },
         };
         const response = await axios
-            .get("/divoc/api/v1/certificates/" + userMobileNumber, config)
+            .get("/divoc/api/v1/certificates", config)
             .then((res) => {
                 return res.data;
             });
