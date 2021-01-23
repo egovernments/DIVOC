@@ -65,14 +65,14 @@ export function WithKeyCloakComponent({children}) {
 async function saveUserAttributes(attributes) {
     await appIndexDb.initDb()
     let userDetails = await appIndexDb.getUserDetails();
-    if (userDetails) {
+    if (!userDetails) {
         userDetails = await ApiServices.getUserDetails()
+        await appIndexDb.saveUserDetails(userDetails)
     }
     for (let attributesKey in attributes) {
         userDetails[attributesKey] = attributes[attributesKey][0]
     }
-    const id = await appIndexDb.saveUserDetails(userDetails)
-    console.log(id)
+    await appIndexDb.saveUserDetails(userDetails)
 }
 
 export function WithoutKeyCloakComponent({children}) {
