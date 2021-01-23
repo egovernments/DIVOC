@@ -42,6 +42,14 @@ type GetFacilitiesParams struct {
 	  In: query
 	*/
 	ProgramStatus *string
+	/*
+	  In: query
+	*/
+	RateUpdatedFrom *string
+	/*
+	  In: query
+	*/
+	RateUpdatedTo *string
 	/*Facility State
 	  In: query
 	*/
@@ -75,6 +83,16 @@ func (o *GetFacilitiesParams) BindRequest(r *http.Request, route *middleware.Mat
 
 	qProgramStatus, qhkProgramStatus, _ := qs.GetOK("programStatus")
 	if err := o.bindProgramStatus(qProgramStatus, qhkProgramStatus, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qRateUpdatedFrom, qhkRateUpdatedFrom, _ := qs.GetOK("rateUpdatedFrom")
+	if err := o.bindRateUpdatedFrom(qRateUpdatedFrom, qhkRateUpdatedFrom, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qRateUpdatedTo, qhkRateUpdatedTo, _ := qs.GetOK("rateUpdatedTo")
+	if err := o.bindRateUpdatedTo(qRateUpdatedTo, qhkRateUpdatedTo, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -144,6 +162,42 @@ func (o *GetFacilitiesParams) bindProgramStatus(rawData []string, hasKey bool, f
 	}
 
 	o.ProgramStatus = &raw
+
+	return nil
+}
+
+// bindRateUpdatedFrom binds and validates parameter RateUpdatedFrom from query.
+func (o *GetFacilitiesParams) bindRateUpdatedFrom(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.RateUpdatedFrom = &raw
+
+	return nil
+}
+
+// bindRateUpdatedTo binds and validates parameter RateUpdatedTo from query.
+func (o *GetFacilitiesParams) bindRateUpdatedTo(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.RateUpdatedTo = &raw
 
 	return nil
 }

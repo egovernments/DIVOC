@@ -12,21 +12,12 @@ function NotifyPopup(props) {
                 centered
             >
                 <Modal.Header closeButton>
-                    <Modal.Title id="contained-modal-title-vcenter">
-                        Dear Facility Administrator,
-                    </Modal.Title>
+
                 </Modal.Header>
                 <Modal.Body>
-                    <p>
-                        Request you to upload / complete all details pertaining
-                        to this facility prior to execution of the C19
-                        VaccinationProgram. Failing to do so, this facility: 
-                        <br/>- will not be accessible to citizen during the
-                        pre-enrolment phase <br/>- will not be able to use the
-                        Vaccination App or generate digital certificates
-                    </p>
-                    <p>Please submit the missing details at the earliest.</p>
-                    <b>DIVOC System Administrator</b>
+                    <span dangerouslySetInnerHTML={{__html: props.message}}>
+
+                    </span>
                 </Modal.Body>
                 <Modal.Footer>
                     <Button onClick={props.onHide}>CANCEL</Button>

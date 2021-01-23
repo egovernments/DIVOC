@@ -52,6 +52,12 @@ paths:
           name: programStatus
           type: string
           description: Program Status
+        - in: query
+          name: rateUpdatedFrom
+          type: string
+        - in: query
+          name: rateUpdatedTo
+          type: string
       security:
         - hasRole: ["admin", "controller"]
       responses:
@@ -112,10 +118,6 @@ paths:
               type: object
               properties:
                 facilityId:
-                  type: string
-                email:
-                  type: string
-                contact:
                   type: string
                 pendingTasks:
                   type: array
@@ -470,7 +472,7 @@ definitions:
       type: object
       properties:
         osid:
-          type: object
+          type: string
         status:
           type: string
         programs:
@@ -481,8 +483,6 @@ definitions:
               id:
                 type: string
               status:
-                type: string
-              osid:
                 type: string
               rate:
                 type: number

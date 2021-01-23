@@ -8,15 +8,8 @@ import (
 	"text/template"
 )
 
-const preEnrollmentTemplateString = `
-{{.Name}}, you have been registered to receive C-19 vaccine. Please proceed to the nearest vaccination center:
-Location: 
-Please show the Pre Enrollment Code: {{.Code}} to the center admin.
-`
-
-var preEnrollmentTemplate = template.Must(template.New("").Parse(preEnrollmentTemplateString))
-
 const EnrollmentEntity = "Enrollment"
+const PreEnrollmentRegistered = "preEnrollmentRegistered"
 
 func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
 	filter := map[string]interface{}{
@@ -54,14 +47,17 @@ func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 }
 
 func NotifyRecipient(enrollment models.Enrollment) error {
-	//TODO : fetch facility and add facility info to message
+	preEnrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[PreEnrollmentRegistered].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[PreEnrollmentRegistered].Subject
+
+	var preEnrollmentTemplate = template.Must(template.New("").Parse(preEnrollmentTemplateString))
+
 	recipient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
 	log.Infof("Sending SMS %s %s", recipient, message)
 	buf := bytes.Buffer{}
 	err := preEnrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {
-		subject := "DIVOC - Pre-Enrollment"
 		if len(enrollment.Phone) > 0 {
 			PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
 		}

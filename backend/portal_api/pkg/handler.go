@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const StateKey = "address.state"
@@ -21,6 +22,7 @@ const DistrictKey = "address.district"
 const TypeKey = "category"
 const ProgramIdKey = "programs.id"
 const ProgramStatusKey = "programs.status"
+const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -125,43 +127,26 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 
 func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
 	filter := map[string]interface{}{}
-	if params.State != nil && !strings.EqualFold(*params.State, "ALL") {
-		states := strings.Split(strings.ToLower(*params.State), ",")
-
-		filter[StateKey] = map[string]interface{}{
-			"or": states,
+	addQueryParamToFilter(params.State, filter, StateKey)
+	addQueryParamToFilter(params.District, filter, DistrictKey)
+	addQueryParamToFilter(params.Type, filter, TypeKey)
+	addQueryParamToFilter(params.ProgramID, filter, ProgramIdKey)
+	addQueryParamToFilter(params.ProgramStatus, filter, ProgramStatusKey)
+	if params.RateUpdatedFrom != nil && params.RateUpdatedTo != nil {
+		filter[ProgramRateUpdatedAtKey] = map[string]interface{}{
+			"between": []string{*params.RateUpdatedFrom, *params.RateUpdatedTo},
 		}
 	}
-	if params.District != nil && !strings.EqualFold(*params.District, "ALL") {
-		districts := strings.Split(strings.ToLower(*params.District), ",")
-
-		filter[DistrictKey] = map[string]interface{}{
-			"or": districts,
-		}
-	}
-	if params.Type != nil && !strings.EqualFold(*params.Type, "ALL") {
-		types := strings.Split(strings.ToLower(*params.Type), ",")
-
-		filter[TypeKey] = map[string]interface{}{
-			"or": types,
-		}
-	}
-	if params.ProgramID != nil && !strings.EqualFold(*params.ProgramID, "ALL") {
-		programIds := strings.Split(strings.ToLower(*params.ProgramID), ",")
-
-		filter[ProgramIdKey] = map[string]interface{}{
-			"or": programIds,
-		}
-	}
-	if params.ProgramStatus != nil && !strings.EqualFold(*params.ProgramStatus, "ALL") {
-		programStatus := strings.Split(strings.ToLower(*params.ProgramStatus), ",")
-
-		filter[ProgramStatusKey] = map[string]interface{}{
-			"or": programStatus,
-		}
-	}
-
 	return filter
+}
+
+func addQueryParamToFilter(param *string, filter map[string]interface{}, filterKey string) {
+	if param != nil && !strings.EqualFold(*param, "ALL") {
+		values := strings.Split(strings.ToLower(*param), ",")
+		filter[filterKey] = map[string]interface{}{
+			"or": values,
+		}
+	}
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -346,17 +331,68 @@ func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principa
 
 func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
-		requestBody, err := json.Marshal(updateRequest)
-		if err != nil {
-			return operations.NewUpdateFacilitiesBadRequest()
+		if updateRequest.Osid == "" {
+			log.Errorf("Facility update request without OSID %v", updateRequest)
+			continue
 		}
-		requestMap := make(map[string]interface{})
-		err = json.Unmarshal(requestBody, &requestMap)
-		resp, err := kernelService.UpdateRegistry("Facility", requestMap)
-		if err != nil {
-			log.Error(err)
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": updateRequest.Osid,
+			},
+		}
+		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		if err == nil {
+			facilities := searchRespone["Facility"].([]interface{})
+			if len(facilities) > 0 {
+				facility := facilities[0].(map[string]interface{})
+				currentPrograms := facility["programs"].([]interface{})
+				var updatePrograms []map[string]interface{}
+				updateFacility := map[string]interface{}{
+					"osid":     updateRequest.Osid,
+					"programs": []interface{}{},
+				}
+				if len(currentPrograms) == 0 {
+					for _, program := range updateRequest.Programs {
+						updatePrograms = append(updatePrograms, map[string]interface{}{
+							"id":              program.ID,
+							"status":          program.Status,
+							"rate":            program.Rate,
+							"statusUpdatedAt": time.Now().Format(time.RFC3339),
+							"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+						})
+					}
+				} else {
+					for _, updateProgram := range updateRequest.Programs {
+						for _, obj := range currentPrograms {
+							facilityProgram := obj.(map[string]interface{})
+							if updateProgram.ID == facilityProgram["id"].(string) {
+								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
+									facilityProgram["status"] = updateProgram.Status
+									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("status", updateProgram.Status,
+										facility["contact"].(string), facility["email"].(string))
+								}
+								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+									facilityProgram["rate"] = updateProgram.Rate
+									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
+										facility["contact"].(string), facility["email"].(string))
+								}
+							}
+							updatePrograms = append(updatePrograms, facilityProgram)
+						}
+					}
+				}
+				updateFacility["programs"] = updatePrograms
+				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Print(resp)
+				}
+			}
 		} else {
-			log.Print(resp)
+			log.Errorf("Finding facility for id %s failed", updateRequest.Osid, err)
 		}
 	}
 	return operations.NewUpdateFacilitiesOK()

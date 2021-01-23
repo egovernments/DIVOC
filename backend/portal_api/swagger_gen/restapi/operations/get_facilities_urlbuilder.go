@@ -13,11 +13,13 @@ import (
 
 // GetFacilitiesURL generates an URL for the get facilities operation
 type GetFacilitiesURL struct {
-	District      *string
-	ProgramID     *string
-	ProgramStatus *string
-	State         *string
-	Type          *string
+	District        *string
+	ProgramID       *string
+	ProgramStatus   *string
+	RateUpdatedFrom *string
+	RateUpdatedTo   *string
+	State           *string
+	Type            *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -75,6 +77,22 @@ func (o *GetFacilitiesURL) Build() (*url.URL, error) {
 	}
 	if programStatusQ != "" {
 		qs.Set("programStatus", programStatusQ)
+	}
+
+	var rateUpdatedFromQ string
+	if o.RateUpdatedFrom != nil {
+		rateUpdatedFromQ = *o.RateUpdatedFrom
+	}
+	if rateUpdatedFromQ != "" {
+		qs.Set("rateUpdatedFrom", rateUpdatedFromQ)
+	}
+
+	var rateUpdatedToQ string
+	if o.RateUpdatedTo != nil {
+		rateUpdatedToQ = *o.RateUpdatedTo
+	}
+	if rateUpdatedToQ != "" {
+		qs.Set("rateUpdatedTo", rateUpdatedToQ)
 	}
 
 	var stateQ string

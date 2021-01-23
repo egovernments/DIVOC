@@ -34,3 +34,5 @@ kafka:
   bootstrapServers: localhost:9092
   notifyTopic: notify
   certifiedTopic: certified
+flagr:
+  url: https://divoc.xiv.in/config

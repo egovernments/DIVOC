@@ -6,34 +6,22 @@ import {
     RadioItem,
 } from "../FacilityFilterTab";
 import { useAxios } from "../../utils/useAxios";
-import { API_URL } from "../../utils/constants";
+import { API_URL , CONSTANTS} from "../../utils/constants";
 import DetailsCard from "../DetailsCard/DetailsCard";
 
 function FacilityActivation({
-    facilities,
-    setFacilities,
-    selectedState,
-    onStateSelected,
-    districtList,
-    selectedDistrict,
-    setSelectedDistrict,
-    stateList,
-    programs,
-    selectedProgram,
-    setSelectedProgram,
-    facilityType,
-    setFacilityType,
-    status,
-    setStatus,
-    fetchFacilities,
-}) {
+                                facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
+                                setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
+                                status, setStatus, fetchFacilities, resetFilter
+                            }) {
+
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios("");
     const [showCard, setShowCard] = useState(false);
     const [selectedRow, setSelectedRow] = useState([]);
 
     useEffect(() => {
-        setStatus("Inactive");
+        resetFilter({status: CONSTANTS.ACTIVE});
         setShowCard(false)
     }, []);
     const handleChange = (value, setValue) => {
@@ -58,14 +46,12 @@ function FacilityActivation({
 
     const getFacilityStatusForProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(
-                (obj) => obj.id === selectedProgram
-            );
+            const program = facility.programs.find(obj => obj.id === selectedProgram);
             if (program) {
                 return program.status;
             }
         }
-        return "Inactive";
+        return CONSTANTS.IN_ACTIVE;
     };
 
     const getFacilityList = () => {
@@ -100,37 +86,18 @@ function FacilityActivation({
         setAllChecked(false);
         if (selectedProgram && selectedFacilities.length > 0) {
             let updateFacilities = [];
-            selectedFacilities.forEach((facility) => {
-                let programs = [];
-                const program = facility.programs.find(
-                    (program) => program.id === selectedProgram
-                );
-                if (program) {
-                    programs = facility.programs.map((program) => {
-                        if (program.id === selectedProgram) {
-                            return {
-                                ...program,
-                                status:
-                                    status !== "Active" ? "ACTIVE" : "INACTIVE",
-                            };
-                        } else {
-                            return program;
-                        }
-                    });
-                } else {
-                    programs = facility.programs.concat({
-                        id: selectedProgram,
-                        status: status !== "Active" ? "ACTIVE" : "INACTIVE",
-                        rate: 0,
-                    });
-                }
-                updateFacilities.push({ osid: facility.osid, programs });
+            selectedFacilities.forEach(facility => {
+                let programs = [{
+                    id: selectedProgram,
+                    status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE
+                }];
+                updateFacilities.push({osid: facility.osid, programs})
             });
             axiosInstance.current
                 .put(API_URL.FACILITY_API, updateFacilities)
                 .then((res) => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 1000);
+                    setTimeout(() => fetchFacilities(), 2000);
                 });
         }
     };
@@ -140,6 +107,7 @@ function FacilityActivation({
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
+                    selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
                     states={stateList}
                     setSelectedState={onStateSelected}
@@ -154,15 +122,15 @@ function FacilityActivation({
                         <span className={"filter-header"}>Status</span>
                         <div className="m-3">
                             <RadioItem
-                                text={"Active"}
-                                checked={status === "Active"}
+                                text={CONSTANTS.ACTIVE}
+                                checked={status === CONSTANTS.ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
                             />
                             <RadioItem
-                                text={"Inactive"}
-                                checked={status === "Inactive"}
+                                text={CONSTANTS.IN_ACTIVE}
+                                checked={status === CONSTANTS.IN_ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
@@ -214,7 +182,7 @@ function FacilityActivation({
             </div>
             <div className="col-sm-3 container">
                 <div className={`card ${styles["card-continer"]}`}>
-                    <div className="card-body text-center">
+                    {selectedProgram && <div className="card-body text-center">
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
                             Make {selectedFacilities.length} facilities active
@@ -224,9 +192,10 @@ function FacilityActivation({
                             onClick={handleActiveClick}
                             className={styles["button"]}
                         >
-                            MAKE {status !== "Active" ? "ACTIVE" : "INACTIVE"}
+                            MAKE {(status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE).toUpperCase()}
                         </button>
                     </div>
+                    }
                 </div>
             </div>
         </div>

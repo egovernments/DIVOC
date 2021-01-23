@@ -1,17 +1,18 @@
 import React, {useEffect, useState} from "react";
 import styles from "./FacilityAdjustingRate.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
+import {formatDate} from "../../utils/dateutil";
 import DetailsCard from "../DetailsCard/DetailsCard";
 
 
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   setStatus, fetchFacilities
+                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter
                                }) {
-    const [lastAdjustedOn, setLastAdjustedOn] = useState("Week");
+
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
     const [allChecked, setAllChecked] = useState(false);
     const axiosInstance = useAxios('');
@@ -19,7 +20,7 @@ function FacilityAdjustingRate({
     const [selectedRow, setSelectedRow] = useState([]);
 
     useEffect(() => {
-        setStatus("")
+        resetFilter({lastAdjustedOn: CONSTANTS.WEEK})
     }, []);
 
     useEffect(() => {
@@ -49,15 +50,17 @@ function FacilityAdjustingRate({
     };
 
     const getFacilityList = () => {
-        return facilities.map((facility, index) => (
-            <tr>
+        return facilities.map((facility, index) => {
+            let rateUpdatedAt = getFacilityProgram(facility).rateUpdatedAt;
+            return <tr>
                 <td>{facility['facilityCode']}</td>
                 <td role="button" onClick={() => {
                     setShowCard(!showCard);
                     setSelectedRow(facility)
                 }}>{facility['facilityName']}</td>
                 <td>{facility['category']}</td>
-                <td>{getFacilityProgram(facility).rate}</td>
+                <td>{getFacilityProgram(facility).rate || '-'}</td>
+                <td>{rateUpdatedAt ? formatDate(rateUpdatedAt) : 'DD/MMM/YYYY'}</td>
                 <td>
                     <CheckboxItem
                         text={facility['id']}
@@ -70,7 +73,7 @@ function FacilityAdjustingRate({
 
                 </td>
             </tr>
-        ));
+        });
 
     };
 
@@ -141,27 +144,11 @@ function FacilityAdjustingRate({
             Object.keys(rateWiseFacilities).forEach((rate) => {
                 const facilityIds = rateWiseFacilities[rate].facilityIds;
                 facilityIds.forEach((facilityId) => {
-                    const facility = facilities.find(facility => facility.osid === facilityId);
-                    if (facility) {
-                        let programs = [];
-                        const program = facility.programs.find(program => program.id === selectedProgram);
-                        if (program) {
-                            programs = facility.programs.map(program => {
-                                if (program.id === selectedProgram) {
-                                    return {...program, rate: rateWiseFacilities[rate].newRate};
-                                } else {
-                                    return program;
-                                }
-                            })
-                        } else {
-                            programs = facility.programs.concat({
-                                id: selectedProgram,
-                                status: "ACTIVE",
-                                rate: rateWiseFacilities[rate].newRate
-                            })
-                        }
-                        updateFacilities.push({osid: facility.osid, programs})
-                    }
+                    let programs = [{
+                        id: selectedProgram,
+                        rate: rateWiseFacilities[rate].newRate
+                    }];
+                    updateFacilities.push({osid: facilityId, programs})
                 });
 
 
@@ -169,7 +156,7 @@ function FacilityAdjustingRate({
             axiosInstance.current.put(API_URL.FACILITY_API, updateFacilities)
                 .then(res => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 1000)
+                    setTimeout(() => fetchFacilities(), 2000)
                 });
         }
     };
@@ -180,6 +167,7 @@ function FacilityAdjustingRate({
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
+                    selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
                     states={stateList}
                     setSelectedState={onStateSelected}
@@ -194,8 +182,8 @@ function FacilityAdjustingRate({
                         <span className={"filter-header"}>Last Adjusted on</span>
                         <div className="m-3">
                             <RadioItem
-                                text={"Week"}
-                                checked={lastAdjustedOn === "Week"}
+                                text={CONSTANTS.WEEK}
+                                checked={lastAdjustedOn === CONSTANTS.WEEK}
                                 onSelect={(event) =>
                                     handleChange(
                                         event.target.name,
@@ -204,8 +192,8 @@ function FacilityAdjustingRate({
                                 }
                             />
                             <RadioItem
-                                text={"Month"}
-                                checked={lastAdjustedOn === "Month"}
+                                text={CONSTANTS.MONTH}
+                                checked={lastAdjustedOn === CONSTANTS.MONTH}
                                 onSelect={(event) =>
                                     handleChange(
                                         event.target.name,
@@ -217,14 +205,18 @@ function FacilityAdjustingRate({
                         <div>
                             <span className={"filter-header"}>Please select date range</span>
                             <div className="m-3">
-                                <input className={styles["custom-date-range"]} type="date"/>
+                                <input className={styles["custom-date-range"]} type="date" onChange={(event) =>
+                                    handleChange(
+                                        event.target.value,
+                                        setLastAdjustedOn
+                                    )}/>
                             </div>
                         </div>
                     </div>
                 </FacilityFilterTab>
             </div>
             <div className={`col-sm-6 container ${styles['table']}`}>
-                {!showCard ? 
+                {!showCard ?
                 <>
                     <p className={styles['highlight']}>{selectedDistrict} facilties</p>
                     <table className={`table table-hover ${styles['table-data']}`}>
@@ -234,7 +226,8 @@ function FacilityAdjustingRate({
                             <th>NAME</th>
                             <th>TYPE</th>
                             <th>PROGRAM RATE</th>
-                            <th>
+                            <th>LAST ADJUSTED</th>
+                        <th>
                                 <CheckboxItem
                                     text={"checkAll"}
                                     checked={allChecked}

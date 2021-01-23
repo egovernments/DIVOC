@@ -1,9 +1,10 @@
 import React from "react";
 import "./index.scss";
 import DropDown from "../DropDown/DropDown";
+import {CONSTANTS} from "../../utils/constants";
 
 export const FacilityFilterTab = ({
-                                      programs, setSelectedProgram, states, setSelectedState, selectedState, districtList,
+                                      programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
                                       selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children
                                   }) => {
 
@@ -36,6 +37,7 @@ export const FacilityFilterTab = ({
         <div className="filter-tab-container">
             <div className="select-program-wrapper">
                 <DropDown
+                    selectedOption={selectedProgram}
                     options={programs}
                     placeholder="Select Program"
                     setSelectedOption={setSelectedProgram}
@@ -44,6 +46,7 @@ export const FacilityFilterTab = ({
             <div>
                 <span className="filter-header">All of India</span>
                 <DropDown
+                    selectedOption={selectedState}
                     options={states}
                     placeholder="Please select State"
                     setSelectedOption={setSelectedState}
@@ -69,8 +72,8 @@ export const FacilityFilterTab = ({
                 <div className="m-3">
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"GOVT"}
-                            checked={facilityType === "GOVT"}
+                            text={CONSTANTS.GOVT}
+                            checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,
@@ -81,8 +84,8 @@ export const FacilityFilterTab = ({
                     </div>
                     <div className="filter-header mb-1">
                         <CheckboxItem
-                            text={"PRIVATE"}
-                            checked={facilityType === "PRIVATE"}
+                            text={CONSTANTS.PRIVATE}
+                            checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>
                                 handleChange(
                                     event.target.name,
