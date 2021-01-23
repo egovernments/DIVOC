@@ -128,18 +128,23 @@ func registryUrl(operationId string) string {
 	return url
 }
 
-func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]interface{}, error) {
+func ReadRegistry(typeId string, osid string) (map[string]interface{}, error) {
 
-	queryRequest := RegistryRequest{
-		"open-saber.registry.search",
+	readRequest := RegistryRequest{
+		"open-saber.registry.read",
 		"1.0",
 		map[string]interface{}{
-			"entityType": []string{typeId},
-			"filters":    filter,
+			typeId: map[string]interface{}{
+				"osid": osid,
+			},
 		},
 	}
-	log.Info("Registry query ", queryRequest)
-	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.SearchOperationId, req.BodyJSON(queryRequest))
+	log.Info("Registry read ", readRequest)
+	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.ReadOperationId, req.BodyJSON(readRequest))
+	return analyseResponse(response, err)
+}
+
+func analyseResponse(response *req.Resp, err error) (map[string]interface{}, error) {
 	if err != nil {
 		return nil, errors.Errorf("Error while querying registry", err)
 	}
@@ -157,6 +162,21 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 		return nil, errors.New("Failed while querying from registry")
 	}
 	return responseObject.Result, nil
+}
+
+func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]interface{}, error) {
+
+	queryRequest := RegistryRequest{
+		"open-saber.registry.search",
+		"1.0",
+		map[string]interface{}{
+			"entityType": []string{typeId},
+			"filters":    filter,
+		},
+	}
+	log.Info("Registry query ", queryRequest)
+	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.SearchOperationId, req.BodyJSON(queryRequest))
+	return analyseResponse(response, err)
 }
 
 func GetEntityType(entityTypeId string) middleware.Responder {

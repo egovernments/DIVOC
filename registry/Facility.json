@@ -138,6 +138,14 @@
             },
             "rate": {
               "type": "number"
+            },
+            "statusUpdatedAt": {
+              "type": "string",
+              "format": "date"
+            },
+            "rateUpdatedAt": {
+              "type": "string",
+              "format": "date"
             }
           }
         },

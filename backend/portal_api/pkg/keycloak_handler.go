@@ -10,8 +10,11 @@ import (
 	"strings"
 	cache "github.com/patrickmn/go-cache"
 	"time"
+	"encoding/json"
+	"strconv"
 )
 
+const RateLimitAttrSuffix = "_rate"
 var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
 
 type KeyCloakUserRequest struct {
@@ -25,6 +28,52 @@ type KeycloakUserAttributes struct {
 	EmployeeID   string   `json:"employee_id"`
 	FullName     string   `json:"full_name"`
 	FacilityCode string   `json:"facility_code"`
+	VaccinationRateLimits []*models.VaccinationRateLimit	`json:"-"`
+}
+
+func (k KeycloakUserAttributes) MarshalJSON() ([]byte, error) {
+	attributes := map[string]interface{}{
+		"mobile_number": k.MobileNumber,
+		"employee_id": k.EmployeeID,
+		"full_name": k.FullName,
+		"facility_code": k.FacilityCode,
+	}
+	for _, vrl := range k.VaccinationRateLimits {
+		attributes[vrl.ProgramName + RateLimitAttrSuffix] = vrl.RateLimit
+	}
+	return json.Marshal(attributes)
+}
+
+func getVaccinationRateLimits(attributes map[string]interface{}) []*models.VaccinationRateLimit {
+	vaccinationRateLimits := []*models.VaccinationRateLimit{}
+	for key, value := range attributes {
+		if strings.HasSuffix(key, RateLimitAttrSuffix) {
+			var rateLimit int
+			if v, ok := value.([]interface{}); ok {
+				rateLimit, _ = strconv.Atoi(v[0].(string));
+			} else {
+				rateLimit = value.(int)
+			}
+			vaccinationRateLimits = append(vaccinationRateLimits, &models.VaccinationRateLimit{
+				ProgramName: key[ : len(key) - len(RateLimitAttrSuffix) ],
+				RateLimit: int64(rateLimit),
+			})
+		}
+	}
+	return vaccinationRateLimits
+}
+
+func (k *KeycloakUserAttributes) UnmarshalJson(data []byte) error {
+	attributes := map[string]interface{}{}
+	if err := json.Unmarshal(data, &attributes); err != nil {
+		return err
+	}
+	k.MobileNumber = attributes["mobile_number"].([]string)
+	k.EmployeeID = attributes["employee_id"].(string)
+	k.FullName = attributes["full_name"].(string)
+	k.FacilityCode = attributes["facility_code"].(string)
+	k.VaccinationRateLimits = getVaccinationRateLimits(attributes)
+	return nil
 }
 
 func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
@@ -197,6 +246,7 @@ func getFacilityUsers(facilityCode string, username string) ([]*models.FacilityU
 					Name:         fullName,
 					Groups:       user.Groups,
 					Enabled:      user.Enabled,
+					VaccinationRateLimits: getVaccinationRateLimits(user.Attributes),
 				})
 			}
 		}

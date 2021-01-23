@@ -52,6 +52,12 @@ paths:
           name: programStatus
           type: string
           description: Program Status
+        - in: query
+          name: rateUpdatedFrom
+          type: string
+        - in: query
+          name: rateUpdatedTo
+          type: string
       security:
         - hasRole: ["admin", "controller", "facility-admin"]
       responses:
@@ -112,10 +118,6 @@ paths:
               type: object
               properties:
                 facilityId:
-                  type: string
-                email:
-                  type: string
-                contact:
                   type: string
                 pendingTasks:
                   type: array
@@ -514,7 +516,7 @@ definitions:
       type: object
       properties:
         osid:
-          type: object
+          type: string
         status:
           type: string
         programs:
@@ -525,8 +527,6 @@ definitions:
               id:
                 type: string
               status:
-                type: string
-              osid:
                 type: string
               rate:
                 type: number
@@ -842,10 +842,22 @@ definitions:
       enabled:
         type: boolean
         title: enable/disable user
+      vaccinationRateLimits:
+        type: array
+        items:
+          "$ref": "#/definitions/VaccinationRateLimit"
       groups:
         type: array
         items:
           "$ref": "#/definitions/UserGroup"
+  VaccinationRateLimit:
+    properties:
+      programName:
+        type: string
+        title: Program Name
+      rateLimit:
+        type: integer
+        title: Maximum rate of vaccination
   UserGroup:
     properties:
       id:

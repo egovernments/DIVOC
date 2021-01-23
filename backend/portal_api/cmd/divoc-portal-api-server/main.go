@@ -1,6 +1,7 @@
 package main
 
 import (
+	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg"
 	"github.com/divoc/portal-api/pkg/db"
@@ -18,6 +19,7 @@ func main() {
 	config.Initialize()
 	services.InitializeKafka()
 	pkg.InitClickHouseConnection()
+	kernelServices.InitializeFlagr()
 	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)

@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
 import './App.scss';
 import Dashboard from "./Dashboard/Dashboard";
-import {useKeycloak} from "@react-keycloak/web";
+import {ReactKeycloakProvider} from "@react-keycloak/web";
 import {SyncFacade} from "./SyncFacade";
 import config from "./config"
+import keycloak, {AuthSafeComponent} from "./utils/keycloak";
+import {LocaleProvider} from "./lang/LocaleContext";
 
-function App() {
-    const {keycloak, initialized} = useKeycloak();
+function App({keycloak, initialized}) {
     const [isDBInit, setDBInit] = useState(false);
     useEffect(() => {
         if (initialized) {
@@ -20,11 +21,13 @@ function App() {
                 });
             } else {
                 if (!keycloak.authenticated) {
-                    keycloak.login({redirectUri:config.urlPath})
+                    keycloak.login({redirectUri: config.urlPath})
                 }
             }
         }
+          // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
+
     if (!initialized || !isDBInit) {
         return <div>Loading...</div>
     }
@@ -35,6 +38,29 @@ function App() {
             <Dashboard/>
         </div>
     );
+}
+
+export function FacilityApp() {
+    const isOnline = navigator.onLine
+    if (isOnline) {
+        return <ReactKeycloakProvider
+            authClient={keycloak}
+            initOptions={{"checkLoginIframe": false}}>
+            <LocaleProvider>
+                <AuthSafeComponent>
+                    <App/>
+                </AuthSafeComponent>
+            </LocaleProvider>
+        </ReactKeycloakProvider>
+    } else {
+        return (
+            <LocaleProvider>
+                <AuthSafeComponent>
+                    <App/>
+                </AuthSafeComponent>
+            </LocaleProvider>
+        );
+    }
 }
 
 export default App;

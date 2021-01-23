@@ -19,6 +19,9 @@ import (
 // swagger:model PreEnrollment
 type PreEnrollment struct {
 
+	// certified
+	Certified bool `json:"certified,omitempty"`
+
 	// code
 	Code string `json:"code,omitempty"`
 

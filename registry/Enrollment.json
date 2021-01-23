@@ -40,6 +40,10 @@
         },
         "code": {
           "type": "string"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
         }
       }
     }

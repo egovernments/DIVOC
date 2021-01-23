@@ -4,19 +4,22 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/flate"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
-	"encoding/hex"
 	"encoding/json"
-	"encoding/xml"
+	"flag"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
+	"github.com/divoc/api/pkg/models"
+	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
 	"github.com/gorilla/mux"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
 	"net/http"
 	"os"
@@ -26,11 +29,25 @@ import (
 
 const ApiRole = "api"
 const ArogyaSetuRole = "arogyasetu"
+const Recipient = "recipient"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
+const DigilockerSuccessEvent = "digilocker-success"
+const DigilockerFailedEvent = "digilocker-failed"
+const InternalSuccessEvent = "internal-success"
+const InternalFailedEvent = "internal-failed"
+const ExternalSuccessEvent = "external-success"
+const ExternalFailedEvent = "external-failed"
+
+var (
+	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
+		Name: "http_request_duration_milliseconds",
+		Help: "Request duration time in milliseconds",
+	})
+)
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -90,269 +107,6 @@ type Certificate struct {
 		ProofPurpose       string    `json:"proofPurpose"`
 		Jws                string    `json:"jws"`
 	} `json:"proof"`
-}
-
-type PullURIRequest struct {
-	XMLName    xml.Name `xml:"PullURIRequest"`
-	Text       string   `xml:",chardata"`
-	Ns2        string   `xml:"ns2,attr"`
-	Ver        string   `xml:"ver,attr"`
-	Ts         string   `xml:"ts,attr"`
-	Txn        string   `xml:"txn,attr"`
-	OrgId      string   `xml:"orgId,attr"`
-	Format     string   `xml:"format,attr"`
-	DocDetails struct {
-		Text         string `xml:",chardata"`
-		DocType      string `xml:"DocType"`
-		DigiLockerId string `xml:"DigiLockerId"`
-		UID          string `xml:"UID"`
-		FullName     string `xml:"FullName"`
-		DOB          string `xml:"DOB"`
-		Photo        string `xml:"Photo"`
-		TrackingId   string `xml:"tracking_id"`
-		UDF1         string `xml:"UDF1"`
-		UDF2         string `xml:"UDF2"`
-		UDF3         string `xml:"UDF3"`
-		UDFn         string `xml:"UDFn"`
-	} `xml:"DocDetails"`
-}
-
-type PullURIResponse struct {
-	XMLName        xml.Name `xml:"PullURIResponse"`
-	Text           string   `xml:",chardata"`
-	Ns2            string   `xml:"ns2,attr"`
-	ResponseStatus struct {
-		Text   string `xml:",chardata"`
-		Status string `xml:"Status,attr"`
-		Ts     string `xml:"ts,attr"`
-		Txn    string `xml:"txn,attr"`
-	} `xml:"ResponseStatus"`
-	DocDetails struct {
-		Text         string `xml:",chardata"`
-		DocType      string `xml:"DocType"`
-		DigiLockerId string `xml:"DigiLockerId"`
-		UID          string `xml:"UID"`
-		FullName     string `xml:"FullName"`
-		DOB          string `xml:"DOB"`
-		TrackingId   string `xml:"tracking_id"`
-		UDF1         string `xml:"UDF1"`
-		URI          string `xml:"URI"`
-		DocContent   string `xml:"DocContent"`
-		DataContent  string `xml:"DataContent"`
-	} `xml:"DocDetails"`
-}
-
-type PullDocRequest struct {
-	XMLName    xml.Name `xml:"PullDocRequest"`
-	Text       string   `xml:",chardata"`
-	Ns2        string   `xml:"ns2,attr"`
-	Ver        string   `xml:"ver,attr"`
-	Ts         string   `xml:"ts,attr"`
-	Txn        string   `xml:"txn,attr"`
-	OrgId      string   `xml:"orgId,attr"`
-	Format     string   `xml:"format,attr"`
-	DocDetails struct {
-		Text         string `xml:",chardata"`
-		URI          string `xml:"URI"`
-		DigiLockerId string `xml:"DigiLockerId"`
-		UID          string `xml:"UID"`
-		FullName     string `xml:"FullName"`
-		DOB          string `xml:"DOB"`
-	} `xml:"DocDetails"`
-}
-
-type PullDocResponse struct {
-	XMLName        xml.Name `xml:"PullDocResponse"`
-	Text           string   `xml:",chardata"`
-	Ns2            string   `xml:"ns2,attr"`
-	ResponseStatus struct {
-		Text   string `xml:",chardata"`
-		Status string `xml:"Status,attr"`
-		Ts     string `xml:"ts,attr"`
-		Txn    string `xml:"txn,attr"`
-	} `xml:"ResponseStatus"`
-	DocDetails struct {
-		Text        string `xml:",chardata"`
-		DocContent  string `xml:"DocContent"`
-		DataContent string `xml:"DataContent"`
-	} `xml:"DocDetails"`
-}
-
-func ValidMAC(message string, messageMAC, key []byte) bool {
-	mac := hmac.New(sha256.New, key)
-	mac.Write([]byte(message))
-	expectedMAC := mac.Sum(nil)
-	hexMac := ([]byte)(hex.EncodeToString(expectedMAC))
-	if log.IsLevelEnabled(log.InfoLevel) {
-		log.Infof("Expected mac %s and got %s", base64.StdEncoding.EncodeToString(hexMac), base64.StdEncoding.EncodeToString(messageMAC))
-	}
-	return !hmac.Equal(messageMAC, hexMac)
-}
-
-func docRequest(w http.ResponseWriter, req *http.Request) {
-	log.Info("Got document request ")
-	requestBuffer, requestString, hmacSignByteArray, done := preProcessRequest(req, w)
-	if done {
-		return
-	}
-
-	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
-		xmlRequest := PullDocRequest{}
-		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
-			log.Errorf("Error in marshalling request from the digilocker %+v", err)
-		} else {
-
-			response := PullDocResponse{}
-			response.ResponseStatus.Ts = xmlRequest.Ts
-			response.ResponseStatus.Txn = xmlRequest.Txn
-			response.ResponseStatus.Status = "0"
-			certBundle := getCertificateByUri(xmlRequest.DocDetails.URI, xmlRequest.DocDetails.DOB)
-			if certBundle != nil {
-				response.ResponseStatus.Status = "1"
-				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
-						log.Errorf("Error in creating certificate pdf %+v", err)
-					} else {
-						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
-					}
-				}
-				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
-					certificateId := certBundle.certificateId
-					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
-					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
-				}
-
-			}
-			if responseBytes, err := xml.Marshal(response); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.Header().Set("Content-Type", "application/xml")
-				w.WriteHeader(200)
-
-				_, _ = w.Write(responseBytes)
-				return
-			}
-			w.WriteHeader(500)
-		}
-	}
-}
-
-func uriRequest(w http.ResponseWriter, req *http.Request) {
-	requestBuffer, requestString, hmacSignByteArray, done := preProcessRequest(req, w)
-	if done {
-		return
-	}
-
-	if ValidMAC(requestString, hmacSignByteArray, []byte(config.Config.Digilocker.AuthHMACKey)) {
-
-		xmlRequest := PullURIRequest{}
-		if err := xml.Unmarshal(requestBuffer, &xmlRequest); err != nil {
-			log.Errorf("Error in marshalling request from the digilocker %+v", err)
-		} else {
-
-			response := PullURIResponse{}
-			response.ResponseStatus.Ts = xmlRequest.Ts
-			response.ResponseStatus.Txn = xmlRequest.Txn
-			response.ResponseStatus.Status = "0"
-			response.DocDetails.DocType = config.Config.Digilocker.DocType
-			response.DocDetails.DigiLockerId = xmlRequest.DocDetails.DigiLockerId
-			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
-			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
-
-			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB)
-			if certBundle != nil {
-				response.DocDetails.URI = certBundle.Uri
-				response.ResponseStatus.Status = "1"
-				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
-						log.Errorf("Error in creating certificate pdf")
-					} else {
-						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
-					}
-				}
-				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
-					certificateId := certBundle.certificateId
-					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
-					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
-				}
-
-			}
-			if responseBytes, err := xml.Marshal(response); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(responseBytes)
-				return
-			}
-			w.WriteHeader(500)
-		}
-	} else {
-		log.Errorf("Unauthorized access")
-		w.WriteHeader(401)
-		_, _ = w.Write([]byte("Unauthorized"))
-	}
-
-}
-
-func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string, []byte, bool) {
-	log.Info("Got request ")
-	for name, values := range req.Header {
-		for _, value := range values {
-			log.Infof("%s:%s", name, value)
-		}
-	}
-	requestBuffer := make([]byte, 2048)
-	n, _ := req.Body.Read(requestBuffer)
-	requestString := string(requestBuffer[:n])
-	log.Infof("Read %d bytes ", n)
-	println(requestString)
-	log.Infof("Request body %s", requestString)
-	hmacDigest := req.Header.Get(config.Config.Digilocker.AuthKeyName)
-	hmacSignByteArray, e := base64.StdEncoding.DecodeString(hmacDigest)
-	if e != nil {
-		log.Errorf("Error in verifying request signature")
-		w.WriteHeader(500)
-		_, _ = w.Write([]byte("Error in verifying request signature"))
-		return nil, "", nil, true
-	}
-	return requestBuffer, requestString, hmacSignByteArray, false
-}
-
-type VaccinationCertificateBundle struct {
-	certificateId string
-	Uri           string
-	signedJson    string
-	pdf           []byte
-}
-
-func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
-	slice := strings.Split(uri, "-")
-	certificateId := slice[len(slice)-1]
-	certificateFromRegistry, err := getCertificateFromRegistryByCertificateId(certificateId)
-	return returnLatestCertificate(err, certificateFromRegistry, certificateId)
-}
-
-func getCertificate(preEnrollmentCode string, dob string) *VaccinationCertificateBundle {
-	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
-	return returnLatestCertificate(err, certificateFromRegistry, preEnrollmentCode)
-}
-
-func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
-	if err == nil {
-		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			log.Infof("certificate resp %v", certificateObj)
-			var cert VaccinationCertificateBundle
-			cert.certificateId = certificateObj["certificateId"].(string)
-			cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
-			cert.signedJson = certificateObj["certificate"].(string)
-			return &cert
-		} else {
-			log.Errorf("No certificates found for req %v", referenceId)
-		}
-	}
-	return nil
 }
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
@@ -446,20 +200,20 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*45.0)
-		pdf.Cell(nil, displayLabels[i])
+		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	pdf.SetX(offsetX)
 	pdf.SetY(offsetY + float64(i)*40.0)
-	pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
+	_ = pdf.Cell(nil, certificate.CredentialSubject.Address.AddressRegion)
 
 	for i = rowSize; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY + float64(i)*45.0)
-		pdf.Cell(nil, displayLabels[i])
+		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	pdf.SetX(offsetNewX)
 	pdf.SetY(offsetNewY + float64(i)*42)
-	pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
+	_ = pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
 
 	e := pasteQrCodeOnPage(certificateText, &pdf)
 	if e != nil {
@@ -599,6 +353,122 @@ func compress(certificateText string) (*bytes.Buffer, error) {
 	return buf, err
 }
 
+func getCertificateList(w http.ResponseWriter, request *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
+	claimBody := auth.ExtractClaimBodyFromHeader(request)
+	if claimBody != nil {
+		filter := map[string]interface{}{}
+		filter[Mobile] = map[string]interface{}{
+			"eq": claimBody.PreferredUsername,
+		}
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		if err == nil {
+			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			log.Infof("Certificate query return %d records", len(certificateArr))
+			if len(certificateArr) > 0 {
+				certificates := map[string]interface{}{
+					"certificates": certificateArr,
+				}
+				if responseBytes, err := json.Marshal(certificates); err != nil {
+					log.Errorf("Error while serializing xml")
+				} else {
+					w.WriteHeader(200)
+					w.Header().Set("Content-Type", "application/json")
+					_, _ = w.Write(responseBytes)
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        pkg.ToString(claimBody.PreferredUsername),
+						TypeOfMessage: InternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
+					return
+				}
+			} else {
+				log.Errorf("No certificates found for request %v", filter)
+				writeResponse(w, 404, mobileNumberMismatchError())
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", filter)
+			w.WriteHeader(500)
+		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        claimBody.PreferredUsername,
+			TypeOfMessage: InternalFailedEvent,
+			ExtraInfo:     "Certificate not found",
+		})
+	} else {
+		payload := ErrorResponse{
+			Status:    "Forbidden",
+			ErrorCode: 0,
+			Message:   `Invalid token`,
+		}
+		writeResponse(w, http.StatusForbidden, payload)
+	}
+}
+
+func getCertificatePDF(w http.ResponseWriter, r *http.Request) {
+	log.Info("GET CERTIFICATES JSON ")
+	claimBody := auth.ExtractClaimBodyFromHeader(r)
+	if claimBody != nil {
+		log.Info("GET PDF HANDLER REQUEST")
+		vars := mux.Vars(r)
+		certificateId := vars[CertificateId]
+		filter := map[string]interface{}{}
+		filter[Mobile] = map[string]interface{}{
+			"eq": claimBody.PreferredUsername,
+		}
+		filter[CertificateId] = map[string]interface{}{
+			"eq": certificateId,
+		}
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		if err == nil {
+			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			log.Infof("Certificate query return %d records", len(certificateArr))
+			if len(certificateArr) > 0 {
+				certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+				log.Infof("certificate resp %v", certificateObj)
+				signedJson := certificateObj["certificate"].(string)
+				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+					log.Errorf("Error in creating certificate pdf")
+				} else {
+					//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+					//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+					//w.Header().Set("Content-Length", string(len(pdfBytes)))
+					w.WriteHeader(200)
+					_, _ = w.Write(pdfBytes)
+					go kafkaService.PublishEvent(models.Event{
+						Date:          time.Now(),
+						Source:        certificateId,
+						TypeOfMessage: InternalSuccessEvent,
+						ExtraInfo:     "Certificate found",
+					})
+					return
+				}
+			} else {
+				log.Errorf("No certificates found for request %v", certificateId)
+				w.WriteHeader(404)
+			}
+		} else {
+			log.Infof("Error %+v", err)
+		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        certificateId,
+			TypeOfMessage: InternalFailedEvent,
+			ExtraInfo:     "Certificate not found",
+		})
+	} else {
+		payload := ErrorResponse{
+			Status:    "Forbidden",
+			ErrorCode: 0,
+			Message:   `Invalid token`,
+		}
+		writeResponse(w, http.StatusForbidden, payload)
+	}
+
+}
+
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("GET PDF HANDLER REQUEST")
 	vars := mux.Vars(r)
@@ -619,6 +489,12 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 				//w.Header().Set("Content-Length", string(len(pdfBytes)))
 				w.WriteHeader(200)
 				_, _ = w.Write(pdfBytes)
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        preEnrollmentCode,
+					TypeOfMessage: InternalSuccessEvent,
+					ExtraInfo:     "Certificate found",
+				})
 				return
 			}
 		} else {
@@ -628,6 +504,12 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		log.Infof("Error %+v", err)
 	}
+	go kafkaService.PublishEvent(models.Event{
+		Date:          time.Now(),
+		Source:        preEnrollmentCode,
+		TypeOfMessage: InternalFailedEvent,
+		ExtraInfo:     "Certificate not found",
+	})
 }
 
 func getCertificateFromRegistryByCertificateId(certificateId string) (map[string]interface{}, error) {
@@ -650,141 +532,14 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 	return certificateFromRegistry, err
 }
 
-func getCertificateJSON(w http.ResponseWriter, request *http.Request) {
-	log.Info("GET CERTIFICATE JSON REQUEST")
-	urlParams := request.URL.Query()
-	filter := map[string]interface{}{}
-	preEnrollmentCode := urlParams.Get(PreEnrollmentCode)
-	if preEnrollmentCode != "" {
-		filter[PreEnrollmentCode] = map[string]interface{}{
-			"eq": preEnrollmentCode,
-		}
-	}
-	beneficiaryId := urlParams.Get(BeneficiaryId)
-	if beneficiaryId != "" {
-		filter[BeneficiaryId] = map[string]interface{}{
-			"eq": beneficiaryId,
-		}
-	}
-	if beneficiaryId == "" && preEnrollmentCode == "" {
-		log.Errorf("Get certificates json doesnt contain required fields %v", urlParams.Encode())
-		w.WriteHeader(400)
-		return
-	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
-	if err == nil {
-		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		log.Infof("Certificate query return %d records", len(certificateArr))
-		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			if responseBytes, err := json.Marshal(certificateObj); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(responseBytes)
-				return
-			}
-		}
-	} else {
-		log.Errorf("No certificates found for request %v", filter)
+func timed(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		startTime := time.Now()
+		next.ServeHTTP(w, r)
+		requestHistogram.Observe(float64(time.Since(startTime).Milliseconds()))
 	}
 }
-
-func getCertificates(w http.ResponseWriter, request *http.Request) {
-	log.Info("GET CERTIFICATES JSON ")
-	var requestBody map[string]interface{}
-	err := json.NewDecoder(request.Body).Decode(&requestBody)
-	mobile, found := requestBody[Mobile]
-	filter := map[string]interface{}{}
-	if found {
-		filter[Mobile] = map[string]interface{}{
-			"eq": mobile,
-		}
-	}
-	beneficiaryId, found := requestBody[BeneficiaryId]
-	if found {
-		filter[PreEnrollmentCode] = map[string]interface{}{
-			"eq": beneficiaryId,
-		}
-	}
-	if mobile == nil && beneficiaryId == nil {
-		log.Errorf("get certificates requested with no parameters, %v", requestBody)
-		w.WriteHeader(400)
-		return
-	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
-	if err == nil {
-		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		log.Infof("Certificate query return %d records", len(certificateArr))
-		if len(certificateArr) > 0 {
-			certificates := map[string]interface{}{
-				"certificates": certificateArr,
-			}
-			if responseBytes, err := json.Marshal(certificates); err != nil {
-				log.Errorf("Error while serializing xml")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(responseBytes)
-				w.Header().Set("Content-Type", "application/json")
-				return
-			}
-		}
-	} else {
-		log.Errorf("No certificates found for request %v", filter)
-		w.WriteHeader(500)
-	}
-}
-
-func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("GET PDF HANDLER REQUEST")
-	var requestBody map[string]interface{}
-	err := json.NewDecoder(r.Body).Decode(&requestBody)
-	mobile, found := requestBody[Mobile]
-	filter := map[string]interface{}{}
-	if found {
-		filter[Mobile] = map[string]interface{}{
-			"eq": mobile,
-		}
-	}
-	beneficiaryId, found := requestBody[BeneficiaryId]
-	if found {
-		filter[PreEnrollmentCode] = map[string]interface{}{
-			"eq": beneficiaryId,
-		}
-	}
-	if mobile == nil && beneficiaryId == nil {
-		log.Errorf("get certificates requested with no parameters, %v", requestBody)
-		w.WriteHeader(400)
-		return
-	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
-	if err == nil {
-		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		log.Infof("Certificate query return %d records", len(certificateArr))
-		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			log.Infof("certificate resp %v", certificateObj)
-			signedJson := certificateObj["certificate"].(string)
-			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
-				log.Errorf("Error in creating certificate pdf")
-			} else {
-				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
-				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-				//w.Header().Set("Content-Length", string(len(pdfBytes)))
-				w.WriteHeader(200)
-				_, _ = w.Write(pdfBytes)
-				return
-			}
-		} else {
-			log.Errorf("No certificates found for request %v", filter)
-			w.WriteHeader(404)
-		}
-	} else {
-		log.Infof("Error %+v", err)
-	}
-}
-
-func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
+func authorize(next http.HandlerFunc, roles []string, eventType string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
 		if claimBody != nil {
@@ -794,24 +549,48 @@ func authorize(next http.HandlerFunc, roles []string) http.HandlerFunc {
 				return
 			}
 		}
+		go kafkaService.PublishEvent(models.Event{
+			Date:          time.Now(),
+			Source:        "",
+			TypeOfMessage: eventType,
+			ExtraInfo:     "Unauthorized access",
+		})
 		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
 }
 
+var addr = flag.String("listen-address", ":8003", "The address to listen on for HTTP requests.")
+
 func main() {
 	config.Initialize()
+	initializeKafka()
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
+	r.Handle("/metrics", promhttp.Handler())
 	//integration
 	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole})).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
+	r.HandleFunc("/cert/api/certificates", timed(authorize(getCertificateList, []string{Recipient}, InternalFailedEvent))).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF", timed(authorize(getCertificatePDF, []string{Recipient}, InternalFailedEvent))).
+		Methods("GET").
+		Queries("certificateId", "{certificateId}")
 	//external
-	r.HandleFunc("/cert/external/api/certificates", authorize(getCertificates, []string{ArogyaSetuRole})).Methods("POST")
-	r.HandleFunc("/cert/external/pdf/certificate", authorize(getCertificatePDFHandler, []string{ArogyaSetuRole})).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
+	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
 
 	http.Handle("/", r)
-	_ = http.ListenAndServe(":8003", nil)
+	_ = http.ListenAndServe(*addr, nil)
+}
+
+func initializeKafka() {
+	servers := config.Config.Kafka.BootstrapServers
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	if err != nil {
+		panic(err)
+	}
+	kafkaService.StartEventProducer(producer)
+	kafkaService.LogProducerEvents(producer)
 }

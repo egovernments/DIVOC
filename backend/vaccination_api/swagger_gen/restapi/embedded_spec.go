@@ -701,6 +701,9 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "certified": {
+          "type": "boolean"
+        },
         "code": {
           "type": "string"
         },
@@ -1690,6 +1693,9 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "certified": {
+          "type": "boolean"
+        },
         "code": {
           "type": "string"
         },

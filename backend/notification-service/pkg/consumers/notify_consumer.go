@@ -1,17 +1,26 @@
 package consumers
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/notification-service/config"
 	eventModels "github.com/divoc/notification-service/pkg/models"
 	"github.com/divoc/notification-service/pkg/services"
 	"github.com/divoc/notification-service/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"text/template"
 )
 
+const RecipientCertified = "recipientCertified"
+
 func certifiedEmailNotificationConsumer() {
+	facilityRegisteredTemplateString := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Message
+	subject := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Subject
+
+	var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certified_email_notifier",
@@ -31,19 +40,31 @@ func certifiedEmailNotificationConsumer() {
 			if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 				log.Errorf("Received message is not in required format %+v", err)
 			}
-			if len(certifyMessage.Recipient.Contact) > 0 {
-				for _, contact := range certifyMessage.Recipient.Contact {
+			if len(certifyMessage.Contact) > 0 {
+				for _, contact := range certifyMessage.Contact {
 					emailID, err := services.GetEmailId(contact)
 					if err == nil {
-						vaccineName := certifyMessage.Vaccination.Name
-						recipientName := certifyMessage.Recipient.Name
-						subject := "DIVOC - Vaccine Certificate"
-						message := recipientName + ", your " + vaccineName + " vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ "
-						if err := services.SendEmail(emailID, subject, message); err == nil {
-							log.Debugf("EMAIL sent response %+v")
-							c.CommitMessage(msg)
-						} else {
-							log.Errorf("Error in sending email %+v", err)
+						var certificate map[string]interface{}
+						err := json.Unmarshal([]byte(certifyMessage.Certificate), &certificate)
+						if err == nil {
+							vaccineName, ok := (certificate["evidence"].([]interface{})[0].(map[string]interface{}))["vaccine"].(string)
+							if ok {
+								templateObject := map[string]interface{}{
+									"Name":        certifyMessage.Name,
+									"VaccineName": vaccineName,
+								}
+								buf := bytes.Buffer{}
+								err := facilityRegisteredTemplate.Execute(&buf, templateObject)
+								if err == nil {
+									if err := services.SendEmail(emailID, subject, buf.String()); err == nil {
+										log.Debugf("EMAIL sent response %+v")
+									} else {
+										log.Errorf("Error in sending email %+v", err)
+									}
+								} else {
+									log.Errorf("Failed generating notification template", err)
+								}
+							}
 						}
 					}
 				}
@@ -55,12 +76,15 @@ func certifiedEmailNotificationConsumer() {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
 		}
+		c.CommitMessage(msg)
 	}
 
 	c.Close()
 }
 
 func certifiedSMSNotificationConsumer() {
+	facilityRegisteredTemplateString := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Message
+	var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certified_sms_notifier",
@@ -80,19 +104,31 @@ func certifiedSMSNotificationConsumer() {
 			if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 				log.Errorf("Received message is not in required format %+v", err)
 			}
-			if len(certifyMessage.Recipient.Contact) > 0 {
-				for _, contact := range certifyMessage.Recipient.Contact {
-					//TODO: check for prefix
+			if len(certifyMessage.Contact) > 0 {
+				for _, contact := range certifyMessage.Contact {
 					mobileNumber, err := services.GetMobileNumber(contact)
 					if err == nil {
-						vaccineName := certifyMessage.Vaccination.Name
-						recipientName := certifyMessage.Recipient.Name
-						message := recipientName + ", your " + vaccineName + " vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ "
-						if resp, err := services.SendSMS(mobileNumber, message); err == nil {
-							log.Debugf("SMS sent response %+v", resp)
-							c.CommitMessage(msg)
-						} else {
-							log.Errorf("Error in sending SMS %+v", err)
+						var certificate map[string]interface{}
+						err := json.Unmarshal([]byte(certifyMessage.Certificate), &certificate)
+						if err == nil {
+							vaccineName, ok := (certificate["evidence"].([]interface{})[0].(map[string]interface{}))["vaccine"].(string)
+							if ok {
+								templateObject := map[string]interface{}{
+									"Name":        certifyMessage.Name,
+									"VaccineName": vaccineName,
+								}
+								buf := bytes.Buffer{}
+								err := facilityRegisteredTemplate.Execute(&buf, templateObject)
+								if err == nil {
+									if resp, err := services.SendSMS(mobileNumber, buf.String()); err == nil {
+										log.Debugf("SMS sent response %+v", resp)
+									} else {
+										log.Errorf("Error in sending SMS %+v", err)
+									}
+								} else {
+									log.Errorf("Failed generating notification template", err)
+								}
+							}
 						}
 					}
 				}
@@ -103,6 +139,7 @@ func certifiedSMSNotificationConsumer() {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
 		}
+		c.CommitMessage(msg)
 	}
 
 	c.Close()
@@ -137,10 +174,7 @@ func notifyConsumer() {
 				if err == nil {
 					if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
 						log.Debugf("SMS sent response %+v", resp)
-						_, err := c.CommitMessage(msg)
-						if err != nil {
-							log.Errorf("Error in committing message %+v", err)
-						}
+
 					} else {
 						log.Errorf("Error in sending SMS %+v", err)
 					}
@@ -152,10 +186,7 @@ func notifyConsumer() {
 				if err == nil {
 					if err := services.SendEmail(emailId, request.Subject, *request.Message); err == nil {
 						log.Debugf("Email sent successfully")
-						_, err := c.CommitMessage(msg)
-						if err != nil {
-							log.Errorf("Error in committing message %+v", err)
-						}
+
 					} else {
 						log.Errorf("Error in sending SMS %+v", err)
 					}
@@ -169,6 +200,10 @@ func notifyConsumer() {
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
+		}
+		_, err = c.CommitMessage(msg)
+		if err != nil {
+			log.Errorf("Error in committing message %+v", err)
 		}
 	}
 

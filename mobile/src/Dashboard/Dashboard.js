@@ -6,7 +6,6 @@ import home from '../Home/home.svg'
 import language from '../Language/language.svg'
 import queue from '../Queue/queue.svg'
 import logout from '../Logout/logout.svg'
-import help from '../assets/img/help.svg'
 import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
 import {SelectLanguage} from "../Language/LanguageSelection";

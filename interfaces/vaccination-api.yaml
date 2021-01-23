@@ -343,6 +343,8 @@ definitions:
         type: string
       meta:
         type: object
+      certified:
+        type: boolean
   CertificationRequest:
     type: object
     properties:

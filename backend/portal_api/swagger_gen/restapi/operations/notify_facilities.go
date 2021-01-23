@@ -79,12 +79,6 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 // swagger:model NotifyFacilitiesParamsBodyItems0
 type NotifyFacilitiesParamsBodyItems0 struct {
 
-	// contact
-	Contact string `json:"contact,omitempty"`
-
-	// email
-	Email string `json:"email,omitempty"`
-
 	// facility Id
 	FacilityID string `json:"facilityId,omitempty"`
 

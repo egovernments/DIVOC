@@ -1,0 +1,18 @@
+.button {
+    background: #5C9EF8 0% 0% no-repeat padding-box;
+    border-radius: 6px;
+    border: none;
+    color: #FFFFFF;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.box-header{
+    margin: 1rem;
+    color: #1D1D1D;
+    font-weight: bolder;
+    font-size: medium;
+}
+.table-container{
+    background: #F8FAFD;
+}

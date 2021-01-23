@@ -1,12 +1,8 @@
 import React, {useState} from "react";
 import "./index.scss";
 import {Form} from "react-bootstrap";
-import SampleSignatureImg from "../../assets/img/sample-signature.png";
 import Button from "react-bootstrap/Button";
-import {CONSTANT} from "../../utils/constants";
-import {BaseFormCard} from "../BaseFormCard";
 import {ACTION_PATIENT_COMPLETED, useConfirmVaccine} from "../../ConfirmVaccination";
-import {appIndexDb} from "../../AppDatabase";
 import {SyncFacade} from "../../SyncFacade";
 import {Loader} from "../../Base/Base";
 
@@ -23,6 +19,9 @@ export const BatchCodeForm = () => {
             }).then((value => {
                 goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
             })).catch((e) => {
+                if (!navigator.onLine) {
+                    goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
+                }
                 console.log(e);
                 setLoading(false)
             })
