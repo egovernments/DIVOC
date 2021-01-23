@@ -49,6 +49,9 @@ type Vaccinator struct {
 	// Required: true
 	NationalIdentifier *string `json:"nationalIdentifier"`
 
+	// programs
+	Programs []*VaccinatorProgramsItems0 `json:"programs"`
+
 	// signature string
 	SignatureString string `json:"signatureString,omitempty"`
 
@@ -90,6 +93,10 @@ func (m *Vaccinator) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateNationalIdentifier(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePrograms(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -168,6 +175,31 @@ func (m *Vaccinator) validateNationalIdentifier(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalIdentifier", "body", m.NationalIdentifier); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func (m *Vaccinator) validatePrograms(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Programs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Programs); i++ {
+		if swag.IsZero(m.Programs[i]) { // not required
+			continue
+		}
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -261,6 +293,41 @@ func (m *Vaccinator) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Vaccinator) UnmarshalBinary(b []byte) error {
 	var res Vaccinator
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// VaccinatorProgramsItems0 vaccinator programs items0
+//
+// swagger:model VaccinatorProgramsItems0
+type VaccinatorProgramsItems0 struct {
+
+	// if vaccinator has certificate for program
+	Certified bool `json:"certified,omitempty"`
+
+	// Id of the program
+	ID string `json:"id,omitempty"`
+}
+
+// Validate validates this vaccinator programs items0
+func (m *VaccinatorProgramsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *VaccinatorProgramsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *VaccinatorProgramsItems0) UnmarshalBinary(b []byte) error {
+	var res VaccinatorProgramsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

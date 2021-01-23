@@ -53,7 +53,7 @@ paths:
           type: string
           description: Program Status
       security:
-        - hasRole: ["admin", "controller"]
+        - hasRole: ["admin", "controller", "facility-admin"]
       responses:
         '200':
           description: OK
@@ -163,6 +163,15 @@ paths:
       operationId: getVaccinators
       security:
         - hasRole: ["facility-admin", "admin"]
+      parameters:
+        - in: query
+          name: facilityCode
+          type: string
+          description: Facility Code
+        - in: query
+          name: name
+          type: string
+          description: Vaccinator Name
       responses:
         '200':
           description: OK
@@ -186,6 +195,24 @@ paths:
           description: Invalid input
           schema:
             $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update Vaccinator
+      operationId: updateVaccinators
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/VaccinatorUpdateRequest'
+          description: Vaccinator Update Request
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
         '401':
           description: Unauthorized
   /vaccinator:
@@ -709,6 +736,60 @@ definitions:
         enum:
           - Active
           - Inactive
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id of the program
+            certified:
+              type: boolean
+              title: if vaccinator has certificate for program
+  VaccinatorUpdateRequest:
+    type: array
+    items:
+      type: object
+      properties:
+        osid:
+          type: object
+        signatureString:
+          type: string
+        code:
+          type: string
+        nationalIdentifier:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        facilityIds:
+          type: array
+          items:
+            type: string
+        mobileNumber:
+          type: string
+          maxLength: 10
+          minLength: 10
+        averageRating:
+          type: number
+        trainingCertificate:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              certified:
+                type: boolean
   Program:
     type: object
     title: Program

@@ -123,6 +123,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		UpdateFacilityUserHandler: UpdateFacilityUserHandlerFunc(func(params UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilityUser has not yet been implemented")
 		}),
+		UpdateVaccinatorsHandler: UpdateVaccinatorsHandlerFunc(func(params UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateVaccinators has not yet been implemented")
+		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
@@ -225,6 +228,8 @@ type DivocPortalAPIAPI struct {
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
 	// UpdateFacilityUserHandler sets the operation handler for the update facility user operation
 	UpdateFacilityUserHandler UpdateFacilityUserHandler
+	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
+	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -385,6 +390,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.UpdateFacilityUserHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilityUserHandler")
+	}
+	if o.UpdateVaccinatorsHandler == nil {
+		unregistered = append(unregistered, "UpdateVaccinatorsHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -590,6 +598,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/facility/users"] = NewUpdateFacilityUser(o.context, o.UpdateFacilityUserHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/vaccinators"] = NewUpdateVaccinators(o.context, o.UpdateVaccinatorsHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

@@ -74,6 +74,18 @@
           "type": "string",
           "enum": ["Active", "Inactive"]
         },
+        "programs": {
+          "$id": "#/properties/programs",
+          "type": "array",
+          "items": {
+            "id":{
+              "type": "string"
+            },
+            "certified": {
+              "type": "boolean"
+            }
+          }
+        },
         "___encryptedFields": {
         }
       }

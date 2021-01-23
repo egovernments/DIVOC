@@ -169,7 +169,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -715,6 +716,20 @@ func init() {
         ],
         "summary": "Get vaccinators",
         "operationId": "getVaccinators",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code",
+            "name": "facilityCode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Vaccinator Name",
+            "name": "name",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -724,6 +739,38 @@ func init() {
                 "$ref": "#/definitions/Vaccinator"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Vaccinator",
+        "operationId": "updateVaccinators",
+        "parameters": [
+          {
+            "description": "Vaccinator Update Request",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/VaccinatorUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1225,6 +1272,22 @@ func init() {
         "nationalIdentifier": {
           "type": "string"
         },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "certified": {
+                "type": "boolean",
+                "title": "if vaccinator has certificate for program"
+              },
+              "id": {
+                "type": "string",
+                "title": "Id of the program"
+              }
+            }
+          }
+        },
         "signatureString": {
           "type": "string"
         },
@@ -1243,6 +1306,70 @@ func init() {
         },
         "trainingCertificate": {
           "type": "string"
+        }
+      }
+    },
+    "VaccinatorUpdateRequest": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "averageRating": {
+            "type": "number"
+          },
+          "code": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "facilityIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "mobileNumber": {
+            "type": "string",
+            "maxLength": 10,
+            "minLength": 10
+          },
+          "name": {
+            "type": "string"
+          },
+          "nationalIdentifier": {
+            "type": "string"
+          },
+          "osid": {
+            "type": "object"
+          },
+          "programs": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "certified": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "signatureString": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "Inactive"
+            ]
+          },
+          "trainingCertificate": {
+            "type": "string"
+          }
         }
       }
     }
@@ -1419,7 +1546,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -1948,6 +2076,20 @@ func init() {
         ],
         "summary": "Get vaccinators",
         "operationId": "getVaccinators",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code",
+            "name": "facilityCode",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "description": "Vaccinator Name",
+            "name": "name",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1957,6 +2099,38 @@ func init() {
                 "$ref": "#/definitions/Vaccinator"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Update Vaccinator",
+        "operationId": "updateVaccinators",
+        "parameters": [
+          {
+            "description": "Vaccinator Update Request",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/VaccinatorUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2500,6 +2674,12 @@ func init() {
         "nationalIdentifier": {
           "type": "string"
         },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VaccinatorProgramsItems0"
+          }
+        },
         "signatureString": {
           "type": "string"
         },
@@ -2517,6 +2697,89 @@ func init() {
           ]
         },
         "trainingCertificate": {
+          "type": "string"
+        }
+      }
+    },
+    "VaccinatorProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "certified": {
+          "type": "boolean",
+          "title": "if vaccinator has certificate for program"
+        },
+        "id": {
+          "type": "string",
+          "title": "Id of the program"
+        }
+      }
+    },
+    "VaccinatorUpdateRequest": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/VaccinatorUpdateRequestItems0"
+      }
+    },
+    "VaccinatorUpdateRequestItems0": {
+      "type": "object",
+      "properties": {
+        "averageRating": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalIdentifier": {
+          "type": "string"
+        },
+        "osid": {
+          "type": "object"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VaccinatorUpdateRequestItems0ProgramsItems0"
+          }
+        },
+        "signatureString": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
+        }
+      }
+    },
+    "VaccinatorUpdateRequestItems0ProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "certified": {
+          "type": "boolean"
+        },
+        "id": {
           "type": "string"
         }
       }
