@@ -11708,10 +11708,10 @@ v8-to-istanbul@^7.0.0:
     convert-source-map "^1.6.0"
     source-map "^0.7.3"
 
-vaccination-context@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/vaccination-context/-/vaccination-context-1.0.1.tgz#c3bb31835153c70c5ed55c649f3414123cd9b307"
-  integrity sha512-h0945Tr3Ej9kG1jHPzFSBa2i1KlWPvAdYfar7cQVp5wpNB6GKkrsOTtFyHZhMuFPv1SnkDtCoaHj+97t9yyuyA==
+vaccination-context@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/vaccination-context/-/vaccination-context-1.0.7.tgz#17de43e823fafa015655ab835b5f2e2e1bad35ef"
+  integrity sha512-uJKwwuu6lfXJjo0V729IYBmT56e8e3DY8VLx45VxrPt9MohpOMejtA44a81yBqaUPlAmZaKV5VuZquaVbHPpRg==
 
 validate-npm-package-license@^3.0.1:
   version "3.0.4"
