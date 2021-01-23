@@ -14,6 +14,20 @@ export const is24hoursAgo = (date) => {
     return oneDayDiff >= oneDayIntoMillis
 }
 
+//TODO: Remove this. It was for testing before API is read
+const program1 = {
+    "certified": false,
+    "id": "c19",
+    "osid": "cfb1d014-520a-4f19-85d3-1055524c3319"
+};
+
+const program2 = {
+    "certified": true,
+    "id": "COVID",
+    "osid": "315858a7-84c6-411c-acfc-c336734d24d9"
+}
+
+
 export class SyncFacade {
 
     static async pull() {
@@ -28,7 +42,17 @@ export class SyncFacade {
         }
 
         const vaccinators = await ApiServices.fetchVaccinators();
-        await appIndexDb.saveVaccinators(vaccinators);
+
+        //TODO: Remove this. It was for testing before API is read
+        const newVaccine = vaccinators.map((item, index) => {
+            if (index % 2 === 0) {
+                item["programs"] = [program1]
+            } else {
+                item["programs"] = [program2]
+            }
+            return item;
+        });
+        await appIndexDb.saveVaccinators(newVaccine);
     }
 
     static async push() {

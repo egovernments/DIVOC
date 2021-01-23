@@ -56,7 +56,10 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, enrollCode);
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
-            if (patient.phone === mobileNumber) {
+            const selectedProgram = getSelectedProgram();
+            //TODO:Check the programName contract when API is done
+            if (patient.phone === mobileNumber
+                && patient.programName === selectedProgram) {
                 patient.dob = this.formatDate(patient.dob)
                 return patient
             } else {
@@ -113,7 +116,20 @@ export class AppDatabase {
     }
 
     async getVaccinators() {
-        return this.db.getAll(VACCINATORS)
+        const vaccinator = await this.db.getAll(VACCINATORS)
+        const selectProgram = getSelectedProgram();
+        const vaccinatorByProgram = vaccinator.filter((item, index) => {
+            const supportProgramsName = item[PROGRAMS]
+            for (let i = 0; i < supportProgramsName.length; i++) {
+                const programName = supportProgramsName[i].id
+                if (programName === selectProgram) {
+                    return true;
+                }
+            }
+            return false;
+
+        });
+        return vaccinatorByProgram
     }
 
     async markPatientAsComplete(enrollCode) {
