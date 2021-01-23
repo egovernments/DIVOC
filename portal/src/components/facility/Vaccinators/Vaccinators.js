@@ -1,25 +1,43 @@
 import React, {useEffect, useState} from "react";
 import {useAxios} from "../../../utils/useAxios";
-import "./Vaccinators.css"
+import "./Vaccinators.module.css"
 import VaccinatorDetails from "../VaccinatorDetails/VaccinatorDetails";
 import VaccinatorList from "../VaccinatorList/VaccinatorList";
+import keycloak from "../../../utils/keycloak";
+import {equals, reject} from "ramda";
+import {API_URL} from "../../../utils/constants";
+import styles from "./Vaccinators.module.css";
 
 
 export default function Vaccinators() {
     const [vaccinators, setVaccinators] = useState([]);
     const [selectedVaccinator, setSelectedVaccinator] = useState({});
     const [enableVaccinatorDetailView, setEnableVaccinatorDetailView] = useState(false);
-    const fileUploadAPI = '/divoc/admin/api/v1/vaccinators';
+    const [facilityCode, setFacilityCode] = useState('');
     const axiosInstance = useAxios('');
+
     useEffect(() => {
-        fetchVaccinators()
+        keycloak.loadUserProfile()
+            .then(res => {
+                setFacilityCode(res["attributes"]["facility_code"][0]);
+                fetchVaccinators(res["attributes"]["facility_code"][0]).then(res => {
+                    res.data.forEach(item => {
+                        if (!("programs" in item)) {
+                            Object.assign(item, {programs: []});
+                        }
+                    });
+                    setVaccinators(res.data)
+                })
+            })
     }, []);
 
-    function fetchVaccinators() {
-        axiosInstance.current.get(fileUploadAPI)
-            .then(res => {
-                setVaccinators(res.data)
-            });
+    function fetchVaccinators(fc) {
+        let params = {
+            facilityCode: fc ? fc : facilityCode,
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+        return axiosInstance.current.get(API_URL.VACCINATORS_API, {params: queryParams})
     }
 
     function onAddVaccinator() {
@@ -27,18 +45,31 @@ export default function Vaccinators() {
         setEnableVaccinatorDetailView(true);
     }
 
-    const onSelectVaccinator = (vaccinators) => {
-        setSelectedVaccinator(vaccinators);
+    const onSelectVaccinator = (vaccinator) => {
+        setSelectedVaccinator(vaccinator);
         setEnableVaccinatorDetailView(true)
     };
+
+    const onSelectVaccinatorBasedOnCode = (code) => {
+        fetchVaccinators().then(res => {
+           setVaccinators(res.data);
+            res.data.map(vaccinator => {
+                if (vaccinator.code === code) {
+                    console.log("got selected vaccinatior ", vaccinator);
+                    setSelectedVaccinator(vaccinator);
+                }
+            })
+        });
+    };
+
     return (
         <div>
             {enableVaccinatorDetailView === false &&
             <div>
-                <div>
-                    <button className="add-vaccinator-button" onClick={onAddVaccinator}>+ ADD VACCINATOR</button>
+                <div className={`row ${styles['container']}`}>
+                    <button className={`${styles['add-vaccinator-button']}`} onClick={onAddVaccinator}>+ ADD VACCINATOR</button>
                 </div>
-                <div >
+                <div className={`row ${styles['container']}`}>
                     <VaccinatorList
                         vaccinators={vaccinators}
                         onSelectVaccinator={onSelectVaccinator}
@@ -51,6 +82,7 @@ export default function Vaccinators() {
                     selectedVaccinator={selectedVaccinator}
                     setEnableVaccinatorDetailView={setEnableVaccinatorDetailView}
                     fetchVaccinators={fetchVaccinators}
+                    onSelectVaccinatorBasedOnCode={onSelectVaccinatorBasedOnCode}
                 />
             }
         </div>
