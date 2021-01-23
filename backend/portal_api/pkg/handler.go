@@ -50,6 +50,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
+	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 }
 
 type GenericResponse struct {
@@ -506,4 +507,20 @@ func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, princ
 		return operations.NewDeleteFacilityUserBadRequest()
 	}
 	return operations.NewDeleteFacilityUserOK()
+}
+
+func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *models.JWTClaimBody) middleware.Responder {
+	entityTypeId := "Facility"
+	if claimBody != nil {
+		response, err := services.GetFacilityByCode(claimBody.FacilityCode)
+		if err != nil {
+			log.Errorf("Error in querying registry", err)
+			return model.NewGenericServerError()
+		}
+		responseArr := response[entityTypeId]
+		return model.NewGenericJSONResponse(responseArr)
+	} else {
+		return NewGenericForbiddenError()
+	}
+
 }
