@@ -340,6 +340,28 @@ func init() {
         }
       }
     },
+    "/facility": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "facility-staff"
+            ]
+          }
+        ],
+        "summary": "get user facility details",
+        "operationId": "getUserFacility",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Facility"
+            }
+          }
+        }
+      }
+    },
     "/facility/groups": {
       "get": {
         "security": [
@@ -1134,6 +1156,12 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
+        },
+        "vaccinationRateLimits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VaccinationRateLimit"
+          }
         }
       }
     },
@@ -1228,6 +1256,18 @@ func init() {
         "name": {
           "type": "string",
           "title": "group name"
+        }
+      }
+    },
+    "VaccinationRateLimit": {
+      "properties": {
+        "programName": {
+          "type": "string",
+          "title": "Program Name"
+        },
+        "rateLimit": {
+          "type": "integer",
+          "title": "Maximum rate of vaccination"
         }
       }
     },
@@ -1702,6 +1742,28 @@ func init() {
               "items": {
                 "type": "object"
               }
+            }
+          }
+        }
+      }
+    },
+    "/facility": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "facility-staff"
+            ]
+          }
+        ],
+        "summary": "get user facility details",
+        "operationId": "getUserFacility",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Facility"
             }
           }
         }
@@ -2523,6 +2585,12 @@ func init() {
         "name": {
           "type": "string",
           "title": "Facility User Name"
+        },
+        "vaccinationRateLimits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VaccinationRateLimit"
+          }
         }
       }
     },
@@ -2631,6 +2699,18 @@ func init() {
         "name": {
           "type": "string",
           "title": "group name"
+        }
+      }
+    },
+    "VaccinationRateLimit": {
+      "properties": {
+        "programName": {
+          "type": "string",
+          "title": "Program Name"
+        },
+        "rateLimit": {
+          "type": "integer",
+          "title": "Maximum rate of vaccination"
         }
       }
     },
