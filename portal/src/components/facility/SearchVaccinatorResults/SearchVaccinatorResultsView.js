@@ -62,8 +62,6 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                 console.log(error);
                 alert("Something went wrong while adding vaccinator!");
             });
-        setTimeout(() => onSelectVaccinatorBasedOnCode(vaccinator.code), 2000);
-
     }
 
     function Row(props) {
