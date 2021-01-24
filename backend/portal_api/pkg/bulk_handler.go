@@ -16,10 +16,6 @@ import (
 const FacilityRegistered = "facilityRegistered"
 
 func createVaccinator(data *Scanner) error {
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
 	mobileNumber := data.Text("mobileNumber")
 	nationalIdentifier := data.Text("nationalIdentifier")
 	code := data.Text("code")
@@ -29,7 +25,6 @@ func createVaccinator(data *Scanner) error {
 	averageRating := 0.0
 	trainingCertificate := ""
 	vaccinator := models.Vaccinator{
-		SerialNum:           &serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
 		Code:                &code,
@@ -70,7 +65,6 @@ func createFacility(data *Scanner, authHeader string) error {
 		averageRating := 0.0
 		trainingCertificate := ""
 		admins = append(admins, &models.Vaccinator{
-			SerialNum:           &index,
 			Code:                &code,
 			NationalIdentifier:  &nationalIdentifier,
 			Name:                &name,

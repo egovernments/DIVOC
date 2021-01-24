@@ -28,6 +28,9 @@ type Vaccinator struct {
 	// Required: true
 	Code *string `json:"code"`
 
+	// vaccinator email
+	Email string `json:"email,omitempty"`
+
 	// facility ids
 	// Required: true
 	FacilityIds []string `json:"facilityIds"`
@@ -46,9 +49,11 @@ type Vaccinator struct {
 	// Required: true
 	NationalIdentifier *string `json:"nationalIdentifier"`
 
-	// serial num
-	// Required: true
-	SerialNum *int64 `json:"serialNum"`
+	// programs
+	Programs []*VaccinatorProgramsItems0 `json:"programs"`
+
+	// signature string
+	SignatureString string `json:"signatureString,omitempty"`
 
 	// signatures
 	Signatures []*Signature `json:"signatures"`
@@ -91,7 +96,7 @@ func (m *Vaccinator) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateSerialNum(formats); err != nil {
+	if err := m.validatePrograms(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -175,10 +180,26 @@ func (m *Vaccinator) validateNationalIdentifier(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Vaccinator) validateSerialNum(formats strfmt.Registry) error {
+func (m *Vaccinator) validatePrograms(formats strfmt.Registry) error {
 
-	if err := validate.Required("serialNum", "body", m.SerialNum); err != nil {
-		return err
+	if swag.IsZero(m.Programs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Programs); i++ {
+		if swag.IsZero(m.Programs[i]) { // not required
+			continue
+		}
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -272,6 +293,41 @@ func (m *Vaccinator) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Vaccinator) UnmarshalBinary(b []byte) error {
 	var res Vaccinator
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// VaccinatorProgramsItems0 vaccinator programs items0
+//
+// swagger:model VaccinatorProgramsItems0
+type VaccinatorProgramsItems0 struct {
+
+	// if vaccinator has certificate for program
+	Certified bool `json:"certified,omitempty"`
+
+	// Id of the program
+	ID string `json:"id,omitempty"`
+}
+
+// Validate validates this vaccinator programs items0
+func (m *VaccinatorProgramsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *VaccinatorProgramsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *VaccinatorProgramsItems0) UnmarshalBinary(b []byte) error {
+	var res VaccinatorProgramsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

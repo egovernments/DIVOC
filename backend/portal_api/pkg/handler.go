@@ -22,6 +22,7 @@ const DistrictKey = "address.district"
 const TypeKey = "category"
 const ProgramIdKey = "programs.id"
 const ProgramStatusKey = "programs.status"
+const FacilityCodeKey = "facilityCode"
 const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
@@ -50,6 +51,8 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
+	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
+	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandler)
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 }
 
@@ -110,20 +113,37 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal *models
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	entityTypeId := "Vaccinator"
 	if HasResourceRole(portalClientId, "admin", principal) {
-		return kernelService.GetEntityType("Vaccinator")
+		return kernelService.GetEntityType(entityTypeId)
 	}
-	facilityCode := principal.FacilityCode
-	if facilityCode == "" {
-		log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
-		return NewGenericServerError()
+
+	filter := map[string]interface{}{}
+	if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
+		filter["facilityIds"] = map[string]interface{}{
+			"contains": params.FacilityCode,
+		}
+	} else if params.FacilityCode == nil {
+		if principal.FacilityCode == "" {
+			log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
+			return NewGenericServerError()
+		}
+		filter["facilityIds"] = map[string]interface{}{
+			"contains": principal.FacilityCode,
+		}
 	}
-	if vaccinators, err := kernelService.GetVaccinatorsForTheFacility(facilityCode); err != nil {
-		log.Errorf("Error in getting vaccinators list")
-		return NewGenericServerError()
-	} else {
-		return NewGenericJSONResponse(vaccinators)
+	if params.Name != nil && !strings.EqualFold(*params.Name, "ALL") {
+		filter["name"] = map[string]interface{}{
+			"startsWith": params.Name,
+		}
 	}
+	response, err := kernelService.QueryRegistry(entityTypeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	responseArr := response[entityTypeId]
+	return model.NewGenericJSONResponse(responseArr)
 }
 
 func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
@@ -153,6 +173,11 @@ func addQueryParamToFilter(param *string, filter map[string]interface{}, filterK
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	filter := createFilterObject(params)
+	if HasResourceRole(portalClientId, "facility-admin", principal) {
+		filter[FacilityCodeKey] = map[string]interface{}{
+			"eq": principal.FacilityCode,
+		}
+	}
 	response, err := kernelService.QueryRegistry(entityTypeId, filter)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
@@ -509,6 +534,44 @@ func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, princ
 	return operations.NewDeleteFacilityUserOK()
 }
 
+func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
+	facilityCode := principal.FacilityCode
+	vaccinator := params.Body
+	vaccinator.FacilityIds = []string{facilityCode}
+	err := kernelService.CreateNewRegistry(vaccinator, "Vaccinator")
+	if err != nil {
+		log.Error(err)
+		return operations.NewCreateVaccinatorBadRequest()
+	}
+	return operations.NewCreateVaccinatorOK()
+}
+
+func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	for _, updateRequest := range params.Body {
+		requestBody, err := json.Marshal(updateRequest)
+		if err != nil {
+			log.Error(err)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		}
+		requestMap := make(map[string]interface{})
+		err = json.Unmarshal(requestBody, &requestMap)
+		if requestMap["facilityIds"] == nil {
+			delete(requestMap, "facilityIds")
+		}
+		if requestMap["programs"] == nil {
+			delete(requestMap, "programs")
+		}
+		resp, err := kernelService.UpdateRegistry("Vaccinator", requestMap)
+		if err != nil {
+			log.Error(err)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		} else {
+			log.Print(resp)
+		}
+	}
+	return operations.NewUpdateVaccinatorsOK()
+}
+
 func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	if claimBody != nil {
@@ -522,5 +585,4 @@ func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *
 	} else {
 		return NewGenericForbiddenError()
 	}
-
 }

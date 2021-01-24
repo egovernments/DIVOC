@@ -16,13 +16,13 @@
       "type": "object",
       "title": "The Vaccinator Schema",
       "required": [
-        "serialNum",
         "code",
         "nationalIdentifier",
         "name",
         "facilityIds",
         "mobileNumber",
-        "status"
+        "status",
+        "email"
       ],
       "properties": {
         "signatures": {
@@ -33,10 +33,10 @@
           },
           "$comment": "Placeholder for all verifiable claims"
         },
-        "serialNum": {
-          "$id": "#/properties/serialNum",
-          "type": "integer",
-          "$comment": "Serial number"
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "$comment": "Email Id"
         },
         "code": {
           "$id": "#/properties/code",
@@ -74,6 +74,18 @@
           "type": "string",
           "enum": ["Active", "Inactive"]
         },
+        "programs": {
+          "$id": "#/properties/programs",
+          "type": "array",
+          "items": {
+            "id":{
+              "type": "string"
+            },
+            "certified": {
+              "type": "boolean"
+            }
+          }
+        },
         "___encryptedFields": {
         }
       }
@@ -87,10 +99,8 @@
       "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
       "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"],
 
-    "privateFields": ["nationalIdentifier", "code"],
-    "signedFields": ["serialNum"],
-    "indexFields": ["(serialNum, code)","name"],
-    "uniqueIndexFields": ["serialNum", "code"],
+    "indexFields": ["code","name"],
+    "uniqueIndexFields": ["code"],
     "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
   }
 }
