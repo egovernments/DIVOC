@@ -24,7 +24,7 @@ type Facility struct {
 	Address *Address `json:"address,omitempty"`
 
 	// admins
-	Admins []*Vaccinator `json:"admins"`
+	Admins []*FacilityAdmin `json:"admins"`
 
 	// Average Rating
 	//
@@ -337,14 +337,20 @@ func (m *Facility) UnmarshalBinary(b []byte) error {
 // swagger:model FacilityProgramsItems0
 type FacilityProgramsItems0 struct {
 
-	// id
-	ID string `json:"id,omitempty"`
+	// program Id
+	ProgramID string `json:"programId,omitempty"`
 
 	// rate
 	Rate float64 `json:"rate,omitempty"`
 
+	// rate updated at
+	RateUpdatedAt string `json:"rateUpdatedAt,omitempty"`
+
 	// status
 	Status string `json:"status,omitempty"`
+
+	// status updated at
+	StatusUpdatedAt string `json:"statusUpdatedAt,omitempty"`
 }
 
 // Validate validates this facility programs items0
