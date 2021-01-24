@@ -6,7 +6,6 @@ import (
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
-	"strconv"
 	"strings"
 )
 
@@ -25,10 +24,6 @@ func (vaccinatorCSV VaccinatorCSV) ValidateRow() []string {
 
 func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 	data := vaccinatorCSV.Data
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
 	mobileNumber := data.Text("mobileNumber")
 	nationalIdentifier := data.Text("nationalIdentifier")
 	code := data.Text("code")
@@ -37,8 +32,8 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 	facilityIds := strings.Split(data.Text("facilityIds"), ",")
 	averageRating := 0.0
 	trainingCertificate := ""
+	email := data.Text("email")
 	vaccinator := models.Vaccinator{
-		SerialNum:           &serialNum,
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
 		Code:                &code,
@@ -48,6 +43,8 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 		AverageRating:       &averageRating,
 		Signatures:          []*models.Signature{},
 		TrainingCertificate: &trainingCertificate,
+		Programs:            []*models.VaccinatorProgramsItems0{},
+		Email:               email,
 	}
 	//services.MakeRegistryCreateRequest(vaccinator, "Vaccinator")
 	errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")

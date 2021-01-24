@@ -27,6 +27,17 @@ consumes:
 produces:
   - application/json
 paths:
+  /facility:
+    get:
+      summary: get user facility details
+      operationId: getUserFacility
+      security:
+        - hasRole: ["facility-admin", "facility-staff"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Facility'
   /facilities:
     get:
       summary: get facilities
@@ -52,8 +63,14 @@ paths:
           name: programStatus
           type: string
           description: Program Status
+        - in: query
+          name: rateUpdatedFrom
+          type: string
+        - in: query
+          name: rateUpdatedTo
+          type: string
       security:
-        - hasRole: ["admin", "controller"]
+        - hasRole: ["admin", "controller", "facility-admin"]
       responses:
         '200':
           description: OK
@@ -113,10 +130,6 @@ paths:
               properties:
                 facilityId:
                   type: string
-                email:
-                  type: string
-                contact:
-                  type: string
                 pendingTasks:
                   type: array
                   items:
@@ -148,6 +161,9 @@ paths:
           name: file
           type: file
           description: Facility data in the form of csv
+        - in: formData
+          name: programId
+          type: string
       responses:
         '200':
           description: OK
@@ -163,6 +179,15 @@ paths:
       operationId: getVaccinators
       security:
         - hasRole: ["facility-admin", "admin"]
+      parameters:
+        - in: query
+          name: facilityCode
+          type: string
+          description: Facility Code
+        - in: query
+          name: name
+          type: string
+          description: Vaccinator Name
       responses:
         '200':
           description: OK
@@ -188,6 +213,41 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+    put:
+      summary: Update Vaccinator
+      operationId: updateVaccinators
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/VaccinatorUpdateRequest'
+          description: Vaccinator Update Request
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /vaccinator:
+    post:
+      summary: Create vaccinator user
+      operationId: createVaccinator
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Vaccinator'
+          description: Vaccinator Details
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
   /programs:
     get:
       summary: get program list
@@ -470,7 +530,7 @@ definitions:
       type: object
       properties:
         osid:
-          type: object
+          type: string
         status:
           type: string
         programs:
@@ -481,8 +541,6 @@ definitions:
               id:
                 type: string
               status:
-                type: string
-              osid:
                 type: string
               rate:
                 type: number
@@ -650,7 +708,6 @@ definitions:
     type: object
     title: The Vaccinator Schema
     required:
-      - serialNum
       - code
       - nationalIdentifier
       - name
@@ -664,8 +721,8 @@ definitions:
         type: array
         items:
           "$ref": Signature.json#/definitions/Signature
-      serialNum:
-        type: integer
+      signatureString:
+        type: string
       code:
         type: string
       nationalIdentifier:
@@ -673,6 +730,9 @@ definitions:
       name:
         type: string
         title: Full name
+      email:
+        type: string
+        title: vaccinator email
       facilityIds:
         type: array
         items:
@@ -690,6 +750,60 @@ definitions:
         enum:
           - Active
           - Inactive
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            id:
+              type: string
+              title: Id of the program
+            certified:
+              type: boolean
+              title: if vaccinator has certificate for program
+  VaccinatorUpdateRequest:
+    type: array
+    items:
+      type: object
+      properties:
+        osid:
+          type: object
+        signatureString:
+          type: string
+        code:
+          type: string
+        nationalIdentifier:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        facilityIds:
+          type: array
+          items:
+            type: string
+        mobileNumber:
+          type: string
+          maxLength: 10
+          minLength: 10
+        averageRating:
+          type: number
+        trainingCertificate:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              certified:
+                type: boolean
   Program:
     type: object
     title: Program

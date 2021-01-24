@@ -15,6 +15,7 @@ import {useDispatch} from "react-redux";
 import digilocker from "../../assets/img/digilocker.png"
 import commonPass from "../../assets/img/CommonPass.png"
 import JSZip from "jszip";
+import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 
 const certificateDetailsPaths = {
     ...CertificateDetailsPaths,
@@ -46,21 +47,29 @@ function CertificateView() {
             "Content-Type": "application/json",
         },
     };
+    const [width, setWidth] = useState(window.innerWidth);
+    function handleWindowSizeChange() {
+        setWidth(window.innerWidth);
+    }
 
     useEffect(() => {
+        window.addEventListener('resize', handleWindowSizeChange);
         getCertificate();
+        return () => {
+            window.removeEventListener('resize', handleWindowSizeChange);
+        }
     }, []);
 
 
     const getCertificate = async () => {
-        let response = await axios
-            .get("/divoc/api/v1/certificates", config)
+        let {certificates} = await axios
+            .get("/cert/api/certificates", config)
             .then((res) => {
                 return res.data;
             });
-        for (let i = 0; i < response.length; i++) {
+        for (let i = 0; i < certificates.length; i++) {
             const zip = new JSZip();
-            const cert = JSON.stringify(response[i].certificate);
+            const cert = JSON.stringify(certificates[i].certificate);
             zip.file(CERTIFICATE_FILE, cert, {
                 compression: "DEFLATE",
                 compressionOptions: {
@@ -72,13 +81,13 @@ function CertificateView() {
                     // console.log(content)
                     return content;
                 });
-            response[i].compressedData = zippedData
+            certificates[i].compressedData = zippedData
         }
 
-        console.log(response);
-        setCertificateList(response);
-        if (response.length === 1) {
-            setCertificateData(response[0]);
+        console.log(certificates);
+        setCertificateList(certificates);
+        if (certificates.length === 1) {
+            setCertificateData(certificates[0]);
         }
     };
 
@@ -114,55 +123,31 @@ function CertificateView() {
     const extractData = (certificateData, key) => {
         return pathOr("NA", certificateDetailsPaths[key].path, certificateData.certificate)
     };
+    const [numPages, setNumPages] = useState(null);
+
+    function onDocumentLoadSuccess({ numPages }) {
+        setNumPages(numPages);
+    }
 
     const showCertificatePreview = (certificateData) => {
         return (
-            <>
-                <div className={["card", "certificate"]}>
-
-                    <div/>
-                    <div className={"right"}/>
-                </div>
-
-                {(extractData(certificateData, "Dose") === extractData(certificateData, "Total Doses")) ? <FinalCertificate
-                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.compressedData)}/>}
-
-                    vaccination={extractData(certificateData, "Vaccination")}
-                    manufacturer={extractData(certificateData, "Manufacturer")}
-                    certificateId={extractData(certificateData, "Certificate ID")}
-                    issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
-                    name={extractData(certificateData, "Name")}
-                    gender={extractData(certificateData, "Gender")}
-                    identityType={"Aadhaar / आधार"}
-                    identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
-                    age={extractData(certificateData, "Age")}
-                    vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
-                    dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
-                    vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
-                    infoUrl={extractData(certificateData, "Info Url")}
-                    dose={extractData(certificateData, "Dose")}
-                    totalDoses={extractData(certificateData, "Total Doses")}
-                /> : 
-                <ProvisionalCertificate 
-                    qrCode={<QRCode size={256} renderAs={"svg"} value={JSON.stringify(certificateData.certificate)}/>}
-                    vaccination={extractData(certificateData, "Vaccination")}
-                    manufacturer={extractData(certificateData, "Manufacturer")}
-                    certificateId={extractData(certificateData, "Certificate ID")}
-                    issuedDate={formatDate(extractData(certificateData, "Date of Issue"))}
-                    name={extractData(certificateData, "Name")}
-                    gender={extractData(certificateData, "Gender")}
-                    identityType={"Aadhaar / आधार"}
-                    identityNumber={formatIdentity(extractData(certificateData, "Identity"))}
-                    age={extractData(certificateData, "Age")}
-                    vaccinationCenter={extractData(certificateData, "Vaccination Facility")}
-                    dateOfVaccination={formatDate(extractData(certificateData, "Date of Issue"))}
-                    vaccinationValidUntil={formatDate(extractData(certificateData, "Valid Until"))}
-                    infoUrl={extractData(certificateData, "Info Url")}
-                    dose={extractData(certificateData, "Dose")}
-                    totalDoses={extractData(certificateData, "Total Doses")}
-                />
-                }
-            </>
+            <div id="certificate">
+                <Document
+                    file={{ url: '/cert/api/certificatePDF?certificateId='+certificateData.certificateId, httpHeaders: { 'Authorization': config.headers.Authorization }, withCredentials: true }}
+                    onLoadSuccess={onDocumentLoadSuccess}
+                >
+                    {Array.from(
+                        new Array(numPages),
+                        (el, index) => (
+                            <Page
+                                key={`page_${index + 1}`}
+                                pageNumber={index + 1}
+                                scale={width <= 768 ? 0.6 : 1}
+                            />
+                        ),
+                    )}
+                </Document>
+            </div>
         );
     };
 
@@ -184,12 +169,37 @@ function CertificateView() {
     };
 
     const downloadAsImage = () => {
-        toPng(document.getElementById('certificate'))
-            .then(function (dataUrl) {
-                console.log(dataUrl);
-                download(dataUrl, "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + '.png');
-            });
+        const certificateDiv = document.getElementById("certificate");
+        const url = certificateDiv.firstChild.firstChild.firstChild.toDataURL("image/png")
+        let link = document.createElement('a');
+        link.download = "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + '.png';
+        link.href = url;
+        link.click();
     };
+
+    function printCanvas()
+    {
+        const certificateDiv = document.getElementById("certificate");
+        const dataUrl = certificateDiv.firstChild.firstChild.firstChild.toDataURL("image/png")
+        var windowContent = '<!DOCTYPE html>';
+        windowContent += '<html>'
+        windowContent += '<head><title>Print canvas</title></head>';
+        windowContent += '<body>'
+        windowContent += '<img src="' + dataUrl + '" style="">';
+        windowContent += '</body>';
+        windowContent += '</html>';
+        const printWin = window.open('', '', '');
+        printWin.document.open();
+        printWin.document.write(windowContent);
+        printWin.document.close();
+
+        printWin.document.addEventListener('load', function() {
+            printWin.focus();
+            printWin.print();
+            // setTimeout(function(){printWin.close();}, 5000);
+        }, true);
+
+    }
 
     const singleCertificateView = () => {
         if (certificateList.length === 1) {
@@ -214,9 +224,9 @@ function CertificateView() {
                     {/*</button>*/}
 
                     <DropdownButton id="dropdown-item-button" variant="success" title="Download" className={styles["btn-success"]}>
-                        <Dropdown.Item href="#/image" onClick={downloadAsImage}>As Image</Dropdown.Item>
-                        <Dropdown.Item href="#/svg" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
-                        <Dropdown.Item href="#/cert" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={downloadAsImage}>As Image</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
                     </DropdownButton>
                 </div>
                 <div >
@@ -234,7 +244,7 @@ function CertificateView() {
                     
                 </div>
                 <div>
-                    <button className={styles["button"]} onClick={() => window.print()}>Print</button>
+                    <button className={styles["button"]} onClick={printCanvas}>Print</button>
                 </div>
                 <br/>
                 <br/>

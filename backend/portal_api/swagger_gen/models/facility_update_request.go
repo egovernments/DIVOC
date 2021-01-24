@@ -50,7 +50,7 @@ func (m FacilityUpdateRequest) Validate(formats strfmt.Registry) error {
 type FacilityUpdateRequestItems0 struct {
 
 	// osid
-	Osid interface{} `json:"osid,omitempty"`
+	Osid string `json:"osid,omitempty"`
 
 	// programs
 	Programs []*FacilityUpdateRequestItems0ProgramsItems0 `json:"programs"`
@@ -123,9 +123,6 @@ type FacilityUpdateRequestItems0ProgramsItems0 struct {
 
 	// id
 	ID string `json:"id,omitempty"`
-
-	// osid
-	Osid string `json:"osid,omitempty"`
 
 	// rate
 	Rate float64 `json:"rate,omitempty"`

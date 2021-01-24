@@ -14,6 +14,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"net/http"
 	"strings"
+	"time"
 )
 
 const StateKey = "address.state"
@@ -21,6 +22,8 @@ const DistrictKey = "address.district"
 const TypeKey = "category"
 const ProgramIdKey = "programs.id"
 const ProgramStatusKey = "programs.status"
+const FacilityCodeKey = "facilityCode"
+const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -48,6 +51,9 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
+	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
+	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandler)
+	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 }
 
 type GenericResponse struct {
@@ -107,66 +113,71 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal *models
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	entityTypeId := "Vaccinator"
 	if HasResourceRole(portalClientId, "admin", principal) {
-		return kernelService.GetEntityType("Vaccinator")
+		return kernelService.GetEntityType(entityTypeId)
 	}
-	facilityCode := principal.FacilityCode
-	if facilityCode == "" {
-		log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
-		return NewGenericServerError()
+
+	filter := map[string]interface{}{}
+	if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
+		filter["facilityIds"] = map[string]interface{}{
+			"contains": params.FacilityCode,
+		}
+	} else if params.FacilityCode == nil {
+		if principal.FacilityCode == "" {
+			log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
+			return NewGenericServerError()
+		}
+		filter["facilityIds"] = map[string]interface{}{
+			"contains": principal.FacilityCode,
+		}
 	}
-	if vaccinators, err := kernelService.GetVaccinatorsForTheFacility(facilityCode); err != nil {
-		log.Errorf("Error in getting vaccinators list")
-		return NewGenericServerError()
-	} else {
-		return NewGenericJSONResponse(vaccinators)
+	if params.Name != nil && !strings.EqualFold(*params.Name, "ALL") {
+		filter["name"] = map[string]interface{}{
+			"startsWith": params.Name,
+		}
 	}
+	response, err := kernelService.QueryRegistry(entityTypeId, filter)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	responseArr := response[entityTypeId]
+	return model.NewGenericJSONResponse(responseArr)
 }
 
 func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
 	filter := map[string]interface{}{}
-	if params.State != nil && !strings.EqualFold(*params.State, "ALL") {
-		states := strings.Split(strings.ToLower(*params.State), ",")
-
-		filter[StateKey] = map[string]interface{}{
-			"or": states,
+	addQueryParamToFilter(params.State, filter, StateKey)
+	addQueryParamToFilter(params.District, filter, DistrictKey)
+	addQueryParamToFilter(params.Type, filter, TypeKey)
+	addQueryParamToFilter(params.ProgramID, filter, ProgramIdKey)
+	addQueryParamToFilter(params.ProgramStatus, filter, ProgramStatusKey)
+	if params.RateUpdatedFrom != nil && params.RateUpdatedTo != nil {
+		filter[ProgramRateUpdatedAtKey] = map[string]interface{}{
+			"between": []string{*params.RateUpdatedFrom, *params.RateUpdatedTo},
 		}
 	}
-	if params.District != nil && !strings.EqualFold(*params.District, "ALL") {
-		districts := strings.Split(strings.ToLower(*params.District), ",")
-
-		filter[DistrictKey] = map[string]interface{}{
-			"or": districts,
-		}
-	}
-	if params.Type != nil && !strings.EqualFold(*params.Type, "ALL") {
-		types := strings.Split(strings.ToLower(*params.Type), ",")
-
-		filter[TypeKey] = map[string]interface{}{
-			"or": types,
-		}
-	}
-	if params.ProgramID != nil && !strings.EqualFold(*params.ProgramID, "ALL") {
-		programIds := strings.Split(strings.ToLower(*params.ProgramID), ",")
-
-		filter[ProgramIdKey] = map[string]interface{}{
-			"or": programIds,
-		}
-	}
-	if params.ProgramStatus != nil && !strings.EqualFold(*params.ProgramStatus, "ALL") {
-		programStatus := strings.Split(strings.ToLower(*params.ProgramStatus), ",")
-
-		filter[ProgramStatusKey] = map[string]interface{}{
-			"or": programStatus,
-		}
-	}
-
 	return filter
+}
+
+func addQueryParamToFilter(param *string, filter map[string]interface{}, filterKey string) {
+	if param != nil && !strings.EqualFold(*param, "ALL") {
+		values := strings.Split(strings.ToLower(*param), ",")
+		filter[filterKey] = map[string]interface{}{
+			"or": values,
+		}
+	}
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	filter := createFilterObject(params)
+	if HasResourceRole(portalClientId, "facility-admin", principal) {
+		filter[FacilityCodeKey] = map[string]interface{}{
+			"eq": principal.FacilityCode,
+		}
+	}
 	response, err := kernelService.QueryRegistry(entityTypeId, filter)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
@@ -233,12 +244,13 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 	fileName := fileHeader.Filename
 	preferredUsername := principal.PreferredUsername
 	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
-		CSVMetadata{
+		CSVMetadata: CSVMetadata{
 			Columns:  columns,
 			Data:     &data,
 			FileName: fileName,
 			UserName: preferredUsername,
 		},
+		ProgramId: *params.ProgramID,
 	}}
 	headerErrors := preEnrollmentCSV.ValidateHeaders()
 	if headerErrors != nil {
@@ -346,17 +358,68 @@ func getFacilityGroupHandler(params operations.GetFacilityGroupsParams, principa
 
 func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
-		requestBody, err := json.Marshal(updateRequest)
-		if err != nil {
-			return operations.NewUpdateFacilitiesBadRequest()
+		if updateRequest.Osid == "" {
+			log.Errorf("Facility update request without OSID %v", updateRequest)
+			continue
 		}
-		requestMap := make(map[string]interface{})
-		err = json.Unmarshal(requestBody, &requestMap)
-		resp, err := kernelService.UpdateRegistry("Facility", requestMap)
-		if err != nil {
-			log.Error(err)
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": updateRequest.Osid,
+			},
+		}
+		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		if err == nil {
+			facilities := searchRespone["Facility"].([]interface{})
+			if len(facilities) > 0 {
+				facility := facilities[0].(map[string]interface{})
+				currentPrograms := facility["programs"].([]interface{})
+				var updatePrograms []map[string]interface{}
+				updateFacility := map[string]interface{}{
+					"osid":     updateRequest.Osid,
+					"programs": []interface{}{},
+				}
+				if len(currentPrograms) == 0 {
+					for _, program := range updateRequest.Programs {
+						updatePrograms = append(updatePrograms, map[string]interface{}{
+							"id":              program.ID,
+							"status":          program.Status,
+							"rate":            program.Rate,
+							"statusUpdatedAt": time.Now().Format(time.RFC3339),
+							"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+						})
+					}
+				} else {
+					for _, updateProgram := range updateRequest.Programs {
+						for _, obj := range currentPrograms {
+							facilityProgram := obj.(map[string]interface{})
+							if updateProgram.ID == facilityProgram["id"].(string) {
+								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
+									facilityProgram["status"] = updateProgram.Status
+									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("status", updateProgram.Status,
+										facility["contact"].(string), facility["email"].(string))
+								}
+								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+									facilityProgram["rate"] = updateProgram.Rate
+									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
+										facility["contact"].(string), facility["email"].(string))
+								}
+							}
+							updatePrograms = append(updatePrograms, facilityProgram)
+						}
+					}
+				}
+				updateFacility["programs"] = updatePrograms
+				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Print(resp)
+				}
+			}
 		} else {
-			log.Print(resp)
+			log.Errorf("Finding facility for id %s failed", updateRequest.Osid, err)
 		}
 	}
 	return operations.NewUpdateFacilitiesOK()
@@ -470,4 +533,57 @@ func deleteFacilityUserHandler(params operations.DeleteFacilityUserParams, princ
 		return operations.NewDeleteFacilityUserBadRequest()
 	}
 	return operations.NewDeleteFacilityUserOK()
+}
+
+func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
+	facilityCode := principal.FacilityCode
+	vaccinator := params.Body
+	vaccinator.FacilityIds = []string{facilityCode}
+	err := kernelService.CreateNewRegistry(vaccinator, "Vaccinator")
+	if err != nil {
+		log.Error(err)
+		return operations.NewCreateVaccinatorBadRequest()
+	}
+	return operations.NewCreateVaccinatorOK()
+}
+
+func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	for _, updateRequest := range params.Body {
+		requestBody, err := json.Marshal(updateRequest)
+		if err != nil {
+			log.Error(err)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		}
+		requestMap := make(map[string]interface{})
+		err = json.Unmarshal(requestBody, &requestMap)
+		if requestMap["facilityIds"] == nil {
+			delete(requestMap, "facilityIds")
+		}
+		if requestMap["programs"] == nil {
+			delete(requestMap, "programs")
+		}
+		resp, err := kernelService.UpdateRegistry("Vaccinator", requestMap)
+		if err != nil {
+			log.Error(err)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		} else {
+			log.Print(resp)
+		}
+	}
+	return operations.NewUpdateVaccinatorsOK()
+}
+
+func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *models.JWTClaimBody) middleware.Responder {
+	entityTypeId := "Facility"
+	if claimBody != nil {
+		response, err := services.GetFacilityByCode(claimBody.FacilityCode)
+		if err != nil {
+			log.Errorf("Error in querying registry", err)
+			return model.NewGenericServerError()
+		}
+		responseArr := response[entityTypeId]
+		return model.NewGenericJSONResponse(responseArr)
+	} else {
+		return NewGenericForbiddenError()
+	}
 }

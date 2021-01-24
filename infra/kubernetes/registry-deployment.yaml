@@ -34,9 +34,10 @@ spec:
           imagePullPolicy: Always
           resources:
             requests:
-              cpu: 200m
-            limits:
               cpu: 500m
+              memory: 2Gi
+#            limits:
+#              cpu: 500m
           name: registry
           ports:
             - containerPort: 8081

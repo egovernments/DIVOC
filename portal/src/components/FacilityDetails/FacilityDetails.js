@@ -1,25 +1,33 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import "./FacilityDetails.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
 import NotifyPopup from "../NotifiyPopup/NotifiyPopup";
 import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
+import {getNotificationTemplates} from "../../utils/config";
 import DetailsCard from "../DetailsCard/DetailsCard";
 
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, fetchFacilities
+                             status, setStatus, resetFilter
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
+    const [notificationTemplate, setNotificationTemplate] = useState('');
     const [showCard, setShowCard] = useState(false);
     const [selectedRow, setSelectedRow] = useState([]);
 
     const [allChecked, setAllChecked] = useState(false);
-
+    useEffect(() => {
+        resetFilter({status: CONSTANTS.ACTIVE});
+        getNotificationTemplates()
+            .then(res => {
+                setNotificationTemplate(res.facilityPendingTasks.html)
+            })
+    }, []);
     const handleChange = (value, setValue) => {
         setValue(value);
     };
@@ -69,8 +77,11 @@ function FacilityDetails({
     };
 
     const handleNotifyClick = () => {
-        setAllChecked(false);
-        setModalShow(true);
+        const selectedFacilities = facilities.filter(facility => facility.isChecked);
+        if (selectedFacilities.length > 0) {
+            setAllChecked(false);
+            setModalShow(true);
+        }
     };
 
     const sendNotification = () => {
@@ -78,8 +89,6 @@ function FacilityDetails({
         const notifyRequest = selectedFacilities.map(facility => {
             let req = {
                 facilityId: facility.osid,
-                contact: facility.contact,
-                email: facility.email,
                 pendingTasks: []
             };
             if(!facility.admins) {
@@ -104,6 +113,7 @@ function FacilityDetails({
             <div className="col-sm-3">
                 <FacilityFilterTab
                     programs={programs}
+                    selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
                     states={stateList}
                     setSelectedState={onStateSelected}
@@ -118,15 +128,15 @@ function FacilityDetails({
                         <span className={"filter-header"}>Status</span>
                         <div className="m-3">
                             <RadioItem
-                                text={"Active"}
-                                checked={status === "Active"}
+                                text={CONSTANTS.ACTIVE}
+                                checked={status === CONSTANTS.ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
                             />
                             <RadioItem
-                                text={"Inactive"}
-                                checked={status === "Inactive"}
+                                text={CONSTANTS.IN_ACTIVE}
+                                checked={status === CONSTANTS.IN_ACTIVE}
                                 onSelect={(event) =>
                                     handleChange(event.target.name, setStatus)
                                 }
@@ -138,7 +148,7 @@ function FacilityDetails({
             </div>
 
             <div className={"col-sm-6 container table"}>
-                {!showCard ? 
+                {!showCard ?
                 <div>
                     <p className={"highlight"}>{selectedDistrict} facilties</p>
                     <table className={"table table-hover table-data"}>
@@ -175,7 +185,7 @@ function FacilityDetails({
 
             <div className="col-sm-3 container">
                 <div className={"card card-continer"}>
-                    <div className="card-body text-center">
+                    {selectedProgram && <div className="card-body text-center">
                         <p>
                             Notify {facilities.filter(facility => facility.isChecked).length} facilities for the {selectedProgram}
                         </p>
@@ -186,6 +196,7 @@ function FacilityDetails({
                             NOTIFY
                         </button>
                         <NotifyPopup
+                            message={notificationTemplate}
                             show={modalShow}
                             onHide={() => {
                                 setModalShow(false)
@@ -195,7 +206,7 @@ function FacilityDetails({
                                 sendNotification()
                             }}
                         />
-                    </div>
+                    </div>}
                 </div>
             </div>
         </div>

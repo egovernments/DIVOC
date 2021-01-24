@@ -22,8 +22,29 @@ function DetailsCard({ showCard, setShowCard, data }) {
                                 <td>{data.contact}</td>
                             </tr>
                             <tr>
+                                <td><b>Business registration license Number</b></td>
+                            </tr>
+                            <tr>
+                                <td><b>Lat/Long geo location</b></td>
+                                <td>{data.geoLocation}</td>
+                            </tr>
+                            <tr>
                                 <td><b>Category Type</b></td>
                                 <td>{data.category}</td>
+                            </tr>
+                            <tr>
+                                <td><b>On-going Vaccination Programs</b></td>
+                                <td>{data.programs[0].id}<br/>{data.operatingHourStart} - {data.operatingHourEnd}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Administrator Details</b></td>
+                                <td>{data.admins[0].name}<br/>{data.admins[0].mobileNumber}</td>
+                            </tr>
+                            <tr>
+                                <td><b>Centre Seal</b></td>
+                            </tr>
+                            <tr>
+                                <td><b>Centre Profile Image</b></td>
                             </tr>
                         </tbody>
                     </table>

@@ -26,6 +26,9 @@ func publishSimpleEvent(source string, event string) {
 
 func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 
+	dateAdr := func(d strfmt.Date) *strfmt.Date { return &d }
+	dateTimeAdr := func(dt strfmt.DateTime) *strfmt.DateTime { return &dt }
+
 	uploadDetails.TotalRecords = uploadDetails.TotalRecords + 1
 
 	// convert to certificate csv fields
@@ -56,12 +59,12 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 		}
 	}
 	reciepient := &models.CertificationRequestRecipient{
-		Name:        certifyData.RecipientName,
+		Name:        &certifyData.RecipientName,
 		Contact:     contact,
-		Dob:         strfmt.Date(dob),
-		Gender:      certifyData.RecipientGender,
-		Nationality: certifyData.RecipientNationality,
-		Identity:    certifyData.RecipientIdentity,
+		Dob:         dateAdr(strfmt.Date(dob)),
+		Gender:      &certifyData.RecipientGender,
+		Nationality: &certifyData.RecipientNationality,
+		Identity:    &certifyData.RecipientIdentity,
 	}
 
 	vaccinationDate, terr := time.Parse(time.RFC3339, certifyData.VaccinationDate)
@@ -86,17 +89,17 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	}
 	vaccination := &models.CertificationRequestVaccination{
 		Batch:          certifyData.VaccinationBatch,
-		Date:           strfmt.DateTime(vaccinationDate),
-		EffectiveStart: strfmt.Date(effectiveStart),
-		EffectiveUntil: strfmt.Date(effectiveUntil),
-		Manufacturer:   certifyData.VaccinationManufacturer,
-		Name:           certifyData.VaccinationName,
-		Dose:           dose,
-		TotalDoses:     totalDoses,
+		Date:           dateTimeAdr(strfmt.DateTime(vaccinationDate)),
+		EffectiveStart: dateAdr(strfmt.Date(effectiveStart)),
+		EffectiveUntil: dateAdr(strfmt.Date(effectiveUntil)),
+		Manufacturer:   &certifyData.VaccinationManufacturer,
+		Name:           &certifyData.VaccinationName,
+		Dose:           &dose,
+		TotalDoses:     &totalDoses,
 	}
 
 	vaccinator := &models.CertificationRequestVaccinator{
-		Name: certifyData.VaccinatorName,
+		Name: &certifyData.VaccinatorName,
 	}
 
 	addressline1 := certifyData.FacilityAddressLine1
@@ -105,13 +108,13 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	state := certifyData.FacilityState
 	pincode := certifyData.FacilityPincode
 	facility := &models.CertificationRequestFacility{
-		Name: certifyData.FacilityName,
+		Name: &certifyData.FacilityName,
 		Address: &models.CertificationRequestFacilityAddress{
-			AddressLine1: addressline1,
+			AddressLine1: &addressline1,
 			AddressLine2: addressline2,
-			District:     district,
-			State:        state,
-			Pincode:      pincode,
+			District:     &district,
+			State:        &state,
+			Pincode:      &pincode,
 		},
 	}
 

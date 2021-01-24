@@ -63,6 +63,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		CreateProgramHandler: CreateProgramHandlerFunc(func(params CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateProgram has not yet been implemented")
 		}),
+		CreateVaccinatorHandler: CreateVaccinatorHandlerFunc(func(params CreateVaccinatorParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation CreateVaccinator has not yet been implemented")
+		}),
 		DeleteFacilityUserHandler: DeleteFacilityUserHandlerFunc(func(params DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteFacilityUser has not yet been implemented")
 		}),
@@ -102,6 +105,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetPublicAnalyticsHandler: GetPublicAnalyticsHandlerFunc(func(params GetPublicAnalyticsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPublicAnalytics has not yet been implemented")
 		}),
+		GetUserFacilityHandler: GetUserFacilityHandlerFunc(func(params GetUserFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetUserFacility has not yet been implemented")
+		}),
 		GetVaccinatorsHandler: GetVaccinatorsHandlerFunc(func(params GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetVaccinators has not yet been implemented")
 		}),
@@ -119,6 +125,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		}),
 		UpdateFacilityUserHandler: UpdateFacilityUserHandlerFunc(func(params UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilityUser has not yet been implemented")
+		}),
+		UpdateVaccinatorsHandler: UpdateVaccinatorsHandlerFunc(func(params UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateVaccinators has not yet been implemented")
 		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
@@ -182,6 +191,8 @@ type DivocPortalAPIAPI struct {
 	CreateMedicineHandler CreateMedicineHandler
 	// CreateProgramHandler sets the operation handler for the create program operation
 	CreateProgramHandler CreateProgramHandler
+	// CreateVaccinatorHandler sets the operation handler for the create vaccinator operation
+	CreateVaccinatorHandler CreateVaccinatorHandler
 	// DeleteFacilityUserHandler sets the operation handler for the delete facility user operation
 	DeleteFacilityUserHandler DeleteFacilityUserHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
@@ -208,6 +219,8 @@ type DivocPortalAPIAPI struct {
 	GetProgramsHandler GetProgramsHandler
 	// GetPublicAnalyticsHandler sets the operation handler for the get public analytics operation
 	GetPublicAnalyticsHandler GetPublicAnalyticsHandler
+	// GetUserFacilityHandler sets the operation handler for the get user facility operation
+	GetUserFacilityHandler GetUserFacilityHandler
 	// GetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	GetVaccinatorsHandler GetVaccinatorsHandler
 	// GetVaccinatorsUploadHistoryHandler sets the operation handler for the get vaccinators upload history operation
@@ -220,6 +233,8 @@ type DivocPortalAPIAPI struct {
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
 	// UpdateFacilityUserHandler sets the operation handler for the update facility user operation
 	UpdateFacilityUserHandler UpdateFacilityUserHandler
+	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
+	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -321,6 +336,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.CreateProgramHandler == nil {
 		unregistered = append(unregistered, "CreateProgramHandler")
 	}
+	if o.CreateVaccinatorHandler == nil {
+		unregistered = append(unregistered, "CreateVaccinatorHandler")
+	}
 	if o.DeleteFacilityUserHandler == nil {
 		unregistered = append(unregistered, "DeleteFacilityUserHandler")
 	}
@@ -360,6 +378,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetPublicAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetPublicAnalyticsHandler")
 	}
+	if o.GetUserFacilityHandler == nil {
+		unregistered = append(unregistered, "GetUserFacilityHandler")
+	}
 	if o.GetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "GetVaccinatorsHandler")
 	}
@@ -377,6 +398,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.UpdateFacilityUserHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilityUserHandler")
+	}
+	if o.UpdateVaccinatorsHandler == nil {
+		unregistered = append(unregistered, "UpdateVaccinatorsHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -502,6 +526,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/programs"] = NewCreateProgram(o.context, o.CreateProgramHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/vaccinator"] = NewCreateVaccinator(o.context, o.CreateVaccinatorHandler)
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
@@ -557,6 +585,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/facility"] = NewGetUserFacility(o.context, o.GetUserFacilityHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/vaccinators"] = NewGetVaccinators(o.context, o.GetVaccinatorsHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
@@ -578,6 +610,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/facility/users"] = NewUpdateFacilityUser(o.context, o.UpdateFacilityUserHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/vaccinators"] = NewUpdateVaccinators(o.context, o.UpdateVaccinatorsHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP
