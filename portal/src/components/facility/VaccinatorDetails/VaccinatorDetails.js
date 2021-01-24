@@ -10,10 +10,11 @@ import DropDown from "../../DropDown/DropDown";
 import {API_URL} from "../../../utils/constants";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
+import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
 
 
 export default function VaccinatorDetails({
-      selectedVaccinator, setEnableVaccinatorDetailView, fetchVaccinators, onSelectVaccinatorBasedOnCode
+      selectedVaccinator, setEnableVaccinatorDetailView, onSelectVaccinatorBasedOnCode, facilityCode
 }) {
 
     const [hasVaccinatorSelected, setHasVaccinatorSelected] = useState(false);
@@ -23,6 +24,8 @@ export default function VaccinatorDetails({
     const [selectedProgram, setSelectedProgram] = useState({});
     const [programs, setPrograms] = useState([]);
     const [searchVaccinatorName, setSearchVaccinatorName] = useState('');
+    const [searchVaccinatorResults, setSearchVaccinatorResults] = useState([]);
+    const [togglePopup, setTogglePopup] = useState(false);
 
     const axiosInstance = useAxios('');
 
@@ -85,8 +88,9 @@ export default function VaccinatorDetails({
         const queryParams = new URLSearchParams(params);
         axiosInstance.current.get(API_URL.VACCINATORS_API, {params: queryParams})
             .then(res => {
-                console.log(res);
-            })
+                setSearchVaccinatorResults(res.data);
+                setTogglePopup(!togglePopup);
+            });
     }
 
     function onValueChange(evt, field) {
@@ -207,8 +211,15 @@ export default function VaccinatorDetails({
             {
                 !hasVaccinatorSelected &&
                 <div className="row search-div">
-                    <TextField value={searchVaccinatorName} onChange={(evt) => setSearchVaccinatorName(evt.target.value)} id="outlined" label="Name" variant="outlined" />
-                    <button className="search-img"><img src={searchImg} alt={""} onClick={searchVaccinators}/></button>
+                    <TextField label="small" value={searchVaccinatorName} onChange={(evt) => setSearchVaccinatorName(evt.target.value)} id="outlined" label="Name" variant="outlined" />
+                    <button disabled={!searchVaccinatorName} className="search-img" onClick={searchVaccinators} ><img src={searchImg} alt={""} /></button>
+                    <SearchVaccinatorResultsView
+                        vaccinators={searchVaccinatorResults}
+                        togglePopup={togglePopup}
+                        setTogglePopup={setTogglePopup}
+                        onSelectVaccinatorBasedOnCode={onSelectVaccinatorBasedOnCode}
+                        facilityCode={facilityCode}
+                    />
                 </div>
             }
             <div className="row">
