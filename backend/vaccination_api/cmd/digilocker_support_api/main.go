@@ -18,11 +18,11 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
-	"github.com/skip2/go-qrcode"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
 	"net/http"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -58,7 +58,7 @@ type Certificate struct {
 		RefId       string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         string `json:"age"`
+		Age         int    `json:"age"`
 		Nationality string `json:"nationality"`
 		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
@@ -110,9 +110,9 @@ type Certificate struct {
 }
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
-	if (!isFinal(certificate)) {
+	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
-			certificate.CredentialSubject.Age,
+			strconv.Itoa(certificate.CredentialSubject.Age),
 			certificate.CredentialSubject.Gender,
 			formatId(certificate.CredentialSubject.ID),
 			certificate.CredentialSubject.RefId,
@@ -125,7 +125,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 		}
 	}
 	return []string{certificate.CredentialSubject.Name,
-		certificate.CredentialSubject.Age,
+		strconv.Itoa(certificate.CredentialSubject.Age),
 		certificate.CredentialSubject.Gender,
 		formatId(certificate.CredentialSubject.ID),
 		certificate.CredentialSubject.RefId,
@@ -313,7 +313,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	return nil
 }
 
-func decompress(buf *bytes.Buffer, err error, ) {
+func decompress(buf *bytes.Buffer, err error) {
 	r, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
 	if err != nil {
 		log.Error(err)
