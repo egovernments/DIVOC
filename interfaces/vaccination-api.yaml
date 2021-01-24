@@ -359,7 +359,7 @@ definitions:
             type: string
             format: date
           age:
-            type: string
+            type: number
           gender:
             type: string
           nationality:

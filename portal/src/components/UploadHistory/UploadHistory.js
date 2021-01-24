@@ -11,7 +11,7 @@ import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
 import "./UploadHistory.css"
 import {TotalRecords} from "../TotalRecords";
 
-const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI, infoTitle}) => {
+const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI, infoTitle, UploadComponent=UploadCSV}) => {
     const axiosInstance = useAxios('');
     const [uploadHistory, setUploadHistory] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null)
@@ -68,7 +68,7 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
     return (
         <div className="upload-csv-container">
             <div className="upload-csv">
-                <UploadCSV fileUploadAPI={fileUploadAPI} onUploadComplete={() => {
+                <UploadComponent fileUploadAPI={fileUploadAPI} onUploadComplete={() => {
                     fetchUploadHistory()
                 }}/>
             </div>

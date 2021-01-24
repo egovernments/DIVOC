@@ -347,7 +347,7 @@ const StaffProgramRate = (props) => {
                             <TableRow>
                                 <BorderLessTableCell>
                                     <FormControl variant="outlined" fullWidth>
-                                        <InputLabel id="demo-simple-select-outlined-label">Role Type</InputLabel>
+                                        <InputLabel id="demo-simple-select-outlined-label">Program</InputLabel>
                                         <Select
                                             labelId="demo-simple-select-outlined-label"
                                             id="demo-simple-select-outlined"
