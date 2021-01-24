@@ -29,7 +29,7 @@ func certifiedEmailNotificationConsumer() {
 	})
 
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	c.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
 	for {
@@ -93,7 +93,7 @@ func certifiedSMSNotificationConsumer() {
 	})
 
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	c.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
 	for {
@@ -154,11 +154,11 @@ func notifyConsumer() {
 	})
 
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	err = c.SubscribeTopics([]string{config.Config.Kafka.NotifyTopic}, nil)
 	if err != nil {
-		panic(err)
+		log.Error(err)
 	}
 	for {
 		msg, err := c.ReadMessage(-1)
