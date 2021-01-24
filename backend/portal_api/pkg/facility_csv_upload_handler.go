@@ -38,7 +38,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	state := data.Text("state")
 	pincode := data.int64("pincode")
 
-	var admins []*models.Vaccinator
+	var admins []*models.FacilityAdmin
 	admins = append(admins, buildVaccinator(data))
 
 	facilityCode := data.Text("facilityCode")
@@ -79,14 +79,14 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		return errors.New(errmsg)
 	}
 	sendFacilityRegisteredNotification(facility)
-	for _, mobile := range facility.Admins {
+	for _, admin := range facility.Admins {
 		//create keycloak user for
-		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
+		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, admin)
 		userRequest := KeyCloakUserRequest{
-			Username: *mobile.MobileNumber,
+			Username: admin.Mobile,
 			Enabled:  true,
 			Attributes: KeycloakUserAttributes{
-				MobileNumber: []string{*mobile.MobileNumber},
+				MobileNumber: []string{admin.Mobile},
 				FacilityCode: facility.FacilityCode,
 			},
 		}
@@ -94,14 +94,14 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		resp, err := CreateKeycloakUser(userRequest)
 		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
-			log.Errorf("Error while creating keycloak user : %s", mobile)
+			log.Errorf("Error while creating keycloak user : %s", admin)
 		} else {
-			log.Info("Setting up roles for the user ", mobile)
+			log.Info("Setting up roles for the user ", admin)
 			keycloakUserId := getKeycloakUserId(resp, userRequest)
 			if keycloakUserId != "" {
 				_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.FacilityAdmin.GroupId)
 			} else {
-				log.Error("Unable to map keycloak user id for ", mobile)
+				log.Error("Unable to map keycloak user id for ", admin)
 			}
 		}
 
@@ -109,25 +109,14 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	return nil
 }
 
-func buildVaccinator(data *Scanner) *models.Vaccinator {
+func buildVaccinator(data *Scanner) *models.FacilityAdmin {
 	adminStatus := "Active"
-	code := ""
-	nationalIdentifier := ""
 	name := data.Text("adminName")
 	mobileNumber := data.Text("adminMobile")
-	averageRating := 0.0
-	trainingCertificate := ""
-	facilityCode := data.Text("facilityCode")
-	return &models.Vaccinator{
-		Code:                &code,
-		NationalIdentifier:  &nationalIdentifier,
-		Name:                &name,
-		FacilityIds:         []string{facilityCode},
-		MobileNumber:        &mobileNumber,
-		Status:              &adminStatus,
-		AverageRating:       &averageRating,
-		Signatures:          []*models.Signature{},
-		TrainingCertificate: &trainingCertificate,
+	return &models.FacilityAdmin{
+		Name:   name,
+		Mobile: mobileNumber,
+		Status: adminStatus,
 	}
 }
 

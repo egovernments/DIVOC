@@ -659,7 +659,7 @@ definitions:
       admins:
         type: array
         items:
-          "$ref": "#/definitions/Vaccinator"
+          "$ref": "#/definitions/FacilityAdmin"
       stamp:
         type: string
       programs:
@@ -667,12 +667,16 @@ definitions:
         items:
           type: object
           properties:
-            id:
+            programId:
               type: string
             status:
               type: string
             rate:
               type: number
+            statusUpdatedAt:
+              type: string
+            rateUpdatedAt:
+              type: string
   Address:
     type: object
     title: Address
@@ -839,6 +843,17 @@ definitions:
         type: array
         items:
           type: string
+  FacilityAdmin:
+    properties:
+      name:
+        type: string
+        title: Facility Admin Name
+      mobile:
+        type: string
+        title: Facility Admin Mobile Number
+      status:
+        type: string
+        title: Facility Admin Status
   FacilityUser:
     properties:
       id:

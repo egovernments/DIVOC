@@ -52,28 +52,18 @@ func createFacility(data *Scanner, authHeader string) error {
 	district := data.Text("district")
 	state := data.Text("state")
 	pincode := data.int64("pincode")
-	var admins []*models.Vaccinator
+	var admins []*models.FacilityAdmin
 	var index int64
 	facilityCode := data.Text("facilityCode")
 	adminStatus := "Active"
 	for index = 1; index <= data.int64("totalAdmins"); index++ {
 		adminPrefix := fmt.Sprintf("%s%d", "admin", index)
-		code := data.Text(adminPrefix + "Code")
-		nationalIdentifier := data.Text(adminPrefix + "NationalIdentifier")
 		name := data.Text(adminPrefix + "Name")
 		mobileNumber := data.Text(adminPrefix + "Mobile")
-		averageRating := 0.0
-		trainingCertificate := ""
-		admins = append(admins, &models.Vaccinator{
-			Code:                &code,
-			NationalIdentifier:  &nationalIdentifier,
-			Name:                &name,
-			FacilityIds:         []string{facilityCode},
-			MobileNumber:        &mobileNumber,
-			Status:              &adminStatus,
-			AverageRating:       &averageRating,
-			Signatures:          []*models.Signature{},
-			TrainingCertificate: &trainingCertificate,
+		admins = append(admins, &models.FacilityAdmin{
+			Name:   name,
+			Mobile: mobileNumber,
+			Status: adminStatus,
 		})
 	}
 	facility := models.Facility{
@@ -101,14 +91,14 @@ func createFacility(data *Scanner, authHeader string) error {
 	}
 	kernelService.MakeRegistryCreateRequest(facility, "Facility")
 	sendFacilityRegisteredNotification(facility)
-	for _, mobile := range facility.Admins {
+	for _, admin := range facility.Admins {
 		//create keycloak user for
-		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, mobile)
+		log.Infof("Creating administrative login for the facility :%s [%s]", facility.FacilityName, admin)
 		userRequest := KeyCloakUserRequest{
-			Username: *mobile.MobileNumber,
+			Username: admin.Mobile,
 			Enabled:  true,
 			Attributes: KeycloakUserAttributes{
-				MobileNumber: []string{*mobile.MobileNumber},
+				MobileNumber: []string{admin.Mobile},
 				FacilityCode: facility.FacilityCode,
 			},
 		}
@@ -116,14 +106,14 @@ func createFacility(data *Scanner, authHeader string) error {
 		resp, err := CreateKeycloakUser(userRequest)
 		log.Infof("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
-			log.Errorf("Error while creating keycloak user : %s", mobile)
+			log.Errorf("Error while creating keycloak user : %s", admin)
 		} else {
-			log.Info("Setting up roles for the user ", mobile)
+			log.Info("Setting up roles for the user ", admin)
 			keycloakUserId := getKeycloakUserId(resp, userRequest)
 			if keycloakUserId != "" {
 				_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.FacilityAdmin.GroupId)
 			} else {
-				log.Error("Unable to map keycloak user id for ", mobile)
+				log.Error("Unable to map keycloak user id for ", admin)
 			}
 		}
 
