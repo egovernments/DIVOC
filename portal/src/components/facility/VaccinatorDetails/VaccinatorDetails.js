@@ -83,12 +83,13 @@ export default function VaccinatorDetails({
     function searchVaccinators() {
         let params = {
             name: searchVaccinatorName,
+            facilityCode: "ALL"
         };
         params = reject(equals(''))(params);
         const queryParams = new URLSearchParams(params);
         axiosInstance.current.get(API_URL.VACCINATORS_API, {params: queryParams})
             .then(res => {
-                setSearchVaccinatorResults(res.data);
+                setSearchVaccinatorResults(res.data.filter(v => !v.facilityIds.includes(facilityCode)));
                 setTogglePopup(!togglePopup);
             });
     }
