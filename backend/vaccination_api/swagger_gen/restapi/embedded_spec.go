@@ -596,7 +596,7 @@ func init() {
               }
             },
             "age": {
-              "type": "string"
+              "type": "number"
             },
             "contact": {
               "type": "array",
@@ -1471,7 +1471,7 @@ func init() {
               }
             },
             "age": {
-              "type": "string"
+              "type": "number"
             },
             "contact": {
               "type": "array",
@@ -1659,7 +1659,7 @@ func init() {
           }
         },
         "age": {
-          "type": "string"
+          "type": "number"
         },
         "contact": {
           "type": "array",
