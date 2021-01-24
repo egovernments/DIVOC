@@ -27,6 +27,17 @@ consumes:
 produces:
   - application/json
 paths:
+  /facility:
+    get:
+      summary: get user facility details
+      operationId: getUserFacility
+      security:
+        - hasRole: ["facility-admin", "facility-staff"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Facility'
   /facilities:
     get:
       summary: get facilities
