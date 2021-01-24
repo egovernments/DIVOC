@@ -363,7 +363,7 @@ type CertificationRequestRecipient struct {
 
 	// age
 	// Required: true
-	Age *float64 `json:"age"`
+	Age *string `json:"age"`
 
 	// contact
 	// Required: true

@@ -23,7 +23,6 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -59,7 +58,7 @@ type Certificate struct {
 		RefId       string `json:"refId"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
-		Age         int    `json:"age"`
+		Age         string `json:"age"`
 		Nationality string `json:"nationality"`
 		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
@@ -111,9 +110,9 @@ type Certificate struct {
 }
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
-	if !isFinal(certificate) {
+	if (!isFinal(certificate)) {
 		return []string{certificate.CredentialSubject.Name,
-			strconv.Itoa(certificate.CredentialSubject.Age),
+			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
 			formatId(certificate.CredentialSubject.ID),
 			certificate.CredentialSubject.RefId,
@@ -126,7 +125,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 		}
 	}
 	return []string{certificate.CredentialSubject.Name,
-		strconv.Itoa(certificate.CredentialSubject.Age),
+		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
 		formatId(certificate.CredentialSubject.ID),
 		certificate.CredentialSubject.RefId,
