@@ -75,7 +75,7 @@ func StartCertifiedConsumer() {
 		"enable.auto.commit": "false",
 	})
 	if err != nil {
-		panic(err)
+		log.Errorf("Failed connecting to kafka", err)
 	}
 	go func() {
 		err := consumer.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
