@@ -88,6 +88,11 @@ func init() {
             "description": "Facility data in the form of csv",
             "name": "file",
             "in": "formData"
+          },
+          {
+            "type": "string",
+            "name": "programId",
+            "in": "formData"
           }
         ],
         "responses": {
@@ -1505,6 +1510,11 @@ func init() {
             "type": "file",
             "description": "Facility data in the form of csv",
             "name": "file",
+            "in": "formData"
+          },
+          {
+            "type": "string",
+            "name": "programId",
             "in": "formData"
           }
         ],

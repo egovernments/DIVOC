@@ -244,12 +244,13 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 	fileName := fileHeader.Filename
 	preferredUsername := principal.PreferredUsername
 	preEnrollmentCSV := CSVUpload{PreEnrollmentCSV{
-		CSVMetadata{
+		CSVMetadata: CSVMetadata{
 			Columns:  columns,
 			Data:     &data,
 			FileName: fileName,
 			UserName: preferredUsername,
 		},
+		ProgramId: *params.ProgramID,
 	}}
 	headerErrors := preEnrollmentCSV.ValidateHeaders()
 	if headerErrors != nil {

@@ -161,6 +161,9 @@ paths:
           name: file
           type: file
           description: Facility data in the form of csv
+        - in: formData
+          name: programId
+          type: string
       responses:
         '200':
           description: OK

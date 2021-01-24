@@ -44,6 +44,9 @@
         "certified": {
           "type": "boolean",
           "default": false
+        },
+        "programId": {
+          "type": "string"
         }
       }
     }

@@ -14,6 +14,7 @@ import (
 
 type PreEnrollmentCSV struct {
 	CSVMetadata
+	ProgramId string
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUploadHistory() *db.CSVUploads {
@@ -39,6 +40,7 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 		Email:             data.Text("email"),
 		Code:              generateEnrollmentCode(),
 		Certified:         false,
+		ProgramId:         preEnrollmentCsv.ProgramId,
 	}
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	if err != nil {
