@@ -130,22 +130,25 @@
           "$id": "#/properties/programs",
           "type": "array",
           "items": {
-            "programId":{
-              "type": "string"
-            },
-            "status": {
-              "type": "string"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "statusUpdatedAt": {
-              "type": "string",
-              "format": "date"
-            },
-            "rateUpdatedAt": {
-              "type": "string",
-              "format": "date"
+            "type": "object",
+            "properties": {
+              "programId":{
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "statusUpdatedAt": {
+                "type": "string",
+                "format": "date"
+              },
+              "rateUpdatedAt": {
+                "type": "string",
+                "format": "date"
+              }
             }
           }
         },

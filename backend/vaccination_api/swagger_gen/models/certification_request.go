@@ -18,22 +18,27 @@ import (
 type CertificationRequest struct {
 
 	// facility
-	Facility *CertificationRequestFacility `json:"facility,omitempty"`
+	// Required: true
+	Facility *CertificationRequestFacility `json:"facility"`
 
 	// meta
 	Meta interface{} `json:"meta,omitempty"`
 
 	// pre enrollment code
-	PreEnrollmentCode string `json:"preEnrollmentCode,omitempty"`
+	// Required: true
+	PreEnrollmentCode *string `json:"preEnrollmentCode"`
 
 	// recipient
-	Recipient *CertificationRequestRecipient `json:"recipient,omitempty"`
+	// Required: true
+	Recipient *CertificationRequestRecipient `json:"recipient"`
 
 	// vaccination
-	Vaccination *CertificationRequestVaccination `json:"vaccination,omitempty"`
+	// Required: true
+	Vaccination *CertificationRequestVaccination `json:"vaccination"`
 
 	// vaccinator
-	Vaccinator *CertificationRequestVaccinator `json:"vaccinator,omitempty"`
+	// Required: true
+	Vaccinator *CertificationRequestVaccinator `json:"vaccinator"`
 }
 
 // Validate validates this certification request
@@ -41,6 +46,10 @@ func (m *CertificationRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateFacility(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePreEnrollmentCode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -64,8 +73,8 @@ func (m *CertificationRequest) Validate(formats strfmt.Registry) error {
 
 func (m *CertificationRequest) validateFacility(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Facility) { // not required
-		return nil
+	if err := validate.Required("facility", "body", m.Facility); err != nil {
+		return err
 	}
 
 	if m.Facility != nil {
@@ -80,10 +89,19 @@ func (m *CertificationRequest) validateFacility(formats strfmt.Registry) error {
 	return nil
 }
 
+func (m *CertificationRequest) validatePreEnrollmentCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("preEnrollmentCode", "body", m.PreEnrollmentCode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *CertificationRequest) validateRecipient(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Recipient) { // not required
-		return nil
+	if err := validate.Required("recipient", "body", m.Recipient); err != nil {
+		return err
 	}
 
 	if m.Recipient != nil {
@@ -100,8 +118,8 @@ func (m *CertificationRequest) validateRecipient(formats strfmt.Registry) error 
 
 func (m *CertificationRequest) validateVaccination(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Vaccination) { // not required
-		return nil
+	if err := validate.Required("vaccination", "body", m.Vaccination); err != nil {
+		return err
 	}
 
 	if m.Vaccination != nil {
@@ -118,8 +136,8 @@ func (m *CertificationRequest) validateVaccination(formats strfmt.Registry) erro
 
 func (m *CertificationRequest) validateVaccinator(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Vaccinator) { // not required
-		return nil
+	if err := validate.Required("vaccinator", "body", m.Vaccinator); err != nil {
+		return err
 	}
 
 	if m.Vaccinator != nil {
@@ -158,10 +176,12 @@ func (m *CertificationRequest) UnmarshalBinary(b []byte) error {
 type CertificationRequestFacility struct {
 
 	// address
-	Address *CertificationRequestFacilityAddress `json:"address,omitempty"`
+	// Required: true
+	Address *CertificationRequestFacilityAddress `json:"address"`
 
 	// name
-	Name string `json:"name,omitempty"`
+	// Required: true
+	Name *string `json:"name"`
 }
 
 // Validate validates this certification request facility
@@ -169,6 +189,10 @@ func (m *CertificationRequestFacility) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateName(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -180,8 +204,8 @@ func (m *CertificationRequestFacility) Validate(formats strfmt.Registry) error {
 
 func (m *CertificationRequestFacility) validateAddress(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Address) { // not required
-		return nil
+	if err := validate.Required("facility"+"."+"address", "body", m.Address); err != nil {
+		return err
 	}
 
 	if m.Address != nil {
@@ -191,6 +215,15 @@ func (m *CertificationRequestFacility) validateAddress(formats strfmt.Registry) 
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestFacility) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("facility"+"."+"name", "body", m.Name); err != nil {
+		return err
 	}
 
 	return nil
@@ -220,23 +253,84 @@ func (m *CertificationRequestFacility) UnmarshalBinary(b []byte) error {
 type CertificationRequestFacilityAddress struct {
 
 	// address line1
-	AddressLine1 string `json:"addressLine1,omitempty"`
+	// Required: true
+	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
 	AddressLine2 string `json:"addressLine2,omitempty"`
 
 	// district
-	District string `json:"district,omitempty"`
+	// Required: true
+	District *string `json:"district"`
 
 	// pincode
-	Pincode int64 `json:"pincode,omitempty"`
+	// Required: true
+	Pincode *int64 `json:"pincode"`
 
 	// state
-	State string `json:"state,omitempty"`
+	// Required: true
+	State *string `json:"state"`
 }
 
 // Validate validates this certification request facility address
 func (m *CertificationRequestFacilityAddress) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAddressLine1(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDistrict(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePincode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateState(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestFacilityAddress) validateAddressLine1(formats strfmt.Registry) error {
+
+	if err := validate.Required("facility"+"."+"address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestFacilityAddress) validateDistrict(formats strfmt.Registry) error {
+
+	if err := validate.Required("facility"+"."+"address"+"."+"district", "body", m.District); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestFacilityAddress) validatePincode(formats strfmt.Registry) error {
+
+	if err := validate.Required("facility"+"."+"address"+"."+"pincode", "body", m.Pincode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestFacilityAddress) validateState(formats strfmt.Registry) error {
+
+	if err := validate.Required("facility"+"."+"address"+"."+"state", "body", m.State); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -264,29 +358,37 @@ func (m *CertificationRequestFacilityAddress) UnmarshalBinary(b []byte) error {
 type CertificationRequestRecipient struct {
 
 	// address
-	Address *CertificationRequestRecipientAddress `json:"address,omitempty"`
+	// Required: true
+	Address *CertificationRequestRecipientAddress `json:"address"`
 
 	// age
-	Age string `json:"age,omitempty"`
+	// Required: true
+	Age *string `json:"age"`
 
 	// contact
+	// Required: true
 	Contact []string `json:"contact"`
 
 	// dob
+	// Required: true
 	// Format: date
-	Dob strfmt.Date `json:"dob,omitempty"`
+	Dob *strfmt.Date `json:"dob"`
 
 	// gender
-	Gender string `json:"gender,omitempty"`
+	// Required: true
+	Gender *string `json:"gender"`
 
 	// identity
-	Identity string `json:"identity,omitempty"`
+	// Required: true
+	Identity *string `json:"identity"`
 
 	// name
-	Name string `json:"name,omitempty"`
+	// Required: true
+	Name *string `json:"name"`
 
 	// nationality
-	Nationality string `json:"nationality,omitempty"`
+	// Required: true
+	Nationality *string `json:"nationality"`
 }
 
 // Validate validates this certification request recipient
@@ -297,7 +399,31 @@ func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error 
 		res = append(res, err)
 	}
 
+	if err := m.validateAge(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateContact(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDob(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateGender(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateIdentity(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateNationality(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -309,8 +435,8 @@ func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error 
 
 func (m *CertificationRequestRecipient) validateAddress(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Address) { // not required
-		return nil
+	if err := validate.Required("recipient"+"."+"address", "body", m.Address); err != nil {
+		return err
 	}
 
 	if m.Address != nil {
@@ -325,13 +451,67 @@ func (m *CertificationRequestRecipient) validateAddress(formats strfmt.Registry)
 	return nil
 }
 
+func (m *CertificationRequestRecipient) validateAge(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"age", "body", m.Age); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateContact(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"contact", "body", m.Contact); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *CertificationRequestRecipient) validateDob(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Dob) { // not required
-		return nil
+	if err := validate.Required("recipient"+"."+"dob", "body", m.Dob); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("recipient"+"."+"dob", "body", "date", m.Dob.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateGender(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"gender", "body", m.Gender); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateIdentity(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"identity", "body", m.Identity); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipient) validateNationality(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"nationality", "body", m.Nationality); err != nil {
 		return err
 	}
 
@@ -362,23 +542,84 @@ func (m *CertificationRequestRecipient) UnmarshalBinary(b []byte) error {
 type CertificationRequestRecipientAddress struct {
 
 	// address line1
-	AddressLine1 string `json:"addressLine1,omitempty"`
+	// Required: true
+	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
 	AddressLine2 string `json:"addressLine2,omitempty"`
 
 	// district
-	District string `json:"district,omitempty"`
+	// Required: true
+	District *string `json:"district"`
 
 	// pincode
-	Pincode int64 `json:"pincode,omitempty"`
+	// Required: true
+	Pincode *int64 `json:"pincode"`
 
 	// state
-	State string `json:"state,omitempty"`
+	// Required: true
+	State *string `json:"state"`
 }
 
 // Validate validates this certification request recipient address
 func (m *CertificationRequestRecipientAddress) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAddressLine1(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDistrict(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePincode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateState(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestRecipientAddress) validateAddressLine1(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipientAddress) validateDistrict(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"address"+"."+"district", "body", m.District); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipientAddress) validatePincode(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"address"+"."+"pincode", "body", m.Pincode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipientAddress) validateState(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"address"+"."+"state", "body", m.State); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -409,28 +650,35 @@ type CertificationRequestVaccination struct {
 	Batch string `json:"batch,omitempty"`
 
 	// date
+	// Required: true
 	// Format: date-time
-	Date strfmt.DateTime `json:"date,omitempty"`
+	Date *strfmt.DateTime `json:"date"`
 
 	// Dose number for example 1 for first dose of 2 doses
-	Dose float64 `json:"dose,omitempty"`
+	// Required: true
+	Dose *float64 `json:"dose"`
 
 	// effective start
+	// Required: true
 	// Format: date
-	EffectiveStart strfmt.Date `json:"effectiveStart,omitempty"`
+	EffectiveStart *strfmt.Date `json:"effectiveStart"`
 
 	// effective until
+	// Required: true
 	// Format: date
-	EffectiveUntil strfmt.Date `json:"effectiveUntil,omitempty"`
+	EffectiveUntil *strfmt.Date `json:"effectiveUntil"`
 
 	// manufacturer
-	Manufacturer string `json:"manufacturer,omitempty"`
+	// Required: true
+	Manufacturer *string `json:"manufacturer"`
 
 	// name
-	Name string `json:"name,omitempty"`
+	// Required: true
+	Name *string `json:"name"`
 
 	// Total number of doses required for this vaccination.
-	TotalDoses float64 `json:"totalDoses,omitempty"`
+	// Required: true
+	TotalDoses *float64 `json:"totalDoses"`
 }
 
 // Validate validates this certification request vaccination
@@ -438,6 +686,10 @@ func (m *CertificationRequestVaccination) Validate(formats strfmt.Registry) erro
 	var res []error
 
 	if err := m.validateDate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDose(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -449,6 +701,18 @@ func (m *CertificationRequestVaccination) Validate(formats strfmt.Registry) erro
 		res = append(res, err)
 	}
 
+	if err := m.validateManufacturer(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateTotalDoses(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -457,8 +721,8 @@ func (m *CertificationRequestVaccination) Validate(formats strfmt.Registry) erro
 
 func (m *CertificationRequestVaccination) validateDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.Date) { // not required
-		return nil
+	if err := validate.Required("vaccination"+"."+"date", "body", m.Date); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("vaccination"+"."+"date", "body", "date-time", m.Date.String(), formats); err != nil {
@@ -468,10 +732,19 @@ func (m *CertificationRequestVaccination) validateDate(formats strfmt.Registry) 
 	return nil
 }
 
+func (m *CertificationRequestVaccination) validateDose(formats strfmt.Registry) error {
+
+	if err := validate.Required("vaccination"+"."+"dose", "body", m.Dose); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *CertificationRequestVaccination) validateEffectiveStart(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveStart) { // not required
-		return nil
+	if err := validate.Required("vaccination"+"."+"effectiveStart", "body", m.EffectiveStart); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("vaccination"+"."+"effectiveStart", "body", "date", m.EffectiveStart.String(), formats); err != nil {
@@ -483,11 +756,38 @@ func (m *CertificationRequestVaccination) validateEffectiveStart(formats strfmt.
 
 func (m *CertificationRequestVaccination) validateEffectiveUntil(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.EffectiveUntil) { // not required
-		return nil
+	if err := validate.Required("vaccination"+"."+"effectiveUntil", "body", m.EffectiveUntil); err != nil {
+		return err
 	}
 
 	if err := validate.FormatOf("vaccination"+"."+"effectiveUntil", "body", "date", m.EffectiveUntil.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestVaccination) validateManufacturer(formats strfmt.Registry) error {
+
+	if err := validate.Required("vaccination"+"."+"manufacturer", "body", m.Manufacturer); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestVaccination) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("vaccination"+"."+"name", "body", m.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestVaccination) validateTotalDoses(formats strfmt.Registry) error {
+
+	if err := validate.Required("vaccination"+"."+"totalDoses", "body", m.TotalDoses); err != nil {
 		return err
 	}
 
@@ -518,11 +818,30 @@ func (m *CertificationRequestVaccination) UnmarshalBinary(b []byte) error {
 type CertificationRequestVaccinator struct {
 
 	// name
-	Name string `json:"name,omitempty"`
+	// Required: true
+	Name *string `json:"name"`
 }
 
 // Validate validates this certification request vaccinator
 func (m *CertificationRequestVaccinator) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestVaccinator) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("vaccinator"+"."+"name", "body", m.Name); err != nil {
+		return err
+	}
+
 	return nil
 }
 

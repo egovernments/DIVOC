@@ -144,7 +144,7 @@ services:
   nginx:
     image: dockerhub/nginx
     ports:
-      - "80:80"
+      - "81:80"
     depends_on:
       - vaccination_api
       - portal_api

@@ -18,6 +18,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/signintech/gopdf"
 	log "github.com/sirupsen/logrus"
+	"github.com/skip2/go-qrcode"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
 	"net/http"
