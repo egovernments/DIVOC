@@ -11,4 +11,5 @@ type Enrollment struct {
 	Email             string `json:"email"`
 	Code              string `json:"code"`
 	Certified         bool   `json:"certified"`
+	ProgramId         string `json:"programId"`
 }
