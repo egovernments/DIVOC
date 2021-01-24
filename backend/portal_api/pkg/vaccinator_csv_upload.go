@@ -32,6 +32,7 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 	facilityIds := strings.Split(data.Text("facilityIds"), ",")
 	averageRating := 0.0
 	trainingCertificate := ""
+	email := data.Text("email")
 	vaccinator := models.Vaccinator{
 		MobileNumber:        &mobileNumber,
 		NationalIdentifier:  &nationalIdentifier,
@@ -42,6 +43,8 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 		AverageRating:       &averageRating,
 		Signatures:          []*models.Signature{},
 		TrainingCertificate: &trainingCertificate,
+		Programs:            []*models.VaccinatorProgramsItems0{},
+		Email:               email,
 	}
 	//services.MakeRegistryCreateRequest(vaccinator, "Vaccinator")
 	errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")

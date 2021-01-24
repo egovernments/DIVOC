@@ -35,3 +35,19 @@
     padding: 0;
 }
 
+.custom-popup {
+    min-width: 170px;
+}
+
+.custom-popup > p {
+    margin-left: 1rem;
+    margin-top: 0.5rem;
+    margin-bottom: 0;
+    font-weight: bold;
+}
+
+.custom-popup > hr {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+

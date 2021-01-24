@@ -1,24 +1,36 @@
 import React, {useEffect, useState} from "react";
 import "./VaccinatorDetails.css"
-import {isEmpty} from "ramda";
+import {append, equals, isEmpty, reject} from "ramda";
 import TextField from "@material-ui/core/TextField";
 import searchImg from "../../../assets/img/search.svg";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import {useAxios} from "../../../utils/useAxios";
 import check from "../../../assets/img/check.png";
+import DropDown from "../../DropDown/DropDown";
+import {API_URL} from "../../../utils/constants";
+import withStyles from "@material-ui/core/styles/withStyles";
+import Switch from "@material-ui/core/Switch/Switch";
 
 
-export default function VaccinatorDetails({selectedVaccinator, setEnableVaccinatorDetailView, fetchVaccinators}) {
+export default function VaccinatorDetails({
+      selectedVaccinator, setEnableVaccinatorDetailView, fetchVaccinators, onSelectVaccinatorBasedOnCode
+}) {
 
-    const [hasVaccinatorSelected, setHasVaccinatorSelected] = useState(!isEmpty(selectedVaccinator));
+    const [hasVaccinatorSelected, setHasVaccinatorSelected] = useState(false);
     const [vaccinator, setVaccinator] = useState({});
     const [savedSuccessfully, setSavedSuccessfully] = useState(false);
+    const [updatedVaccinatorFields, setUpdatedVaccinatorFields] = useState({});
+    const [selectedProgram, setSelectedProgram] = useState({});
+    const [programs, setPrograms] = useState([]);
+    const [searchVaccinatorName, setSearchVaccinatorName] = useState('');
 
     const axiosInstance = useAxios('');
 
     useEffect(() => {
-        if (hasVaccinatorSelected) {
+        setHasVaccinatorSelected(!isEmpty(selectedVaccinator));
+        if (!isEmpty(selectedVaccinator)) {
             setVaccinator(selectedVaccinator);
+            setUpdatedVaccinatorFields({})
         } else {
             setVaccinator({
                 name: "",
@@ -31,19 +43,55 @@ export default function VaccinatorDetails({selectedVaccinator, setEnableVaccinat
                 signatures: [],
                 averageRating:0,
                 trainingCertificate:"",
-                signatureString: ""
-            })
+                signatureString: "",
+                programs: []
+            });
+            setUpdatedVaccinatorFields({})
         }
-    }, []);
+        fetchPrograms();
+        setSelectedProgram({});
+    }, [selectedVaccinator]);
+
+    function fetchPrograms() {
+        let params = {
+            programStatus: "Active",
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+        axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
+            .then(res => {
+                res.data.forEach(item => {
+                    if (!("programs" in item)) {
+                        setPrograms([]);
+                    } else {
+                        let programsAsSet = new Set(programs);
+                        let data = new Array(...programsAsSet);
+                        item.programs.map(p => {
+                            if (!programsAsSet.has(p.id) && !data.includes(p.id)) {
+                                data.push(p.id);
+                            }
+                        });
+                        setPrograms(data)
+                    }
+                });
+            });
+    }
 
     function searchVaccinators() {
-        console.log("TODO: wireup searching vaccinator")
+        let params = {
+            name: searchVaccinatorName,
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+        axiosInstance.current.get(API_URL.VACCINATORS_API, {params: queryParams})
+            .then(res => {
+                console.log(res);
+            })
     }
 
     function onValueChange(evt, field) {
-        const data = {...vaccinator};
-        data[field] = evt.target.value;
-        setVaccinator(data)
+        setUpdatedVaccinatorFields({...updatedVaccinatorFields, [field]: evt.target.value});
+        setVaccinator({...vaccinator, [field]: evt.target.value})
     }
 
     function isVaccinatorValid(vaccinator) {
@@ -56,12 +104,14 @@ export default function VaccinatorDetails({selectedVaccinator, setEnableVaccinat
 
     function saveVaccinator() {
         if (isVaccinatorValid(vaccinator)) {
-            axiosInstance.current.post('/divoc/admin/api/v1/vaccinator', vaccinator)
+            const data = {...vaccinator};
+            if (selectedProgram.id) {
+                data.programs = [selectedProgram]
+            }
+            axiosInstance.current.post('/divoc/admin/api/v1/vaccinator', data)
                 .then(res => {
                     if (res.status === 200) {
-                        setSavedSuccessfully(true);
-                        setHasVaccinatorSelected(true);
-                        fetchVaccinators();
+                        onSuccessfulSave()
                     }
                     else
                         alert("Something went wrong while saving!");
@@ -72,58 +122,147 @@ export default function VaccinatorDetails({selectedVaccinator, setEnableVaccinat
     }
 
     function editVaccinator() {
-        if (isVaccinatorValid(vaccinator)) {
-            axiosInstance.current.put('/divoc/admin/api/v1/vaccinators', vaccinator)
-                .then(res => {
-                    if (res.status === 200) {
-                        setSavedSuccessfully(true);
-                        fetchVaccinators();
-                    }
-                    else
-                        alert("Something went wrong while saving!");
-                });
+        if (isVaccinatorValid(vaccinator) && vaccinator.osid) {
+            const editData = {...updatedVaccinatorFields};
+            if (editData) {
+                editData['osid'] = vaccinator.osid;
+                if (selectedProgram.id && !vaccinator.programs.filter(p => p.id === selectedProgram.id).length > 0) {
+                    editData['programs'] = vaccinator.programs.concat(selectedProgram)
+                } else {
+                    editData['programs'] = vaccinator.programs
+                }
+                axiosInstance.current.put(API_URL.VACCINATORS_API, [editData])
+                    .then(res => {
+                        if (res.status === 200) {
+                            onSuccessfulSave()
+                        }
+                        else
+                            alert("Something went wrong while saving!");
+                    });
+            }
         } else {
             alert("Please fill all the required values!")
         }
     }
 
+    const onSuccessfulSave = () => {
+        setSavedSuccessfully(true);
+        setEnableVaccinatorDetailView(true);
+        setTimeout(() => onSelectVaccinatorBasedOnCode(vaccinator.code), 2000);
+    };
+
     function exitDetailView() {
         setEnableVaccinatorDetailView(false)
     }
 
+    const CustomSwitch = withStyles({
+        switchBase: {
+            '&$checked': {
+                color: "#88C6A9",
+            },
+            '&$checked + $track': {
+                backgroundColor: "#88C6A9",
+            },
+        },
+        checked: {},
+        track: {},
+    })(Switch);
+
+    function onProgramCertifyChange(program, certified) {
+        program.certified = certified;
+        let updatedPrograms = vaccinator.programs.map(p => {
+            if (p.id === program.id) {
+                p.certified = program.certified
+            }
+            return p
+        });
+
+        setUpdatedVaccinatorFields({...updatedVaccinatorFields, "programs": updatedPrograms});
+        setVaccinator({...vaccinator, "programs": updatedPrograms})
+    }
+
+    function onAddProgramChange(value) {
+        let program = {
+            id: value,
+            certified: false
+        };
+        setSelectedProgram(program);
+    }
+
+    function onAddProgramCertify(value) {
+        setSelectedProgram({...selectedProgram, "certified": value})
+    };
+
     return (
         <div>
-            <div>
-                <div className="container-button">
-                    <h2>{hasVaccinatorSelected ? "Vaccinator Details" : "Add Vaccinator" }</h2>
+            <div className="row">
+                <div className="col-sm-8"><h2>{hasVaccinatorSelected ? "Vaccinator Details" : "Add Vaccinator" }</h2></div>
+                <div className="col-sm-4">
+                    {savedSuccessfully && <span><img src={check}/> <span className="saved-success">Details Saved</span></span>}
+                    {!hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={saveVaccinator}>ADD</button>}
+                    {hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={editVaccinator}>SAVE</button>}
+                    <button className="add-vaccinator-button" onClick={exitDetailView} >BACK</button>
+                </div>
+            </div>
+            {
+                !hasVaccinatorSelected &&
+                <div className="row search-div">
+                    <TextField value={searchVaccinatorName} onChange={(evt) => setSearchVaccinatorName(evt.target.value)} id="outlined" label="Name" variant="outlined" />
+                    <button className="search-img"><img src={searchImg} alt={""} onClick={searchVaccinators}/></button>
+                </div>
+            }
+            <div className="row">
+                <div className="col-sm-8 personal-details-div">
+                    <h3>Personal Details</h3>
+                    <TextField className="vaccinator-input" required value={vaccinator.name} onChange={(evt) => onValueChange(evt, "name")} label="Name" variant="outlined"/>
+                    <TextField required value={vaccinator.email} onChange={(evt) => onValueChange(evt, "email")} label="Email" variant="outlined"/>
+                    <TextField
+                        required
+                        value={vaccinator.mobileNumber}
+                        onChange={(evt) => onValueChange(evt, "mobileNumber")}
+                        InputProps={{
+                            startAdornment: <InputAdornment position="start">+91</InputAdornment>,
+                        }}
+                        label="Mobile" variant="outlined"/>
+                    <TextField required value={vaccinator.nationalIdentifier} onChange={(evt) => onValueChange(evt, "nationalIdentifier")} label="Aadhaar" variant="outlined"/>
+                    <TextField required value={vaccinator.code} onChange={(evt) => onValueChange(evt, "code")} label="Licence Number" variant="outlined"/>
+                    <TextField value={vaccinator.signatureString} onChange={(evt) => onValueChange(evt, "signatureString")} label="Signature" variant="outlined"/>
+                </div>
+                <div className="col-sm-4 program-details-div">
+                    <h3>Training & Certification</h3>
+                    {
+                        vaccinator.programs &&
+                            vaccinator.programs.map(program => (
+                                <div className="row vaccinator-prg-div">
+                                    <span className="col-sm-7 vaccinator-prg-span">{program.id}</span>
+                                    <CustomSwitch
+                                        checked={program.certified}
+                                        onChange={() => onProgramCertifyChange(program, !program.certified)}
+                                        color="primary"
+                                    />
+                                    <span className="vaccinator-prg-span">Certified</span>
+                                </div>
+                            ))
+                    }
                     <div>
-                        {!hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={saveVaccinator}>ADD</button>}
-                        {hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={editVaccinator}>EDIT</button>}
-                        <button className="add-vaccinator-button" onClick={exitDetailView} >BACK</button>
-                        {savedSuccessfully && <span><img src={check}/> <span className="saved-success">Details Saved</span></span>}
+                        <span className="filter-header">Certification (if any)</span>
+                        <DropDown
+                            options={programs}
+                            placeholder="Please select Program"
+                            setSelectedOption={onAddProgramChange}
+                        />
+                        <div>
+                            <span>Certified</span>
+                            <CustomSwitch
+                                checked={selectedProgram.certified}
+                                onChange={() => onAddProgramCertify(!selectedProgram.certified)}
+                                color="primary"
+                            />
+                        </div>
                     </div>
                 </div>
-                <div className="search-div">
-                    <TextField id="outlined" label="Name" variant="outlined" />
-                    <button disabled className="search-img"><img src={searchImg} alt={""} onClick={searchVaccinators}/></button>
-                </div>
             </div>
-            <div className="personal-details-div">
-                <h3>Personal Details</h3>
-                <TextField className="vaccinator-input" required value={vaccinator.name} onChange={(evt) => onValueChange(evt, "name")} label="Name" variant="outlined"/>
-                <TextField required value={vaccinator.email} onChange={(evt) => onValueChange(evt, "email")} label="Email" variant="outlined"/>
-                <TextField
-                    required
-                    value={vaccinator.mobileNumber}
-                    onChange={(evt) => onValueChange(evt, "mobileNumber")}
-                    InputProps={{
-                        startAdornment: <InputAdornment position="start">+91</InputAdornment>,
-                    }}
-                    label="Mobile" variant="outlined"/>
-                <TextField required value={vaccinator.nationalIdentifier} onChange={(evt) => onValueChange(evt, "nationalIdentifier")} label="Aadhaar" variant="outlined"/>
-                <TextField required value={vaccinator.code} onChange={(evt) => onValueChange(evt, "code")} label="Licence Number" variant="outlined"/>
-                <TextField value={vaccinator.signatureString} onChange={(evt) => onValueChange(evt, "signatureString")} label="Signature" variant="outlined"/>
-            </div>
+
         </div>
     );
 }
