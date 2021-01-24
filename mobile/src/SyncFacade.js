@@ -39,7 +39,6 @@ export class SyncFacade {
     static async isSyncedIn24Hours() {
         await appIndexDb.initDb();
         const events = await appIndexDb.getAllEvents();
-        console.log(events)
         if (events) {
             if (events.length && events.length > 0) {
                 const lastSyncedDate = localStorage.getItem(LAST_SYNC_KEY);

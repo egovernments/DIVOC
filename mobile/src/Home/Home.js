@@ -95,15 +95,15 @@ function Statistics() {
 }
 
 export function VaccineProgram() {
-    const [isSynced, setSynced] = useState(false)
+    const [isNotSynced, setNotSynced] = useState(false)
     useEffect(() => {
         SyncFacade.isSyncedIn24Hours()
-            .then((result) => setSynced(result))
+            .then((result) => setNotSynced(result))
             .catch(e => console.log(e.message))
     }, [])
     return <div className={"home-container"}>
         <ProgramHeader/>
-        {isSynced && <SyncData onSyncDone={() => setSynced(true)}/>}
+        {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_NUMBERS)} content={<Statistics/>}/>
     </div>;
