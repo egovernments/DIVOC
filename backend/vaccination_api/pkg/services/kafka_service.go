@@ -61,18 +61,7 @@ func InitializeKafka() {
 		}
 	}()
 
-	go func() {
-		topic := config.Config.Kafka.EventsTopic
-		for {
-			msg := <-events
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
+	StartEventProducer(producer)
 
 	go func() {
 		topic := config.Config.Kafka.ReportedSideEffectsTopic
@@ -125,8 +114,12 @@ func InitializeKafka() {
 		}
 	}()
 
+	LogProducerEvents(producer)
+}
+
+func LogProducerEvents(producerClient *kafka.Producer) {
 	go func() {
-		for e := range producer.Events() {
+		for e := range producerClient.Events() {
 			log.Infof("%+v", e)
 			switch ev := e.(type) {
 			case *kafka.Message:
@@ -138,6 +131,21 @@ func InitializeKafka() {
 			}
 		}
 
+	}()
+}
+
+func StartEventProducer(producerClient *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.EventsTopic
+		for {
+			msg := <-events
+			if err := producerClient.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
 	}()
 }
 

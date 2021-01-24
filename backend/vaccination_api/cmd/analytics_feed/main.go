@@ -16,6 +16,8 @@ import (
 	"github.com/ClickHouse/clickhouse-go"
 )
 
+const tableNameEvents = "eventsv2"
+
 type CertifyMessage struct {
 	Facility struct {
 		Address struct {
@@ -76,13 +78,14 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = connect.Exec(`
-CREATE TABLE IF NOT EXISTS eventsv1 (
-dt Date,
+	_, err = connect.Exec(fmt.Sprintf(`
+CREATE TABLE IF NOT EXISTS %s (
+dt DateTime,
 source String,
-type String
+type String,
+info String
 ) engine = MergeTree() order by dt
-`)
+`, tableNameEvents))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,6 +100,12 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
+//	_, err = connect.Exec(`
+//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
+//`)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
@@ -175,19 +184,26 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) error {
 	// push to click house - todo: batch it
 	var (
 		tx, _     = connect.Begin()
-		stmt, err = tx.Prepare(`INSERT INTO eventsv1 
+		stmt, err = tx.Prepare(fmt.Sprintf(`INSERT INTO %s 
 	(  dt,
 	source,
-	type ) 
-	VALUES (?,?,?)`)
+	type,
+	info
+	 ) 
+	VALUES (?,?,?,?)`, tableNameEvents))
 	)
 	if err != nil {
 		log.Infof("Error in preparing stmt %+v", err)
+	}
+	info, ok := event.ExtraInfo.(string)
+	if !ok {
+		info = ""
 	}
 	if _, err := stmt.Exec(
 		event.Date,
 		event.Source,
 		event.TypeOfMessage,
+		info,
 	); err != nil {
 		log.Errorf("Error in saving %+v", err)
 	}

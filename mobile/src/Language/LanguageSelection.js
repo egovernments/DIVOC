@@ -28,6 +28,7 @@ export function SelectLanguage(props) {
             <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.SELECT_LANGUAGE)}>
                 {languageSupports.map((item, index) => {
                     return <LanguageItem
+                        key={item.languageCode}
                         name={item.languageName}
                         selected={item.languageCode === currentSelectedLocale}
                         onClick={() => onLanguageSelected(item.languageCode)}>

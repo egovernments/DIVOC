@@ -2,25 +2,42 @@ import Button from "react-bootstrap/Button";
 import React from "react";
 import {BaseCard} from "../Base/Base";
 import "./Logout.scss"
-import {useKeycloak} from "@react-keycloak/web";
 import {appIndexDb} from "../AppDatabase";
 import {SyncFacade} from "../SyncFacade";
+import * as PropTypes from "prop-types";
+import {AuthSafeComponent} from "../utils/keycloak";
+import {Messages} from "../Base/Constants";
 
-export function Logout(props) {
-    const {keycloak} = useKeycloak();
-
-    return (
-        <BaseCard>
-            <div className={"logout-container"}>
-                <Button variant="success" onClick={() => {
+function AuthSafeLogout({keycloak}) {
+    return <BaseCard>
+        <div className={"logout-container"}>
+            <Button variant="success" onClick={() => {
+                if (navigator.onLine) {
                     SyncFacade
                         .push()
-                        .then(() => appIndexDb.clearEverything())
                         .then((value => {
-                            keycloak.logout();
+                            return keycloak.logout();
                         }))
-                }}>Logout</Button>{' '}
-            </div>
-        </BaseCard>
+                        .then(() => appIndexDb.clearEverything())
+                        .catch(e => {
+                            if (!navigator.onLine) {
+                                alert(Messages.NO_INTERNET_CONNECTION)
+                            }
+                        })
+                } else {
+                    alert(Messages.NO_INTERNET_CONNECTION)
+                }
+            }}>Logout</Button>{" "}
+        </div>
+    </BaseCard>;
+}
+
+AuthSafeLogout.propTypes = {onClick: PropTypes.func};
+
+export function Logout(props) {
+    return (
+        <AuthSafeComponent>
+            <AuthSafeLogout/>
+        </AuthSafeComponent>
     );
 }

@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState} from "react";
 import styles from "./PrintCertificate.module.css";
 import DropDown from "../DropDown/DropDown";
 import CustomPrint from "./CustomPrint";
 import ReactToPrint from 'react-to-print';
+import {API_URL} from "../../utils/constants";
+import {useAxios} from "../../utils/useAxios";
 
 const dummyTableData = [
     {
@@ -151,16 +153,28 @@ const dummyTableData = [
     }
 ]
 
-const PROGRAMS = ["C-19 Program"];
-
 
 function PrintCertificate() {
     const [selectedReceipt, setSelectedReceipt] = React.useState([]);
     const [selectedCertificate, setSelectedCertificate] = React.useState([]);
-    const [selectedProgram,setSelectedProgram] = React.useState()
+    const [selectedProgram,setSelectedProgram] = React.useState();
+    const [programs, setPrograms] = useState([]);
     const [tableData,setTableData] = React.useState(dummyTableData);
     const receiptRef = React.useRef();
     const certificateRef = React.useRef();
+    const axiosInstance = useAxios('');
+
+    useEffect(() => {
+        fetchPrograms();
+    }, []);
+
+    function fetchPrograms() {
+        axiosInstance.current.get(API_URL.PROGRAM_API)
+            .then(res => {
+                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                setPrograms(programs)
+            });
+    }
 
     const handleChange = (data,dataList,setDataList) => {
         let newData=dataList;
@@ -257,8 +271,8 @@ function PrintCertificate() {
     return (
         <div className={`row ${styles['container']}`}>
             <div>
-                <h3 >Vaccinated Recipients</h3>
-                <DropDown setSelectedOption={setSelectedProgram} placeholder="Select a program"  options={PROGRAMS}/>
+                <h3>Vaccinated Recipients</h3>
+                <DropDown setSelectedOption={setSelectedProgram} placeholder="Select a program"  options={programs}/>
             </div>
             <div className="col-sm-12">{selectedProgram ? showFilterOptions() : ''}</div>
             <div className="col-sm-9">

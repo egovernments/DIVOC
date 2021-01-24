@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/notification-service/config"
 	"github.com/divoc/notification-service/pkg/consumers"
 	"github.com/divoc/notification-service/swagger_gen/restapi"
@@ -12,6 +13,7 @@ import (
 )
 
 func main() {
+	services.InitializeFlagr()
 	config.Initialize()
 	consumers.Init()
 	log.Infof("Starting certificate processor")

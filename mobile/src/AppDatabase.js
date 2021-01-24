@@ -25,7 +25,6 @@ export class AppDatabase {
         }
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
             upgrade(database, oldVersion, newVersion) {
-                debugger
                 if (oldVersion === 0 || newVersion === 5) {
                     database.createObjectStore(PATIENTS, {keyPath: "code"});
                     database.createObjectStore(QUEUE, {keyPath: "code"});
@@ -183,9 +182,13 @@ export class AppDatabase {
         const deleteVaccinators = this.db.clear(VACCINATORS);
         const deleteEvents = await this.db.clear(EVENTS);
         const deleteQueue = await this.db.clear(QUEUE);
+        localStorage.clear()
         return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
     }
 
+    async getAllEvents() {
+        return await this.db.getAll(EVENTS) || [];
+    }
 }
 
 export const appIndexDb = new AppDatabase();

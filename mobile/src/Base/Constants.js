@@ -7,3 +7,7 @@ export class LoginLabels {
     static LABEL_LOADING = "Loading...";
     static ERROR_MSG_INVALID_PHONE_NUMBER = "Invalid phone number";
 }
+
+export class Messages {
+    static NO_INTERNET_CONNECTION = "Failed to logout.\nNo internet connection found.\nPlease check your internet connection"
+}

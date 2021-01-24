@@ -70,7 +70,7 @@ BottomItem.propTypes = {
 
 export function BottomItem({src, href, title, currentLocation}) {
     return (
-        <Link eventKey={title} to={href} className={`bottom-item ${currentLocation === href ? "active" : ""}`}>
+        <Link eventkey={title} to={href} className={`bottom-item ${currentLocation === href ? "active" : ""}`}>
             <img className={'icon'} src={src} alt={""}/>
             <span className={'title'}>{title}</span>
         </Link>);

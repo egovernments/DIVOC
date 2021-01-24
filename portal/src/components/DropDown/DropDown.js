@@ -4,7 +4,7 @@ import 'react-dropdown/style.css';
 import styles from './DropDown.module.css';
 
 
-function DropDown({setSelectedOption, placeholder, options}) {
+function DropDown({setSelectedOption, placeholder, options, selectedOption}) {
 
     const handleChange = (selectedItemFromDropdown) => {
         setSelectedOption(selectedItemFromDropdown.value)
@@ -12,6 +12,7 @@ function DropDown({setSelectedOption, placeholder, options}) {
     return (
         <div className="m-3">
             <Dropdown
+                value={selectedOption}
                 options={options}
                 onChange={handleChange}
                 placeholder={placeholder}

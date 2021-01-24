@@ -1,24 +1,23 @@
-import React, {createContext, useContext, useEffect, useMemo, useReducer} from "react";
+import React, {createContext, useContext, useEffect} from "react";
 import "./Login.scss"
 import {useHistory} from "react-router";
 import {useKeycloak} from "@react-keycloak/web";
-import config from "../config"
+import config from "config.json"
 
 export function LoginComponent() {
     const {keycloak} = useKeycloak();
     const history = useHistory();
-    useEffect(() => {
-        if (!keycloak.authenticated) {
-            keycloak.login()
-        }
-    }, []);
+
     useEffect(() => {
         if (keycloak.authenticated) {
             let redirectUrl = config.urlPath + "/";
             history.push(redirectUrl)
+        } else {
+            keycloak.login()
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [keycloak]);
-   
+
     return (
         <div>
             Login
@@ -26,20 +25,6 @@ export function LoginComponent() {
     )
 }
 
-const initialState = {mobileNumber: "", otp: ""};
-
-function loginReducer(state, action) {
-    switch (action.type) {
-        case ACTION_LOGIN:
-            return {otp: action.payload.otp, ...state};
-        case ACTION_OTP:
-            return {mobileNumber: action.payload.mobileNumber};
-        default:
-            throw new Error();
-    }
-}
-
-export const ACTION_LOGIN = 'login';
 export const ACTION_OTP = 'otp';
 
 const LoginContext = createContext(null);
@@ -69,10 +54,4 @@ export function useLogin() {
         goToHome
     }
 
-}
-
-function LoginProvider(props) {
-    const [state, dispatch] = useReducer(loginReducer, initialState)
-    const value = useMemo(() => [state, dispatch], [state])
-    return <LoginContext.Provider value={value} {...props} />
 }

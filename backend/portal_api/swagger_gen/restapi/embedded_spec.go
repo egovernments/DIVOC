@@ -206,6 +206,16 @@ func init() {
             "description": "Program Status",
             "name": "programStatus",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedTo",
+            "in": "query"
           }
         ],
         "responses": {
@@ -303,12 +313,6 @@ func init() {
               "items": {
                 "type": "object",
                 "properties": {
-                  "contact": {
-                    "type": "string"
-                  },
-                  "email": {
-                    "type": "string"
-                  },
                   "facilityId": {
                     "type": "string"
                   },
@@ -1078,7 +1082,7 @@ func init() {
         "type": "object",
         "properties": {
           "osid": {
-            "type": "object"
+            "type": "string"
           },
           "programs": {
             "type": "array",
@@ -1086,9 +1090,6 @@ func init() {
               "type": "object",
               "properties": {
                 "id": {
-                  "type": "string"
-                },
-                "osid": {
                   "type": "string"
                 },
                 "rate": {
@@ -1582,6 +1583,16 @@ func init() {
             "type": "string",
             "description": "Program Status",
             "name": "programStatus",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedFrom",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "name": "rateUpdatedTo",
             "in": "query"
           }
         ],
@@ -2458,7 +2469,7 @@ func init() {
       "type": "object",
       "properties": {
         "osid": {
-          "type": "object"
+          "type": "string"
         },
         "programs": {
           "type": "array",
@@ -2475,9 +2486,6 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
-        },
-        "osid": {
           "type": "string"
         },
         "rate": {
@@ -2521,12 +2529,6 @@ func init() {
     "NotifyFacilitiesParamsBodyItems0": {
       "type": "object",
       "properties": {
-        "contact": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string"
-        },
         "facilityId": {
           "type": "string"
         },
