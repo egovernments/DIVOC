@@ -121,8 +121,8 @@ export class AppDatabase {
         const vaccinatorByProgram = vaccinator.filter((item, index) => {
             const supportProgramsName = item[PROGRAMS]
             for (let i = 0; i < supportProgramsName.length; i++) {
-                const programName = supportProgramsName[i].id
-                if (programName === selectProgram) {
+                const program = supportProgramsName[i]
+                if (program.id === selectProgram && program.certified) {
                     return true;
                 }
             }

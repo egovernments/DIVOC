@@ -5,7 +5,7 @@ import "./Home.scss"
 import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
-import NoImagePlaceholder from "../assets/img/no_image.png"
+import NoImagePlaceholder from "../assets/img/no_image.svg"
 import enrollRecipient from "./enroll_recipient.png"
 import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
