@@ -373,14 +373,14 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			if len(facilities) > 0 {
 				facility := facilities[0].(map[string]interface{})
 				currentPrograms := facility["programs"].([]interface{})
-				var updatePrograms []map[string]interface{}
+				var programsTobeUpdated []map[string]interface{}
 				updateFacility := map[string]interface{}{
 					"osid":     updateRequest.Osid,
 					"programs": []interface{}{},
 				}
 				if len(currentPrograms) == 0 {
 					for _, program := range updateRequest.Programs {
-						updatePrograms = append(updatePrograms, map[string]interface{}{
+						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
 							"id":              program.ID,
 							"status":          program.Status,
 							"rate":            program.Rate,
@@ -389,9 +389,13 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						})
 					}
 				} else {
+					for _, obj := range currentPrograms {
+						facilityProgram := obj.(map[string]interface{})
+						programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
+					}
 					for _, updateProgram := range updateRequest.Programs {
-						for _, obj := range currentPrograms {
-							facilityProgram := obj.(map[string]interface{})
+						existingProgram := false
+						for _, facilityProgram := range programsTobeUpdated {
 							if updateProgram.ID == facilityProgram["id"].(string) {
 								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
 									facilityProgram["status"] = updateProgram.Status
@@ -405,12 +409,22 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
 										facility["contact"].(string), facility["email"].(string))
 								}
+								existingProgram = true
 							}
-							updatePrograms = append(updatePrograms, facilityProgram)
+						}
+						if !existingProgram {
+							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+								"id":              updateProgram.ID,
+								"status":          updateProgram.Status,
+								"rate":            updateProgram.Rate,
+								"statusUpdatedAt": time.Now().Format(time.RFC3339),
+								"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+							})
 						}
 					}
+
 				}
-				updateFacility["programs"] = updatePrograms
+				updateFacility["programs"] = programsTobeUpdated
 				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
 				if err != nil {
 					log.Error(err)
