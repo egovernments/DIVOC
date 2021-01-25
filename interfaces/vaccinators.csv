@@ -1,5 +1,1 @@
-code,name,nationalIdentifier,mobileNumber,email,status,facilityIds
-EE341,Vaidya Acharya,223434223,7897891244,,Active,
-EE342,Krishna Reddy,223434223,7897891233,,Active,
-EE344,Narayan Reddy,223434223,7897891235,narayan@email.com,Active,BLR341
-EE346,Nayan A,223434223,7897891236,,Active,DEL002
+*code,*name,*nationalIdentifier,*mobileNumber,*email,*status,*facilityIds

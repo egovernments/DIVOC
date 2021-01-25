@@ -1,4 +1,1 @@
-serialNum,facilityCode,facilityName,contact,email,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,websiteURL,adminName,adminMobile
-100,DEL010,Awesome Hospital,9809989981,awesome@mailinator.com,9,18,GOVT,Fixed location,Active,No 23,"Road, NIBM Road",Delhi,Delhi,100001,28,77,www.awesome.com  ,suresh,1111111111
-110,BLR311,Aolo Hospital,9876543210,aolo@mailinator.com,10,17,PRIVATE,Fixed location,Active,,"My C,D,E",Bengaluru,Karnataka,560001,13,75,www.aolo.com,ramesh,1111111121
-120,MOB2322,Mobile Vaccination Center,9879879879,mobile@mailinator.com,8,18,GOVT,Mobile,Active,,,Bengaluru,,5600001,,,www.mobile.com,mahesh,1111111131
+*serialNum,*facilityCode,*facilityName,*contact,email,*operatingHourStart,*operatingHourEnd,*category,*type,*status,*addressLine1,*addressLine2,district,state,pincode,*geoLocationLat,*geoLocationLon,websiteURL,*adminName,*adminMobile
