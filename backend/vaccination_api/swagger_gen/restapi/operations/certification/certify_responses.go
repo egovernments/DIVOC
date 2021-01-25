@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // CertifyOKCode is the HTTP code returned for type CertifyOK
@@ -33,4 +35,48 @@ func (o *CertifyOK) WriteResponse(rw http.ResponseWriter, producer runtime.Produ
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(200)
+}
+
+// CertifyBadRequestCode is the HTTP code returned for type CertifyBadRequest
+const CertifyBadRequestCode int = 400
+
+/*CertifyBadRequest Invalid input
+
+swagger:response certifyBadRequest
+*/
+type CertifyBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
+}
+
+// NewCertifyBadRequest creates CertifyBadRequest with default headers values
+func NewCertifyBadRequest() *CertifyBadRequest {
+
+	return &CertifyBadRequest{}
+}
+
+// WithPayload adds the payload to the certify bad request response
+func (o *CertifyBadRequest) WithPayload(payload *models.Error) *CertifyBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the certify bad request response
+func (o *CertifyBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
+// WriteResponse to the client
+func (o *CertifyBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
