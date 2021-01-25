@@ -141,7 +141,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
-      REDIS_URL: redis:6379
+      REDIS_URL: redis://redis:6379
     depends_on:
       - kafka
       - redis
@@ -166,5 +166,7 @@ services:
   digilocker_support_api:
     image: dockerhub/digilocker_support_api:divoc-0.0.1
     environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
