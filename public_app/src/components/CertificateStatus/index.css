@@ -36,6 +36,7 @@
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px;
     min-height: 82px;
+    cursor: pointer;
 }
 .small-card-img {
     height: 5rem;
