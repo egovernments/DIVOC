@@ -5,13 +5,34 @@ import info from "../../../assets/img/info.png";
 import filter from "../../../assets/img/filter.svg";
 import Popover from "@material-ui/core/Popover";
 import {CheckboxItem} from "../../FacilityFilterTab";
+import Chip from "@material-ui/core/Chip";
+import makeStyles from "@material-ui/core/styles/makeStyles";
+import {API_URL} from "../../../utils/constants";
+import {useAxios} from "../../../utils/useAxios";
+import Tooltip from "@material-ui/core/Tooltip";
 
 
-export default function VaccinatorList({vaccinators, onSelectVaccinator}) {
+export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVaccinators}) {
 
     const [programs, setPrograms] = useState([]);
     const [selectedPrograms, setSelectedPrograms] = useState([]);
+    const axiosInstance = useAxios('');
+    const useStyles = makeStyles((theme) => ({
+        root: {
+            display: 'flex',
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            '& > *': {
+                margin: theme.spacing(0.5),
+            },
+        },
+    }));
+    const classes = useStyles();
 
+    useEffect(() => {
+        setPrograms(getAllPrograms(vaccinators));
+        setSelectedPrograms(getAllPrograms(vaccinators))
+    }, [vaccinators]);
 
     function getAllPrograms(vaccinators) {
         let programList = [];
@@ -23,42 +44,68 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator}) {
         return Array.from(new Set(programList));
     }
 
-    useEffect(() => {
-        setPrograms(getAllPrograms(vaccinators));
-        setSelectedPrograms(getAllPrograms(vaccinators))
-    }, [vaccinators]);
-
     function onEditVaccinator(vaccinator) {
         onSelectVaccinator(vaccinator)
+    }
+
+    function onStatusChange(vaccinator) {
+        const editData = {
+            osid: vaccinator.osid,
+            programs: vaccinator.programs,
+            status: vaccinator.status === "Active" ? "Inactive" : "Active"
+        };
+        axiosInstance.current.put(API_URL.VACCINATORS_API, [editData])
+            .then(res => {
+                if (res.status === 200) {
+                    setTimeout(() => fetchVaccinators(), 2000);
+                }
+                else {
+                    alert("Something went wrong while saving!");
+                }
+            }, (error) => {
+                console.log(error);
+                alert("Something went wrong while adding vaccinator!");
+            });
     }
 
     const getVaccinatorList = () => {
         return vaccinators.map((vaccinator, index) => {
             if (vaccinator.programs && vaccinator.programs.length > 0) {
                 return vaccinator.programs.filter(p => selectedPrograms.includes(p.id)).map(program => (
-                    <tr>
+                    <tr key={vaccinator.name+program.id}>
                         <td>{vaccinator.name}</td>
                         <td>{program.id}</td>
-                        <td>{program.certified ? <img src={check}/> : <img src={info}/>}</td>
-                        <td>{vaccinator.signatureString ? <img src={check}/> : <img src={info}/>}</td>
+                        <td>
+                            { program.certified ?
+                                <img src={check}/> :
+                                <Tooltip title="Certificate Not Uploaded"><img src={info}/></Tooltip>}
+                        </td>
+                        <td>
+                            { vaccinator.signatureString ?
+                                <img src={check}/> :
+                                <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
+                        </td>
                         <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
-                        <td className={"action-row"}>
-                            <button className={"action-button"}>{vaccinator.status === "Active" ? "Make Inactive" : "Make Active"}</button>
-                            <button className={"action-button"} onClick={() => onEditVaccinator(vaccinator)}>"Edit Profile"</button>
+                        <td className={classes.root}>
+                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
+                            <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>
                 ))
             } else {
                 return (
-                    <tr>
+                    <tr key={vaccinator.name}>
                         <td>{vaccinator.name}</td>
                         <td>-</td>
-                        <td><img src={info}/></td>
-                        <td>{vaccinator.signatureString ? <img src={check}/> : <img src={info}/>}</td>
+                        <td>-</td>
+                        <td>{vaccinator.signatureString ?
+                            <img src={check}/> :
+                            <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
+                        </td>
                         <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
-                        <td className={"action-row"}>
-                            <button className={"action-button"}>{vaccinator.status === "Active" ? "Make Inactive" : "Make Active"}</button>
-                            <button className={"action-button"} onClick={() => onEditVaccinator(vaccinator)}>"Edit Profile"</button>
+                        <td className={classes.root}>
+                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
+                            <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>
                 )
