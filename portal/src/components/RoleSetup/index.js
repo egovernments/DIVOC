@@ -159,13 +159,14 @@ export const RoleSetup = () => {
     }
 
     function deleteStaff(index) {
-        const staff = staffs[index];
-        axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/' + staff.id)
+        if(window.confirm('Are you sure to delete this record?')){ 
+            const staff = staffs[index];
+            axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/' + staff.id)
             .then(res => {
                 fetchUsers()
             });
+        }
     }
-
     return (
         <div>
             <TableContainer component={CustomPaper}>
