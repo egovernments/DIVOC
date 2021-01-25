@@ -114,16 +114,26 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal *models
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Vaccinator"
+	filter := map[string]interface{}{}
+
 	if HasResourceRole(portalClientId, "admin", principal) {
 		return kernelService.GetEntityType(entityTypeId)
-	}
-
-	filter := map[string]interface{}{}
-	if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
-		filter["facilityIds"] = map[string]interface{}{
-			"contains": params.FacilityCode,
+	} else if HasResourceRole(portalClientId, "facility-admin", principal) {
+		if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
+			filter["facilityIds"] = map[string]interface{}{
+				"contains": params.FacilityCode,
+			}
+		} else if params.FacilityCode == nil {
+			if principal.FacilityCode == "" {
+				log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
+				return NewGenericServerError()
+			}
+			filter["facilityIds"] = map[string]interface{}{
+				"contains": principal.FacilityCode,
+			}
 		}
-	} else if params.FacilityCode == nil {
+	} else {
+		// for others uses adding facilityCode from principal
 		if principal.FacilityCode == "" {
 			log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
 			return NewGenericServerError()
@@ -132,6 +142,7 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 			"contains": principal.FacilityCode,
 		}
 	}
+
 	if params.Name != nil && !strings.EqualFold(*params.Name, "ALL") {
 		filter["name"] = map[string]interface{}{
 			"startsWith": params.Name,

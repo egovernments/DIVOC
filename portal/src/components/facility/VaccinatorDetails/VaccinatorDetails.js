@@ -236,7 +236,7 @@ export default function VaccinatorDetails({
                             startAdornment: <InputAdornment position="start">+91</InputAdornment>,
                         }}
                         label="Mobile" variant="outlined"/>
-                    <TextField required value={vaccinator.nationalIdentifier} onChange={(evt) => onValueChange(evt, "nationalIdentifier")} label="Aadhaar" variant="outlined"/>
+                    <TextField required value={vaccinator.nationalIdentifier} onChange={(evt) => onValueChange(evt, "nationalIdentifier")} label="National Identifier" variant="outlined"/>
                     <TextField required value={vaccinator.code} onChange={(evt) => onValueChange(evt, "code")} label="Licence Number" variant="outlined"/>
                     <TextField value={vaccinator.signatureString} onChange={(evt) => onValueChange(evt, "signatureString")} label="Signature" variant="outlined"/>
                 </div>
