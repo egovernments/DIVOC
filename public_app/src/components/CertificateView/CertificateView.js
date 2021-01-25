@@ -239,7 +239,7 @@ function CertificateView() {
 
                     <DropdownButton id="dropdown-item-button" variant="success" title="Export" className={styles["btn-success"]}>
                         <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
-                        <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                        <Dropdown.Item href="#/svg" onClick={()=>alert("This feature is still not implemented")}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
                     </DropdownButton>
                     
                 </div>
