@@ -16,7 +16,7 @@ const monthNames = [
     "May", "Jun", "Jul", "Aug",
     "Sep", "Oct", "Nov", "Dec"
 ];
-const PROGRAM_NAME = "programName";
+const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
 
@@ -85,7 +85,7 @@ export class AppDatabase {
         if (this.db) {
             const result = await this.db.getAll(QUEUE);
             result.forEach((item) => {
-                if (item[PROGRAM_NAME] === programName)
+                if (item[PROGRAM_ID] === programName)
                     if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
                         waiting++;
                     } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
@@ -103,10 +103,10 @@ export class AppDatabase {
 
     async getQueue(status) {
         if (status) {
-            const programName = getSelectedProgram()
+            const programId = getSelectedProgram()
             const result = await this.db.getAll(QUEUE);
             const filter = result.filter((item) => {
-                    return item[STATUS] === status && item[PROGRAM_NAME] === programName
+                    return item[STATUS] === status && item[PROGRAM_ID] === programId
                 }
             );
             return Promise.resolve(filter)
@@ -176,6 +176,7 @@ export class AppDatabase {
     async saveWalkInEnrollments(walkEnrollment) {
         if (walkEnrollment) {
             walkEnrollment.code = Date.now().toString()
+            walkEnrollment.programId = getSelectedProgram()
             await this.saveEnrollments([walkEnrollment])
             const queue = {
                 enrollCode: walkEnrollment.code,
@@ -186,7 +187,7 @@ export class AppDatabase {
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
                 code: walkEnrollment.code,
-                programName: getSelectedProgram()
+                programId: walkEnrollment.programId
             }
             await this.addToQueue(queue)
         } else {
