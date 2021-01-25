@@ -10,6 +10,8 @@ export function VaccinationStatus() {
     useEffect(() => {
         getVaccinationStatus()
             .then((result) => setVaccinationStatus(result))
+            .catch(e => {
+            });
     }, [])
 
     if (!vaccinationStatus) {
@@ -26,9 +28,9 @@ export function VaccinationStatus() {
         const message = vaccinationStatus.message
         const exceedCount = vaccinationStatus.isExceed ? vaccinationStatus.exceedVaccinations : ""
         return (
-                <h5 className="status-message pl-4 pt-1 text-center">{message} {exceedCount ? (
-                    <span>(<span className="exceed">{exceedCount}</span>)</span>) : ""}
-                </h5>
+            <h5 className="status-message pl-4 pt-1 text-center">{message} {exceedCount ? (
+                <span>(<span className="exceed">{exceedCount}</span>)</span>) : ""}
+            </h5>
         );
     }
 
@@ -48,12 +50,12 @@ export function VaccinationStatus() {
 
 async function getVaccinationStatus() {
     const userDetails = await appIndexDb.getUserDetails()
-    const programRate = userDetails["covid19_rate"] ?? 0
+    const programName = localStorage.getItem("program")
+    const programRate = userDetails[programName + "_rate"] ?? 0
     const recipientDetails = await appIndexDb.recipientDetails()
     const certificateIssue = recipientDetails[1].value
     const isExceed = certificateIssue > programRate
     const remainingCertificate = programRate - certificateIssue
-    console.log(remainingCertificate);
     const isLimitToReach = remainingCertificate >= 0 && remainingCertificate <= 10;
     return new VaccinationDetails(
         certificateIssue,

@@ -31,7 +31,9 @@ export function WithKeyCloakComponent({children}) {
                     console.log(e.message)
                 })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
+
     if (!keycloak || !children) {
         return <div>
             Loading...
