@@ -123,31 +123,63 @@
           "$id": "#/properties/admins",
           "type": "array",
           "items": {
-            "$ref": "Vaccinator.json#/definitions/Vaccinator"
+            "$ref": "#/definitions/FacilityAdmin"
           }
         },
         "programs": {
           "$id": "#/properties/programs",
           "type": "array",
           "items": {
-            "programId":{
-              "type": "string"
-            },
-            "status": {
-              "type": "string"
-            },
-            "rate": {
-              "type": "number"
-            },
-            "statusUpdatedAt": {
-              "type": "string",
-              "format": "date"
-            },
-            "rateUpdatedAt": {
-              "type": "string",
-              "format": "date"
-            }
+            "$ref": "#/definitions/FacilityProgram"
           }
+        },
+        "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityAdmin": {
+      "$id": "#/properties/FacilityAdmin",
+      "type": "object",
+      "title": "The FacilityProgram Schema",
+      "properties": {
+        "name":{
+          "$id": "#/properties/name",
+          "type": "string"
+        },
+        "mobile": {
+          "$id": "#/properties/mobile",
+          "type": "string"
+        },
+        "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityProgram": {
+      "$id": "#/properties/FacilityProgram",
+      "type": "object",
+      "title": "The FacilityProgram Schema",
+      "properties": {
+        "programId":{
+          "$id": "#/properties/programId",
+          "type": "string"
+        },
+        "status": {
+          "$id": "#/properties/status",
+          "type": "string"
+        },
+        "rate": {
+          "$id": "#/properties/rate",
+          "type": "number"
+        },
+        "statusUpdatedAt": {
+          "$id": "#/properties/statusUpdatedAt",
+          "type": "string",
+          "format": "date"
+        },
+        "rateUpdatedAt": {
+          "$id": "#/properties/rateUpdatedAt",
+          "type": "string",
+          "format": "date"
         },
         "___encryptedFields": {
         }

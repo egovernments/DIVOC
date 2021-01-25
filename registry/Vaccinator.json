@@ -78,11 +78,14 @@
           "$id": "#/properties/programs",
           "type": "array",
           "items": {
-            "id":{
-              "type": "string"
-            },
-            "certified": {
-              "type": "boolean"
+            "type": "object",
+            "properties": {
+              "id":{
+                "type": "string"
+              },
+              "certified": {
+                "type": "boolean"
+              }
             }
           }
         },

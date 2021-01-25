@@ -55,7 +55,6 @@ export default function Vaccinators() {
            setVaccinators(res.data);
             res.data.map(vaccinator => {
                 if (vaccinator.code === code) {
-                    console.log("got selected vaccinatior ", vaccinator);
                     setSelectedVaccinator(vaccinator);
                 }
             })
@@ -73,6 +72,7 @@ export default function Vaccinators() {
                     <VaccinatorList
                         vaccinators={vaccinators}
                         onSelectVaccinator={onSelectVaccinator}
+                        fetchVaccinators={fetchVaccinators}
                     />
                 </div>
             </div>
@@ -81,8 +81,8 @@ export default function Vaccinators() {
                 <VaccinatorDetails
                     selectedVaccinator={selectedVaccinator}
                     setEnableVaccinatorDetailView={setEnableVaccinatorDetailView}
-                    fetchVaccinators={fetchVaccinators}
                     onSelectVaccinatorBasedOnCode={onSelectVaccinatorBasedOnCode}
+                    facilityCode={facilityCode}
                 />
             }
         </div>

@@ -1010,7 +1010,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Vaccinator"
+            "$ref": "#/definitions/FacilityAdmin"
           }
         },
         "averageRating": {
@@ -1060,13 +1060,19 @@ func init() {
           "items": {
             "type": "object",
             "properties": {
-              "id": {
+              "programId": {
                 "type": "string"
               },
               "rate": {
                 "type": "number"
               },
+              "rateUpdatedAt": {
+                "type": "string"
+              },
               "status": {
+                "type": "string"
+              },
+              "statusUpdatedAt": {
                 "type": "string"
               }
             }
@@ -1100,6 +1106,22 @@ func init() {
         "websiteUrl": {
           "type": "string",
           "title": "Website URL"
+        }
+      }
+    },
+    "FacilityAdmin": {
+      "properties": {
+        "mobile": {
+          "type": "string",
+          "title": "Facility Admin Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Admin Name"
+        },
+        "status": {
+          "type": "string",
+          "title": "Facility Admin Status"
         }
       }
     },
@@ -2435,7 +2457,7 @@ func init() {
         "admins": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Vaccinator"
+            "$ref": "#/definitions/FacilityAdmin"
           }
         },
         "averageRating": {
@@ -2517,16 +2539,38 @@ func init() {
         }
       }
     },
+    "FacilityAdmin": {
+      "properties": {
+        "mobile": {
+          "type": "string",
+          "title": "Facility Admin Mobile Number"
+        },
+        "name": {
+          "type": "string",
+          "title": "Facility Admin Name"
+        },
+        "status": {
+          "type": "string",
+          "title": "Facility Admin Status"
+        }
+      }
+    },
     "FacilityProgramsItems0": {
       "type": "object",
       "properties": {
-        "id": {
+        "programId": {
           "type": "string"
         },
         "rate": {
           "type": "number"
         },
+        "rateUpdatedAt": {
+          "type": "string"
+        },
         "status": {
+          "type": "string"
+        },
+        "statusUpdatedAt": {
           "type": "string"
         }
       }

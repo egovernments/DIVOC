@@ -504,12 +504,29 @@ func init() {
     },
     "CertificationRequest": {
       "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "vaccination",
+        "vaccinator",
+        "facility"
+      ],
       "properties": {
         "facility": {
           "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
           "properties": {
             "address": {
               "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
               "properties": {
                 "addressLine1": {
                   "type": "string"
@@ -541,9 +558,25 @@ func init() {
         },
         "recipient": {
           "type": "object",
+          "required": [
+            "name",
+            "dob",
+            "age",
+            "gender",
+            "nationality",
+            "identity",
+            "contact",
+            "address"
+          ],
           "properties": {
             "address": {
               "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
               "properties": {
                 "addressLine1": {
                   "type": "string"
@@ -591,6 +624,15 @@ func init() {
         },
         "vaccination": {
           "type": "object",
+          "required": [
+            "name",
+            "manufacturer",
+            "date",
+            "effectiveStart",
+            "effectiveUntil",
+            "dose",
+            "totalDoses"
+          ],
           "properties": {
             "batch": {
               "type": "string"
@@ -627,6 +669,9 @@ func init() {
         },
         "vaccinator": {
           "type": "object",
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
               "type": "string"
@@ -1334,12 +1379,29 @@ func init() {
     },
     "CertificationRequest": {
       "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "vaccination",
+        "vaccinator",
+        "facility"
+      ],
       "properties": {
         "facility": {
           "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
           "properties": {
             "address": {
               "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
               "properties": {
                 "addressLine1": {
                   "type": "string"
@@ -1371,9 +1433,25 @@ func init() {
         },
         "recipient": {
           "type": "object",
+          "required": [
+            "name",
+            "dob",
+            "age",
+            "gender",
+            "nationality",
+            "identity",
+            "contact",
+            "address"
+          ],
           "properties": {
             "address": {
               "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
               "properties": {
                 "addressLine1": {
                   "type": "string"
@@ -1421,6 +1499,15 @@ func init() {
         },
         "vaccination": {
           "type": "object",
+          "required": [
+            "name",
+            "manufacturer",
+            "date",
+            "effectiveStart",
+            "effectiveUntil",
+            "dose",
+            "totalDoses"
+          ],
           "properties": {
             "batch": {
               "type": "string"
@@ -1457,6 +1544,9 @@ func init() {
         },
         "vaccinator": {
           "type": "object",
+          "required": [
+            "name"
+          ],
           "properties": {
             "name": {
               "type": "string"
@@ -1467,9 +1557,19 @@ func init() {
     },
     "CertificationRequestFacility": {
       "type": "object",
+      "required": [
+        "name",
+        "address"
+      ],
       "properties": {
         "address": {
           "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
           "properties": {
             "addressLine1": {
               "type": "string"
@@ -1495,6 +1595,12 @@ func init() {
     },
     "CertificationRequestFacilityAddress": {
       "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
       "properties": {
         "addressLine1": {
           "type": "string"
@@ -1515,9 +1621,25 @@ func init() {
     },
     "CertificationRequestRecipient": {
       "type": "object",
+      "required": [
+        "name",
+        "dob",
+        "age",
+        "gender",
+        "nationality",
+        "identity",
+        "contact",
+        "address"
+      ],
       "properties": {
         "address": {
           "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
           "properties": {
             "addressLine1": {
               "type": "string"
@@ -1565,6 +1687,12 @@ func init() {
     },
     "CertificationRequestRecipientAddress": {
       "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
       "properties": {
         "addressLine1": {
           "type": "string"
@@ -1585,6 +1713,15 @@ func init() {
     },
     "CertificationRequestVaccination": {
       "type": "object",
+      "required": [
+        "name",
+        "manufacturer",
+        "date",
+        "effectiveStart",
+        "effectiveUntil",
+        "dose",
+        "totalDoses"
+      ],
       "properties": {
         "batch": {
           "type": "string"
@@ -1621,6 +1758,9 @@ func init() {
     },
     "CertificationRequestVaccinator": {
       "type": "object",
+      "required": [
+        "name"
+      ],
       "properties": {
         "name": {
           "type": "string"
@@ -1831,6 +1971,17 @@ func init() {
         }
       }
     },
+    "VaccinatorProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "certified": {
+          "type": "boolean"
+        },
+        "id": {
+          "type": "string"
+        }
+      }
+    },
     "sideEffectsResponse": {
       "description": "Indian address format",
       "type": "object",
@@ -1934,13 +2085,13 @@ func init() {
       "type": "object",
       "title": "The Vaccinator Schema",
       "required": [
-        "serialNum",
         "code",
         "nationalIdentifier",
         "name",
         "facilityIds",
         "mobileNumber",
-        "status"
+        "status",
+        "email"
       ],
       "properties": {
         "___encryptedFields": {},
@@ -1951,6 +2102,11 @@ func init() {
           "type": "string",
           "$comment": "Code",
           "$id": "#/properties/code"
+        },
+        "email": {
+          "type": "string",
+          "$comment": "Email Id",
+          "$id": "#/properties/email"
         },
         "facilityIds": {
           "type": "array",
@@ -1973,10 +2129,12 @@ func init() {
           "$comment": "Nationality",
           "$id": "#/properties/nationalIdentifier"
         },
-        "serialNum": {
-          "type": "integer",
-          "$comment": "Serial number",
-          "$id": "#/properties/serialNum"
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/VaccinatorProgramsItems0"
+          },
+          "$id": "#/properties/programs"
         },
         "signatures": {
           "type": "array",
