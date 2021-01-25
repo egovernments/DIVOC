@@ -781,6 +781,9 @@ func init() {
         },
         "phone": {
           "type": "string"
+        },
+        "programId": {
+          "type": "string"
         }
       }
     },
@@ -1867,6 +1870,9 @@ func init() {
           "type": "string"
         },
         "phone": {
+          "type": "string"
+        },
+        "programId": {
           "type": "string"
         }
       }

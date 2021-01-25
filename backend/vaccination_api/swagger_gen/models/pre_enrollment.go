@@ -50,6 +50,9 @@ type PreEnrollment struct {
 
 	// phone
 	Phone string `json:"phone,omitempty"`
+
+	// program Id
+	ProgramID string `json:"programId,omitempty"`
 }
 
 // Validate validates this pre enrollment

@@ -345,6 +345,8 @@ definitions:
         type: object
       certified:
         type: boolean
+      programId:
+        type: string
   CertificationRequest:
     type: object
     properties:

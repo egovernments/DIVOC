@@ -1,6 +1,6 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry
+IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry-es dockerhub/keycloak
 ifeq ($(RELEASE_VERSION), )
-RELEASE_VERSION := 0.0.1
+RELEASE_VERSION := divoc-0.0.1
 endif
 $(info RELEASE VERSION $(RELEASE_VERSION))
 

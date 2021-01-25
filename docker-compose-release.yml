@@ -17,7 +17,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   registry:
-    image: dockerhub/registry-es
+    image: dockerhub/registry-es:divoc-0.0.1
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
@@ -30,7 +30,7 @@ services:
     depends_on:
       - db
   keycloak:
-    image: dockerhub/keycloak
+    image: dockerhub/keycloak:divoc-0.0.1
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -95,7 +95,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api
+    image: dockerhub/vaccination_api:divoc-0.0.1
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -107,7 +107,7 @@ services:
       - kafka
       - keycloak
   portal_api:
-    image: dockerhub/portal_api
+    image: dockerhub/portal_api:divoc-0.0.1
     ports:
       - "8001:8001"
     environment:
@@ -121,14 +121,14 @@ services:
       - kafka
       - keycloak
   analytics_feed:
-    image: dockerhub/analytics_feed
+    image: dockerhub/analytics_feed:divoc-0.0.1
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
   certificate_processor:
-    image: dockerhub/certificate_processor
+    image: dockerhub/certificate_processor:divoc-0.0.1
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -137,7 +137,7 @@ services:
     depends_on:
       - registry
   certificate_signer:
-    image: dockerhub/certificate_signer
+    image: dockerhub/certificate_signer:divoc-0.0.1
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -146,14 +146,14 @@ services:
       - kafka
       - redis
   nginx:
-    image: dockerhub/nginx
+    image: dockerhub/nginx:divoc-0.0.1
     ports:
       - "81:80"
     depends_on:
       - vaccination_api
       - portal_api
   notification-service:
-    image: dockerhub/notification-service
+    image: dockerhub/notification-service:divoc-0.0.1
     ports:
       - "8765:8765"
     environment:
@@ -164,7 +164,7 @@ services:
     depends_on:
       - kafka
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+    image: dockerhub/digilocker_support_api:divoc-0.0.1
     environment:
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
