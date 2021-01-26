@@ -7,7 +7,7 @@ import {appIndexDb} from "../../AppDatabase";
 
 export function ProgramSelection() {
     const [programs, setPrograms] = useState([])
-    const [selectedProgram, setSelectedProgram] = useState(localStorage.getItem("program"))
+    const [selectedProgram, setSelectedProgram] = useState(getSelectedProgram())
 
     useEffect(() => {
         appIndexDb
@@ -20,7 +20,7 @@ export function ProgramSelection() {
 
     const onProgramSelected = (program) => {
         setSelectedProgram(program)
-        localStorage.setItem("program", program)
+        saveSelectedProgram(program)
     }
 
     return (
@@ -53,4 +53,13 @@ function ProgramItem(props) {
             </Card.Header>
         </div>
     );
+}
+
+
+export function getSelectedProgram() {
+    return localStorage.getItem("program")
+}
+
+export function saveSelectedProgram(programName) {
+    localStorage.setItem("program", programName)
 }

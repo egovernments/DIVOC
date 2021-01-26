@@ -129,6 +129,11 @@ export class AppDatabase {
         return this.db.getAll(PROGRAMS);
     }
 
+    async getProgramByName(programName) {
+        const program = await this.db.get(PROGRAMS, programName);
+        return program
+    }
+
     async saveUserDetails(userDetails) {
         return this.db.put(USER_DETAILS, userDetails, USER_DETAILS);
     }
