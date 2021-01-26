@@ -87,8 +87,6 @@ func StartCertifiedConsumer() {
 			if err == nil {
 				var message map[string]interface{}
 				json.Unmarshal(msg.Value, &message)
-				// check the status
-				// update that status to certifyErrorRows db
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 				preEnrollmentCode, ok := message["preEnrollmentCode"].(string)
 				if !ok {

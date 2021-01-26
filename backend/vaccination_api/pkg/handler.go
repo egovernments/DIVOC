@@ -30,6 +30,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const FacilityEntity = "Facility"
+
 func SetupHandlers(api *operations.DivocAPI) {
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
 
@@ -170,13 +172,38 @@ func getVaccinators(params configuration.GetVaccinatorsParams, principal *models
 }
 
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
-	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+	if facilityCode, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
 	} else {
-		programsFor := findProgramsForFacility(scopeId)
-		return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+		if facilities := getFacilityByCode(facilityCode); len(facilities) > 0 {
+			facility := facilities[0].(map[string]interface{})
+			var programNames []string
+			for _, programObject := range facility["programs"].([]interface{}) {
+				program := programObject.(map[string]interface{})
+				if strings.EqualFold(program["status"].(string), "active") {
+					programNames = append(programNames, program["id"].(string))
+				}
+			}
+			programsFor := findProgramsByName(programNames)
+			return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+		} else {
+			log.Errorf("Facility not found: %s", facilityCode)
+			return NewGenericServerError()
+		}
 	}
+}
+
+func getFacilityByCode(facilityCode string) []interface{} {
+	filter := map[string]interface{}{
+		"facilityCode": map[string]interface{}{
+			"eq": facilityCode,
+		},
+	}
+	if programs, err := services.QueryRegistry(FacilityEntity, filter); err == nil {
+		return programs[FacilityEntity].([]interface{})
+	}
+	return nil
 }
 
 func getConfigurationResponder(params configuration.GetConfigurationParams, principal *models.JWTClaimBody) middleware.Responder {
