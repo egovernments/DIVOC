@@ -1,9 +1,11 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
+import {getSelectedProgram} from "./components/ProgramSelection";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 9;
+const DATABASE_VERSION = 10;
 const PATIENTS = "patients";
+const PROGRAMS = "programs";
 const QUEUE = "queue";
 const EVENTS = "events";
 const VACCINATORS = "vaccinators";
@@ -14,6 +16,7 @@ const monthNames = [
     "May", "Jun", "Jul", "Aug",
     "Sep", "Oct", "Nov", "Dec"
 ];
+const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
 
@@ -31,8 +34,11 @@ export class AppDatabase {
                     database.createObjectStore(VACCINATORS, {keyPath: "osid"});
                     database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
                 }
-                if (oldVersion === 0 || newVersion === 6) {
+                if (oldVersion === 0 || newVersion === 6 || newVersion === 10) {
                     database.createObjectStore(USER_DETAILS);
+                }
+                if (oldVersion === 0 || newVersion === 10) {
+                    database.createObjectStore(PROGRAMS, {keyPath: "name"});
                 }
             }
         });
@@ -50,7 +56,9 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, enrollCode);
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
-            if (patient.phone === mobileNumber) {
+            const selectedProgram = getSelectedProgram();
+            if (patient.phone === mobileNumber
+                && patient[PROGRAM_ID] === selectedProgram) {
                 patient.dob = this.formatDate(patient.dob)
                 return patient
             } else {
@@ -72,14 +80,16 @@ export class AppDatabase {
     async recipientDetails() {
         let waiting = 0;
         let issue = 0;
+        const programName = getSelectedProgram()
         if (this.db) {
             const result = await this.db.getAll(QUEUE);
             result.forEach((item) => {
-                if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
-                    waiting++;
-                } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
-                    issue++;
-                }
+                if (item[PROGRAM_ID] === programName)
+                    if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
+                        waiting++;
+                    } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
+                        issue++;
+                    }
             });
         }
 
@@ -89,10 +99,15 @@ export class AppDatabase {
         ];
     }
 
+
     async getQueue(status) {
         if (status) {
+            const programId = getSelectedProgram()
             const result = await this.db.getAll(QUEUE);
-            const filter = result.filter((item) => item[STATUS] === status);
+            const filter = result.filter((item) => {
+                    return item[STATUS] === status && item[PROGRAM_ID] === programId
+                }
+            );
             return Promise.resolve(filter)
         } else {
             return this.db.getAll(QUEUE)
@@ -100,7 +115,20 @@ export class AppDatabase {
     }
 
     async getVaccinators() {
-        return this.db.getAll(VACCINATORS)
+        const vaccinator = await this.db.getAll(VACCINATORS)
+        const selectProgram = getSelectedProgram();
+        const vaccinatorByProgram = vaccinator.filter((item, index) => {
+            const supportProgramsName = item[PROGRAMS]
+            for (let i = 0; i < supportProgramsName.length; i++) {
+                const program = supportProgramsName[i]
+                if (program.id === selectProgram && program.certified) {
+                    return true;
+                }
+            }
+            return false;
+
+        });
+        return vaccinatorByProgram
     }
 
     async markPatientAsComplete(enrollCode) {
@@ -111,6 +139,23 @@ export class AppDatabase {
 
     async saveEvent(event) {
         return this.db.add(EVENTS, event)
+    }
+
+
+    async savePrograms(programs) {
+        const programList = programs || [];
+        const facilityProgram = programList.map((item, index) => this.db.put(PROGRAMS, item));
+        return Promise.all(facilityProgram)
+    }
+
+
+    async getPrograms() {
+        return this.db.getAll(PROGRAMS);
+    }
+
+    async getProgramByName(programName) {
+        const program = await this.db.get(PROGRAMS, programName);
+        return program
     }
 
     async saveUserDetails(userDetails) {
@@ -130,6 +175,7 @@ export class AppDatabase {
     async saveWalkInEnrollments(walkEnrollment) {
         if (walkEnrollment) {
             walkEnrollment.code = Date.now().toString()
+            walkEnrollment.programId = getSelectedProgram()
             await this.saveEnrollments([walkEnrollment])
             const queue = {
                 enrollCode: walkEnrollment.code,
@@ -139,7 +185,8 @@ export class AppDatabase {
                 dob: walkEnrollment.dob,
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
-                code: walkEnrollment.code
+                code: walkEnrollment.code,
+                programId: walkEnrollment.programId
             }
             await this.addToQueue(queue)
         } else {
@@ -173,17 +220,27 @@ export class AppDatabase {
         }
     }
 
-    async cleanUp() {
+    async cleanEvents() {
         await this.db.clear(EVENTS)
     }
 
     async clearEverything() {
         const deletePatients = this.db.clear(PATIENTS);
         const deleteVaccinators = this.db.clear(VACCINATORS);
-        const deleteEvents = await this.db.clear(EVENTS);
-        const deleteQueue = await this.db.clear(QUEUE);
+        const deleteEvents = this.db.clear(EVENTS);
+        const deleteQueue = this.db.clear(QUEUE);
+        const deletePrograms = this.db.clear(PROGRAMS);
+        const deleteUserDetails = this.db.clear(USER_DETAILS);
         localStorage.clear()
-        return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
+        return Promise.all(
+            [
+                deleteEvents,
+                deletePatients,
+                deleteQueue,
+                deleteVaccinators,
+                deletePrograms,
+                deleteUserDetails
+            ]);
     }
 
     async getAllEvents() {

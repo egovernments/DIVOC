@@ -86,7 +86,7 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                 "value": "email",
             },
             {
-                "label": "Aadhaar",
+                "label": "National Identifier",
                 "value": "nationalIdentifier"
             },
         ];

@@ -9,27 +9,29 @@ import {AuthSafeComponent} from "../utils/keycloak";
 import {Messages} from "../Base/Constants";
 
 function AuthSafeLogout({keycloak}) {
-    return <BaseCard>
-        <div className={"logout-container"}>
-            <Button variant="success" onClick={() => {
-                if (navigator.onLine) {
-                    SyncFacade
-                        .push()
-                        .then((value => {
-                            return keycloak.logout();
-                        }))
-                        .then(() => appIndexDb.clearEverything())
-                        .catch(e => {
-                            if (!navigator.onLine) {
-                                alert(Messages.NO_INTERNET_CONNECTION)
-                            }
-                        })
-                } else {
-                    alert(Messages.NO_INTERNET_CONNECTION)
-                }
-            }}>Logout</Button>{" "}
-        </div>
-    </BaseCard>;
+    return <div className="logout-container">
+        <BaseCard>
+            <div className="button-center">
+                <Button variant="success" onClick={() => {
+                    if (navigator.onLine) {
+                        SyncFacade
+                            .push()
+                            .catch((e) => console.log(e.message))
+                            .then(() => appIndexDb.clearEverything())
+                            .then((() => keycloak.logout()))
+                            .catch(e => {
+                                console.log(e.message)
+                                if (!navigator.onLine) {
+                                    alert(Messages.NO_INTERNET_CONNECTION)
+                                }
+                            })
+                    } else {
+                        alert(Messages.NO_INTERNET_CONNECTION)
+                    }
+                }}>Logout</Button>{" "}
+            </div>
+        </BaseCard>
+    </div>;
 }
 
 AuthSafeLogout.propTypes = {onClick: PropTypes.func};

@@ -122,6 +122,10 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
   /bulkCertify:
     post:
       tags:
@@ -360,6 +364,7 @@ definitions:
           dob:
             type: string
             format: date
+            x-nullable: true
           age:
             type: string
           gender:
@@ -392,8 +397,6 @@ definitions:
               - pincode
         required:
           - name
-          - dob
-          - age
           - gender
           - nationality
           - identity

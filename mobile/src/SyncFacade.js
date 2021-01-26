@@ -1,5 +1,6 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
+import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -17,10 +18,17 @@ export class SyncFacade {
 
     static async pull() {
         await appIndexDb.initDb();
-        const vaccinators = await ApiServices.fetchVaccinators();
-        await appIndexDb.saveVaccinators(vaccinators);
         const preEnrollments = await ApiServices.fetchPreEnrollments();
         await appIndexDb.saveEnrollments(preEnrollments);
+
+        const programs = await ApiServices.fetchPrograms();
+        await appIndexDb.savePrograms(programs)
+        if (programs.length > 0 && !getSelectedProgram()) {
+            saveSelectedProgram(programs[0].name)
+        }
+
+        const vaccinators = await ApiServices.fetchVaccinators();
+        await appIndexDb.saveVaccinators(vaccinators);
     }
 
     static async push() {
@@ -29,7 +37,7 @@ export class SyncFacade {
             await ApiServices.certify(certifyPatients);
         }
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
-        await appIndexDb.cleanUp()
+        await appIndexDb.cleanEvents()
     }
 
 

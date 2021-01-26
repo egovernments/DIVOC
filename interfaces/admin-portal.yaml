@@ -178,7 +178,7 @@ paths:
       summary: Get vaccinators
       operationId: getVaccinators
       security:
-        - hasRole: ["facility-admin", "admin"]
+        - hasRole: ["facility-admin", "admin", "facility-staff"]
       parameters:
         - in: query
           name: facilityCode

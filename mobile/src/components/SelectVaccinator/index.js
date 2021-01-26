@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import "./index.scss";
 import {Table} from "react-bootstrap";
-import SampleSignatureImg from "../../assets/img/sample-signature.png";
 import {appIndexDb} from "../../AppDatabase";
 import Button from "react-bootstrap/Button";
 import {CONSTANT} from "../../utils/constants";
