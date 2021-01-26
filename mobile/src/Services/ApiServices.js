@@ -3,7 +3,7 @@ import {appIndexDb} from "../AppDatabase";
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
 const PROGRAMS = "/divoc/api/v1/programs/current"
-const VACCINATORS = "/divoc/api/v1/vaccinators"
+const VACCINATORS = "/divoc/admin/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
 
@@ -60,8 +60,6 @@ export class ApiServices {
                         "tel:" + patientDetails.phone
                     ],
                     dob: patientDetails.dob,
-                    //TODO: remove age
-                    age: "0",
                     gender: patientDetails.gender,
                     identity: item.identity ? "did:in.gov.uidai.aadhaar:" + item.identity : "",
                     name: patientDetails.name,

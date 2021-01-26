@@ -57,9 +57,8 @@ export class AppDatabase {
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
             const selectedProgram = getSelectedProgram();
-            //TODO:Check the programName contract when API is done
             if (patient.phone === mobileNumber
-                && patient.programName === selectedProgram) {
+                && patient[PROGRAM_ID] === selectedProgram) {
                 patient.dob = this.formatDate(patient.dob)
                 return patient
             } else {
