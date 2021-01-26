@@ -23,19 +23,22 @@ type ProgramsRegistryResponse struct {
 	StartDate   string        `json:"startDate"`
 }
 
-func findProgramsForFacility(facilityCode string) []*models.Program {
+func findProgramsByName(programNames []string) []*models.Program {
+
 	typeId := "Program"
 	filter := map[string]interface{}{
-
-		"startDate": map[string]interface{}{
-			"gt": "2020-12-12", //todo: temporary filter
+		"name": map[string]interface{}{
+			"or": programNames,
 		},
-		//"enrollmentScopeId": map[string]interface{}{
-		//	"eq": scopeId,
-		//},
-		//"code": map[string]interface{}{
-		//	"eq": code,
-		//},
+		"status": map[string]interface{}{
+			"eq": "active",
+		},
+		"startDate": map[string]interface{}{
+			"lte": time.Now().Format("2006-01-02"),
+		},
+		"endDate": map[string]interface{}{
+			"gte": time.Now().Format("2006-01-02"),
+		},
 	}
 	if programs, err := services.QueryRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in getting programs for the facility")
