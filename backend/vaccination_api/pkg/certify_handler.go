@@ -2,11 +2,13 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/api/config"
 	eventsModel "github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/models"
@@ -58,8 +60,16 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 			dob = dob2
 		}
 	}
-	reciepient := &models.CertificationRequestRecipient{
-		Name:        &certifyData.RecipientName,
+	recipient := &models.CertificationRequestRecipient{
+		Name: &certifyData.RecipientName,
+		Age:  certifyData.RecipientAge,
+		Address: &models.CertificationRequestRecipientAddress{
+			AddressLine1: &certifyData.RecipientAddressLine1,
+			AddressLine2: certifyData.RecipientAddressLine2,
+			District:     &certifyData.RecipientDistrict,
+			Pincode:      &certifyData.RecipientPincode,
+			State:        &certifyData.RecipientState,
+		},
 		Contact:     contact,
 		Dob:         dateAdr(strfmt.Date(dob)),
 		Gender:      &certifyData.RecipientGender,
@@ -102,25 +112,20 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 		Name: &certifyData.VaccinatorName,
 	}
 
-	addressline1 := certifyData.FacilityAddressLine1
-	addressline2 := certifyData.FacilityAddressLine2
-	district := certifyData.FacilityDistrict
-	state := certifyData.FacilityState
-	pincode := certifyData.FacilityPincode
 	facility := &models.CertificationRequestFacility{
 		Name: &certifyData.FacilityName,
 		Address: &models.CertificationRequestFacilityAddress{
-			AddressLine1: &addressline1,
-			AddressLine2: addressline2,
-			District:     &district,
-			State:        &state,
-			Pincode:      &pincode,
+			AddressLine1: &certifyData.FacilityAddressLine1,
+			AddressLine2: certifyData.FacilityAddressLine2,
+			District:     &certifyData.FacilityDistrict,
+			State:        &certifyData.FacilityState,
+			Pincode:      &certifyData.FacilityPincode,
 		},
 	}
 
 	certificate := models.CertificationRequest{
 		Facility:    facility,
-		Recipient:   reciepient,
+		Recipient:   recipient,
 		Vaccination: vaccination,
 		Vaccinator:  vaccinator,
 	}
@@ -154,6 +159,12 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		RecipientGender:           data.Text("recipientGender"),
 		RecipientNationality:      data.Text("recipientNationality"),
 		RecipientIdentity:         data.Text("recipientIdentity"),
+		RecipientAge:              data.Text("recipientAge"),
+		RecipientAddressLine1:     data.Text("recipientAddressLine1"),
+		RecipientAddressLine2:     data.Text("recipientAddressLine2"),
+		RecipientDistrict:         data.Text("recipientDistrict"),
+		RecipientState:            data.Text("recipientState"),
+		RecipientPincode:          data.int64("recipientPincode"),
 		VaccinationBatch:          data.Text("vaccinationBatch"),
 		VaccinationDate:           data.Text("vaccinationDate"),
 		VaccinationDose:           data.Text("vaccinationDose"),
@@ -169,5 +180,33 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		FacilityDistrict:          data.Text("facilityDistrict"),
 		FacilityState:             data.Text("facilityState"),
 		FacilityPincode:           data.int64("facilityPincode"),
+	}
+}
+
+func validateBulkCertifyCSVHeaders(headers []string) error {
+	columns := strings.Split(config.Config.Certificate.Upload.Columns, ",")
+	missingHeaders := getDiff(columns, headers)
+
+	var errMsgs []string
+	if missingHeaders["recipientDOB"] && missingHeaders["recipientAge"] {
+		errMsgs = append(errMsgs, "Alteast one of recipientDOB & recipientAge should be present")
+	}
+	missingHeaders["recipientDOB"] = false
+	missingHeaders["recipientAge"] = false
+
+	var missingHeaderList []string
+	for k := range missingHeaders {
+		if missingHeaders[k] {
+			missingHeaderList = append(missingHeaderList, k)
+		}
+	}
+	if len(missingHeaderList) > 0 {
+		errMsgs = append(errMsgs, "Missing Headers : " + strings.Join(missingHeaderList, ","))
+	}
+
+	if len(errMsgs) == 0 {
+		return nil
+	} else {
+		return errors.New(strings.Join(errMsgs, "; "))
 	}
 }

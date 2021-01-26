@@ -52,6 +52,12 @@ type CertifyUploadFields struct {
 	RecipientGender           string `json:"recipientGender"`
 	RecipientNationality      string `json:"recipientNationality"`
 	RecipientIdentity         string `json:"recipientIdentity"`
+	RecipientAge              string `json:"recipientAge"`
+	RecipientAddressLine1     string `json:"recipientAddressLine1"`
+	RecipientAddressLine2     string `json:"recipientAddressLine2"`
+	RecipientDistrict         string `json:"recipientDistrict"`
+	RecipientState            string `json:"recipientState"`
+	RecipientPincode          int64  `json:"recipientPincode"`
 	VaccinationBatch          string `json:"vaccinationBatch"`
 	VaccinationDate           string `json:"vaccinationDate"`
 	VaccinationDose           string `json:"vaccinationDose"`
