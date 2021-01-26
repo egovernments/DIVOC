@@ -78,6 +78,7 @@ function preEnrollmentReducer(state, action) {
             newState.name = action.payload.name;
             newState.dob = action.payload.dob;
             newState.gender = action.payload.gender;
+            newState.programId = action.payload.programId;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
 
