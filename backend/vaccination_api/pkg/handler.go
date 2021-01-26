@@ -241,22 +241,14 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
-	columns := strings.Split(config.Config.Certificate.Upload.Columns, ",")
-
 	data := NewScanner(params.File)
-
-	// csv template validation
-	csvHeaders := data.GetHeaders()
-	for _, c := range columns {
-		if !contains(csvHeaders, c) {
-			code := "INVALID_TEMPLATE"
-			message := c + " column doesn't exist in uploaded csv file"
-			error := &models.Error{
-				Code:    &code,
-				Message: &message,
-			}
-			return certification.NewBulkCertifyBadRequest().WithPayload(error)
-		}
+	if err := validateBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
+		code := "INVALID_TEMPLATE"
+		message := err.Error()
+		return certification.NewBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
 	}
 
 	// Initializing CertifyUpload entity
@@ -270,11 +262,10 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	if err := db.CreateCertifyUpload(&uploadEntry); err != nil {
 		code := "DATABASE_ERROR"
 		message := err.Error()
-		error := &models.Error{
+		return certification.NewBulkCertifyBadRequest().WithPayload(&models.Error{
 			Code:    &code,
 			Message: &message,
-		}
-		return certification.NewBulkCertifyBadRequest().WithPayload(error)
+		})
 	}
 
 	// Creating Certificates
