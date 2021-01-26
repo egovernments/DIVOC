@@ -15,19 +15,6 @@ func contains(s []string, e string) bool {
     return false
 }
 
-func getDiff(a []string, b []string) map[string]bool {
-    diffSet := make(map[string]bool)
-    for _, i := range a {
-        diffSet[i] = true
-    }
-    for _, i := range b {
-        if diffSet[i] {
-            diffSet[i] = false
-        }
-    }
-    return diffSet
-}
-
 // ToString Change arg to string
 func ToString(arg interface{}) string {
     switch v := arg.(type) {
