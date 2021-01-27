@@ -63,7 +63,7 @@ var Config = struct {
 		Password string `default:"postgres" yaml:"password" env:"DB_PASSWORD"`
 		User     string `default:"postgres" yaml:"user" env:"DB_USER"`
 		Port     string `default:"5432" yaml:"port" env:"DB_PORT"`
-		DBName   string `default:"postgres" yaml:"dbname"`
+		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
 	Certificate struct {
 		Upload struct {
