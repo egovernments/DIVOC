@@ -6,6 +6,7 @@ import {SyncFacade} from "./SyncFacade";
 import config from "./config"
 import keycloak, {AuthSafeComponent} from "./utils/keycloak";
 import {LocaleProvider} from "./lang/LocaleContext";
+import {useOnlineStatus} from "./utils/offlineStatus";
 
 function App({keycloak, initialized}) {
     const [isDBInit, setDBInit] = useState(false);
@@ -25,7 +26,7 @@ function App({keycloak, initialized}) {
                 }
             }
         }
-          // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
 
     if (!initialized || !isDBInit) {
@@ -41,7 +42,8 @@ function App({keycloak, initialized}) {
 }
 
 export function FacilityApp() {
-    const isOnline = navigator.onLine
+    const isOnline = useOnlineStatus();
+
     if (isOnline) {
         return <ReactKeycloakProvider
             authClient={keycloak}
