@@ -69,6 +69,10 @@ async function saveUserAttributes(attributes) {
     let userDetails = await appIndexDb.getUserDetails();
     if (!userDetails) {
         userDetails = await ApiServices.getUserDetails()
+        const facilityDetails = await ApiServices.getFacilityDetails();
+        if (facilityDetails && facilityDetails.length > 0) {
+            userDetails["facilityDetails"] = facilityDetails[0]
+        }
         await appIndexDb.saveUserDetails(userDetails)
     }
     for (let attributesKey in attributes) {

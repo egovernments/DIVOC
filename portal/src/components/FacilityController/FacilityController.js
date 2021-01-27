@@ -39,10 +39,11 @@ function FacilityController() {
 
     function resetFilter(state = {}) {
         if (programs.length > 0) {
-            state.selectedProgram = programs[0].value
+            state.selectedProgram = programs[0].value;
         }
-        setFilter({...defaultState, ...state})
-        setFacilities([])
+        setFilter({...defaultState, ...state});
+        setFacilities([]);
+        setDistricts([]);
     }
 
     function setSelectedState(value) {
@@ -114,7 +115,7 @@ function FacilityController() {
             let params = {
                 programId: selectedProgram,
                 state: selectedState,
-                district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
+                district: selectedDistrict.map(d => d.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", "")),
                 programStatus: status,
                 type: facilityType,
                 rateUpdatedTo,
