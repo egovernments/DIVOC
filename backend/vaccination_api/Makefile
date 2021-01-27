@@ -6,7 +6,7 @@ endif
 $(info Using spec file $(SPEC_FILE))
 source := $(wildcard *.go **/*.go */*/*.go)
 
-all: divoc-server certificate_processor analytics_feed digilocker_support_api
+all: divoc-server certificate_processor analytics_feed digilocker_support_api caching-dash-server
 
 deps:
 	@GO111MODULE=off go get -u github.com/myitcv/gobin
@@ -36,6 +36,11 @@ analytics_feed: $(source)
 digilocker_support_api: $(source)
 	@echo "Building digilocker support api $(PWD)/digilocker_support_api"
 	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/api/cmd/digilocker_support_api
+
+caching-dash-server: $(source)
+	@echo "Building caching-dash-server $(PWD)/caching-dash-server"
+	@CGO_ENABLED=1 GO111MODULE=on go build github.com/divoc/api/cmd/caching-dash-server
+
 
 clean:
 	@echo "Cleaning up all the generated files"
