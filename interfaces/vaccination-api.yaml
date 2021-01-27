@@ -351,6 +351,19 @@ definitions:
         type: boolean
       programId:
         type: string
+      address:
+        type: object
+        properties:
+          addressLine1:
+            type: string
+          addressLine2:
+            type: string
+          district:
+            type: string
+          state:
+            type: string
+          pincode:
+            type: integer
   CertificationRequest:
     type: object
     properties:

@@ -19,6 +19,9 @@ import (
 // swagger:model PreEnrollment
 type PreEnrollment struct {
 
+	// address
+	Address *PreEnrollmentAddress `json:"address,omitempty"`
+
 	// certified
 	Certified bool `json:"certified,omitempty"`
 
@@ -59,6 +62,10 @@ type PreEnrollment struct {
 func (m *PreEnrollment) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDob(formats); err != nil {
 		res = append(res, err)
 	}
@@ -70,6 +77,24 @@ func (m *PreEnrollment) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *PreEnrollment) validateAddress(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Address) { // not required
+		return nil
+	}
+
+	if m.Address != nil {
+		if err := m.Address.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -143,6 +168,50 @@ func (m *PreEnrollment) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *PreEnrollment) UnmarshalBinary(b []byte) error {
 	var res PreEnrollment
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// PreEnrollmentAddress pre enrollment address
+//
+// swagger:model PreEnrollmentAddress
+type PreEnrollmentAddress struct {
+
+	// address line1
+	AddressLine1 string `json:"addressLine1,omitempty"`
+
+	// address line2
+	AddressLine2 string `json:"addressLine2,omitempty"`
+
+	// district
+	District string `json:"district,omitempty"`
+
+	// pincode
+	Pincode int64 `json:"pincode,omitempty"`
+
+	// state
+	State string `json:"state,omitempty"`
+}
+
+// Validate validates this pre enrollment address
+func (m *PreEnrollmentAddress) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *PreEnrollmentAddress) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *PreEnrollmentAddress) UnmarshalBinary(b []byte) error {
+	var res PreEnrollmentAddress
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

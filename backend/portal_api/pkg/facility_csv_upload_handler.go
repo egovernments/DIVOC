@@ -32,11 +32,6 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	if err != nil {
 		return err
 	}
-	addressline1 := data.Text("addressLine1")
-	addressline2 := data.Text("addressLine2")
-	district := data.Text("district")
-	state := data.Text("state")
-	pincode := data.int64("pincode")
 
 	var admins []*models.FacilityAdmin
 	admins = append(admins, buildVaccinator(data))
@@ -53,17 +48,11 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		Type:               data.Text("type"),
 		Status:             data.Text("status"),
 		Admins:             admins,
-		Address: &models.Address{
-			AddressLine1: &addressline1,
-			AddressLine2: &addressline2,
-			District:     &district,
-			State:        &state,
-			Pincode:      &pincode,
-		},
-		Email:       data.Text("email"),
-		GeoLocation: data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
-		WebsiteURL:  data.Text("websiteURL"),
-		Programs:    []*models.FacilityProgramsItems0{},
+		Address:            GetAddressObject(data),
+		Email:              data.Text("email"),
+		GeoLocation:        data.Text("geoLocationLat") + "," + data.Text("geoLocationLon"),
+		WebsiteURL:         data.Text("websiteURL"),
+		Programs:           []*models.FacilityProgramsItems0{},
 	}
 	err = services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
