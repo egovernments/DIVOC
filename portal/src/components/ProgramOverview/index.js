@@ -53,7 +53,7 @@ export default function ProgramOverview() {
     function displayProgramDetails(data) {
         const selectedProgram = programsList.filter((program) => program.name === data.id)[0];
         return (
-            <Card>
+            <Card className="card-container">
                 <CardContent>
                     <h3 className="card-padding">{selectedProgram.name}</h3>
                     <p className="card-padding">{selectedProgram.description}</p>
