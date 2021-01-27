@@ -48,6 +48,11 @@
     padding-left: 15rem;
 }
 
+.center-align{
+    display: flex !important; 
+    justify-content: center !important;
+}
+
 @media only screen and (max-width: 500px) {
     .no-print{
         width: 70%;
