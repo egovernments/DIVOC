@@ -14,7 +14,7 @@ import (
 func main() {
 	config.Initialize()
 	consumers.Init()
-	log.Infof("Starting certificate processor")
+	log.Infof("Starting notification processor")
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
 		log.Fatalln(err)
