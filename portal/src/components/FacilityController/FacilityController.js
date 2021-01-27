@@ -39,10 +39,11 @@ function FacilityController() {
 
     function resetFilter(state = {}) {
         if (programs.length > 0) {
-            state.selectedProgram = programs[0].value
+            state.selectedProgram = programs[0].value;
         }
-        setFilter({...defaultState, ...state})
-        setFacilities([])
+        setFilter({...defaultState, ...state});
+        setFacilities([]);
+        setDistricts([]);
     }
 
     function setSelectedState(value) {
