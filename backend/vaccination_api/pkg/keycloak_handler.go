@@ -136,7 +136,7 @@ func addUserToGroup(userId string, groupId string, authHeader string) error {
 	}
 	log.Infof("Added user to group on keycloak %d : %s", response.Response().StatusCode, response.String())
 	if response.Response().StatusCode != 204 {
-		log.Errorf("Error while adding user to group, status code %s", response.Response().StatusCode)
+		log.Errorf("Error while adding user to group, status code %d", response.Response().StatusCode)
 		return errors.New("Error while adding user to group for " + userId + "" + groupId)
 	}
 	return nil
