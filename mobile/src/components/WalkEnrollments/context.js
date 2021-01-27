@@ -26,6 +26,12 @@ function walkInEnrollmentReducer(state, action) {
             newState.dob = action.payload.dob;
             newState.email = action.payload.email;
             newState.phone = action.payload.phone;
+            newState.address = {
+                addressLine1: action.payload.addressLine1,
+                district: action.payload.district,
+                state: action.payload.state,
+                pincode: action.payload.pincode
+            }
             return newState
         }
         case FORM_WALK_IN_ENROLL_PAYMENTS: {
