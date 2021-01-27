@@ -34,7 +34,13 @@ export class SyncFacade {
     static async push() {
         const certifyPatients = await appIndexDb.getDataForCertification();
         if (certifyPatients.length > 0) {
-            await ApiServices.certify(certifyPatients);
+            const response = await ApiServices.certify(certifyPatients);
+            if (response.code) {
+                const isSuccess = response.code >= 200 && response.code <= 300;
+                if (!isSuccess) {
+                    throw new Error("Failed to sync");
+                }
+            }
         }
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
         await appIndexDb.cleanEvents()
