@@ -7,6 +7,7 @@ const PROGRAMS = "/divoc/api/v1/programs/current"
 const VACCINATORS = "/divoc/admin/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
+const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
 
 export class ApiServices {
 
@@ -51,6 +52,7 @@ export class ApiServices {
     static async certify(certifyPatients) {
         const userDetails = await appIndexDb.getUserDetails();
         const allPrograms = await appIndexDb.getPrograms()
+        const facilityDetails = userDetails.facilityDetails;
         const certifyBody = certifyPatients.map((item, index) => {
             const patientDetails = item.patient;
             //TODO: Move this into App database as medicine details object.
@@ -99,14 +101,13 @@ export class ApiServices {
                     name: item.vaccinator.name
                 },
                 facility: {
-                    name: userDetails.facility.facilityName,
-                    //TODO: Need to get address from user/me api.
+                    name: facilityDetails.facilityName ?? "N/A",
                     address: {
-                        addressLine1: "TEST",
-                        addressLine2: "TEST",
-                        district: "TEST",
-                        state: "TEST",
-                        pincode: 100000
+                        addressLine1: facilityDetails.address.addressLine1 ?? "N/A",
+                        addressLine2: facilityDetails.address.addressLine2 ?? "N/A",
+                        district: facilityDetails.address.district ?? "N/A",
+                        state: facilityDetails.address.state ?? "N/A",
+                        pincode: facilityDetails.address.pincode ?? 100000
                     }
                 }
             }
@@ -141,6 +142,21 @@ export class ApiServices {
             },
         };
         return fetch(USER_INFO, requestOptions)
+            .then(response => {
+                return response.json()
+            })
+    }
+
+    static async getFacilityDetails() {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+        };
+        return fetch(FACILITY_DETAILS, requestOptions)
             .then(response => {
                 return response.json()
             })
