@@ -11,7 +11,7 @@ import {API_URL, CONSTANTS} from "../../utils/constants";
 const defaultState = {
     selectedProgram: "",
     selectedState: CONSTANTS.ALL,
-    selectedDistrict: "",
+    selectedDistrict: [],
     facilityType: CONSTANTS.GOVT,
     status: "",
     lastAdjustedOn: ""
@@ -48,7 +48,8 @@ function FacilityController() {
     function setSelectedState(value) {
         setFilter({
             ...filter,
-            selectedState: value
+            selectedState: value,
+            selectedDistrict: []
         })
     }
 
