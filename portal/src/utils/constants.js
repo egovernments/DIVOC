@@ -16,6 +16,7 @@ export const CONSTANTS = Object.freeze({
 
 export const API_URL = Object.freeze({
     FACILITY_API: "/divoc/admin/api/v1/facilities",
+    USER_FACILITY_API: "/divoc/admin/api/v1/facility",
     FACILITY_NOTIFY_API: "/divoc/admin/api/v1/facilities/notify",
     PROGRAM_API: "/divoc/admin/api/v1/programs",
     FACILITY_FILE_UPLOAD_HISTORY_API: '/divoc/admin/api/v1/facility/uploads',

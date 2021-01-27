@@ -1,0 +1,8 @@
+.container{
+    float:left;
+    width: 40%;
+}
+
+.card-padding{
+    padding-left: 0.7rem;
+}
