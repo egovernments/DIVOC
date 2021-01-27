@@ -42,7 +42,7 @@ const ExternalFailedEvent = "external-failed"
 
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
-		Name: "http_request_duration_milliseconds",
+		Name: "divoc_http_request_duration_milliseconds",
 		Help: "Request duration time in milliseconds",
 	})
 )
@@ -453,11 +453,11 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/metrics", promhttp.Handler())
 	//integration
-	r.HandleFunc("/cert/api/pullUriRequest", uriRequest).Methods("POST")
-	r.HandleFunc("/cert/api/pullDocRequest", docRequest).Methods("POST")
+	r.HandleFunc("/cert/api/pullUriRequest", timed(uriRequest)).Methods("POST")
+	r.HandleFunc("/cert/api/pullDocRequest", timed(docRequest)).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent))).Methods("GET")
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent))).Methods("GET")
 	//external
 	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
