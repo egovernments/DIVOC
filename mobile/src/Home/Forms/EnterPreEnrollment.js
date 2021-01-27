@@ -2,9 +2,10 @@ import {Button} from "react-bootstrap";
 import React, {useState} from "react";
 import {FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from "./PreEnrollmentFlow";
 import Form from "react-bootstrap/Form";
-import {PHONE_NUMBER_MAX} from "../../Login/EnterPhoneNumberComponent";
 import "./EnterPreEnrollment.scss"
 import {BaseFormCard} from "../../components/BaseFormCard";
+
+export const PHONE_NUMBER_MAX = 10
 
 export function PreEnrollmentCode(props) {
     return (
@@ -38,8 +39,10 @@ function EnterPreEnrollmentContent(props) {
                     <div className="divInner">
 
                         <Form.Group>
-                            <Form.Control type="text" placeholder="+91-XXXXXXXXX" tabIndex="1" value={phoneNumber} onChange={handlePhoneNumberOnChange}/>
-                            <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode} onChange={handleEnrollCodeOnChange}/>
+                            <Form.Control type="text" placeholder="+91-XXXXXXXXX" tabIndex="1" value={phoneNumber}
+                                          onChange={handlePhoneNumberOnChange}/>
+                            <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode}
+                                          onChange={handleEnrollCodeOnChange}/>
                             {/*<input id="otp" type="text" className="otp" tabIndex="2" maxLength="5"*/}
                             {/*       value={enrollCode}*/}
                             {/*       onChange={handleEnrollCodeOnChange}*/}
