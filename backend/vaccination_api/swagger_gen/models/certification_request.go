@@ -455,6 +455,7 @@ func (m *CertificationRequestRecipient) validateContact(formats strfmt.Registry)
 }
 
 func (m *CertificationRequestRecipient) validateDob(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
@@ -639,7 +640,6 @@ type CertificationRequestVaccination struct {
 	Date *strfmt.DateTime `json:"date"`
 
 	// Dose number for example 1 for first dose of 2 doses
-	// Example: 1
 	// Required: true
 	Dose *float64 `json:"dose"`
 
@@ -662,7 +662,6 @@ type CertificationRequestVaccination struct {
 	Name *string `json:"name"`
 
 	// Total number of doses required for this vaccination.
-	// Example: 2
 	// Required: true
 	TotalDoses *float64 `json:"totalDoses"`
 }
