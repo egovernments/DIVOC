@@ -138,6 +138,7 @@ export class AppDatabase {
     }
 
     async saveEvent(event) {
+        event.date = new Date().toISOString()
         return this.db.add(EVENTS, event)
     }
 
@@ -216,11 +217,13 @@ export class AppDatabase {
             patient: patient,
             batchCode: event.batchCode,
             enrollCode: event.enrollCode,
+            eventDate: event.date ?? new Date().toISOString(),
             identity: queue.aadhaarNumber
         }
     }
 
     async cleanEvents() {
+        console.log("Clear")
         await this.db.clear(EVENTS)
     }
 

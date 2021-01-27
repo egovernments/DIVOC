@@ -1,4 +1,5 @@
 import {appIndexDb} from "../AppDatabase";
+import {formatCertifyDate} from "../utils/date_utils";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
@@ -52,7 +53,15 @@ export class ApiServices {
         const allPrograms = await appIndexDb.getPrograms()
         const certifyBody = certifyPatients.map((item, index) => {
             const patientDetails = item.patient;
+            //TODO: Move this into App database as medicine details object.
+            const eventDate = new Date(item.eventDate);
             const givenVaccination = this.getPatientGivenMedicine(allPrograms, patientDetails.programId)
+            let repeatUntil = 0;
+            if (givenVaccination["schedule"] && givenVaccination["schedule"]["repeatInterval"]) {
+                repeatUntil = givenVaccination["schedule"]["repeatInterval"]
+            }
+            const medicineEffectiveDate = givenVaccination["effectiveUntil"] ?? 0;
+            const effectiveUntilDate = this.getEffectiveUntil(eventDate, medicineEffectiveDate)
             return {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
@@ -77,15 +86,14 @@ export class ApiServices {
 
                 vaccination: {
                     batch: item.batchCode,
-                    date: "2020-12-02T09:44:03.802Z",
-                    effectiveStart: "2020-12-02",
-                    //TODO: Need to get effectiveUntil in date format
-                    effectiveUntil: "2020-12-02",//""+givenVaccination["effectiveUntil"],
+                    date: eventDate,
+                    effectiveStart: formatCertifyDate(eventDate),
+                    effectiveUntil: effectiveUntilDate,
                     manufacturer: givenVaccination["provider"] ?? "N/A",
                     name: givenVaccination["name"] ?? "N/A",
-                    //TODO: Need to get dose and total doeses in date format
+                    //TODO: Need dose from vaccinator in UI
                     dose: 1,
-                    totalDoses: 1,
+                    totalDoses: repeatUntil,
                 },
                 vaccinator: {
                     name: item.vaccinator.name
@@ -140,7 +148,6 @@ export class ApiServices {
 
     static getPatientGivenMedicine(allPrograms, programName) {
         const patientProgram = allPrograms.find((value => {
-            console.log(value["name"], programName)
             return value["name"] === programName
         }))
         const patientProgramMedicine = patientProgram["medicines"]
@@ -148,5 +155,12 @@ export class ApiServices {
             return patientProgramMedicine[0]
         }
         return {}
+    }
+
+    static getEffectiveUntil(event, effectiveUntil) {
+        const eventDate = new Date(event)
+        const newDateMonths = eventDate.setMonth(eventDate.getMonth() + effectiveUntil);
+        const newDate = new Date(newDateMonths);
+        return formatCertifyDate(newDate);
     }
 }
