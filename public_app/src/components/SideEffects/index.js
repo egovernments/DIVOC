@@ -50,7 +50,7 @@ export const SideEffects = () => {
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
-                    <h3 className="text-center">Provide Feedback</h3>
+                    <h3 className="text-center">Report symptoms</h3>
                     <span className="text-center d-block">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
                     <Container className="pt-5">
                         <Row>

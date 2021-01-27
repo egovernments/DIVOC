@@ -45,7 +45,7 @@
           "title": "Status"
         },
         "price": {
-          "title": "Price Range",
+          "title": "Price",
           "type": "number"
         }
       }

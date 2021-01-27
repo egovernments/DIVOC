@@ -5,6 +5,8 @@
     background: none;
     padding: 0.375rem ;
     margin: 1rem;
+    padding-right: 1.5rem;
+    padding-left: 1.5rem;
     border-radius: .25rem;
 }
 
@@ -44,6 +46,11 @@
 }
 .cert-top{
     padding-left: 15rem;
+}
+
+.center-align{
+    display: flex !important; 
+    justify-content: center !important;
 }
 
 @media only screen and (max-width: 500px) {

@@ -49,7 +49,7 @@ export const Home = () => {
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={"Download your Vaccination Certificate"}
-                                      subtitle={"You would need your Aadhaar number and Mobile number to verify OTP in order to access your digital certificate."}
+                                      subtitle={"You would need your unique id and Mobile number to verify OTP in order to access your digital certificate."}
                                       buttonText={"Download"}
                                       buttonOnClick={() => {
                                           history.push("/certificate/")
@@ -69,7 +69,7 @@ export const Home = () => {
                             />
 
                             <HomeCard img={<img src={SideEffectsBannerImg} alt={""} width={"60%"}/>}
-                                      title={"Provide Feedback"}
+                                      title={"Report symptoms"}
                                       subtitle={"By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively."}
                                       buttonText={"Report Side-effects"}
                                       buttonOnClick={() => {
