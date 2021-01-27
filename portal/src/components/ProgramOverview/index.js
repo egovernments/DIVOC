@@ -5,6 +5,7 @@ import CardContent from "@material-ui/core/CardContent";
 import keycloak from "../../utils/keycloak";
 import { equals, reject } from "ramda";
 import { API_URL } from "../../utils/constants";
+import ProgramActiveImg from "../../assets/img/program-active.svg";
 import "./index.css";
 
 export default function ProgramOverview() {
@@ -55,6 +56,12 @@ export default function ProgramOverview() {
         return (
             <Card className="card-container">
                 <CardContent>
+                    <span className={'list-view-logo-img card-padding'}>
+                        {"image" in data ? <img alt="" src={selectedProgram.image} width={"100%"}/> : "LOGO"}
+                        <img src={ProgramActiveImg}
+                                className={'list-view-program-status-img'} alt={selectedProgram.status}
+                                title={selectedProgram.status}/>
+                    </span>
                     <h3 className="card-padding">{selectedProgram.name}</h3>
                     <p className="card-padding">{selectedProgram.description}</p>
                     <div className="d-flex">
