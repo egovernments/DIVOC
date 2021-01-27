@@ -41,6 +41,7 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 		Code:              generateEnrollmentCode(),
 		Certified:         false,
 		ProgramId:         preEnrollmentCsv.ProgramId,
+		Address:           GetAddressObject(data),
 	}
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	if err != nil {
