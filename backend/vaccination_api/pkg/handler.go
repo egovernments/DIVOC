@@ -115,7 +115,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			result := []interface{}{}
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
-					log.Infof("cert ", body)
+					log.Infof("cert %v", body)
 					if certString, ok := body["certificate"].(string); ok {
 						cert := map[string]interface{}{}
 						if err := json.Unmarshal([]byte(certString), &cert); err == nil {
