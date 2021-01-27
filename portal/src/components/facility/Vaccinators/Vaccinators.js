@@ -20,16 +20,20 @@ export default function Vaccinators() {
         keycloak.loadUserProfile()
             .then(res => {
                 setFacilityCode(res["attributes"]["facility_code"][0]);
-                fetchVaccinators(res["attributes"]["facility_code"][0]).then(res => {
-                    res.data.forEach(item => {
-                        if (!("programs" in item)) {
-                            Object.assign(item, {programs: []});
-                        }
-                    });
-                    setVaccinators(res.data)
-                })
+                fetchSetVaccinators(res["attributes"]["facility_code"][0])
             })
     }, []);
+
+    function fetchSetVaccinators(fc) {
+        fetchVaccinators(fc).then(res => {
+            res.data.forEach(item => {
+                if (!("programs" in item)) {
+                    Object.assign(item, {programs: []});
+                }
+            });
+            setVaccinators(res.data)
+        })
+    }
 
     function fetchVaccinators(fc) {
         let params = {
@@ -72,7 +76,7 @@ export default function Vaccinators() {
                     <VaccinatorList
                         vaccinators={vaccinators}
                         onSelectVaccinator={onSelectVaccinator}
-                        fetchVaccinators={fetchVaccinators}
+                        fetchVaccinators={fetchSetVaccinators}
                     />
                 </div>
             </div>
