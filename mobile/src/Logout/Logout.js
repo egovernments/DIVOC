@@ -15,11 +15,11 @@ function AuthSafeLogout({keycloak}) {
                 if (navigator.onLine) {
                     SyncFacade
                         .push()
-                        .then((value => {
-                            return keycloak.logout();
-                        }))
+                        .catch((e) => console.log(e.message))
                         .then(() => appIndexDb.clearEverything())
+                        .then((() => keycloak.logout()))
                         .catch(e => {
+                            console.log(e.message)
                             if (!navigator.onLine) {
                                 alert(Messages.NO_INTERNET_CONNECTION)
                             }

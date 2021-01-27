@@ -10,6 +10,8 @@ export function VaccinationStatus() {
     useEffect(() => {
         getVaccinationStatus()
             .then((result) => setVaccinationStatus(result))
+            .catch(e => {
+            });
     }, [])
 
     if (!vaccinationStatus) {

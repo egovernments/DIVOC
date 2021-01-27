@@ -1,5 +1,6 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
+import {getSelectedProgram} from "./components/ProgramSelection";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 10;
@@ -15,6 +16,7 @@ const monthNames = [
     "May", "Jun", "Jul", "Aug",
     "Sep", "Oct", "Nov", "Dec"
 ];
+const PROGRAM_NAME = "programName";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
 
@@ -76,14 +78,16 @@ export class AppDatabase {
     async recipientDetails() {
         let waiting = 0;
         let issue = 0;
+        const programName = getSelectedProgram()
         if (this.db) {
             const result = await this.db.getAll(QUEUE);
             result.forEach((item) => {
-                if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
-                    waiting++;
-                } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
-                    issue++;
-                }
+                if (item[PROGRAM_NAME] === programName)
+                    if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
+                        waiting++;
+                    } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
+                        issue++;
+                    }
             });
         }
 
@@ -93,10 +97,15 @@ export class AppDatabase {
         ];
     }
 
+
     async getQueue(status) {
         if (status) {
+            const programName = getSelectedProgram()
             const result = await this.db.getAll(QUEUE);
-            const filter = result.filter((item) => item[STATUS] === status);
+            const filter = result.filter((item) => {
+                    return item[STATUS] === status && item[PROGRAM_NAME] === programName
+                }
+            );
             return Promise.resolve(filter)
         } else {
             return this.db.getAll(QUEUE)
@@ -160,7 +169,8 @@ export class AppDatabase {
                 dob: walkEnrollment.dob,
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
-                code: walkEnrollment.code
+                code: walkEnrollment.code,
+                programName: getSelectedProgram()
             }
             await this.addToQueue(queue)
         } else {
@@ -194,17 +204,27 @@ export class AppDatabase {
         }
     }
 
-    async cleanUp() {
+    async cleanEvents() {
         await this.db.clear(EVENTS)
     }
 
     async clearEverything() {
         const deletePatients = this.db.clear(PATIENTS);
         const deleteVaccinators = this.db.clear(VACCINATORS);
-        const deleteEvents = await this.db.clear(EVENTS);
-        const deleteQueue = await this.db.clear(QUEUE);
+        const deleteEvents = this.db.clear(EVENTS);
+        const deleteQueue = this.db.clear(QUEUE);
+        const deletePrograms = this.db.clear(PROGRAMS);
+        const deleteUserDetails = this.db.clear(USER_DETAILS);
         localStorage.clear()
-        return Promise.all([deleteEvents, deletePatients, deleteQueue, deleteVaccinators])
+        return Promise.all(
+            [
+                deleteEvents,
+                deletePatients,
+                deleteQueue,
+                deleteVaccinators,
+                deletePrograms,
+                deleteUserDetails
+            ]);
     }
 
     async getAllEvents() {

@@ -37,7 +37,7 @@ export class SyncFacade {
             await ApiServices.certify(certifyPatients);
         }
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
-        await appIndexDb.cleanUp()
+        await appIndexDb.cleanEvents()
     }
 
 
