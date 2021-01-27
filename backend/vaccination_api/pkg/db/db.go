@@ -46,6 +46,7 @@ type CertifyUploadErrors struct {
 }
 
 type CertifyUploadFields struct {
+	PreEnrollmentCode         string `json:"preEnrollmentCode"`
 	RecipientName             string `json:"recipientName"`
 	RecipientMobileNumber     string `json:"recipientMobileNumber"`
 	RecipientDOB              string `json:"recipientDOB"`

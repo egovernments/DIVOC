@@ -131,6 +131,7 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	}
 
 	certificate := models.CertificationRequest{
+		PreEnrollmentCode: &certifyData.PreEnrollmentCode,
 		Facility:    facility,
 		Recipient:   recipient,
 		Vaccination: vaccination,
@@ -158,6 +159,7 @@ func validateBulkCertifyCSVRowData(data *Scanner) error {
 
 func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 	return &db.CertifyUploadFields{
+		PreEnrollmentCode:         data.Text("preEnrollmentCode"),
 		RecipientName:             data.Text("recipientName"),
 		RecipientMobileNumber:     data.Text("recipientMobileNumber"),
 		RecipientDOB:              data.Text("recipientDOB"),
