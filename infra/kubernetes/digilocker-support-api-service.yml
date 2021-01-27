@@ -7,7 +7,6 @@ metadata:
     k8s-app: digilocker-support-api
   name: digilocker-support-api
 spec:
-  externalTrafficPolicy: Cluster
   ports:
     - name: "tcp-8003"
       port: 8003
@@ -16,4 +15,3 @@ spec:
   selector:
     k8s-app: digilocker-support-api
   sessionAffinity: None
-  type: LoadBalancer

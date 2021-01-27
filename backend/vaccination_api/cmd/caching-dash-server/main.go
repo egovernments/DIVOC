@@ -114,6 +114,10 @@ func postContentCaching(url string, contentType string, body io.Reader) (*Respon
 	return nil
 }
 
+func okHandler(w http.ResponseWriter, req *http.Request) {
+	w.WriteHeader(200)
+}
+
 func relayingProxy(w http.ResponseWriter, req *http.Request) {
 	log.Info(req.URL);
 	url := getUrl(req.URL)
@@ -167,19 +171,24 @@ func getUrl(url *url.URL) string {
 var Config = struct {
 	RedashBaseURL 				  string `env:"REDASH_BASE_URL"`
 	DashKey                       string `env:"REDASH_KEY"`
-	DefaultCacheDurationInMinutes uint `default:"60" env:"CACHE_DURATION"`
+	DefaultCacheDurationInMinutes uint `default:"60" env:"CACHE_DURATION_MINUTES"`
 }{}
 
 var addr = flag.String("listen-address", ":8004", "The address to listen on for HTTP requests.")
 
 func main() {
-	if err := configor.Load(&Config, "./config/application-default.yml"); err != nil {
+	if err := configor.Load(&Config); err != nil {
 		panic("Error initializing configuration")
 	}
+	log.Infof("Using RedashBaseURL %s or Key %s", Config.RedashBaseURL, Config.DashKey)
+	if Config.RedashBaseURL == "" || Config.DashKey == "" {
+		panic("Missing configuration url or key")
+	}
 	defaultExpiry = time.Minute * time.Duration(Config.DefaultCacheDurationInMinutes)
-	log.Info("Running caching support for dashboard")
 	r := mux.NewRouter()
 	r.Handle("/metrics", promhttp.Handler())
+	r.HandleFunc("/health", okHandler)
 	http.HandleFunc("/", relayingProxy)
+	log.Infof("Running caching support for dashboard on %s", *addr)
 	_ = http.ListenAndServe(*addr, nil)
 }

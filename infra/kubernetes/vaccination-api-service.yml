@@ -7,7 +7,6 @@ metadata:
     k8s-app: vaccination-api
   name: vaccination-api
 spec:
-  externalTrafficPolicy: Cluster
   ports:
     - name: "tcp-8000"
       port: 8000
@@ -16,6 +15,3 @@ spec:
   selector:
     k8s-app: vaccination-api
   sessionAffinity: None
-  type: LoadBalancer
-status:
-  loadBalancer: {}

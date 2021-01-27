@@ -4,14 +4,14 @@ metadata:
   finalizers:
     - service.kubernetes.io/load-balancer-cleanup
   labels:
-    k8s-app: keycloak-service
-  name: keycloak-service
+    k8s-app: caching-dash-server
+  name: caching-dash-server
 spec:
   ports:
-    - name: "tcp-8003"
-      port: 8080
+    - name: "tcp-8004"
+      port: 8004
       protocol: TCP
-      targetPort: 8080
+      targetPort: 8004
   selector:
-    k8s-app: keycloak-service
+    k8s-app: caching-dash-server
   sessionAffinity: None
