@@ -186,8 +186,7 @@ function FacilityActivation({
                     {selectedProgram && <div className="card-body text-center">
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
-                            Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()}
-                            for the {selectedProgram}
+                            Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
                         </p>
                         <button
                             onClick={handleActiveClick}
