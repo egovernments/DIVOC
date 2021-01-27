@@ -71,3 +71,11 @@ RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/digilocker_support_api /app/digilocker_support_api
 COPY vaccination_api/config /config
 CMD ["/app/digilocker_support_api"]
+
+#caching-dash-server
+FROM alpine:3.9 as caching-dash-server
+LABEL name=caching-dash-server
+RUN apk add ca-certificates
+COPY --from=build_base /tmp/divoc/vaccination_api/caching-dash-server /app/caching-dash-server
+COPY vaccination_api/config /config
+CMD ["/app/caching-dash-server"]

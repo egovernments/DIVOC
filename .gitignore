@@ -25,4 +25,5 @@ dockerdeps
 backend/vaccination_api/analytics_feed
 backend/vaccination_api/certificate_processor
 backend/vaccination_api/divoc-server
+backend/vaccination_api/caching-dash-server
 yarn.lock
