@@ -7,7 +7,11 @@
     "nationalId",
     "dob",
     "email",
-    "phone"
+    "phone",
+    "addressLine1",
+    "district",
+    "state",
+    "pincode"
   ],
   "properties": {
     "name": {
@@ -51,6 +55,26 @@
       "type": "string",
       "$id": "#/properties/phone",
       "format": "phone-in"
+    },
+    "addressLine1": {
+      "$id": "#/properties/addressLine1",
+      "type": "string",
+      "title": "Locality"
+    },
+    "district": {
+      "$id": "#/properties/district",
+      "type": "string",
+      "title": "District"
+    },
+    "state": {
+      "$id": "#/properties/state",
+      "type": "string",
+      "title": "State"
+    },
+    "pincode": {
+      "$id": "#/properties/pincode",
+      "type": "number",
+      "title": "Pincode"
     }
   }
 }
