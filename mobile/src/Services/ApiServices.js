@@ -78,11 +78,11 @@ export class ApiServices {
 
                     //TODO: Need to get recipient in date format
                     address: {
-                        addressLine1: "TEST",
-                        addressLine2: "TEST",
-                        district: "TEST",
-                        state: "TEST",
-                        pincode: 100000
+                        addressLine1: patientDetails.address.addressLine1 ?? "N/A",
+                        addressLine2: patientDetails.address.addressLine2 ?? "N/A",
+                        district: patientDetails.address.district ?? "N/A",
+                        state: patientDetails.address.state ?? "N/A",
+                        pincode: patientDetails.address.pincode ?? 100000
                     }
                 },
 
