@@ -4,10 +4,10 @@ import {ProgressBar} from 'react-bootstrap';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
-import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import Select from "@material-ui/core/Select/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from '@material-ui/core/FormHelperText';
 
 function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
@@ -67,9 +67,9 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
 
     return (
         <div className={styles['container']}>
-            <div className="d-flex p-3" style={{width: "100%"}}>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="demo-simple-select-outlined-label">Select a program</InputLabel>
+            <div className={styles["inner-container"]}>
+                <FormControl variant="outlined" fullWidth className="d-flex">
+                    <FormHelperText>Select a program</FormHelperText>
                     <Select
                         labelId="demo-simple-select-outlined-label"
                         id="demo-simple-select-outlined"
