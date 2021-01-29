@@ -33,7 +33,6 @@ export default function ProgramOverview() {
                         }
                     });
                     const activeProgramsList = res.data[0].programs.filter((data) => data.status === "Active")
-                    console.log("active programs", activeProgramsList);
                     setProgram(activeProgramsList);
                 }
             );
@@ -59,6 +58,26 @@ export default function ProgramOverview() {
         return await axiosInstance.current.get(API_URL.MEDICINE_API);
     }
 
+    function showMedicineTable(tableData){
+        return(
+            tableData.map(data => {
+                const selectedMedicine = medicinesList.filter((medicine) => medicine.osid === data)
+                return(
+                    <div className="table-row">
+                        <tr className={"d-flex"}>
+                            <td className="p-2 mr-auto"><b>{selectedMedicine[0]['name']}</b></td>
+                            <td className="p-2"></td>
+                        </tr>
+                        <tr className={"d-flex"}>
+                            <td className="p-2 mr-auto">{selectedMedicine[0]['provider']}</td>
+                            <td className="p-2">{selectedMedicine[0]['price']}</td>
+                        </tr> 
+                    </div>
+                )
+            })
+        )
+    }
+
     function displayProgramDetails(data) {
         const selectedProgram = programsList.filter((program) => program.name === data.id)[0];
         return (
@@ -80,7 +99,10 @@ export default function ProgramOverview() {
                         <p className="p-2 mr-auto">End Date:</p>
                         <b className="p-2">{selectedProgram.endDate}</b>
                     </div>
-                    <h4>Program Medicines</h4>
+                    <h5>Program Medicines</h5>
+                    <table className="table table-borderless">
+                        <tbody>{showMedicineTable(selectedProgram.medicineIds)}</tbody>
+                    </table>
                 </CardContent>
             </Card>
         );
