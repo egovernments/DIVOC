@@ -19,6 +19,7 @@ export const API_URL = Object.freeze({
     USER_FACILITY_API: "/divoc/admin/api/v1/facility",
     FACILITY_NOTIFY_API: "/divoc/admin/api/v1/facilities/notify",
     PROGRAM_API: "/divoc/admin/api/v1/programs",
+    MEDICINE_API: "/divoc/admin/api/v1/medicines",
     FACILITY_FILE_UPLOAD_HISTORY_API: '/divoc/admin/api/v1/facility/uploads',
     FACILITY_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/facility/uploads/:id/errors',
     VACCINATORS_API: '/divoc/admin/api/v1/vaccinators',

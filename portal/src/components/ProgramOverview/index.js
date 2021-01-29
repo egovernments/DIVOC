@@ -12,10 +12,14 @@ export default function ProgramOverview() {
     const [program, setProgram] = useState([]);
     const [facilityCode, setFacilityCode] = useState("");
     const [programsList, setProgramsList] = useState([]);
+    const [medicinesList, setMedicinesList] = useState([]);
     const axiosInstance = useAxios("");
 
     useEffect(() => {
         fetchPrograms().then((res) => setProgramsList(res.data));
+        fetchMedicines().then((res)=> {
+            setMedicinesList(res.data)
+        })
     }, []);
 
     useEffect(() => {
@@ -51,6 +55,10 @@ export default function ProgramOverview() {
         return await axiosInstance.current.get(API_URL.PROGRAM_API);
     }
 
+    async function fetchMedicines() {
+        return await axiosInstance.current.get(API_URL.MEDICINE_API);
+    }
+
     function displayProgramDetails(data) {
         const selectedProgram = programsList.filter((program) => program.name === data.id)[0];
         return (
@@ -72,6 +80,7 @@ export default function ProgramOverview() {
                         <p className="p-2 mr-auto">End Date:</p>
                         <b className="p-2">{selectedProgram.endDate}</b>
                     </div>
+                    <h4>Program Medicines</h4>
                 </CardContent>
             </Card>
         );
