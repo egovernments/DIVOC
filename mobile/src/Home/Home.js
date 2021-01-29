@@ -5,23 +5,34 @@ import "./Home.scss"
 import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
-import vaccineBanner from "../assets/img/home-banner.svg"
+import NoImagePlaceholder from "../assets/img/no_image.svg"
 import enrollRecipient from "./enroll_recipient.png"
 import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
-import Row from "react-bootstrap/Row";
-import {getMessageComponent, getNumberComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
+import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
 import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
+import {getSelectedProgram} from "../components/ProgramSelection";
 
 function ProgramHeader() {
+    const [bannerImage, setBannerImage] = useState()
+    const programName = getSelectedProgram();
+
+    useEffect(() => {
+        appIndexDb
+            .getProgramByName(programName)
+            .then((program) => setBannerImage(program["logoURL"]))
+
+    }, [programName])
+
     return <div className={"program-header"}>
         <BaseCard>
-            <img className={"banner"} src={vaccineBanner} alt={""}/>
+            <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
+                 onError={() => setBannerImage(null)}/>
         </BaseCard>
     </div>;
 }
@@ -67,33 +78,6 @@ function EnrolmentItems({icon, title, onClick}) {
     );
 }
 
-
-function StatisticsItem({title, value}) {
-    return (
-        <div className={"recipient-row"}>
-            <BaseCard>
-                <Row>
-                    <Col xs={3}>
-                        <div className={"value"}>{value}</div>
-                    </Col>
-                    <Col xs={7} className={"title"}>{title}</Col>
-                </Row>
-            </BaseCard>
-        </div>
-    );
-}
-
-
-function Statistics() {
-    const [result, setResults] = useState([])
-    useEffect(() => {
-        appIndexDb.recipientDetails().then((result) => setResults(result))
-    }, [])
-    return <div className={"recipient-container"}>
-        {result.map((item) => <StatisticsItem key={item.titleKey} title={getMessageComponent(item.titleKey)}
-                                              value={getNumberComponent(item.value)}/>)}
-    </div>;
-}
 
 export function VaccineProgram() {
     const [isNotSynced, setNotSynced] = useState(false)
@@ -143,7 +127,7 @@ export function Home(props) {
         SyncFacade.push()
             .then(() => {
             })
-            .catch((e) => console.log("Sync Failed"))
+            .catch((e) => console.log("Sync Failed", e.message))
     }, [])
     return (
         <HomeProvider>

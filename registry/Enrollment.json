@@ -47,6 +47,11 @@
         },
         "programId": {
           "type": "string"
+        },
+        "address": {
+          "$id": "#/properties/address",
+          "$ref": "Common.json#/definitions/Address",
+          "title": "Address"
         }
       }
     }

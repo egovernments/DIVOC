@@ -6,6 +6,7 @@ import home from '../Home/home.svg'
 import language from '../Language/language.svg'
 import queue from '../Queue/queue.svg'
 import logout from '../Logout/logout.svg'
+import programs from '../components/ProgramSelection/programs.svg'
 import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
 import {SelectLanguage} from "../Language/LanguageSelection";
@@ -20,6 +21,7 @@ import {WalkEnrollmentFlow} from "../components/WalkEnrollments";
 import {Help} from "../components/Help";
 import config from "../config";
 import { createBrowserHistory } from 'history';
+import {ProgramSelection} from "../components/ProgramSelection";
 
 Dashboard.propTypes = {};
 
@@ -36,6 +38,7 @@ function Dashboard(props) {
                         <PrivateRoute path={config.urlPath + "/queue"} exact component={Queue}/>
                         <PrivateRoute path={config.urlPath + "/logout"} exact component={Logout}/>
                         <PrivateRoute path={config.urlPath + "/help"} exact component={Help}/>
+                        <PrivateRoute path={config.urlPath + "/programs"} exact component={ProgramSelection}/>
                         <PrivateRoute path={config.urlPath + "/preEnroll/:pageName"} component={PreEnrollmentFlow}/>
                         <PrivateRoute path={config.urlPath + "/walkInEnroll/:pageName"} component={WalkEnrollmentFlow}/>
                         <PrivateRoute path={config.urlPath + "/confirm/vaccination/:recipient_id/:pageName"} component={ConfirmFlow}/>
@@ -61,8 +64,8 @@ const Footer = () => {
                         title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
             <BottomItem currentLocation={location.pathname} src={queue} href={config.urlPath + "/queue"}
                         title={getMessageComponent(LANGUAGE_KEYS.QUEUE)}/>
-           {/* <BottomItem currentLocation={location.pathname} src={help} href={config.urlPath + "/help"}
-                        title={getMessageComponent(LANGUAGE_KEYS.HELP)}/>*/}
+            <BottomItem currentLocation={location.pathname} src={programs} href={config.urlPath + "/programs"}
+                        title={getMessageComponent(LANGUAGE_KEYS.PROGRAM)}/>
             <BottomItem currentLocation={location.pathname} src={logout} href={config.urlPath + "/logout"}
                         title={getMessageComponent(LANGUAGE_KEYS.LOGOUT)}/>
         </div>

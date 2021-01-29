@@ -11,7 +11,7 @@ import {API_URL, CONSTANTS} from "../../utils/constants";
 const defaultState = {
     selectedProgram: "",
     selectedState: CONSTANTS.ALL,
-    selectedDistrict: "",
+    selectedDistrict: [],
     facilityType: CONSTANTS.GOVT,
     status: "",
     lastAdjustedOn: ""
@@ -39,16 +39,18 @@ function FacilityController() {
 
     function resetFilter(state = {}) {
         if (programs.length > 0) {
-            state.selectedProgram = programs[0].value
+            state.selectedProgram = programs[0].value;
         }
-        setFilter({...defaultState, ...state})
-        setFacilities([])
+        setFilter({...defaultState, ...state});
+        setFacilities([]);
+        setDistricts([]);
     }
 
     function setSelectedState(value) {
         setFilter({
             ...filter,
-            selectedState: value
+            selectedState: value,
+            selectedDistrict: []
         })
     }
 
@@ -113,7 +115,7 @@ function FacilityController() {
             let params = {
                 programId: selectedProgram,
                 state: selectedState,
-                district: selectedDistrict.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", ""),
+                district: selectedDistrict.map(d => d.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", "")),
                 programStatus: status,
                 type: facilityType,
                 rateUpdatedTo,

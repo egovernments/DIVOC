@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	eventsModel "github.com/divoc/api/pkg/models"
 	"net/http"
 	"strings"
@@ -29,6 +28,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
 )
+
+const FacilityEntity = "Facility"
 
 func SetupHandlers(api *operations.DivocAPI) {
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
@@ -114,7 +115,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			result := []interface{}{}
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
-					log.Infof("cert ", body)
+					log.Infof("cert %v", body)
 					if certString, ok := body["certificate"].(string); ok {
 						cert := map[string]interface{}{}
 						if err := json.Unmarshal([]byte(certString), &cert); err == nil {
@@ -170,13 +171,38 @@ func getVaccinators(params configuration.GetVaccinatorsParams, principal *models
 }
 
 func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
-	if scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
+	if facilityCode, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization")); err != nil {
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
 	} else {
-		programsFor := findProgramsForFacility(scopeId)
-		return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+		if facilities := getFacilityByCode(facilityCode); len(facilities) > 0 {
+			facility := facilities[0].(map[string]interface{})
+			var programNames []string
+			for _, programObject := range facility["programs"].([]interface{}) {
+				program := programObject.(map[string]interface{})
+				if strings.EqualFold(program["status"].(string), "active") {
+					programNames = append(programNames, program["id"].(string))
+				}
+			}
+			programsFor := findProgramsByName(programNames)
+			return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
+		} else {
+			log.Errorf("Facility not found: %s", facilityCode)
+			return NewGenericServerError()
+		}
 	}
+}
+
+func getFacilityByCode(facilityCode string) []interface{} {
+	filter := map[string]interface{}{
+		"facilityCode": map[string]interface{}{
+			"eq": facilityCode,
+		},
+	}
+	if programs, err := services.QueryRegistry(FacilityEntity, filter); err == nil {
+		return programs[FacilityEntity].([]interface{})
+	}
+	return nil
 }
 
 func getConfigurationResponder(params configuration.GetConfigurationParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -221,8 +247,19 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 func certify(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
-	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
+		log.Infof("CertificationRequest: %+v\n", request)
+		if request.Recipient.Age == "" && request.Recipient.Dob == nil {
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Age and DOB both are missing. Atleast one should be present"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code: &errorCode,
+				Message: &errorMsg,
+			})
+		}
+		if request.Recipient.Age == "" {
+			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
+		}
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
 		}
@@ -231,22 +268,14 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
-	columns := strings.Split(config.Config.Certificate.Upload.Columns, ",")
-
 	data := NewScanner(params.File)
-
-	// csv template validation
-	csvHeaders := data.GetHeaders()
-	for _, c := range columns {
-		if !contains(csvHeaders, c) {
-			code := "INVALID_TEMPLATE"
-			message := c + " column doesn't exist in uploaded csv file"
-			error := &models.Error{
-				Code:    &code,
-				Message: &message,
-			}
-			return certification.NewBulkCertifyBadRequest().WithPayload(error)
-		}
+	if err := validateBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
+		code := "INVALID_TEMPLATE"
+		message := err.Error()
+		return certification.NewBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
 	}
 
 	// Initializing CertifyUpload entity
@@ -260,11 +289,10 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 	if err := db.CreateCertifyUpload(&uploadEntry); err != nil {
 		code := "DATABASE_ERROR"
 		message := err.Error()
-		error := &models.Error{
+		return certification.NewBulkCertifyBadRequest().WithPayload(&models.Error{
 			Code:    &code,
 			Message: &message,
-		}
-		return certification.NewBulkCertifyBadRequest().WithPayload(error)
+		})
 	}
 
 	// Creating Certificates

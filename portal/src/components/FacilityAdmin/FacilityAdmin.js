@@ -31,6 +31,7 @@ export default function FacilityAdmin() {
             {title: "Vaccinator Details", component: <Vaccinators/>},
             {title: "Program Overview", component: <ProgramOverview/>},
 
+
         ]}/>
     );
 }

@@ -1,7 +1,9 @@
 package pkg
 
 import (
+    "time"
     "strconv"
+	"github.com/go-openapi/strfmt"
 )
 
 func contains(s []string, e string) bool {
@@ -35,4 +37,12 @@ func ToString(arg interface{}) string {
     default:
         return ""
     }
+}
+
+func calcAge(dob strfmt.Date) string {
+    t0 := time.Time{}
+    return strconv.Itoa(
+        t0.Add(time.Since(time.Time(dob))).Year() - t0.Year(),
+    )
+    
 }

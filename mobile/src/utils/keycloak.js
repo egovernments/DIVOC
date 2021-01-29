@@ -31,7 +31,9 @@ export function WithKeyCloakComponent({children}) {
                     console.log(e.message)
                 })
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
+
     if (!keycloak || !children) {
         return <div>
             Loading...
@@ -67,6 +69,10 @@ async function saveUserAttributes(attributes) {
     let userDetails = await appIndexDb.getUserDetails();
     if (!userDetails) {
         userDetails = await ApiServices.getUserDetails()
+        const facilityDetails = await ApiServices.getFacilityDetails();
+        if (facilityDetails && facilityDetails.length > 0) {
+            userDetails["facilityDetails"] = facilityDetails[0]
+        }
         await appIndexDb.saveUserDetails(userDetails)
     }
     for (let attributesKey in attributes) {
