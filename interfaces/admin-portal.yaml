@@ -285,7 +285,7 @@ paths:
       summary: Get medicines
       operationId: getMedicines
       security:
-        - hasRole: ["user", "admin"]
+        - hasRole: ["user", "admin","facility-admin"]
       responses:
         '200':
           description: OK
