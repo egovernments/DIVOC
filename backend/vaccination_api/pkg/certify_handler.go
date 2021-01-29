@@ -2,11 +2,14 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
+	"github.com/divoc/api/config"
 	eventsModel "github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	"strconv"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/models"
@@ -40,12 +43,11 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	certifyUploadErrors.Status = db.CERTIFY_UPLOAD_PROCESSING_STATUS
 	db.CreateCertifyUploadError(&certifyUploadErrors)
 	// validating data errors
-	errorMsgs := validateErrors(certifyData)
-	if len(errorMsgs) > 0 {
-		certifyUploadErrors.Errors = strings.Join(errorMsgs, ",")
+	if err := validateBulkCertifyCSVRowData(data); err != nil {
+		log.Info("validationErrors : ", err.Error())
+		certifyUploadErrors.Errors = err.Error()
 		certifyUploadErrors.Status = db.CERTIFY_UPLOAD_FAILED_STATUS
-		e := db.UpdateCertifyUploadError(&certifyUploadErrors)
-		return e
+		return db.UpdateCertifyUploadError(&certifyUploadErrors)
 	}
 
 	contact := []string{"tel:" + certifyData.RecipientMobileNumber}
@@ -58,8 +60,23 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 			dob = dob2
 		}
 	}
-	reciepient := &models.CertificationRequestRecipient{
-		Name:        &certifyData.RecipientName,
+
+	recipientAge := certifyData.RecipientAge
+	if recipientAge == "" {
+		recipientAge = calcAge(strfmt.Date(dob))
+		log.Info("calculated Age : ", recipientAge)
+	}
+
+	recipient := &models.CertificationRequestRecipient{
+		Name: &certifyData.RecipientName,
+		Age:  recipientAge,
+		Address: &models.CertificationRequestRecipientAddress{
+			AddressLine1: &certifyData.RecipientAddressLine1,
+			AddressLine2: certifyData.RecipientAddressLine2,
+			District:     &certifyData.RecipientDistrict,
+			Pincode:      &certifyData.RecipientPincode,
+			State:        &certifyData.RecipientState,
+		},
 		Contact:     contact,
 		Dob:         dateAdr(strfmt.Date(dob)),
 		Gender:      &certifyData.RecipientGender,
@@ -102,25 +119,21 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 		Name: &certifyData.VaccinatorName,
 	}
 
-	addressline1 := certifyData.FacilityAddressLine1
-	addressline2 := certifyData.FacilityAddressLine2
-	district := certifyData.FacilityDistrict
-	state := certifyData.FacilityState
-	pincode := certifyData.FacilityPincode
 	facility := &models.CertificationRequestFacility{
 		Name: &certifyData.FacilityName,
 		Address: &models.CertificationRequestFacilityAddress{
-			AddressLine1: &addressline1,
-			AddressLine2: addressline2,
-			District:     &district,
-			State:        &state,
-			Pincode:      &pincode,
+			AddressLine1: &certifyData.FacilityAddressLine1,
+			AddressLine2: certifyData.FacilityAddressLine2,
+			District:     &certifyData.FacilityDistrict,
+			State:        &certifyData.FacilityState,
+			Pincode:      &certifyData.FacilityPincode,
 		},
 	}
 
 	certificate := models.CertificationRequest{
+		PreEnrollmentCode: &certifyData.PreEnrollmentCode,
 		Facility:    facility,
-		Recipient:   reciepient,
+		Recipient:   recipient,
 		Vaccination: vaccination,
 		Vaccinator:  vaccinator,
 	}
@@ -135,25 +148,30 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	return nil
 }
 
-func validateErrors(data *db.CertifyUploadFields) []string {
-	var errorMsgs []string
-	if data.RecipientMobileNumber == "" {
-		errorMsgs = append(errorMsgs, "RecipientMobileNumber is missing")
-	}
-	if data.RecipientName == "" {
-		errorMsgs = append(errorMsgs, "RecipientName is missing")
-	}
-	return errorMsgs
+func validateBulkCertifyCSVRowData(data *Scanner) error {
+	requiredFields := strings.Split(config.Config.Certificate.Upload.RequiredFields, ",")
+	return validateBulkCertifyCSV(
+		"Fields",
+		requiredFields,
+		func(field string) bool { return data.Text(field) == ""},
+	)
 }
 
 func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 	return &db.CertifyUploadFields{
+		PreEnrollmentCode:         data.Text("preEnrollmentCode"),
 		RecipientName:             data.Text("recipientName"),
 		RecipientMobileNumber:     data.Text("recipientMobileNumber"),
 		RecipientDOB:              data.Text("recipientDOB"),
 		RecipientGender:           data.Text("recipientGender"),
 		RecipientNationality:      data.Text("recipientNationality"),
 		RecipientIdentity:         data.Text("recipientIdentity"),
+		RecipientAge:              data.Text("recipientAge"),
+		RecipientAddressLine1:     data.Text("recipientAddressLine1"),
+		RecipientAddressLine2:     data.Text("recipientAddressLine2"),
+		RecipientDistrict:         data.Text("recipientDistrict"),
+		RecipientState:            data.Text("recipientState"),
+		RecipientPincode:          data.int64("recipientPincode"),
 		VaccinationBatch:          data.Text("vaccinationBatch"),
 		VaccinationDate:           data.Text("vaccinationDate"),
 		VaccinationDose:           data.Text("vaccinationDose"),
@@ -170,4 +188,41 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		FacilityState:             data.Text("facilityState"),
 		FacilityPincode:           data.int64("facilityPincode"),
 	}
+}
+
+func validateBulkCertifyCSVHeaders(headers []string) error {
+	requiredHeaders := strings.Split(config.Config.Certificate.Upload.Columns, ",")
+	return validateBulkCertifyCSV(
+		"Headers",
+		requiredHeaders,
+		func(field string) bool { return !contains(headers, field)},
+	)
+}
+
+func validateBulkCertifyCSV(targetType string, required []string, isMissing func(field string) bool) error {
+	var errMsgs []string
+	missing := map[string]bool{}
+	for _, f := range required {
+		if isMissing(f) {
+			missing[f] = true
+		}
+	}
+
+	if missing["recipientAge"] && missing["recipientDOB"] {
+		errMsgs = append(errMsgs, fmt.Sprintf("Both recipientAge and recipientDOB %s are missing[at least one required]", targetType))
+	}
+	delete(missing, "recipientAge")
+	delete(missing, "recipientDOB")
+
+	if len(missing) > 0 {
+		var missedFields []string
+		for k := range missing {
+			missedFields = append(missedFields, k)
+		}
+		errMsgs = append(errMsgs, fmt.Sprintf("Missing %s : %s", targetType, strings.Join(missedFields, ",")))
+	}
+	if len(errMsgs) > 0 {
+		return errors.New(strings.Join(errMsgs, "; "))
+	}
+	return nil
 }

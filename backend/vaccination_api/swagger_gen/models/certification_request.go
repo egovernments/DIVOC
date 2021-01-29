@@ -362,17 +362,15 @@ type CertificationRequestRecipient struct {
 	Address *CertificationRequestRecipientAddress `json:"address"`
 
 	// age
-	// Required: true
-	Age *string `json:"age"`
+	Age string `json:"age,omitempty"`
 
 	// contact
 	// Required: true
 	Contact []string `json:"contact"`
 
 	// dob
-	// Required: true
 	// Format: date
-	Dob *strfmt.Date `json:"dob"`
+	Dob *strfmt.Date `json:"dob,omitempty"`
 
 	// gender
 	// Required: true
@@ -396,10 +394,6 @@ func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error 
 	var res []error
 
 	if err := m.validateAddress(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateAge(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -451,15 +445,6 @@ func (m *CertificationRequestRecipient) validateAddress(formats strfmt.Registry)
 	return nil
 }
 
-func (m *CertificationRequestRecipient) validateAge(formats strfmt.Registry) error {
-
-	if err := validate.Required("recipient"+"."+"age", "body", m.Age); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (m *CertificationRequestRecipient) validateContact(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"contact", "body", m.Contact); err != nil {
@@ -471,8 +456,8 @@ func (m *CertificationRequestRecipient) validateContact(formats strfmt.Registry)
 
 func (m *CertificationRequestRecipient) validateDob(formats strfmt.Registry) error {
 
-	if err := validate.Required("recipient"+"."+"dob", "body", m.Dob); err != nil {
-		return err
+	if swag.IsZero(m.Dob) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("recipient"+"."+"dob", "body", "date", m.Dob.String(), formats); err != nil {

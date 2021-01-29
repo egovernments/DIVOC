@@ -218,7 +218,7 @@ function FacilityAdjustingRate({
             <div className={`col-sm-6 container ${styles['table']}`}>
                 {!showCard ?
                 <>
-                    <p className={styles['highlight']}>{selectedDistrict} facilties</p>
+                    <p className={styles['highlight']}>{selectedDistrict.join(", ")} facilties</p>
                     <table className={`table table-hover ${styles['table-data']}`}>
                         <thead>
                         <tr>

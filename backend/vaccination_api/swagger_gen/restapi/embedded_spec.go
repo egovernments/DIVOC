@@ -159,6 +159,12 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -560,8 +566,6 @@ func init() {
           "type": "object",
           "required": [
             "name",
-            "dob",
-            "age",
             "gender",
             "nationality",
             "identity",
@@ -606,7 +610,8 @@ func init() {
             },
             "dob": {
               "type": "string",
-              "format": "date"
+              "format": "date",
+              "x-nullable": true
             },
             "gender": {
               "type": "string"
@@ -746,6 +751,26 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
         "certified": {
           "type": "boolean"
         },
@@ -780,6 +805,9 @@ func init() {
           "type": "string"
         },
         "phone": {
+          "type": "string"
+        },
+        "programId": {
           "type": "string"
         }
       }
@@ -1034,6 +1062,12 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -1435,8 +1469,6 @@ func init() {
           "type": "object",
           "required": [
             "name",
-            "dob",
-            "age",
             "gender",
             "nationality",
             "identity",
@@ -1481,7 +1513,8 @@ func init() {
             },
             "dob": {
               "type": "string",
-              "format": "date"
+              "format": "date",
+              "x-nullable": true
             },
             "gender": {
               "type": "string"
@@ -1623,8 +1656,6 @@ func init() {
       "type": "object",
       "required": [
         "name",
-        "dob",
-        "age",
         "gender",
         "nationality",
         "identity",
@@ -1669,7 +1700,8 @@ func init() {
         },
         "dob": {
           "type": "string",
-          "format": "date"
+          "format": "date",
+          "x-nullable": true
         },
         "gender": {
           "type": "string"
@@ -1833,6 +1865,26 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
         "certified": {
           "type": "boolean"
         },
@@ -1867,6 +1919,29 @@ func init() {
           "type": "string"
         },
         "phone": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
+    "PreEnrollmentAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
           "type": "string"
         }
       }

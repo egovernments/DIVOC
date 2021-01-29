@@ -114,16 +114,26 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal *models
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Vaccinator"
+	filter := map[string]interface{}{}
+
 	if HasResourceRole(portalClientId, "admin", principal) {
 		return kernelService.GetEntityType(entityTypeId)
-	}
-
-	filter := map[string]interface{}{}
-	if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
-		filter["facilityIds"] = map[string]interface{}{
-			"contains": params.FacilityCode,
+	} else if HasResourceRole(portalClientId, "facility-admin", principal) {
+		if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
+			filter["facilityIds"] = map[string]interface{}{
+				"contains": params.FacilityCode,
+			}
+		} else if params.FacilityCode == nil {
+			if principal.FacilityCode == "" {
+				log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
+				return NewGenericServerError()
+			}
+			filter["facilityIds"] = map[string]interface{}{
+				"contains": principal.FacilityCode,
+			}
 		}
-	} else if params.FacilityCode == nil {
+	} else {
+		// for others uses adding facilityCode from principal
 		if principal.FacilityCode == "" {
 			log.Errorf("Error facility code not mapped for the login %s", principal.PreferredUsername)
 			return NewGenericServerError()
@@ -132,6 +142,7 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 			"contains": principal.FacilityCode,
 		}
 	}
+
 	if params.Name != nil && !strings.EqualFold(*params.Name, "ALL") {
 		filter["name"] = map[string]interface{}{
 			"startsWith": params.Name,
@@ -373,14 +384,14 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			if len(facilities) > 0 {
 				facility := facilities[0].(map[string]interface{})
 				currentPrograms := facility["programs"].([]interface{})
-				var updatePrograms []map[string]interface{}
+				var programsTobeUpdated []map[string]interface{}
 				updateFacility := map[string]interface{}{
 					"osid":     updateRequest.Osid,
 					"programs": []interface{}{},
 				}
 				if len(currentPrograms) == 0 {
 					for _, program := range updateRequest.Programs {
-						updatePrograms = append(updatePrograms, map[string]interface{}{
+						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
 							"id":              program.ID,
 							"status":          program.Status,
 							"rate":            program.Rate,
@@ -389,9 +400,13 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						})
 					}
 				} else {
+					for _, obj := range currentPrograms {
+						facilityProgram := obj.(map[string]interface{})
+						programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
+					}
 					for _, updateProgram := range updateRequest.Programs {
-						for _, obj := range currentPrograms {
-							facilityProgram := obj.(map[string]interface{})
+						existingProgram := false
+						for _, facilityProgram := range programsTobeUpdated {
 							if updateProgram.ID == facilityProgram["id"].(string) {
 								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
 									facilityProgram["status"] = updateProgram.Status
@@ -405,12 +420,22 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
 										facility["contact"].(string), facility["email"].(string))
 								}
+								existingProgram = true
 							}
-							updatePrograms = append(updatePrograms, facilityProgram)
+						}
+						if !existingProgram {
+							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+								"id":              updateProgram.ID,
+								"status":          updateProgram.Status,
+								"rate":            updateProgram.Rate,
+								"statusUpdatedAt": time.Now().Format(time.RFC3339),
+								"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+							})
 						}
 					}
+
 				}
-				updateFacility["programs"] = updatePrograms
+				updateFacility["programs"] = programsTobeUpdated
 				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
 				if err != nil {
 					log.Error(err)

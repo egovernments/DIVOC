@@ -122,6 +122,10 @@ paths:
       responses:
         '200':
           description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
   /bulkCertify:
     post:
       tags:
@@ -345,6 +349,21 @@ definitions:
         type: object
       certified:
         type: boolean
+      programId:
+        type: string
+      address:
+        type: object
+        properties:
+          addressLine1:
+            type: string
+          addressLine2:
+            type: string
+          district:
+            type: string
+          state:
+            type: string
+          pincode:
+            type: integer
   CertificationRequest:
     type: object
     properties:
@@ -358,6 +377,7 @@ definitions:
           dob:
             type: string
             format: date
+            x-nullable: true
           age:
             type: string
           gender:
@@ -390,8 +410,6 @@ definitions:
               - pincode
         required:
           - name
-          - dob
-          - age
           - gender
           - nationality
           - identity

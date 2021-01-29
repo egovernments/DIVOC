@@ -2,7 +2,14 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: 4%;
   height: 100%;
+
+  .button-center {
+    display: grid;
+    height: 100%;
+    place-items: center;
+  }
 
   .title {
     text-align: center;

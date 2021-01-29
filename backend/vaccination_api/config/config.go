@@ -68,6 +68,7 @@ var Config = struct {
 	Certificate struct {
 		Upload struct {
 			Columns string `yaml:"columns"`
+			RequiredFields string `yaml:"required_fields"`
 		}
 	}
 	Clickhouse struct {

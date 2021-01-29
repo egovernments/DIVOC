@@ -1,5 +1,6 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
+import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -17,19 +18,32 @@ export class SyncFacade {
 
     static async pull() {
         await appIndexDb.initDb();
-        const vaccinators = await ApiServices.fetchVaccinators();
-        await appIndexDb.saveVaccinators(vaccinators);
         const preEnrollments = await ApiServices.fetchPreEnrollments();
         await appIndexDb.saveEnrollments(preEnrollments);
+
+        const programs = await ApiServices.fetchPrograms();
+        await appIndexDb.savePrograms(programs)
+        if (programs.length > 0 && !getSelectedProgram()) {
+            saveSelectedProgram(programs[0].name)
+        }
+
+        const vaccinators = await ApiServices.fetchVaccinators();
+        await appIndexDb.saveVaccinators(vaccinators);
     }
 
     static async push() {
         const certifyPatients = await appIndexDb.getDataForCertification();
         if (certifyPatients.length > 0) {
-            await ApiServices.certify(certifyPatients);
+            const response = await ApiServices.certify(certifyPatients);
+            if (response.code) {
+                const isSuccess = response.code >= 200 && response.code <= 300;
+                if (!isSuccess) {
+                    throw new Error("Failed to sync");
+                }
+            }
         }
         localStorage.setItem(LAST_SYNC_KEY, new Date().toISOString())
-        await appIndexDb.cleanUp()
+        await appIndexDb.cleanEvents()
     }
 
 

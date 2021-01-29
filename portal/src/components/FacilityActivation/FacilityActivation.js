@@ -19,6 +19,7 @@ function FacilityActivation({
     const axiosInstance = useAxios("");
     const [showCard, setShowCard] = useState(false);
     const [selectedRow, setSelectedRow] = useState([]);
+    const oppositeStatus = status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE;
 
     useEffect(() => {
         resetFilter({status: CONSTANTS.ACTIVE});
@@ -145,7 +146,7 @@ function FacilityActivation({
                 {!showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
-                            {selectedDistrict} facilties
+                            {selectedDistrict.join(", ")} facilties
                         </p>
                         <table
                             className={`table table-hover ${styles["table-data"]}`}
@@ -185,14 +186,13 @@ function FacilityActivation({
                     {selectedProgram && <div className="card-body text-center">
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
-                            Make {selectedFacilities.length} facilities active
-                            for the {selectedProgram}
+                            Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
                         </p>
                         <button
                             onClick={handleActiveClick}
                             className={styles["button"]}
                         >
-                            MAKE {(status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE).toUpperCase()}
+                            MAKE {oppositeStatus.toUpperCase()}
                         </button>
                     </div>
                     }

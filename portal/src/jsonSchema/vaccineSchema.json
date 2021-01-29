@@ -25,12 +25,8 @@
           "title": "Schedule Details",
           "type": "object",
           "properties": {
-            "repeatTimes": {
-              "type": "number",
-              "title": "Repeat times"
-            },
             "repeatInterval": {
-              "title": "Repeat interval",
+              "title": "Total doses",
               "type": "number"
             }
           }

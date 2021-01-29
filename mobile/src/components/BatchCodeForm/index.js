@@ -19,10 +19,7 @@ export const BatchCodeForm = () => {
             }).then((value => {
                 goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
             })).catch((e) => {
-                if (!navigator.onLine) {
-                    goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
-                }
-                console.log(e);
+                goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
                 setLoading(false)
             })
         }
