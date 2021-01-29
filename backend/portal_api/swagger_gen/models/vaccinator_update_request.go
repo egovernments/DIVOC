@@ -226,10 +226,66 @@ type VaccinatorUpdateRequestItems0ProgramsItems0 struct {
 
 	// id
 	ID string `json:"id,omitempty"`
+
+	// status
+	// Enum: [Active Inactive]
+	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this vaccinator update request items0 programs items0
 func (m *VaccinatorUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var vaccinatorUpdateRequestItems0ProgramsItems0TypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["Active","Inactive"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		vaccinatorUpdateRequestItems0ProgramsItems0TypeStatusPropEnum = append(vaccinatorUpdateRequestItems0ProgramsItems0TypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// VaccinatorUpdateRequestItems0ProgramsItems0StatusActive captures enum value "Active"
+	VaccinatorUpdateRequestItems0ProgramsItems0StatusActive string = "Active"
+
+	// VaccinatorUpdateRequestItems0ProgramsItems0StatusInactive captures enum value "Inactive"
+	VaccinatorUpdateRequestItems0ProgramsItems0StatusInactive string = "Inactive"
+)
+
+// prop value enum
+func (m *VaccinatorUpdateRequestItems0ProgramsItems0) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, vaccinatorUpdateRequestItems0ProgramsItems0TypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *VaccinatorUpdateRequestItems0ProgramsItems0) validateStatus(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Status) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
+		return err
+	}
+
 	return nil
 }
 

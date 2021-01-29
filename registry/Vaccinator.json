@@ -85,6 +85,16 @@
               },
               "certified": {
                 "type": "boolean"
+              },
+              "statusUpdatedAt": {
+                "$id": "#/properties/statusUpdatedAt",
+                "type": "string",
+                "format": "date"
+              },
+              "certifiedUpdatedAt": {
+                "$id": "#/properties/certifiedUpdatedAt",
+                "type": "string",
+                "format": "date"
               }
             }
           }

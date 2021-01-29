@@ -48,11 +48,15 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
         onSelectVaccinator(vaccinator)
     }
 
-    function onStatusChange(vaccinator) {
+    function onProgramStatusChange(vaccinator, program) {
         const editData = {
             osid: vaccinator.osid,
-            programs: vaccinator.programs,
-            status: vaccinator.status === "Active" ? "Inactive" : "Active"
+            programs: vaccinator.programs.map(p => {
+                if (p.id === program.id) {
+                    p.status = p.status === "Active" ? "Inactive" : "Active"
+                }
+                return p
+            }),
         };
         axiosInstance.current.put(API_URL.VACCINATORS_API, [editData])
             .then(res => {
@@ -87,7 +91,7 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                         </td>
                         <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
                         <td className={classes.root}>
-                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
+                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onProgramStatusChange(vaccinator, program)} />
                             <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>
@@ -102,9 +106,8 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                             <img src={check}/> :
                             <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
                         </td>
-                        <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
+                        <td>-</td>
                         <td className={classes.root}>
-                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
                             <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>

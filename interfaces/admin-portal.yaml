@@ -762,6 +762,11 @@ definitions:
             id:
               type: string
               title: Id of the program
+            status:
+              type: string
+              enum:
+                - Active
+                - Inactive
             certified:
               type: boolean
               title: if vaccinator has certificate for program
@@ -806,6 +811,11 @@ definitions:
             properties:
               id:
                 type: string
+              status:
+                type: string
+                enum:
+                  - Active
+                  - Inactive
               certified:
                 type: boolean
   Program:
