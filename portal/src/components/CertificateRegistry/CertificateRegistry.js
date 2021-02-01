@@ -26,10 +26,6 @@ function Certificates() {
             .then(res => {
                 return res.data
             })
-            .catch(e => {
-                console.log(e);
-                return []
-            })
             .then((result) => {
                 return result.map((item, index) => {
                     const uploadedDate = new Date(item["CreatedAt"])
@@ -47,6 +43,10 @@ function Certificates() {
             })
             .then((result) => {
                 setUploadHistory(result)
+            })
+            .catch(e => {
+                console.log(e);
+                return []
             });
     }
 
