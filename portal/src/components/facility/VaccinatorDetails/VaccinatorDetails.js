@@ -70,8 +70,8 @@ export default function VaccinatorDetails({
                         let programsAsSet = new Set(programs);
                         let data = new Array(...programsAsSet);
                         item.programs.map(p => {
-                            if (!programsAsSet.has(p.id) && !data.includes(p.id)) {
-                                data.push(p.id);
+                            if (!programsAsSet.has(p.programId) && !data.includes(p.programId)) {
+                                data.push(p.programId);
                             }
                         });
                         setPrograms(data)
