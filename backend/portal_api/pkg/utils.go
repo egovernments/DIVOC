@@ -1,6 +1,10 @@
 package pkg
 
-import "strconv"
+import (
+	"encoding/json"
+	"errors"
+	"strconv"
+)
 
 func isEqual(arr1 []string, arr2 []string) bool {
 	// If one is nil, the other must also be nil.
@@ -51,4 +55,16 @@ func ToString(arg interface{}) string {
 	default:
 		return ""
 	}
+}
+
+func convertStructToInterface(structToConvert interface{}, result interface{}) error {
+	b, e := json.Marshal(structToConvert)
+	if e != nil {
+		return errors.New("JSON marshelling error")
+	}
+	e = json.Unmarshal(b, result)
+	if e != nil {
+		return errors.New("JSON unmarshelling error")
+	}
+	return nil
 }

@@ -622,9 +622,11 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 				vaccinator := vaccinators[0].(map[string]interface{})
 				currentPrograms := vaccinator["programs"].([]interface{})
 				var programsTobeUpdated []map[string]interface{}
-				updateVaccinator := map[string]interface{}{
-					"osid":     updateRequest.Osid,
-					"programs": []interface{}{},
+				var updateVaccinator map[string]interface{}
+				e := convertStructToInterface(updateRequest, &updateVaccinator)
+				if e != nil {
+					log.Errorf("Error which converting to Interface %+v", updateRequest)
+					return NewGenericServerError()
 				}
 				if len(currentPrograms) == 0 {
 					for _, program := range updateRequest.Programs {
