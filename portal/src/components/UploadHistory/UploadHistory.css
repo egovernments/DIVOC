@@ -2,10 +2,16 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     grid-gap: 2%;
-    margin-top: 4%;
+    margin-top: 2%;
 }
 
 .upload-csv {
+    margin-top: 4%;
+    display: flex;
+    justify-content: space-between;
+    background: #ffffff;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
 }
 
 .upload-csv .UploadCSV_container__1cn_q {
@@ -13,7 +19,7 @@
 }
 
 .total {
-    grid-column: 2 / 4;
+    /* grid-column: 2 / 4; */
 }
 
 .upload-history {
@@ -70,4 +76,13 @@
     font-weight: bold;
     color: #FC573B;
     font-size: 18px;
+}
+
+.title{
+    border-bottom: 1px solid #8DC2FF;
+}
+
+.modal-container{
+    background: #000000 0% 0% no-repeat padding-box;
+    opacity: 0.82;
 }

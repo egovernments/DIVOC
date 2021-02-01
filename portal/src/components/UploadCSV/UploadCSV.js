@@ -4,9 +4,12 @@ import {ProgressBar} from 'react-bootstrap';
 import React, {useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
+import Toast from 'react-bootstrap/Toast'
 
 function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
+    const [showA, setShowA] = useState(true);
+    const toggleShowA = () => setShowA(!showA);
 
     const {keycloak} = useKeycloak();
 
@@ -39,7 +42,19 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
     };
 
     return (
-        <div className={styles['container']}>
+        <div className={styles['container'] + " d-flex justify-content-end"}>
+            <div className={styles['progress-bar-container']}>
+                <div>{uploadPercentage > 0 && <Toast className="toast-container" show={showA} onClose={toggleShowA}>
+                <Toast.Header>
+                    <strong className="mr-auto">Records Uploaded</strong>
+                </Toast.Header>
+                <Toast.Body className="toast-body">
+                    <span>File Uploaded</span>&emsp;
+                    <ProgressBar now={uploadPercentage} active/>
+                    <span>{uploadPercentage > 0 && `${uploadPercentage}%`}</span>
+                </Toast.Body>
+                </Toast>}</div>
+            </div>
             <div>
                 <input
                     type='file'
@@ -63,10 +78,6 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
                         Download sample CSV
                     </a>
                 </div>}
-            </div>
-            <div className={styles['progress-bar-container']}>
-                <div className={styles['progress-bar']}>{uploadPercentage > 0 && `${uploadPercentage}%`}</div>
-                <div>{uploadPercentage > 0 && <ProgressBar now={uploadPercentage} active/>}</div>
             </div>
         </div>
     );
