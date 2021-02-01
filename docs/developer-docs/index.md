@@ -30,10 +30,10 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
     ```
     docker-compose up -d
     ```
-    * [Verify the state of containers](#docker-compose-ps). All containers should be up.
+    * Verify the state of containers. All containers should be up.
 
     * Some services might fail to start because the dependent service might not be ready yet. 
-    [Restarting the failed service](#docker-compose-restart) should start it successfully in this case.
+    Restarting the failed service should start it successfully in this case.
 
     * On Mac/Windows services might crash with exit code : 137, if sufficient memory is not set for docker.
     This can be changed in Docker desktop preferences, resources tab as shown [here](https://docs.docker.com/docker-for-mac/#resources).
