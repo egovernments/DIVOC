@@ -28,7 +28,7 @@ export default function FacilityAdmin() {
             },
             {title: "Role Setup", component: <RoleSetup/>},
             {title: "Vaccinator Details", component: <Vaccinators/>},
-            {title: "Program Overview", component: <span>Program Overview</span>},
+            // {title: "Program Overview", component: <span>Program Overview</span>},
 
         ]}/>
     );

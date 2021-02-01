@@ -159,11 +159,11 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 };
 
 export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
-    <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}}>
+    <div className="small-info-card-wrapper mt-3 mb-3" style={{backgroundColor: backgroundColor}} onClick={onClick}>
         <div className="w-50 ">
             <img src={img} alt={""} className="small-card-img float-right"/>
         </div>
-        <div onClick={onClick}
+        <div 
              className="w-50 d-flex flex-column align-items-start justify-content-center font-weight-bold">
             <span>{text}</span>
             <img src={NextArrowImg} alt={""}/>

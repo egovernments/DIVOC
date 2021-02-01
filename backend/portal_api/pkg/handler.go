@@ -20,7 +20,7 @@ import (
 const StateKey = "address.state"
 const DistrictKey = "address.district"
 const TypeKey = "category"
-const ProgramIdKey = "programs.id"
+const ProgramIdKey = "programs.programId"
 const ProgramStatusKey = "programs.status"
 const FacilityCodeKey = "facilityCode"
 const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
@@ -383,60 +383,8 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			facilities := searchRespone["Facility"].([]interface{})
 			if len(facilities) > 0 {
 				facility := facilities[0].(map[string]interface{})
-				currentPrograms := facility["programs"].([]interface{})
-				var programsTobeUpdated []map[string]interface{}
-				updateFacility := map[string]interface{}{
-					"osid":     updateRequest.Osid,
-					"programs": []interface{}{},
-				}
-				if len(currentPrograms) == 0 {
-					for _, program := range updateRequest.Programs {
-						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-							"id":              program.ID,
-							"status":          program.Status,
-							"rate":            program.Rate,
-							"statusUpdatedAt": time.Now().Format(time.RFC3339),
-							"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-						})
-					}
-				} else {
-					for _, obj := range currentPrograms {
-						facilityProgram := obj.(map[string]interface{})
-						programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
-					}
-					for _, updateProgram := range updateRequest.Programs {
-						existingProgram := false
-						for _, facilityProgram := range programsTobeUpdated {
-							if updateProgram.ID == facilityProgram["id"].(string) {
-								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
-									facilityProgram["status"] = updateProgram.Status
-									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
-									services.NotifyFacilityUpdate("status", updateProgram.Status,
-										facility["contact"].(string), facility["email"].(string))
-								}
-								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
-									facilityProgram["rate"] = updateProgram.Rate
-									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
-									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
-										facility["contact"].(string), facility["email"].(string))
-								}
-								existingProgram = true
-							}
-						}
-						if !existingProgram {
-							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-								"id":              updateProgram.ID,
-								"status":          updateProgram.Status,
-								"rate":            updateProgram.Rate,
-								"statusUpdatedAt": time.Now().Format(time.RFC3339),
-								"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-							})
-						}
-					}
-
-				}
-				updateFacility["programs"] = programsTobeUpdated
-				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
+				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
+				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
 				} else {
@@ -448,6 +396,64 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 		}
 	}
 	return operations.NewUpdateFacilitiesOK()
+}
+
+func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *models.FacilityUpdateRequestItems0) map[string]interface{} {
+	currentPrograms := facility["programs"].([]interface{})
+	var programsTobeUpdated []map[string]interface{}
+	updateFacility := map[string]interface{}{
+		"osid":     updateRequest.Osid,
+		"programs": []interface{}{},
+	}
+	if len(currentPrograms) == 0 {
+		for _, program := range updateRequest.Programs {
+			programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+				"programId":       program.ID,
+				"status":          program.Status,
+				"rate":            program.Rate,
+				"statusUpdatedAt": time.Now().Format(time.RFC3339),
+				"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+			})
+		}
+	} else {
+		for _, obj := range currentPrograms {
+			facilityProgram := obj.(map[string]interface{})
+			programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
+		}
+		for _, updateProgram := range updateRequest.Programs {
+			existingProgram := false
+			for _, facilityProgram := range programsTobeUpdated {
+				if updateProgram.ID == facilityProgram["programId"].(string) {
+					if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
+						facilityProgram["status"] = updateProgram.Status
+						facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+						services.NotifyFacilityUpdate("status", updateProgram.Status,
+							facility["contact"].(string), facility["email"].(string))
+					}
+					if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+						facilityProgram["rate"] = updateProgram.Rate
+						facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+						services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
+							facility["contact"].(string), facility["email"].(string))
+					}
+					existingProgram = true
+					break
+				}
+			}
+			if !existingProgram {
+				programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+					"programId":       updateProgram.ID,
+					"status":          updateProgram.Status,
+					"rate":            updateProgram.Rate,
+					"statusUpdatedAt": time.Now().Format(time.RFC3339),
+					"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+				})
+			}
+		}
+
+	}
+	updateFacility["programs"] = programsTobeUpdated
+	return updateFacility
 }
 
 func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {

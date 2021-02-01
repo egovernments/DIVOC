@@ -6,6 +6,7 @@ import (
 	"compress/flate"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
@@ -21,6 +22,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -41,7 +43,7 @@ const InternalSuccessEvent = "internal-success"
 const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
-
+const YYYYMMDD = "2006-01-02"
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "http_request_duration_milliseconds",
@@ -109,6 +111,21 @@ type Certificate struct {
 	} `json:"proof"`
 }
 
+func getVaccineValidDays(start string,end string) string {
+	days := 28
+	startDate, err := time.Parse(YYYYMMDD, start)
+	if err == nil {
+		endDate, err := time.Parse(YYYYMMDD, end)
+		if err == nil {
+			validDays := int(math.Ceil(endDate.Sub(startDate).Hours() / 24))
+			if validDays > 0 {
+				days = validDays
+			}
+		}
+	}
+	return fmt.Sprintf("after %d days", days)
+}
+
 func showLabelsAsPerTemplate(certificate Certificate) []string {
 	if (!isFinal(certificate)) {
 		return []string{certificate.CredentialSubject.Name,
@@ -119,7 +136,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 			formatRecipientAddress(certificate),
 			certificate.Evidence[0].Vaccine,
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
-			"after 28 days",
+			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
 			certificate.Evidence[0].Verifier.Name,
 			formatFacilityAddress(certificate),
 		}
@@ -266,7 +283,7 @@ func formatDate(date time.Time) string {
 func formatId(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "aadhaar") {
+	if strings.Contains(identity, "aadhaar") && len(lastFragment) >= 4 {
 		return "Aadhaar # XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
 	}
 	if strings.Contains(identity, "Driving") {

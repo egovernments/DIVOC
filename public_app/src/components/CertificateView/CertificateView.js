@@ -214,7 +214,7 @@ function CertificateView() {
     const selectedCertificate = (certificateData) => {
         return <>
             {showCertificatePreview(certificateData)}
-            <div className={styles["top-pad"] + " " + styles["no-print"]}>
+            <div className={styles["top-pad"] + " " + styles["no-print"] + " "+ styles["center-align"]}>
                 <div >
                     {/*<button className={styles["button"]} onClick={handleClick}>*/}
                     {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
@@ -239,7 +239,7 @@ function CertificateView() {
 
                     <DropdownButton id="dropdown-item-button" variant="success" title="Export" className={styles["btn-success"]}>
                         <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
-                        <Dropdown.Item href="#/svg" onClick={downloadAsSvg}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
+                        <Dropdown.Item href="#/svg" onClick={()=>alert("This feature is still not implemented")}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
                     </DropdownButton>
                     
                 </div>
@@ -257,7 +257,7 @@ function CertificateView() {
     const multiCertificateView = () => {
         return (
             <div>
-                <div className={styles["no-print"]}>
+                <div className={styles["no-print"] + " " + styles["center-align"]}>
                     <p>There are multiple certificates associated with phone : {userMobileNumber}</p>
                     <b>Please choose the certificate for </b>
                     <div>{getListOfCertificateBearers()}</div>
@@ -273,8 +273,8 @@ function CertificateView() {
         <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
             <div className="col-12 d-flex d-flex justify-content-center">
                 <div>
-                    <div className={styles["no-print"]}>
-                        <p>Vaccination certificate</p>
+                    <div className={styles["no-print"] + " " + styles["center-align"]}>
+                        <h4>Vaccination certificate</h4>
                     </div>
                     {(certificateList.length > 1) ? multiCertificateView() : singleCertificateView()}
                 </div>

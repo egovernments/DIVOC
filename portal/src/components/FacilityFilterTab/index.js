@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import "./index.scss";
 import DropDown from "../DropDown/DropDown";
 import {CONSTANTS} from "../../utils/constants";
@@ -22,7 +22,7 @@ export const FacilityFilterTab = ({
                             checked={selectedDistrict.includes(district.name)}
                             onSelect={(event) =>
                                 handleChange(
-                                    district.name,
+                                    selectedDistrict.includes(district.name) ? selectedDistrict.filter(dName => dName !== district.name) : selectedDistrict.concat(district.name),
                                     setSelectedDistrict
                                 )
                             }/>

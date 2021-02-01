@@ -751,6 +751,26 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
         "certified": {
           "type": "boolean"
         },
@@ -1845,6 +1865,26 @@ func init() {
     "PreEnrollment": {
       "type": "object",
       "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
         "certified": {
           "type": "boolean"
         },
@@ -1882,6 +1922,26 @@ func init() {
           "type": "string"
         },
         "programId": {
+          "type": "string"
+        }
+      }
+    },
+    "PreEnrollmentAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
           "type": "string"
         }
       }

@@ -20,7 +20,7 @@ func getSymptoms(params symptoms.GetSymptomsParams) middleware.Responder {
 	filter := map[string]interface{}{}
 	queryResults, err := services.QueryRegistry(typeId, filter)
 	if err != nil {
-		log.Errorf("Error in querying registry", err)
+		log.Errorf("Error in querying registry %v", err)
 		return NewGenericServerError()
 	}
 	return NewGenericJSONResponse(queryResults[typeId])
@@ -31,7 +31,7 @@ func getInstructions(params symptoms.GetInstructionsParams) middleware.Responder
 	filter := map[string]interface{}{}
 	queryResults, err := services.QueryRegistry(typeId, filter)
 	if err != nil {
-		log.Errorf("Error in querying registry", err)
+		log.Errorf("Error in querying registry %v", err)
 		return NewGenericServerError()
 	}
 	return NewGenericJSONResponse(queryResults[typeId])

@@ -257,6 +257,7 @@ paths:
             - admin
             - user
             - controller
+            - facility-admin
       responses:
         '200':
             description: OK

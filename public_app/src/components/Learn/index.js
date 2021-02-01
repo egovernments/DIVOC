@@ -30,7 +30,7 @@ const videoDetails = [
 
 const videoHeaderDetails = {
     title: "Learn about the C-19 Program",
-    description: "The C-19 vaccination drive launched in India in 2021 aims to control, reduce and eradicate the prevalence of …",
+    description: "You can find information about the vaccination program, learn about side-effect and how you access your digital vaccination certificate.",
     videoTitle: "Mobile technology to be used for COVID-19",
     videoUrl: "https://divoc.xiv.in/video/learn/vaccination.m4v"
 }

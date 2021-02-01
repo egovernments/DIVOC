@@ -127,7 +127,7 @@ export function Home(props) {
         SyncFacade.push()
             .then(() => {
             })
-            .catch((e) => console.log("Sync Failed"))
+            .catch((e) => console.log("Sync Failed", e.message))
     }, [])
     return (
         <HomeProvider>

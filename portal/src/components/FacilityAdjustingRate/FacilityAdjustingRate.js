@@ -41,7 +41,7 @@ function FacilityAdjustingRate({
 
     const getFacilityProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.id === selectedProgram);
+            const program = facility.programs.find(obj => obj.programId === selectedProgram);
             if (program) {
                 return program;
             }
@@ -218,7 +218,7 @@ function FacilityAdjustingRate({
             <div className={`col-sm-6 container ${styles['table']}`}>
                 {!showCard ?
                 <>
-                    <p className={styles['highlight']}>{selectedDistrict} facilties</p>
+                    <p className={styles['highlight']}>{selectedDistrict.join(", ")} facilties</p>
                     <table className={`table table-hover ${styles['table-data']}`}>
                         <thead>
                         <tr>

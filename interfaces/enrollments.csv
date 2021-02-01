@@ -1,2 +1,1 @@
-phone,enrollmentScopeId,nationalId,dob,gender,name,email
-1111111400,BLR341,234234234234,1990-01-01,Male,Soorya A,soorya.a@example.com
+*phone,*enrollmentScopeId,*nationalId,*dob,gender,name,email,*addressLine1,*addressLine2,district,state,pincode
