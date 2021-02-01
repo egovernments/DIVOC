@@ -760,7 +760,7 @@ definitions:
         items:
           type: object
           properties:
-            id:
+            programId:
               type: string
               title: Id of the program
             status:
@@ -810,7 +810,7 @@ definitions:
           items:
             type: object
             properties:
-              id:
+              programId:
                 type: string
               status:
                 type: string

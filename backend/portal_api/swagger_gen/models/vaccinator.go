@@ -309,7 +309,7 @@ type VaccinatorProgramsItems0 struct {
 	Certified bool `json:"certified,omitempty"`
 
 	// Id of the program
-	ID string `json:"id,omitempty"`
+	ProgramID string `json:"programId,omitempty"`
 
 	// status
 	// Enum: [Active Inactive]

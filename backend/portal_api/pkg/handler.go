@@ -629,7 +629,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 				if len(currentPrograms) == 0 {
 					for _, program := range updateRequest.Programs {
 						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-							"id":                 program.ID,
+							"programId":          program.ProgramID,
 							"status":             program.Status,
 							"certified":          program.Certified,
 							"statusUpdatedAt":    time.Now().Format(time.RFC3339),
@@ -644,7 +644,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 					for _, updateProgram := range updateRequest.Programs {
 						existingProgram := false
 						for _, vaccinatorProgram := range programsTobeUpdated {
-							if updateProgram.ID == vaccinatorProgram["id"].(string) {
+							if updateProgram.ProgramID == vaccinatorProgram["programId"].(string) {
 								if updateProgram.Status != "" && updateProgram.Status != vaccinatorProgram["status"].(string) {
 									vaccinatorProgram["status"] = updateProgram.Status
 									vaccinatorProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
@@ -658,7 +658,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 						}
 						if !existingProgram {
 							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-								"id":                   updateProgram.ID,
+								"programId":            updateProgram.ProgramID,
 								"status":               updateProgram.Status,
 								"certified":            updateProgram.Certified,
 								"statusUpdatedAt":      time.Now().Format(time.RFC3339),

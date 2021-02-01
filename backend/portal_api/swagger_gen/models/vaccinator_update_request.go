@@ -224,8 +224,8 @@ type VaccinatorUpdateRequestItems0ProgramsItems0 struct {
 	// certified
 	Certified bool `json:"certified,omitempty"`
 
-	// id
-	ID string `json:"id,omitempty"`
+	// program Id
+	ProgramID string `json:"programId,omitempty"`
 
 	// status
 	// Enum: [Active Inactive]
