@@ -20,7 +20,7 @@ import (
 const StateKey = "address.state"
 const DistrictKey = "address.district"
 const TypeKey = "category"
-const ProgramIdKey = "programs.id"
+const ProgramIdKey = "programs.programId"
 const ProgramStatusKey = "programs.status"
 const FacilityCodeKey = "facilityCode"
 const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"

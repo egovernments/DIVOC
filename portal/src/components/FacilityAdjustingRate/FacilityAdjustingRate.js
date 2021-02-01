@@ -41,7 +41,7 @@ function FacilityAdjustingRate({
 
     const getFacilityProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.id === selectedProgram);
+            const program = facility.programs.find(obj => obj.programId === selectedProgram);
             if (program) {
                 return program;
             }
