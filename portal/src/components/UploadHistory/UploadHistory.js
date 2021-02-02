@@ -32,11 +32,11 @@ const UploadHistory = ({
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     useEffect(() => {
-        fetchFacilities();
+        fetchTableDetails();
         fetchUploadHistory();
     }, []);
 
-    function fetchFacilities() {
+    function fetchTableDetails() {
         axiosInstance.current.get(fetchAPI)
             .then(res => {
                 return res.data
@@ -210,7 +210,6 @@ function UploadErrors({
                 </div>
             </div>
             </Modal.Body>
-
         </Modal>
     );
 }

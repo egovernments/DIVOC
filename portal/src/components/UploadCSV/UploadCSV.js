@@ -101,8 +101,8 @@ function ToastComponent({
     const toggleShow = () => setShowToast(!showToast);
 
     return (
-        <Toast className="toast-container" show={showToast} onClose={toggleShow} style={{ marginRight: "3.5rem",width: "100%",position: "absolute", bottom: "0",right: "0",backgroundColor: '#4E4E4E',color: '#FFFFFF',boxShadow: '0px 6px 20px #C1CFD933',borderRadius: '5px'}} >
-        <Toast.Header style={{ backgroundColor: '#4E4E4E',color: '#FFFFFF', border: '1px solid #717171'}}>
+        <Toast className="toast-container" show={showToast} onClose={toggleShow} >
+        <Toast.Header className="toast-header">
             <strong className="mr-auto">{header} Records Uploaded</strong>
         </Toast.Header>
         <Toast.Body>

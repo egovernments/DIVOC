@@ -12,6 +12,8 @@ function PreEnrollment() {
         fileUploadErrorsAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
+        tableTitle="All Pre-Enrollments"
+        fetchAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_API}
     />
 }
 
