@@ -9,6 +9,7 @@ import {appIndexDb} from "../AppDatabase";
 import config from "config.json"
 import {programDb} from "../Services/ProgramDB";
 import {getSelectedProgram} from "../components/ProgramSelection";
+import {getVaccinationDetails, saveVaccinationDetails} from "../utils/storage";
 
 export function ConfirmFlow(props) {
     return (
@@ -74,7 +75,6 @@ function confirmVaccineReducer(state, action) {
     }
 }
 
-export const ACTION_SELECT_BATCH = "selectBatch"
 export const ACTION_PATIENT_COMPLETED = "patientCompleted"
 
 export function useConfirmVaccine() {
@@ -102,17 +102,19 @@ export function useConfirmVaccine() {
         const selectedProgram = getSelectedProgram();
         const vaccinator = await appIndexDb.getVaccinators();
         const medicines = await programDb.getMedicines(selectedProgram)
+        const vaccinationDetails = getVaccinationDetails();
         return {
             vaccinator: vaccinator || [],
-            selectedVaccinator: null,
+            selectedVaccinator: vaccinationDetails.vaccinatorId,
             medicines: medicines,
-            selectedMedicine: null,
-            batchIds: [],
+            selectedMedicine: vaccinationDetails.medicineId,
+            batchIds: vaccinationDetails.batchIds,
             selectedBatchId: null,
         }
     }
 
     const markPatientComplete = async function (payload) {
+        saveVaccinationDetails(payload)
         try {
             await appIndexDb.saveEvent(payload)
             await appIndexDb.markPatientAsComplete(payload.enrollCode)

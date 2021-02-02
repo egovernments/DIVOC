@@ -9,19 +9,19 @@ import {SyncFacade} from "../../SyncFacade";
 export const SelectVaccinator = (props) => {
     const {markPatientComplete, getFormDetails, goNext} = useConfirmVaccine();
     const [vaccinators, setVaccinators] = useState([])
-    const [selectedVaccinator, setSelectedVaccinator] = useState();
-    const [selectedMedicine, setSelectedMedicine] = useState();
+    const [selectedVaccinatorId, setSelectedVaccinatorId] = useState();
+    const [selectedMedicineName, setSelectedMedicineName] = useState();
     const [medicines, setMedicines] = useState([])
     const [batchIds, setBatchIds] = useState([])
     const [selectedBatchIds, setSelectedBatchIds] = useState();
     const [batchCode, setBatchCode] = useState();
 
     function onActionBtnClick() {
-        if (selectedVaccinator && selectedMedicine && batchCode) {
+        if (selectedVaccinatorId && selectedMedicineName && batchCode) {
             const payload = {
                 enrollCode: props.enrollCode,
-                vaccinatorId: selectedVaccinator.osid,
-                medicineId: selectedMedicine.name,
+                vaccinatorId: selectedVaccinatorId,
+                medicineId: selectedMedicineName,
                 batchId: batchCode
             }
             markPatientComplete(payload).then((value) => {
@@ -43,9 +43,9 @@ export const SelectVaccinator = (props) => {
             .then((result) => {
                 setVaccinators(result.vaccinator)
                 setMedicines(result.medicines)
-                setBatchIds(result.batchIds)
-                setSelectedVaccinator(result.selectedVaccinator)
-                setSelectedMedicine(result.selectedMedicine)
+                setBatchIds(result.batchIds || [])
+                setSelectedVaccinatorId(result.selectedVaccinator)
+                setSelectedMedicineName(result.selectedMedicine)
                 setSelectedBatchIds(result.selectedBatchId)
             })
     }, [])
@@ -56,11 +56,11 @@ export const SelectVaccinator = (props) => {
                 <DropdownButton id="dropdown-item-button" title="Dropdown button">
                     {
                         vaccinators.map((data, index) => {
-                            if (selectedVaccinator && selectedVaccinator.osid === data.osid) {
+                            if (selectedVaccinatorId && selectedVaccinatorId === data.osid) {
                                 return <DropdownItem as="button" active>{data.name}</DropdownItem>
                             } else {
                                 return <DropdownItem as="button"
-                                                     onClick={() => setSelectedVaccinator(data)}>
+                                                     onClick={() => setSelectedVaccinatorId(data.osid)}>
                                     {data.name}</DropdownItem>
                             }
                         })
@@ -70,11 +70,11 @@ export const SelectVaccinator = (props) => {
                 <DropdownButton id="dropdown-item-button" title="Dropdown button">
                     {
                         medicines.map((data, index) => {
-                            if (selectedMedicine && selectedMedicine.osid === data.osid) {
+                            if (selectedMedicineName && selectedMedicineName.osid === data.osid) {
                                 return <DropdownItem as="button" active>{data.name}</DropdownItem>
                             } else {
                                 return <DropdownItem as="button"
-                                                     onClick={() => setSelectedMedicine(data)}>
+                                                     onClick={() => setSelectedMedicineName(data.name)}>
                                     {data.name}</DropdownItem>
                             }
                         })
@@ -85,11 +85,11 @@ export const SelectVaccinator = (props) => {
                 <DropdownButton id="dropdown-item-button" title="Dropdown button">
                     {
                         batchIds.map((data, index) => {
-                            if (selectedBatchIds && selectedBatchIds.name === data.name) {
-                                return <DropdownItem as="button" active>{data.name}</DropdownItem>
+                            if (selectedBatchIds && selectedBatchIds === data) {
+                                return <DropdownItem as="button" active>{data}</DropdownItem>
                             } else {
                                 return <DropdownItem as="button"
-                                                     onClick={() => setSelectedMedicine(data)}>
+                                                     onClick={() => setBatchCode(data)}>
                                     {data.name}</DropdownItem>
                             }
                         })
