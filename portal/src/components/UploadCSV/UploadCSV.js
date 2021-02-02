@@ -4,12 +4,12 @@ import {ProgressBar} from 'react-bootstrap';
 import React, {useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
-import Toast from 'react-bootstrap/Toast'
+import Toast from 'react-bootstrap/Toast';
+import Button from 'react-bootstrap/Button';
 
-function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
+function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
-    const [showA, setShowA] = useState(true);
-    const toggleShowA = () => setShowA(!showA);
+    const [showToast, setShowToast] = useState(false);
 
     const {keycloak} = useKeycloak();
 
@@ -29,8 +29,8 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
         setUploadPercentage(1);
         axios.post(fileUploadAPI, dataToSend, config).then(res => {
             setTimeout(() => {
-                setUploadPercentage(0)
-                alert("Successfully uploaded CSV");
+                setUploadPercentage(0);
+                setShowToast(!showToast);
             }, 500);
             onUploadComplete();
         }).catch((error) => {
@@ -41,20 +41,30 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
         })
     };
 
+    function uploadingToastBody () {
+        return(
+            <div>
+                <span>File Uploaded</span>&emsp;
+                <ProgressBar variant="success" now={uploadPercentage} active/>
+                <span>{uploadPercentage > 0 && `${uploadPercentage}%`}</span>
+            </div>
+        )
+    }
+
+    function uploadedToastBody() {
+        return(
+            <div className="d-flex justify-content-between">
+                <p>Errors Found</p>
+                <Button style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
+            </div>
+        )
+    }
     return (
         <div className={styles['container'] + " d-flex justify-content-end"}>
             <div className={styles['progress-bar-container']}>
-                <div>{uploadPercentage > 0 && <Toast className="toast-container" show={showA} onClose={toggleShowA}>
-                <Toast.Header>
-                    <strong className="mr-auto">Records Uploaded</strong>
-                </Toast.Header>
-                <Toast.Body className="toast-body">
-                    <span>File Uploaded</span>&emsp;
-                    <ProgressBar now={uploadPercentage} active/>
-                    <span>{uploadPercentage > 0 && `${uploadPercentage}%`}</span>
-                </Toast.Body>
-                </Toast>}</div>
+            {uploadPercentage >= 0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
             </div>
+            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()}/>}
             <div>
                 <input
                     type='file'
@@ -80,6 +90,25 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
                 </div>}
             </div>
         </div>
+    );
+}
+
+function ToastComponent({
+    header,
+    toastBody
+}) {
+    const [showToast, setShowToast] = useState(true);
+    const toggleShow = () => setShowToast(!showToast);
+
+    return (
+        <Toast className="toast-container" show={showToast} onClose={toggleShow} style={{ marginRight: "3.5rem",width: "100%",position: "absolute", bottom: "0",right: "0",backgroundColor: '#4E4E4E',color: '#FFFFFF',boxShadow: '0px 6px 20px #C1CFD933',borderRadius: '5px'}} >
+        <Toast.Header style={{ backgroundColor: '#4E4E4E',color: '#FFFFFF', border: '1px solid #717171'}}>
+            <strong className="mr-auto">{header} Records Uploaded</strong>
+        </Toast.Header>
+        <Toast.Body>
+            {toastBody}
+        </Toast.Body>
+        </Toast>
     );
 }
 

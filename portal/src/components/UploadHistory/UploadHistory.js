@@ -1,20 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {useAxios} from "../../utils/useAxios";
-import {formatDate} from "../../utils/dateutil";
+import React, { useEffect, useState } from "react";
+import { useAxios } from "../../utils/useAxios";
+import { formatDate } from "../../utils/dateutil";
 import UploadCSV from "../UploadCSV/UploadCSV";
-import {UploadHistoryTable} from "../UploadHistoryTable";
+import { UploadHistoryTable } from "../UploadHistoryTable";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
-import {Card} from "@material-ui/core";
+import { Card } from "@material-ui/core";
 import ProgramActive from "../../assets/img/program-active.svg";
-import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
-import "./UploadHistory.css"
-import {TotalRecords} from "../TotalRecords";
-import {API_URL} from "../../utils/constants";
-import Modal from 'react-bootstrap/Modal'
+import { UploadErrorList } from "../UploadHistoryTable/UploadErrorList";
+import "./UploadHistory.css";
+import { TotalRecords } from "../TotalRecords";
 
-const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI, infoTitle, UploadComponent=UploadCSV}) => {
-    const axiosInstance = useAxios('');
+import Modal from "react-bootstrap/Modal";
+
+const UploadHistory = ({
+    fileUploadAPI,
+    fileUploadHistoryAPI,
+    fileUploadErrorsAPI,
+    infoTitle,
+    UploadComponent = UploadCSV,
+    tableTitle,
+    fetchAPI,
+}) => {
+    const axiosInstance = useAxios("");
     const [uploadHistory, setUploadHistory] = useState([]);
     const [allFacilities, setAllFacilities] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null);
@@ -23,15 +31,13 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-    
-
     useEffect(() => {
         fetchFacilities();
         fetchUploadHistory();
     }, []);
 
     function fetchFacilities() {
-        axiosInstance.current.get(API_URL.FACILITY_API)
+        axiosInstance.current.get(fetchAPI)
             .then(res => {
                 return res.data
             })
@@ -41,14 +47,12 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
             })
             .then((result) => {
                 return result.map((item, index) => {
-                    console.log("res data",item)
-                        return {
-                            facilityId: item["facilityCode"],
-                            name: item["facilityName"],
-                            state: item["address"].state,
-                        };
+                    return {
+                        facilityId: item["facilityCode"],
+                        name: item["facilityName"],
+                        state: item["address"].state,
                     }
-                )
+                })
             })
             .then((result) => {
                 setAllFacilities(result)
@@ -66,9 +70,9 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
             })
             .then((result) => {
                 return result.map((item, index) => {
-                        const uploadedDate = new Date(item["CreatedAt"])
-                        const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                        const uploadLocalDate = formatDate(uploadedDate)
+                    const uploadedDate = new Date(item["CreatedAt"]);
+                    const uploadLocalTime = uploadedDate.toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit" });
+                    const uploadLocalDate = formatDate(uploadedDate);
                         return {
                             id: item["ID"],
                             fileName: item["Filename"],
@@ -76,9 +80,8 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
                             time: uploadLocalTime,
                             success: getSuccessRecords(item),
                             errors: item["TotalErrorRows"]
-                        };
                     }
-                )
+                })
             })
             .then((result) => {
                 setUploadHistory(result)
@@ -103,13 +106,20 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
     return (
         <div>
             <div className="upload-csv">
-                {infoTitle && <TotalRecords
+                {infoTitle && (
+                    <TotalRecords
                         title={infoTitle}
                         count={getTotalSuccessUploadCount()}
-                    />}
-                <UploadComponent fileUploadAPI={fileUploadAPI} onUploadComplete={() => {
-                    fetchUploadHistory()
-                }}/>
+                    />
+                )}
+                <UploadComponent
+                    fileUploadAPI={fileUploadAPI}
+                    onUploadComplete={() => {
+                        fetchUploadHistory();
+                    }}
+                    uploadHistoryCount={selectedHistory && selectedHistory.success}
+                    handleShow={handleShow}
+                />
             </div>
             <div className="upload-csv-container">
                 <div>
@@ -119,6 +129,7 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
                         onCellClicked={(value) => {
                             setSelectedFacility(value);
                         }}
+                        title={tableTitle}
                     />
                 </div>
                 <div className="upload-history">
@@ -129,24 +140,25 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
                             setSelectedHistory(value);
                             handleShow();
                         }}
+                        title="Uploads History"
                     />
                 </div>
                 <div className="error-temp">
-                    {selectedHistory && <UploadErrors
-                            uploadHistory={selectedHistory}
-                            fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)}
-                            handleClose={handleClose}
-                            show={show}
-                        /> 
-                    }
+                    {selectedHistory && (
+                        <UploadErrors uploadHistory={selectedHistory} fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)} handleClose={handleClose} show={show}/> 
+                    )}
                 </div>
             </div>
         </div>
     );
 };
 
-
-function UploadErrors({uploadHistory, fileUploadHistoryDetailsAPI,handleClose,show}) {
+function UploadErrors({
+    uploadHistory,
+    fileUploadHistoryDetailsAPI,
+    handleClose,
+    show,
+}) {
     const axiosInstance = useAxios('');
     const [uploadHistoryDetails, setUploadHistoryDetails] = useState({});
     useEffect(() => {

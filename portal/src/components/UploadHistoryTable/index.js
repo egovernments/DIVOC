@@ -32,7 +32,7 @@ const RowTableCell = withStyles({
         fontSize: "0.85rem",
         padding: "8px",
         color: "#646D82",
-        borderBottom: "1px solid #CEE5FF",
+        borderBottom: "1px solid #E6E6E6",
         font: "Proxima Nova"
     }
 })(TableCell);
@@ -42,7 +42,7 @@ const HeaderTableCell = withStyles({
         fontSize: "0.75rem",
         fontWeight: "bold",
         color: "#646D82",
-        borderBottom: "1px solid #CEE5FF"
+        borderBottom: "none",
     }
 })(TableCell);
 
@@ -64,7 +64,7 @@ export class HeaderData {
 }
 
 
-export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
+export const UploadHistoryTable = ({data, headerData, onCellClicked,title}) => {
 
     const [selectedHistory, setSelectedHistory] = useState()
     const classes = useStyles();
@@ -72,7 +72,7 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
     return (
         <div>
             <TableContainer component={CustomPaper}>
-                <h5 className="m-2">Uploads History</h5>
+                <h5 className="m-2">{title}</h5>
                 <hr color="#CEE5FF" style={{
                     border: 0,
                     borderBottom: "1px solid #CEE5FF"
@@ -100,7 +100,8 @@ export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
                                     <TableRow
                                         selected={selectedHistory && selectedHistory.id === row["id"]}
                                         style={{
-                                            cursor: 'pointer'
+                                            cursor: 'pointer',
+                                            background: 'none',
                                         }}
                                         onClick={() => {
                                             setSelectedHistory(row)
