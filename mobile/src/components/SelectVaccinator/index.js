@@ -107,7 +107,7 @@ export const SelectVaccinator = (props) => {
                 </Form.Group>
 
             </div>
-            <Button variant="outline-primary" className="action-btn" onClick={(onActionBtnClick)}>{"NEXT"}</Button>
+            <Button variant="outline-primary" className="action-btn" onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
         </div>
     );
 }

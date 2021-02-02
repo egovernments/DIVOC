@@ -224,7 +224,6 @@ export class AppDatabase {
     }
 
     async cleanEvents() {
-        console.log("Clear")
         await this.db.clear(EVENTS)
     }
 

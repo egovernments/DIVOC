@@ -4,7 +4,6 @@ import {BaseFormCard} from "../components/BaseFormCard";
 import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
-import {BatchCodeForm} from "../components/BatchCodeForm";
 import {appIndexDb} from "../AppDatabase";
 import config from "config.json"
 import {programDb} from "../Services/ProgramDB";
@@ -26,8 +25,6 @@ export function ConfirmVaccination(props) {
         switch (pageName) {
             case CONSTANT.SELECT_VACCINATOR:
                 return <SelectVaccinator enrollCode={recipient_id}/>;
-            case CONSTANT.BATCH_CODE:
-                return <BatchCodeForm/>;
             default:
                 return <Redirect to={config.urlPath + '/queue'}/>
         }
