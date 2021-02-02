@@ -79,19 +79,18 @@ export const SelectVaccinator = (props) => {
                         setSelectedVaccinatorId(option.value)
                     }}/>
                 <span className="select-title">SELECT VACCINE</span>
-                <DropdownButton id="dropdown-item-button" title="Dropdown button">
-                    {
-                        medicines.map((data, index) => {
-                            if (selectedMedicineName && selectedMedicineName.osid === data.osid) {
-                                return <DropdownItem as="button" active>{data.name}</DropdownItem>
-                            } else {
-                                return <DropdownItem as="button"
-                                                     onClick={() => setSelectedMedicineName(data.name)}>
-                                    {data.name}</DropdownItem>
-                            }
-                        })
-                    }
-                </DropdownButton>
+                <Select
+                    key={selectedMedicineName}
+                    defaultValue={{value: selectedMedicineName, label: selectedMedicineName}}
+                    options={medicines.map((item, index) => {
+                        return {
+                            label: item.name,
+                            value: item.name,
+                        }
+                    })}
+                    onChange={(option) => {
+                        setSelectedMedicineName(option.value)
+                    }}/>
 
                 <span className="select-title">SELECT BATCH IDS</span>
                 <DropdownButton id="dropdown-item-button" title="Dropdown button">
