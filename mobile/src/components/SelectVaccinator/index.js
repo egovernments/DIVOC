@@ -62,7 +62,7 @@ export const SelectVaccinator = (props) => {
             <div className="table-wrapper">
                 <div className="select-title">SELECT VACCINATOR*</div>
                 <Select
-                    key={selectedVaccinatorId}
+                    key={selectedVaccinatorId ?? "vaccinatorId"}
                     isSearchable={false}
                     defaultValue={defaultVaccinatorOption()}
                     options={vaccinators.map((item, index) => {
@@ -76,7 +76,7 @@ export const SelectVaccinator = (props) => {
                     }}/>
                 <div className="select-title">SELECT VACCINE*</div>
                 <Select
-                    key={selectedMedicineName}
+                    key={selectedMedicineName ?? "medicineId"}
                     isSearchable={false}
                     defaultValue={{value: selectedMedicineName, label: selectedMedicineName}}
                     options={medicines.map((item, index) => {
@@ -93,7 +93,7 @@ export const SelectVaccinator = (props) => {
                     <div className="select-title">ENTER BATCH ID*</div>
                     <AutoComplete
                         noSuggestion={false}
-                        key={tempSelectedBatchId}
+                        key={tempSelectedBatchId ?? "batchId"}
                         onChange={(value) => {
                             setSelectedBatchId(value)
                         }}
