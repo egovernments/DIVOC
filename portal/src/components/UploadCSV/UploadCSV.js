@@ -62,7 +62,7 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
     return (
         <div className={styles['container'] + " d-flex justify-content-end"}>
             <div className={styles['progress-bar-container']}>
-            {uploadPercentage >= 0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
+            {uploadPercentage>0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
             </div>
             {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()}/>}
             <div>
