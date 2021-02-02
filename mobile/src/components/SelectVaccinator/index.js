@@ -1,11 +1,10 @@
 import React, {useEffect, useState} from "react";
 import "./index.scss";
-import {DropdownButton, Form} from "react-bootstrap";
 import Button from "react-bootstrap/Button";
 import {ACTION_PATIENT_COMPLETED, useConfirmVaccine} from "../../ConfirmVaccination";
-import DropdownItem from "react-bootstrap/DropdownItem";
 import {SyncFacade} from "../../SyncFacade";
 import Select from 'react-select'
+import AutoComplete from "../AutoComplete";
 
 export const SelectVaccinator = (props) => {
     const {markPatientComplete, getFormDetails, goNext} = useConfirmVaccine();
@@ -15,15 +14,15 @@ export const SelectVaccinator = (props) => {
     const [medicines, setMedicines] = useState([])
     const [batchIds, setBatchIds] = useState([])
     const [selectedBatchId, setSelectedBatchId] = useState();
-    const [batchCode, setBatchCode] = useState();
+    const [tempSelectedBatchId, setTempSelectedBatchId] = useState();
 
     function onActionBtnClick() {
-        if (selectedVaccinatorId && selectedMedicineName && batchCode) {
+        if (selectedVaccinatorId && selectedMedicineName && selectedBatchId) {
             const payload = {
                 enrollCode: props.enrollCode,
                 vaccinatorId: selectedVaccinatorId,
                 medicineId: selectedMedicineName,
-                batchId: batchCode
+                batchId: selectedBatchId
             }
             markPatientComplete(payload).then((value) => {
                 return SyncFacade.push()
@@ -45,29 +44,26 @@ export const SelectVaccinator = (props) => {
         }
     }
 
-    function onBatchCodeChange(e) {
-        setBatchCode(e.target.value)
-    }
-
     useEffect(() => {
         getFormDetails()
             .then((result) => {
                 setVaccinators(result.vaccinator)
                 setMedicines(result.medicines)
                 setBatchIds(result.batchIds)
-                setBatchCode(result.selectedBatchId)
                 setSelectedVaccinatorId(result.selectedVaccinator)
                 setSelectedMedicineName(result.selectedMedicine)
                 setSelectedBatchId(result.selectedBatchId)
+                setTempSelectedBatchId(result.selectedBatchId)
             })
     }, [])
 
     return (
         <div className="select-vaccinator-wrapper">
             <div className="table-wrapper">
-                <span className="select-title">SELECT VACCINATOR</span>
+                <div className="select-title">SELECT VACCINATOR*</div>
                 <Select
                     key={selectedVaccinatorId}
+                    isSearchable={false}
                     defaultValue={defaultVaccinatorOption()}
                     options={vaccinators.map((item, index) => {
                         return {
@@ -78,9 +74,10 @@ export const SelectVaccinator = (props) => {
                     onChange={(option) => {
                         setSelectedVaccinatorId(option.value)
                     }}/>
-                <span className="select-title">SELECT VACCINE</span>
+                <div className="select-title">SELECT VACCINE*</div>
                 <Select
                     key={selectedMedicineName}
+                    isSearchable={false}
                     defaultValue={{value: selectedMedicineName, label: selectedMedicineName}}
                     options={medicines.map((item, index) => {
                         return {
@@ -92,32 +89,21 @@ export const SelectVaccinator = (props) => {
                         setSelectedMedicineName(option.value)
                     }}/>
 
-                <span className="select-title">SELECT BATCH IDS</span>
-                <DropdownButton id="dropdown-item-button" title="Dropdown button">
-                    {
-                        batchIds.map((data, index) => {
-                            if (selectedBatchId && selectedBatchId === data) {
-                                return <DropdownItem as="button" active>{data}</DropdownItem>
-                            } else {
-                                return <DropdownItem as="button"
-                                                     onClick={() => {
-                                                         setBatchCode(data)
-                                                         setSelectedBatchId(data)
-                                                     }}>
-                                    {data}</DropdownItem>
-                            }
-                        })
-                    }
-                </DropdownButton>
-
-                <Form.Group>
-                    <Form.Label className="d-block text-center">Enter Batch ID</Form.Label>
-                    <Form.Control value={batchCode} type="text" placeholder="XXXXXXXXXXXXX"
-                                  onChange={onBatchCodeChange}/>
-                </Form.Group>
-
+                <div className="d-flex flex-column">
+                    <div className="select-title">ENTER BATCH ID*</div>
+                    <AutoComplete
+                        noSuggestion={false}
+                        key={tempSelectedBatchId}
+                        onChange={(value) => {
+                            setSelectedBatchId(value)
+                        }}
+                        defaultText={selectedBatchId}
+                        suggestions={batchIds}
+                    />
+                </div>
             </div>
-            <Button variant="outline-primary" className="action-btn" onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
+            <Button variant="outline-primary" className="action-btn mt-4"
+                    onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
         </div>
     );
 }

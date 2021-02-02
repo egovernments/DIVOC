@@ -32,7 +32,7 @@ export function ConfirmVaccination(props) {
 
     return (
         <div className="confirm-vaccination-container">
-            <BaseFormCard title={"Confirm Vaccinator and Batch"}>
+            <BaseFormCard title={"Confirm Vaccination"}>
                 <div className="pt-3 form-wrapper">
                     {
                         getForm()
