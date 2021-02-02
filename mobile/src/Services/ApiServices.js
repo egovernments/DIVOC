@@ -57,7 +57,7 @@ export class ApiServices {
             const patientDetails = item.patient;
             //TODO: Move this into App database as medicine details object.
             const eventDate = new Date(item.eventDate);
-            const givenVaccination = this.getPatientGivenMedicine(allPrograms, patientDetails.programId)
+            const givenVaccination = this.getPatientGivenMedicine(allPrograms, patientDetails.programId, item.medicineId)
             let repeatUntil = 0;
             if (givenVaccination["schedule"] && givenVaccination["schedule"]["repeatInterval"]) {
                 repeatUntil = givenVaccination["schedule"]["repeatInterval"]
@@ -162,13 +162,18 @@ export class ApiServices {
             })
     }
 
-    static getPatientGivenMedicine(allPrograms, programName) {
+    static getPatientGivenMedicine(allPrograms, programName, medicineId) {
         const patientProgram = allPrograms.find((value => {
             return value["name"] === programName
         }))
         const patientProgramMedicine = patientProgram["medicines"]
         if (patientProgramMedicine && patientProgramMedicine.length > 0) {
-            return patientProgramMedicine[0]
+            const findProgramMedicine = patientProgramMedicine.find((value => {
+                return value["name"] === medicineId
+            }))
+            if (findProgramMedicine != null) {
+                return findProgramMedicine
+            }
         }
         return {}
     }

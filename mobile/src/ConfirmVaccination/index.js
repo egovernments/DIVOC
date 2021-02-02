@@ -7,6 +7,8 @@ import {CONSTANT} from "../utils/constants";
 import {BatchCodeForm} from "../components/BatchCodeForm";
 import {appIndexDb} from "../AppDatabase";
 import config from "config.json"
+import {programDb} from "../Services/ProgramDB";
+import {getSelectedProgram} from "../components/ProgramSelection";
 
 export function ConfirmFlow(props) {
     return (
@@ -59,14 +61,11 @@ const initialState = {};
 
 function confirmVaccineReducer(state, action) {
     switch (action.type) {
-        case ACTION_SELECT_BATCH: {
+        case ACTION_PATIENT_COMPLETED: {
             const newState = {...state}
             newState.enrollCode = action.payload.enrollCode;
             newState.vaccinatorId = action.payload.vaccinatorId;
-            return newState
-        }
-        case ACTION_PATIENT_COMPLETED: {
-            const newState = {...state}
+            newState.medicineId = action.payload.medicineId;
             newState.batchCode = action.payload.batchCode
             return newState
         }
@@ -99,12 +98,24 @@ export function useConfirmVaccine() {
         history.goBack()
     }
 
-    const markPatientComplete = async function (batchCode) {
+    const getFormDetails = async function () {
+        const selectedProgram = getSelectedProgram();
+        const vaccinator = await appIndexDb.getVaccinators();
+        const medicines = await programDb.getMedicines(selectedProgram)
+        return {
+            vaccinator: vaccinator || [],
+            selectedVaccinator: null,
+            medicines: medicines,
+            selectedMedicine: null,
+            batchIds: [],
+            selectedBatchId: null,
+        }
+    }
+
+    const markPatientComplete = async function (payload) {
         try {
-            const [state] = context;
-            state.batchCode = batchCode
-            await appIndexDb.saveEvent(state)
-            await appIndexDb.markPatientAsComplete(state.enrollCode)
+            await appIndexDb.saveEvent(payload)
+            await appIndexDb.markPatientAsComplete(payload.enrollCode)
         } catch (e) {
             return Promise.reject(e.message)
         }
@@ -115,6 +126,7 @@ export function useConfirmVaccine() {
         dispatch,
         goNext,
         goBack,
-        markPatientComplete
+        markPatientComplete,
+        getFormDetails
     }
 }

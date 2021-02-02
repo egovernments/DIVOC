@@ -218,6 +218,7 @@ export class AppDatabase {
             batchCode: event.batchCode,
             enrollCode: event.enrollCode,
             eventDate: event.date ?? new Date().toISOString(),
+            medicineId: event.medicineId,
             identity: queue.aadhaarNumber
         }
     }
