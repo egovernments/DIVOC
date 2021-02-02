@@ -1,7 +1,7 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgram} from "./components/ProgramSelection";
-import {formatCertifyDate} from "./utils/date_utils";
+import {programDb} from "./Services/ProgramDB";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 10;
@@ -115,23 +115,6 @@ export class AppDatabase {
         }
     }
 
-    async getVaccinators() {
-        const vaccinator = await this.db.getAll(VACCINATORS)
-        const selectProgram = getSelectedProgram();
-        const vaccinatorByProgram = vaccinator.filter((item, index) => {
-            const supportProgramsName = item[PROGRAMS]
-            for (let i = 0; i < supportProgramsName.length; i++) {
-                const program = supportProgramsName[i]
-                if (program.id === selectProgram && program.certified) {
-                    return true;
-                }
-            }
-            return false;
-
-        });
-        return vaccinatorByProgram
-    }
-
     async markPatientAsComplete(enrollCode) {
         const patient = await this.db.get(QUEUE, enrollCode);
         patient.status = QUEUE_STATUS.COMPLETED;
@@ -141,23 +124,6 @@ export class AppDatabase {
     async saveEvent(event) {
         event.date = new Date().toISOString()
         return this.db.add(EVENTS, event)
-    }
-
-
-    async savePrograms(programs) {
-        const programList = programs || [];
-        const facilityProgram = programList.map((item, index) => this.db.put(PROGRAMS, item));
-        return Promise.all(facilityProgram)
-    }
-
-
-    async getPrograms() {
-        return this.db.getAll(PROGRAMS);
-    }
-
-    async getProgramByName(programName) {
-        const program = await this.db.get(PROGRAMS, programName);
-        return program
     }
 
     async saveUserDetails(userDetails) {
@@ -213,7 +179,7 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        const vaccination = await this.getVaccinationDetails(event, patient.programId)
+        const vaccination = await programDb.getVaccinationDetails(event, patient.programId)
         return {
             vaccinatorName: vaccinator.name,
             patient: patient,
@@ -222,54 +188,6 @@ export class AppDatabase {
             vaccination: vaccination
         }
     }
-
-    async getVaccinationDetails(event, programId) {
-        const allPrograms = await appIndexDb.getPrograms()
-        const eventDate = new Date(event.date);
-        const givenVaccination = this.getPatientGivenMedicine(allPrograms, programId, event.medicineId)
-        let repeatUntil = 0;
-        if (givenVaccination["schedule"] && givenVaccination["schedule"]["repeatInterval"]) {
-            repeatUntil = givenVaccination["schedule"]["repeatInterval"]
-        }
-        const medicineEffectiveDate = givenVaccination["effectiveUntil"] ?? 0;
-        const effectiveUntilDate = this.getEffectiveUntil(eventDate, medicineEffectiveDate)
-        return {
-            batch: event.batchId,
-            date: eventDate,
-            effectiveStart: formatCertifyDate(eventDate),
-            effectiveUntil: effectiveUntilDate,
-            manufacturer: givenVaccination["provider"] ?? "N/A",
-            name: givenVaccination["name"] ?? "N/A",
-            //TODO: Need dose from vaccinator in UI
-            dose: 1,
-            totalDoses: repeatUntil,
-        }
-    }
-
-
-    getEffectiveUntil(event, effectiveUntil) {
-        const eventDate = new Date(event)
-        const newDateMonths = eventDate.setMonth(eventDate.getMonth() + effectiveUntil);
-        const newDate = new Date(newDateMonths);
-        return formatCertifyDate(newDate);
-    }
-
-    getPatientGivenMedicine(allPrograms, programName, medicineId) {
-        const patientProgram = allPrograms.find((value => {
-            return value["name"] === programName
-        }))
-        const patientProgramMedicine = patientProgram["medicines"]
-        if (patientProgramMedicine && patientProgramMedicine.length > 0) {
-            const findProgramMedicine = patientProgramMedicine.find((value => {
-                return value["name"] === medicineId
-            }))
-            if (findProgramMedicine != null) {
-                return findProgramMedicine
-            }
-        }
-        return {}
-    }
-
 
     async cleanEvents() {
         await this.db.clear(EVENTS)

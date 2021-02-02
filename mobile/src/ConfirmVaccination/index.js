@@ -97,7 +97,7 @@ export function useConfirmVaccine() {
 
     const getFormDetails = async function () {
         const selectedProgram = getSelectedProgram();
-        const vaccinator = await appIndexDb.getVaccinators();
+        const vaccinator = await programDb.getVaccinators();
         const medicines = await programDb.getMedicines(selectedProgram)
         const vaccinationDetails = getVaccinationDetails();
         return {
