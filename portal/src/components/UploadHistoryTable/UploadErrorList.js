@@ -71,6 +71,7 @@ export function UploadErrorList({uploadHistoryDetails, columns, fileName}) {
 
                 }}/>
                 {isErrorFound ? <Table component={CustomPaper}>
+                    <div style={{ overflow: 'auto', height: '350px' }}>
                     <TableBody>
                         {
                             uploadHistoryDetails.map((item, index) => {
@@ -84,6 +85,7 @@ export function UploadErrorList({uploadHistoryDetails, columns, fileName}) {
                             })
                         }
                     </TableBody>
+                    </div>
                 </Table> : <p>No Error Found</p>}
             </div>
             {isErrorFound && <Button variant="danger" className="m-4" onClick={() => {
