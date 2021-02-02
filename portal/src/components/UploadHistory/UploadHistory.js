@@ -84,6 +84,7 @@ const UploadHistory = ({
                 })
             })
             .then((result) => {
+                setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
     }
@@ -118,6 +119,7 @@ const UploadHistory = ({
                         fetchUploadHistory();
                     }}
                     uploadHistoryCount={selectedHistory && selectedHistory.success}
+                    errorCount={selectedHistory && selectedHistory.errors}
                     handleShow={handleShow}
                 />
             </div>

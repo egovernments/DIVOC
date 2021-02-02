@@ -71,7 +71,7 @@ export function UploadErrorList({uploadHistoryDetails, columns, fileName}) {
 
                 }}/>
                 {isErrorFound ? <Table component={CustomPaper}>
-                    <div style={{ overflow: 'auto', height: '350px' }}>
+                    <div style={{ overflow: 'auto', height: '35vh' }}>
                     <TableBody>
                         {
                             uploadHistoryDetails.map((item, index) => {

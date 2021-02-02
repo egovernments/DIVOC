@@ -7,7 +7,7 @@ import {useKeycloak} from "@react-keycloak/web";
 import Toast from 'react-bootstrap/Toast';
 import Button from 'react-bootstrap/Button';
 
-function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow}) {
+function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow,errorCount}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
     const [showToast, setShowToast] = useState(false);
 
@@ -30,7 +30,7 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
         axios.post(fileUploadAPI, dataToSend, config).then(res => {
             setTimeout(() => {
                 setUploadPercentage(0);
-                setShowToast(!showToast);
+                setShowToast(true);
             }, 500);
             onUploadComplete();
         }).catch((error) => {
@@ -54,7 +54,7 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
     function uploadedToastBody() {
         return(
             <div className="d-flex justify-content-between">
-                <p>Errors Found</p>
+                <p>{errorCount} Errors Found</p>
                 <Button style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
             </div>
         )
@@ -64,7 +64,7 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
             <div className={styles['progress-bar-container']}>
             {uploadPercentage>0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
             </div>
-            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()}/>}
+            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()} />}
             <div>
                 <input
                     type='file'
