@@ -13,7 +13,7 @@ export const SelectVaccinator = (props) => {
     const [selectedMedicineName, setSelectedMedicineName] = useState();
     const [medicines, setMedicines] = useState([])
     const [batchIds, setBatchIds] = useState([])
-    const [selectedBatchIds, setSelectedBatchIds] = useState();
+    const [selectedBatchId, setSelectedBatchId] = useState();
     const [batchCode, setBatchCode] = useState();
 
     function onActionBtnClick() {
@@ -43,10 +43,11 @@ export const SelectVaccinator = (props) => {
             .then((result) => {
                 setVaccinators(result.vaccinator)
                 setMedicines(result.medicines)
-                setBatchIds(result.batchIds || [])
+                setBatchIds(result.batchIds)
+                setBatchCode(result.selectedBatchId)
                 setSelectedVaccinatorId(result.selectedVaccinator)
                 setSelectedMedicineName(result.selectedMedicine)
-                setSelectedBatchIds(result.selectedBatchId)
+                setSelectedBatchId(result.selectedBatchId)
             })
     }, [])
     return (
@@ -85,12 +86,15 @@ export const SelectVaccinator = (props) => {
                 <DropdownButton id="dropdown-item-button" title="Dropdown button">
                     {
                         batchIds.map((data, index) => {
-                            if (selectedBatchIds && selectedBatchIds === data) {
+                            if (selectedBatchId && selectedBatchId === data) {
                                 return <DropdownItem as="button" active>{data}</DropdownItem>
                             } else {
                                 return <DropdownItem as="button"
-                                                     onClick={() => setBatchCode(data)}>
-                                    {data.name}</DropdownItem>
+                                                     onClick={() => {
+                                                         setBatchCode(data)
+                                                         setSelectedBatchId(data)
+                                                     }}>
+                                    {data}</DropdownItem>
                             }
                         })
                     }
@@ -98,7 +102,8 @@ export const SelectVaccinator = (props) => {
 
                 <Form.Group>
                     <Form.Label className="d-block text-center">Enter Batch ID</Form.Label>
-                    <Form.Control type="text" placeholder="XXXXXXXXXXXXX" onChange={onBatchCodeChange}/>
+                    <Form.Control value={batchCode} type="text" placeholder="XXXXXXXXXXXXX"
+                                  onChange={onBatchCodeChange}/>
                 </Form.Group>
 
             </div>

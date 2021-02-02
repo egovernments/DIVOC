@@ -215,7 +215,7 @@ export class AppDatabase {
         return {
             vaccinator: vaccinator,
             patient: patient,
-            batchCode: event.batchCode,
+            batchId: event.batchId,
             enrollCode: event.enrollCode,
             eventDate: event.date ?? new Date().toISOString(),
             medicineId: event.medicineId,
