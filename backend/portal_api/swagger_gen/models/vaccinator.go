@@ -306,7 +306,8 @@ func (m *Vaccinator) UnmarshalBinary(b []byte) error {
 type VaccinatorProgramsItems0 struct {
 
 	// if vaccinator has certificate for program
-	Certified bool `json:"certified,omitempty"`
+	// Required: true
+	Certified *bool `json:"certified"`
 
 	// Id of the program
 	ProgramID string `json:"programId,omitempty"`
@@ -320,6 +321,10 @@ type VaccinatorProgramsItems0 struct {
 func (m *VaccinatorProgramsItems0) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateCertified(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateStatus(formats); err != nil {
 		res = append(res, err)
 	}
@@ -327,6 +332,15 @@ func (m *VaccinatorProgramsItems0) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *VaccinatorProgramsItems0) validateCertified(formats strfmt.Registry) error {
+
+	if err := validate.Required("certified", "body", m.Certified); err != nil {
+		return err
+	}
+
 	return nil
 }
 

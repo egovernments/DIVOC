@@ -294,12 +294,59 @@ type VaccinatorProgramsItems0 struct {
 	// certified
 	Certified bool `json:"certified,omitempty"`
 
+	// certified updated at
+	// Format: date
+	CertifiedUpdatedAt strfmt.Date `json:"certifiedUpdatedAt,omitempty"`
+
 	// id
 	ID string `json:"id,omitempty"`
+
+	// status updated at
+	// Format: date
+	StatusUpdatedAt strfmt.Date `json:"statusUpdatedAt,omitempty"`
 }
 
 // Validate validates this vaccinator programs items0
 func (m *VaccinatorProgramsItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateCertifiedUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateStatusUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *VaccinatorProgramsItems0) validateCertifiedUpdatedAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.CertifiedUpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("certifiedUpdatedAt", "body", "date", m.CertifiedUpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *VaccinatorProgramsItems0) validateStatusUpdatedAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.StatusUpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("statusUpdatedAt", "body", "date", m.StatusUpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
 	return nil
 }
 

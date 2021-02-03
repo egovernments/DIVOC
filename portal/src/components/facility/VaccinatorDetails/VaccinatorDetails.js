@@ -189,7 +189,8 @@ export default function VaccinatorDetails({
     function onAddProgramChange(value) {
         let program = {
             programId: value,
-            certified: false
+            certified: false,
+            status: "Active"
         };
         setSelectedProgram(program);
     }
