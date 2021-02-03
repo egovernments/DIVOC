@@ -17,13 +17,14 @@ import {SyncFacade} from "../SyncFacade";
 import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
+import {programDb} from "../Services/ProgramDB";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState()
     const programName = getSelectedProgram();
 
     useEffect(() => {
-        appIndexDb
+        programDb
             .getProgramByName(programName)
             .then((program) => setBannerImage(program["logoURL"]))
 

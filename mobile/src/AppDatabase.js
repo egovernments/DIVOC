@@ -1,6 +1,7 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgram} from "./components/ProgramSelection";
+import {programDb} from "./Services/ProgramDB";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 10;
@@ -114,23 +115,6 @@ export class AppDatabase {
         }
     }
 
-    async getVaccinators() {
-        const vaccinator = await this.db.getAll(VACCINATORS)
-        const selectProgram = getSelectedProgram();
-        const vaccinatorByProgram = vaccinator.filter((item, index) => {
-            const supportProgramsName = item[PROGRAMS]
-            for (let i = 0; i < supportProgramsName.length; i++) {
-                const program = supportProgramsName[i]
-                if (program.id === selectProgram && program.certified) {
-                    return true;
-                }
-            }
-            return false;
-
-        });
-        return vaccinatorByProgram
-    }
-
     async markPatientAsComplete(enrollCode) {
         const patient = await this.db.get(QUEUE, enrollCode);
         patient.status = QUEUE_STATUS.COMPLETED;
@@ -140,23 +124,6 @@ export class AppDatabase {
     async saveEvent(event) {
         event.date = new Date().toISOString()
         return this.db.add(EVENTS, event)
-    }
-
-
-    async savePrograms(programs) {
-        const programList = programs || [];
-        const facilityProgram = programList.map((item, index) => this.db.put(PROGRAMS, item));
-        return Promise.all(facilityProgram)
-    }
-
-
-    async getPrograms() {
-        return this.db.getAll(PROGRAMS);
-    }
-
-    async getProgramByName(programName) {
-        const program = await this.db.get(PROGRAMS, programName);
-        return program
     }
 
     async saveUserDetails(userDetails) {
@@ -212,18 +179,17 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
+        const vaccination = await programDb.getVaccinationDetails(event, patient.programId)
         return {
-            vaccinator: vaccinator,
+            vaccinatorName: vaccinator.name,
             patient: patient,
-            batchCode: event.batchCode,
             enrollCode: event.enrollCode,
-            eventDate: event.date ?? new Date().toISOString(),
-            identity: queue.aadhaarNumber
+            identity: queue.aadhaarNumber,
+            vaccination: vaccination
         }
     }
 
     async cleanEvents() {
-        console.log("Clear")
         await this.db.clear(EVENTS)
     }
 

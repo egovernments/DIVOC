@@ -1,6 +1,7 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
+import {programDb} from "./Services/ProgramDB";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -22,7 +23,7 @@ export class SyncFacade {
         await appIndexDb.saveEnrollments(preEnrollments);
 
         const programs = await ApiServices.fetchPrograms();
-        await appIndexDb.savePrograms(programs)
+        await programDb.savePrograms(programs)
         if (programs.length > 0 && !getSelectedProgram()) {
             saveSelectedProgram(programs[0].name)
         }

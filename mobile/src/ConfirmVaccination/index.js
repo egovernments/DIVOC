@@ -4,9 +4,11 @@ import {BaseFormCard} from "../components/BaseFormCard";
 import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
-import {BatchCodeForm} from "../components/BatchCodeForm";
 import {appIndexDb} from "../AppDatabase";
 import config from "config.json"
+import {programDb} from "../Services/ProgramDB";
+import {getSelectedProgram} from "../components/ProgramSelection";
+import {getVaccinationDetails, saveVaccinationDetails} from "../utils/storage";
 
 export function ConfirmFlow(props) {
     return (
@@ -23,8 +25,6 @@ export function ConfirmVaccination(props) {
         switch (pageName) {
             case CONSTANT.SELECT_VACCINATOR:
                 return <SelectVaccinator enrollCode={recipient_id}/>;
-            case CONSTANT.BATCH_CODE:
-                return <BatchCodeForm/>;
             default:
                 return <Redirect to={config.urlPath + '/queue'}/>
         }
@@ -32,7 +32,7 @@ export function ConfirmVaccination(props) {
 
     return (
         <div className="confirm-vaccination-container">
-            <BaseFormCard title={"Confirm Vaccinator and Batch"}>
+            <BaseFormCard title={"Confirm Vaccination"}>
                 <div className="pt-3 form-wrapper">
                     {
                         getForm()
@@ -59,14 +59,11 @@ const initialState = {};
 
 function confirmVaccineReducer(state, action) {
     switch (action.type) {
-        case ACTION_SELECT_BATCH: {
+        case ACTION_PATIENT_COMPLETED: {
             const newState = {...state}
             newState.enrollCode = action.payload.enrollCode;
             newState.vaccinatorId = action.payload.vaccinatorId;
-            return newState
-        }
-        case ACTION_PATIENT_COMPLETED: {
-            const newState = {...state}
+            newState.medicineId = action.payload.medicineId;
             newState.batchCode = action.payload.batchCode
             return newState
         }
@@ -75,7 +72,6 @@ function confirmVaccineReducer(state, action) {
     }
 }
 
-export const ACTION_SELECT_BATCH = "selectBatch"
 export const ACTION_PATIENT_COMPLETED = "patientCompleted"
 
 export function useConfirmVaccine() {
@@ -99,12 +95,26 @@ export function useConfirmVaccine() {
         history.goBack()
     }
 
-    const markPatientComplete = async function (batchCode) {
+    const getFormDetails = async function () {
+        const selectedProgram = getSelectedProgram();
+        const vaccinator = await programDb.getVaccinators();
+        const medicines = await programDb.getMedicines(selectedProgram)
+        const vaccinationDetails = getVaccinationDetails();
+        return {
+            vaccinator: vaccinator || [],
+            selectedVaccinator: vaccinationDetails.vaccinatorId,
+            medicines: medicines || [],
+            selectedMedicine: vaccinationDetails.medicineId,
+            batchIds: vaccinationDetails.batchIds || [],
+            selectedBatchId: vaccinationDetails.lastBatchId,
+        }
+    }
+
+    const markPatientComplete = async function (payload) {
+        saveVaccinationDetails(payload)
         try {
-            const [state] = context;
-            state.batchCode = batchCode
-            await appIndexDb.saveEvent(state)
-            await appIndexDb.markPatientAsComplete(state.enrollCode)
+            await appIndexDb.saveEvent(payload)
+            await appIndexDb.markPatientAsComplete(payload.enrollCode)
         } catch (e) {
             return Promise.reject(e.message)
         }
@@ -115,6 +125,7 @@ export function useConfirmVaccine() {
         dispatch,
         goNext,
         goBack,
-        markPatientComplete
+        markPatientComplete,
+        getFormDetails
     }
 }

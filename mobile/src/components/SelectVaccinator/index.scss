@@ -1,16 +1,23 @@
 .select-vaccinator-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  .table-wrapper{
+  height: 100%;
+
+  .table-wrapper {
     width: 100%;
   }
+
   .select-title {
     color: #646D82;
-    font-weight: 500;
+    letter-spacing: 1.1px;
+    font-weight: 600;
     font-size: 12px;
+    margin-top: 16px;
+    margin-bottom: 4px;
   }
+
   .selected-vaccinator {
     color: #5C9EF8;
   }
