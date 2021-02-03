@@ -101,7 +101,7 @@ const UploadHistory = ({
                 />
             </div>
             <div className="upload-csv-container">
-                <div>
+                <div className="upload-history">
                     <UploadHistoryTable 
                         data={tableData}
                         headerData={tableHeader}
@@ -165,6 +165,7 @@ function UploadErrors({
             aria-labelledby="contained-modal-title-vcenter"
             centered
             className="modal-container"
+            dialogClassName="my-modal"
         >
             <Modal.Header closeButton className="title">
                 <Modal.Title >{uploadHistory.fileName}</Modal.Title>
@@ -214,22 +215,4 @@ const uploadCSVHeaderData = [
     }
 ]
 
-const AllFacilitiesHeaderData= [
-    {
-        title: "FACILITY ID",
-        key: "facilityId"
-    },
-    {
-        title: "FACILITY NAME",
-        key: "name"
-    },
-    {
-        title: "STATE",
-        key: "state"
-    },
-    {
-        title: "UPLOADED ON",
-        key: "uploadedOn"
-    }
-]
 export default UploadHistory;

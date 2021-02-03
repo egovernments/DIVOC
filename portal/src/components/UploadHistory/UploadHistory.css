@@ -89,3 +89,8 @@
 .modal-container>div>div{
     padding: 0 1rem;
 }
+
+.my-modal {
+    width: 40vw;
+    max-width: 90vw;
+} 
