@@ -32,11 +32,3 @@
     color: #2CD889;
     text-align: right;
 }
-
-.toast-container{
-    opacity: 1;
-}
-.toast-body{
-    display: flex;
-    justify-content: space-between;
-}

@@ -8,12 +8,16 @@ import InputLabel from "@material-ui/core/InputLabel/InputLabel";
 import Select from "@material-ui/core/Select/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import FormControl from "@material-ui/core/FormControl";
+import ToastComponent from "../Toast/Toast";
+import Button from 'react-bootstrap/Button';
 
-function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
+function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow,errorCount}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
     const [programList, setProgramList] = useState([]);
     const [program, setProgram] = useState("");
     const {keycloak} = useKeycloak();
+    const [showToast, setShowToast] = useState(false);
+
     useEffect(() => {
         getListOfRegisteredPrograms();
     }, []);
@@ -54,7 +58,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
         axios.post(fileUploadAPI, dataToSend, config).then(res => {
             setTimeout(() => {
                 setUploadPercentage(0);
-                alert("Successfully uploaded CSV");
+                setShowToast(true);
             }, 500);
             onUploadComplete();
         }).catch((error) => {
@@ -65,30 +69,54 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
         })
     };
 
+    function uploadingToastBody () {
+        return(
+            <div>
+                <span>File Uploaded</span>&emsp;
+                <ProgressBar variant="success" now={uploadPercentage} active/>
+                <span>{uploadPercentage > 0 && `${uploadPercentage}%`}</span>
+            </div>
+        )
+    }
+
+    function uploadedToastBody() {
+        return(
+            <div className="d-flex justify-content-between">
+                <p>{errorCount} Errors Found</p>
+                <Button style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
+            </div>
+        )
+    }
+
     return (
-        <div className={styles['container']}>
-            <div className="d-flex p-3" style={{width: "100%"}}>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="demo-simple-select-outlined-label">Select a program</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-outlined-label"
-                        id="demo-simple-select-outlined"
-                        value={program}
-                        onChange={(evt)=>{setProgram(evt.target.value)}}
-                        label="Program"
-                    >
-                        <MenuItem value="">
-                            <em>Please select</em>
-                        </MenuItem>
-                        {
-                            programList.map((group, index) => (
-                                <MenuItem value={group.name} name={group.name}>{group.name}</MenuItem>
+        <div className={styles['container'] + " d-flex justify-content-between"}>
+            <FormControl variant="outlined" fullWidth>
+                <InputLabel id="demo-simple-select-outlined-label">Select a program</InputLabel>
+                <Select
+                    labelId="demo-simple-select-outlined-label"
+                    id="demo-simple-select-outlined"
+                    value={program}
+                    onChange={(evt)=>{setProgram(evt.target.value)}}
+                    label="Program"
+                    className={styles['form']}
+                >
+                <MenuItem value="">
+                    <em>Please select</em>
+                </MenuItem>
+                {
+                    programList.map((group, index) => (
+                        <MenuItem value={group.name} name={group.name}>{group.name}</MenuItem>
 
-                            ))
-                        }
+                    ))
+                }
 
-                    </Select>
-                </FormControl>
+                </Select>
+            </FormControl>
+            <div className={styles['progress-bar-container']}>
+            {uploadPercentage>=0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
+            </div>
+            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()} />}
+            { program && <div>
                 <input
                     type='file'
                     id='actual-btn'
@@ -117,11 +145,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete}) {
                         Download sample CSV
                     </a>
                 </div>}
-            </div>
-            <div className={styles['progress-bar-container']}>
-                <div className={styles['progress-bar']}>{uploadPercentage > 0 && `${uploadPercentage}%`}</div>
-                <div>{uploadPercentage > 0 && <ProgressBar now={uploadPercentage} active/>}</div>
-            </div>
+            </div>}
         </div>
     );
 }

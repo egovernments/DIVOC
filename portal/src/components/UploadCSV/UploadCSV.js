@@ -4,7 +4,7 @@ import {ProgressBar} from 'react-bootstrap';
 import React, {useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
-import Toast from 'react-bootstrap/Toast';
+import ToastComponent from '../Toast/Toast';
 import Button from 'react-bootstrap/Button';
 
 function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow,errorCount}) {
@@ -90,25 +90,6 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
                 </div>}
             </div>
         </div>
-    );
-}
-
-function ToastComponent({
-    header,
-    toastBody
-}) {
-    const [showToast, setShowToast] = useState(true);
-    const toggleShow = () => setShowToast(!showToast);
-
-    return (
-        <Toast className="toast-container" show={showToast} onClose={toggleShow} >
-        <Toast.Header className="toast-header">
-            <strong className="mr-auto">{header} Records Uploaded</strong>
-        </Toast.Header>
-        <Toast.Body>
-            {toastBody}
-        </Toast.Body>
-        </Toast>
     );
 }
 

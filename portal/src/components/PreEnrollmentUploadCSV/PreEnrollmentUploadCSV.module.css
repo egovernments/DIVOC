@@ -1,11 +1,12 @@
 .container {
-    background: #ffffff;
+    /* background: #ffffff;
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px;
     display: inline-flex;
     width: calc(50% - 1rem);
     margin-right: 1rem;
     align-items: center;
+    width: 100%; */
     width: 100%;
 }
 
@@ -32,4 +33,11 @@
 .progress-bar {
     color: #5C9EF8;
     text-align: right;
+}
+
+.form{
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    border: 1px solid #E8E9EC;
+    border-radius: 4px;
+    padding-left: 0.3rem;
 }
