@@ -113,7 +113,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
                 </Select>
             </FormControl>
             <div className={styles['progress-bar-container']}>
-            {uploadPercentage>=0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
+            {uploadPercentage>0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
             </div>
             {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()} />}
             { program && <div>
