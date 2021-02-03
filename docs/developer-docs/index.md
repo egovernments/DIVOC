@@ -68,6 +68,39 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
          docker-compose up -d --build --no-deps <service1> <service2>...
          docker-compose restart nginx
         ```
+        
+   * Flagr Configuration
+     * Below steps configure notification templates for the App. This can skipped if you don't want to test notifications.
+     * Visit `localhost/config`. Enter `notification_templates`in the flag description field and click on `Create New Flag`
+     * Click on the new flag created to configure it
+        * In Flag section, change Flag key to `notification_templates`
+        * In Variant section, Create new variant with key as `default`, below attachment
+          ```
+          {
+              "facilityPendingTasks": {
+              "html": "<h4>Dear Facility Administrator,</h4>Request you to upload / complete all details pertaining to this facility prior to execution of the Vaccination Program. <br/>Failing to do so, this facility: <br/><b>- will not be accessible to citizen during the pre-enrolment phase <br/>- will not be able to use the Vaccination App or generate digital certificates. </b><br/>Please submit the missing details at the earliest.DIVOC System Administrator",
+              "message": "Dear Facility Administrator,Request you to upload / complete all details pertaining to this facility prior to execution of the C19 VaccinationProgram. Failing to do so, this facility: - will not be accessible to citizen during the pre-enrolment phase - will not be able to use the Vaccination App or generate digital certificates. Please submit the missing details at the earliest.DIVOC System Administrator",
+              "subject": "DIVOC - Facility Pending Tasks"
+              },
+              "facilityRegistered": {
+              "message": "Welcome {{.FacilityName}}. Your facility has been registered under divoc. You can login at https://divoc.xiv.in/portal using {{.Admins}} contact numbers.",
+              "subject": "DIVOC - Facility Registered"
+              },
+              "facilityUpdate": {
+              "message": "Dear Facility Administrator. Your facility {{.field}} is been updated to {{.value}}",
+              "subject": "DIVOC - Facility Updated"
+              },
+              "preEnrollmentRegistered": {
+              "message": "{{.Name}}, you have been registered to receive {{.ProgramId}}. Please proceed to the nearest vaccination center. Please show the Pre Enrollment Code: {{.Code}} to the center admin.",
+              "subject": "DIVOC - Pre-Enrollment"
+              },
+              "recipientCertified": {
+              "message": "{{.Name}}, your {{.VaccineName}} vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ ",
+              "subject": "DIVOC - Vaccination Certificate"
+              }
+          }
+         ```
+        * In segment section, Create a new segment with `default` key and a default distribution of 100%
     
    * Create `admin` and `controller` users in Keycloak
    
@@ -137,6 +170,11 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
        * `Report` any side effects/symptoms after vaccination 
      * For above operations, you would need the recipient mobile number (given during pre-enrollment/vaccination).
        Use OTP : 1234 for all logins.
+
+5. Deployment Notes
+    * Change Admin password of Keycloak console
+        * Go to Admin console, Click on Admin menu in the top right corner and Select Manage account
+        * Change password in the password section in the right
 
 ### API Documentation
 
