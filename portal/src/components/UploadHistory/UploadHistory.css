@@ -86,3 +86,6 @@
     background: #000000 0% 0% no-repeat padding-box;
     opacity: 0.82;
 }
+.modal-container>div>div{
+    padding: 0 1rem;
+}
