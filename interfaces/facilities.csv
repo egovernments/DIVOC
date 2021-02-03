@@ -1,1 +1,1 @@
-*serialNum,*facilityCode,*facilityName,*contact,email,*operatingHourStart,*operatingHourEnd,*category,*type,*status,*addressLine1,*addressLine2,district,state,pincode,*geoLocationLat,*geoLocationLon,websiteURL,*adminName,*adminMobile
+serialNum,facilityCode,facilityName,contact,email,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,websiteURL,adminName,adminMobile
