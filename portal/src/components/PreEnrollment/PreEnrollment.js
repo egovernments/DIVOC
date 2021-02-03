@@ -55,7 +55,7 @@ function PreEnrollment() {
         fileUploadAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_API}
         fileUploadHistoryAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
+        infoTitle={"Records in the DIVOC Pre-Enrollment Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
         tableTitle="All Pre-Enrollments"
         tableData={data}

@@ -4,12 +4,11 @@ import {ProgressBar} from 'react-bootstrap';
 import React, {useEffect, useState} from 'react';
 import axios from 'axios'
 import {useKeycloak} from "@react-keycloak/web";
-import InputLabel from "@material-ui/core/InputLabel/InputLabel";
-import Select from "@material-ui/core/Select/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import FormControl from "@material-ui/core/FormControl";
 import ToastComponent from "../Toast/Toast";
 import Button from 'react-bootstrap/Button';
+import DropDown from "../DropDown/DropDown";
+import { useAxios } from "../../utils/useAxios";
+import {API_URL} from "../../utils/constants";
 
 function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow,errorCount}) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
@@ -17,25 +16,18 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
     const [program, setProgram] = useState("");
     const {keycloak} = useKeycloak();
     const [showToast, setShowToast] = useState(false);
+    const axiosInstance = useAxios("");
 
     useEffect(() => {
-        getListOfRegisteredPrograms();
+        fetchPrograms();
     }, []);
-    const getListOfRegisteredPrograms = async () => {
-        const config = {
-            headers: {
-                Authorization: `Bearer ${keycloak.token} `,
-                "Content-Type": "application/json",
-            },
-        };
-        let res = await axios
-            .get("/divoc/admin/api/v1/programs", config)
-            .then((res) => {
-                return res.data
+    function fetchPrograms() {
+        axiosInstance.current.get(API_URL.PROGRAM_API)
+            .then(res => {
+                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                setProgramList(programs)
             });
-        res = res.map(r => ({...r}));
-        setProgramList(res)
-    };
+    }
     const uploadFile = (evt) => {
         if(program === "") {
             alert("Select a program");
@@ -90,33 +82,19 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
 
     return (
         <div className={styles['container'] + " d-flex justify-content-between"}>
-            <FormControl variant="outlined" fullWidth>
-                <InputLabel id="demo-simple-select-outlined-label">Select a program</InputLabel>
-                <Select
-                    labelId="demo-simple-select-outlined-label"
-                    id="demo-simple-select-outlined"
-                    value={program}
-                    onChange={(evt)=>{setProgram(evt.target.value)}}
-                    label="Program"
-                    className={styles['form']}
-                >
-                <MenuItem value="">
-                    <em>Please select</em>
-                </MenuItem>
-                {
-                    programList.map((group, index) => (
-                        <MenuItem value={group.name} name={group.name}>{group.name}</MenuItem>
-
-                    ))
-                }
-
-                </Select>
-            </FormControl>
             <div className={styles['progress-bar-container']}>
             {uploadPercentage>0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
             </div>
             {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()} />}
-            { program && <div>
+            <div className={styles["select-program-wrapper"]}>
+                <DropDown
+                    selectedOption={program}
+                    options={programList}
+                    placeholder="Select a Program"
+                    setSelectedOption={setProgram}
+                />
+            </div>
+            <div>
                 <input
                     type='file'
                     id='actual-btn'
@@ -136,7 +114,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
                 />
                 <label
                     htmlFor='actual-btn'
-                    className={styles['button']}
+                    className={styles['button']+ (program ? '' : ' disabled')}
                 >
                     UPLOAD CSV
                 </label>
@@ -145,7 +123,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
                         Download sample CSV
                     </a>
                 </div>}
-            </div>}
+            </div>
         </div>
     );
 }

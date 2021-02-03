@@ -57,7 +57,7 @@ function Facilities() {
         fileUploadAPI={API_URL.FACILITY_API}
         fileUploadHistoryAPI={API_URL.FACILITY_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.FACILITY_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Total # of Records in the\nDIVOC Facility Registry"}
+        infoTitle={"Records in the DIVOC Facility Registry"}
         tableTitle="All Facilities"
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}

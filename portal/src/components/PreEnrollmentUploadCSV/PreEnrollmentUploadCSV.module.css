@@ -35,9 +35,14 @@
     text-align: right;
 }
 
-.form{
-    background: #FFFFFF 0% 0% no-repeat padding-box;
-    border: 1px solid #E8E9EC;
-    border-radius: 4px;
-    padding-left: 0.3rem;
-}
+
+.select-program-wrapper>div>div>div  {
+      border-color: #5C9EF8;
+      color: #5C9EF8;
+      white-space: nowrap;
+      width: max-content;
+  }
+
+  .select-program-wrapper>div>div>div>div {
+    border-color: #5C9EF8;
+  }

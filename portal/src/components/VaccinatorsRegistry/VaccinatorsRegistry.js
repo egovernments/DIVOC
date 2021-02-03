@@ -53,7 +53,7 @@ function VaccinatorsRegistry() {
         fileUploadAPI={API_URL.VACCINATORS_API}
         fileUploadHistoryAPI={API_URL.VACCINATOR_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.VACCINATOR_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Total # of Records in the\nDIVOC Vaccinators Registry"}
+        infoTitle={"Records in the DIVOC Vaccinator Registry"}
         tableTitle="All Vaccinators"
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
