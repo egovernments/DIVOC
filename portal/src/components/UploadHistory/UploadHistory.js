@@ -20,11 +20,11 @@ const UploadHistory = ({
     infoTitle,
     UploadComponent = UploadCSV,
     tableTitle,
-    fetchAPI,
+    tableData,
+    tableHeader
 }) => {
     const axiosInstance = useAxios("");
     const [uploadHistory, setUploadHistory] = useState([]);
-    const [allFacilities, setAllFacilities] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null);
     const [show, setShow] = useState(false);
     const [selectedFacility, setSelectedFacility] = useState(null);
@@ -32,32 +32,9 @@ const UploadHistory = ({
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
     useEffect(() => {
-        fetchTableDetails();
         fetchUploadHistory();
     }, []);
 
-    function fetchTableDetails() {
-        axiosInstance.current.get(fetchAPI)
-            .then(res => {
-                return res.data
-            })
-            .catch(e => {
-                console.log(e);
-                return []
-            })
-            .then((result) => {
-                return result.map((item, index) => {
-                    return {
-                        facilityId: item["facilityCode"],
-                        name: item["facilityName"],
-                        state: item["address"].state,
-                    }
-                })
-            })
-            .then((result) => {
-                setAllFacilities(result)
-            });
-    }
 
     function fetchUploadHistory() {
         axiosInstance.current.get(fileUploadHistoryAPI)
@@ -126,8 +103,8 @@ const UploadHistory = ({
             <div className="upload-csv-container">
                 <div>
                     <UploadHistoryTable 
-                        data={allFacilities}
-                        headerData={AllFacilitiesHeaderData}
+                        data={tableData}
+                        headerData={tableHeader}
                         onCellClicked={(value) => {
                             setSelectedFacility(value);
                         }}

@@ -1,9 +1,54 @@
-import React from 'react';
-import UploadHistory from "../UploadHistory/UploadHistory";
+import React, { useEffect,useState } from 'react';
 import {API_URL} from "../../utils/constants";
+import UploadHistory from "../UploadHistory/UploadHistory";
+import { useAxios } from "../../utils/useAxios";
 import PreEnrollmentUploadCSV from "../PreEnrollmentUploadCSV/PreEnrollmentUploadCSV";
 
 function PreEnrollment() {
+
+    const axiosInstance = useAxios("");
+    const [data,setData] = useState([]);
+
+    useEffect(() => {
+        fetchTableDetails();
+    }, []);
+
+    function fetchTableDetails() {
+        axiosInstance.current.get(API_URL.PRE_ENROLLMENT_FILE_UPLOAD_API)
+            .then(res => {
+                return res.data
+            })
+            .catch(e => {
+                console.log(e);
+                return []
+            })
+            .then((result) => {
+                return result.map((item, index) => {
+                    return {
+                        nationalId: item["nationalId"],
+                        name: item["name"],
+                    }
+                })
+            })
+            .then((result) => {
+                setData(result)
+            });
+    }
+
+    const AllFacilitiesHeaderData= [
+        {
+            title: "National ID",
+            key: "nationalId"
+        },
+        {
+            title: "NAME",
+            key: "name"
+        },
+        {
+            title: "UPLOADED ON",
+            key: "uploadedOn"
+        }
+    ]
 
 
     return <UploadHistory
@@ -13,7 +58,8 @@ function PreEnrollment() {
         infoTitle={"Total # of Enrollments in the\nDIVOC Enrollments Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
         tableTitle="All Pre-Enrollments"
-        fetchAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_API}
+        tableData={data}
+        tableHeader={AllFacilitiesHeaderData}
     />
 }
 
