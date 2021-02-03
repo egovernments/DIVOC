@@ -6,6 +6,16 @@ import {SyncFacade} from "../../SyncFacade";
 import Select from 'react-select'
 import AutoComplete from "../AutoComplete";
 
+
+const selectorTheme = theme => ({
+    ...theme,
+    colors: {
+        ...theme.colors,
+        primary25: 'neutral0',
+        primary: 'black',
+    },
+});
+
 export const SelectVaccinator = (props) => {
     const {markPatientComplete, getFormDetails, goNext} = useConfirmVaccine();
     const [vaccinators, setVaccinators] = useState([])
@@ -71,6 +81,7 @@ export const SelectVaccinator = (props) => {
                             value: item.osid,
                         }
                     })}
+                    theme={selectorTheme}
                     onChange={(option) => {
                         setSelectedVaccinatorId(option.value)
                     }}/>
@@ -78,13 +89,14 @@ export const SelectVaccinator = (props) => {
                 <Select
                     key={selectedMedicineName ?? "medicineId"}
                     isSearchable={false}
-                    defaultValue={{value: selectedMedicineName, label: selectedMedicineName}}
+                    defaultValue={selectedMedicineName && {value: selectedMedicineName, label: selectedMedicineName}}
                     options={medicines.map((item, index) => {
                         return {
                             label: item.name,
                             value: item.name,
                         }
                     })}
+                    theme={selectorTheme}
                     onChange={(option) => {
                         setSelectedMedicineName(option.value)
                     }}/>
