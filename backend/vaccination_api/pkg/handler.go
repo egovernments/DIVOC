@@ -176,15 +176,17 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 		return NewGenericServerError()
 	} else {
 		if facilities := getFacilityByCode(facilityCode); len(facilities) > 0 {
-			facility := facilities[0].(map[string]interface{})
 			var programNames []string
-			for _, programObject := range facility["programs"].([]interface{}) {
-				program := programObject.(map[string]interface{})
-				if strings.EqualFold(program["status"].(string), "active") {
-					programNames = append(programNames, program["programId"].(string))
+			for _, facilityObj := range facilities {
+				facility := facilityObj.(map[string]interface{})
+				for _, programObject := range facility["programs"].([]interface{}) {
+					program := programObject.(map[string]interface{})
+					if strings.EqualFold(program["status"].(string), "active") {
+						programNames = append(programNames, strings.ToLower(program["programId"].(string)))
+					}
 				}
 			}
-			var programsFor []*models.Program{}
+			var programsFor []*models.Program
 			if len(programNames) > 0 {
 				programsFor = findProgramsByName(programNames)
 			}
