@@ -42,7 +42,7 @@ export default function VaccinatorDetails({
                 email: "",
                 facilityIds: [],
                 nationalIdentifier: "",
-                status: "Inactive",
+                status: "Active",
                 signatures: [],
                 averageRating:0,
                 trainingCertificate:"",
