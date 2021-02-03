@@ -181,7 +181,7 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 			for _, programObject := range facility["programs"].([]interface{}) {
 				program := programObject.(map[string]interface{})
 				if strings.EqualFold(program["status"].(string), "active") {
-					programNames = append(programNames, program["id"].(string))
+					programNames = append(programNames, program["programId"].(string))
 				}
 			}
 			programsFor := findProgramsByName(programNames)

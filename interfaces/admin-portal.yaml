@@ -760,9 +760,14 @@ definitions:
         items:
           type: object
           properties:
-            id:
+            programId:
               type: string
               title: Id of the program
+            status:
+              type: string
+              enum:
+                - Active
+                - Inactive
             certified:
               type: boolean
               title: if vaccinator has certificate for program
@@ -805,8 +810,13 @@ definitions:
           items:
             type: object
             properties:
-              id:
+              programId:
                 type: string
+              status:
+                type: string
+                enum:
+                  - Active
+                  - Inactive
               certified:
                 type: boolean
   Program:

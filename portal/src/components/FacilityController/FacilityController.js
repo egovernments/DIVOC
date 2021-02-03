@@ -13,7 +13,7 @@ const defaultState = {
     selectedState: CONSTANTS.ALL,
     selectedDistrict: [],
     facilityType: CONSTANTS.GOVT,
-    status: "",
+    status: CONSTANTS.ACTIVE,
     lastAdjustedOn: ""
 };
 

@@ -27,7 +27,12 @@
 .list-view-program-status-img {
     position: absolute;
     bottom: 0;
-    right: 0;
+    right: 0; 
     width: 30%;
     height: 30%;
+}
+
+.table-row{
+    background-color: #F2FAF6;
+    font-size: large;
 }

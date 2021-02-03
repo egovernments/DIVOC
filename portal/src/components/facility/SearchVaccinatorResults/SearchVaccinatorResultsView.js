@@ -150,7 +150,7 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                                                                 <TextField
                                                                     id="filled-read-only-input"
                                                                     label="Program"
-                                                                    defaultValue={p.id}
+                                                                    defaultValue={p.programId}
                                                                     InputProps={{
                                                                         readOnly: true,
                                                                     }}
