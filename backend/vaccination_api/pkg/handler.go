@@ -184,7 +184,10 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 					programNames = append(programNames, program["programId"].(string))
 				}
 			}
-			programsFor := findProgramsByName(programNames)
+			var programsFor []*models.Program{}
+			if len(programNames) > 0 {
+				programsFor = findProgramsByName(programNames)
+			}
 			return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
 		} else {
 			log.Errorf("Facility not found: %s", facilityCode)
