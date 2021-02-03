@@ -110,7 +110,7 @@ export default function VaccinatorDetails({
     function saveVaccinator() {
         if (isVaccinatorValid(vaccinator)) {
             const data = {...vaccinator};
-            if (selectedProgram.id) {
+            if (selectedProgram.programId) {
                 data.programs = [selectedProgram]
             }
             axiosInstance.current.post('/divoc/admin/api/v1/vaccinator', data)
@@ -131,7 +131,7 @@ export default function VaccinatorDetails({
             const editData = {...updatedVaccinatorFields};
             if (editData) {
                 editData['osid'] = vaccinator.osid;
-                if (selectedProgram.id && !vaccinator.programs.filter(p => p.id === selectedProgram.id).length > 0) {
+                if (selectedProgram.programId && !vaccinator.programs.filter(p => p.programId === selectedProgram.programId).length > 0) {
                     editData['programs'] = vaccinator.programs.concat(selectedProgram)
                 } else {
                     editData['programs'] = vaccinator.programs
@@ -176,7 +176,7 @@ export default function VaccinatorDetails({
     function onProgramCertifyChange(program, certified) {
         program.certified = certified;
         let updatedPrograms = vaccinator.programs.map(p => {
-            if (p.id === program.id) {
+            if (p.programId === program.programId) {
                 p.certified = program.certified
             }
             return p
@@ -188,7 +188,7 @@ export default function VaccinatorDetails({
 
     function onAddProgramChange(value) {
         let program = {
-            id: value,
+            programId: value,
             certified: false
         };
         setSelectedProgram(program);
@@ -246,7 +246,7 @@ export default function VaccinatorDetails({
                         vaccinator.programs &&
                             vaccinator.programs.map(program => (
                                 <div className="row vaccinator-prg-div">
-                                    <span className="col-sm-7 vaccinator-prg-span">{program.id}</span>
+                                    <span className="col-sm-7 vaccinator-prg-span">{program.programId}</span>
                                     <CustomSwitch
                                         checked={program.certified}
                                         onChange={() => onProgramCertifyChange(program, !program.certified)}

@@ -642,7 +642,8 @@ func init() {
             "hasRole": [
               "admin",
               "user",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -1350,9 +1351,16 @@ func init() {
                 "type": "boolean",
                 "title": "if vaccinator has certificate for program"
               },
-              "id": {
+              "programId": {
                 "type": "string",
                 "title": "Id of the program"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Active",
+                  "Inactive"
+                ]
               }
             }
           }
@@ -1420,8 +1428,15 @@ func init() {
                 "certified": {
                   "type": "boolean"
                 },
-                "id": {
+                "programId": {
                   "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "Active",
+                    "Inactive"
+                  ]
                 }
               }
             }
@@ -2077,6 +2092,7 @@ func init() {
             "hasRole": [
               "admin",
               "controller",
+              "facility-admin",
               "user"
             ]
           }
@@ -2846,9 +2862,16 @@ func init() {
           "type": "boolean",
           "title": "if vaccinator has certificate for program"
         },
-        "id": {
+        "programId": {
           "type": "string",
           "title": "Id of the program"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },
@@ -2917,8 +2940,15 @@ func init() {
         "certified": {
           "type": "boolean"
         },
-        "id": {
+        "programId": {
           "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },
