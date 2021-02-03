@@ -88,7 +88,7 @@ class ProgramDB {
             const supportProgramsName = item[PROGRAMS]
             for (let i = 0; i < supportProgramsName.length; i++) {
                 const program = supportProgramsName[i]
-                if (program.id === selectProgram && program.certified) {
+                if (program.programId === selectProgram && program.certified) {
                     return true;
                 }
             }
