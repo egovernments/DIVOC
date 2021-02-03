@@ -58,6 +58,7 @@ export default function ProgramOverview() {
         return await axiosInstance.current.get(API_URL.MEDICINE_API);
     }
 
+
     function showMedicineTable(tableData){
         return(
             tableData.map(data => {
@@ -77,6 +78,7 @@ export default function ProgramOverview() {
             })
         )
     }
+
 
     function displayProgramDetails(data) {
         const selectedProgram = programsList.filter((program) => program.name === data.id)[0];
