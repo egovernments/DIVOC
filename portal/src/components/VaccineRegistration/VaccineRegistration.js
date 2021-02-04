@@ -6,6 +6,9 @@ import ListView from '../ListView/ListView';
 import Form from "@rjsf/core";
 import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
+import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
+import {CustomTextWidget} from "../CustomTextWidget/index";
+import {CustomTextAreaWidget} from "../CustomTextAreaWidget/index";
 
 
 function VaccineRegistration() {
@@ -30,6 +33,13 @@ function VaccineRegistration() {
         title: {
             classNames: styles["form-title"],
         },
+    };
+
+
+    const widgets = {
+        TextWidget: CustomTextWidget,
+        TextareaWidget: CustomTextAreaWidget,
+        SelectWidget: CustomDropdownWidget,
     };
 
     const handleSubmit = (dataToSend) => {
@@ -61,18 +71,22 @@ function VaccineRegistration() {
                 <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
             </div>
             <Form
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    onSubmit={(e) => {
-                        // setFormData(e.formData);
-                        handleSubmit(e.formData);
-                    }}
-                >
-                    <button type="submit" className={styles['button']}>SAVE</button>
-                </Form>
+                widgets={widgets}
+                schema={schema}
+                uiSchema={uiSchema}
+                onSubmit={(e) => {
+                    // setFormData(e.formData);
+                    handleSubmit(e.formData);
+                }}
+            >
+                <button type="submit" className={styles['button']}>SAVE</button>
+            </Form>
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
             <ListView 
+                schema={schema}
+                uiSchema={uiSchema}
+                widgets={widgets}
                 listData={medicineList} 
                 fields={["provider", "price", "effectiveUntil"]} 
                 show={showForm} 

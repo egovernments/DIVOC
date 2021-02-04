@@ -4,9 +4,20 @@ import ProgramActiveImg from "../../assets/img/program-active.svg";
 import Program from "../../assets/img/program.svg";
 import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
 import Button from 'react-bootstrap/Button';
+import Form from "@rjsf/core";
 
-function ListView({listData, fields,show,setShow,title,buttonTitle}) {
+function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
+
+    function autoFillForm() {
+        return { name : listData[selectedIndex].name, 
+            description: listData[selectedIndex].description,
+            logoURL: listData[selectedIndex].logoURL,
+            startDate: listData[selectedIndex].startDate,
+            endDate: listData[selectedIndex.endDate],
+            vaccine: listData[selectedIndex.vaccine],
+        }
+    } 
     return (
         <div>
             {
@@ -42,25 +53,20 @@ function ListView({listData, fields,show,setShow,title,buttonTitle}) {
                     <div className={"list-view-selected-container"}>
                         <div className="d-flex justify-content-between align-items-center">
                             <span className={'list-view-name'}>{listData[selectedIndex].name}</span>
-                            {/* <span className={'list-view-logo-img'}>
-                                        {"image" in listData[selectedIndex] ? <img alt="" src={listData[selectedIndex].image} width={"100%"}/> : "LOGO"}
-                                        <img
-                                            src={listData[selectedIndex].status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
-                                            className={'list-view-program-status-img'}
-                                            alt={listData[selectedIndex].status}
-                                            title={listData[selectedIndex].status}/>
-                            </span> */}
                             <button className="mt-3 list-selected-back-btn" onClick={() => setSelectedIndex(-1)}>BACK</button>
                         </div>
-                        <div className="d-flex flex-wrap">
-                            {
-                                fields.map((item, index) => (
-                                    <div className="w-50 d-flex flex-column p-3 align-items-start">
-                                        <span className="list-selected-title">{item}</span>
-                                        <span className="list-selected-value">{listData[selectedIndex][item]}</span>
-                                    </div>
-                                ))
-                            }
+                        <div className="form-container">
+                            <Form
+                                schema={schema}
+                                uiSchema={uiSchema}
+                                widgets={widgets}
+                                onSubmit={(e) => {
+                                    window.alert("helloo")
+                                }}
+                                formData={autoFillForm()}
+                            >
+                                <button type="submit" className="button">SAVE</button>
+                            </Form>
                         </div>
                     </div>
                 </div>

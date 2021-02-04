@@ -14,21 +14,23 @@ export const CustomDateWidget = (props) => {
 };
 
   const CustomInput = ({ value, onClick }) => (
-    <div className="date-picker-container">
-        <label className="custom-input" onClick={onClick}>
+    <div className="date-picker-container d-flex justify-content-between">
+        <label className="date-picker-label p-2 mr-auto" onClick={onClick}>
         {value}
         </label>
-        <img src={date} onClick={onClick} />
+        <img className="p-2" src={date} onClick={onClick} />
     </div>
   );
   return (
-        <DatePicker 
+    <div className="date-picker">
+    <DatePicker
             selected={startDate} 
             onChange={updateValue} 
             dateFormat="dd-MM-yyyy"
             id="date-picker"
             customInput={<CustomInput />}
         />
+    </div>
   );
 };
 

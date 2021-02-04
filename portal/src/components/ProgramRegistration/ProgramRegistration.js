@@ -8,6 +8,9 @@ import schema from '../../jsonSchema/programSchema.json';
 import Program from "../../assets/img/program.svg";
 import Button from 'react-bootstrap/Button';
 import {CustomDateWidget} from '../CustomDateWidget/index';
+import {CustomTextWidget} from '../CustomTextWidget/index';
+import {CustomTextAreaWidget} from '../CustomTextAreaWidget/index';
+import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
@@ -40,10 +43,19 @@ function VaccineRegistration() {
                 "inline": true,
             }
         },
+        description: {
+            "ui:widget": "textarea",
+            "ui:options": {
+                rows: 5
+              }
+        }
     };
 
     const widgets = {
         DateWidget: CustomDateWidget,
+        TextWidget: CustomTextWidget,
+        TextareaWidget: CustomTextAreaWidget,
+        SelectWidget: CustomDropdownWidget,
     };
 
     const handleSubmit = (datatoSend) => {
@@ -89,7 +101,7 @@ function VaccineRegistration() {
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
             <div className="d-flex">
-                <h4 className={styles['heading']+ " p-2 mr-auto"}>Register New Vaccine Program</h4>
+                <h4 className={"p-2 mr-auto"}>Register New Vaccine Program</h4>
                 <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
             </div>
             
@@ -108,7 +120,10 @@ function VaccineRegistration() {
             </Form>
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
-            <ListView 
+            <ListView
+                schema={programSchema}
+                uiSchema={uiSchema}
+                widgets={widgets}
                 listData={programList} 
                 fields={["description", "startDate", "endDate"]} 
                 show={showForm} 
