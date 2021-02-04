@@ -65,6 +65,7 @@ export const SelectVaccinator = (props) => {
                 setSelectedBatchId(result.selectedBatchId)
                 setTempSelectedBatchId(result.selectedBatchId)
             })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return (

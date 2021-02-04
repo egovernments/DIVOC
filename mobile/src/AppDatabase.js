@@ -4,7 +4,7 @@ import {getSelectedProgram} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 10;
+const DATABASE_VERSION = 11;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
@@ -29,18 +29,32 @@ export class AppDatabase {
         }
         const db = await openDB(DATABASE_NAME, DATABASE_VERSION, {
             upgrade(database, oldVersion, newVersion) {
-                if (oldVersion === 0 || newVersion === 5) {
+                const objectNames = database.objectStoreNames;
+
+                if (!objectNames.contains(PATIENTS)) {
                     database.createObjectStore(PATIENTS, {keyPath: "code"});
+                }
+
+                if (!objectNames.contains(QUEUE)) {
                     database.createObjectStore(QUEUE, {keyPath: "code"});
+                }
+
+                if (!objectNames.contains(VACCINATORS)) {
                     database.createObjectStore(VACCINATORS, {keyPath: "osid"});
+                }
+
+                if (!objectNames.contains(EVENTS)) {
                     database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
                 }
-                if (oldVersion === 0 || newVersion === 6 || newVersion === 10) {
+
+                if (!objectNames.contains(USER_DETAILS)) {
                     database.createObjectStore(USER_DETAILS);
                 }
-                if (oldVersion === 0 || newVersion === 10) {
+
+                if (!objectNames.contains(PROGRAMS)) {
                     database.createObjectStore(PROGRAMS, {keyPath: "name"});
                 }
+                console.log("DB upgraded from " + oldVersion + " to " + newVersion)
             }
         });
         this.db = db;
