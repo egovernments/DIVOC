@@ -104,7 +104,7 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 
 	if resp == nil || err != nil {
 		log.Error("Failed to request registry ", url, " ", err)
-		return errors.New("Failed to request registry")
+		return err
 	}
 	if resp.Response().StatusCode != 200 {
 		log.Error("Registry response is ", resp.Response().StatusCode, url)
