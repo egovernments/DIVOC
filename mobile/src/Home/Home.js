@@ -17,22 +17,49 @@ import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
+import Row from "react-bootstrap/Row";
+import {appIndexDb} from "../AppDatabase";
+import {formatLoginDate} from "../utils/date_utils";
 
 function ProgramHeader() {
-    const [bannerImage, setBannerImage] = useState()
+    const [bannerImage, setBannerImage] = useState();
+    const [userDetails, setUserDetails] = useState();
     const programName = getSelectedProgram();
 
     useEffect(() => {
         programDb
             .getProgramByName(programName)
             .then((program) => setBannerImage(program["logoURL"]))
+            .catch((e) => {
+            })
+
+        appIndexDb.getUserDetails()
+            .then((userDetails) => setUserDetails(userDetails))
+            .catch((e) => {
+            })
 
     }, [programName])
 
     return <div className={"program-header"}>
         <BaseCard>
-            <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
-                 onError={() => setBannerImage(null)}/>
+            <div>
+                {userDetails && <div>
+                    <Row className="m-2">
+                        <Col>
+                            <div className="name">{userDetails.facilityDetails.facilityName}</div>
+                            <div
+                                className="subtitle">{userDetails.facilityDetails.address.district},{userDetails.facilityDetails.address.state}</div>
+                        </Col>
+                        <div className="mr-2 d-flex flex-column justify-content-end">
+                            <div className="subtitle label">Last logged in</div>
+                            <div className="subtitle date">{formatLoginDate(userDetails.loginTime)}</div>
+                        </div>
+                    </Row>
+                </div>}
+                {userDetails && <hr className="mt-0"/>}
+                <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
+                     onError={() => setBannerImage(null)}/>
+            </div>
         </BaseCard>
     </div>;
 }
