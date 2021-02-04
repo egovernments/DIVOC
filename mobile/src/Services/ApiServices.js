@@ -1,5 +1,4 @@
 import {appIndexDb} from "../AppDatabase";
-import {formatCertifyDate} from "../utils/date_utils";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
