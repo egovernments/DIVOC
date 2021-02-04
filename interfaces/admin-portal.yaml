@@ -759,6 +759,8 @@ definitions:
         type: array
         items:
           type: object
+          required:
+            - certified
           properties:
             programId:
               type: string
@@ -775,6 +777,8 @@ definitions:
     type: array
     items:
       type: object
+      required:
+        - osid
       properties:
         osid:
           type: object
@@ -790,6 +794,7 @@ definitions:
           type: string
         facilityIds:
           type: array
+          x-omitempty: true
           items:
             type: string
         mobileNumber:

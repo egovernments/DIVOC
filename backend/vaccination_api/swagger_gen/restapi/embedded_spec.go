@@ -2052,8 +2052,18 @@ func init() {
         "certified": {
           "type": "boolean"
         },
+        "certifiedUpdatedAt": {
+          "type": "string",
+          "format": "date",
+          "$id": "#/properties/certifiedUpdatedAt"
+        },
         "id": {
           "type": "string"
+        },
+        "statusUpdatedAt": {
+          "type": "string",
+          "format": "date",
+          "$id": "#/properties/statusUpdatedAt"
         }
       }
     },

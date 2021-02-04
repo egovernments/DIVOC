@@ -61,7 +61,7 @@ type VaccinatorUpdateRequestItems0 struct {
 	Email string `json:"email,omitempty"`
 
 	// facility ids
-	FacilityIds []string `json:"facilityIds"`
+	FacilityIds []string `json:"facilityIds,omitempty"`
 
 	// mobile number
 	// Max Length: 10
@@ -75,7 +75,8 @@ type VaccinatorUpdateRequestItems0 struct {
 	NationalIdentifier string `json:"nationalIdentifier,omitempty"`
 
 	// osid
-	Osid interface{} `json:"osid,omitempty"`
+	// Required: true
+	Osid interface{} `json:"osid"`
 
 	// programs
 	Programs []*VaccinatorUpdateRequestItems0ProgramsItems0 `json:"programs"`
@@ -96,6 +97,10 @@ func (m *VaccinatorUpdateRequestItems0) Validate(formats strfmt.Registry) error 
 	var res []error
 
 	if err := m.validateMobileNumber(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateOsid(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -124,6 +129,15 @@ func (m *VaccinatorUpdateRequestItems0) validateMobileNumber(formats strfmt.Regi
 	}
 
 	if err := validate.MaxLength("mobileNumber", "body", string(m.MobileNumber), 10); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *VaccinatorUpdateRequestItems0) validateOsid(formats strfmt.Registry) error {
+
+	if err := validate.Required("osid", "body", m.Osid); err != nil {
 		return err
 	}
 
