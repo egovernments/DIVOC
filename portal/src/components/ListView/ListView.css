@@ -1,10 +1,11 @@
 .list-view-card-container {
     float: left;
-    width: 40%;
+    width: 30%;
     margin: 10px 10px;
     padding: 20px;
     background-color: #f1f1f1;
     border-radius: 10px;
+    height: 20vh;
 }
 
 .list-view-card-container:nth-child(4n+1) {

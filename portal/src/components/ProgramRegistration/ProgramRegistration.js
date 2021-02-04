@@ -7,6 +7,7 @@ import ListView from '../ListView/ListView';
 import schema from '../../jsonSchema/programSchema.json';
 import Program from "../../assets/img/program.svg";
 import Button from 'react-bootstrap/Button';
+import {CustomDateWidget} from '../CustomDateWidget/index';
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
@@ -39,6 +40,10 @@ function VaccineRegistration() {
                 "inline": true,
             }
         },
+    };
+
+    const widgets = {
+        DateWidget: CustomDateWidget,
     };
 
     const handleSubmit = (datatoSend) => {
@@ -91,6 +96,7 @@ function VaccineRegistration() {
             <Form
                 schema={programSchema}
                 uiSchema={uiSchema}
+                widgets={widgets}
                 onSubmit={(e) => {
                     setFormData(e.formData);
                     const newField = {medicineIds: [e.formData.vaccine]};

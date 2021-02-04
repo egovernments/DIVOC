@@ -1,16 +1,15 @@
 .container{
     margin-top: 2%;
+    height: 80vh;
+    box-shadow: 0px 6px 20px #C1CFD933;
 }
 .form-container{
     width: 50%;
-    box-shadow: 0px 6px 20px #C1CFD933;
     padding: 2rem;
 }
 
 .sub-container{
     padding: 2rem;
-    padding-bottom:  40vh;
-    box-shadow: 0px 6px 20px #C1CFD933;
 }
 
 .form{

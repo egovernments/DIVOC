@@ -1,0 +1,10 @@
+.date-picker-container{
+    border: 1px solid #E6E6E6;
+    border-radius: 4px;
+    width: 100%;
+    padding: 0.2rem 1rem;
+}
+
+.custom-input{
+    padding-right: 2rem;
+}
