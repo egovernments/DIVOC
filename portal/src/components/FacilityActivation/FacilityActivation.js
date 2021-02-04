@@ -146,7 +146,7 @@ function FacilityActivation({
                 {!showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
-                            {selectedDistrict.join(", ")} facilties
+                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
                         </p>
                         <table
                             className={`table table-hover ${styles["table-data"]}`}

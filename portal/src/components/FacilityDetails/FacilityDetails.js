@@ -150,7 +150,9 @@ function FacilityDetails({
             <div className={"col-sm-6 container table"}>
                 {!showCard ?
                 <div>
-                    <p className={"highlight"}>{selectedDistrict.join(", ")} facilties</p>
+                    <p className={"highlight"}>
+                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                    </p>
                     <table className={"table table-hover table-data"}>
                         <thead>
                         <tr>

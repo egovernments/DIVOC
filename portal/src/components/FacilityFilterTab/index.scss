@@ -25,10 +25,10 @@
   }
 
   .district-table {
-    height: 20vh;
+    max-height: 20vh;
     overflow: auto;
     border: 1px solid #E8E9EC;
-
+    box-shadow: 0;
     td {
       padding: 0.25rem;
     }
