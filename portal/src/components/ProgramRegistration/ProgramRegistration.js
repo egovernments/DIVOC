@@ -18,6 +18,7 @@ function VaccineRegistration() {
     const [programList, setProgramList] = useState([]);
     const [programSchema, setProgramSchema] = useState(schema);
     const [showForm, setShowForm] = useState(false);
+    const[selectedProgram,setSelectedProgram] = useState([]);
 
     useEffect(() => {
         getListOfRegisteredPrograms();
@@ -59,20 +60,31 @@ function VaccineRegistration() {
     };
 
     const handleSubmit = (datatoSend) => {
-        axios
+        if (datatoSend.edited) {
+            axios
+            .put("/divoc/admin/api/v1/programs", datatoSend, config)
+            .then((res) => {
+                console.log(res);
+                getListOfRegisteredPrograms()
+            });
+        } else {
+            axios
             .post("/divoc/admin/api/v1/programs", datatoSend, config)
             .then((res) => {
                 alert("Successfully Registered");
                 console.log(res);
                 getListOfRegisteredPrograms()
             });
+        }
     };
 
     const getListOfRegisteredPrograms = async () => {
         let res = await axios
             .get("/divoc/admin/api/v1/programs", config)
             .then( (res) => {
-                return res.data
+                return res.data.map(d => {
+                    return {...d,edited: false}
+                })
             });
         res = res.map(r => ({...r, image: Program}));
         setProgramList(res)
@@ -96,6 +108,17 @@ function VaccineRegistration() {
         setProgramSchema({});
         setProgramSchema(updatedSchema);
     };
+
+
+    function onStatusChange(data,status) {
+        let editedData = {...data}
+        editedData.edited = true;
+        editedData.status = status;
+        data.status = status;
+        setSelectedProgram(editedData);
+        handleSubmit(editedData);
+        getListOfRegisteredPrograms();
+    }
 
     return (
         <div className={styles["container"]}>
@@ -131,6 +154,8 @@ function VaccineRegistration() {
                 buttonTitle="Register New Vaccine Program"
                 title="List of Registered Vaccine Programs"
                 showDetails={true}
+                onStatusChange={onStatusChange}
+                setSelectedProgram={setSelectedProgram}
             />
             </div>}
         </div>

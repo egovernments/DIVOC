@@ -5,9 +5,24 @@ import Program from "../../assets/img/program.svg";
 import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
 import Button from 'react-bootstrap/Button';
 import Form from "@rjsf/core";
+import withStyles from "@material-ui/core/styles/withStyles";
+import Switch from "@material-ui/core/Switch/Switch";
 
-function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails}) {
+function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails,onStatusChange,setSelectedProgram}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
+
+    const CustomSwitch = withStyles({
+        switchBase: {
+            '&$checked': {
+                color: "#88C6A9",
+            },
+            '&$checked + $track': {
+                backgroundColor: "#88C6A9",
+            },
+        },
+        checked: {},
+        track: {},
+    })(Switch);
 
     function autoFillForm() {
         return { 
@@ -32,8 +47,8 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                  </div>
                 {listData.map((data, index) => {
                     return (
-                        <div className={'list-view-card-container'}  onClick={() => setSelectedIndex(index)}>
-                            <div className="d-flex justify-content-between">
+                        <div className={'list-view-card-container'} >
+                            <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index)}}>
                                 <span className={'list-view-name'}>{data.name}</span>
                                 <span className={'list-view-logo-img'}>
                                     {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
@@ -49,10 +64,21 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                     <div className="d-flex">
                                         <span>Start Date</span>&emsp;&emsp;
                                         <span>End Date</span>
+                                        <CustomSwitch
+                                            className="ml-auto"
+                                            checked={data.status==="Active" || false}
+                                            onChange={() => {
+                                                console.log("data",data.status)
+                                                setSelectedProgram(data);
+                                                onStatusChange(data,data.status==="Active" ? "Inactive" : "Active" )
+                                            }}
+                                            color="primary"
+                                        />
                                     </div>
                                     <div className="d-flex">
                                         <span><b>{data.startDate}</b></span>&emsp;
                                         <span><b>{data.endDate}</b></span>
+                                        <span className="ml-auto p-2">{data.status === "Active" ? "Active" : "Inactive"}</span>
                                     </div>
                                 </div>
                                 </>
