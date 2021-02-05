@@ -642,7 +642,8 @@ func init() {
             "hasRole": [
               "admin",
               "user",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -657,6 +658,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1274,6 +1300,20 @@ func init() {
           ]
         }
       }
+    },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     },
     "UserGroup": {
       "properties": {
@@ -2077,6 +2117,7 @@ func init() {
             "hasRole": [
               "admin",
               "controller",
+              "facility-admin",
               "user"
             ]
           }
@@ -2092,6 +2133,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2745,6 +2811,20 @@ func init() {
           ]
         }
       }
+    },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     },
     "UserGroup": {
       "properties": {

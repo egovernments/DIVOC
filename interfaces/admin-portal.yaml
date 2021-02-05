@@ -260,11 +260,11 @@ paths:
             - facility-admin
       responses:
         '200':
-            description: OK
-            schema:
-              type: array
-              items:
-                $ref: '#/definitions/Program'
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
     post:
       summary: Create program
       operationId: createProgram
@@ -274,6 +274,22 @@ paths:
           schema:
             $ref: '#/definitions/ProgramRequest'
           description: Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update program
+      operationId: updateProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramUpdateRequest'
+          description: Update Vaccination Program
       responses:
         '200':
           description: OK
@@ -349,7 +365,7 @@ paths:
       summary: Update Facility User
       operationId: updateFacilityUser
       security:
-          - hasRole: ["facility-admin"]
+        - hasRole: ["facility-admin"]
       parameters:
         - in: body
           name: body
@@ -569,6 +585,12 @@ definitions:
         type: array
         items:
           type: string
+  ProgramUpdateRequest:
+    allOf:
+      - $ref: "#/definitions/ProgramRequest"
+      - properties:
+          osid:
+            type: string
   CreateMedicineRequest:
     type: object
     properties:

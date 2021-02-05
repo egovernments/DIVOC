@@ -1,1 +1,2 @@
-*serialNum,*facilityCode,*facilityName,*contact,email,*operatingHourStart,*operatingHourEnd,*category,*type,*status,*addressLine1,*addressLine2,district,state,pincode,*geoLocationLat,*geoLocationLon,websiteURL,*adminName,*adminMobile
+serialNum,facilityCode,facilityName,contact,email,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,websiteURL,adminName,adminMobile
+89,BLRi9,Bengaluru Hospital,4444444440,mysuru@mailinator.com,9,18,GOVT,Fixed location,Active,No 23,"OMR",mysuru,Karnataka,560027,28,77,www.awesome.com  ,tejash1,4444444440

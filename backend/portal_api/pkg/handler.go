@@ -54,6 +54,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
 	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandler)
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
+	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 }
 
 type GenericResponse struct {
@@ -245,6 +246,30 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 		return NewGenericServerError()
 	}
 	return kernelService.MakeRegistryCreateRequest(requestMap, objectId)
+}
+
+
+func updateProgramsHandler(params operations.UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
+	log.Infof("Update Program %+v", params.Body)
+	objectId := "Program"
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		return operations.NewUpdateProgramBadRequest()
+	}
+	requestMap := make(map[string]interface{})
+	err = json.Unmarshal(requestBody, &requestMap)
+	if err != nil {
+		log.Info(err)
+		return NewGenericServerError()
+	}
+	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateProgramBadRequest()
+	} else {
+		log.Print(resp)
+		return NewGenericStatusOk()
+	}
 }
 
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
