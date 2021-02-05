@@ -63,12 +63,12 @@ const Footer = () => {
         <div className="bottom-bar d-flex justify-content-around">
             <BottomItem currentLocation={location.pathname} src={home} href={config.urlPath + "/"}
                         title={getMessageComponent(LANGUAGE_KEYS.HOME)}/>
-            <BottomItem currentLocation={location.pathname} src={language} href={config.urlPath + "/language"}
-                        title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
             <BottomItem currentLocation={location.pathname} src={queue} href={config.urlPath + "/queue"}
                         title={getMessageComponent(LANGUAGE_KEYS.QUEUE)}/>
             <BottomItem currentLocation={location.pathname} src={programs} href={config.urlPath + "/programs"}
                         title={getMessageComponent(LANGUAGE_KEYS.PROGRAM)}/>
+            <BottomItem currentLocation={location.pathname} src={language} href={config.urlPath + "/language"}
+                        title={getMessageComponent(LANGUAGE_KEYS.LANGUAGE)}/>
             <BottomItem currentLocation={location.pathname} src={ImgProfile} href={config.urlPath + "/profile"}
                         title={getMessageComponent(LANGUAGE_KEYS.PROFILE)}/>
         </div>
