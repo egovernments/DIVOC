@@ -19,5 +19,6 @@
   "app.enrollmentToday": "आज नामांकन",
   "app.limitReachMessage": "कृपया ध्यान दें: आप दैनिक नामांकन सीमा तक पहुंच रहे हैं।",
   "app.program": "कार्यक्रम",
-  "app.selectProgram": "कार्यक्रम बदलें"
+  "app.selectProgram": "कार्यक्रम बदलें",
+  "app.profile": "प्रोफाइल"
 }
