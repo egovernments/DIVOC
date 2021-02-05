@@ -31,7 +31,7 @@ type CreateMedicineParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Facility data in the form of csv
+	/*Create Medicine
 	  In: body
 	*/
 	Body *models.CreateMedicineRequest

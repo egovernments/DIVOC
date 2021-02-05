@@ -38,7 +38,7 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
         let programList = [];
         vaccinators.map(vaccinator => {
             vaccinator.programs.map(program => {
-                programList.push(program.id)
+                programList.push(program.programId)
             })
         });
         return Array.from(new Set(programList));
@@ -48,11 +48,15 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
         onSelectVaccinator(vaccinator)
     }
 
-    function onStatusChange(vaccinator) {
+    function onProgramStatusChange(vaccinator, program) {
         const editData = {
             osid: vaccinator.osid,
-            programs: vaccinator.programs,
-            status: vaccinator.status === "Active" ? "Inactive" : "Active"
+            programs: vaccinator.programs.map(p => {
+                if (p.programId === program.programId) {
+                    p.status = p.status === "Active" ? "Inactive" : "Active"
+                }
+                return p
+            }),
         };
         axiosInstance.current.put(API_URL.VACCINATORS_API, [editData])
             .then(res => {
@@ -71,10 +75,10 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
     const getVaccinatorList = () => {
         return vaccinators.map((vaccinator, index) => {
             if (vaccinator.programs && vaccinator.programs.length > 0) {
-                return vaccinator.programs.filter(p => selectedPrograms.includes(p.id)).map(program => (
-                    <tr key={vaccinator.name+program.id}>
+                return vaccinator.programs.filter(p => selectedPrograms.includes(p.programId)).map(program => (
+                    <tr key={vaccinator.name+program.programId}>
                         <td>{vaccinator.name}</td>
-                        <td>{program.id}</td>
+                        <td>{program.programId}</td>
                         <td>
                             { program.certified ?
                                 <img src={check}/> :
@@ -85,9 +89,9 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                                 <img src={check}/> :
                                 <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
                         </td>
-                        <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
+                        <td className={program.status === "Active" ? "active status" : "inactive status"}>{program.status}</td>
                         <td className={classes.root}>
-                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
+                            <Chip variant="outlined" label={program.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onProgramStatusChange(vaccinator, program)} />
                             <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>
@@ -102,9 +106,8 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                             <img src={check}/> :
                             <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
                         </td>
-                        <td className={vaccinator.status === "Active" ? "active status" : "inactive status"}>{vaccinator.status}</td>
+                        <td>-</td>
                         <td className={classes.root}>
-                            <Chip variant="outlined" label={vaccinator.status === "Active" ? "Make Inactive" : "Make Active"} onClick={() => onStatusChange(vaccinator)} />
                             <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)} />
                         </td>
                     </tr>

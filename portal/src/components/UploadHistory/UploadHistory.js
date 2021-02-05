@@ -1,24 +1,40 @@
-import React, {useEffect, useState} from 'react';
-import {useAxios} from "../../utils/useAxios";
-import {formatDate} from "../../utils/dateutil";
+import React, { useEffect, useState } from "react";
+import { useAxios } from "../../utils/useAxios";
+import { formatDate } from "../../utils/dateutil";
 import UploadCSV from "../UploadCSV/UploadCSV";
-import {UploadHistoryTable} from "../UploadHistoryTable";
+import { UploadHistoryTable } from "../UploadHistoryTable";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
-import {Card} from "@material-ui/core";
+import { Card } from "@material-ui/core";
 import ProgramActive from "../../assets/img/program-active.svg";
-import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
-import "./UploadHistory.css"
-import {TotalRecords} from "../TotalRecords";
+import { UploadErrorList } from "../UploadHistoryTable/UploadErrorList";
+import "./UploadHistory.css";
+import { TotalRecords } from "../TotalRecords";
 
-const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI, infoTitle, UploadComponent=UploadCSV}) => {
-    const axiosInstance = useAxios('');
+import Modal from "react-bootstrap/Modal";
+
+const UploadHistory = ({
+    fileUploadAPI,
+    fileUploadHistoryAPI,
+    fileUploadErrorsAPI,
+    infoTitle,
+    UploadComponent = UploadCSV,
+    tableTitle,
+    tableData,
+    tableHeader
+}) => {
+    const axiosInstance = useAxios("");
     const [uploadHistory, setUploadHistory] = useState([]);
-    const [selectedHistory, setSelectedHistory] = useState(null)
+    const [selectedHistory, setSelectedHistory] = useState(null);
+    const [show, setShow] = useState(false);
+    const [selectedFacility, setSelectedFacility] = useState(null);
 
+    const handleClose = () => setShow(false);
+    const handleShow = () => setShow(true);
     useEffect(() => {
-        fetchUploadHistory()
+        fetchUploadHistory();
     }, []);
+
 
     function fetchUploadHistory() {
         axiosInstance.current.get(fileUploadHistoryAPI)
@@ -31,9 +47,9 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
             })
             .then((result) => {
                 return result.map((item, index) => {
-                        const uploadedDate = new Date(item["CreatedAt"])
-                        const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'});
-                        const uploadLocalDate = formatDate(uploadedDate)
+                    const uploadedDate = new Date(item["CreatedAt"]);
+                    const uploadLocalTime = uploadedDate.toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit" });
+                    const uploadLocalDate = formatDate(uploadedDate);
                         return {
                             id: item["ID"],
                             fileName: item["Filename"],
@@ -41,11 +57,11 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
                             time: uploadLocalTime,
                             success: getSuccessRecords(item),
                             errors: item["TotalErrorRows"]
-                        };
                     }
-                )
+                })
             })
             .then((result) => {
+                setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
     }
@@ -66,38 +82,62 @@ const UploadHistory = ({fileUploadAPI, fileUploadHistoryAPI, fileUploadErrorsAPI
     }
 
     return (
-        <div className="upload-csv-container">
+        <div>
             <div className="upload-csv">
-                <UploadComponent fileUploadAPI={fileUploadAPI} onUploadComplete={() => {
-                    fetchUploadHistory()
-                }}/>
-            </div>
-            <div className="total">
-                {infoTitle && <TotalRecords
-                    title={infoTitle}
-                    count={getTotalSuccessUploadCount()}
-                />}
-            </div>
-            <div className="upload-history">
-                <UploadHistoryTable
-                    data={uploadHistory}
-                    headerData={headerData}
-                    onCellClicked={(value) => setSelectedHistory(value)}
+                {infoTitle && (
+                    <TotalRecords
+                        title={infoTitle}
+                        count={getTotalSuccessUploadCount()}
+                    />
+                )}
+                <UploadComponent
+                    fileUploadAPI={fileUploadAPI}
+                    onUploadComplete={() => {
+                        fetchUploadHistory();
+                    }}
+                    uploadHistoryCount={selectedHistory && selectedHistory.success}
+                    errorCount={selectedHistory && selectedHistory.errors}
+                    handleShow={handleShow}
                 />
             </div>
-            <div className="error-temp">
-                {selectedHistory ? <UploadErrors
-                        uploadHistory={selectedHistory}
-                        fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)}
-                    /> :
-                    <div/>}
+            <div className="upload-csv-container">
+                <div className="upload-history">
+                    <UploadHistoryTable 
+                        data={tableData}
+                        headerData={tableHeader}
+                        onCellClicked={(value) => {
+                            setSelectedFacility(value);
+                        }}
+                        title={tableTitle}
+                    />
+                </div>
+                <div className="upload-history">
+                    <UploadHistoryTable
+                        data={uploadHistory}
+                        headerData={uploadCSVHeaderData}
+                        onCellClicked={(value) => {
+                            setSelectedHistory(value);
+                            handleShow();
+                        }}
+                        title="Uploads History"
+                    />
+                </div>
+                <div className="error-temp">
+                    {selectedHistory && (
+                        <UploadErrors uploadHistory={selectedHistory} fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)} handleClose={handleClose} show={show}/> 
+                    )}
+                </div>
             </div>
         </div>
     );
 };
 
-
-function UploadErrors({uploadHistory, fileUploadHistoryDetailsAPI}) {
+function UploadErrors({
+    uploadHistory,
+    fileUploadHistoryDetailsAPI,
+    handleClose,
+    show,
+}) {
     const axiosInstance = useAxios('');
     const [uploadHistoryDetails, setUploadHistoryDetails] = useState({});
     useEffect(() => {
@@ -118,18 +158,19 @@ function UploadErrors({uploadHistory, fileUploadHistoryDetailsAPI}) {
             });
     }
 
-    const CustomPaper = withStyles({
-        root: {
-            boxShadow: "0px 6px 20px #C1CFD933",
-            borderRadius: "10px",
-            width: "100%",
-            height: '60vh',
-            padding: "16px"
-        }
-    })(Paper);
 
     return (
-        <Card component={CustomPaper}>
+        <Modal
+            show={show} onHide={handleClose}
+            aria-labelledby="contained-modal-title-vcenter"
+            centered
+            className="modal-container"
+            dialogClassName="my-modal"
+        >
+            <Modal.Header closeButton className="title">
+                <Modal.Title >{uploadHistory.fileName}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
             <div className="error-container">
                 <div className="error-count ml-lg-5 mt-5">
                     <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
@@ -145,13 +186,13 @@ function UploadErrors({uploadHistory, fileUploadHistoryDetailsAPI}) {
                     <p>{uploadHistory.date}</p>
                     <p>{uploadHistory.time}</p>
                 </div>
-
             </div>
-        </Card>
+            </Modal.Body>
+        </Modal>
     );
 }
 
-const headerData = [
+const uploadCSVHeaderData = [
     {
         title: "FILE NAME",
         key: "fileName"

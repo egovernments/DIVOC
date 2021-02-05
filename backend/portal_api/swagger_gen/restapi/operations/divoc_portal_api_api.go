@@ -126,6 +126,12 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		UpdateFacilityUserHandler: UpdateFacilityUserHandlerFunc(func(params UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilityUser has not yet been implemented")
 		}),
+		UpdateMedicineHandler: UpdateMedicineHandlerFunc(func(params UpdateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateMedicine has not yet been implemented")
+		}),
+		UpdateProgramHandler: UpdateProgramHandlerFunc(func(params UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateProgram has not yet been implemented")
+		}),
 		UpdateVaccinatorsHandler: UpdateVaccinatorsHandlerFunc(func(params UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateVaccinators has not yet been implemented")
 		}),
@@ -233,6 +239,10 @@ type DivocPortalAPIAPI struct {
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
 	// UpdateFacilityUserHandler sets the operation handler for the update facility user operation
 	UpdateFacilityUserHandler UpdateFacilityUserHandler
+	// UpdateMedicineHandler sets the operation handler for the update medicine operation
+	UpdateMedicineHandler UpdateMedicineHandler
+	// UpdateProgramHandler sets the operation handler for the update program operation
+	UpdateProgramHandler UpdateProgramHandler
 	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
 	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -398,6 +408,12 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.UpdateFacilityUserHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilityUserHandler")
+	}
+	if o.UpdateMedicineHandler == nil {
+		unregistered = append(unregistered, "UpdateMedicineHandler")
+	}
+	if o.UpdateProgramHandler == nil {
+		unregistered = append(unregistered, "UpdateProgramHandler")
 	}
 	if o.UpdateVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "UpdateVaccinatorsHandler")
@@ -610,6 +626,14 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/facility/users"] = NewUpdateFacilityUser(o.context, o.UpdateFacilityUserHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/medicines"] = NewUpdateMedicine(o.context, o.UpdateMedicineHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/programs"] = NewUpdateProgram(o.context, o.UpdateProgramHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

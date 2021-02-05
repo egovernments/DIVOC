@@ -5,12 +5,14 @@ import axios from "axios";
 import ListView from '../ListView/ListView';
 import Form from "@rjsf/core";
 import schema from '../../jsonSchema/vaccineSchema.json';
+import Button from 'react-bootstrap/Button';
 
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
-    const [medicineList, setMedicineList] = useState([])
+    const [medicineList, setMedicineList] = useState([]);
+    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -53,9 +55,12 @@ function VaccineRegistration() {
 
     return (
         <div className={styles["container"]}>
-            <div className={styles["form-container"]}>
-                <h4 className={styles['heading']}>Register New Vaccine</h4>
-                <Form
+            {showForm && <div className={styles["form-container"]}>
+            <div className="d-flex">
+                <h4 className={styles['heading']+ " p-2 mr-auto"}>Register New Vaccine</h4>
+                <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
+            </div>
+            <Form
                     schema={schema}
                     uiSchema={uiSchema}
                     onSubmit={(e) => {
@@ -65,11 +70,17 @@ function VaccineRegistration() {
                 >
                     <button type="submit" className={styles['button']}>SAVE</button>
                 </Form>
-            </div>
-            <div className={styles["sub-container"]}>
-                <p className={styles['list-title']}>List of Registered Medicines / Vaccines</p>
-                <ListView listData={medicineList} fields={["provider", "price", "effectiveUntil"]}/>
-            </div>
+            </div>}
+            {!showForm && <div className={styles["sub-container"]}>
+            <ListView 
+                listData={medicineList} 
+                fields={["provider", "price", "effectiveUntil"]} 
+                show={showForm} 
+                setShow={setShowForm}
+                buttonTitle="Register New Vaccine"
+                title="Active Vaccines"
+            />
+            </div>}
         </div>
     );
 }

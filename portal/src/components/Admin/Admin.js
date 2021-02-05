@@ -16,7 +16,7 @@ export default function Admin() {
     function renderDownloadTemplateButton(templateLink) {
         return <Button bsPrefix={"btn-template"} href={templateLink}>
             <Col className="d-flex flex-row">
-                <h6>DOWNLOAD TEMPLATE.CSV</h6>
+                <h6>DOWNLOAD TEMPLATE</h6>
                 <img src={DownloadImg} alt={"Download CSV"}/>
             </Col>
         </Button>;

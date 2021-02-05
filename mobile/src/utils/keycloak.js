@@ -73,6 +73,7 @@ async function saveUserAttributes(attributes) {
         if (facilityDetails && facilityDetails.length > 0) {
             userDetails["facilityDetails"] = facilityDetails[0]
         }
+        userDetails["loginTime"] = new Date().toISOString()
         await appIndexDb.saveUserDetails(userDetails)
     }
     for (let attributesKey in attributes) {

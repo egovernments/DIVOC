@@ -7,9 +7,11 @@ import config from "./config"
 import keycloak, {AuthSafeComponent} from "./utils/keycloak";
 import {LocaleProvider} from "./lang/LocaleContext";
 import {useOnlineStatus} from "./utils/offlineStatus";
+import {getSelectedProgram, SelectProgram} from "./components/ProgramSelection";
 
 function App({keycloak, initialized}) {
     const [isDBInit, setDBInit] = useState(false);
+    const [programSelected, setProgramSelected] = useState(getSelectedProgram())
     useEffect(() => {
         if (initialized) {
             if (keycloak.authenticated) {
@@ -32,11 +34,13 @@ function App({keycloak, initialized}) {
     if (!initialized || !isDBInit) {
         return <div>Loading...</div>
     }
-
+    const onDone = (name) => {
+        setProgramSelected(name)
+    }
 
     return (
         <div className="App">
-            <Dashboard/>
+            {programSelected ? <Dashboard/> : <SelectProgram onDone={onDone}/>}
         </div>
     );
 }

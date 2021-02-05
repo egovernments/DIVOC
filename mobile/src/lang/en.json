@@ -19,5 +19,6 @@
   "app.enrollmentToday": "Enrollments Today",
   "app.limitReachMessage": "Please Note: You are reaching the daily enrolment limit.",
   "app.program": "Programs",
-  "app.selectProgram": "Change Program"
+  "app.selectProgram": "Change Program",
+  "app.profile": "Profile"
 }

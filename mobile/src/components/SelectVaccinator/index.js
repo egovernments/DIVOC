@@ -1,51 +1,122 @@
 import React, {useEffect, useState} from "react";
 import "./index.scss";
-import {Table} from "react-bootstrap";
-import {appIndexDb} from "../../AppDatabase";
 import Button from "react-bootstrap/Button";
-import {CONSTANT} from "../../utils/constants";
-import {ACTION_SELECT_BATCH, useConfirmVaccine} from "../../ConfirmVaccination";
+import {ACTION_PATIENT_COMPLETED, useConfirmVaccine} from "../../ConfirmVaccination";
+import {SyncFacade} from "../../SyncFacade";
+import Select from 'react-select'
+import AutoComplete from "../AutoComplete";
+
+
+const selectorTheme = theme => ({
+    ...theme,
+    colors: {
+        ...theme.colors,
+        primary25: 'neutral0',
+        primary: 'black',
+    },
+});
 
 export const SelectVaccinator = (props) => {
-    const {goNext} = useConfirmVaccine();
-    const [vaccinatorIdx, setVaccinatorIdx] = useState(-1);
+    const {markPatientComplete, getFormDetails, goNext} = useConfirmVaccine();
     const [vaccinators, setVaccinators] = useState([])
+    const [selectedVaccinatorId, setSelectedVaccinatorId] = useState();
+    const [selectedMedicineName, setSelectedMedicineName] = useState();
+    const [medicines, setMedicines] = useState([])
+    const [batchIds, setBatchIds] = useState([])
+    const [selectedBatchId, setSelectedBatchId] = useState();
+    const [tempSelectedBatchId, setTempSelectedBatchId] = useState();
 
     function onActionBtnClick() {
-        if (vaccinatorIdx !== -1) {
-            return goNext(ACTION_SELECT_BATCH,
-                `/confirm/vaccination/${props.enrollCode}/${CONSTANT.BATCH_CODE}`,
-                {enrollCode: props.enrollCode, vaccinatorId: vaccinatorIdx});
+        if (selectedVaccinatorId && selectedMedicineName && selectedBatchId) {
+            const payload = {
+                enrollCode: props.enrollCode,
+                vaccinatorId: selectedVaccinatorId,
+                medicineId: selectedMedicineName,
+                batchId: selectedBatchId
+            }
+            markPatientComplete(payload).then((value) => {
+                return SyncFacade.push()
+            }).then((value => {
+                goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
+            })).catch((e) => {
+                goNext(ACTION_PATIENT_COMPLETED, `/queue`, {});
+            })
+        }
+    }
+
+    function defaultVaccinatorOption() {
+        const defaultVaccinator = vaccinators.find((item) => item.osid === selectedVaccinatorId)
+        if (defaultVaccinator) {
+            return {
+                label: defaultVaccinator.name,
+                value: defaultVaccinator.osid,
+            }
         }
     }
 
     useEffect(() => {
-        appIndexDb
-            .getVaccinators()
-            .then((result) => setVaccinators(result))
+        getFormDetails()
+            .then((result) => {
+                setVaccinators(result.vaccinator)
+                setMedicines(result.medicines)
+                setBatchIds(result.batchIds)
+                setSelectedVaccinatorId(result.selectedVaccinator)
+                setSelectedMedicineName(result.selectedMedicine)
+                setSelectedBatchId(result.selectedBatchId)
+                setTempSelectedBatchId(result.selectedBatchId)
+            })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
+
     return (
         <div className="select-vaccinator-wrapper">
             <div className="table-wrapper">
-                <span className="select-title">SELECT VACCINATOR</span>
-                <Table responsive>
-                    <tbody>
-                    {
-                        vaccinators.map((data, index) => (
-                            <tr className={vaccinatorIdx === data.osid && "selected-vaccinator"} key={index}
-                                onClick={() => {
-                                    setVaccinatorIdx(data.osid)
-                                }}>
-                                <td>
-                                    <span>{data.name}</span>
-                                </td>
-                            </tr>
-                        ))
-                    }
-                    </tbody>
-                </Table>
+                <div className="select-title">SELECT VACCINATOR*</div>
+                <Select
+                    key={selectedVaccinatorId ?? "vaccinatorId"}
+                    isSearchable={false}
+                    defaultValue={defaultVaccinatorOption()}
+                    options={vaccinators.map((item, index) => {
+                        return {
+                            label: item.name,
+                            value: item.osid,
+                        }
+                    })}
+                    theme={selectorTheme}
+                    onChange={(option) => {
+                        setSelectedVaccinatorId(option.value)
+                    }}/>
+                <div className="select-title">SELECT VACCINE*</div>
+                <Select
+                    key={selectedMedicineName ?? "medicineId"}
+                    isSearchable={false}
+                    defaultValue={selectedMedicineName && {value: selectedMedicineName, label: selectedMedicineName}}
+                    options={medicines.map((item, index) => {
+                        return {
+                            label: item.name,
+                            value: item.name,
+                        }
+                    })}
+                    theme={selectorTheme}
+                    onChange={(option) => {
+                        setSelectedMedicineName(option.value)
+                    }}/>
+
+                <div className="d-flex flex-column">
+                    <div className="select-title">ENTER BATCH ID*</div>
+                    <AutoComplete
+                        noSuggestion={false}
+                        key={tempSelectedBatchId ?? "batchId"}
+                        onChange={(value) => {
+                            setSelectedBatchId(value)
+                        }}
+                        defaultText={selectedBatchId}
+                        suggestions={batchIds}
+                    />
+                </div>
             </div>
-            <Button variant="outline-primary" className="action-btn" onClick={(onActionBtnClick)}>{"NEXT"}</Button>
+            <Button variant="outline-primary" className="action-btn mt-4"
+                    onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
         </div>
     );
 }
