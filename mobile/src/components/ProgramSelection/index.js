@@ -59,17 +59,16 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
 
 function ProgramItem({program, selected, onClick}) {
     const [bannerImage, setBannerImage] = useState(program.logoURL)
-    //   const [bannerImage, setBannerImage] = useState("https://www.nsmedicaldevices.com/wp-content/uploads/sites/2/2020/05/Bioradcovid-740x520.jpg")
     return (
         <div className={`program-item ${selected ? 'active' : ''}`} onClick={onClick}>
             {selected && <img className="tick" src={ImgTick} alt={""}/>}
             <div className="selection">
-                <Col>
+                <div className="d-flex flex-column justify-content-center">
                     <img className={"banner-image"} src={bannerImage ? bannerImage : ImgPlaceholder}
                          alt={program.name}
                          onError={() => setBannerImage(null)}/>
                     <div className='title'>{program.name}</div>
-                </Col>
+                </div>
             </div>
         </div>
     );
