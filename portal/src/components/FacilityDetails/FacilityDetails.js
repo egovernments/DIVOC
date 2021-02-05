@@ -181,7 +181,8 @@ function FacilityDetails({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
                     status={status}
                     updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
