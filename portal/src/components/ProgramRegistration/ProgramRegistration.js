@@ -101,7 +101,7 @@ function VaccineRegistration() {
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
             <div className="d-flex">
-                <h4 className={"p-2 mr-auto"}>Register New Vaccine Program</h4>
+                <h5 className={"mr-auto"}>Register New Vaccine Program</h5>
                 <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
             </div>
             

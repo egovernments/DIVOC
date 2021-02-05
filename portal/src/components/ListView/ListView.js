@@ -10,12 +10,16 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
     const [selectedIndex, setSelectedIndex] = useState(-1);
 
     function autoFillForm() {
-        return { name : listData[selectedIndex].name, 
+        return { 
+            name : listData[selectedIndex].name, 
             description: listData[selectedIndex].description,
             logoURL: listData[selectedIndex].logoURL,
             startDate: listData[selectedIndex].startDate,
-            endDate: listData[selectedIndex.endDate],
-            vaccine: listData[selectedIndex.vaccine],
+            endDate: listData[selectedIndex].endDate,
+            vaccine: listData[selectedIndex].vaccine,
+            provider: listData[selectedIndex].provider,
+            price: listData[selectedIndex].price,
+            effectiveUntil: listData[selectedIndex].effectiveUntil,
         }
     } 
     return (
@@ -65,7 +69,7 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                 }}
                                 formData={autoFillForm()}
                             >
-                                <button type="submit" className="button">SAVE</button>
+                                <button type="submit" className="custom-button">SAVE</button>
                             </Form>
                         </div>
                     </div>

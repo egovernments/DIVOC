@@ -12,7 +12,7 @@ export const CustomDropdownWidget= (props) => {
         <DropDown 
             selectedOption={props.value}
             options={props.options.enumOptions}
-            placeholder="Select a Program"
+            placeholder={props.label}
             setSelectedOption={setSelectedOption}
         />
         </div>

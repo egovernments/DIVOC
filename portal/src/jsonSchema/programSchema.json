@@ -18,11 +18,6 @@
         "type": "string",
         "title": "Program Logo"
       },
-      "vaccine": {
-        "title": "Vaccine",
-        "type": "string",
-        "enum": []
-      },
       "startDate": {
         "$id": "#/properties/startDate",
         "type": "string",
@@ -35,11 +30,10 @@
         "title": "End Date",
         "format": "date"
       },
-      "status": {
-        "$id": "#properties/status",
+      "vaccine": {
+        "title": "Select Vaccine",
         "type": "string",
-        "title": "Status",
-        "enum": ["Active", "Inactive"]
+        "enum": []
       }
     }
 }

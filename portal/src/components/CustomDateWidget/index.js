@@ -6,7 +6,7 @@ import "./index.css";
 
 
 export const CustomDateWidget = (props) => {
-  const [startDate, setStartDate] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date(props.value || null));
 
   const updateValue = (newValue) => {
     setStartDate(newValue);

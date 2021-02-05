@@ -106,7 +106,7 @@
 }
 
 .form-container>form>div>fieldset{
-    height: 50vh;
+    height: 45vh;
     display: flex;
     flex-direction: column;
     flex-wrap: wrap;
@@ -116,33 +116,11 @@
     padding-right: 2rem;
 }
 
-.button {
+.custom-button {
     border: 2px solid #5C9EF8;
     border-radius: 6px;
     background-color:white;
     color: #5C9EF8;
     margin-top: 15px;
     padding: 0.25rem 1.5rem;
-}
-
-.custom-text-box{
-    border: 1px solid #E6E6E6;
-    border-radius: 4px;
-    width: 70%;
-    height: 4vh;
-}
-
-.custom-textarea{
-    border: 1px solid #E6E6E6;
-    border-radius: 4px;
-    width: 70%;
-}
-
-.custom-dropdown>div>div>div{
-    border: 1px solid #E6E6E6;
-    border-radius: 4px;
-    width: 80%;
-}
-.custom-dropdown>div{
-    margin: unset !important;
 }
