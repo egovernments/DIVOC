@@ -1,5 +1,4 @@
 import {BaseCard} from "../Base/Base";
-import {appIndexDb} from "../AppDatabase";
 import React, {createContext, useContext, useEffect, useMemo, useReducer, useState} from "react";
 import "./Home.scss"
 import {Col} from "react-bootstrap";
@@ -17,22 +16,46 @@ import {SyncFacade} from "../SyncFacade";
 import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
+import {programDb} from "../Services/ProgramDB";
+import {appIndexDb} from "../AppDatabase";
 
 function ProgramHeader() {
-    const [bannerImage, setBannerImage] = useState()
+    const [bannerImage, setBannerImage] = useState();
+    const [userDetails, setUserDetails] = useState();
     const programName = getSelectedProgram();
 
     useEffect(() => {
-        appIndexDb
+        programDb
             .getProgramByName(programName)
             .then((program) => setBannerImage(program["logoURL"]))
+            .catch((e) => {
+            })
+
+        appIndexDb.getUserDetails()
+            .then((userDetails) => setUserDetails(userDetails))
+            .catch((e) => {
+            })
 
     }, [programName])
 
     return <div className={"program-header"}>
         <BaseCard>
-            <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
-                 onError={() => setBannerImage(null)}/>
+            <div>
+                {userDetails &&
+                <div className="ml-3 m-2">
+                    <div className="name">{userDetails.facilityDetails.facilityName}</div>
+                    <div
+                        className="subtitle">{userDetails.facilityDetails.address.district},{userDetails.facilityDetails.address.state}</div>
+                </div>
+                }
+                {userDetails && <hr className="mt-0 mb-0"/>}
+                {!bannerImage && <div className="program-name-container">
+                    <div
+                        className="program-name">{programName}</div>
+                </div>}
+                {<img className={"banner"} src={bannerImage} alt={""}
+                      onError={() => setBannerImage(null)}/>}
+            </div>
         </BaseCard>
     </div>;
 }

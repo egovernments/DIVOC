@@ -6,12 +6,14 @@ import Form from "@rjsf/core";
 import ListView from '../ListView/ListView';
 import schema from '../../jsonSchema/programSchema.json';
 import Program from "../../assets/img/program.svg";
+import Button from 'react-bootstrap/Button';
 
 function VaccineRegistration() {
     const { keycloak } = useKeycloak();
     const [formData, setFormData] = useState(null);
     const [programList, setProgramList] = useState([]);
     const [programSchema, setProgramSchema] = useState(schema);
+    const [showForm, setShowForm] = useState(false);
 
     useEffect(() => {
         getListOfRegisteredPrograms();
@@ -80,25 +82,35 @@ function VaccineRegistration() {
 
     return (
         <div className={styles["container"]}>
-            <div className={styles["form-container"]}>
-            <h4 className={styles['heading']}>Register New Vaccine Program</h4>
-                <Form
-                    schema={programSchema}
-                    uiSchema={uiSchema}
-                    onSubmit={(e) => {
-                        setFormData(e.formData);
-                        const newField = {medicineIds: [e.formData.vaccine]};
-                        Object.assign(e.formData, newField);
-                        handleSubmit(e.formData);
-                    }}
-                >
-                    <button type="submit" className={styles['button']}>SAVE</button>
-                </Form>
+            {showForm && <div className={styles["form-container"]}>
+            <div className="d-flex">
+                <h4 className={styles['heading']+ " p-2 mr-auto"}>Register New Vaccine Program</h4>
+                <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
             </div>
-            <div className={styles["sub-container"]}>
-                <p className={styles['list-title']}>List of Registered Vaccine Programs</p>
-                <ListView listData={programList} fields={["description", "startDate", "endDate"]}/>
-            </div>
+            
+            <Form
+                schema={programSchema}
+                uiSchema={uiSchema}
+                onSubmit={(e) => {
+                    setFormData(e.formData);
+                    const newField = {medicineIds: [e.formData.vaccine]};
+                    Object.assign(e.formData, newField);
+                    handleSubmit(e.formData);
+                }}
+            >
+                <button type="submit" className={styles['button']}>SAVE</button>
+            </Form>
+            </div>}
+            {!showForm && <div className={styles["sub-container"]}>
+            <ListView 
+                listData={programList} 
+                fields={["description", "startDate", "endDate"]} 
+                show={showForm} 
+                setShow={setShowForm}
+                buttonTitle="Register New Vaccine Program"
+                title="List of Registered Vaccine Programs"
+            />
+            </div>}
         </div>
     );
 }

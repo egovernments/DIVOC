@@ -302,7 +302,7 @@ paths:
       summary: Get medicines
       operationId: getMedicines
       security:
-        - hasRole: ["user", "admin"]
+        - hasRole: ["user", "admin","facility-admin"]
       responses:
         '200':
           description: Get medicine
@@ -805,10 +805,17 @@ definitions:
         type: array
         items:
           type: object
+          required:
+            - certified
           properties:
-            id:
+            programId:
               type: string
               title: Id of the program
+            status:
+              type: string
+              enum:
+                - Active
+                - Inactive
             certified:
               type: boolean
               title: if vaccinator has certificate for program
@@ -816,6 +823,8 @@ definitions:
     type: array
     items:
       type: object
+      required:
+        - osid
       properties:
         osid:
           type: object
@@ -831,6 +840,7 @@ definitions:
           type: string
         facilityIds:
           type: array
+          x-omitempty: true
           items:
             type: string
         mobileNumber:
@@ -851,8 +861,13 @@ definitions:
           items:
             type: object
             properties:
-              id:
+              programId:
                 type: string
+              status:
+                type: string
+                enum:
+                  - Active
+                  - Inactive
               certified:
                 type: boolean
   Program:

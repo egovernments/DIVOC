@@ -3,14 +3,14 @@ import React, {useEffect, useState} from "react";
 import "./index.scss"
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
-import {appIndexDb} from "../../AppDatabase";
+import {programDb} from "../../Services/ProgramDB";
 
 export function ProgramSelection() {
     const [programs, setPrograms] = useState([])
     const [selectedProgram, setSelectedProgram] = useState(getSelectedProgram())
 
     useEffect(() => {
-        appIndexDb
+        programDb
             .getPrograms()
             .then((result) => {
                 setPrograms(result)

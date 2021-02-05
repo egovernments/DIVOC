@@ -16,8 +16,10 @@ export const CONSTANTS = Object.freeze({
 
 export const API_URL = Object.freeze({
     FACILITY_API: "/divoc/admin/api/v1/facilities",
+    USER_FACILITY_API: "/divoc/admin/api/v1/facility",
     FACILITY_NOTIFY_API: "/divoc/admin/api/v1/facilities/notify",
     PROGRAM_API: "/divoc/admin/api/v1/programs",
+    MEDICINE_API: "/divoc/admin/api/v1/medicines",
     FACILITY_FILE_UPLOAD_HISTORY_API: '/divoc/admin/api/v1/facility/uploads',
     FACILITY_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/facility/uploads/:id/errors',
     VACCINATORS_API: '/divoc/admin/api/v1/vaccinators',
@@ -29,8 +31,8 @@ export const API_URL = Object.freeze({
 });
 
 export class SampleCSV {
-    static FACILITY_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/facilities.csv"
-    static VACCINATOR_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/vaccinators.csv"
-    static PRE_ENROLLMENT = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/enrollments.csv"
-    static BULK_CERTIFY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/certificates.csv"
+    static FACILITY_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/orchestration/interfaces/facilities.csv"
+    static VACCINATOR_REGISTRY = "https://raw.githubusercontent.com/egovernments/DIVOC/orchestration/interfaces/vaccinators.csv"
+    static PRE_ENROLLMENT = "https://raw.githubusercontent.com/egovernments/DIVOC/orchestration/interfaces/enrollments.csv"
+    static BULK_CERTIFY = "https://raw.githubusercontent.com/egovernments/DIVOC/orchestration/interfaces/certificates.csv"
 }

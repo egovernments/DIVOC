@@ -1,11 +1,11 @@
 .container {
-    background: #ffffff;
+    /* background: #ffffff;
     box-shadow: 0px 6px 20px #C1CFD933;
-    border-radius: 10px;
-    display: inline-flex;
-    width: calc(50% - 1rem);
-    margin-right: 1rem;
-    align-items: center;
+    border-radius: 10px; */
+    /* display: inline-flex;
+    width: calc(50% - 1rem); */
+    /* margin-right: 1rem;
+    align-items: center; */
 }
 
 .button {
@@ -29,6 +29,6 @@
     background-color: #E6F2FF;
 }
 .progress-bar {
-    color: #5C9EF8;
+    color: #2CD889;
     text-align: right;
 }

@@ -1,5 +1,4 @@
 import {appIndexDb} from "../AppDatabase";
-import {formatCertifyDate} from "../utils/date_utils";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
@@ -51,24 +50,15 @@ export class ApiServices {
 
     static async certify(certifyPatients) {
         const userDetails = await appIndexDb.getUserDetails();
-        const allPrograms = await appIndexDb.getPrograms()
         const facilityDetails = userDetails.facilityDetails;
         const certifyBody = certifyPatients.map((item, index) => {
             const patientDetails = item.patient;
-            //TODO: Move this into App database as medicine details object.
-            const eventDate = new Date(item.eventDate);
-            const givenVaccination = this.getPatientGivenMedicine(allPrograms, patientDetails.programId)
-            let repeatUntil = 0;
-            if (givenVaccination["schedule"] && givenVaccination["schedule"]["repeatInterval"]) {
-                repeatUntil = givenVaccination["schedule"]["repeatInterval"]
-            }
-            const medicineEffectiveDate = givenVaccination["effectiveUntil"] ?? 0;
-            const effectiveUntilDate = this.getEffectiveUntil(eventDate, medicineEffectiveDate)
             return {
                 preEnrollmentCode: item.enrollCode,
                 recipient: {
                     contact: [
-                        "tel:" + patientDetails.phone
+                        "tel:" + patientDetails.phone,
+                        "mailto:" + patientDetails.email
                     ],
                     dob: patientDetails.dob,
                     gender: patientDetails.gender,
@@ -76,7 +66,6 @@ export class ApiServices {
                     name: patientDetails.name,
                     nationality: patientDetails.nationalId,
 
-                    //TODO: Need to get recipient in date format
                     address: {
                         addressLine1: patientDetails.address.addressLine1 ?? "N/A",
                         addressLine2: patientDetails.address.addressLine2 ?? "N/A",
@@ -87,18 +76,17 @@ export class ApiServices {
                 },
 
                 vaccination: {
-                    batch: item.batchCode,
-                    date: eventDate,
-                    effectiveStart: formatCertifyDate(eventDate),
-                    effectiveUntil: effectiveUntilDate,
-                    manufacturer: givenVaccination["provider"] ?? "N/A",
-                    name: givenVaccination["name"] ?? "N/A",
-                    //TODO: Need dose from vaccinator in UI
-                    dose: 1,
-                    totalDoses: repeatUntil,
+                    batch: item.batchId,
+                    date: item.vaccination.date,
+                    effectiveStart: item.vaccination.effectiveStart,
+                    effectiveUntil: item.vaccination.effectiveUntil,
+                    manufacturer: item.vaccination.manufacturer,
+                    name: item.vaccination.name,
+                    dose: item.vaccination.dose,
+                    totalDoses: item.vaccination.totalDoses,
                 },
                 vaccinator: {
-                    name: item.vaccinator.name
+                    name: item.vaccinatorName
                 },
                 facility: {
                     name: facilityDetails.facilityName ?? "N/A",
@@ -160,23 +148,5 @@ export class ApiServices {
             .then(response => {
                 return response.json()
             })
-    }
-
-    static getPatientGivenMedicine(allPrograms, programName) {
-        const patientProgram = allPrograms.find((value => {
-            return value["name"] === programName
-        }))
-        const patientProgramMedicine = patientProgram["medicines"]
-        if (patientProgramMedicine && patientProgramMedicine.length > 0) {
-            return patientProgramMedicine[0]
-        }
-        return {}
-    }
-
-    static getEffectiveUntil(event, effectiveUntil) {
-        const eventDate = new Date(event)
-        const newDateMonths = eventDate.setMonth(eventDate.getMonth() + effectiveUntil);
-        const newDate = new Date(newDateMonths);
-        return formatCertifyDate(newDate);
     }
 }

@@ -1,14 +1,15 @@
-import React, {useState} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
-import Paper from '@material-ui/core/Paper';
+import React, { useState } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
+import TableContainer from "@material-ui/core/TableContainer";
+import TableRow from "@material-ui/core/TableRow";
+import Paper from "@material-ui/core/Paper";
 import withStyles from "@material-ui/core/styles/withStyles";
 import TableHead from "@material-ui/core/TableHead";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
+import TablePagination from "@material-ui/core/TablePagination";
 
 const useStyles = makeStyles({
         table: {
@@ -19,22 +20,19 @@ const useStyles = makeStyles({
 
 const CustomPaper = withStyles({
     root: {
-        boxShadow: "0px 6px 20px #C1CFD933",
-        borderRadius: "10px",
         width: "100%",
-        height: '60vh',
-        padding: "16px"
-    }
+        padding: "16px",
+    },
 })(Paper);
 
 const RowTableCell = withStyles({
     root: {
         fontSize: "0.85rem",
-        padding: "8px",
         color: "#646D82",
-        borderBottom: "1px solid #CEE5FF",
-        font: "Proxima Nova"
-    }
+        borderBottom: "1px solid #E6E6E6",
+        font: "Proxima Nova",
+        textAlign: "left",
+    },
 })(TableCell);
 
 const HeaderTableCell = withStyles({
@@ -42,7 +40,8 @@ const HeaderTableCell = withStyles({
         fontSize: "0.75rem",
         fontWeight: "bold",
         color: "#646D82",
-        borderBottom: "1px solid #CEE5FF"
+        borderBottom: "none",
+        textAlign: "left",
     }
 })(TableCell);
 
@@ -63,67 +62,108 @@ export class HeaderData {
     }
 }
 
-
-export const UploadHistoryTable = ({data, headerData, onCellClicked}) => {
-
-    const [selectedHistory, setSelectedHistory] = useState()
+export const UploadHistoryTable = ({
+    data,
+    headerData,
+    onCellClicked,
+    title,
+}) => {
+    const [selectedHistory, setSelectedHistory] = useState();
     const classes = useStyles();
+    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [page, setPage] = React.useState(0);
 
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0);
+    };
     return (
-        <div>
+        <div className="conatiner">
             <TableContainer component={CustomPaper}>
-                <h5 className="m-2">Uploads History</h5>
-                <hr color="#CEE5FF" style={{
-                    border: 0,
-                    borderBottom: "1px solid #CEE5FF"
-
-                }}/>
-                {data.length === 0 ? <div className="centered-and-flexed">No Upload history found</div> :
-                    <Table className={classes.table}
-                           aria-label="facility staffs">
+                <h5 className="m-2">{title}</h5>
+                <hr
+                    color="#CEE5FF"
+                    style={{
+                        border: 0,
+                        borderBottom: "1px solid #CEE5FF",
+                    }}
+                />
+                {data.length === 0 ? (
+                    <div className="centered-and-flexed">
+                        No Upload history found
+                    </div>
+                ) : (
+                    <Table
+                        className={classes.table}
+                        aria-label="facility staffs"
+                    >
                         <TableHead>
                             <TableRow>
-                                {
-                                    headerData.map((field, index) => (
-                                        <TableCell
-                                            component={HeaderTableCell}
-                                            size="small"
-                                            align="center"
-                                            key={index}>{field.title}</TableCell>
-                                    ))
-                                }
+                                {headerData.map((field, index) => (
+                                    <TableCell
+                                        component={HeaderTableCell}
+                                        size="small"
+                                        align="center"
+                                        key={index}
+                                    >
+                                        {field.title}
+                                    </TableCell>
+                                ))}
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {
-                                data.map((row) => (
+                            {data
+                                .slice(
+                                    page * rowsPerPage,
+                                    page * rowsPerPage + rowsPerPage
+                                )
+                                .map((row) => (
                                     <TableRow
-                                        selected={selectedHistory && selectedHistory.id === row["id"]}
+                                        selected={
+                                            selectedHistory &&
+                                            selectedHistory.id === row["id"]
+                                        }
                                         style={{
-                                            cursor: 'pointer'
+                                            cursor: "pointer",
+                                            background: "none",
                                         }}
                                         onClick={() => {
-                                            setSelectedHistory(row)
+                                            setSelectedHistory(row);
                                             if (onCellClicked) {
-                                                onCellClicked(row)
+                                                onCellClicked(row);
                                             }
-                                        }}>
-                                        {
-                                            headerData.map((field, index) => (
-                                                <TableCell
-                                                    component={RowTableCell}
-                                                    size="small"
-                                                    align="center"
-                                                    key={index}>{row[field.key]}</TableCell>
-                                            ))
-                                        }
+                                        }}
+                                    >
+                                        {headerData.map((field, index) => (
+                                            <TableCell
+                                                component={RowTableCell}
+                                                size="small"
+                                                align="center"
+                                                key={index}
+                                            >
+                                                {row[field.key]}
+                                            </TableCell>
+                                        ))}
                                     </TableRow>
-                                ))
-                            }
+                                ))}
                         </TableBody>
                     </Table>
-                }
+                )}
+                
             </TableContainer>
+            <TablePagination
+                    rowsPerPageOptions={[10, 20, 25]}
+                    component="div"
+                    count={data.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onChangePage={handleChangePage}
+                    onChangeRowsPerPage={handleChangeRowsPerPage}
+                />
         </div>
     );
 };

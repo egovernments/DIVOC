@@ -1,6 +1,7 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
+import {programDb} from "./Services/ProgramDB";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -22,7 +23,7 @@ export class SyncFacade {
         await appIndexDb.saveEnrollments(preEnrollments);
 
         const programs = await ApiServices.fetchPrograms();
-        await appIndexDb.savePrograms(programs)
+        await programDb.savePrograms(programs)
         if (programs.length > 0 && !getSelectedProgram()) {
             saveSelectedProgram(programs[0].name)
         }
@@ -79,13 +80,13 @@ function relativeTimeDifference(current, previous) {
     const elapsed = current - previous;
 
     if (elapsed < msPerMinute) {
-        return Math.round(elapsed / 1000) + ' seconds ago';
+        return Math.round(elapsed / 1000) + ' second(s) ago';
     } else if (elapsed < msPerHour) {
-        return Math.round(elapsed / msPerMinute) + ' minutes ago';
+        return Math.round(elapsed / msPerMinute) + ' minute(s) ago';
     } else if (elapsed < msPerDay) {
-        return Math.round(elapsed / msPerHour) + ' hours ago';
+        return Math.round(elapsed / msPerHour) + ' hour(s) ago';
     } else if (elapsed < msPerMonth) {
-        return Math.round(elapsed / msPerDay) + ' days ago';
+        return Math.round(elapsed / msPerDay) + ' day(s) ago';
     } else if (elapsed < msPerYear) {
         return Math.round(elapsed / msPerMonth) + ' months ago';
     } else {

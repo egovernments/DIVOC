@@ -3,13 +3,19 @@ import './ListView.css';
 import ProgramActiveImg from "../../assets/img/program-active.svg";
 import Program from "../../assets/img/program.svg";
 import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
+import Button from 'react-bootstrap/Button';
 
-function ListView({listData, fields}) {
+function ListView({listData, fields,show,setShow,title,buttonTitle}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
     return (
         <div>
             {
-                selectedIndex === -1 && listData.map((data, index) => {
+                selectedIndex === -1 && <>
+                 <div className="d-flex">
+                    <p className={" p-2 mr-auto"}>{title}</p>
+                    <Button variant="outline-primary" onClick={()=> setShow(!show)}>{buttonTitle}</Button>
+                 </div>
+                {listData.map((data, index) => {
                     return (
                         <div className={'list-view-card-container'}>
                             <div className={'list-view-card-details'}>
@@ -27,7 +33,8 @@ function ListView({listData, fields}) {
                             </div>
                         </div>
                     )
-                })
+                })}
+                </>
             }
             {
                 selectedIndex > -1 &&
@@ -35,14 +42,15 @@ function ListView({listData, fields}) {
                     <div className={"list-view-selected-container"}>
                         <div className="d-flex justify-content-between align-items-center">
                             <span className={'list-view-name'}>{listData[selectedIndex].name}</span>
-                            <span className={'list-view-logo-img'}>
+                            {/* <span className={'list-view-logo-img'}>
                                         {"image" in listData[selectedIndex] ? <img alt="" src={listData[selectedIndex].image} width={"100%"}/> : "LOGO"}
                                         <img
                                             src={listData[selectedIndex].status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
                                             className={'list-view-program-status-img'}
                                             alt={listData[selectedIndex].status}
                                             title={listData[selectedIndex].status}/>
-                                    </span>
+                            </span> */}
+                            <button className="mt-3 list-selected-back-btn" onClick={() => setSelectedIndex(-1)}>BACK</button>
                         </div>
                         <div className="d-flex flex-wrap">
                             {
@@ -55,7 +63,6 @@ function ListView({listData, fields}) {
                             }
                         </div>
                     </div>
-                    <button className="mt-3 list-selected-back-btn" onClick={() => setSelectedIndex(-1)}>BACK</button>
                 </div>
             }
         </div>

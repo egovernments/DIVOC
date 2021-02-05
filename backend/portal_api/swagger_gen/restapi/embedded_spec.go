@@ -583,7 +583,8 @@ func init() {
           {
             "hasRole": [
               "user",
-              "admin"
+              "admin",
+              "facility-admin"
             ]
           }
         ],
@@ -1431,14 +1432,24 @@ func init() {
           "type": "array",
           "items": {
             "type": "object",
+            "required": [
+              "certified"
+            ],
             "properties": {
               "certified": {
                 "type": "boolean",
                 "title": "if vaccinator has certificate for program"
               },
-              "id": {
+              "programId": {
                 "type": "string",
                 "title": "Id of the program"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Active",
+                  "Inactive"
+                ]
               }
             }
           }
@@ -1468,6 +1479,9 @@ func init() {
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "osid"
+        ],
         "properties": {
           "averageRating": {
             "type": "number"
@@ -1482,7 +1496,8 @@ func init() {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-omitempty": true
           },
           "mobileNumber": {
             "type": "string",
@@ -1506,8 +1521,15 @@ func init() {
                 "certified": {
                   "type": "boolean"
                 },
-                "id": {
+                "programId": {
                   "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "Active",
+                    "Inactive"
+                  ]
                 }
               }
             }
@@ -2104,6 +2126,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "facility-admin",
               "user"
             ]
           }
@@ -3013,14 +3036,24 @@ func init() {
     },
     "VaccinatorProgramsItems0": {
       "type": "object",
+      "required": [
+        "certified"
+      ],
       "properties": {
         "certified": {
           "type": "boolean",
           "title": "if vaccinator has certificate for program"
         },
-        "id": {
+        "programId": {
           "type": "string",
           "title": "Id of the program"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },
@@ -3032,6 +3065,9 @@ func init() {
     },
     "VaccinatorUpdateRequestItems0": {
       "type": "object",
+      "required": [
+        "osid"
+      ],
       "properties": {
         "averageRating": {
           "type": "number"
@@ -3046,7 +3082,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-omitempty": true
         },
         "mobileNumber": {
           "type": "string",
@@ -3089,8 +3126,15 @@ func init() {
         "certified": {
           "type": "boolean"
         },
-        "id": {
+        "programId": {
           "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },

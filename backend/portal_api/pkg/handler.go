@@ -52,7 +52,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
 	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
-	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandler)
+	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandlerV2)
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
@@ -649,6 +649,88 @@ func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, princip
 			return operations.NewUpdateVaccinatorsBadRequest()
 		} else {
 			log.Print(resp)
+		}
+	}
+	return operations.NewUpdateVaccinatorsOK()
+}
+
+func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	for _, updateRequest := range params.Body {
+		if updateRequest.Osid == "" {
+			log.Errorf("Vaccinator update request without OSID %v", updateRequest)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		}
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": updateRequest.Osid,
+			},
+		}
+		searchResponse, err := kernelService.QueryRegistry("Vaccinator", searchFilter)
+		if err == nil {
+			vaccinators := searchResponse["Vaccinator"].([]interface{})
+			if len(vaccinators) > 0 {
+				vaccinator := vaccinators[0].(map[string]interface{})
+				currentPrograms := vaccinator["programs"].([]interface{})
+				var programsTobeUpdated []map[string]interface{}
+				var updateVaccinator map[string]interface{}
+				e := convertStructToInterface(updateRequest, &updateVaccinator)
+				if e != nil {
+					log.Errorf("Error which converting to Interface %+v", updateRequest)
+					return NewGenericServerError()
+				}
+				if len(currentPrograms) == 0 {
+					for _, program := range updateRequest.Programs {
+						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+							"programId":          program.ProgramID,
+							"status":             program.Status,
+							"certified":          program.Certified,
+							"statusUpdatedAt":    time.Now().Format(time.RFC3339),
+							"certifiedUpdatedAt": time.Now().Format(time.RFC3339),
+						})
+					}
+				} else {
+					for _, obj := range currentPrograms {
+						vaccinatorProgram := obj.(map[string]interface{})
+						programsTobeUpdated = append(programsTobeUpdated, vaccinatorProgram)
+					}
+					for _, updateProgram := range updateRequest.Programs {
+						existingProgram := false
+						for _, vaccinatorProgram := range programsTobeUpdated {
+							if updateProgram.ProgramID == vaccinatorProgram["programId"].(string) {
+								if updateProgram.Status != "" && updateProgram.Status != vaccinatorProgram["status"].(string) {
+									vaccinatorProgram["status"] = updateProgram.Status
+									vaccinatorProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+								if updateProgram.Certified != vaccinatorProgram["certified"].(bool) {
+									vaccinatorProgram["certified"] = updateProgram.Certified
+									vaccinatorProgram["certifiedUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+								existingProgram = true
+							}
+						}
+						if !existingProgram {
+							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+								"programId":            updateProgram.ProgramID,
+								"status":               updateProgram.Status,
+								"certified":            updateProgram.Certified,
+								"statusUpdatedAt":      time.Now().Format(time.RFC3339),
+								"certifiedUpdatedAt":   time.Now().Format(time.RFC3339),
+							})
+						}
+					}
+
+				}
+				updateVaccinator["programs"] = programsTobeUpdated
+				resp, err := kernelService.UpdateRegistry("Vaccinator", updateVaccinator)
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Print(resp)
+				}
+			}
+		} else {
+			log.Errorf("Finding Vaccinator for id %s failed", updateRequest.Osid, err)
+			return operations.NewUpdateVaccinatorsBadRequest()
 		}
 	}
 	return operations.NewUpdateVaccinatorsOK()
