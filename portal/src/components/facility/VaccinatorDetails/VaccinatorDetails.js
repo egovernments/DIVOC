@@ -11,6 +11,7 @@ import {API_URL} from "../../../utils/constants";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
+import {useSelector} from "react-redux";
 
 
 export default function VaccinatorDetails({
@@ -26,6 +27,7 @@ export default function VaccinatorDetails({
     const [searchVaccinatorName, setSearchVaccinatorName] = useState('');
     const [searchVaccinatorResults, setSearchVaccinatorResults] = useState([]);
     const [togglePopup, setTogglePopup] = useState(false);
+    const countryCode = useSelector(state => state.flagr.appConfig.countryCode)
 
     const axiosInstance = useAxios('');
 
@@ -233,7 +235,7 @@ export default function VaccinatorDetails({
                         value={vaccinator.mobileNumber}
                         onChange={(evt) => onValueChange(evt, "mobileNumber")}
                         InputProps={{
-                            startAdornment: <InputAdornment position="start">+91</InputAdornment>,
+                            startAdornment: <InputAdornment position="start">{countryCode}</InputAdornment>,
                         }}
                         label="Mobile" variant="outlined"/>
                     <TextField required value={vaccinator.nationalIdentifier} onChange={(evt) => onValueChange(evt, "nationalIdentifier")} label="National Identifier" variant="outlined"/>

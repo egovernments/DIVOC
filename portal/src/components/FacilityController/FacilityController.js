@@ -7,6 +7,7 @@ import {useAxios} from "../../utils/useAxios";
 import state_and_districts from '../../utils/state_and_districts.json';
 import {equals, reject} from "ramda";
 import {API_URL, CONSTANTS} from "../../utils/constants";
+import {useSelector} from "react-redux";
 
 const defaultState = {
     selectedProgram: "",
@@ -22,6 +23,8 @@ function FacilityController() {
     const [facilities, setFacilities] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [districts, setDistricts] = useState([]);
+    const countryName = useSelector(state => state.flagr.appConfig.countryName);
+    const state_and_districts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const stateList = [{
         value: CONSTANTS.ALL,
         label: CONSTANTS.ALL
@@ -165,6 +168,7 @@ function FacilityController() {
                     title: "Facility Activation",
                     component: (
                         <FacilityActivation
+                            countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}
                             districtList={districts}
@@ -189,6 +193,7 @@ function FacilityController() {
                     title: "Adjusting Rate",
                     component: (
                         <FacilityAdjustingRate
+                            countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}
                             districtList={districts}
@@ -214,6 +219,7 @@ function FacilityController() {
                     title: "All Facilities",
                     component: (
                         <FacilityDetails
+                            countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}
                             districtList={districts}

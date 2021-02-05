@@ -5,7 +5,7 @@ import {CONSTANTS} from "../../utils/constants";
 
 export const FacilityFilterTab = ({
                                       programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
-                                      selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children
+                                      selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children, countryName
                                   }) => {
 
     const handleChange = (value, setValue) => {
@@ -44,7 +44,7 @@ export const FacilityFilterTab = ({
                 />
             </div>
             <div>
-                <span className="filter-header">All of India</span>
+                <span className="filter-header">All of {countryName}</span>
                 <DropDown
                     selectedOption={selectedState}
                     options={states}

@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                 setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                status, setStatus, fetchFacilities, resetFilter
+                                status, setStatus, fetchFacilities, resetFilter, countryName
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
@@ -110,6 +110,7 @@ function FacilityActivation({
                     programs={programs}
                     selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
+                    countryName={countryName}
                     states={stateList}
                     setSelectedState={onStateSelected}
                     selectedState={selectedState}
