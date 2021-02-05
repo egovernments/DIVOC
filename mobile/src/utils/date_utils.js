@@ -13,9 +13,9 @@ export function formatCertifyDate(dob) {
 
 
 export function formatLoginDate(loginDate) {
-    const date = new Date(loginDate)
-    let day = date.getDate().toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping: false});
-    let year = date.getFullYear();
-    let monthName = monthNames[date.getMonth()];
-    return `${day}-${monthName}-${year}`;
+    const d = new Date(loginDate),
+        minutes = d.getMinutes().toString().length === 1 ? '0' + d.getMinutes() : d.getMinutes(),
+        hours = d.getHours().toString().length === 1 ? '0' + d.getHours() : d.getHours(),
+        ampm = d.getHours() >= 12 ? 'pm' : 'am';
+    return d.getDate() + '-' + monthNames[d.getMonth()] + '-' + d.getFullYear() + ' ' + hours + ':' + minutes + ' ' + ampm;
 }

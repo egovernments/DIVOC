@@ -10,7 +10,6 @@ import programs from '../components/ProgramSelection/programs.svg'
 import {Home} from "../Home/Home";
 import {Queue} from "../Queue/Queue";
 import {SelectLanguage} from "../Language/LanguageSelection";
-import {Logout} from "../Logout/Logout";
 import {PrivateRoute} from "../utils/PrivateRoute";
 import {LoginComponent} from "../Login/Login";
 import {PreEnrollmentFlow} from "../Home/Forms/PreEnrollmentFlow";

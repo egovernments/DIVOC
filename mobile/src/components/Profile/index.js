@@ -52,20 +52,23 @@ function AuthSafeUserProfile({keycloak}) {
                     </div>
                     <div className="logout-container mt-5 d-flex justify-content-around">
                         <Button variant="outline-danger" onClick={() => {
-                            if (navigator.onLine) {
-                                SyncFacade
-                                    .push()
-                                    .catch((e) => console.log(e.message))
-                                    .then(() => appIndexDb.clearEverything())
-                                    .then((() => keycloak.logout()))
-                                    .catch(e => {
-                                        console.log(e.message)
-                                        if (!navigator.onLine) {
-                                            alert(Messages.NO_INTERNET_CONNECTION)
-                                        }
-                                    })
-                            } else {
-                                alert(Messages.NO_INTERNET_CONNECTION)
+                            const isConfirmed = window.confirm("Are you sure want to logout?");
+                            if (isConfirmed) {
+                                if (navigator.onLine) {
+                                    SyncFacade
+                                        .push()
+                                        .catch((e) => console.log(e.message))
+                                        .then(() => appIndexDb.clearEverything())
+                                        .then((() => keycloak.logout()))
+                                        .catch(e => {
+                                            console.log(e.message)
+                                            if (!navigator.onLine) {
+                                                alert(Messages.NO_INTERNET_CONNECTION)
+                                            }
+                                        })
+                                } else {
+                                    alert(Messages.NO_INTERNET_CONNECTION)
+                                }
                             }
                         }}>Logout</Button>{" "}
                     </div>
