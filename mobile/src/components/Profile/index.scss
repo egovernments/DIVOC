@@ -1,0 +1,35 @@
+@import "styles/colors.scss";
+@import "styles/common-mixins.scss";
+
+.profile-container {
+  margin: 4%;
+  height: 100%;
+
+  .name {
+    font-weight: 700;
+    font-size: 16px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+
+  .date {
+    font-weight: 400;
+    color: $primaryThemeColor
+  }
+
+  .label {
+    font-weight: 400;
+  }
+
+  .logout-container {
+    height: 100%;
+  }
+}

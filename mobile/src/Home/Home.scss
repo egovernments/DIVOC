@@ -12,8 +12,45 @@
 
     .banner {
       width: 100%;
-      max-height: 250px;
-      padding: 2rem;
+      max-height: 200px;
+      padding: 1rem;
+    }
+
+    .program-name-container {
+      display: grid;
+      place-items: center;
+      height: 150px;
+      font-size: 20px;
+      font-weight: 700;
+
+      .program-name {
+        word-wrap: anywhere;
+        text-align: center;
+      }
+    }
+
+    .name {
+      font-weight: 700;
+      font-size: 16px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .date {
+      font-weight: 700;
+      color: $primaryThemeColor
+    }
+
+    .label {
+      font-weight: 700;
     }
   }
 
@@ -53,6 +90,7 @@
   .recipient-container {
     .recipient-row {
       margin-top: 4%;
+
       .my-card {
         padding: 0.5rem 1rem;
 

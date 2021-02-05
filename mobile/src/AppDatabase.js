@@ -2,6 +2,7 @@ import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgram} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
+import {monthNames} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 11;
@@ -12,11 +13,7 @@ const EVENTS = "events";
 const VACCINATORS = "vaccinators";
 const STATUS = "status";
 const USER_DETAILS = "user_details";
-const monthNames = [
-    "Jan", "Feb", "Mar", "Apr",
-    "May", "Jun", "Jul", "Aug",
-    "Sep", "Oct", "Nov", "Dec"
-];
+
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});

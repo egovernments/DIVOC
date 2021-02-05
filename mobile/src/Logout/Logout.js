@@ -28,7 +28,7 @@ function AuthSafeLogout({keycloak}) {
                     } else {
                         alert(Messages.NO_INTERNET_CONNECTION)
                     }
-                }}>Logout</Button>{" "}
+                }}>Confirm Logout ?</Button>{" "}
             </div>
         </BaseCard>
     </div>;
