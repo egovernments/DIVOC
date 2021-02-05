@@ -305,7 +305,7 @@ paths:
         - hasRole: ["user", "admin"]
       responses:
         '200':
-          description: OK
+          description: Get medicine
           schema:
             type: array
             items:
@@ -321,7 +321,25 @@ paths:
           name: body
           schema:
             $ref: '#/definitions/CreateMedicineRequest'
-          description: Facility data in the form of csv
+          description: Create Medicine
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update Medicine
+      operationId: updateMedicine
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/UpdateMedicineRequest'
+          description: Upadte Medicine
       responses:
         '200':
           description: OK
@@ -588,6 +606,12 @@ definitions:
   ProgramUpdateRequest:
     allOf:
       - $ref: "#/definitions/ProgramRequest"
+      - properties:
+          osid:
+            type: string
+  UpdateMedicineRequest:
+    allOf:
+      - $ref: "#/definitions/CreateMedicineRequest"
       - properties:
           osid:
             type: string

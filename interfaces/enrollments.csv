@@ -1,2 +1,1 @@
-phone,enrollmentScopeId,nationalId,dob,gender,name,email,addressLine1,addressLine2,state,district,pincode
-9876543215,DEL1,234234234234,1995-01-01,Male,kiran,kiran@mailinator.com,21,Street,Mysuru,Karnataka,202021
+*phone,*enrollmentScopeId,*nationalId,*dob,gender,name,email,*addressLine1,*addressLine2,district,state,pincode
