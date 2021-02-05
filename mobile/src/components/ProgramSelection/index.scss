@@ -9,9 +9,14 @@
 
 .program-grid {
   display: grid;
+  margin-top: 14px;
   grid-template-columns: 1fr 1fr;
+  grid-column-gap: 4px;
+  grid-row-gap: 4px;
+
 
   .program-item {
+
     .title {
       font-size: 13px;
       text-align: center;

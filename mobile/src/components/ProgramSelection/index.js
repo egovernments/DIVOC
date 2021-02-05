@@ -4,9 +4,10 @@ import "./index.scss"
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {programDb} from "../../Services/ProgramDB";
-import {BaseCard} from "../../Base/Base";
 import Col from "react-bootstrap/Col";
 import ImgPlaceholder from "assets/img/no_image.svg"
+import Button from "react-bootstrap/Button";
+import {ApiServices} from "../../Services/ApiServices";
 
 export function ProgramSelection() {
     const [programs, setPrograms] = useState([])
@@ -37,7 +38,9 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
 
     const onProgramSelected = (program) => {
         setSelectedProgram(program)
-        onProgramSelectedCallback(program)
+        if (onProgramSelectedCallback) {
+            onProgramSelectedCallback(program)
+        }
     }
     return (
         <div className="program-grid">
@@ -65,6 +68,36 @@ function ProgramItem({program, selected, onClick}) {
                     <div className='title'>{program.name}</div>
                 </Col>
             </Card>
+        </div>
+    );
+}
+
+
+export function SelectProgram({onDone}) {
+    const [programs, setPrograms] = useState([])
+    const [selectedProgram, setSelectedProgram] = useState()
+    useEffect(() => {
+        ApiServices
+            .fetchPrograms()
+            .then((result) => {
+                setPrograms(result)
+            })
+            .catch(e => console.log(e.message))
+    }, [])
+
+    const onProgramSelected = (programName) => {
+        setSelectedProgram(programName)
+    }
+    return (
+        <div>
+            <h3>Please selected the Program</h3>
+            <ProgramSelectionGrid programs={programs} onProgramSelectedCallback={onProgramSelected}/>
+            <Button onClick={() => {
+                if (selectedProgram && onDone) {
+                    saveSelectedProgram(selectedProgram)
+                    onDone(selectedProgram)
+                }
+            }}>Done</Button>
         </div>
     );
 }
