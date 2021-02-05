@@ -5,8 +5,13 @@
   height: 100%;
 
 
-  .program-item {
+}
 
+.program-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+
+  .program-item {
     .title {
       font-size: 13px;
       text-align: center;
@@ -17,7 +22,19 @@
       border-bottom-color: $textColorLight;
     }
 
+    .banner-image {
+      width: 100%;
+      height: 75%;
+      padding: 2px;
+      object-fit: cover;
+    }
+
     &.active {
+      .banner-image {
+        border: 2px solid $primaryThemeColor;
+        border-radius: 4px;
+      }
+
       .title {
         color: $textSelectedColor;
       }
