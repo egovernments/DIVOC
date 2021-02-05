@@ -17,9 +17,7 @@ import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
-import Row from "react-bootstrap/Row";
 import {appIndexDb} from "../AppDatabase";
-import {formatLoginDate} from "../utils/date_utils";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState();
@@ -43,19 +41,13 @@ function ProgramHeader() {
     return <div className={"program-header"}>
         <BaseCard>
             <div>
-                {userDetails && <div>
-                    <Row className="m-2">
-                        <Col>
-                            <div className="name">{userDetails.facilityDetails.facilityName}</div>
-                            <div
-                                className="subtitle">{userDetails.facilityDetails.address.district},{userDetails.facilityDetails.address.state}</div>
-                        </Col>
-                        <div className="mr-2 d-flex flex-column justify-content-end">
-                            <div className="subtitle label">Last logged in</div>
-                            <div className="subtitle date">{formatLoginDate(userDetails.loginTime)}</div>
-                        </div>
-                    </Row>
-                </div>}
+                {userDetails &&
+                <div className="ml-3 m-2">
+                    <div className="name">{userDetails.facilityDetails.facilityName}</div>
+                    <div
+                        className="subtitle">{userDetails.facilityDetails.address.district},{userDetails.facilityDetails.address.state}</div>
+                </div>
+                }
                 {userDetails && <hr className="mt-0"/>}
                 <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
                      onError={() => setBannerImage(null)}/>
