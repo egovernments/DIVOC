@@ -6,6 +6,7 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {programDb} from "../../Services/ProgramDB";
 import Col from "react-bootstrap/Col";
 import ImgPlaceholder from "assets/img/no_image.svg"
+import ImgTick from "assets/img/tick.svg"
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../../Services/ApiServices";
 
@@ -61,13 +62,15 @@ function ProgramItem({program, selected, onClick}) {
     //   const [bannerImage, setBannerImage] = useState("https://www.nsmedicaldevices.com/wp-content/uploads/sites/2/2020/05/Bioradcovid-740x520.jpg")
     return (
         <div className={`program-item ${selected ? 'active' : ''}`} onClick={onClick}>
-            <Card className="d-flex justify-content-between">
+            {selected && <img className="tick" src={ImgTick} alt={""}/>}
+            <div className="selection">
                 <Col>
-                    <img className={"banner-image"} src={bannerImage ? bannerImage : ImgPlaceholder} alt={program.name}
+                    <img className={"banner-image"} src={bannerImage ? bannerImage : ImgPlaceholder}
+                         alt={program.name}
                          onError={() => setBannerImage(null)}/>
                     <div className='title'>{program.name}</div>
                 </Col>
-            </Card>
+            </div>
         </div>
     );
 }
@@ -89,15 +92,21 @@ export function SelectProgram({onDone}) {
         setSelectedProgram(programName)
     }
     return (
-        <div>
-            <h3>Please selected the Program</h3>
-            <ProgramSelectionGrid programs={programs} onProgramSelectedCallback={onProgramSelected}/>
-            <Button onClick={() => {
-                if (selectedProgram && onDone) {
-                    saveSelectedProgram(selectedProgram)
-                    onDone(selectedProgram)
-                }
-            }}>Done</Button>
+        <div className="selection-program-container">
+            <h5>Please select a Vaccination Program</h5>
+            <div className="program-selection-grid">
+                <ProgramSelectionGrid programs={programs} onProgramSelectedCallback={onProgramSelected}/>
+            </div>
+            <div>
+                <Button
+                    variant="outline-primary" className="action-btn mt-4"
+                    onClick={() => {
+                        if (selectedProgram && onDone) {
+                            saveSelectedProgram(selectedProgram)
+                            onDone(selectedProgram)
+                        }
+                    }}>Done</Button>
+            </div>
         </div>
     );
 }
