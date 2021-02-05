@@ -26,24 +26,24 @@ function AuthSafeUserProfile({keycloak}) {
         <div className="profile-container">
             <BaseFormCard title="Profile">
                 {userDetails && <div>
-                    <div className="name mt-2">{userDetails.full_name}</div>
+                    <div className="name mt-4">{userDetails.full_name}</div>
                     <div className="mt-2 mr-2">
-                        <Row>
+                        <Col>
                             <Col>
-                                <div className="subtitle label">Last logged in</div>
+                                <div className="subtitle label mt-4">Last logged in</div>
                                 <div className="subtitle date">{formatLoginDate(userDetails.loginTime)}</div>
                             </Col>
                             <Col>
-                                <div className="d-flex flex-column justify-content-end">
+                                <div className="mt-4 d-flex flex-column justify-content-end">
                                     <div className="subtitle label">Last sync</div>
                                     <div className="subtitle date">{SyncFacade.lastSyncedOn()}</div>
                                 </div>
                             </Col>
-                        </Row>
+                        </Col>
                     </div>
-                    <hr/>
+                    <hr className="mt-4 mb-4"/>
                     <div>
-                        <div className="name">Facility Center</div>
+                        <div className="name">Facility</div>
                         <div className="mt-2">{userDetails.facilityDetails.facilityName}</div>
                         <div
                             className="subtitle mt-1">{userDetails.facilityDetails.address.addressLine1}{userDetails.facilityDetails.address.district ? "," : ""} {userDetails.facilityDetails.address.district}</div>

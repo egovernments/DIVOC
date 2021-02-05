@@ -4,10 +4,11 @@
 .profile-container {
   margin: 4%;
   height: 100%;
+  text-align: center;
 
   .name {
     font-weight: 700;
-    font-size: 16px;
+    font-size: 18px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
@@ -21,8 +22,10 @@
   }
 
   .date {
-    font-weight: 400;
-    color: $primaryThemeColor
+    font-weight: 700;
+    font-size: 16px;
+    margin-top: 4px;
+    color: #4E67D1
   }
 
   .label {
