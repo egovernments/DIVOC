@@ -48,9 +48,13 @@ function ProgramHeader() {
                         className="subtitle">{userDetails.facilityDetails.address.district},{userDetails.facilityDetails.address.state}</div>
                 </div>
                 }
-                {userDetails && <hr className="mt-0"/>}
-                <img className={"banner"} src={bannerImage ? bannerImage : NoImagePlaceholder} alt={"program"}
-                     onError={() => setBannerImage(null)}/>
+                {userDetails && <hr className="mt-0 mb-0"/>}
+                {!bannerImage && <div className="program-name-container">
+                    <div
+                        className="program-name">{programName}</div>
+                </div>}
+                {<img className={"banner"} src={bannerImage} alt={""}
+                      onError={() => setBannerImage(null)}/>}
             </div>
         </BaseCard>
     </div>;
