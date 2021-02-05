@@ -15,40 +15,40 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
-// NewCreateMedicineParams creates a new CreateMedicineParams object
+// NewUpdateMedicineParams creates a new UpdateMedicineParams object
 // no default values defined in spec.
-func NewCreateMedicineParams() CreateMedicineParams {
+func NewUpdateMedicineParams() UpdateMedicineParams {
 
-	return CreateMedicineParams{}
+	return UpdateMedicineParams{}
 }
 
-// CreateMedicineParams contains all the bound params for the create medicine operation
+// UpdateMedicineParams contains all the bound params for the update medicine operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters createMedicine
-type CreateMedicineParams struct {
+// swagger:parameters updateMedicine
+type UpdateMedicineParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Create Medicine
+	/*Upadte Medicine
 	  In: body
 	*/
-	Body *models.CreateMedicineRequest
+	Body *models.UpdateMedicineRequest
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewCreateMedicineParams() beforehand.
-func (o *CreateMedicineParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewUpdateMedicineParams() beforehand.
+func (o *UpdateMedicineParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.CreateMedicineRequest
+		var body models.UpdateMedicineRequest
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

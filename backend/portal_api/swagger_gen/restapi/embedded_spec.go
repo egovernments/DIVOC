@@ -592,7 +592,7 @@ func init() {
         "operationId": "getMedicines",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Get medicine",
             "schema": {
               "type": "array",
               "items": {
@@ -600,6 +600,38 @@ func init() {
                 "$ref": "#/definitions/CreateMedicineRequest"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Update Medicine",
+        "operationId": "updateMedicine",
+        "parameters": [
+          {
+            "description": "Upadte Medicine",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateMedicineRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -615,7 +647,7 @@ func init() {
         "operationId": "createMedicine",
         "parameters": [
           {
-            "description": "Facility data in the form of csv",
+            "description": "Create Medicine",
             "name": "body",
             "in": "body",
             "schema": {
@@ -659,6 +691,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1276,6 +1333,34 @@ func init() {
           ]
         }
       }
+    },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateMedicineRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/CreateMedicineRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     },
     "UserGroup": {
       "properties": {
@@ -2050,7 +2135,7 @@ func init() {
         "operationId": "getMedicines",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Get medicine",
             "schema": {
               "type": "array",
               "items": {
@@ -2058,6 +2143,38 @@ func init() {
                 "$ref": "#/definitions/CreateMedicineRequest"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Update Medicine",
+        "operationId": "updateMedicine",
+        "parameters": [
+          {
+            "description": "Upadte Medicine",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateMedicineRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2073,7 +2190,7 @@ func init() {
         "operationId": "createMedicine",
         "parameters": [
           {
-            "description": "Facility data in the form of csv",
+            "description": "Create Medicine",
             "name": "body",
             "in": "body",
             "schema": {
@@ -2117,6 +2234,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2770,6 +2912,34 @@ func init() {
           ]
         }
       }
+    },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateMedicineRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/CreateMedicineRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
     },
     "UserGroup": {
       "properties": {

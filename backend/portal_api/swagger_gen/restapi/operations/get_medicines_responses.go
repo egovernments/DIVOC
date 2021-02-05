@@ -16,7 +16,7 @@ import (
 // GetMedicinesOKCode is the HTTP code returned for type GetMedicinesOK
 const GetMedicinesOKCode int = 200
 
-/*GetMedicinesOK OK
+/*GetMedicinesOK Get medicine
 
 swagger:response getMedicinesOK
 */
