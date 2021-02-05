@@ -10,7 +10,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -249,6 +249,8 @@ function FacilityAdjustingRate({
                     showCard={showCard}
                     setShowCard={setShowCard}
                     data={selectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
             <div className="col-sm-3 container">

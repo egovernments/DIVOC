@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, resetFilter
+                             status, setStatus, resetFilter, updateFacilityProgramStatus
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
@@ -182,6 +182,8 @@ function FacilityDetails({
                     showCard={showCard}
                     setShowCard={setShowCard}
                     data={selectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
 

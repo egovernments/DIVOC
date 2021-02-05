@@ -5,14 +5,16 @@ import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from "@material-ui/core/Button";
 import AddAdminIcon from "../../assets/img/add-admin.svg";
+import { CONSTANTS} from "../../utils/constants";
 
 
-function DetailsCard({ showCard, setShowCard, data }) {
+function DetailsCard({ showCard, setShowCard, data, status, updateFacilityProgramStatus }) {
     console.log("data", data);
-    const [editAdmin, setEditAdmin] = useState(false);
+    const [editAdmin, setEditAdmin] = useState(false);  
     const getInputClass = () => {
         return editAdmin ? "enabled" : "disabled"
     }
+
     const box = () => {
         return (
             <div >
@@ -117,8 +119,13 @@ function DetailsCard({ showCard, setShowCard, data }) {
                         </form>
                     </Container>
                     {editAdmin && <Button style={{"marginTop":"10px"}} className="mr-2 blue-btn" variant="outlined" color="primary">SAVE</Button>}
-                    <Button style={{"marginTop":"10px"}} className="mr-2 blue-btn" variant="outlined" color="primary">MESSAGE</Button>
-                    <Button className="mr-2 blue-btn" variant="outlined" color="primary" style={{"marginTop": "10px"}}>DELIST FACILITY</Button>
+                    {false && <Button style={{"marginTop":"10px"}} className="mr-2 blue-btn" variant="outlined" color="primary">MESSAGE</Button>}
+                    {status===CONSTANTS.ACTIVE && <Button 
+                        className="mr-2 blue-btn" variant="outlined" color="primary" 
+                        style={{"marginTop": "10px"}}
+                        onClick={()=>{updateFacilityProgramStatus([data], CONSTANTS.IN_ACTIVE)}}>
+                        DELIST FACILITY
+                    </Button>}
                 </Container>
             </div>
         );
