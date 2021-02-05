@@ -130,6 +130,7 @@ function VaccineRegistration() {
                 setShow={setShowForm}
                 buttonTitle="Register New Vaccine Program"
                 title="List of Registered Vaccine Programs"
+                showDetails={true}
             />
             </div>}
         </div>

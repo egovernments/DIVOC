@@ -1,6 +1,7 @@
 .container{
     margin-top: 2%;
-    height: 80vh;
+    height: 75vh;
+    overflow-y: auto;
     box-shadow: 0px 6px 20px #C1CFD933;
 }
 .form-container{

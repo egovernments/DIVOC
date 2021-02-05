@@ -6,7 +6,7 @@ import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
 import Button from 'react-bootstrap/Button';
 import Form from "@rjsf/core";
 
-function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets}) {
+function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
 
     function autoFillForm() {
@@ -32,20 +32,31 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                  </div>
                 {listData.map((data, index) => {
                     return (
-                        <div className={'list-view-card-container'}>
-                            <div className={'list-view-card-details'}>
-                                <div className="d-flex justify-content-between">
-                                    <span className={'list-view-name'}>{data.name}</span>
-                                    <span className={'list-view-logo-img'}>
-                                        {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
-                                        <img src={data.status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
-                                             className={'list-view-program-status-img'} alt={data.status}
-                                             title={data.status}/>
-                                    </span>
-                                </div>
-                                <div className='list-view-details'
-                                     onClick={() => setSelectedIndex(index)}>{"More Details ->"}</div>
+                        <div className={'list-view-card-container'}  onClick={() => setSelectedIndex(index)}>
+                            <div className="d-flex justify-content-between">
+                                <span className={'list-view-name'}>{data.name}</span>
+                                <span className={'list-view-logo-img'}>
+                                    {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
+                                    <img src={data.status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
+                                            className={'list-view-program-status-img'} alt={data.status}
+                                            title={data.status}/>
+                                </span>
                             </div>
+                            {showDetails && 
+                                <>
+                                <div>{data.description}</div>
+                                <div className="additional-details-card">
+                                    <div className="d-flex">
+                                        <span>Start Date</span>&emsp;&emsp;
+                                        <span>End Date</span>
+                                    </div>
+                                    <div className="d-flex">
+                                        <span><b>{data.startDate}</b></span>&emsp;
+                                        <span><b>{data.endDate}</b></span>
+                                    </div>
+                                </div>
+                                </>
+                            }
                         </div>
                     )
                 })}

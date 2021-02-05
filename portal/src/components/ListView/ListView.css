@@ -5,7 +5,9 @@
     padding: 20px;
     background-color: #f1f1f1;
     border-radius: 10px;
-    height: 20vh;
+    height: fit-content;
+    padding-bottom: 1.5em;
+    cursor: pointer;
 }
 
 .list-view-card-container:nth-child(4n+1) {
@@ -75,7 +77,7 @@
 }
 
 .list-view-card-details {
-    padding-bottom: 1.5em;
+    
 }
 
 .list-view-selected-container {
@@ -84,6 +86,13 @@
 
 .list-selected-title {
     font-size: 14px;
+}
+
+.additional-details-card{
+    font-size: 10px;
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 2px solid white;
 }
 
 .list-selected-value {
