@@ -8,6 +8,9 @@ import keycloak, {AuthSafeComponent} from "./utils/keycloak";
 import {LocaleProvider} from "./lang/LocaleContext";
 import {useOnlineStatus} from "./utils/offlineStatus";
 import {getSelectedProgram, SelectProgram} from "./components/ProgramSelection";
+import {store} from "../src/redux/store";
+import {Provider} from "react-redux";
+import {storeApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
 
 function App({keycloak, initialized}) {
     const [isDBInit, setDBInit] = useState(false);
@@ -27,6 +30,7 @@ function App({keycloak, initialized}) {
                     keycloak.login({redirectUri: config.urlPath})
                 }
             }
+            storeApplicationConfigFromFlagr(store.dispatch)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);
@@ -49,22 +53,26 @@ export function FacilityApp() {
     const isOnline = useOnlineStatus();
 
     if (isOnline) {
-        return <ReactKeycloakProvider
-            authClient={keycloak}
-            initOptions={{"checkLoginIframe": false}}>
-            <LocaleProvider>
-                <AuthSafeComponent>
-                    <App/>
-                </AuthSafeComponent>
-            </LocaleProvider>
-        </ReactKeycloakProvider>
+        return <Provider store={store}>
+            <ReactKeycloakProvider
+                authClient={keycloak}
+                initOptions={{"checkLoginIframe": false}}>
+                <LocaleProvider>
+                    <AuthSafeComponent>
+                        <App/>
+                    </AuthSafeComponent>
+                </LocaleProvider>
+            </ReactKeycloakProvider>
+        </Provider>
     } else {
         return (
-            <LocaleProvider>
-                <AuthSafeComponent>
-                    <App/>
-                </AuthSafeComponent>
-            </LocaleProvider>
+            <Provider store={store}>
+                <LocaleProvider>
+                    <AuthSafeComponent>
+                        <App/>
+                    </AuthSafeComponent>
+                </LocaleProvider>
+            </Provider>
         );
     }
 }

@@ -10,6 +10,7 @@ import schema from '../../jsonSchema/walk_in_form.json';
 import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 import config from "config.json"
+import {useSelector} from "react-redux";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -44,7 +45,8 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 
 function WalkEnrollment(props) {
-    const {state, goNext} = useWalkInEnrollment()
+    const {state, goNext} = useWalkInEnrollment();
+    const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
 
     const customFormats = {
         'phone-in': /\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$/
@@ -53,7 +55,7 @@ function WalkEnrollment(props) {
     const uiSchema = {
         classNames: "form-container",
         phone: {
-            "ui:placeholder": "+91"
+            "ui:placeholder": countryCode
         },
     };
     return (
