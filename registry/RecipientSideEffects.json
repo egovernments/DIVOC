@@ -88,10 +88,10 @@
       ""
     ],
     "systemFields": [
-      "_osCreatedAt",
-      "_osUpdatedAt",
-      "_osCreatedBy",
-      "_osUpdatedBy"
+      "osCreatedAt",
+      "osUpdatedAt",
+      "osCreatedBy",
+      "osUpdatedBy"
     ]
   }
 }

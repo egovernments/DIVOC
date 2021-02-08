@@ -76,6 +76,7 @@ function VaccineRegistration() {
                 console.log(res);
                 getListOfRegisteredPrograms()
             });
+            setShowForm(!showForm)
         }
     };
 
@@ -87,7 +88,6 @@ function VaccineRegistration() {
                     return {...d,edited: false}
                 })
             });
-        res = res.map(r => ({...r, image: Program}));
         setProgramList(res)
     };
 

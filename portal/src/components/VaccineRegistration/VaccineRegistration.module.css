@@ -1,7 +1,9 @@
 .container{
-    margin-top: 2%;
-    height: 80vh;
+    height: 75vh;
     box-shadow: 0px 6px 20px #C1CFD933;
+    margin: 2% 2rem 0;
+    border-radius: 1rem;
+    overflow: auto;
 }
 .form-container{
     padding:  2rem;

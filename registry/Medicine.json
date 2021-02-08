@@ -80,6 +80,6 @@
     "signedFields": [],
     "indexFields": ["(provider, name)","name"],
     "uniqueIndexFields": ["name"],
-    "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }
