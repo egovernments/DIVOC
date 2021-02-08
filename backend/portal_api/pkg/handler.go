@@ -150,7 +150,8 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 			"startsWith": params.Name,
 		}
 	}
-	response, err := kernelService.QueryRegistry(entityTypeId, filter)
+	limit, offset := getFilterAndOffset(params.Limit, params.Offset)
+	response, err := kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
 		return model.NewGenericServerError()
@@ -183,6 +184,18 @@ func addQueryParamToFilter(param *string, filter map[string]interface{}, filterK
 	}
 }
 
+func getFilterAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+	limit := config.Config.SearchRegistry.DefaultLimit
+	offset := config.Config.SearchRegistry.DefaultOffset
+	if limitValue != nil {
+		limit = int(*limitValue)
+	}
+	if offsetValue != nil {
+		offset = int(*offsetValue)
+	}
+	return limit, offset
+}
+
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	filter := createFilterObject(params)
@@ -191,7 +204,8 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			"eq": principal.FacilityCode,
 		}
 	}
-	response, err := kernelService.QueryRegistry(entityTypeId, filter)
+	limit, offset := getFilterAndOffset(params.Limit, params.Offset)
+	response, err := kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
 		return model.NewGenericServerError()
@@ -204,7 +218,7 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			"neq": params.ProgramID,
 		}
 		delete(filter, ProgramStatusKey)
-		response, err = kernelService.QueryRegistry(entityTypeId, filter)
+		response, err = kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 		if err != nil {
 			log.Errorf("Error in querying registry", err)
 			return model.NewGenericServerError()
@@ -423,16 +437,10 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			log.Errorf("Facility update request without OSID %v", updateRequest)
 			continue
 		}
-		searchFilter := map[string]interface{}{
-			"osid": map[string]interface{}{
-				"eq": updateRequest.Osid,
-			},
-		}
-		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		searchRespone, err := kernelService.ReadRegistry("Facility", updateRequest.Osid)
 		if err == nil {
-			facilities := searchRespone["Facility"].([]interface{})
-			if len(facilities) > 0 {
-				facility := facilities[0].(map[string]interface{})
+			facility := searchRespone["Facility"].(map[string]interface{})
+			if facility != nil {
 				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
@@ -656,20 +664,15 @@ func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, princip
 
 func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
-		if updateRequest.Osid == "" {
+		if *updateRequest.Osid == "" {
 			log.Errorf("Vaccinator update request without OSID %v", updateRequest)
 			return operations.NewUpdateVaccinatorsBadRequest()
 		}
-		searchFilter := map[string]interface{}{
-			"osid": map[string]interface{}{
-				"eq": updateRequest.Osid,
-			},
-		}
-		searchResponse, err := kernelService.QueryRegistry("Vaccinator", searchFilter)
+
+		searchResponse, err := kernelService.ReadRegistry("Vaccinator", *updateRequest.Osid)
 		if err == nil {
-			vaccinators := searchResponse["Vaccinator"].([]interface{})
-			if len(vaccinators) > 0 {
-				vaccinator := vaccinators[0].(map[string]interface{})
+			vaccinator := searchResponse["Vaccinator"].(map[string]interface{})
+			if vaccinator != nil {
 				currentPrograms := vaccinator["programs"].([]interface{})
 				var programsTobeUpdated []map[string]interface{}
 				var updateVaccinator map[string]interface{}
@@ -739,7 +742,8 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	if claimBody != nil {
-		response, err := services.GetFacilityByCode(claimBody.FacilityCode)
+		limit, offset := getFilterAndOffset(nil, nil)
+		response, err := services.GetFacilityByCode(claimBody.FacilityCode, limit, offset)
 		if err != nil {
 			log.Errorf("Error in querying registry", err)
 			return model.NewGenericServerError()
