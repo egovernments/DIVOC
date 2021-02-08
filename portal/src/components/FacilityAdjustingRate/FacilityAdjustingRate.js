@@ -215,7 +215,7 @@ function FacilityAdjustingRate({
                     </div>
                 </FacilityFilterTab>
             </div>
-            <div className={`col-sm-6 container ${styles['table']}`}>
+            <div className={`col-sm-6 ${styles['table']}`}>
                 {!showCard ?
                 <>
                     <p className={styles['highlight']}>
