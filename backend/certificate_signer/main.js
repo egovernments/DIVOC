@@ -4,6 +4,17 @@ const signer = require('./signer');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 const redis = require('./redis');
 const R = require('ramda');
+const promClient = require('prom-client');
+
+const certificatesCounter = new client.Counter({
+  name: 'dovoc_certificates_count',
+  help: 'Number of certificates issued.',
+});
+
+const certificatesMessagesCounter = new client.Counter({
+  name: 'dovoc_certificates_messages_count',
+  help: 'Number of certificates issued.',
+});
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -29,6 +40,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
   await consumer.run({
     eachMessage: async ({topic, partition, message}) => {
       console.time("certify");
+      certificatesMessagesCounter.inc();
       console.log({
         value: message.value.toString(),
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
@@ -55,6 +67,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
               }
               let errMsg;
               if (res.status === 200) {
+                certificatesCounter.inc();
                 sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
                 producer.send({
                   topic: config.CERTIFIED_TOPIC,

@@ -15,11 +15,11 @@
       "type": "object",
       "title": "Recipient SideEffects",
       "required": [
-        "recipientCertificateId",
+        "beneficiaryId",
         "recipientMobileNumber"
       ],
       "properties": {
-        "recipientCertificateId": {
+        "beneficiaryId": {
           "type": "string"
         },
         "sideEffectsResponse": {
