@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
@@ -42,7 +43,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 		})
 		return
 	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))
@@ -119,7 +120,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 		})
 		return
 	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))

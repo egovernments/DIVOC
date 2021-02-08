@@ -164,7 +164,7 @@ func analyseResponse(response *req.Resp, err error) (map[string]interface{}, err
 	return responseObject.Result, nil
 }
 
-func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]interface{}, error) {
+func QueryRegistry(typeId string, filter map[string]interface{}, limit int, offset int) (map[string]interface{}, error) {
 
 	queryRequest := RegistryRequest{
 		"open-saber.registry.search",
@@ -172,6 +172,8 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 		map[string]interface{}{
 			"entityType": []string{typeId},
 			"filters":    filter,
+			"limit":      limit,
+			"offset":     offset,
 		},
 	}
 	log.Info("Registry query ", queryRequest)
@@ -181,7 +183,7 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 
 func GetEntityType(entityTypeId string) middleware.Responder {
 	filter := map[string]interface{}{}
-	response, err := QueryRegistry(entityTypeId, filter)
+	response, err := QueryRegistry(entityTypeId, filter, 100, 0)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
 		return model.NewGenericServerError()
@@ -225,7 +227,7 @@ func GetVaccinatorsForTheFacility(facilityCode string) (interface{}, error) {
 			"contains": facilityCode,
 		},
 	}
-	if resp, err := QueryRegistry("Vaccinator", filter); err != nil {
+	if resp, err := QueryRegistry("Vaccinator", filter, 100, 0); err != nil {
 		log.Errorf("Error in getting vaccinator from registry for the facility %s", facilityCode)
 		return nil, err
 	} else {

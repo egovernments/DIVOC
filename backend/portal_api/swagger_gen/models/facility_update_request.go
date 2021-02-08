@@ -127,12 +127,41 @@ type FacilityUpdateRequestItems0ProgramsItems0 struct {
 	// rate
 	Rate float64 `json:"rate,omitempty"`
 
+	// schedule
+	Schedule *FacilityUpdateRequestItems0ProgramsItems0Schedule `json:"schedule,omitempty"`
+
 	// status
 	Status string `json:"status,omitempty"`
 }
 
 // Validate validates this facility update request items0 programs items0
 func (m *FacilityUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateSchedule(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0ProgramsItems0) validateSchedule(formats strfmt.Registry) error {
+	if swag.IsZero(m.Schedule) { // not required
+		return nil
+	}
+
+	if m.Schedule != nil {
+		if err := m.Schedule.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("schedule")
+			}
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -147,6 +176,44 @@ func (m *FacilityUpdateRequestItems0ProgramsItems0) MarshalBinary() ([]byte, err
 // UnmarshalBinary interface implementation
 func (m *FacilityUpdateRequestItems0ProgramsItems0) UnmarshalBinary(b []byte) error {
 	var res FacilityUpdateRequestItems0ProgramsItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// FacilityUpdateRequestItems0ProgramsItems0Schedule facility update request items0 programs items0 schedule
+//
+// swagger:model FacilityUpdateRequestItems0ProgramsItems0Schedule
+type FacilityUpdateRequestItems0ProgramsItems0Schedule struct {
+
+	// days
+	Days []string `json:"days"`
+
+	// end time
+	EndTime *string `json:"endTime,omitempty"`
+
+	// start time
+	StartTime *string `json:"startTime,omitempty"`
+}
+
+// Validate validates this facility update request items0 programs items0 schedule
+func (m *FacilityUpdateRequestItems0ProgramsItems0Schedule) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *FacilityUpdateRequestItems0ProgramsItems0Schedule) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *FacilityUpdateRequestItems0ProgramsItems0Schedule) UnmarshalBinary(b []byte) error {
+	var res FacilityUpdateRequestItems0ProgramsItems0Schedule
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

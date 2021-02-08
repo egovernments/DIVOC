@@ -14,13 +14,13 @@ const FacilityEntity string = "Facility"
 const FacilityPendingTasks string = "facilityPendingTasks"
 const FacilityUpdate string = "facilityUpdate"
 
-func GetFacilityByCode(facilityCode string) (map[string]interface{}, error) {
+func GetFacilityByCode(facilityCode string, limit int, offset int) (map[string]interface{}, error) {
 	filter := map[string]interface{}{
 		"facilityCode": map[string]interface{}{
 			"eq": facilityCode,
 		},
 	}
-	return kernelService.QueryRegistry(FacilityEntity, filter)
+	return kernelService.QueryRegistry(FacilityEntity, filter, limit, offset)
 }
 
 func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, claimBody *models.JWTClaimBody) middleware.Responder {
@@ -29,16 +29,10 @@ func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, clai
 	var pendingTasksTemplate = template.Must(template.New("").Parse(pendingTasksTemplateString))
 
 	for _, facilityNotifyRequest := range params.Body {
-		searchFilter := map[string]interface{}{
-			"osid": map[string]interface{}{
-				"eq": facilityNotifyRequest.FacilityID,
-			},
-		}
-		searchRespone, err := kernelService.QueryRegistry("Facility", searchFilter)
+		searchRespone, err := kernelService.ReadRegistry("Facility", facilityNotifyRequest.FacilityID)
 		if err == nil {
-			facilities := searchRespone["Facility"].([]interface{})
-			if len(facilities) > 0 {
-				facility := facilities[0].(map[string]interface{})
+			facility := searchRespone["Facility"].(map[string]interface{})
+			if facility != nil {
 				log.Infof("Notifying facility %s", facilityNotifyRequest.FacilityID)
 				buf := bytes.Buffer{}
 				err := pendingTasksTemplate.Execute(&buf, facilityNotifyRequest)

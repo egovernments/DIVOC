@@ -1,13 +1,16 @@
 .container{
     color: #4D4F5C;
 }
-.district-table {
-    height: 350px;
+.set-rate-table {
+    /*height: 350px;*/
     overflow: scroll;
-    border: 1px solid #E8E9EC; 
+    /*border: 1px solid #E8E9EC; */
     margin-bottom: 20px;
 }
 
+.facility-grid-container{
+    padding: 1rem;
+}
 thead,tbody{
     color:  #4E4E4E;
     font-size: smaller;

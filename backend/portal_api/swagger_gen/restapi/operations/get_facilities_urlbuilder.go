@@ -9,11 +9,15 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetFacilitiesURL generates an URL for the get facilities operation
 type GetFacilitiesURL struct {
 	District        *string
+	Limit           *float64
+	Offset          *float64
 	ProgramID       *string
 	ProgramStatus   *string
 	RateUpdatedFrom *string
@@ -61,6 +65,22 @@ func (o *GetFacilitiesURL) Build() (*url.URL, error) {
 	}
 	if districtQ != "" {
 		qs.Set("district", districtQ)
+	}
+
+	var limitQ string
+	if o.Limit != nil {
+		limitQ = swag.FormatFloat64(*o.Limit)
+	}
+	if limitQ != "" {
+		qs.Set("limit", limitQ)
+	}
+
+	var offsetQ string
+	if o.Offset != nil {
+		offsetQ = swag.FormatFloat64(*o.Offset)
+	}
+	if offsetQ != "" {
+		qs.Set("offset", offsetQ)
 	}
 
 	var programIDQ string

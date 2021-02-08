@@ -63,3 +63,7 @@ input[type="radio"]:checked + .wrapper {
     border-radius: 10px;
     border: none;
 }
+
+.pad-1rem {
+    padding: 1rem;
+}

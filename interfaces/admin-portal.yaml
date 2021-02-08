@@ -69,6 +69,12 @@ paths:
         - in: query
           name: rateUpdatedTo
           type: string
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
       security:
         - hasRole: ["admin", "controller", "facility-admin"]
       responses:
@@ -188,6 +194,12 @@ paths:
           name: name
           type: string
           description: Vaccinator Name
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
       responses:
         '200':
           description: OK
@@ -579,6 +591,19 @@ definitions:
                 type: string
               rate:
                 type: number
+              schedule:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  startTime:
+                    type: string
+                    x-nullable: true
+                  endTime:
+                    type: string
+                    x-nullable: true
   ProgramRequest:
     type: object
     properties:
@@ -827,7 +852,7 @@ definitions:
         - osid
       properties:
         osid:
-          type: object
+          type: string
         signatureString:
           type: string
         code:
