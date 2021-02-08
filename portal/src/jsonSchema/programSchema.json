@@ -1,7 +1,7 @@
 {
     "$id": "#properties/Program",
     "type": "object",
-    "required": ["name", "description", "startDate"],
+    "required": ["name", "description"],
     "properties": {
       "name": {
         "$id": "#/properties/name",
@@ -18,22 +18,32 @@
         "type": "string",
         "title": "Program Logo"
       },
-      "startDate": {
-        "$id": "#/properties/startDate",
-        "type": "string",
-        "title": "Start Date",
-        "format": "date"
+      "dateRange": {
+        "title": " ",
+        "type": "object",
+        "properties": {
+          "startDate": {
+            "$id": "#/properties/startDate",
+            "type": "string",
+            "title": "Start Date",
+            "format": "date"
+          },
+          "endDate": {
+            "$id": "#/properties/endDate",
+            "type": "string",
+            "title": "End Date",
+            "format": "date"
+          }
+        }
       },
-      "endDate": {
-        "$id": "#/properties/endDate",
-        "type": "string",
-        "title": "End Date",
-        "format": "date"
-      },
-      "vaccine": {
+      "medicineIds": {
         "title": "Select Vaccine",
-        "type": "string",
-        "enum": []
+        "type": "array",
+        "items": {
+          "type": "string",
+          "enum": []
+        },
+        "uniqueItems": true
       }
     }
 }

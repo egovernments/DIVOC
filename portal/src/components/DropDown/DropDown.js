@@ -10,7 +10,7 @@ function DropDown({setSelectedOption, placeholder, options, selectedOption}) {
         setSelectedOption(selectedItemFromDropdown.value)
     };
     return (
-        <div className="m-3">
+        <div className="drop-down-wrapper m-3">
             <Dropdown
                 value={selectedOption}
                 options={options}
