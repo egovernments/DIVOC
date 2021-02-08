@@ -67,16 +67,16 @@ export default function Vaccinators() {
     };
 
     return (
-        <Card className="mt-4">
+        <div className="vaccinator-list-container">
             {enableVaccinatorDetailView === false &&
             <div>
-                <div className='ml-4 d-flex justify-content-between align-items-center'>
+                <div className='mt-2 ml-4 d-flex justify-content-between align-items-center'>
                     <div className="title-vaccinator">All Vaccinators</div>
                     <button className='add-vaccinator-button mr-4' onClick={onAddVaccinator}>+ ADD
                         NEW VACCINATOR
                     </button>
                 </div>
-                <div className={`row`}>
+                <div className={`row pl-lg-5 pr-lg-5`}>
                     <VaccinatorList
                         vaccinators={vaccinators}
                         onSelectVaccinator={onSelectVaccinator}
@@ -93,7 +93,7 @@ export default function Vaccinators() {
                 facilityCode={facilityCode}
             />
             }
-        </Card>
+        </div>
     );
 }
 

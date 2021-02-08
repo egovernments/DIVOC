@@ -24,3 +24,33 @@
     font-size: 1em;
     color: #1D1D1D;
 }
+
+.vaccinator-list-container {
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.MuiSwitch-input {
+    color: #2CD889;
+}
+
+.table {
+    box-shadow: none !important;
+    border-radius: 10px;
+}
+
+.table > tbody > td,
+.table > thead > tr > th {
+    border: 0 !important
+}
+
+.table thead th {
+    font-size: 12px;
+    font-weight: bold;
+    color: #646D82;
+}
+
+.table td {
+    vertical-align: middle;
+}
