@@ -12,13 +12,13 @@ import (
 type ProgramsRegistryResponse struct {
 	EndDate     string        `json:"endDate"`
 	Type        string        `json:"@type"`
-	OsCreatedAt time.Time     `json:"_osCreatedAt"`
-	OsUpdatedBy string        `json:"_osUpdatedBy"`
+	OsCreatedAt time.Time     `json:"osCreatedAt"`
+	OsUpdatedBy string        `json:"osUpdatedBy"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Osid        string        `json:"osid"`
-	OsCreatedBy string        `json:"_osCreatedBy"`
-	OsUpdatedAt time.Time     `json:"_osUpdatedAt"`
+	OsCreatedBy string        `json:"osCreatedBy"`
+	OsUpdatedAt time.Time     `json:"osUpdatedAt"`
 	MedicineIds []interface{} `json:"medicineIds"`
 	StartDate   string        `json:"startDate"`
 }
