@@ -2,3 +2,19 @@
     cursor: pointer;
     width: 3%;
 }
+
+.roleTypeMenu {
+    height: calc(1.5em + 0.75rem + 2px);
+}
+
+.roleTypeSelector {
+    top: -4px;
+}
+
+.roleTypeSelector input {
+    border: 1px solid lightgray;
+}
+
+.switchInput {
+    top: 8px;
+}
