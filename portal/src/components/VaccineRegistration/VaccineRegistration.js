@@ -40,7 +40,7 @@ function VaccineRegistration() {
     const widgets = {
         TextWidget: CustomTextWidget,
         TextareaWidget: CustomTextAreaWidget,
-        // SelectWidget: CustomDropdownWidget,
+        SelectWidget: CustomDropdownWidget,
     };
 
     const handleSubmit = (dataToSend) => {
@@ -84,6 +84,7 @@ function VaccineRegistration() {
 
     function autoFillForm() {
         return { 
+            osid: selectedMedicine.osid,
             name: selectedMedicine.name,
             effectiveUntil: selectedMedicine.effectiveUntil,
             price: selectedMedicine.price,

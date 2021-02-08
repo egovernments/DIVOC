@@ -38,13 +38,14 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                         <div className={'list-view-card-container'} >
                             <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index);setSelectedData(data)}}>
                                 <span className={'list-view-name'}>{data.name}</span>
-                                <span className={'list-view-logo-img'}>
+                                {showDetails && <span className={'list-view-logo-img'}>
                                     {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
                                     <img src={data.status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
                                             className={'list-view-program-status-img'} alt={data.status}
                                             title={data.status}/>
-                                </span>
+                                </span>}
                             </div>
+                            {!showDetails && <span className="">{data.provider}</span>}
                             {showDetails && 
                                 <>
                                 <div>{data.description}</div>
@@ -60,9 +61,8 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                 </div>
                                 </>
                             }
-                            <div>
+                            <div className="custom-switch">
                                 <CustomSwitch
-                                className="ml-auto"
                                 checked={data.status==="Active" || false}
                                 onChange={() => {
                                     setSelectedData(data);
@@ -72,7 +72,7 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                 }}
                                 color="primary"
                             />
-                            <span className="ml-auto p-2">{data.status === "Active" ? "Active" : "Inactive"}</span>
+                            <p>{data.status === "Active" ? "Active" : "Inactive"}</p>
                             </div>
                         </div>
                     )

@@ -137,3 +137,7 @@
     margin-top: 15px;
     padding: 0.25rem 1.5rem;
 }
+
+.custom-switch{
+    float: right;
+}

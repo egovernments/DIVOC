@@ -64,6 +64,7 @@ function VaccineRegistration() {
             axios
             .put("/divoc/admin/api/v1/programs", datatoSend, config)
             .then((res) => {
+                alert("Successfully Edited");
                 console.log(res);
                 getListOfRegisteredPrograms()
             });
@@ -121,6 +122,7 @@ function VaccineRegistration() {
 
     function autoFillForm() {
         return { 
+            osid: selectedProgram.osid,
             name : selectedProgram.name, 
             description: selectedProgram.description,
             logoURL: selectedProgram.image,
