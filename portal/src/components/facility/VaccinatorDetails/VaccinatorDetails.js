@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from "react";
 import "./VaccinatorDetails.css"
-import {append, equals, isEmpty, reject} from "ramda";
-import TextField from "@material-ui/core/TextField";
+import { equals, isEmpty, reject} from "ramda";
 import searchImg from "../../../assets/img/search.svg";
-import InputAdornment from "@material-ui/core/InputAdornment";
 import {useAxios} from "../../../utils/useAxios";
 import check from "../../../assets/img/check.png";
 import DropDown from "../../DropDown/DropDown";
@@ -347,7 +345,7 @@ export default function VaccinatorDetails({
                 </div>
             </div>
         </div>
-            <div>
+            <div style={{marginLeft: "12px"}}>
                 {savedSuccessfully && <span><img src={check}/> <span className="saved-success">Details Saved</span></span>}
                 {!hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={saveVaccinator}>ADD</button>}
                 {hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={editVaccinator}>SAVE</button>}

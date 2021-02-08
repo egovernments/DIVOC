@@ -9,7 +9,6 @@ import Paper from '@material-ui/core/Paper';
 import withStyles from "@material-ui/core/styles/withStyles";
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from "@material-ui/core/Button";
 import {useAxios} from "../../utils/useAxios";
@@ -259,7 +258,6 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 
                             ))
                         }
-
                     </Select>
                 </FormControl>
             </BorderLessTableCell>
