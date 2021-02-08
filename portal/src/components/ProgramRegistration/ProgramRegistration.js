@@ -75,7 +75,7 @@ function VaccineRegistration() {
         const requestBody = {...formData, ...formData.dateRange};
         if (validateFields(requestBody)) {
             axios
-                .post("/divoc/admin/api/v1/programs", requestBody, config)
+                .post("/divoc/admin/api/v1/programs", {...requestBody, status: "Active"}, config)
                 .then((res) => {
                     alert("Successfully Registered");
                     console.log(res);
@@ -141,7 +141,7 @@ function VaccineRegistration() {
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
                 <div className="d-flex">
-                    <h5 className={"mr-auto"}>Register New Vaccine Program</h5>
+                    <h5 className={"mr-auto"}>{formData.edited ? formData.name : "Register New Vaccine Program"}</h5>
                     <Button variant="outline-primary" onClick={() => setShowForm(!showForm)}>BACK</Button>
                 </div>
 

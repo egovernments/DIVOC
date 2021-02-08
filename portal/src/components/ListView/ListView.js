@@ -44,7 +44,7 @@ function ListView({listData, onRegisterBtnClick, title, buttonTitle, showDetails
                                     <span className={'list-view-name'}>{data.name}</span>
                                     {
                                         showDetails && <span className='list-view-logo-img'>
-                                    {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
+                                    {"logoURL" in data ? <img alt="" src={data.logoURL} width={"100%"}/> : "LOGO"}
 
                                 </span>
                                     }

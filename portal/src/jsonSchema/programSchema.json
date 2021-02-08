@@ -4,8 +4,7 @@
   "required": [
     "name",
     "description",
-    "medicineIds",
-    "dateRange"
+    "medicineIds"
   ],
   "properties": {
     "name": {
