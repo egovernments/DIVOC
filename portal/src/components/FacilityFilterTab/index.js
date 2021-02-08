@@ -36,6 +36,7 @@ export const FacilityFilterTab = ({
     return (
         <div className="filter-tab-container">
             <div className="select-program-wrapper">
+                <span className="filter-header">Program Name</span>
                 <DropDown
                     selectedOption={selectedProgram}
                     options={programs}
@@ -52,26 +53,30 @@ export const FacilityFilterTab = ({
                     setSelectedOption={setSelectedState}
                 />
             </div>
-            <span className="filter-header">{selectedState}</span>
-            <div className="m-3">
-                <div className="table-responsive district-table">
-                    <table className="table table-borderless table-hover">
-                        <thead>
-                        <tr>
-                            <td>Please select District</td>
-                        </tr>
-                        </thead>
-                        <tbody className="tbody">
-                        {selectedState ? showDistrictList() : ''}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            {selectedState != "All" && 
+                <React.Fragment>
+                    <span className="filter-header">{selectedState}</span>
+                    <div className="m-3">
+                        <div className="table-responsive district-table">
+                            <table className="table table-borderless table-hover">
+                                <thead>
+                                <tr>
+                                    <th style={{"marginLeft":"12px"}}>Please select Districts</th>
+                                </tr>
+                                </thead>
+                                <tbody className="tbody">
+                                {selectedState ? showDistrictList() : ''}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </React.Fragment>
+            }
             <div>
                 <span className="filter-header">Type of Facility</span>
                 <div className="m-3">
                     <div className="filter-header mb-1">
-                        <CheckboxItem
+                        <RadioItem
                             text={CONSTANTS.GOVT}
                             checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
@@ -83,7 +88,7 @@ export const FacilityFilterTab = ({
                         />
                     </div>
                     <div className="filter-header mb-1">
-                        <CheckboxItem
+                        <RadioItem
                             text={CONSTANTS.PRIVATE}
                             checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>

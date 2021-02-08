@@ -12,6 +12,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewGetFacilitiesParams creates a new GetFacilitiesParams object
@@ -34,6 +35,14 @@ type GetFacilitiesParams struct {
 	  In: query
 	*/
 	District *string
+	/*
+	  In: query
+	*/
+	Limit *float64
+	/*
+	  In: query
+	*/
+	Offset *float64
 	/*Program
 	  In: query
 	*/
@@ -73,6 +82,16 @@ func (o *GetFacilitiesParams) BindRequest(r *http.Request, route *middleware.Mat
 
 	qDistrict, qhkDistrict, _ := qs.GetOK("district")
 	if err := o.bindDistrict(qDistrict, qhkDistrict, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qLimit, qhkLimit, _ := qs.GetOK("limit")
+	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	qOffset, qhkOffset, _ := qs.GetOK("offset")
+	if err := o.bindOffset(qOffset, qhkOffset, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -126,6 +145,50 @@ func (o *GetFacilitiesParams) bindDistrict(rawData []string, hasKey bool, format
 	}
 
 	o.District = &raw
+
+	return nil
+}
+
+// bindLimit binds and validates parameter Limit from query.
+func (o *GetFacilitiesParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	value, err := swag.ConvertFloat64(raw)
+	if err != nil {
+		return errors.InvalidType("limit", "query", "float64", raw)
+	}
+	o.Limit = &value
+
+	return nil
+}
+
+// bindOffset binds and validates parameter Offset from query.
+func (o *GetFacilitiesParams) bindOffset(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	value, err := swag.ConvertFloat64(raw)
+	if err != nil {
+		return errors.InvalidType("offset", "query", "float64", raw)
+	}
+	o.Offset = &value
 
 	return nil
 }

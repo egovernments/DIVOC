@@ -19,7 +19,7 @@ import config from "./config"
 import {Provider, useDispatch} from "react-redux";
 import {store} from "./redux/store";
 import {getApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
-
+import FacilityInfo from './components/FacilityInfo/FacilityInfo';
 
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -47,6 +47,7 @@ export default function App() {
                             <PrivateRoute exact path={config.urlPath + "/admin"} component={Admin} role={CONSTANTS.ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/analytics"} component={Analytics} role={CONSTANTS.MONITORING} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/facility_admin"} component={FacilityAdmin} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                            <PrivateRoute exact path={config.urlPath + "/facility_info"} component={FacilityInfo} role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/facility_controller"} component={FacilityController} role={CONSTANTS.ROLE_CONTROLLER} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/facility"} component={PrintCertificate} role={CONSTANTS.FACILITY_PRINT_STAFF} clientId={CONSTANTS.PORTAL_CLIENT}/>
                         </Switch>

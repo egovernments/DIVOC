@@ -9,7 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollment, error) {
+func findEnrollmentScopeAndCode(scopeId string, code string, limit int, offset int) (*models.PreEnrollment, error) {
 	typeId := "Enrollment"
 	filter := map[string]interface{}{
 		"enrollmentScopeId": map[string]interface{}{
@@ -19,7 +19,7 @@ func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollm
 			"eq": code,
 		},
 	}
-	if enrollmentsJson, err := services.QueryRegistry(typeId, filter); err == nil {
+	if enrollmentsJson, err := services.QueryRegistry(typeId, filter, limit, offset); err == nil {
 		log.Infof("Enrollments %+v", enrollmentsJson)
 		enrollmentsJsonArray := enrollmentsJson["Enrollment"]
 		if jsonArray, err := json.Marshal(enrollmentsJsonArray); err == nil {
@@ -42,7 +42,7 @@ func findEnrollmentScopeAndCode(scopeId string, code string) (*models.PreEnrollm
 	return nil, errors.New("unable to get the enrollment " + code)
 }
 
-func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, error) {
+func findEnrollmentsForScope(facilityCode string, limit int, offset int) ([]*models.PreEnrollment, error) {
 	typeId := "Enrollment"
 	filter := map[string]interface{}{
 		"enrollmentScopeId": map[string]interface{}{
@@ -52,7 +52,7 @@ func findEnrollmentsForScope(facilityCode string) ([]*models.PreEnrollment, erro
 			"eq": false,
 		},
 	}
-	if enrollmentsJson, err := services.QueryRegistry(typeId, filter); err == nil {
+	if enrollmentsJson, err := services.QueryRegistry(typeId, filter, limit, offset); err == nil {
 		log.Info("Response ", enrollmentsJson)
 		enrollmentsJsonArray := enrollmentsJson["Enrollment"]
 		if jsonArray, err := json.Marshal(enrollmentsJsonArray); err == nil {

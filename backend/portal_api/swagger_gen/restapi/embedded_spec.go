@@ -221,6 +221,16 @@ func init() {
             "type": "string",
             "name": "rateUpdatedTo",
             "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -818,6 +828,16 @@ func init() {
             "type": "string",
             "description": "Vaccinator Name",
             "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
             "in": "query"
           }
         ],
@@ -1511,7 +1531,7 @@ func init() {
             "type": "string"
           },
           "osid": {
-            "type": "object"
+            "type": "string"
           },
           "programs": {
             "type": "array",
@@ -1774,6 +1794,16 @@ func init() {
           {
             "type": "string",
             "name": "rateUpdatedTo",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
             "in": "query"
           }
         ],
@@ -2361,6 +2391,16 @@ func init() {
             "type": "string",
             "description": "Vaccinator Name",
             "name": "name",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
             "in": "query"
           }
         ],
@@ -3097,7 +3137,7 @@ func init() {
           "type": "string"
         },
         "osid": {
-          "type": "object"
+          "type": "string"
         },
         "programs": {
           "type": "array",

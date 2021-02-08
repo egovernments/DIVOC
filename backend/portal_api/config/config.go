@@ -66,6 +66,10 @@ var Config = struct {
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
 		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
 	}
+	SearchRegistry struct {
+		DefaultLimit  int `default:"100"`
+		DefaultOffset int `default:"0"`
+	}
 }{}
 
 func Initialize() {

@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                 setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                status, setStatus, fetchFacilities, resetFilter, countryName
+                                status, setStatus, fetchFacilities, resetFilter, updateFacilityProgramStatus, countryName
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
@@ -85,22 +85,7 @@ function FacilityActivation({
 
     const handleActiveClick = () => {
         setAllChecked(false);
-        if (selectedProgram && selectedFacilities.length > 0) {
-            let updateFacilities = [];
-            selectedFacilities.forEach(facility => {
-                let programs = [{
-                    id: selectedProgram,
-                    status: status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE
-                }];
-                updateFacilities.push({osid: facility.osid, programs})
-            });
-            axiosInstance.current
-                .put(API_URL.FACILITY_API, updateFacilities)
-                .then((res) => {
-                    //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 2000);
-                });
-        }
+        updateFacilityProgramStatus(selectedFacilities, oppositeStatus);
     };
 
     return (
@@ -143,11 +128,11 @@ function FacilityActivation({
                 </FacilityFilterTab>
             </div>
 
-            <div className={`col-sm-6 container ${styles["table"]}`}>
+            <div className={`col-sm-6 ${styles["table"]} ${styles["pad-1rem"]}`}>
                 {!showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
-                            {selectedDistrict.join(", ")} facilties
+                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
                         </p>
                         <table
                             className={`table table-hover ${styles["table-data"]}`}
@@ -179,12 +164,15 @@ function FacilityActivation({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
             <div className="col-sm-3 container">
                 <div className={`card ${styles["card-continer"]}`}>
-                    {selectedProgram && <div className="card-body text-center">
+                    {selectedProgram && <div className={`text-center ${styles["pad-1rem"]}`}>
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
                             Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
