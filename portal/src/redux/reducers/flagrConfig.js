@@ -44,7 +44,7 @@ export const getApplicationConfigFromFlagr = (dispatch) => {
     };
     try {
         axios
-            .post("https://divoc.xiv.in/config/api/v1/evaluation", data)
+            .post("/config/api/v1/evaluation", data)
             .then((res) => {
                 return dispatch(loadApplicationConfig(res.data["variantAttachment"]))
             })
