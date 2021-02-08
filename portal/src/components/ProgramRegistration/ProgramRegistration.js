@@ -59,16 +59,30 @@ function VaccineRegistration() {
         SelectWidget: CustomDropdownWidget,
     };
 
+    const validateFields = (data) => {
+        const requiredFields = ["name", "startDate", "endDate"];
+        let valid = true;
+        requiredFields.forEach(field => {
+            if (!R.pathOr(false, [field], data)) {
+                valid = false;
+                alert(`${field} is a required field`)
+            }
+        });
+        return valid
+    }
+
     const handleSubmit = () => {
         const requestBody = {...formData, ...formData.dateRange};
-        axios
-            .post("/divoc/admin/api/v1/programs", requestBody, config)
-            .then((res) => {
-                alert("Successfully Registered");
-                console.log(res);
-                getListOfRegisteredPrograms()
-            });
-        setShowForm(false)
+        if (validateFields(requestBody)) {
+            axios
+                .post("/divoc/admin/api/v1/programs", requestBody, config)
+                .then((res) => {
+                    alert("Successfully Registered");
+                    console.log(res);
+                    getListOfRegisteredPrograms()
+                });
+            setShowForm(false)
+        }
     };
 
     const getListOfRegisteredPrograms = async () => {
@@ -109,18 +123,20 @@ function VaccineRegistration() {
     };
 
 
-    function onActiveSwitchClick(data) {
+    function onEdit(data) {
         const requestBody = {...data, ...data.dateRange};
-        axios
-            .put("/divoc/admin/api/v1/programs", requestBody, config)
-            .then((res) => {
-                alert("Successfully Edited");
-                console.log(res);
-                getListOfRegisteredPrograms()
-            });
-        setShowForm(false)
+        if (validateFields(requestBody)) {
+            axios
+                .put("/divoc/admin/api/v1/programs", requestBody, config)
+                .then((res) => {
+                    alert("Successfully Edited");
+                    console.log(res);
+                    getListOfRegisteredPrograms()
+                });
+            setShowForm(false)
+        }
     }
-    
+
     return (
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
@@ -135,10 +151,13 @@ function VaccineRegistration() {
                     widgets={widgets}
                     formData={formData}
                     onSubmit={(e) => {
-                        handleSubmit();
+                        if (e.formData.edited) {
+                            onEdit(e.formData)
+                        } else {
+                            handleSubmit();
+                        }
                     }}
                     onChange={(evt) => {
-                        debugger
                         setFormData(evt.formData)
                     }}
                 >
@@ -155,9 +174,9 @@ function VaccineRegistration() {
                     title="List of Registered Vaccine Programs"
                     buttonTitle="Register New Vaccine Program"
                     showDetails={true}
-                    onActiveSwitchClick={onActiveSwitchClick}
+                    onActiveSwitchClick={onEdit}
                     setSelectedData={(data) => {
-                        setFormData(data);
+                        setFormData({...data, edited: true});
                         setShowForm(true)
                     }}
                 />

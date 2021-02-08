@@ -1,49 +1,57 @@
 {
-    "$id": "#properties/Program",
-    "type": "object",
-    "required": ["name", "description"],
-    "properties": {
-      "name": {
-        "$id": "#/properties/name",
-        "type": "string",
-        "title": "Program Name"
-      },
-      "description": {
-        "$id": "#/properties/description",
-        "type": "string",
-        "title": "Program Description"
-      },
-      "logoURL": {
-        "$id": "#/properties/logoURL",
-        "type": "string",
-        "title": "Program Logo"
-      },
-      "dateRange": {
-        "title": " ",
-        "type": "object",
-        "properties": {
-          "startDate": {
-            "$id": "#/properties/startDate",
-            "type": "string",
-            "title": "Start Date",
-            "format": "date"
-          },
-          "endDate": {
-            "$id": "#/properties/endDate",
-            "type": "string",
-            "title": "End Date",
-            "format": "date"
-          }
-        }
-      },
-      "medicineIds": {
-        "title": "Select Vaccine",
-        "type": "array",
-        "items": {
+  "$id": "#properties/Program",
+  "type": "object",
+  "required": [
+    "name",
+    "description",
+    "medicineIds",
+    "dateRange"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "Program Name"
+    },
+    "description": {
+      "$id": "#/properties/description",
+      "type": "string",
+      "title": "Program Description"
+    },
+    "logoURL": {
+      "$id": "#/properties/logoURL",
+      "type": "string",
+      "title": "Program Logo"
+    },
+    "dateRange": {
+      "title": " ",
+      "type": "object",
+      "required": ["startDate", "endDate"],
+      "properties": {
+        "startDate": {
+          "$id": "#/properties/startDate",
           "type": "string",
-          "enum": []
+          "title": "Start Date",
+          "format": "date"
         },
-        "uniqueItems": true
+        "endDate": {
+          "$id": "#/properties/endDate",
+          "type": "string",
+          "title": "End Date",
+          "format": "date"
+        }
       }
+    },
+    "medicineIds": {
+      "title": "Select Vaccine",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": []
+      },
+      "min": 1,
+      "minItems": 1,
+      "uniqueItems": true
     }
+  }
 }
