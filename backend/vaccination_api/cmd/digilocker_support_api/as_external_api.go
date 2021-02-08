@@ -157,7 +157,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 			writeResponse(w, 404, certificateNotFoundForBeneficiaryId(pkg.ToString(beneficiaryId)))
 		}
 	} else {
-		log.Errorf("No certificates found for request %v", filter)
+		log.Errorf("Error in querying registry %v , %+v", filter, err)
 		w.WriteHeader(500)
 	}
 	go kafkaService.PublishEvent(models.Event{
