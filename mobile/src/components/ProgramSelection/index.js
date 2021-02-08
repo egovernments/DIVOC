@@ -142,7 +142,7 @@ function NoProgramFound({keycloak}) {
         <div className="no-program-container">
             <BaseCard>
                 <div className="no-program-container d-flex flex-column justify-content-center">
-                    <h6 className="mb-4">There is no program associated with this Facility. Please contact facility
+                    <h6 className="mb-4">There is no vaccination program associated with your facility. Please contact your facility
                         admin.</h6>
                     <Button variant="outline-danger" onClick={() => {
                         keycloak.logout()
