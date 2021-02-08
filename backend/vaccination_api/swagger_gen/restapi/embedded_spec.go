@@ -331,6 +331,18 @@ func init() {
         ],
         "summary": "Get all pre enrollments applicable to assigned facility",
         "operationId": "getPreEnrollmentsForFacility",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -358,6 +370,16 @@ func init() {
             "name": "preEnrollmentCode",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -479,6 +501,18 @@ func init() {
         ],
         "summary": "Get active vaccinators mapped for the facility",
         "operationId": "getVaccinators",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1234,6 +1268,18 @@ func init() {
         ],
         "summary": "Get all pre enrollments applicable to assigned facility",
         "operationId": "getPreEnrollmentsForFacility",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1261,6 +1307,16 @@ func init() {
             "name": "preEnrollmentCode",
             "in": "path",
             "required": true
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1382,6 +1438,18 @@ func init() {
         ],
         "summary": "Get active vaccinators mapped for the facility",
         "operationId": "getVaccinators",
+        "parameters": [
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",

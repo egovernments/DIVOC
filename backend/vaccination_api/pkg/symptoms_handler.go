@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/divoc/api/config"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/symptoms"
 	"github.com/divoc/kernel_library/services"
@@ -18,7 +19,7 @@ func createSymptoms(params symptoms.CreateSymptomsParams, principal *models.JWTC
 func getSymptoms(params symptoms.GetSymptomsParams) middleware.Responder {
 	typeId := "Symptom"
 	filter := map[string]interface{}{}
-	queryResults, err := services.QueryRegistry(typeId, filter)
+	queryResults, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err != nil {
 		log.Errorf("Error in querying registry %v", err)
 		return NewGenericServerError()
@@ -29,7 +30,7 @@ func getSymptoms(params symptoms.GetSymptomsParams) middleware.Responder {
 func getInstructions(params symptoms.GetInstructionsParams) middleware.Responder {
 	typeId := "instructions"
 	filter := map[string]interface{}{}
-	queryResults, err := services.QueryRegistry(typeId, filter)
+	queryResults, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err != nil {
 		log.Errorf("Error in querying registry %v", err)
 		return NewGenericServerError()

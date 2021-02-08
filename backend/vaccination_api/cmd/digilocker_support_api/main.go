@@ -378,7 +378,7 @@ func getCertificateList(w http.ResponseWriter, request *http.Request) {
 		filter[Mobile] = map[string]interface{}{
 			"eq": claimBody.PreferredUsername,
 		}
-		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 			log.Infof("Certificate query return %d records", len(certificateArr))
@@ -438,7 +438,7 @@ func getCertificatePDF(w http.ResponseWriter, r *http.Request) {
 		filter[CertificateId] = map[string]interface{}{
 			"eq": certificateId,
 		}
-		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 			log.Infof("Certificate query return %d records", len(certificateArr))
@@ -535,7 +535,7 @@ func getCertificateFromRegistryByCertificateId(certificateId string) (map[string
 			"eq": certificateId,
 		},
 	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	return certificateFromRegistry, err
 }
 
@@ -545,7 +545,7 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 			"eq": preEnrollmentCode,
 		},
 	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	return certificateFromRegistry, err
 }
 

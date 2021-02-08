@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	kernelService "github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/models"
 	log "github.com/sirupsen/logrus"
 	"text/template"
@@ -23,7 +24,8 @@ func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 			"eq": name,
 		},
 	}
-	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter)
+	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 
+		config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
 		if len(enrollments) > 0 {

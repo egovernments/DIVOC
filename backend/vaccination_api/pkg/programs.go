@@ -40,7 +40,7 @@ func findProgramsByName(programNames []string) []*models.Program {
 			"gte": time.Now().Format("2006-01-02"),
 		},
 	}
-	if programs, err := services.QueryRegistry(typeId, filter); err != nil {
+	if programs, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
 		log.Errorf("Error in getting programs for the facility")
 	} else {
 		log.Infof("Programs %+v", programs)

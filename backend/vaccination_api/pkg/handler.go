@@ -106,7 +106,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			"eq": principal.PreferredUsername,
 		},
 	}
-	if response, err := services.QueryRegistry(typeId, filter); err != nil {
+	if response, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
 		log.Infof("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {
@@ -165,7 +165,8 @@ func getVaccinators(params configuration.GetVaccinatorsParams, principal *models
 		log.Errorf("Error while getting vaccinators %+v", err)
 		return NewGenericServerError()
 	} else {
-		vaccinators := getVaccinatorsForFacility(scopeId)
+		limit, offset := getLimitAndOffset(params.Limit, params.Offset)
+		vaccinators := getVaccinatorsForFacility(scopeId, limit, offset)
 		return NewGenericJSONResponse(vaccinators)
 	}
 }
@@ -204,7 +205,7 @@ func getFacilityByCode(facilityCode string) []interface{} {
 			"eq": facilityCode,
 		},
 	}
-	if programs, err := services.QueryRegistry(FacilityEntity, filter); err == nil {
+	if programs, err := services.QueryRegistry(FacilityEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
 		return programs[FacilityEntity].([]interface{})
 	}
 	return nil
@@ -226,13 +227,26 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *mo
 	return identity.NewPostIdentityVerifyPartialContent()
 }
 
+func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+	limit := config.Config.SearchRegistry.DefaultLimit
+	offset := config.Config.SearchRegistry.DefaultOffset
+	if limitValue != nil {
+		limit = int(*limitValue)
+	}
+	if offsetValue != nil {
+		offset = int(*offsetValue)
+	}
+	return limit, offset
+}
+
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, principal *models.JWTClaimBody) middleware.Responder {
 	code := params.PreEnrollmentCode
 	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
 	if err != nil {
 		return NewGenericServerError()
 	}
-	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code); err == nil {
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
+	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code, limit, offset); err == nil {
 		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
 	return NewGenericServerError()
@@ -243,7 +257,8 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 	if err != nil {
 		return NewGenericServerError()
 	}
-	if enrollments, err := findEnrollmentsForScope(scopeId); err == nil {
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
+	if enrollments, err := findEnrollmentsForScope(scopeId, limit, offset); err == nil {
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
 	return NewGenericServerError()

@@ -76,7 +76,7 @@ type VaccinatorUpdateRequestItems0 struct {
 
 	// osid
 	// Required: true
-	Osid interface{} `json:"osid"`
+	Osid *string `json:"osid"`
 
 	// programs
 	Programs []*VaccinatorUpdateRequestItems0ProgramsItems0 `json:"programs"`

@@ -9,12 +9,16 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetVaccinatorsURL generates an URL for the get vaccinators operation
 type GetVaccinatorsURL struct {
 	FacilityCode *string
+	Limit        *float64
 	Name         *string
+	Offset       *float64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -58,12 +62,28 @@ func (o *GetVaccinatorsURL) Build() (*url.URL, error) {
 		qs.Set("facilityCode", facilityCodeQ)
 	}
 
+	var limitQ string
+	if o.Limit != nil {
+		limitQ = swag.FormatFloat64(*o.Limit)
+	}
+	if limitQ != "" {
+		qs.Set("limit", limitQ)
+	}
+
 	var nameQ string
 	if o.Name != nil {
 		nameQ = *o.Name
 	}
 	if nameQ != "" {
 		qs.Set("name", nameQ)
+	}
+
+	var offsetQ string
+	if o.Offset != nil {
+		offsetQ = swag.FormatFloat64(*o.Offset)
+	}
+	if offsetQ != "" {
+		qs.Set("offset", offsetQ)
 	}
 
 	_result.RawQuery = qs.Encode()
