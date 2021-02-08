@@ -229,20 +229,20 @@ function CertificateView() {
                         <Dropdown.Item href="" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
                     </DropdownButton>
                 </div>
-                <div >
-                    {/*<button className={styles["button"]} onClick={handleClick}>*/}
-                    {/*    Download Certificate <img src={DownloadLogo} alt="download"/>*/}
-                    {/*</button>*/}
-                    {/*<button className={styles["button"]} onClick={downloadAsImage}>*/}
-                    {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
-                    {/*</button>*/}
+                {/*<div >*/}
+                {/*    /!*<button className={styles["button"]} onClick={handleClick}>*!/*/}
+                {/*    /!*    Download Certificate <img src={DownloadLogo} alt="download"/>*!/*/}
+                {/*    /!*</button>*!/*/}
+                {/*    /!*<button className={styles["button"]} onClick={downloadAsImage}>*!/*/}
+                {/*    /!*    Download Image <img src={DownloadLogo} alt="download"/>*!/*/}
+                {/*    /!*</button>*!/*/}
 
-                    <DropdownButton id="dropdown-item-button" variant="success" title="Export" className={styles["btn-success"]}>
-                        <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>
-                        <Dropdown.Item href="#/svg" onClick={()=>alert("This feature is still not implemented")}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>
-                    </DropdownButton>
-                    
-                </div>
+                {/*    <DropdownButton id="dropdown-item-button" variant="success" title="Export" className={styles["btn-success"]}>*/}
+                {/*        <Dropdown.Item href="#/image" onClick={downloadAsImage}><img src={digilocker} className={styles["export-icon"]}></img>to DigiLocker</Dropdown.Item>*/}
+                {/*        <Dropdown.Item href="#/svg" onClick={()=>alert("This feature is still not implemented")}><img src={commonPass}  className={styles["common-pass"]}></img>to CommonPass</Dropdown.Item>*/}
+                {/*    </DropdownButton>*/}
+                {/*    */}
+                {/*</div>*/}
                 <div>
                     <button className={styles["button"]} onClick={printCanvas}>Print</button>
                 </div>
