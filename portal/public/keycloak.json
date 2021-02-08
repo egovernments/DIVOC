@@ -1,6 +1,6 @@
 {
   "realm": "divoc",
-  "auth-server-url": "/auth/",
+  "auth-server-url": "https://divoc.xiv.in/auth/",
   "ssl-required": "external",
   "resource": "facility-admin-portal",
   "public-client": true,

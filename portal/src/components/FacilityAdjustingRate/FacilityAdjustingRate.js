@@ -215,7 +215,7 @@ function FacilityAdjustingRate({
                     </div>
                 </FacilityFilterTab>
             </div>
-            <div className={`col-sm-6 container ${styles['table']}`}>
+            <div className={`col-sm-6 ${styles['facility-grid-container']} ${styles['table']}`}>
                 {!showCard ?
                 <>
                     <p className={styles['highlight']}>
@@ -254,11 +254,11 @@ function FacilityAdjustingRate({
                     updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
-            <div className="col-sm-3 container">
-                <div className={styles['highlight']}>Set Rate</div>
-                {selectedProgram && Object.keys(rateWiseFacilities).length > 0 && <div>
+            <div className="col-sm-3 pad-1rem">
+                <div className={styles['highlight']}>Set Daily Rate</div>
+                {(selectedProgram && Object.keys(rateWiseFacilities).length > 0)? <div>
                     <div
-                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}`}>
+                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["set-rate-table"]}`}>
                         <table className="table table-borderless table-hover">
                             <thead>
                             <tr>
@@ -278,7 +278,9 @@ function FacilityAdjustingRate({
                         </button>
                     </div>
                     {/*{submit ? <div>All rates set successfully</div> : ''}*/}
-                </div>}
+                </div>
+                :<p>Please select one or more facilities to set daily vaccination rate</p>}
+
             </div>
         </div>
     );
