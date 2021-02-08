@@ -6,11 +6,11 @@ import "./index.css";
 
 
 export const CustomDateWidget = (props) => {
-  const [startDate, setStartDate] = useState(new Date(props.value || null));
+  const [startDate, setStartDate] = useState(new Date(props.value || new Date()));
 
   const updateValue = (newValue) => {
     setStartDate(newValue);
-    props.onChange(newValue)
+    props.onChange(newValue.toISOString().substring(0, 10))
 };
 
   const CustomInput = ({ value, onClick }) => (

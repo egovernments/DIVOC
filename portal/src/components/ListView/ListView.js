@@ -32,7 +32,8 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                     <p className={" p-2 mr-auto"}>{title}</p>
                     <Button variant="outline-primary" onClick={()=> setShow(!show)}>{buttonTitle}</Button>
                  </div>
-                {listData.map((data, index) => {
+                 <div className="cards-container">
+                 {listData.map((data, index) => {
                     return (
                         <div className={'list-view-card-container'} >
                             <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index);setSelectedData(data)}}>
@@ -76,6 +77,7 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                         </div>
                     )
                 })}
+                 </div>
                 </>
             }
             {

@@ -5,9 +5,13 @@
     padding: 20px;
     background-color: #f1f1f1;
     border-radius: 10px;
-    height: fit-content;
+    height: max-content;
     padding-bottom: 1.5em;
     cursor: pointer;
+}
+.cards-container{
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .list-view-card-container:nth-child(4n+1) {
