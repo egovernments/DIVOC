@@ -653,6 +653,8 @@ definitions:
       schedule:
         type: object
         properties:
+          osid:
+            type: string
           repeatTimes:
             type: number
             description: How many times vaccination should be taken
