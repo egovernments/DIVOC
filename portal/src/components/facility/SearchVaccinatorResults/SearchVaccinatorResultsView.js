@@ -196,9 +196,7 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                                             }
                                         </div>
                                     </>
-                                    <div className="container">
-                                        <button className={styles['add-vaccinator-button']} onClick={() => addVaccinator(row)} >ADD VACCINATOR</button>
-                                    </div>
+                                    <button className={styles['add-vaccinator-button']} onClick={() => addVaccinator(row)} >ADD VACCINATOR</button>
                                 </div>
                             </Box>
                         </Collapse>
