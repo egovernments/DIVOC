@@ -579,6 +579,19 @@ definitions:
                 type: string
               rate:
                 type: number
+              schedule:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  startTime:
+                    type: string
+                    x-nullable: true
+                  endTime:
+                    type: string
+                    x-nullable: true
   ProgramRequest:
     type: object
     properties:
