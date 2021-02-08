@@ -63,7 +63,7 @@ export const SubmitSymptomsForm = (props) => {
         }
 
         if (currentState === state.CompletedMessage) {
-            history.push("/feedback");
+            keycloak.logout({redirectUri: window.location.origin + "/feedback"});
         }
     }
 
@@ -111,6 +111,10 @@ export const SubmitSymptomsForm = (props) => {
                 return res.data;
             });
         setRecipients(response)
+        if (response.length === 1) {
+            setPatientSelected(0);
+            setCurrentState(state.ShowPatientDetails);
+        }
     }
 
     return (
