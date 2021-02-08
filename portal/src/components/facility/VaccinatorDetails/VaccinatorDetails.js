@@ -11,6 +11,7 @@ import {API_URL} from "../../../utils/constants";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
+import {useSelector} from "react-redux";
 
 
 export default function VaccinatorDetails({
@@ -26,6 +27,7 @@ export default function VaccinatorDetails({
     const [searchVaccinatorName, setSearchVaccinatorName] = useState('');
     const [searchVaccinatorResults, setSearchVaccinatorResults] = useState([]);
     const [togglePopup, setTogglePopup] = useState(false);
+    const countryCode = useSelector(state => state.flagr.appConfig.countryCode)
 
     const axiosInstance = useAxios('');
 
@@ -308,7 +310,6 @@ export default function VaccinatorDetails({
                             </div>
                         </div>
                     </form>
-
                 </div>
             </div>
             <div className="row">

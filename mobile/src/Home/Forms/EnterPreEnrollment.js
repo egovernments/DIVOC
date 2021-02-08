@@ -4,6 +4,7 @@ import {FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, usePreEnrollment} from ".
 import Form from "react-bootstrap/Form";
 import "./EnterPreEnrollment.scss"
 import {BaseFormCard} from "../../components/BaseFormCard";
+import {useSelector} from "react-redux";
 
 export const PHONE_NUMBER_MAX = 10
 
@@ -19,6 +20,7 @@ function EnterPreEnrollmentContent(props) {
     const {state, goNext} = usePreEnrollment()
     const [phoneNumber, setPhoneNumber] = useState(state.mobileNumber)
     const [enrollCode, setEnrollCode] = useState(state.enrollCode)
+    const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
 
     const handlePhoneNumberOnChange = (e) => {
         if (e.target.value.length <= PHONE_NUMBER_MAX) {
@@ -39,7 +41,7 @@ function EnterPreEnrollmentContent(props) {
                     <div className="divInner">
 
                         <Form.Group>
-                            <Form.Control type="text" placeholder="+91-XXXXXXXXX" tabIndex="1" value={phoneNumber}
+                            <Form.Control type="text" placeholder={countryCode+"-XXXXXXXXX"} tabIndex="1" value={phoneNumber}
                                           onChange={handlePhoneNumberOnChange}/>
                             <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode}
                                           onChange={handleEnrollCodeOnChange}/>

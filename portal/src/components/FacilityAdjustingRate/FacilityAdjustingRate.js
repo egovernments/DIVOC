@@ -5,12 +5,13 @@ import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
 import DetailsCard from "../DetailsCard/DetailsCard";
+import FacilityActivation from "../FacilityActivation/FacilityActivation";
 
 
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus, countryName
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -166,6 +167,7 @@ function FacilityAdjustingRate({
         <div className={`row ${styles['container']}`}>
             <div className="col-sm-3">
                 <FacilityFilterTab
+                    countryName={countryName}
                     programs={programs}
                     selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
