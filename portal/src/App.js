@@ -20,7 +20,7 @@ import FacilityInfo from './components/FacilityInfo/FacilityInfo';
 
 
 export default function App() {
-    const {initialized, keycloak} = useKeycloak();
+    const {initialized} = useKeycloak();
     if (!initialized) {
         return <div>Loading...</div>
     }

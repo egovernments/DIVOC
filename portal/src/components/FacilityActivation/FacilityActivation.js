@@ -127,7 +127,7 @@ function FacilityActivation({
                 </FacilityFilterTab>
             </div>
 
-            <div className={`col-sm-6 container ${styles["table"]}`}>
+            <div className={`col-sm-6 ${styles["table"]} ${styles["pad-1rem"]}`}>
                 {!showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
@@ -171,7 +171,7 @@ function FacilityActivation({
             </div>
             <div className="col-sm-3 container">
                 <div className={`card ${styles["card-continer"]}`}>
-                    {selectedProgram && <div className="card-body text-center">
+                    {selectedProgram && <div className={`text-center ${styles["pad-1rem"]}`}>
                         {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                         <p>
                             Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}

@@ -107,7 +107,10 @@ function FacilityDetails({
                 //registry update in ES happening async, so calling search immediately will not get back actual data
                 // setTimeout(() => fetchFacilities(), 1000)
             });
-    }
+    };
+
+    const numberOfFacilities = facilities.filter(facility => facility.isChecked).length;
+
     return (
         <div className={"row"}>
             <div className="col-sm-3">
@@ -147,7 +150,7 @@ function FacilityDetails({
                 </FacilityFilterTab>
             </div>
 
-            <div className={"col-sm-6 container table"}>
+            <div className={"col-sm-6 pad-1rem table"}>
                 {!showCard ?
                 <div>
                     <p className={"highlight"}>
@@ -191,9 +194,10 @@ function FacilityDetails({
             <div className="col-sm-3 container">
                 <div className={"card card-continer"}>
                     {selectedProgram && <div className="card-body text-center">
-                        <p>
-                            Notify {facilities.filter(facility => facility.isChecked).length} facilities for the {selectedProgram}
-                        </p>
+                        {(numberOfFacilities>0)?
+                            <p>Notify {numberOfFacilities} facilities for the {selectedProgram}</p>
+                          :<p>Please select one or more facilities.</p>
+                        }
                         <button
                             onClick={() => handleNotifyClick()}
                             className={"button"}

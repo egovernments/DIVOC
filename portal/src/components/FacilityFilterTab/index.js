@@ -76,7 +76,7 @@ export const FacilityFilterTab = ({
                 <span className="filter-header">Type of Facility</span>
                 <div className="m-3">
                     <div className="filter-header mb-1">
-                        <CheckboxItem
+                        <RadioItem
                             text={CONSTANTS.GOVT}
                             checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
@@ -88,7 +88,7 @@ export const FacilityFilterTab = ({
                         />
                     </div>
                     <div className="filter-header mb-1">
-                        <CheckboxItem
+                        <RadioItem
                             text={CONSTANTS.PRIVATE}
                             checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>
