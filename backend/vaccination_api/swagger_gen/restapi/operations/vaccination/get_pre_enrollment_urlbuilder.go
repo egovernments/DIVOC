@@ -10,11 +10,16 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 	"strings"
+
+	"github.com/go-openapi/swag"
 )
 
 // GetPreEnrollmentURL generates an URL for the get pre enrollment operation
 type GetPreEnrollmentURL struct {
 	PreEnrollmentCode string
+
+	Limit  *float64
+	Offset *float64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -54,6 +59,26 @@ func (o *GetPreEnrollmentURL) Build() (*url.URL, error) {
 		_basePath = "/divoc/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var limitQ string
+	if o.Limit != nil {
+		limitQ = swag.FormatFloat64(*o.Limit)
+	}
+	if limitQ != "" {
+		qs.Set("limit", limitQ)
+	}
+
+	var offsetQ string
+	if o.Offset != nil {
+		offsetQ = swag.FormatFloat64(*o.Offset)
+	}
+	if offsetQ != "" {
+		qs.Set("offset", offsetQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

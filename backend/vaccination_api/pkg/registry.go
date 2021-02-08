@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"github.com/divoc/api/config"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 )
@@ -14,7 +15,7 @@ func getUserInfo(facilityCode string) interface{} {
 			"eq": facilityCode,
 		},
 	}
-	if resp, err := services.QueryRegistry(typeId, filter); err != nil {
+	if resp, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
 		log.Infof("Error in getting facility information %+v", err)
 	} else {
 		if facilities, ok := resp["Facility"].([]interface{}); ok {
@@ -34,10 +35,10 @@ func getUserInfo(facilityCode string) interface{} {
 	return response
 }
 
-func getVaccinatorsForFacility(facilityCode string) interface{} {
+func getVaccinatorsForFacility(facilityCode string, limit int, offset int) interface{} {
 	typeId := "Vaccinator"
 	filter := map[string]interface{}{}
-	response, err := services.QueryRegistry(typeId, filter)
+	response, err := services.QueryRegistry(typeId, filter, limit, offset)
 	if err != nil {
 		log.Errorf("Error in querying registry %v", err)
 		return NewGenericServerError()

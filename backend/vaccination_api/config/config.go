@@ -79,4 +79,8 @@ var Config = struct {
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
 		DocType     string `env:"DIGILOCKER_DOCTYPE"`
 	}
+	SearchRegistry struct {
+		DefaultLimit  int `default:"100"`
+		DefaultOffset int `default:"0"`
+	}
 }{}

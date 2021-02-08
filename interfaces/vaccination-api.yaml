@@ -83,6 +83,12 @@ paths:
           in: path
           required: true
           type: string
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
       responses:
         '200':
           description: OK
@@ -94,6 +100,13 @@ paths:
         - vaccination
       summary: Get all pre enrollments applicable to assigned facility
       operationId: getPreEnrollmentsForFacility
+      parameters:
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
       responses:
         '200':
           description: OK
@@ -208,6 +221,13 @@ paths:
         - configuration
       summary: Get active vaccinators mapped for the facility
       operationId: getVaccinators
+      parameters:
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
       responses:
         '200':
           description: OK

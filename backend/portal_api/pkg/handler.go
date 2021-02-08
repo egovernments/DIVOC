@@ -150,7 +150,7 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 			"startsWith": params.Name,
 		}
 	}
-	limit, offset := getFilterAndOffset(params.Limit, params.Offset)
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
 	response, err := kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
@@ -184,7 +184,7 @@ func addQueryParamToFilter(param *string, filter map[string]interface{}, filterK
 	}
 }
 
-func getFilterAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
 	limit := config.Config.SearchRegistry.DefaultLimit
 	offset := config.Config.SearchRegistry.DefaultOffset
 	if limitValue != nil {
@@ -204,7 +204,7 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			"eq": principal.FacilityCode,
 		}
 	}
-	limit, offset := getFilterAndOffset(params.Limit, params.Offset)
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
 	response, err := kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)
@@ -742,7 +742,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	if claimBody != nil {
-		limit, offset := getFilterAndOffset(nil, nil)
+		limit, offset := getLimitAndOffset(nil, nil)
 		response, err := services.GetFacilityByCode(claimBody.FacilityCode, limit, offset)
 		if err != nil {
 			log.Errorf("Error in querying registry", err)
