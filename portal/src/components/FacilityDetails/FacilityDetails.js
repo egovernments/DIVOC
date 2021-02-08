@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, resetFilter
+                             status, setStatus, resetFilter, updateFacilityProgramStatus
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
@@ -150,7 +150,9 @@ function FacilityDetails({
             <div className={"col-sm-6 container table"}>
                 {!showCard ?
                 <div>
-                    <p className={"highlight"}>{selectedDistrict.join(", ")} facilties</p>
+                    <p className={"highlight"}>
+                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                    </p>
                     <table className={"table table-hover table-data"}>
                         <thead>
                         <tr>
@@ -179,7 +181,10 @@ function FacilityDetails({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
 

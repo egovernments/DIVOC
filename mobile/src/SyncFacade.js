@@ -24,9 +24,6 @@ export class SyncFacade {
 
         const programs = await ApiServices.fetchPrograms();
         await programDb.savePrograms(programs)
-        if (programs.length > 0 && !getSelectedProgram()) {
-            saveSelectedProgram(programs[0].name)
-        }
 
         const vaccinators = await ApiServices.fetchVaccinators();
         await appIndexDb.saveVaccinators(vaccinators);

@@ -2,6 +2,10 @@ package pkg
 
 import (
 	"encoding/json"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
@@ -12,9 +16,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 const StateKey = "address.state"
@@ -465,12 +466,17 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 	}
 	if len(currentPrograms) == 0 {
 		for _, program := range updateRequest.Programs {
+			var schedule interface{} = struct{}{}
+			if program.Schedule != nil {
+				schedule = program.Schedule
+			}
 			programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
 				"programId":       program.ID,
 				"status":          program.Status,
 				"rate":            program.Rate,
 				"statusUpdatedAt": time.Now().Format(time.RFC3339),
 				"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+				"schedule":        schedule,
 			})
 		}
 	} else {
@@ -494,18 +500,25 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 						services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
 							facility["contact"].(string), facility["email"].(string))
 					}
+					if updateProgram.Schedule != nil {
+						facilityProgram["schedule"] = updateProgram.Schedule
+					}
 					existingProgram = true
 					break
 				}
 			}
 			if !existingProgram {
-				programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+				newProgram := map[string]interface{}{
 					"programId":       updateProgram.ID,
 					"status":          updateProgram.Status,
 					"rate":            updateProgram.Rate,
 					"statusUpdatedAt": time.Now().Format(time.RFC3339),
 					"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-				})
+				}
+				if updateProgram.Schedule != nil {
+					newProgram["schedule"] = updateProgram.Schedule
+				}
+				programsTobeUpdated = append(programsTobeUpdated, newProgram)
 			}
 		}
 

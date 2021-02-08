@@ -27,7 +27,7 @@ function ProgramHeader() {
     useEffect(() => {
         programDb
             .getProgramByName(programName)
-            .then((program) => setBannerImage(program["logoURL"]))
+            .then((program) => setBannerImage(program.logoURL))
             .catch((e) => {
             })
 
