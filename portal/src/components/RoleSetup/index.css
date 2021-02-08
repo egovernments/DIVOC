@@ -7,14 +7,22 @@
     height: calc(1.5em + 0.75rem + 2px);
 }
 
-.roleTypeSelector {
+.selectorHeight {
     top: -4px;
 }
 
-.roleTypeSelector input {
+.rateSelector {
+    top: -3px;
+}
+
+.selectorHeight input {
     border: 1px solid lightgray;
 }
 
 .switchInput {
     top: 8px;
+}
+
+.rateDeleteButton {
+    top: 9px;
 }

@@ -12,7 +12,6 @@ import Select from '@material-ui/core/Select';
 import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
 import Button from "@material-ui/core/Button";
-import Dropdown from 'react-dropdown';
 import {useAxios} from "../../utils/useAxios";
 import AddUserImg from "../../assets/img/add-user.svg";
 import AddProgramImg from "../../assets/img/add-program.svg";
@@ -20,10 +19,8 @@ import "./index.css"
 import Switch from "@material-ui/core/Switch/Switch";
 import {Modal} from "react-bootstrap";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormHelperText from "@material-ui/core/FormHelperText";
-import styles from "../DropDown/DropDown.module.css";
 
 const useStyles = makeStyles({
     table: {
@@ -242,7 +239,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
     return (
         <TableRow key={index}>
             <BorderLessTableCell>
-                <FormControl variant="outlined" className="roleTypeSelector" fullWidth>
+                <FormControl variant="outlined" className="selectorHeight" fullWidth>
                     <label htmlFor="demo-simple-select-outlined">
                         Role Type
                     </label>
@@ -383,17 +380,18 @@ const StaffProgramRate = (props) => {
                             <TableRow>
                                 <BorderLessTableCell>
                                     <FormControl variant="outlined" fullWidth>
-                                        <InputLabel id="demo-simple-select-outlined-label">Program</InputLabel>
+                                        <label htmlFor="demo-simple-select-outlined">
+                                            Program
+                                        </label>
                                         <Select
+                                            className="roleTypeMenu rateSelector"
                                             labelId="demo-simple-select-outlined-label"
                                             id="demo-simple-select-outlined"
                                             value={limit.programName}
                                             onChange={(evt) => {
                                                 props.updateProgram(index, "programName", evt.target.value)
                                             }}
-                                            label="Program"
                                         >
-
                                             {
                                                 (limit.programName === "" ? newPrograms : props.programs).map((program, index) => (
                                                     <MenuItem value={program.programId}
@@ -423,7 +421,7 @@ const StaffProgramRate = (props) => {
                                     </>
                                 </BorderLessTableCell>
                                 <BorderLessTableCell>
-                                    <Button className="mr-2" variant="outlinedPrimary" onClick={() => {
+                                    <Button className="mr-2 rateDeleteButton" variant="outlinedPrimary" onClick={() => {
                                         props.deleteProgram(index)
                                     }}>
                                         DELETE
