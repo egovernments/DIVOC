@@ -149,6 +149,7 @@ func (m *FacilityUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Regi
 }
 
 func (m *FacilityUpdateRequestItems0ProgramsItems0) validateSchedule(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}
