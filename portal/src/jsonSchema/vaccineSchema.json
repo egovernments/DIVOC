@@ -2,7 +2,7 @@
     "$id": "#properties/Medicine",
       "type": "object",
       "required": [
-        "name", "status", "provider"
+        "name", "provider"
       ],
       "properties": {
         "name": {
@@ -26,8 +26,8 @@
           "enum": ["muscular injection", "oral", "nasal"],
           "default": "muscular injection"
         },
-        "Approximate Price": {
-          "title": "Price",
+        "price": {
+          "title": "Approximate Price",
           "type": "number"
         },
         "schedule": {
