@@ -30,6 +30,8 @@ RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/divoc-server /app/divoc-server
 COPY vaccination_api/config /config
 EXPOSE 8000
+#RUN useradd -u 8000 vaccination_api
+USER 8000
 CMD ["/app/divoc-server", "--scheme", "http", "--port", "8000", "--host", "0.0.0.0"]
 
 FROM alpine:3.9 as analytics_feed
@@ -37,6 +39,8 @@ LABEL name=analytics_feed
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/analytics_feed /app/analytics_feed
 COPY vaccination_api/config /config
+#RUN useradd -u 1001 analytics_feed
+USER 1001
 CMD ["/app/analytics_feed"]
 
 FROM alpine:3.9 as certificate_processor
@@ -44,6 +48,8 @@ LABEL name=certificate_processor
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/certificate_processor /app/certificate_processor
 COPY vaccination_api/config /config
+#RUN useradd -u 1001 certificate_processor
+USER 1002
 CMD ["/app/certificate_processor"]
 
 #portal api
@@ -53,6 +59,8 @@ RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/portal_api/divoc-portal-api-server /app/divoc-portal-api-server
 COPY portal_api/config /config
 EXPOSE 8001
+#RUN useradd -u 8001 portal_api
+USER 8001
 CMD ["/app/divoc-portal-api-server", "--scheme", "http", "--port", "8001", "--host", "0.0.0.0"]
 
 #notification-service
@@ -62,6 +70,8 @@ RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/notification-service/notification-service /app/notification-service
 COPY notification-service/config /config
 EXPOSE 8765
+#RUN useradd -u 8765 divoc-notification
+USER 8765
 CMD ["/app/notification-service", "--scheme", "http", "--port", "8765", "--host", "0.0.0.0"]
 
 #digilocker_support_api
@@ -70,6 +80,8 @@ LABEL name=digilocker_support_api
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/digilocker_support_api /app/digilocker_support_api
 COPY vaccination_api/config /config
+#RUN useradd -u 8003 divoc-cert
+USER 8003
 CMD ["/app/digilocker_support_api"]
 
 #caching-dash-server
@@ -78,4 +90,6 @@ LABEL name=caching-dash-server
 RUN apk add ca-certificates
 COPY --from=build_base /tmp/divoc/vaccination_api/caching-dash-server /app/caching-dash-server
 COPY vaccination_api/config /config
+#RUN useradd -u 8004 divoc-cache
+USER 8004
 CMD ["/app/caching-dash-server"]
