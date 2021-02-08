@@ -160,7 +160,7 @@ function transformW3(cert, certificateId) {
 }
 
 async function signAndSave(certificate, retryCount = 0) {
-  const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
+  const certificateId = "" + Math.floor(1e10 + (Math.random() * 9e10));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
