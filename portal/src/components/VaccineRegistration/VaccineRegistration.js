@@ -6,6 +6,9 @@ import ListView from '../ListView/ListView';
 import Form from "@rjsf/core";
 import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
+import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
+import {CustomTextWidget} from "../CustomTextWidget/index";
+import {CustomTextAreaWidget} from "../CustomTextAreaWidget/index";
 
 
 function VaccineRegistration() {
@@ -13,6 +16,7 @@ function VaccineRegistration() {
     const [formData, setFormData] = useState(null);
     const [medicineList, setMedicineList] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [selectedMedicine,setSelectedMedicine] = useState([]);
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -32,13 +36,29 @@ function VaccineRegistration() {
         },
     };
 
+
+    const widgets = {
+        TextWidget: CustomTextWidget,
+        TextareaWidget: CustomTextAreaWidget,
+        SelectWidget: CustomDropdownWidget,
+    };
+
     const handleSubmit = (dataToSend) => {
-        axios
+        if (dataToSend.edited) {
+            axios
+            .put("/divoc/admin/api/v1/medicines", dataToSend, config)
+            .then((res) => {
+                alert("Successfully Edited");
+                getListOfRegisteredVaccines()
+            });
+        } else {
+            axios
             .post("/divoc/admin/api/v1/medicines", dataToSend, config)
             .then((res) => {
                 alert("Successfully Registered");
                 getListOfRegisteredVaccines()
             });
+        }
     };
 
     
@@ -47,38 +67,67 @@ function VaccineRegistration() {
         const res = await axios
             .get("/divoc/admin/api/v1/medicines", config)
             .then( (res) => {
-                return res.data
+                return res.data.map(d => {
+                    return {...d,edited: false}
+                })
             })
         setMedicineList(res)
     }
 
+    function onEdit(data) {
+        data.edited = true;
+        console.log("data to send",data)
+        setSelectedMedicine(data);
+        handleSubmit(data);
+        getListOfRegisteredVaccines();
+    }
+
+    function autoFillForm() {
+        return { 
+            osid: selectedMedicine.osid,
+            name: selectedMedicine.name,
+            effectiveUntil: selectedMedicine.effectiveUntil,
+            price: selectedMedicine.price,
+            provider: selectedMedicine.provider,
+            schedule: selectedMedicine.schedule,
+            status: selectedMedicine.status,
+        }
+    } 
 
     return (
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
             <div className="d-flex">
-                <h4 className={styles['heading']+ " p-2 mr-auto"}>Register New Vaccine</h4>
+                <h5 className={"mr-auto"}>Register New Vaccine</h5>
                 <Button variant="outline-primary" onClick={()=> setShowForm(!showForm)}>BACK</Button>
             </div>
             <Form
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    onSubmit={(e) => {
-                        // setFormData(e.formData);
-                        handleSubmit(e.formData);
-                    }}
-                >
-                    <button type="submit" className={styles['button']}>SAVE</button>
-                </Form>
+                widgets={widgets}
+                schema={schema}
+                uiSchema={uiSchema}
+                onSubmit={(e) => {
+                    // setFormData(e.formData);
+                    handleSubmit(e.formData);
+                }}
+            >
+                <button type="submit" className={styles['button']}>SAVE</button>
+            </Form>
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
             <ListView 
+                schema={schema}
+                uiSchema={uiSchema}
+                widgets={widgets}
                 listData={medicineList} 
                 fields={["provider", "price", "effectiveUntil"]} 
                 show={showForm} 
                 setShow={setShowForm}
                 buttonTitle="Register New Vaccine"
                 title="Active Vaccines"
+                showDetails={false}
+                autoFillForm={autoFillForm}
+                onEdit={onEdit}
+                setSelectedData={setSelectedMedicine}
             />
             </div>}
         </div>
