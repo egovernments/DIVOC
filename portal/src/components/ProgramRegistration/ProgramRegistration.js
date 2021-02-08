@@ -3,7 +3,7 @@ import styles from "./ProgramRegistration.module.css";
 import axios from "axios";
 import { useKeycloak } from "@react-keycloak/web";
 import Form from "@rjsf/core";
-import ListView from '../ListView/ListView';
+import ProgramList from '../ProgramListView/ProgramList';
 import schema from '../../jsonSchema/programSchema.json';
 import Program from "../../assets/img/program.svg";
 import Button from 'react-bootstrap/Button';
@@ -155,17 +155,13 @@ function VaccineRegistration() {
             </Form>
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
-            <ListView
+            <ProgramList
                 schema={programSchema}
                 uiSchema={uiSchema}
                 widgets={widgets}
                 listData={programList} 
-                fields={["description", "startDate", "endDate"]} 
                 show={showForm} 
                 setShow={setShowForm}
-                buttonTitle="Register New Vaccine Program"
-                title="List of Registered Vaccine Programs"
-                showDetails={true}
                 onEdit={onEdit}
                 setSelectedData={setSelectedProgram}
                 autoFillForm={autoFillForm}

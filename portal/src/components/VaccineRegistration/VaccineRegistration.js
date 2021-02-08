@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./VaccineRegistration.module.css";
 import { useKeycloak } from "@react-keycloak/web";
 import axios from "axios";
-import ListView from '../ListView/ListView';
+import VaccineList from "../VaccineListView/VaccineList";
 import Form from "@rjsf/core";
 import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
@@ -114,17 +114,13 @@ function VaccineRegistration() {
             </Form>
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
-            <ListView 
+            <VaccineList
                 schema={schema}
                 uiSchema={uiSchema}
                 widgets={widgets}
                 listData={medicineList} 
-                fields={["provider", "price", "effectiveUntil"]} 
                 show={showForm} 
                 setShow={setShowForm}
-                buttonTitle="Register New Vaccine"
-                title="Active Vaccines"
-                showDetails={false}
                 autoFillForm={autoFillForm}
                 onEdit={onEdit}
                 setSelectedData={setSelectedMedicine}

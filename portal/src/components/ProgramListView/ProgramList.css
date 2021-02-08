@@ -141,3 +141,11 @@
 .custom-switch{
     float: right;
 }
+
+.details-text{
+    font-size: 12px;
+}
+
+.register-button{
+    float: right;
+}

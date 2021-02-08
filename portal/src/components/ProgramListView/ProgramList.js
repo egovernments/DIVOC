@@ -1,36 +1,22 @@
 import React, {useState} from 'react';
-import './ListView.css';
+import './ProgramList.css';
 import ProgramActiveImg from "../../assets/img/program-active.svg";
-import Program from "../../assets/img/program.svg";
 import ProgramInActiveImg from "../../assets/img/program-inactive.svg";
 import Button from 'react-bootstrap/Button';
 import Form from "@rjsf/core";
-import withStyles from "@material-ui/core/styles/withStyles";
-import Switch from "@material-ui/core/Switch/Switch";
+import { CustomSwitch } from '../CustomSwitch/CustomSwitch';
 
-function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails,onEdit,setSelectedData,autoFillForm}) {
+function ProgramList({listData,show,setShow,schema,uiSchema,widgets,onEdit,setSelectedData,autoFillForm}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
 
-    const CustomSwitch = withStyles({
-        switchBase: {
-            '&$checked': {
-                color: "#88C6A9",
-            },
-            '&$checked + $track': {
-                backgroundColor: "#88C6A9",
-            },
-        },
-        checked: {},
-        track: {},
-    })(Switch);
 
     return (
         <div>
             {
                 selectedIndex === -1 && <>
                  <div className="d-flex">
-                    <p className={" p-2 mr-auto"}>{title}</p>
-                    <Button variant="outline-primary" onClick={()=> setShow(!show)}>{buttonTitle}</Button>
+                    <p className={" p-2 mr-auto"}><b>List of Registered Vaccine Programs</b></p>
+                    <Button variant="outline-primary" onClick={()=> setShow(!show)}>REGISTER NEW VACCINE PROGRAM</Button>
                  </div>
                  <div className="cards-container">
                  {listData.map((data, index) => {
@@ -38,41 +24,38 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                         <div className={'list-view-card-container'} >
                             <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index);setSelectedData(data)}}>
                                 <span className={'list-view-name'}>{data.name}</span>
-                                {showDetails && <span className={'list-view-logo-img'}>
+                                <span className={'list-view-logo-img'}>
                                     {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
                                     <img src={data.status === "Active" ? ProgramActiveImg : ProgramInActiveImg}
                                             className={'list-view-program-status-img'} alt={data.status}
                                             title={data.status}/>
-                                </span>}
+                                </span>
                             </div>
-                            {!showDetails && <span className="">{data.provider}</span>}
-                            {showDetails && 
-                                <>
-                                <div>{data.description}</div>
-                                <div className="additional-details-card">
-                                    <div className="d-flex">
-                                        <span>Start Date</span>&emsp;&emsp;
-                                        <span>End Date</span>
-                                    </div>
-                                    <div className="d-flex">
-                                        <span><b>{data.startDate}</b></span>&emsp;
-                                        <span><b>{data.endDate}</b></span>
+                            
+                            <div>{data.description}</div>
+                            <div className="additional-details-card">
+                                <div className="d-flex">
+                                    <span>Start Date</span>&emsp;&emsp;
+                                    <span>End Date</span>
+                                    <div className="ml-auto">
+                                        <CustomSwitch
+                                            checked={data.status==="Active" || false}
+                                            onChange={() => {
+                                                setSelectedData(data);
+                                                let editedData =  Object.assign({}, data);
+                                                editedData.status = editedData.status==="Active" ? "Inactive" : "Active" ;
+                                                onEdit(editedData)
+                                            }}
+                                            color="primary"
+                                            
+                                        />
                                     </div>
                                 </div>
-                                </>
-                            }
-                            <div className="custom-switch">
-                                <CustomSwitch
-                                checked={data.status==="Active" || false}
-                                onChange={() => {
-                                    setSelectedData(data);
-                                    let editedData =  Object.assign({}, data);
-                                    editedData.status = editedData.status==="Active" ? "Inactive" : "Active" ;
-                                    onEdit(editedData)
-                                }}
-                                color="primary"
-                            />
-                            <p>{data.status === "Active" ? "Active" : "Inactive"}</p>
+                                <div className="d-flex">
+                                    <span><b>{data.startDate}</b></span>&emsp;
+                                    <span><b>{data.endDate}</b></span>
+                                    <p className="ml-auto">{data.status === "Active" ? "Active" : "Inactive"}</p>
+                                </div>
                             </div>
                         </div>
                     )
@@ -109,4 +92,4 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
     );
 }
 
-export default ListView;
+export default ProgramList;
