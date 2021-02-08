@@ -6,7 +6,7 @@ export const CustomTextAreaWidget = (props) => {
   return (
       <div>
           <textarea 
-              value={props.value} 
+              value={props.value || ''} 
               className={"custom-textarea"} 
               rows="4" 
               cols="50" 

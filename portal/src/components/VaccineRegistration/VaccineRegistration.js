@@ -16,6 +16,7 @@ function VaccineRegistration() {
     const [formData, setFormData] = useState(null);
     const [medicineList, setMedicineList] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [selectedMedicine,setSelectedMedicine] = useState([]);
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -39,16 +40,25 @@ function VaccineRegistration() {
     const widgets = {
         TextWidget: CustomTextWidget,
         TextareaWidget: CustomTextAreaWidget,
-        SelectWidget: CustomDropdownWidget,
+        // SelectWidget: CustomDropdownWidget,
     };
 
     const handleSubmit = (dataToSend) => {
-        axios
+        if (dataToSend.edited) {
+            axios
+            .put("/divoc/admin/api/v1/medicines", dataToSend, config)
+            .then((res) => {
+                alert("Successfully Edited");
+                getListOfRegisteredVaccines()
+            });
+        } else {
+            axios
             .post("/divoc/admin/api/v1/medicines", dataToSend, config)
             .then((res) => {
                 alert("Successfully Registered");
                 getListOfRegisteredVaccines()
             });
+        }
     };
 
     
@@ -57,11 +67,31 @@ function VaccineRegistration() {
         const res = await axios
             .get("/divoc/admin/api/v1/medicines", config)
             .then( (res) => {
-                return res.data
+                return res.data.map(d => {
+                    return {...d,edited: false}
+                })
             })
         setMedicineList(res)
     }
 
+    function onEdit(data) {
+        data.edited = true;
+        console.log("data to send",data)
+        setSelectedMedicine(data);
+        handleSubmit(data);
+        getListOfRegisteredVaccines();
+    }
+
+    function autoFillForm() {
+        return { 
+            name: selectedMedicine.name,
+            effectiveUntil: selectedMedicine.effectiveUntil,
+            price: selectedMedicine.price,
+            provider: selectedMedicine.provider,
+            schedule: selectedMedicine.schedule,
+            status: selectedMedicine.status,
+        }
+    } 
 
     return (
         <div className={styles["container"]}>
@@ -94,6 +124,9 @@ function VaccineRegistration() {
                 buttonTitle="Register New Vaccine"
                 title="Active Vaccines"
                 showDetails={false}
+                autoFillForm={autoFillForm}
+                onEdit={onEdit}
+                setSelectedData={setSelectedMedicine}
             />
             </div>}
         </div>

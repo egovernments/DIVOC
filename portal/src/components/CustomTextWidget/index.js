@@ -7,7 +7,7 @@ export const CustomTextWidget = (props) => {
       <div>
           <input type="text"
               className={"custom-text-box"}
-              value={props.value}
+              value={props.value || ''}
               required={props.required}
               onChange={(event) => props.onChange(event.target.value)} />
       </div>

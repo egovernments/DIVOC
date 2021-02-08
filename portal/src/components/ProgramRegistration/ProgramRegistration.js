@@ -110,15 +110,25 @@ function VaccineRegistration() {
     };
 
 
-    function onStatusChange(data,status) {
+    function onEdit(data) {
         let editedData = {...data}
         editedData.edited = true;
-        editedData.status = status;
-        data.status = status;
+        console.log("edited data",data)
         setSelectedProgram(editedData);
         handleSubmit(editedData);
         getListOfRegisteredPrograms();
     }
+
+    function autoFillForm() {
+        return { 
+            name : selectedProgram.name, 
+            description: selectedProgram.description,
+            logoURL: selectedProgram.image,
+            startDate: selectedProgram.startDate,
+            endDate: selectedProgram.endDate,
+            medicineIds: [...selectedProgram.medicineIds],
+        }
+    } 
 
     return (
         <div className={styles["container"]}>
@@ -154,8 +164,9 @@ function VaccineRegistration() {
                 buttonTitle="Register New Vaccine Program"
                 title="List of Registered Vaccine Programs"
                 showDetails={true}
-                onStatusChange={onStatusChange}
-                setSelectedProgram={setSelectedProgram}
+                onEdit={onEdit}
+                setSelectedData={setSelectedProgram}
+                autoFillForm={autoFillForm}
             />
             </div>}
         </div>

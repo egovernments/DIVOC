@@ -8,7 +8,7 @@ import Form from "@rjsf/core";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 
-function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails,onStatusChange,setSelectedProgram}) {
+function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSchema,widgets,showDetails,onEdit,setSelectedData,autoFillForm}) {
     const [selectedIndex, setSelectedIndex] = useState(-1);
 
     const CustomSwitch = withStyles({
@@ -24,19 +24,6 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
         track: {},
     })(Switch);
 
-    function autoFillForm() {
-        return { 
-            name : listData[selectedIndex].name, 
-            description: listData[selectedIndex].description,
-            logoURL: listData[selectedIndex].logoURL,
-            startDate: listData[selectedIndex].startDate,
-            endDate: listData[selectedIndex].endDate,
-            vaccine: listData[selectedIndex].vaccine,
-            provider: listData[selectedIndex].provider,
-            price: listData[selectedIndex].price,
-            effectiveUntil: listData[selectedIndex].effectiveUntil,
-        }
-    } 
     return (
         <div>
             {
@@ -48,7 +35,7 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                 {listData.map((data, index) => {
                     return (
                         <div className={'list-view-card-container'} >
-                            <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index)}}>
+                            <div className="d-flex justify-content-between" onClick={() => {setSelectedIndex(index);setSelectedData(data)}}>
                                 <span className={'list-view-name'}>{data.name}</span>
                                 <span className={'list-view-logo-img'}>
                                     {"image" in data ? <img alt="" src={data.image} width={"100%"}/> : "LOGO"}
@@ -64,25 +51,28 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                     <div className="d-flex">
                                         <span>Start Date</span>&emsp;&emsp;
                                         <span>End Date</span>
-                                        <CustomSwitch
-                                            className="ml-auto"
-                                            checked={data.status==="Active" || false}
-                                            onChange={() => {
-                                                console.log("data",data.status)
-                                                setSelectedProgram(data);
-                                                onStatusChange(data,data.status==="Active" ? "Inactive" : "Active" )
-                                            }}
-                                            color="primary"
-                                        />
                                     </div>
                                     <div className="d-flex">
                                         <span><b>{data.startDate}</b></span>&emsp;
                                         <span><b>{data.endDate}</b></span>
-                                        <span className="ml-auto p-2">{data.status === "Active" ? "Active" : "Inactive"}</span>
                                     </div>
                                 </div>
                                 </>
                             }
+                            <div>
+                                <CustomSwitch
+                                className="ml-auto"
+                                checked={data.status==="Active" || false}
+                                onChange={() => {
+                                    setSelectedData(data);
+                                    let editedData =  Object.assign({}, data);
+                                    editedData.status = editedData.status==="Active" ? "Inactive" : "Active" ;
+                                    onEdit(editedData)
+                                }}
+                                color="primary"
+                            />
+                            <span className="ml-auto p-2">{data.status === "Active" ? "Active" : "Inactive"}</span>
+                            </div>
                         </div>
                     )
                 })}
@@ -102,7 +92,7 @@ function ListView({listData, fields,show,setShow,title,buttonTitle,schema,uiSche
                                 uiSchema={uiSchema}
                                 widgets={widgets}
                                 onSubmit={(e) => {
-                                    window.alert("helloo")
+                                    onEdit(e.formData);
                                 }}
                                 formData={autoFillForm()}
                             >
