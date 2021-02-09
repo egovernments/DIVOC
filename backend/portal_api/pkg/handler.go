@@ -178,7 +178,7 @@ func createFilterObject(params operations.GetFacilitiesParams) map[string]interf
 
 func addQueryParamToFilter(param *string, filter map[string]interface{}, filterKey string) {
 	if param != nil && !strings.EqualFold(*param, "ALL") {
-		values := strings.Split(strings.ToLower(*param), ",")
+		values := strings.Split(*param, ",")
 		filter[filterKey] = map[string]interface{}{
 			"or": values,
 		}
