@@ -186,11 +186,6 @@ func addQueryParamToFilter(param *string, filter map[string]interface{}, filterK
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	filter := createFilterObject(params)
-	if HasResourceRole(portalClientId, "facility-admin", principal) {
-		filter[FacilityCodeKey] = map[string]interface{}{
-			"eq": principal.FacilityCode,
-		}
-	}
 	response, err := kernelService.QueryRegistry(entityTypeId, filter)
 	if err != nil {
 		log.Errorf("Error in querying registry", err)

@@ -70,7 +70,7 @@ paths:
           name: rateUpdatedTo
           type: string
       security:
-        - hasRole: ["admin", "controller", "facility-admin"]
+        - hasRole: ["admin", "controller"]
       responses:
         '200':
           description: OK

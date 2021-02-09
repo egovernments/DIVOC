@@ -174,8 +174,7 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller",
-              "facility-admin"
+              "controller"
             ]
           }
         ],
@@ -1728,8 +1727,7 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller",
-              "facility-admin"
+              "controller"
             ]
           }
         ],
