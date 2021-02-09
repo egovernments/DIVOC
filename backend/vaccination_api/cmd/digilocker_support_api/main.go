@@ -6,6 +6,7 @@ import (
 	"compress/flate"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/models"
@@ -20,6 +21,7 @@ import (
 	"github.com/skip2/go-qrcode"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"io"
+	"math"
 	"net/http"
 	"os"
 	"strings"
@@ -39,7 +41,7 @@ const InternalSuccessEvent = "internal-success"
 const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
-
+const YYYYMMDD = "2006-01-02"
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "divoc_http_request_duration_milliseconds",
@@ -108,6 +110,20 @@ type Certificate struct {
 	} `json:"proof"`
 }
 
+func getVaccineValidDays(start string,end string) string {
+	days := 28
+	startDate, err := time.Parse(YYYYMMDD, start)
+	if err == nil {
+		endDate, err := time.Parse(YYYYMMDD, end)
+		if err == nil {
+			validDays := int(math.Ceil(endDate.Sub(startDate).Hours() / 24))
+			if validDays > 0 {
+				days = validDays
+			}
+		}
+	}
+	return fmt.Sprintf("after %d days", days)
+}
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
 	if (!isFinal(certificate)) {
@@ -119,7 +135,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 			formatRecipientAddress(certificate),
 			certificate.Evidence[0].Vaccine,
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
-			"after 28 days",
+			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
 			certificate.Evidence[0].Verifier.Name,
 			formatFacilityAddress(certificate),
 		}
@@ -313,7 +329,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 	return nil
 }
 
-func decompress(buf *bytes.Buffer, err error, ) {
+func decompress(buf *bytes.Buffer, err error) {
 	r, err := zip.NewReader(bytes.NewReader(buf.Bytes()), int64(buf.Len()))
 	if err != nil {
 		log.Error(err)
@@ -367,32 +383,37 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 			signedJson := certificateObj["certificate"].(string)
 			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
 				log.Errorf("Error in creating certificate pdf")
+				publishEvent(preEnrollmentCode, InternalFailedEvent, "Error in creating pdf")
 			} else {
 				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
 				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
 				//w.Header().Set("Content-Length", string(len(pdfBytes)))
 				w.WriteHeader(200)
 				_, _ = w.Write(pdfBytes)
-				go kafkaService.PublishEvent(models.Event{
-					Date:          time.Now(),
-					Source:        preEnrollmentCode,
-					TypeOfMessage: InternalSuccessEvent,
-					ExtraInfo:     "Certificate found",
-				})
+				publishEvent(preEnrollmentCode, InternalSuccessEvent, "Certificate found")
 				return
 			}
 		} else {
 			log.Errorf("No certificates found for request %v", preEnrollmentCode)
 			w.WriteHeader(404)
+			publishEvent(preEnrollmentCode, InternalFailedEvent, "Certificate not found")
+			return
 		}
 	} else {
 		log.Infof("Error %+v", err)
+		w.WriteHeader(500)
+		publishEvent(preEnrollmentCode, InternalFailedEvent, "Internal error")
+		return
 	}
+	publishEvent(preEnrollmentCode, InternalFailedEvent, "Unknown")
+}
+
+func publishEvent(preEnrollmentCode string, typeOfEvent string, info string) {
 	go kafkaService.PublishEvent(models.Event{
 		Date:          time.Now(),
 		Source:        preEnrollmentCode,
-		TypeOfMessage: InternalFailedEvent,
-		ExtraInfo:     "Certificate not found",
+		TypeOfMessage: typeOfEvent,
+		ExtraInfo:     info,
 	})
 }
 
