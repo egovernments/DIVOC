@@ -10,6 +10,7 @@ import {useAxios} from "../../../utils/useAxios";
 import Tooltip from "@material-ui/core/Tooltip";
 import {FormControlLabel, Switch} from "@material-ui/core";
 import withStyles from "@material-ui/core/styles/withStyles";
+import MultipleSelect from "../ProgramSelection";
 
 
 export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVaccinators}) {
@@ -147,7 +148,12 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
             <thead>
             <tr>
                 <th>OPERATOR NAME</th>
-                <th>ALL PROGRAMS <img onClick={handleClick} src={filter}/>{<FilterPopup/>}</th>
+                <th><MultipleSelect
+                    key={programs}
+                    names={programs}
+                    onSelected={(values) => {
+                        setSelectedPrograms(values);
+                    }}/></th>
                 <th>CERTIFIED</th>
                 <th>STATUS</th>
             </tr>
