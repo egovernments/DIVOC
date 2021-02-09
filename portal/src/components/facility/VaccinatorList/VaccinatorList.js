@@ -5,7 +5,6 @@ import info from "../../../assets/img/ic_info_24px.svg";
 import filter from "../../../assets/img/filter.svg";
 import Popover from "@material-ui/core/Popover";
 import {CheckboxItem} from "../../FacilityFilterTab";
-import makeStyles from "@material-ui/core/styles/makeStyles";
 import {API_URL} from "../../../utils/constants";
 import {useAxios} from "../../../utils/useAxios";
 import Tooltip from "@material-ui/core/Tooltip";
@@ -17,18 +16,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
 
     const [programs, setPrograms] = useState([]);
     const [selectedPrograms, setSelectedPrograms] = useState([]);
-    const axiosInstance = useAxios('');
-    const useStyles = makeStyles((theme) => ({
-        root: {
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            '& > *': {
-                margin: theme.spacing(0.5),
-            },
-        },
-    }));
-    const classes = useStyles();
 
     useEffect(() => {
         setPrograms(getAllPrograms(vaccinators));
@@ -47,29 +34,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
 
     function onEditVaccinator(vaccinator) {
         onSelectVaccinator(vaccinator)
-    }
-
-    function onProgramStatusChange(vaccinator, program) {
-        const editData = {
-            osid: vaccinator.osid,
-            programs: vaccinator.programs.map(p => {
-                if (p.programId === program.programId) {
-                    p.status = p.status === "Active" ? "Inactive" : "Active"
-                }
-                return p
-            }),
-        };
-        axiosInstance.current.put(API_URL.VACCINATORS_API, [editData])
-            .then(res => {
-                if (res.status === 200) {
-                    setTimeout(() => fetchVaccinators(), 2000);
-                } else {
-                    alert("Something went wrong while saving!");
-                }
-            }, (error) => {
-                console.log(error);
-                alert("Something went wrong while adding vaccinator!");
-            });
     }
 
     const getVaccinatorList = () => {
@@ -95,13 +59,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                                 }}
                             />
                         </td>
-                        {/*<td className={program.status === "Active" ? "active status" : "inactive status"}>{program.status}</td>*/}
-                        {/*<td className={classes.root}>
-                            <Chip variant="outlined"
-                                  label={program.status === "Active" ? "Make Inactive" : "Make Active"}
-                                  onClick={() => onProgramStatusChange(vaccinator, program)}/>
-                            <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)}/>
-                        </td>*/}
                     </tr>
                 ))
             } else {
@@ -245,7 +202,7 @@ function ToggleStatus({vaccinator, program, onUpdate}) {
                 alert("Something went wrong while adding vaccinator!");
             });
     }
-    return <FormControlLabel
+    return <div style={{minWidth: "200px"}}><FormControlLabel
         control={
             <CustomSwitch
                 checked={isActive}
@@ -256,4 +213,5 @@ function ToggleStatus({vaccinator, program, onUpdate}) {
         }
         label={isActive ? "Active" : "Inactive"}
     />
+    </div>
 }
