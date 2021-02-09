@@ -31,7 +31,7 @@ func findProgramsByName(programNames []string) []*models.Program {
 			"or": programNames,
 		},
 		"status": map[string]interface{}{
-			"eq": "active",
+			"eq": "Active",
 		},
 		"startDate": map[string]interface{}{
 			"lte": time.Now().Format("2006-01-02"),
