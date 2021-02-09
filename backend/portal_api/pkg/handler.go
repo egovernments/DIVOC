@@ -185,7 +185,7 @@ func addQueryParamToFilter(param *string, filter map[string]interface{}, filterK
 	}
 }
 
-func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 	limit := config.Config.SearchRegistry.DefaultLimit
 	offset := config.Config.SearchRegistry.DefaultOffset
 	if limitValue != nil {
@@ -259,7 +259,6 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 	return kernelService.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
-
 func updateProgramsHandler(params operations.UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Update Program %+v", params.Body)
 	objectId := "Program"
@@ -282,7 +281,6 @@ func updateProgramsHandler(params operations.UpdateProgramParams, principal *mod
 		return NewGenericStatusOk()
 	}
 }
-
 
 func updateMedicineHandler(params operations.UpdateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Update Medicine %+v", params.Body)
@@ -438,6 +436,15 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			facility := searchRespone["Facility"].(map[string]interface{})
 			if facility != nil {
 				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
+				updatedFacility["facilityName"] = updateRequest.FacilityName
+				updatedFacility["address"] = updateRequest.Address
+				updatedFacility["geoLocation"] = updateRequest
+				updatedFacility["websiteUrl"] = updateRequest
+				updatedFacility["email"] = updateRequest
+				updatedFacility["contact"] = updateRequest
+				updatedFacility["operatingHourStart"] = updateRequest
+				updatedFacility["operatingHourEnd"] = updateRequest
+				updatedFacility["category"] = updateRequest
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
@@ -736,11 +743,11 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 						}
 						if !existingProgram {
 							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-								"programId":            updateProgram.ProgramID,
-								"status":               updateProgram.Status,
-								"certified":            updateProgram.Certified,
-								"statusUpdatedAt":      time.Now().Format(time.RFC3339),
-								"certifiedUpdatedAt":   time.Now().Format(time.RFC3339),
+								"programId":          updateProgram.ProgramID,
+								"status":             updateProgram.Status,
+								"certified":          updateProgram.Certified,
+								"statusUpdatedAt":    time.Now().Format(time.RFC3339),
+								"certifiedUpdatedAt": time.Now().Format(time.RFC3339),
 							})
 						}
 					}

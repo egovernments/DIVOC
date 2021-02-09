@@ -49,6 +49,30 @@ func (m FacilityUpdateRequest) Validate(formats strfmt.Registry) error {
 // swagger:model FacilityUpdateRequestItems0
 type FacilityUpdateRequestItems0 struct {
 
+	// Address
+	Address *Address `json:"address,omitempty"`
+
+	// Category
+	Category string `json:"category,omitempty"`
+
+	// Contact number
+	Contact string `json:"contact,omitempty"`
+
+	// Facility Email
+	Email string `json:"email,omitempty"`
+
+	// Facility Name
+	FacilityName string `json:"facilityName,omitempty"`
+
+	// Geo Location
+	GeoLocation string `json:"geoLocation,omitempty"`
+
+	// Operating hours end of day
+	OperatingHourEnd int64 `json:"operatingHourEnd,omitempty"`
+
+	// Operating hours start of day
+	OperatingHourStart int64 `json:"operatingHourStart,omitempty"`
+
 	// osid
 	Osid string `json:"osid,omitempty"`
 
@@ -57,11 +81,18 @@ type FacilityUpdateRequestItems0 struct {
 
 	// status
 	Status string `json:"status,omitempty"`
+
+	// Website URL
+	WebsiteURL string `json:"websiteUrl,omitempty"`
 }
 
 // Validate validates this facility update request items0
 func (m *FacilityUpdateRequestItems0) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := m.validatePrograms(formats); err != nil {
 		res = append(res, err)
@@ -73,8 +104,24 @@ func (m *FacilityUpdateRequestItems0) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *FacilityUpdateRequestItems0) validatePrograms(formats strfmt.Registry) error {
+func (m *FacilityUpdateRequestItems0) validateAddress(formats strfmt.Registry) error {
+	if swag.IsZero(m.Address) { // not required
+		return nil
+	}
 
+	if m.Address != nil {
+		if err := m.Address.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0) validatePrograms(formats strfmt.Registry) error {
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -193,10 +240,10 @@ type FacilityUpdateRequestItems0ProgramsItems0Schedule struct {
 	Days []string `json:"days"`
 
 	// end time
-	EndTime *string `json:"endTime,omitempty"`
+	EndTime string `json:"endTime,omitempty"`
 
 	// start time
-	StartTime *string `json:"startTime,omitempty"`
+	StartTime string `json:"startTime,omitempty"`
 }
 
 // Validate validates this facility update request items0 programs items0 schedule
