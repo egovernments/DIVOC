@@ -4,8 +4,7 @@ import FacilityActivation from "../FacilityActivation/FacilityActivation";
 import FacilityAdjustingRate from "../FacilityAdjustingRate/FacilityAdjustingRate";
 import FacilityDetails from "../FacilityDetails/FacilityDetails";
 import {useAxios} from "../../utils/useAxios";
-import state_and_districts from '../../utils/state_and_districts.json';
-import {equals, reject} from "ramda";
+import {equals, find, flatten, propEq, reject} from "ramda";
 import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useSelector} from "react-redux";
 
@@ -48,7 +47,7 @@ function FacilityController() {
         setFacilities([]);
         setDistricts([]);
     }
- 
+
     function setSelectedState(value) {
         setFilter({
             ...filter,
@@ -110,7 +109,7 @@ function FacilityController() {
                 .put(API_URL.FACILITY_API, updateFacilities)
                 .then((res) => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 2000);
+                    setTimeout(() => fetchFacilities(), 500);
                 });
         }
     }
@@ -124,45 +123,116 @@ function FacilityController() {
                 let toDate = new Date();
                 if (lastAdjustedOn === CONSTANTS.WEEK) {
                     fromDate.setDate(fromDate.getDate() - 7);
-                    rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
-                    rateUpdatedTo = toDate.toISOString().substr(0, 10);
+                    rateUpdatedFrom = fromDate;
+                    rateUpdatedTo = toDate;
                 } else if (lastAdjustedOn === CONSTANTS.MONTH) {
                     fromDate.setDate(fromDate.getDate() - 30);
-                    rateUpdatedFrom = fromDate.toISOString().substr(0, 10);
-                    rateUpdatedTo = toDate.toISOString().substr(0, 10);
+                    rateUpdatedFrom = fromDate;
+                    rateUpdatedTo = toDate;
                 } else {
                     rateUpdatedFrom = rateUpdatedTo = lastAdjustedOn;
                 }
             }
             let params = {
-                programId: selectedProgram,
-                state: selectedState,
-                district: selectedDistrict.map(d => d.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", "")),
-                programStatus: status,
-                type: facilityType,
-                rateUpdatedTo,
-                rateUpdatedFrom
+                // programId: selectedProgram,
+                // state: selectedState,
+                // district: selectedDistrict.map(d => d.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", "")),
+                // programStatus: status,
+                // type: facilityType,
+                // rateUpdatedTo,
+                // rateUpdatedFrom,
+                limit: 10000,
+                offset: 0
             };
             params = reject(equals(''))(params);
             const queryParams = new URLSearchParams(params);
             axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
                 .then(res => {
+                    let matchedFacilities = [];
                     res.data.forEach(item => {
                         Object.assign(item, {isChecked: false});
                         if (!("programs" in item)) {
                             Object.assign(item, {programs: []});
                         }
+                        let isFiltersMatched = true;
+                        [
+                            {
+                                data: item["programs"],
+                                filterKey: "programId",
+                                filterValue: [selectedProgram],
+                                toBePartiallyChecked: false
+                            },
+                            {
+                                data: item["programs"].filter(program => program.programId === selectedProgram),
+                                filterKey: "status",
+                                filterValue: [status],
+                                toBePartiallyChecked: false
+                            },
+                            {
+                                data: [item],
+                                filterKey: "category",
+                                filterValue: [facilityType],
+                                toBePartiallyChecked: false
+                            },
+                            {
+                                data: [item.address],
+                                filterKey: "state",
+                                filterValue: [selectedState],
+                                toBePartiallyChecked: false
+                            },
+                            {
+                                data: [item.address],
+                                filterKey: "district",
+                                filterValue: flatten(selectedDistrict.map(d => d.replaceAll(" ", ",").replaceAll("(", "").replaceAll(")", "").split(","))),
+                                toBePartiallyChecked: true
+                            }
+                        ].forEach(({data, filterKey, filterValue, toBePartiallyChecked}) => {
+                            let matchedCount = 0;
+                            filterValue.forEach(value => {
+                                if (value === "All" || findBy(data, filterKey, value)) {
+                                    matchedCount++;
+                                }
+                            });
+                            if (toBePartiallyChecked) {
+                                if (matchedCount === 0 && filterValue.length !== 0) {
+                                    isFiltersMatched = false
+                                }
+                            } else {
+                                if (matchedCount !== filterValue.length) {
+                                    isFiltersMatched = false
+                                }
+                            }
+                        });
+                        if(status === CONSTANTS.IN_ACTIVE && !isFiltersMatched) {
+                            if(!findBy(item["programs"], "programId", selectedProgram)) {
+                                isFiltersMatched = true
+                            }
+                        }
+                        if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
+                            const program = findBy(item["programs"], "programId", selectedProgram)
+                            if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
+                                isFiltersMatched = false
+                            }
+                        }
+                        if (isFiltersMatched) {
+                            matchedFacilities.push(item)
+                        }
                     });
-                    setFacilities(res.data)
+                    setFacilities(matchedFacilities)
                 });
         }
     }
+
+    function findBy(items, key, value) {
+        return find(propEq(key, value))(items);
+    }
+
 
     function fetchPrograms() {
         axiosInstance.current.get(API_URL.PROGRAM_API)
             .then(res => {
                 const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
-                setPrograms(programs)
+                setPrograms(programs);
                 if (programs.length > 0) {
                     setSelectedProgram(programs[0].value)
                 }
