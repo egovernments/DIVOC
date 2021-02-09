@@ -5,7 +5,7 @@ export function getNotificationTemplates() {
         "flagKey": "notification_templates"
     };
     return axios
-        .post("https://divoc.xiv.in/config/api/v1/evaluation", data)
+        .post("/config/api/v1/evaluation", data)
         .then((res) => {
             return res.data;
         })
