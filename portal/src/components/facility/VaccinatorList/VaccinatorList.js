@@ -87,11 +87,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                                 <Tooltip title="Certificate Not Uploaded"><img src={info}/></Tooltip>}
                         </td>
                         <td>
-                            {vaccinator.signatureString ?
-                                <img src={check}/> :
-                                <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
-                        </td>
-                        <td>
                             <ToggleStatus
                                 vaccinator={vaccinator}
                                 program={program}
@@ -124,10 +119,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                             </div>
                         </td>
                         <td>-</td>
-                        <td>{vaccinator.signatureString ?
-                            <img src={check}/> :
-                            <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
-                        </td>
                         <td>
                             <div className="mt-2 mb-2">-</div>
                         </td>
@@ -201,7 +192,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                 <th>OPERATOR NAME</th>
                 <th>ALL PROGRAMS <img onClick={handleClick} src={filter}/>{<FilterPopup/>}</th>
                 <th>CERTIFIED</th>
-                <th>SIGNATURE</th>
                 <th>STATUS</th>
             </tr>
             </thead>
