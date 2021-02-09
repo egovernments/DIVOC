@@ -7,8 +7,6 @@ import keycloak from "../../../utils/keycloak";
 import {equals, reject} from "ramda";
 import {API_URL} from "../../../utils/constants";
 import "./Vaccinators.css";
-import {Card} from "@material-ui/core";
-
 
 export default function Vaccinators() {
     const [vaccinators, setVaccinators] = useState([]);
@@ -32,7 +30,7 @@ export default function Vaccinators() {
                     Object.assign(item, {programs: []});
                 }
             });
-            setVaccinators(sampleJson)
+            setVaccinators(res.data)
         })
     }
 

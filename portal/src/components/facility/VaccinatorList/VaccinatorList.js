@@ -5,7 +5,6 @@ import info from "../../../assets/img/ic_info_24px.svg";
 import filter from "../../../assets/img/filter.svg";
 import Popover from "@material-ui/core/Popover";
 import {CheckboxItem} from "../../FacilityFilterTab";
-import Chip from "@material-ui/core/Chip";
 import makeStyles from "@material-ui/core/styles/makeStyles";
 import {API_URL} from "../../../utils/constants";
 import {useAxios} from "../../../utils/useAxios";
@@ -78,7 +77,7 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
             if (vaccinator.programs && vaccinator.programs.length > 0) {
                 return vaccinator.programs.filter(p => selectedPrograms.includes(p.programId)).map(program => (
                     <tr key={vaccinator.name + program.programId}>
-                        <td onClick={() => {
+                        <td className="vaccinator-name" onClick={() => {
                             onEditVaccinator(vaccinator)
                         }}>{vaccinator.name}</td>
                         <td>{program.programId}</td>
@@ -113,16 +112,24 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
             } else {
                 return (
                     <tr key={vaccinator.name}>
-                        <td>{vaccinator.name}</td>
-                        <td>-</td>
+                        <td>
+                            <div className="vaccinator-name" onClick={() => {
+                                onEditVaccinator(vaccinator)
+                            }}>{vaccinator.name}</div>
+                        </td>
+                        <td>
+                            <div className="assign-button" onClick={() => {
+                                onEditVaccinator(vaccinator)
+                            }}>Assign
+                            </div>
+                        </td>
                         <td>-</td>
                         <td>{vaccinator.signatureString ?
                             <img src={check}/> :
                             <Tooltip title="Signature Not Uploaded"><img src={info}/></Tooltip>}
                         </td>
-                        <td>-</td>
-                        <td className={classes.root}>
-                            <Chip variant="outlined" label="Edit Profile" onClick={() => onEditVaccinator(vaccinator)}/>
+                        <td>
+                            <div className="mt-2 mb-2">-</div>
                         </td>
                     </tr>
                 )
@@ -196,7 +203,6 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                 <th>CERTIFIED</th>
                 <th>SIGNATURE</th>
                 <th>STATUS</th>
-                {/*<th>ACTIONS</th>*/}
             </tr>
             </thead>
             <tbody>{getVaccinatorList()}</tbody>
