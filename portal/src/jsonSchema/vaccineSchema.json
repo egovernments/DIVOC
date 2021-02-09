@@ -1,48 +1,48 @@
 {
-    "$id": "#properties/Medicine",
-      "type": "object",
-      "required": [
-        "name", "provider"
+  "$id": "#properties/Medicine",
+  "type": "object",
+  "required": [
+    "name",
+    "provider"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "Name of Vaccine"
+    },
+    "provider": {
+      "title": "Manufacturer",
+      "type": "string",
+      "$id": "#/properties/provider"
+    },
+    "vaccinationMode": {
+      "title": "Administration Type",
+      "type": "string",
+      "enum": [
+        "muscular injection",
+        "oral",
+        "nasal"
       ],
+      "default": "muscular injection"
+    },
+    "price": {
+      "title": "Approximate Price",
+      "type": "number"
+    },
+    "schedule": {
+      "title": "",
+      "type": "object",
       "properties": {
-        "name": {
-          "$id": "#/properties/name",
-          "type": "string",
-          "title": "Name of Vaccine"
-        },
-        "provider": {
-          "title": "Manufacturer",
-          "type": "string",
-          "$id": "#/properties/provider"
-        },
-        "medicineId": {
-          "title": "Medicine ID (if applicable)",
-          "type": "string",
-          "$id": "#/properties/medicineId"
-        },
-        "administrationType": {
-          "title": "Administration Type",
-          "type": "string",
-          "enum": ["muscular injection", "oral", "nasal"],
-          "default": "muscular injection"
-        },
-        "price": {
-          "title": "Approximate Price",
+        "repeatInterval": {
+          "title": "Total doses",
           "type": "number"
-        },
-        "schedule": {
-          "title": "",
-          "type": "object",
-          "properties": {
-            "repeatInterval": {
-              "title": "Total doses",
-              "type": "number"
-            }
-          }
-        },
-        "effectiveUntil": {
-          "type": "number",
-          "title": "Effective until (months)"
         }
       }
+    },
+    "effectiveUntil": {
+      "type": "number",
+      "title": "Effective until (months)"
     }
+  }
+}

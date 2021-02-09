@@ -1,9 +1,9 @@
-.custom-dropdown>div>div>div{
+.custom-dropdown .Dropdown-control, .custom-dropdown .Dropdown-menu{
     border: 1px solid #E6E6E6;
     border-radius: 4px;
     width: 70%;
 }
 
-.custom-dropdown>div{
+.custom-dropdown .drop-down-wrapper {
     margin: unset !important;
 }

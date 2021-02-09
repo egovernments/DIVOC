@@ -9,6 +9,7 @@ import Button from 'react-bootstrap/Button';
 import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
 import {CustomTextWidget} from "../CustomTextWidget/index";
 import {CustomTextAreaWidget} from "../CustomTextAreaWidget/index";
+import * as R from "ramda";
 
 
 function VaccineRegistration() {
@@ -16,7 +17,6 @@ function VaccineRegistration() {
     const [formData, setFormData] = useState(null);
     const [medicineList, setMedicineList] = useState([]);
     const [showForm, setShowForm] = useState(false);
-    const [selectedMedicine, setSelectedMedicine] = useState([]);
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -43,17 +43,22 @@ function VaccineRegistration() {
         SelectWidget: CustomDropdownWidget,
     };
 
-    const handleSubmit = (dataToSend) => {
-        if (dataToSend.edited) {
+    const validateFields = (data) => {
+        const requiredFields = ["name", "provider", "price"];
+        let valid = true;
+        requiredFields.forEach(field => {
+            if (!R.pathOr(false, [field], data)) {
+                valid = false;
+                alert(`${field} is a required field`)
+            }
+        });
+        return valid
+    };
+
+    const handleSubmit = () => {
+        if (validateFields(formData)) {
             axios
-                .put("/divoc/admin/api/v1/medicines", dataToSend, config)
-                .then((res) => {
-                    alert("Successfully Edited");
-                    getListOfRegisteredVaccines()
-                });
-        } else {
-            axios
-                .post("/divoc/admin/api/v1/medicines", {...dataToSend, status: "Active"}, config)
+                .post("/divoc/admin/api/v1/medicines", {...formData, status: "Active"}, config)
                 .then((res) => {
                     alert("Successfully Registered");
                     getListOfRegisteredVaccines()
@@ -62,36 +67,38 @@ function VaccineRegistration() {
         }
     };
 
-
     const getListOfRegisteredVaccines = async () => {
-        const res = await axios
+        let res = await axios
             .get("/divoc/admin/api/v1/medicines", config)
             .then((res) => {
                 return res.data.map(d => {
                     return {...d, edited: false}
                 })
-            })
+            });
+        const sortByNameCaseInsensitive = R.sortBy(R.compose(R.toLower, R.prop('name')));
+        res = sortByNameCaseInsensitive(res);
         setMedicineList(res)
-    }
+    };
 
     function onEdit(data) {
-        data.edited = true;
-        console.log("data to send", data)
-        setSelectedMedicine(data);
-        handleSubmit(data);
-        getListOfRegisteredVaccines();
+        if (validateFields(data)) {
+            axios
+                .put("/divoc/admin/api/v1/medicines", {...data}, config)
+                .then((res) => {
+                    alert("Successfully Registered");
+                    getListOfRegisteredVaccines()
+                });
+            setShowForm(false)
+        }
     }
 
-    function autoFillForm() {
-        return {
-            osid: selectedMedicine.osid,
-            name: selectedMedicine.name,
-            effectiveUntil: selectedMedicine.effectiveUntil,
-            price: selectedMedicine.price,
-            provider: selectedMedicine.provider,
-            schedule: selectedMedicine.schedule,
-            status: selectedMedicine.status,
+    const getSchema = () => {
+        if(formData.edited) {
+            const updatedSchema = {...schema};
+            delete updatedSchema.properties.name
+            return updatedSchema
         }
+        return schema;
     }
 
     let blockedVaccines = medicineList.filter(data => data.status === "Blocked");
@@ -100,20 +107,23 @@ function VaccineRegistration() {
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
                 <div className="d-flex">
-                    <h5 className={"mr-auto"}>Register New Vaccine</h5>
+                    <h5 className={"mr-auto"}>{formData.edited ? formData.name : "Register New Vaccine"}</h5>
                     <Button variant="outline-primary" onClick={() => setShowForm(!showForm)}>BACK</Button>
                 </div>
                 <Form
                     widgets={widgets}
-                    schema={schema}
+                    schema={getSchema()}
                     uiSchema={uiSchema}
                     formData={formData}
                     onChange={(e) => {
                         setFormData(e.formData)
                     }}
                     onSubmit={(e) => {
-                        // setFormData(e.formData);
-                        handleSubmit(e.formData);
+                        if (e.formData.edited) {
+                            onEdit(e.formData)
+                        } else {
+                            handleSubmit();
+                        }
                     }}
                 >
                     <button type="submit" className={styles['button']}>SAVE</button>
@@ -121,52 +131,61 @@ function VaccineRegistration() {
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
                 <ListView
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    widgets={widgets}
                     listData={medicineList.filter(data => data.status === "Active")}
-                    fields={["provider", "price", "effectiveUntil"]}
-                    show={showForm}
-                    setShow={setShowForm}
-                    buttonTitle="Register New Vaccine"
+                    onRegisterBtnClick={() => {
+                        setShowForm(true);
+                        setFormData({});
+                    }}
                     title="Active Vaccines"
+                    buttonTitle="Register New Vaccine"
                     showDetails={false}
-                    autoFillForm={autoFillForm}
-                    onEdit={onEdit}
-                    setSelectedData={setSelectedMedicine}
+                    onActiveSwitchClick={onEdit}
+                    setSelectedData={
+                        (data) => {
+                            setFormData({...data, edited: true});
+                            setShowForm(true)
+                        }
+                    }
                 />
-                {inactiveVaccines.length > 0 && <><div className="mt-3"/>
-                <ListView
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    widgets={widgets}
-                    listData={inactiveVaccines}
-                    fields={["provider", "price", "effectiveUntil"]}
-                    show={showForm}
-                    setShow={setShowForm}
-                    buttonTitle=""
-                    title="Inactive Vaccines"
-                    showDetails={false}
-                    autoFillForm={autoFillForm}
-                    onEdit={onEdit}
-                    setSelectedData={setSelectedMedicine}
-                /></>}
-                {blockedVaccines.length > 0 && <><div className="mt-3"/>
-                <ListView
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    widgets={widgets}
-                    listData={blockedVaccines}
-                    fields={["provider", "price", "effectiveUntil"]}
-                    show={showForm}
-                    setShow={setShowForm}
-                    buttonTitle=""
-                    title="Blocked Vaccines"
-                    showDetails={false}
-                    autoFillForm={autoFillForm}
-                    onEdit={onEdit}
-                    setSelectedData={setSelectedMedicine}
-                /></>}
+                {inactiveVaccines.length > 0 && <>
+                    <div className="mt-3"/>
+                    <ListView
+                        listData={inactiveVaccines}
+                        onRegisterBtnClick={() => {
+                            setShowForm(true);
+                            setFormData({});
+                        }}
+                        title="Inactive Vaccines"
+                        buttonTitle=""
+                        showDetails={false}
+                        onActiveSwitchClick={onEdit}
+                        setSelectedData={
+                            (data) => {
+                                setFormData({...data, edited: true});
+                                setShowForm(true)
+                            }
+                        }
+                    /></>}
+                {blockedVaccines.length > 0 && <>
+                    <div className="mt-3"/>
+                    <ListView
+                        listData={blockedVaccines}
+                        onRegisterBtnClick={() => {
+                            setShowForm(true);
+                            setFormData({});
+                        }}
+                        title="Blocked Vaccines"
+                        buttonTitle=""
+                        showDetails={false}
+                        onActiveSwitchClick={onEdit}
+                        setSelectedData={
+                            (data) => {
+                                setFormData({...data, edited: true});
+                                setShowForm(true)
+                            }
+                        }
+                    />
+                </>}
             </div>}
         </div>
     );
