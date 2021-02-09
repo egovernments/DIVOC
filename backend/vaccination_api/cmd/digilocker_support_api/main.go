@@ -4,7 +4,9 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/flate"
+	"context"
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"github.com/divoc/api/config"
@@ -12,6 +14,7 @@ import (
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
+	"github.com/go-redis/redis/v8"
 	"github.com/gorilla/mux"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promauto"
@@ -42,6 +45,9 @@ const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
 const YYYYMMDD = "2006-01-02"
+
+const DEFAULT_DUE_DATE_N_DAYS = 28
+
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "divoc_http_request_duration_milliseconds",
@@ -49,6 +55,7 @@ var (
 	})
 )
 
+var ctx = context.Background()
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -110,8 +117,8 @@ type Certificate struct {
 	} `json:"proof"`
 }
 
-func getVaccineValidDays(start string,end string) string {
-	days := 28
+func getVaccineValidDays(start string, end string) string {
+	days := DEFAULT_DUE_DATE_N_DAYS
 	startDate, err := time.Parse(YYYYMMDD, start)
 	if err == nil {
 		endDate, err := time.Parse(YYYYMMDD, end)
@@ -373,6 +380,49 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("GET PDF HANDLER REQUEST")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
+	signedJson, err := getSignedJson(preEnrollmentCode)
+
+	if err != nil {
+		log.Infof("Error %+v", err)
+		w.WriteHeader(500)
+		publishEvent(preEnrollmentCode, InternalFailedEvent, "Internal error")
+		return
+	}
+
+	if signedJson != "" {
+		if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+			log.Errorf("Error in creating certificate pdf")
+			publishEvent(preEnrollmentCode, InternalFailedEvent, "Error in creating pdf")
+		} else {
+			w.WriteHeader(200)
+			_, _ = w.Write(pdfBytes)
+			publishEvent(preEnrollmentCode, InternalSuccessEvent, "Certificate found")
+			return
+		}
+	} else {
+		log.Errorf("No certificates found for request %v", preEnrollmentCode)
+		w.WriteHeader(404)
+		publishEvent(preEnrollmentCode, InternalFailedEvent, "Certificate not found")
+	}
+
+	publishEvent(preEnrollmentCode, InternalFailedEvent, "Unknown")
+}
+
+var rdb = redis.NewClient(&redis.Options{
+	Addr:     config.Config.Redis.Url,
+	Password: config.Config.Redis.Password,
+	DB:       config.Config.Redis.DB,
+})
+
+func getSignedJson(preEnrollmentCode string) (string, error) {
+	if cachedCertificate, err := rdb.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+		log.Infof("Error while looking up cache %+v", err)
+	} else {
+		if cachedCertificate != "" {
+			//log.Infof("Got certificate from cache %s", preEnrollmentCode)
+			return cachedCertificate, nil
+		}
+	}
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
@@ -381,31 +431,14 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
-			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
-				log.Errorf("Error in creating certificate pdf")
-				publishEvent(preEnrollmentCode, InternalFailedEvent, "Error in creating pdf")
-			} else {
-				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
-				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-				//w.Header().Set("Content-Length", string(len(pdfBytes)))
-				w.WriteHeader(200)
-				_, _ = w.Write(pdfBytes)
-				publishEvent(preEnrollmentCode, InternalSuccessEvent, "Certificate found")
-				return
-			}
+			return signedJson, nil
 		} else {
-			log.Errorf("No certificates found for request %v", preEnrollmentCode)
-			w.WriteHeader(404)
-			publishEvent(preEnrollmentCode, InternalFailedEvent, "Certificate not found")
-			return
+			return "", nil
 		}
 	} else {
-		log.Infof("Error %+v", err)
-		w.WriteHeader(500)
-		publishEvent(preEnrollmentCode, InternalFailedEvent, "Internal error")
-		return
+		log.Errorf("Error in accessing registery %+v", err)
+		return "", errors.New("Internal error")
 	}
-	publishEvent(preEnrollmentCode, InternalFailedEvent, "Unknown")
 }
 
 func publishEvent(preEnrollmentCode string, typeOfEvent string, info string) {
@@ -436,7 +469,6 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	return certificateFromRegistry, err
 }
-
 
 func timed(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

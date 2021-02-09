@@ -65,6 +65,11 @@ var Config = struct {
 		Port     string `default:"5432" yaml:"port" env:"DB_PORT"`
 		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
+	Redis struct {
+		Url 		string `env:"REDIS_URL"`
+		Password 	string `default:"" env:"REDIS_PASSWORD"`
+		DB          int `default:"0" env:"REDIS_DB"`
+	}
 	Certificate struct {
 		Upload struct {
 			Columns string `yaml:"columns"`
