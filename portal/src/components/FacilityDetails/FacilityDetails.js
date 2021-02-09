@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, resetFilter
+                             status, setStatus, resetFilter, updateFacilityProgramStatus, countryName
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
@@ -107,11 +107,15 @@ function FacilityDetails({
                 //registry update in ES happening async, so calling search immediately will not get back actual data
                 // setTimeout(() => fetchFacilities(), 1000)
             });
-    }
+    };
+
+    const numberOfFacilities = facilities.filter(facility => facility.isChecked).length;
+
     return (
         <div className={"row"}>
             <div className="col-sm-3">
                 <FacilityFilterTab
+                    countryName={countryName}
                     programs={programs}
                     selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
@@ -147,10 +151,12 @@ function FacilityDetails({
                 </FacilityFilterTab>
             </div>
 
-            <div className={"col-sm-6 container table"}>
+            <div className={"col-sm-6 pad-1rem table"}>
                 {!showCard ?
                 <div>
-                    <p className={"highlight"}>{selectedDistrict.join(", ")} facilties</p>
+                    <p className={"highlight"}>
+                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                    </p>
                     <table className={"table table-hover table-data"}>
                         <thead>
                         <tr>
@@ -179,16 +185,20 @@ function FacilityDetails({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
 
             <div className="col-sm-3 container">
                 <div className={"card card-continer"}>
                     {selectedProgram && <div className="card-body text-center">
-                        <p>
-                            Notify {facilities.filter(facility => facility.isChecked).length} facilities for the {selectedProgram}
-                        </p>
+                        {(numberOfFacilities>0)?
+                            <p>Notify {numberOfFacilities} facilities for the {selectedProgram}</p>
+                          :<p>Please select one or more facilities.</p>
+                        }
                         <button
                             onClick={() => handleNotifyClick()}
                             className={"button"}

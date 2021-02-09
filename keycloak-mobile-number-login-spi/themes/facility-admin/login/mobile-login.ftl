@@ -23,7 +23,7 @@
                           action="${url.loginAction}" method="post">
                         <div class="input-wrapper">
                             <div class="input-field mobile">
-                                <label for="mobile_number" class="mobile-prefix">+91</label>
+<#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
                                        name="mobile_number"

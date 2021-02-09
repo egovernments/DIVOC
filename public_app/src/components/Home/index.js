@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {Link, useHistory} from "react-router-dom";
 import CertificateSmallImg from '../../assets/img/certificate-small.svg'
 import CenterSmallImg from '../../assets/img/center-small.svg'
@@ -14,6 +14,7 @@ import "./index.css";
 import 'pure-react-carousel/dist/react-carousel.es.css';
 import {Col, Row} from "react-bootstrap";
 import {CustomButton} from "../CustomButton";
+import {useKeycloak} from "@react-keycloak/web";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
     <Col lg={3}>
@@ -38,6 +39,12 @@ const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassN
 
 export const Home = () => {
     const history = useHistory();
+    const {keycloak} = useKeycloak();
+    useEffect(() => {
+        if(keycloak.authenticated) {
+            keycloak.logout()
+        }
+    }, []);
     return (
         <div className="home-section">
             <div className="section ">

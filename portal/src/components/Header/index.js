@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Navbar from "react-bootstrap/Navbar";
 import NavbarLogo from "../../assets/img/nav-logo.png";
 import "./index.css";
@@ -7,15 +7,18 @@ import NavDropdown from "react-bootstrap/NavDropdown";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
 import config from "../../config";
+import {useSelector} from "react-redux";
 
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
+    const logo = useSelector(state => state.flagr.appConfig.applicationLogo);
+
     return (
         <Navbar fixed="top" bg="white">
             <Navbar.Brand href="/">
                 <img
-                    src={NavbarLogo}
-                    width="200"
+                    src={logo ? logo : NavbarLogo}
+                    height="28"
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />

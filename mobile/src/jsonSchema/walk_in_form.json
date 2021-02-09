@@ -56,20 +56,20 @@
       "$id": "#/properties/phone",
       "format": "phone-in"
     },
-    "addressLine1": {
-      "$id": "#/properties/addressLine1",
+    "state": {
+      "$id": "#/properties/state",
       "type": "string",
-      "title": "Locality"
+      "title": "State"
     },
     "district": {
       "$id": "#/properties/district",
       "type": "string",
       "title": "District"
     },
-    "state": {
-      "$id": "#/properties/state",
+    "addressLine1": {
+      "$id": "#/properties/addressLine1",
       "type": "string",
-      "title": "State"
+      "title": "Locality"
     },
     "pincode": {
       "$id": "#/properties/pincode",

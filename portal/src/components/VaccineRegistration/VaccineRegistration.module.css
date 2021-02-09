@@ -1,17 +1,16 @@
 .container{
-    display: flex;
+    height: 75vh;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    margin: 2% 2rem 0;
+    border-radius: 1rem;
+    overflow: auto;
 }
 .form-container{
-    width: 50%;
-    padding:  50px;
-    box-shadow: 0px 6px 20px #C1CFD933;
-    margin-right: 1rem;
+    padding:  2rem;
 }
 
 .sub-container{
-    width: 100%;
-    padding:  50px;
-    box-shadow: 0px 6px 20px #C1CFD933;
+   padding: 2rem;
 }
 
 .heading{
@@ -39,4 +38,15 @@
 .list-title{
     color: #1D1D1D;
     font-weight: 600;
+}
+
+.form-container>form>div>fieldset{
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.form-container>form>div>fieldset>div{
+    padding-right: 2rem;
 }

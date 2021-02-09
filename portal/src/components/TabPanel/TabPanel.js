@@ -36,8 +36,8 @@ export const StyledTab = withStyles((theme) => ({
 export const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
-        paddingLeft: theme.spacing(10),
-        paddingRight: theme.spacing(10),
+        paddingLeft: theme.spacing(1),
+        paddingRight: theme.spacing(1),
         paddingTop: theme.spacing(3),
     },
 }));

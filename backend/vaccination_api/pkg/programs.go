@@ -12,13 +12,13 @@ import (
 type ProgramsRegistryResponse struct {
 	EndDate     string        `json:"endDate"`
 	Type        string        `json:"@type"`
-	OsCreatedAt time.Time     `json:"_osCreatedAt"`
-	OsUpdatedBy string        `json:"_osUpdatedBy"`
+	OsCreatedAt time.Time     `json:"osCreatedAt"`
+	OsUpdatedBy string        `json:"osUpdatedBy"`
 	Name        string        `json:"name"`
 	Description string        `json:"description"`
 	Osid        string        `json:"osid"`
-	OsCreatedBy string        `json:"_osCreatedBy"`
-	OsUpdatedAt time.Time     `json:"_osUpdatedAt"`
+	OsCreatedBy string        `json:"osCreatedBy"`
+	OsUpdatedAt time.Time     `json:"osUpdatedAt"`
 	MedicineIds []interface{} `json:"medicineIds"`
 	StartDate   string        `json:"startDate"`
 }
@@ -31,7 +31,7 @@ func findProgramsByName(programNames []string) []*models.Program {
 			"or": programNames,
 		},
 		"status": map[string]interface{}{
-			"eq": "active",
+			"eq": "Active",
 		},
 		"startDate": map[string]interface{}{
 			"lte": time.Now().Format("2006-01-02"),
@@ -40,7 +40,7 @@ func findProgramsByName(programNames []string) []*models.Program {
 			"gte": time.Now().Format("2006-01-02"),
 		},
 	}
-	if programs, err := services.QueryRegistry(typeId, filter); err != nil {
+	if programs, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
 		log.Errorf("Error in getting programs for the facility")
 	} else {
 		log.Infof("Programs %+v", programs)

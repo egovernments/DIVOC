@@ -114,6 +114,6 @@
 
     "indexFields": ["code","name"],
     "uniqueIndexFields": ["code"],
-    "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }
