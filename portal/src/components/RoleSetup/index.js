@@ -361,8 +361,8 @@ const StaffProgramRate = (props) => {
 
                                             {
                                                 (limit.programName === "" ? newPrograms : props.programs).map((program, index) => (
-                                                    <MenuItem value={program.id}
-                                                              name={program.id}>{program.id}</MenuItem>
+                                                    <MenuItem value={program.programId}
+                                                              name={program.programId}>{program.programId}</MenuItem>
 
                                                 ))
                                             }

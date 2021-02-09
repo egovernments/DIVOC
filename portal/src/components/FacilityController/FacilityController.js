@@ -13,7 +13,7 @@ const defaultState = {
     selectedState: CONSTANTS.ALL,
     selectedDistrict: [],
     facilityType: CONSTANTS.GOVT,
-    status: "",
+    status: CONSTANTS.ACTIVE,
     lastAdjustedOn: ""
 };
 
@@ -45,7 +45,7 @@ function FacilityController() {
         setFacilities([]);
         setDistricts([]);
     }
-
+ 
     function setSelectedState(value) {
         setFilter({
             ...filter,
@@ -91,6 +91,25 @@ function FacilityController() {
             lastAdjustedOn: value
         })
 
+    }
+
+    function updateFacilityProgramStatus(facilities, newStatus) {
+        if (selectedProgram && facilities.length > 0) {
+            let updateFacilities = [];
+            facilities.forEach(facility => {
+                let programs = [{
+                    id: selectedProgram,
+                    status: newStatus
+                }];
+                updateFacilities.push({osid: facility.osid, programs})
+            });
+            axiosInstance.current
+                .put(API_URL.FACILITY_API, updateFacilities)
+                .then((res) => {
+                    //registry update in ES happening async, so calling search immediately will not get back actual data
+                    setTimeout(() => fetchFacilities(), 2000);
+                });
+        }
     }
 
     function fetchFacilities() {
@@ -182,6 +201,7 @@ function FacilityController() {
                             setStatus={setStatus}
                             fetchFacilities={fetchFacilities}
                             resetFilter={resetFilter}
+                            updateFacilityProgramStatus={updateFacilityProgramStatus}
                         />
                     ),
                 },
@@ -202,11 +222,12 @@ function FacilityController() {
                             setSelectedProgram={setSelectedProgram}
                             facilityType={facilityType}
                             setFacilityType={setFacilityType}
-                            setStatus={setStatus}
+                            status={status}
                             fetchFacilities={fetchFacilities}
                             lastAdjustedOn={lastAdjustedOn}
                             setLastAdjustedOn={setLastAdjustedOn}
                             resetFilter={resetFilter}
+                            updateFacilityProgramStatus={updateFacilityProgramStatus}
                         />
                     ),
                 },
@@ -231,6 +252,7 @@ function FacilityController() {
                             setStatus={setStatus}
                             fetchFacilities={fetchFacilities}
                             resetFilter={resetFilter}
+                            updateFacilityProgramStatus={updateFacilityProgramStatus}
                         />
                     ),
                 },

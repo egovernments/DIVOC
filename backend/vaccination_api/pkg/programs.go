@@ -44,27 +44,30 @@ func findProgramsByName(programNames []string) []*models.Program {
 		log.Errorf("Error in getting programs for the facility")
 	} else {
 		log.Infof("Programs %+v", programs)
-		programsList := programs[typeId].([]interface{})
-		programsResult := []*models.Program{}
-		for _, object := range programsList {
-			p := object.(map[string]interface{})
-			medicines := []*models.ProgramMedicinesItems0{}
-			for _, medicineId := range p["medicineIds"].([]interface{}) {
-				medicine, _ := getMedicine(medicineId.(string))
-				log.Info(medicine)
-				medicines = append(medicines, medicine)
+		if val, ok := programs[typeId]; ok {
+			if programsList, ok := val.([]interface{}); ok {
+				var programsResult []*models.Program
+				for _, object := range programsList {
+					p := object.(map[string]interface{})
+					var medicines []*models.ProgramMedicinesItems0
+					for _, medicineId := range p["medicineIds"].([]interface{}) {
+						medicine, _ := getMedicine(medicineId.(string))
+						log.Info(medicine)
+						medicines = append(medicines, medicine)
+					}
+					programsResult = append(programsResult,
+						&models.Program{
+							ID:          valueOf(p, "osid"),
+							Description: valueOf(p, "description"),
+							LogoURL:     valueOf(p, "logoURL"),
+							Medicines:   medicines,
+							Name:        valueOf(p, "name"),
+						},
+					)
+				}
+				return programsResult
 			}
-			programsResult = append(programsResult,
-				&models.Program{
-					ID:          valueOf(p, "osid"),
-					Description: valueOf(p, "description"),
-					LogoURL:     valueOf(p, "logoURL"),
-					Medicines:   medicines,
-					Name:        valueOf(p, "name"),
-				},
-			)
 		}
-		return programsResult
 	}
 	return nil
 }

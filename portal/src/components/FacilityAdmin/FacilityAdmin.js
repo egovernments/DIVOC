@@ -7,6 +7,7 @@ import "./FacilityAdmin.css"
 import {Button, Col, Row} from "react-bootstrap";
 import {RoleSetup} from "../RoleSetup"
 import Vaccinators from "../facility/Vaccinators/Vaccinators";
+import ProgramOverview from "../ProgramOverview";
 
 
 export default function FacilityAdmin() {
@@ -28,8 +29,7 @@ export default function FacilityAdmin() {
             },
             {title: "Role Setup", component: <RoleSetup/>},
             {title: "Vaccinator Details", component: <Vaccinators/>},
-            // {title: "Program Overview", component: <span>Program Overview</span>},
-
+            {title: "Program Overview", component: <ProgramOverview/>},
         ]}/>
     );
 }

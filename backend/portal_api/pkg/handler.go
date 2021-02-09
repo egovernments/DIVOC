@@ -2,6 +2,10 @@ package pkg
 
 import (
 	"encoding/json"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
@@ -12,15 +16,12 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 const StateKey = "address.state"
 const DistrictKey = "address.district"
 const TypeKey = "category"
-const ProgramIdKey = "programs.id"
+const ProgramIdKey = "programs.programId"
 const ProgramStatusKey = "programs.status"
 const FacilityCodeKey = "facilityCode"
 const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
@@ -52,8 +53,10 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
 	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
-	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandler)
+	api.UpdateVaccinatorsHandler = operations.UpdateVaccinatorsHandlerFunc(updateVaccinatorsHandlerV2)
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
+	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
+	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
 }
 
 type GenericResponse struct {
@@ -247,6 +250,54 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 	return kernelService.MakeRegistryCreateRequest(requestMap, objectId)
 }
 
+
+func updateProgramsHandler(params operations.UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
+	log.Infof("Update Program %+v", params.Body)
+	objectId := "Program"
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		return operations.NewUpdateProgramBadRequest()
+	}
+	requestMap := make(map[string]interface{})
+	err = json.Unmarshal(requestBody, &requestMap)
+	if err != nil {
+		log.Info(err)
+		return NewGenericServerError()
+	}
+	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateProgramBadRequest()
+	} else {
+		log.Print(resp)
+		return NewGenericStatusOk()
+	}
+}
+
+
+func updateMedicineHandler(params operations.UpdateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
+	log.Infof("Update Medicine %+v", params.Body)
+	objectId := "Medicine"
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		return operations.NewUpdateMedicineBadRequest()
+	}
+	requestMap := make(map[string]interface{})
+	err = json.Unmarshal(requestBody, &requestMap)
+	if err != nil {
+		log.Info(err)
+		return NewGenericServerError()
+	}
+	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateMedicineBadRequest()
+	} else {
+		log.Print(resp)
+		return NewGenericStatusOk()
+	}
+}
+
 func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *models.JWTClaimBody) middleware.Responder {
 	columns := strings.Split(config.Config.PreEnrollment.Upload.Columns, ",")
 	log.Println(columns)
@@ -383,60 +434,8 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			facilities := searchRespone["Facility"].([]interface{})
 			if len(facilities) > 0 {
 				facility := facilities[0].(map[string]interface{})
-				currentPrograms := facility["programs"].([]interface{})
-				var programsTobeUpdated []map[string]interface{}
-				updateFacility := map[string]interface{}{
-					"osid":     updateRequest.Osid,
-					"programs": []interface{}{},
-				}
-				if len(currentPrograms) == 0 {
-					for _, program := range updateRequest.Programs {
-						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-							"id":              program.ID,
-							"status":          program.Status,
-							"rate":            program.Rate,
-							"statusUpdatedAt": time.Now().Format(time.RFC3339),
-							"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-						})
-					}
-				} else {
-					for _, obj := range currentPrograms {
-						facilityProgram := obj.(map[string]interface{})
-						programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
-					}
-					for _, updateProgram := range updateRequest.Programs {
-						existingProgram := false
-						for _, facilityProgram := range programsTobeUpdated {
-							if updateProgram.ID == facilityProgram["id"].(string) {
-								if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
-									facilityProgram["status"] = updateProgram.Status
-									facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
-									services.NotifyFacilityUpdate("status", updateProgram.Status,
-										facility["contact"].(string), facility["email"].(string))
-								}
-								if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
-									facilityProgram["rate"] = updateProgram.Rate
-									facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
-									services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
-										facility["contact"].(string), facility["email"].(string))
-								}
-								existingProgram = true
-							}
-						}
-						if !existingProgram {
-							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-								"id":              updateProgram.ID,
-								"status":          updateProgram.Status,
-								"rate":            updateProgram.Rate,
-								"statusUpdatedAt": time.Now().Format(time.RFC3339),
-								"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-							})
-						}
-					}
-
-				}
-				updateFacility["programs"] = programsTobeUpdated
-				resp, err := kernelService.UpdateRegistry("Facility", updateFacility)
+				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
+				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
 				} else {
@@ -448,6 +447,76 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 		}
 	}
 	return operations.NewUpdateFacilitiesOK()
+}
+
+func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *models.FacilityUpdateRequestItems0) map[string]interface{} {
+	currentPrograms := facility["programs"].([]interface{})
+	var programsTobeUpdated []map[string]interface{}
+	updateFacility := map[string]interface{}{
+		"osid":     updateRequest.Osid,
+		"programs": []interface{}{},
+	}
+	if len(currentPrograms) == 0 {
+		for _, program := range updateRequest.Programs {
+			var schedule interface{} = struct{}{}
+			if program.Schedule != nil {
+				schedule = program.Schedule
+			}
+			programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+				"programId":       program.ID,
+				"status":          program.Status,
+				"rate":            program.Rate,
+				"statusUpdatedAt": time.Now().Format(time.RFC3339),
+				"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+				"schedule":        schedule,
+			})
+		}
+	} else {
+		for _, obj := range currentPrograms {
+			facilityProgram := obj.(map[string]interface{})
+			programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
+		}
+		for _, updateProgram := range updateRequest.Programs {
+			existingProgram := false
+			for _, facilityProgram := range programsTobeUpdated {
+				if updateProgram.ID == facilityProgram["programId"].(string) {
+					if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
+						facilityProgram["status"] = updateProgram.Status
+						facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+						services.NotifyFacilityUpdate("status", updateProgram.Status,
+							facility["contact"].(string), facility["email"].(string))
+					}
+					if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+						facilityProgram["rate"] = updateProgram.Rate
+						facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+						services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
+							facility["contact"].(string), facility["email"].(string))
+					}
+					if updateProgram.Schedule != nil {
+						facilityProgram["schedule"] = updateProgram.Schedule
+					}
+					existingProgram = true
+					break
+				}
+			}
+			if !existingProgram {
+				newProgram := map[string]interface{}{
+					"programId":       updateProgram.ID,
+					"status":          updateProgram.Status,
+					"rate":            updateProgram.Rate,
+					"statusUpdatedAt": time.Now().Format(time.RFC3339),
+					"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+				}
+				if updateProgram.Schedule != nil {
+					newProgram["schedule"] = updateProgram.Schedule
+				}
+				programsTobeUpdated = append(programsTobeUpdated, newProgram)
+			}
+		}
+
+	}
+	updateFacility["programs"] = programsTobeUpdated
+	return updateFacility
 }
 
 func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -593,6 +662,88 @@ func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, princip
 			return operations.NewUpdateVaccinatorsBadRequest()
 		} else {
 			log.Print(resp)
+		}
+	}
+	return operations.NewUpdateVaccinatorsOK()
+}
+
+func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	for _, updateRequest := range params.Body {
+		if updateRequest.Osid == "" {
+			log.Errorf("Vaccinator update request without OSID %v", updateRequest)
+			return operations.NewUpdateVaccinatorsBadRequest()
+		}
+		searchFilter := map[string]interface{}{
+			"osid": map[string]interface{}{
+				"eq": updateRequest.Osid,
+			},
+		}
+		searchResponse, err := kernelService.QueryRegistry("Vaccinator", searchFilter)
+		if err == nil {
+			vaccinators := searchResponse["Vaccinator"].([]interface{})
+			if len(vaccinators) > 0 {
+				vaccinator := vaccinators[0].(map[string]interface{})
+				currentPrograms := vaccinator["programs"].([]interface{})
+				var programsTobeUpdated []map[string]interface{}
+				var updateVaccinator map[string]interface{}
+				e := convertStructToInterface(updateRequest, &updateVaccinator)
+				if e != nil {
+					log.Errorf("Error which converting to Interface %+v", updateRequest)
+					return NewGenericServerError()
+				}
+				if len(currentPrograms) == 0 {
+					for _, program := range updateRequest.Programs {
+						programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+							"programId":          program.ProgramID,
+							"status":             program.Status,
+							"certified":          program.Certified,
+							"statusUpdatedAt":    time.Now().Format(time.RFC3339),
+							"certifiedUpdatedAt": time.Now().Format(time.RFC3339),
+						})
+					}
+				} else {
+					for _, obj := range currentPrograms {
+						vaccinatorProgram := obj.(map[string]interface{})
+						programsTobeUpdated = append(programsTobeUpdated, vaccinatorProgram)
+					}
+					for _, updateProgram := range updateRequest.Programs {
+						existingProgram := false
+						for _, vaccinatorProgram := range programsTobeUpdated {
+							if updateProgram.ProgramID == vaccinatorProgram["programId"].(string) {
+								if updateProgram.Status != "" && updateProgram.Status != vaccinatorProgram["status"].(string) {
+									vaccinatorProgram["status"] = updateProgram.Status
+									vaccinatorProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+								if updateProgram.Certified != vaccinatorProgram["certified"].(bool) {
+									vaccinatorProgram["certified"] = updateProgram.Certified
+									vaccinatorProgram["certifiedUpdatedAt"] = time.Now().Format(time.RFC3339)
+								}
+								existingProgram = true
+							}
+						}
+						if !existingProgram {
+							programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
+								"programId":            updateProgram.ProgramID,
+								"status":               updateProgram.Status,
+								"certified":            updateProgram.Certified,
+								"statusUpdatedAt":      time.Now().Format(time.RFC3339),
+								"certifiedUpdatedAt":   time.Now().Format(time.RFC3339),
+							})
+						}
+					}
+
+				}
+				updateVaccinator["programs"] = programsTobeUpdated
+				resp, err := kernelService.UpdateRegistry("Vaccinator", updateVaccinator)
+				if err != nil {
+					log.Error(err)
+				} else {
+					log.Print(resp)
+				}
+			}
+		} else {
+			log.Errorf("Finding Vaccinator for id %s failed", updateRequest.Osid, err)
+			return operations.NewUpdateVaccinatorsBadRequest()
 		}
 	}
 	return operations.NewUpdateVaccinatorsOK()

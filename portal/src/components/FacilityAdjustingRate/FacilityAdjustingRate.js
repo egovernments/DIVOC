@@ -10,7 +10,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -41,7 +41,7 @@ function FacilityAdjustingRate({
 
     const getFacilityProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.id === selectedProgram);
+            const program = facility.programs.find(obj => obj.programId === selectedProgram);
             if (program) {
                 return program;
             }
@@ -218,7 +218,9 @@ function FacilityAdjustingRate({
             <div className={`col-sm-6 container ${styles['table']}`}>
                 {!showCard ?
                 <>
-                    <p className={styles['highlight']}>{selectedDistrict.join(", ")} facilties</p>
+                    <p className={styles['highlight']}>
+                        {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
+                    </p>
                     <table className={`table table-hover ${styles['table-data']}`}>
                         <thead>
                         <tr>
@@ -246,7 +248,10 @@ function FacilityAdjustingRate({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
             <div className="col-sm-3 container">

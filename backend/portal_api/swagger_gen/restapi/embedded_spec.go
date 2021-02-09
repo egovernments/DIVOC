@@ -583,7 +583,8 @@ func init() {
           {
             "hasRole": [
               "user",
-              "admin"
+              "admin",
+              "facility-admin"
             ]
           }
         ],
@@ -591,7 +592,7 @@ func init() {
         "operationId": "getMedicines",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Get medicine",
             "schema": {
               "type": "array",
               "items": {
@@ -599,6 +600,38 @@ func init() {
                 "$ref": "#/definitions/CreateMedicineRequest"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Update Medicine",
+        "operationId": "updateMedicine",
+        "parameters": [
+          {
+            "description": "Upadte Medicine",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateMedicineRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -614,7 +647,7 @@ func init() {
         "operationId": "createMedicine",
         "parameters": [
           {
-            "description": "Facility data in the form of csv",
+            "description": "Create Medicine",
             "name": "body",
             "in": "body",
             "schema": {
@@ -642,7 +675,8 @@ func init() {
             "hasRole": [
               "admin",
               "user",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -657,6 +691,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -1275,6 +1334,34 @@ func init() {
         }
       }
     },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateMedicineRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/CreateMedicineRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
     "UserGroup": {
       "properties": {
         "id": {
@@ -1345,14 +1432,24 @@ func init() {
           "type": "array",
           "items": {
             "type": "object",
+            "required": [
+              "certified"
+            ],
             "properties": {
               "certified": {
                 "type": "boolean",
                 "title": "if vaccinator has certificate for program"
               },
-              "id": {
+              "programId": {
                 "type": "string",
                 "title": "Id of the program"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "Active",
+                  "Inactive"
+                ]
               }
             }
           }
@@ -1382,6 +1479,9 @@ func init() {
       "type": "array",
       "items": {
         "type": "object",
+        "required": [
+          "osid"
+        ],
         "properties": {
           "averageRating": {
             "type": "number"
@@ -1396,7 +1496,8 @@ func init() {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "x-omitempty": true
           },
           "mobileNumber": {
             "type": "string",
@@ -1420,8 +1521,15 @@ func init() {
                 "certified": {
                   "type": "boolean"
                 },
-                "id": {
+                "programId": {
                   "type": "string"
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "Active",
+                    "Inactive"
+                  ]
                 }
               }
             }
@@ -2018,6 +2126,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "facility-admin",
               "user"
             ]
           }
@@ -2026,7 +2135,7 @@ func init() {
         "operationId": "getMedicines",
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Get medicine",
             "schema": {
               "type": "array",
               "items": {
@@ -2034,6 +2143,38 @@ func init() {
                 "$ref": "#/definitions/CreateMedicineRequest"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "admin"
+            ]
+          }
+        ],
+        "summary": "Update Medicine",
+        "operationId": "updateMedicine",
+        "parameters": [
+          {
+            "description": "Upadte Medicine",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/UpdateMedicineRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2049,7 +2190,7 @@ func init() {
         "operationId": "createMedicine",
         "parameters": [
           {
-            "description": "Facility data in the form of csv",
+            "description": "Create Medicine",
             "name": "body",
             "in": "body",
             "schema": {
@@ -2077,6 +2218,7 @@ func init() {
             "hasRole": [
               "admin",
               "controller",
+              "facility-admin",
               "user"
             ]
           }
@@ -2092,6 +2234,31 @@ func init() {
                 "$ref": "#/definitions/Program"
               }
             }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update program",
+        "operationId": "updateProgram",
+        "parameters": [
+          {
+            "description": "Update Vaccination Program",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/ProgramUpdateRequest"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -2746,6 +2913,34 @@ func init() {
         }
       }
     },
+    "ProgramUpdateRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/ProgramRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "UpdateMedicineRequest": {
+      "allOf": [
+        {
+          "$ref": "#/definitions/CreateMedicineRequest"
+        },
+        {
+          "properties": {
+            "osid": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
     "UserGroup": {
       "properties": {
         "id": {
@@ -2841,14 +3036,24 @@ func init() {
     },
     "VaccinatorProgramsItems0": {
       "type": "object",
+      "required": [
+        "certified"
+      ],
       "properties": {
         "certified": {
           "type": "boolean",
           "title": "if vaccinator has certificate for program"
         },
-        "id": {
+        "programId": {
           "type": "string",
           "title": "Id of the program"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },
@@ -2860,6 +3065,9 @@ func init() {
     },
     "VaccinatorUpdateRequestItems0": {
       "type": "object",
+      "required": [
+        "osid"
+      ],
       "properties": {
         "averageRating": {
           "type": "number"
@@ -2874,7 +3082,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "x-omitempty": true
         },
         "mobileNumber": {
           "type": "string",
@@ -2917,8 +3126,15 @@ func init() {
         "certified": {
           "type": "boolean"
         },
-        "id": {
+        "programId": {
           "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
         }
       }
     },
