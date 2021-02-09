@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Redirect} from "react-router";
 import {BaseFormCard} from "../BaseFormCard";
 import "./index.scss"
@@ -10,6 +10,7 @@ import schema from '../../jsonSchema/walk_in_form.json';
 import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 import config from "config.json"
+import {useSelector} from "react-redux";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -44,7 +45,15 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 
 function WalkEnrollment(props) {
-    const {state, goNext} = useWalkInEnrollment()
+    const {state, goNext} = useWalkInEnrollment();
+    const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
+    const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
+    const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
+    const [formData, setFormData] = useState(state);
+
+    useEffect(() => {
+        setStateListInSchema();
+    }, []);
 
     const customFormats = {
         'phone-in': /\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$/
@@ -53,18 +62,40 @@ function WalkEnrollment(props) {
     const uiSchema = {
         classNames: "form-container",
         phone: {
-            "ui:placeholder": "+91"
+            "ui:placeholder": countryCode
         },
     };
+
+    function setDistrictListInSchema(exisingFromData) {
+        let customeSchema = {...enrollmentSchema};
+        let districts = stateAndDistricts['states'].filter(s => s.name === exisingFromData.state)[0].districts;
+        customeSchema.properties.district.enum = districts.map(d => d.name);
+        let customData = {...exisingFromData, district: customeSchema.properties.district.enum[0]}
+        setEnrollmentSchema(customeSchema)
+        setFormData(customData)
+    }
+
+    function setStateListInSchema() {
+        let customeSchema = {...enrollmentSchema};
+        customeSchema.properties.state.enum = stateAndDistricts['states'].map(obj => obj.name);
+        setFormData({...formData, state:customeSchema.properties.state.enum[0]});
+        setEnrollmentSchema(customeSchema)
+    }
+
     return (
         <div className="new-enroll-container">
             <BaseFormCard title={"Enroll Recipient"}>
                 <div className="pt-3 form-wrapper">
                     <Form
-                        schema={schema}
+                        schema={enrollmentSchema}
                         customFormats={customFormats}
                         uiSchema={uiSchema}
-                        formData={state}
+                        formData={formData}
+                        onChange={(e) => {
+                            if (e.formData.state !== formData.state) {
+                                setDistrictListInSchema((e.formData))
+                            }
+                        }}
                         onSubmit={(e) => {
                             goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, e.formData)
                         }}

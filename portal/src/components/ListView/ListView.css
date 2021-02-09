@@ -1,10 +1,16 @@
 .list-view-card-container {
     float: left;
-    width: 40%;
+    width: 30%;
     margin: 10px 10px;
     padding: 20px;
     background-color: #f1f1f1;
     border-radius: 10px;
+    height: max-content;
+    cursor: pointer;
+}
+.cards-container{
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .list-view-card-container:nth-child(4n+1) {
@@ -23,10 +29,26 @@
     background-color: #EFF9FF;
 }
 
+.list-view-card-container:nth-child(4n+1) .list-view-logo-img{
+    color: #4CA07A;
+}
+
+.list-view-card-container:nth-child(4n+2) .list-view-logo-img{
+    color: #DE9D00;
+}
+
+.list-view-card-container:nth-child(4n+3) .list-view-logo-img{
+    color: #4E67D1;
+}
+
+.list-view-card-container:nth-child(4n+4) .list-view-logo-img{
+    color: #59BCF9;
+}
+
 
 .list-view-logo-img {
-    font-size: 10px;
-    background: white;
+    font-size: 13px;
+    background: white !important;
     border-radius: 100rem;
     width: 4rem;
     height: 4rem;
@@ -34,6 +56,7 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
 }
 
 .list-view-program-status-img {
@@ -48,6 +71,7 @@
     color: #1D1D1D;
     font-size: larger;
     font-weight: 500;
+    text-transform: capitalize;
 }
 
 .list-view-details {
@@ -74,17 +98,28 @@
 }
 
 .list-view-card-details {
-    padding-bottom: 1.5em;
+    
 }
 
 .list-view-selected-container {
-    background: #F2FAF6;
-    border-radius: 10px;
     padding: 1rem 2rem;
 }
 
 .list-selected-title {
     font-size: 14px;
+}
+.additional-details {
+    min-height: 15vh;
+    max-height: 15vh;
+    margin-top: 0.5rem;
+}
+.additional-details-card{
+    font-size: 11px;
+    margin-top: 1rem;
+    border-top: 2px solid white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .list-selected-value {
@@ -104,4 +139,28 @@
     border-radius: 6px;
     color: white;
     padding: 0.25rem 1.5rem;
+}
+
+.form-container>form>div>fieldset{
+    height: 45vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.form-container>form>div>fieldset>div{
+    padding-right: 2rem;
+}
+
+.custom-button {
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    background-color:white;
+    color: #5C9EF8;
+    margin-top: 15px;
+    padding: 0.25rem 1.5rem;
+}
+
+.custom-switch{
+    z-index: 9;
 }

@@ -11,7 +11,6 @@ import Collapse from "@material-ui/core/Collapse";
 import Box from "@material-ui/core/Box";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
-import TextField from "@material-ui/core/TextField";
 import styles from "./SearchVaccinatorResults.module.css";
 import {API_URL} from "../../../utils/constants";
 import {useAxios} from "../../../utils/useAxios";
@@ -115,30 +114,29 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                         <Collapse in={open} timeout="auto" unmountOnExit>
                             <Box margin={1}>
                                 <div className={classes.root}>
-                                    <div className="container">
-                                        <Typography variant="h6" gutterBottom component="div">
-                                            Personal Details
-                                        </Typography>
-                                        <div className="row">
-                                            {
-                                                PersonalDetailsFields.map(pd => (
-                                                    <div>
-                                                        <TextField
-                                                            id="filled-read-only-input"
-                                                            label={pd.label}
-                                                            defaultValue={row[pd.value]}
-                                                            InputProps={{
-                                                                readOnly: true,
-                                                            }}
-                                                            variant="filled"
-                                                        />
-                                                    </div>
-                                                ))
-                                            }
-                                        </div>
+                                    <Typography variant="h6" gutterBottom component="div">
+                                        Personal Details
+                                    </Typography>
+                                    <div className="row">
+                                        {
+                                            PersonalDetailsFields.map(pd => (
+                                                <div className={styles['popup-vaccinator-fields']}>
+                                                    <label htmlFor="filled-read-only-input">
+                                                        {pd.label}
+                                                    </label>
+                                                    <input
+                                                        className="form-control"
+                                                        value = {row[pd.value]}
+                                                        type="text"
+                                                        id="filled-read-only-input"
+                                                        disabled
+                                                    />
+                                                </div>
+                                            ))
+                                        }
                                     </div>
                                     { (row.programs && row.programs.length > 0) &&
-                                        <div className="container">
+                                        <>
                                             <Typography variant="h6" gutterBottom component="div">
                                                 Training & Certification
                                             </Typography>
@@ -146,58 +144,59 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                                                 row.programs &&
                                                     row.programs.map(p => (
                                                         <div className="row">
-                                                            <div>
-                                                                <TextField
+                                                            <div className={styles['popup-vaccinator-fields']}>
+                                                                <label htmlFor="filled-read-only-input">
+                                                                    Program
+                                                                </label>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value = {p.programId}
+                                                                    type="text"
                                                                     id="filled-read-only-input"
-                                                                    label="Program"
-                                                                    defaultValue={p.programId}
-                                                                    InputProps={{
-                                                                        readOnly: true,
-                                                                    }}
-                                                                    variant="filled"
+                                                                    disabled
                                                                 />
                                                             </div>
-                                                            <div>
-                                                                <TextField
+                                                            <div className={styles['popup-vaccinator-fields']}>
+                                                                <label htmlFor="filled-read-only-input">
+                                                                    Certification
+                                                                </label>
+                                                                <input
+                                                                    className="form-control"
+                                                                    value = {p.certified ? "Certified": "Not Certified"}
+                                                                    type="text"
                                                                     id="filled-read-only-input"
-                                                                    label="Certification"
-                                                                    defaultValue={p.certified ? "Certified": "Not Certified"}
-                                                                    InputProps={{
-                                                                        readOnly: true,
-                                                                    }}
-                                                                    variant="filled"
+                                                                    disabled
                                                                 />
                                                             </div>
                                                         </div>
                                                     ))
                                             }
-                                        </div>
+                                        </>
                                     }
-                                    <div className="container">
+                                    <>
                                         <Typography variant="h6" gutterBottom component="div">
                                             Associated Facilities
                                         </Typography>
                                         <div className="row">
                                             {
                                                 row.facilityIds.map(r => (
-                                                    <div>
-                                                        <TextField
+                                                    <div className={styles['popup-vaccinator-fields']}>
+                                                        <label htmlFor="filled-read-only-input">
+                                                            Facility Code
+                                                        </label>
+                                                        <input
+                                                            className="form-control"
+                                                            value = {r}
+                                                            type="text"
                                                             id="filled-read-only-input"
-                                                            label="facility Code"
-                                                            defaultValue={r}
-                                                            InputProps={{
-                                                                readOnly: true,
-                                                            }}
-                                                            variant="filled"
+                                                            disabled
                                                         />
                                                     </div>
                                                 ))
                                             }
                                         </div>
-                                    </div>
-                                    <div className="container">
-                                        <button className={styles['add-vaccinator-button']} onClick={() => addVaccinator(row)} >ADD VACCINATOR</button>
-                                    </div>
+                                    </>
+                                    <button className={styles['add-vaccinator-button']} onClick={() => addVaccinator(row)} >ADD VACCINATOR</button>
                                 </div>
                             </Box>
                         </Collapse>

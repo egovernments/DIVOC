@@ -1,55 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import "./DetailsCard.css";
+import Container from 'react-bootstrap/Container';
+import Row from 'react-bootstrap/Row';
+import Col from 'react-bootstrap/Col';
+import Button from "@material-ui/core/Button";
+import AddAdminIcon from "../../assets/img/add-admin.svg";
+import { CONSTANTS} from "../../utils/constants";
+import {Header} from "../Header";
+import FacilityForm from "../FacilityForm/FacilityForm";
 
-function DetailsCard({ showCard, setShowCard, data }) {
-    console.log("data", data);
+
+
+function DetailsCard({ showCard, setShowCard, facility, setFacility,status, updateFacilityProgramStatus }) {
+    console.log("data", facility);
+    const [editAdmin, setEditAdmin] = useState(false);  
+    const getInputClass = () => {
+        return editAdmin ? "enabled" : "disabled"
+    }
+
     const box = () => {
-        return (
-            <div >
-                <div className="d-flex box-header">
-                    {data.facilityName}
-                    <button className="p-2 ml-auto button" onClick={() => setShowCard(!showCard)}>Back</button>
-                </div>
-                <div className="table-container">
-                    <table className="table table-borderless">
-                        <tbody>
-                            <tr>
-                                <td><b>Address</b></td>
-                                <td>{data.address.addressLine1 + "," + data.address.addressLine2 + "," + data.address.district + "," + data.address.state}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Contact Landline Number</b></td>
-                                <td>{data.contact}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Business registration license Number</b></td>
-                            </tr>
-                            <tr>
-                                <td><b>Lat/Long geo location</b></td>
-                                <td>{data.geoLocation}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Category Type</b></td>
-                                <td>{data.category}</td>
-                            </tr>
-                            <tr>
-                                <td><b>On-going Vaccination Programs</b></td>
-                                <td>{data.programs[0].id}<br/>{data.operatingHourStart} - {data.operatingHourEnd}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Administrator Details</b></td>
-                                <td>{data.admins[0].name}<br/>{data.admins[0].mobileNumber}</td>
-                            </tr>
-                            <tr>
-                                <td><b>Centre Seal</b></td>
-                            </tr>
-                            <tr>
-                                <td><b>Centre Profile Image</b></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        return (<React.Fragment>
+            <Row>
+                <Col style={{"marginTop": "10px"}}><h4>{facility.facilityName}</h4></Col>
+                <Col style={{"textAlign": "right"}}>
+                <Button className="mr-2 blue-btn" variant="outlined" color="primary"
+                    onClick={() => setShowCard(!showCard)}>
+                    BACK
+                </Button>
+                </Col>
+            </Row>
+            <FacilityForm facility={facility} setFacility={setFacility}/>
+            {status===CONSTANTS.ACTIVE && <Button 
+                         className="mr-2 blue-btn" variant="outlined" color="primary" 
+                         style={{"marginTop": "10px"}}
+                         onClick={()=>{updateFacilityProgramStatus([facility], CONSTANTS.IN_ACTIVE)}}>
+                         DELIST FACILITY
+            </Button>}
+            </React.Fragment>
         );
     };
     return <div>{showCard ? box() : ""}</div>;

@@ -15,15 +15,15 @@ const dummyTableData = [
             "tel:9880414887"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Aditi Musunur\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.6   46Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T14:41:49.497Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T14:41:49.497Z",
         "name": "Aditi Musunur",
         "gender":"Female",
         "receiptId": 1,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-4370f6c9-350a-4287-afed-9a1c57479d8c",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T14:41:49.497Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T14:41:49.497Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -33,15 +33,15 @@ const dummyTableData = [
             "tel:9880414887"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Savitri Morar\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T14:40:18.971Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T14:40:18.971Z",
         "name": "Savitri Morar",
         "gender":"Female",
         "receiptId": 2,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-e41597a4-43bb-4de3-b1d0-55faf4c65849",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T14:40:18.971Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T14:40:18.971Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -51,15 +51,15 @@ const dummyTableData = [
             "tel:9880414887"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Sonam Sankaran\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T14:42:22.571Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T14:42:22.571Z",
         "name": "Sonam Sankaran",
         "gender":"Female",
         "receiptId": 3,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-06380349-819b-468e-816a-e7994c6dad98",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T14:42:22.571Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T14:42:22.571Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -69,15 +69,15 @@ const dummyTableData = [
             "tel:9880414887"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414887\"],\"dob\":\"1995-11-30\",\"gender\":\"Male\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343321\",\"name\":\"Bdya Mitra\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:08.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T12:02:44.541Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T12:02:44.541Z",
         "name": "Bdya Mitra",
         "gender":"Male",
         "receiptId": 4,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-5d012f81-122a-4271-ba32-f23b7edd204b",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T12:02:44.541Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T12:02:44.541Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -87,15 +87,15 @@ const dummyTableData = [
             "tel:9880414888"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414888\"],\"dob\":\"1990-11-30\",\"gender\":\"Female\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Chaya Mitra\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T14:45:45.141Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T14:45:45.141Z",
         "name": "Chaya Mitra",
         "gender":"Female",
         "receiptId": 5,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-b8cd331d-239d-4fbc-bba0-6595cbda7c33",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T14:45:45.141Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T14:45:45.141Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -105,15 +105,15 @@ const dummyTableData = [
             "tel:9880414889"
         ],
         "certificate": "{\"facility\":{\"address\":{\"addressLine1\":\"123, Koramangala\",\"district\":\"Bengaluru South\",\"state\":\"Karnataka\"},\"name\":\"ABC Medical Center\"},\"preEnrollmentCode\":\"12346\",\"recipient\":{\"contact\":[\"tel:9880414889\"],\"dob\":\"1990-11-30\",\"gender\":\"Male\",\"identity\":\"did:in.gov.uidai.aadhaar:2342343334\",\"name\":\"Ravi Murthy\"},\"vaccination\":{\"batch\":\"MB3428BX\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"manufacturer\":\"COVPharma\",\"name\":\"CoVax\"},\"vaccinator\":{\"name\":\"Sooraj Singh\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-02T15:20:59.712Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-02T15:20:59.712Z",
         "name": "Ravi Murthy",
         "gender":"Male",
         "receiptId": 6,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-9381e683-45bb-424c-a5d9-26cb2bbbc0cc",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-02T15:20:59.712Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-02T15:20:59.712Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -123,15 +123,15 @@ const dummyTableData = [
             9876541101
         ],
         "certificate": "{\"preEnrollmentCode\":\"63237\",\"recipient\":{\"contact\":[\"9876541101\"],\"dob\":\"1980-05-01\",\"gender\":\"Female\",\"name\":\"Jaya P\"},\"vaccination\":{\"batch\":\"123123\",\"date\":\"2020-12-02T09:44:03.802Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2020-12-02\",\"manufacturer\":\"string\",\"name\":\"TOD0\"},\"vaccinator\":{\"name\":\"Vaidya Acharya\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-03T07:44:41.179Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-03T07:44:41.179Z",
         "name": "Jaya P",
         "gender":"Female",
         "receiptId": 7,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-463abb24-1c63-4cc3-b18e-f23c7b9efd13",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-03T07:44:41.179Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-03T07:44:41.179Z"
     },
     {
         "@type": "VaccinationCertificate",
@@ -141,15 +141,15 @@ const dummyTableData = [
             9876541101
         ],
         "certificate": "{\"preEnrollmentCode\":\"63237\",\"recipient\":{\"contact\":[\"9876541101\"],\"dob\":\"1980-05-01\",\"gender\":\"Female\",\"name\":\"Sakshi R\"},\"vaccination\":{\"batch\":\"123123\",\"date\":\"2020-12-02T09:44:03.802Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2020-12-02\",\"manufacturer\":\"string\",\"name\":\"TOD0\"},\"vaccinator\":{\"name\":\"Vaidya Acharya\"}}",
-        "_osUpdatedBy": "",
-        "_osCreatedAt": "2020-12-03T07:46:34.187Z",
+        "osUpdatedBy": "",
+        "osCreatedAt": "2020-12-03T07:46:34.187Z",
         "name": "Sakshi R",
         "gender":"Female",
         "receiptId": 8,
         "date":"2020-12-02T19:21:18.6",
         "osid": "1-11979d36-1119-4123-b2bb-9784a87e994e",
-        "_osCreatedBy": "",
-        "_osUpdatedAt": "2020-12-03T07:46:34.187Z"
+        "osCreatedBy": "",
+        "osUpdatedAt": "2020-12-03T07:46:34.187Z"
     }
 ]
 

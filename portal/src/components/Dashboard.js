@@ -61,7 +61,7 @@ export default function Dashboard() {
                     return (<tr>
                             <td>{operator['OperatorName']}</td>
                             <td>{operator['serialNum']}</td>
-                            <td>{operator['_osUpdatedAt']}</td>
+                            <td>{operator['osUpdatedAt']}</td>
                     </tr>)
                 })
                 }
@@ -86,7 +86,7 @@ export default function Dashboard() {
                         <td>{facility['operatingHourStart'] + " to " + facility['operatingHourEnd']}</td>
                         <td>{facility['type']}</td>
                         <td>{facility['category']}</td>
-                        <td>{facility['_osUpdatedAt']}</td>
+                        <td>{facility['osUpdatedAt']}</td>
                     </tr>)
                 })
                 }

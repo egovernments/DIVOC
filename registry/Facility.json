@@ -181,7 +181,33 @@
           "type": "string",
           "format": "date"
         },
+        "schedule": {
+          "$id": "#/properties/schedule",
+          "$ref": "#/definitions/FacilityProgramSchedule"
+        },
         "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityProgramSchedule": {
+      "$id": "#/properties/FacilityProgramSchedule",
+      "type": "object",
+      "title": "The FacilityProgramSchedule Schema",
+      "properties": {
+        "days": {
+          "$id": "#/properties/activeDays",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "startTime": {
+          "$id": "#/properties/operatingHourStart",
+          "type": "string"
+        },
+        "endTime": {
+          "$id": "#/properties/operatingHourEnd",
+          "type": "string"
         }
       }
     }
@@ -198,6 +224,6 @@
     "signedFields": [],
     "indexFields": ["(serialNum, facilityCode)","facilityName"],
     "uniqueIndexFields": ["serialNum", "facilityCode"],
-    "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }

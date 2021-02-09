@@ -9,6 +9,11 @@ import ImgPlaceholder from "assets/img/no_image.svg"
 import ImgTick from "assets/img/tick.svg"
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../../Services/ApiServices";
+import {AuthSafeComponent} from "../../utils/keycloak";
+import {SyncFacade} from "../../SyncFacade";
+import {appIndexDb} from "../../AppDatabase";
+import {Messages} from "../../Base/Constants";
+import {BaseCard} from "../../Base/Base";
 
 export function ProgramSelection() {
     const [programs, setPrograms] = useState([])
@@ -78,18 +83,32 @@ function ProgramItem({program, selected, onClick}) {
 export function SelectProgram({onDone}) {
     const [programs, setPrograms] = useState([])
     const [selectedProgram, setSelectedProgram] = useState()
+    const [loading, setLoading] = useState(true)
     useEffect(() => {
         ApiServices
             .fetchPrograms()
             .then((result) => {
-                setPrograms(result)
+                setLoading(false);
+                setPrograms(result);
             })
-            .catch(e => console.log(e.message))
+            .catch(e => {
+                setLoading(false);
+                console.log(e.message)
+            })
     }, [])
 
     const onProgramSelected = (programName) => {
         setSelectedProgram(programName)
     }
+
+    if (loading) {
+        return <div>Loading...</div>
+    }
+
+    if (programs && programs.length === 0) {
+        return <NoProgramFoundAuthSafe/>
+    }
+
     return (
         <div className="selection-program-container">
             <h5>Please select a Vaccination Program</h5>
@@ -108,6 +127,30 @@ export function SelectProgram({onDone}) {
             </div>
         </div>
     );
+}
+
+function NoProgramFoundAuthSafe() {
+    return (
+        <AuthSafeComponent>
+            <NoProgramFound/>
+        </AuthSafeComponent>
+    )
+}
+
+function NoProgramFound({keycloak}) {
+    return (
+        <div className="no-program-container">
+            <BaseCard>
+                <div className="no-program-container d-flex flex-column justify-content-center">
+                    <h6 className="mb-4">There is no vaccination program associated with your facility. Please contact your facility
+                        admin.</h6>
+                    <Button variant="outline-danger" onClick={() => {
+                        keycloak.logout()
+                    }}>Logout</Button>{" "}
+                </div>
+            </BaseCard>
+        </div>
+    )
 }
 
 

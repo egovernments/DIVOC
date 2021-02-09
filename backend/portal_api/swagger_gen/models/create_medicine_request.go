@@ -198,6 +198,9 @@ func (m *CreateMedicineRequest) UnmarshalBinary(b []byte) error {
 // swagger:model CreateMedicineRequestSchedule
 type CreateMedicineRequestSchedule struct {
 
+	// osid
+	Osid string `json:"osid,omitempty"`
+
 	// Number of times the vaccination should be taken.
 	RepeatInterval float64 `json:"repeatInterval,omitempty"`
 

@@ -5,12 +5,13 @@ import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
 import DetailsCard from "../DetailsCard/DetailsCard";
+import FacilityActivation from "../FacilityActivation/FacilityActivation";
 
 
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   setStatus, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus, countryName
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -166,6 +167,7 @@ function FacilityAdjustingRate({
         <div className={`row ${styles['container']}`}>
             <div className="col-sm-3">
                 <FacilityFilterTab
+                    countryName={countryName}
                     programs={programs}
                     selectedProgram={selectedProgram}
                     setSelectedProgram={setSelectedProgram}
@@ -215,10 +217,12 @@ function FacilityAdjustingRate({
                     </div>
                 </FacilityFilterTab>
             </div>
-            <div className={`col-sm-6 container ${styles['table']}`}>
+            <div className={`col-sm-6 ${styles['facility-grid-container']} ${styles['table']}`}>
                 {!showCard ?
                 <>
-                    <p className={styles['highlight']}>{selectedDistrict.join(", ")} facilties</p>
+                    <p className={styles['highlight']}>
+                        {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
+                    </p>
                     <table className={`table table-hover ${styles['table-data']}`}>
                         <thead>
                         <tr>
@@ -246,14 +250,17 @@ function FacilityAdjustingRate({
                 <DetailsCard
                     showCard={showCard}
                     setShowCard={setShowCard}
-                    data={selectedRow}
+                    facility={selectedRow}
+                    setFacility={setSelectedRow}
+                    status={status}
+                    updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
             </div>
-            <div className="col-sm-3 container">
-                <div className={styles['highlight']}>Set Rate</div>
-                {selectedProgram && Object.keys(rateWiseFacilities).length > 0 && <div>
+            <div className="col-sm-3 pad-1rem">
+                <div className={styles['highlight']}>Set Daily Rate</div>
+                {(selectedProgram && Object.keys(rateWiseFacilities).length > 0)? <div>
                     <div
-                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["district-table"]}`}>
+                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["set-rate-table"]}`}>
                         <table className="table table-borderless table-hover">
                             <thead>
                             <tr>
@@ -273,7 +280,9 @@ function FacilityAdjustingRate({
                         </button>
                     </div>
                     {/*{submit ? <div>All rates set successfully</div> : ''}*/}
-                </div>}
+                </div>
+                :<p>Please select one or more facilities to set daily vaccination rate</p>}
+
             </div>
         </div>
     );

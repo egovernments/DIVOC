@@ -8,8 +8,8 @@ export const CONSTANTS = Object.freeze({
     WEEK: "Week",
     MONTH: "Month",
     ALL: "All",
-    GOVT: "Govt",
-    PRIVATE: "Private",
+    GOVT: "GOVT",
+    PRIVATE: "PRIVATE",
     ACTIVE: "Active",
     IN_ACTIVE: "Inactive"
 });

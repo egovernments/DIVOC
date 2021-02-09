@@ -7,6 +7,7 @@ const VACCINATORS = "/divoc/admin/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
 const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
+const FLAGR_APPLICATION_CONFIG = "/config/api/v1/evaluation";
 
 export class ApiServices {
 
@@ -145,6 +146,24 @@ export class ApiServices {
             },
         };
         return fetch(FACILITY_DETAILS, requestOptions)
+            .then(response => {
+                return response.json()
+            })
+    }
+
+    static async fetchApplicationConfigFromFlagr() {
+        const data = {
+            "flagKey": "country_specific_features"
+        };
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        return fetch(FLAGR_APPLICATION_CONFIG, requestOptions)
             .then(response => {
                 return response.json()
             })

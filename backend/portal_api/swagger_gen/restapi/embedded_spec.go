@@ -221,6 +221,16 @@ func init() {
             "type": "string",
             "name": "rateUpdatedTo",
             "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -819,6 +829,16 @@ func init() {
             "description": "Vaccinator Name",
             "name": "name",
             "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1018,6 +1038,9 @@ func init() {
         "schedule": {
           "type": "object",
           "properties": {
+            "osid": {
+              "type": "string"
+            },
             "repeatInterval": {
               "description": "Number of times the vaccination should be taken.",
               "type": "number"
@@ -1203,6 +1226,25 @@ func init() {
                 },
                 "rate": {
                   "type": "number"
+                },
+                "schedule": {
+                  "type": "object",
+                  "properties": {
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "endTime": {
+                      "type": "string",
+                      "x-nullable": true
+                    },
+                    "startTime": {
+                      "type": "string",
+                      "x-nullable": true
+                    }
+                  }
                 },
                 "status": {
                   "type": "string"
@@ -1511,7 +1553,7 @@ func init() {
             "type": "string"
           },
           "osid": {
-            "type": "object"
+            "type": "string"
           },
           "programs": {
             "type": "array",
@@ -1774,6 +1816,16 @@ func init() {
           {
             "type": "string",
             "name": "rateUpdatedTo",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
             "in": "query"
           }
         ],
@@ -2362,6 +2414,16 @@ func init() {
             "description": "Vaccinator Name",
             "name": "name",
             "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
           }
         ],
         "responses": {
@@ -2561,6 +2623,9 @@ func init() {
         "schedule": {
           "type": "object",
           "properties": {
+            "osid": {
+              "type": "string"
+            },
             "repeatInterval": {
               "description": "Number of times the vaccination should be taken.",
               "type": "number"
@@ -2592,6 +2657,9 @@ func init() {
     "CreateMedicineRequestSchedule": {
       "type": "object",
       "properties": {
+        "osid": {
+          "type": "string"
+        },
         "repeatInterval": {
           "description": "Number of times the vaccination should be taken.",
           "type": "number"
@@ -2776,8 +2844,46 @@ func init() {
         "rate": {
           "type": "number"
         },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "endTime": {
+              "type": "string",
+              "x-nullable": true
+            },
+            "startTime": {
+              "type": "string",
+              "x-nullable": true
+            }
+          }
+        },
         "status": {
           "type": "string"
+        }
+      }
+    },
+    "FacilityUpdateRequestItems0ProgramsItems0Schedule": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endTime": {
+          "type": "string",
+          "x-nullable": true
+        },
+        "startTime": {
+          "type": "string",
+          "x-nullable": true
         }
       }
     },
@@ -3097,7 +3203,7 @@ func init() {
           "type": "string"
         },
         "osid": {
-          "type": "object"
+          "type": "string"
         },
         "programs": {
           "type": "array",
