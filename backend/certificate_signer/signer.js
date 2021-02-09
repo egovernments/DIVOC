@@ -189,6 +189,7 @@ async function signAndSave(certificate, retryCount = 0) {
   }
   if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
     redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, certificateId)
+    redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}-cert`, signedCertificateForDB.certificate)
   }
   return resp;
 }
