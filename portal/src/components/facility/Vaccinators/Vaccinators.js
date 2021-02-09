@@ -1,13 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {useAxios} from "../../../utils/useAxios";
-import "./Vaccinators.module.css"
+import "./Vaccinators.css"
 import VaccinatorDetails from "../VaccinatorDetails/VaccinatorDetails";
 import VaccinatorList from "../VaccinatorList/VaccinatorList";
 import keycloak from "../../../utils/keycloak";
 import {equals, reject} from "ramda";
 import {API_URL} from "../../../utils/constants";
-import styles from "./Vaccinators.module.css";
-
+import "./Vaccinators.css";
 
 export default function Vaccinators() {
     const [vaccinators, setVaccinators] = useState([]);
@@ -56,7 +55,7 @@ export default function Vaccinators() {
 
     const onSelectVaccinatorBasedOnCode = (code) => {
         fetchVaccinators().then(res => {
-           setVaccinators(res.data);
+            setVaccinators(res.data);
             res.data.map(vaccinator => {
                 if (vaccinator.code === code) {
                     setSelectedVaccinator(vaccinator);
@@ -66,13 +65,16 @@ export default function Vaccinators() {
     };
 
     return (
-        <div>
+        <div className="vaccinator-list-container">
             {enableVaccinatorDetailView === false &&
-            <div>
-                <div className={`row ${styles['container']}`}>
-                    <button className={`${styles['add-vaccinator-button']}`} onClick={onAddVaccinator}>+ ADD VACCINATOR</button>
+            <div className="mt-5">
+                <div className='mt-2 ml-4 d-flex justify-content-between align-items-center'>
+                    <div className="title-vaccinator">All Vaccinators</div>
+                    <button className='add-vaccinator-button mr-4' onClick={onAddVaccinator}>+ ADD
+                        NEW VACCINATOR
+                    </button>
                 </div>
-                <div className={`row ${styles['container']}`}>
+                <div className={`row pl-lg-5 pr-lg-5`}>
                     <VaccinatorList
                         vaccinators={vaccinators}
                         onSelectVaccinator={onSelectVaccinator}
@@ -82,12 +84,12 @@ export default function Vaccinators() {
             </div>
             }
             {enableVaccinatorDetailView === true &&
-                <VaccinatorDetails
-                    selectedVaccinator={selectedVaccinator}
-                    setEnableVaccinatorDetailView={setEnableVaccinatorDetailView}
-                    onSelectVaccinatorBasedOnCode={onSelectVaccinatorBasedOnCode}
-                    facilityCode={facilityCode}
-                />
+            <VaccinatorDetails
+                selectedVaccinator={selectedVaccinator}
+                setEnableVaccinatorDetailView={setEnableVaccinatorDetailView}
+                onSelectVaccinatorBasedOnCode={onSelectVaccinatorBasedOnCode}
+                facilityCode={facilityCode}
+            />
             }
         </div>
     );
