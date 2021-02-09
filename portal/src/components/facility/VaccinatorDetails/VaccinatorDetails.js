@@ -5,7 +5,7 @@ import searchImg from "../../../assets/img/search.svg";
 import {useAxios} from "../../../utils/useAxios";
 import check from "../../../assets/img/check.png";
 import DropDown from "../../DropDown/DropDown";
-import {API_URL} from "../../../utils/constants";
+import {API_URL, CONSTANTS} from "../../../utils/constants";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
@@ -61,7 +61,7 @@ export default function VaccinatorDetails({
         };
         params = reject(equals(''))(params);
         const queryParams = new URLSearchParams(params);
-        axiosInstance.current.get(API_URL.FACILITY_API, {params: queryParams})
+        axiosInstance.current.get(API_URL.USER_FACILITY_API)
             .then(res => {
                 res.data.forEach(item => {
                     if (!("programs" in item)) {
@@ -70,7 +70,7 @@ export default function VaccinatorDetails({
                         let programsAsSet = new Set(programs);
                         let data = new Array(...programsAsSet);
                         item.programs.map(p => {
-                            if (!programsAsSet.has(p.programId) && !data.includes(p.programId)) {
+                            if (!programsAsSet.has(p.programId) && !data.includes(p.programId) && p.status === CONSTANTS.ACTIVE) {
                                 data.push(p.programId);
                             }
                         });
