@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { useAxios } from "../../utils/useAxios";
-import { formatDate } from "../../utils/dateutil";
+import React, {useEffect, useState} from "react";
+import {useAxios} from "../../utils/useAxios";
+import {formatDate} from "../../utils/dateutil";
 import UploadCSV from "../UploadCSV/UploadCSV";
-import { UploadHistoryTable } from "../UploadHistoryTable";
+import {UploadHistoryTable} from "../UploadHistoryTable";
 import withStyles from "@material-ui/core/styles/withStyles";
 import Paper from "@material-ui/core/Paper";
-import { Card } from "@material-ui/core";
+import {Card} from "@material-ui/core";
 import ProgramActive from "../../assets/img/program-active.svg";
-import { UploadErrorList } from "../UploadHistoryTable/UploadErrorList";
+import {UploadErrorList} from "../UploadHistoryTable/UploadErrorList";
 import "./UploadHistory.css";
-import { TotalRecords } from "../TotalRecords";
+import {TotalRecords} from "../TotalRecords";
 
 import Modal from "react-bootstrap/Modal";
 
@@ -47,15 +47,15 @@ const UploadHistory = ({
             .then((result) => {
                 return result.map((item, index) => {
                     const uploadedDate = new Date(item["CreatedAt"]);
-                    const uploadLocalTime = uploadedDate.toLocaleTimeString([],{ hour: "2-digit", minute: "2-digit" });
+                    const uploadLocalTime = uploadedDate.toLocaleTimeString([], {hour: "2-digit", minute: "2-digit"});
                     const uploadLocalDate = formatDate(uploadedDate);
-                        return {
-                            id: item["ID"],
-                            fileName: item["Filename"],
-                            date: uploadLocalDate,
-                            time: uploadLocalTime,
-                            success: getSuccessRecords(item),
-                            errors: item["TotalErrorRows"]
+                    return {
+                        id: item["ID"],
+                        fileName: item["Filename"],
+                        date: uploadLocalDate,
+                        time: uploadLocalTime,
+                        success: getSuccessRecords(item),
+                        errors: item["TotalErrorRows"]
                     }
                 })
             })
@@ -72,12 +72,11 @@ const UploadHistory = ({
         return 0
     }
 
-    function getTotalSuccessUploadCount() {
-        let sum = 0;
-        for (let i = 0; i < uploadHistory.length; i++) {
-            sum += uploadHistory[i].success
+    function getTotalRegistryUploadCount() {
+        if (tableData && tableData.length) {
+            return tableData.length;
         }
-        return sum;
+        return 0;
     }
 
     return (
@@ -86,7 +85,7 @@ const UploadHistory = ({
                 {infoTitle && (
                     <TotalRecords
                         title={infoTitle}
-                        count={getTotalSuccessUploadCount()}
+                        count={getTotalRegistryUploadCount()}
                     />
                 )}
                 <UploadComponent
@@ -120,7 +119,9 @@ const UploadHistory = ({
                 </div>
                 <div className="error-temp">
                     {selectedHistory && (
-                        <UploadErrors uploadHistory={selectedHistory} fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)} handleClose={handleClose} show={show}/>
+                        <UploadErrors uploadHistory={selectedHistory}
+                                      fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)}
+                                      handleClose={handleClose} show={show}/>
                     )}
                 </div>
             </div>
@@ -129,11 +130,11 @@ const UploadHistory = ({
 };
 
 function UploadErrors({
-    uploadHistory,
-    fileUploadHistoryDetailsAPI,
-    handleClose,
-    show,
-}) {
+                          uploadHistory,
+                          fileUploadHistoryDetailsAPI,
+                          handleClose,
+                          show,
+                      }) {
     const axiosInstance = useAxios('');
     const [uploadHistoryDetails, setUploadHistoryDetails] = useState({});
     useEffect(() => {
@@ -164,25 +165,25 @@ function UploadErrors({
             dialogClassName="my-modal"
         >
             <Modal.Header closeButton className="title">
-                <Modal.Title >{uploadHistory.fileName}</Modal.Title>
+                <Modal.Title>{uploadHistory.fileName}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-            <div className="error-container">
-                <div className="error-count ml-lg-5 mt-5">
-                    <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
-                    <h3>{uploadHistory.success}</h3>
-                    <h5>Records<br/>Uploaded</h5>
+                <div className="error-container">
+                    <div className="error-count ml-lg-5 mt-5">
+                        <img src={ProgramActive} width={"50px"} height={"50px"} alt={"Record Success"}/>
+                        <h3>{uploadHistory.success}</h3>
+                        <h5>Records<br/>Uploaded</h5>
+                    </div>
+                    <UploadErrorList
+                        columns={uploadHistoryDetails.columns}
+                        uploadHistoryDetails={uploadHistoryDetails["errorRows"]}
+                        fileName={uploadHistory.fileName}/>
+                    <div className="error-file-details  ml-lg-5 mb-5">
+                        <p>{uploadHistory.fileName}</p>
+                        <p>{uploadHistory.date}</p>
+                        <p>{uploadHistory.time}</p>
+                    </div>
                 </div>
-                <UploadErrorList
-                    columns={uploadHistoryDetails.columns}
-                    uploadHistoryDetails={uploadHistoryDetails["errorRows"]}
-                    fileName={uploadHistory.fileName}/>
-                <div className="error-file-details  ml-lg-5 mb-5">
-                    <p>{uploadHistory.fileName}</p>
-                    <p>{uploadHistory.date}</p>
-                    <p>{uploadHistory.time}</p>
-                </div>
-            </div>
             </Modal.Body>
         </Modal>
     );
