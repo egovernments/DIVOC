@@ -36,7 +36,7 @@
                             <div class="input-field otp">
                                 <label for="otp" class="otp-prefix">OTP</label>
                                 <input id="otp" class="login-field" placeholder="XX XX"
-                                       type="password"
+                                       type="password" autofocus
                                        name="otp" tabindex="2">
                             </div>
                         </div>

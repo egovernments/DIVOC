@@ -52,7 +52,7 @@
                           action="${url.loginAction}" method="post">
                         <div id="divOuter">
                             <div id="divInner">
-                                <input id="otp" type="password" name="otp" tabindex="1" maxlength="4"
+                                <input id="otp" autofocus type="password" name="otp" tabindex="1" maxlength="4"
                                        placeholder=""/>
                             </div>
                         </div>

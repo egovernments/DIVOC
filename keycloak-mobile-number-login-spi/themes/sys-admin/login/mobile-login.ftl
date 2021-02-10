@@ -31,7 +31,7 @@
 <#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
-                                       name="mobile_number"
+                                       name="mobile_number" autofocus
                                        tabindex="1"/>
                             </div>
 
