@@ -458,7 +458,10 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 }
 
 func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *models.FacilityUpdateRequestItems0) map[string]interface{} {
-	currentPrograms := facility["programs"].([]interface{})
+	currentPrograms, ok := facility["programs"].([]interface{})
+	if !ok {
+		currentPrograms = []interface{}{}
+	}
 	var programsTobeUpdated []map[string]interface{}
 	updateFacility := map[string]interface{}{
 		"osid":     updateRequest.Osid,
@@ -488,17 +491,29 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 			existingProgram := false
 			for _, facilityProgram := range programsTobeUpdated {
 				if updateProgram.ID == facilityProgram["programId"].(string) {
+					facilityContact := facility["contact"]
+					if facilityContact != nil {
+						facilityContact = facilityContact.(string)
+					} else {
+						facilityContact = ""
+					}
+					facilityEmail := facility["email"]
+					if facilityEmail != nil {
+						facilityEmail = facilityEmail.(string)
+					} else {
+						facilityEmail = ""
+					}
 					if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
 						facilityProgram["status"] = updateProgram.Status
 						facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
 						services.NotifyFacilityUpdate("status", updateProgram.Status,
-							facility["contact"].(string), facility["email"].(string))
+							facilityContact.(string), facilityEmail.(string))
 					}
 					if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
 						facilityProgram["rate"] = updateProgram.Rate
 						facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
 						services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
-							facility["contact"].(string), facility["email"].(string))
+							facilityContact.(string), facilityEmail.(string))
 					}
 					if updateProgram.Schedule != nil {
 						facilityProgram["schedule"] = updateProgram.Schedule
