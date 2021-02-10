@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetVaccinatorsUploadHistoryParams creates a new GetVaccinatorsUploadHistoryParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetVaccinatorsUploadHistoryParams() GetVaccinatorsUploadHistoryParams {
 
 	return GetVaccinatorsUploadHistoryParams{}

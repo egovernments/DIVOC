@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetProgramsParams creates a new GetProgramsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetProgramsParams() GetProgramsParams {
 
 	return GetProgramsParams{}

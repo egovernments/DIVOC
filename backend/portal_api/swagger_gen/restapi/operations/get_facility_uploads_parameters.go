@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetFacilityUploadsParams creates a new GetFacilityUploadsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetFacilityUploadsParams() GetFacilityUploadsParams {
 
 	return GetFacilityUploadsParams{}

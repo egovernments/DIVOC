@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 
@@ -308,6 +309,78 @@ func (m *Facility) validateType(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validate this facility based on the context it is used
+func (m *Facility) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateAdmins(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePrograms(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Facility) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Facility) contextValidateAdmins(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Admins); i++ {
+
+		if m.Admins[i] != nil {
+			if err := m.Admins[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("admins" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *Facility) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Programs); i++ {
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *Facility) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -349,6 +422,11 @@ type FacilityProgramsItems0 struct {
 
 // Validate validates this facility programs items0
 func (m *FacilityProgramsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this facility programs items0 based on context it is used
+func (m *FacilityProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
