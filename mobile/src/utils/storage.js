@@ -4,6 +4,7 @@ export function saveVaccinationDetails(payload) {
     const vaccinationDetails = getVaccinationDetails() || {}
     vaccinationDetails.vaccinatorId = payload.vaccinatorId;
     vaccinationDetails.medicineId = payload.medicineId;
+    vaccinationDetails.selectedDose = payload.doseId;
     vaccinationDetails.lastBatchId = payload.batchId
     if (vaccinationDetails.batchIds) {
         const batchIds = vaccinationDetails.batchIds
@@ -26,6 +27,7 @@ export function getVaccinationDetails() {
         return {
             vaccinatorId: null,
             medicineId: null,
+            selectedDose: null,
             lastBatchId: null,
             batchIds: []
         }

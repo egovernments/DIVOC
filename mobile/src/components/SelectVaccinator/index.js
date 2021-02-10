@@ -21,6 +21,7 @@ export const SelectVaccinator = (props) => {
     const [vaccinators, setVaccinators] = useState([])
     const [selectedVaccinatorId, setSelectedVaccinatorId] = useState();
     const [selectedMedicineName, setSelectedMedicineName] = useState();
+    const [selectedDose, setSelectedDose] = useState();
     const [medicines, setMedicines] = useState([])
     const [batchIds, setBatchIds] = useState([])
     const [selectedBatchId, setSelectedBatchId] = useState();
@@ -32,6 +33,7 @@ export const SelectVaccinator = (props) => {
                 enrollCode: props.enrollCode,
                 vaccinatorId: selectedVaccinatorId,
                 medicineId: selectedMedicineName,
+                doseId: selectedDose,
                 batchId: selectedBatchId
             }
             markPatientComplete(payload).then((value) => {
@@ -54,6 +56,15 @@ export const SelectVaccinator = (props) => {
         }
     }
 
+    function fetchDoseOptions() {
+        const selectedMedicine = medicines.filter( item => item.name === selectedMedicineName)[0]
+        let doseCounts = [];
+        for(let i = 1; i <= selectedMedicine.schedule.repeatInterval; i++){
+            doseCounts.push({label: i,value: i})
+        }
+        return doseCounts;
+    }
+
     useEffect(() => {
         getFormDetails()
             .then((result) => {
@@ -62,6 +73,7 @@ export const SelectVaccinator = (props) => {
                 setBatchIds(result.batchIds)
                 setSelectedVaccinatorId(result.selectedVaccinator)
                 setSelectedMedicineName(result.selectedMedicine)
+                setSelectedDose(result.selectedDose)
                 setSelectedBatchId(result.selectedBatchId)
                 setTempSelectedBatchId(result.selectedBatchId)
             })
@@ -101,7 +113,19 @@ export const SelectVaccinator = (props) => {
                     onChange={(option) => {
                         setSelectedMedicineName(option.value)
                     }}/>
-
+                {selectedMedicineName && <div>
+                    <div className="select-title">SELECT DOSE*</div>
+                    <Select
+                        key={selectedDose ?? "doseId"}
+                        isSearchable={false}
+                        defaultValue={selectedDose && {value: selectedDose, label: selectedDose}}
+                        options={fetchDoseOptions()}
+                        theme={selectorTheme}
+                        onChange={(option) => {
+                            setSelectedDose(option.value)
+                        }}/>
+                    </div>
+                }
                 <div className="d-flex flex-column">
                     <div className="select-title">ENTER BATCH ID*</div>
                     <AutoComplete
