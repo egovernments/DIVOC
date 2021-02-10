@@ -6,12 +6,13 @@ const redis = require('./redis');
 const R = require('ramda');
 const promClient = require('prom-client');
 
-const certificatesCounter = new client.Counter({
+
+const certificatesCounter = new promClient.Counter({
   name: 'dovoc_certificates_count',
   help: 'Number of certificates issued.',
 });
 
-const certificatesMessagesCounter = new client.Counter({
+const certificatesMessagesCounter = new promClient.Counter({
   name: 'dovoc_certificates_messages_count',
   help: 'Number of certificates issued.',
 });
