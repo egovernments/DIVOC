@@ -33,7 +33,7 @@ export const SelectVaccinator = (props) => {
                 enrollCode: props.enrollCode,
                 vaccinatorId: selectedVaccinatorId,
                 medicineId: selectedMedicineName,
-                doseId: selectedDose,
+                dose: selectedDose,
                 batchId: selectedBatchId
             }
             markPatientComplete(payload).then((value) => {
