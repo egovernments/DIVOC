@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import "./VaccinatorList.css"
 import check from "../../../assets/img/ic_check_circle_24px.svg";
 import info from "../../../assets/img/ic_info_24px.svg";
-import filter from "../../../assets/img/filter.svg";
+import filter from "../../../assets/img/arrow_down.svg";
 import Popover from "@material-ui/core/Popover";
 import {CheckboxItem} from "../../FacilityFilterTab";
 import {API_URL} from "../../../utils/constants";
@@ -10,7 +10,6 @@ import {useAxios} from "../../../utils/useAxios";
 import Tooltip from "@material-ui/core/Tooltip";
 import {FormControlLabel, Switch} from "@material-ui/core";
 import withStyles from "@material-ui/core/styles/withStyles";
-import MultipleSelect from "../ProgramSelection";
 
 
 export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVaccinators}) {
@@ -116,19 +115,18 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                 onClose={handleClose}
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'center',
+                    horizontal: 'left',
                 }}
                 transformOrigin={{
                     vertical: 'top',
-                    horizontal: 'center',
+                    horizontal: 'left',
                 }}
             >
                 <div className="custom-popup">
-                    <p>FILTER BY</p>
-                    <hr/>
                     {
                         programs.map(program => (
                             <CheckboxItem
+                                checkedColor={"#5C9EF8"}
                                 text={program}
                                 checked={selectedPrograms.includes(program)}
                                 onSelect={(event) =>
@@ -148,12 +146,7 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
             <thead>
             <tr>
                 <th>OPERATOR NAME</th>
-                <th><MultipleSelect
-                    key={programs}
-                    names={programs}
-                    onSelected={(values) => {
-                        setSelectedPrograms(values);
-                    }}/></th>
+                <th>ALL PROGRAMS <img onClick={handleClick} src={filter}/>{<FilterPopup/>}</th>
                 <th>CERTIFIED</th>
                 <th>STATUS</th>
             </tr>
