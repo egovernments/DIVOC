@@ -27,7 +27,6 @@ const UploadHistory = ({
     const [uploadHistory, setUploadHistory] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null);
     const [show, setShow] = useState(false);
-    const [selectedFacility, setSelectedFacility] = useState(null);
 
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -102,12 +101,9 @@ const UploadHistory = ({
             </div>
             <div className="upload-csv-container">
                 <div className="upload-history">
-                    <UploadHistoryTable 
+                    <UploadHistoryTable
                         data={tableData}
                         headerData={tableHeader}
-                        onCellClicked={(value) => {
-                            setSelectedFacility(value);
-                        }}
                         title={tableTitle}
                     />
                 </div>
@@ -124,7 +120,7 @@ const UploadHistory = ({
                 </div>
                 <div className="error-temp">
                     {selectedHistory && (
-                        <UploadErrors uploadHistory={selectedHistory} fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)} handleClose={handleClose} show={show}/> 
+                        <UploadErrors uploadHistory={selectedHistory} fileUploadHistoryDetailsAPI={fileUploadErrorsAPI.replace(":id", selectedHistory.id)} handleClose={handleClose} show={show}/>
                     )}
                 </div>
             </div>

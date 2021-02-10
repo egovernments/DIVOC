@@ -128,7 +128,7 @@ export const UploadHistoryTable = ({
                                             selectedHistory.id === row["id"]
                                         }
                                         style={{
-                                            cursor: "pointer",
+                                            cursor: onCellClicked ? "pointer" : "",
                                             background: "none",
                                         }}
                                         onClick={() => {
@@ -153,7 +153,7 @@ export const UploadHistoryTable = ({
                         </TableBody>
                     </Table>
                 )}
-                
+
             </TableContainer>
             <TablePagination
                     rowsPerPageOptions={[10, 20, 25]}
