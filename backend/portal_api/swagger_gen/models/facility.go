@@ -337,6 +337,9 @@ func (m *Facility) UnmarshalBinary(b []byte) error {
 // swagger:model FacilityProgramsItems0
 type FacilityProgramsItems0 struct {
 
+	// name
+	Name string `json:"name,omitempty"`
+
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
 

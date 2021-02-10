@@ -224,7 +224,8 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
 		}
 	}
-	return model.NewGenericJSONResponse(responseArr)
+	results := enrichFacilityWithProgramDetails(responseArr)
+	return model.NewGenericJSONResponse(results)
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -757,8 +758,54 @@ func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *
 			return model.NewGenericServerError()
 		}
 		responseArr := response[entityTypeId]
-		return model.NewGenericJSONResponse(responseArr)
+		results := enrichFacilityWithProgramDetails(responseArr)
+		return model.NewGenericJSONResponse(results)
 	} else {
 		return NewGenericForbiddenError()
 	}
+}
+
+func enrichFacilityWithProgramDetails(response interface{}) []interface{}{
+	responseArr := response.([]interface{})
+	if responseArr == nil || len(responseArr) == 0 {
+		return []interface{}{}
+	}
+	limit, offset := getLimitAndOffset(nil, nil)
+	var results []interface{}
+
+	for _,objects := range responseArr {
+		obj := objects.(map[string]interface{})
+		programs := obj["programs"].([]interface{})
+		log.Infof("programs in facility %v", programs)
+		var updatedPrograms []interface{}
+		if programs != nil && len(programs) > 0 {
+			for _,obj := range programs {
+				program := obj.(map[string]interface{})
+				id := program["programId"].(string)
+				response, err := getProgramById(id, limit, offset)
+				log.Infof("program entity %v", response)
+				if err != nil {
+					log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
+				} else {
+					responseArr := response["Program"].([]interface{})
+					if len(responseArr) != 0 {
+						program["name"] = responseArr[0].(map[string]interface{})["name"]
+						updatedPrograms = append(updatedPrograms, program)
+					}
+				}
+			}
+			obj["programs"] = updatedPrograms
+		}
+		results = append(results, obj)
+	}
+	return results
+}
+
+func getProgramById(osid string, limit int, offset int) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		"osid": map[string]interface{}{
+			"eq": osid,
+		},
+	}
+	return kernelService.QueryRegistry("Program", filter, limit, offset)
 }

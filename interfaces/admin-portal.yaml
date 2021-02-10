@@ -743,6 +743,8 @@ definitions:
           properties:
             programId:
               type: string
+            name:
+              type: string
             status:
               type: string
             rate:
