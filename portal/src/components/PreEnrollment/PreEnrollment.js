@@ -62,6 +62,7 @@ function PreEnrollment() {
         tableTitle="All Pre-Enrollments"
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 

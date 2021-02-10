@@ -14,15 +14,16 @@ import {TotalRecords} from "../TotalRecords";
 import Modal from "react-bootstrap/Modal";
 
 const UploadHistory = ({
-    fileUploadAPI,
-    fileUploadHistoryAPI,
-    fileUploadErrorsAPI,
-    infoTitle,
-    UploadComponent = UploadCSV,
-    tableTitle,
-    tableData,
-    tableHeader
-}) => {
+                           fileUploadAPI,
+                           fileUploadHistoryAPI,
+                           fileUploadErrorsAPI,
+                           infoTitle,
+                           UploadComponent = UploadCSV,
+                           tableTitle,
+                           tableData,
+                           tableHeader,
+                           onRefresh,
+                       }) => {
     const axiosInstance = useAxios("");
     const [uploadHistory, setUploadHistory] = useState([]);
     const [selectedHistory, setSelectedHistory] = useState(null);
@@ -92,6 +93,9 @@ const UploadHistory = ({
                     fileUploadAPI={fileUploadAPI}
                     onUploadComplete={() => {
                         fetchUploadHistory();
+                        if (onRefresh) {
+                            onRefresh();
+                        }
                     }}
                     uploadHistoryCount={selectedHistory && selectedHistory.success}
                     errorCount={selectedHistory && selectedHistory.errors}

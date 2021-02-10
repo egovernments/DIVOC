@@ -63,6 +63,7 @@ function Facilities() {
         tableTitle="All Facilities"
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 

@@ -59,6 +59,7 @@ function VaccinatorsRegistry() {
         tableTitle="All Vaccinators"
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 
