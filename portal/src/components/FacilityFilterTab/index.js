@@ -53,7 +53,7 @@ export const FacilityFilterTab = ({
                     setSelectedOption={setSelectedState}
                 />
             </div>
-            {selectedState != "All" && 
+            {selectedState != "All" &&
                 <React.Fragment>
                     <span className="filter-header">{selectedState}</span>
                     <div className="m-3">
@@ -108,7 +108,7 @@ export const FacilityFilterTab = ({
     )
 };
 
-export const CheckboxItem = ({text, checked, onSelect, showText=true}) => (
+export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedColor}) => (
     <div className="custom-checkbox-item-wrapper">
         <label
             className="form-check-label d-flex align-items-center"
@@ -128,7 +128,7 @@ export const CheckboxItem = ({text, checked, onSelect, showText=true}) => (
                 style={{
                     backgroundColor:
                         checked
-                            ? "#DE9D00"
+                            ? checkedColor ? checkedColor : "#DE9D00"
                             : "",
                 }}
             >
