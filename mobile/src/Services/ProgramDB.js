@@ -44,8 +44,7 @@ class ProgramDB {
             effectiveUntil: effectiveUntilDate,
             manufacturer: givenVaccination["provider"] ?? "N/A",
             name: givenVaccination["name"] ?? "N/A",
-            //TODO: Need dose from vaccinator in UI
-            dose: 1,
+            dose: event.dose,
             totalDoses: repeatUntil,
         }
     }
