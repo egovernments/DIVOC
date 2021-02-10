@@ -7,15 +7,35 @@ import {useKeycloak} from "@react-keycloak/web";
 import { API_URL, CONSTANTS } from "../../utils/constants";
 import { update } from "ramda";
 
-function FacilityForm({facility, setFacility, heading}) {
-    const isGovtFacility = facility.category === "GOVT";
+function FacilityForm({facility, refreshFacility, heading}) {
     const [editFacility, setEditFacility] = useState(false);
     const [editAdmin, setEditAdmin] = useState(false);
+    const [users, setUsers] = useState({});
+    const [vaccinators, setVaccinators] = useState(0);
     const {keycloak} = useKeycloak();
     const axiosInstance = useAxios('');
     const isFacilityAdmin = () => keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT);
     const isFacilityController = () => keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT);
 
+    
+    function fetchFacilityUsers() {
+        axiosInstance.current.get('/divoc/admin/api/v1/facility/users', {params: {facilityCode: facility.facilityCode}})
+        .then(r => setUsers(r.data));
+    }
+
+    function fetchVaccinators() {
+        axiosInstance.current.get(API_URL.VACCINATORS_API, {params: {facilityCode: facility.facilityCode}})
+        .then(r => setVaccinators(r.data?.length ? r.data.length : 0));
+    }
+    
+    useEffect(() => {
+        if (axiosInstance.current) {
+            (async function () { 
+                await fetchFacilityUsers(); 
+                await fetchVaccinators(); 
+            })()
+        }
+    }, [axiosInstance]);
 
     const setFormData = (f) => {
         const formData =  {
@@ -34,9 +54,9 @@ function FacilityForm({facility, setFacility, heading}) {
         }
 
         if(f.admins && f.admins.length > 0) {
-            formData["adminName"] = f.admins[0].name;
-            formData["adminContact"] = f.admins[0].mobile;
-            formData["adminEmail"] = f.admins[0].email;
+            formData["adminName"] = f.admins[0]?.name;
+            formData["adminContact"] = f.admins[0]?.mobile;
+            formData["adminEmail"] = f.admins[0]?.email;
         }
 
         f.programs?.forEach(p => {
@@ -59,7 +79,7 @@ function FacilityForm({facility, setFacility, heading}) {
         const updatedFacility = {...facility, ...data}
         updatedFacility.address.addressLine1 = data.addressLine1;
         updatedFacility.address.addressLine2 = data.addressLine2;
-        updatedFacility.address.pincode = data.pincode;
+        updatedFacility.address.pincode = parseInt(data.pincode);
 
         if(updatedFacility.admins && updatedFacility.admins.length > 0) {
             updatedFacility.admins[0].name = data.adminName;
@@ -75,20 +95,39 @@ function FacilityForm({facility, setFacility, heading}) {
             }
         })
 
+        console.log(updatedFacility);
+
         axiosInstance.current
         .put(API_URL.FACILITY_API, [updatedFacility])
         .then((res) => {
             console.log(res);
             //registry update in ES happening async, so calling search immediately will not get back actual data
-            // setTimeout(() => setFacility(), 2000);
+            setTimeout(() => refreshFacility(), 2000);
         });
+    }
+
+    const handleEditAdmin = () => {
+        const updatedAdmin = users.filter(u => u.mobileNumber == facility.admins[0].mobile)[0];
+        updatedAdmin.name = data.adminName;
+        updatedAdmin.mobileNumber = data.adminContact;
+        updatedAdmin.email = data.adminEmail;
+        updatedAdmin.facilityCode = facility.facilityCode;
+
+        axiosInstance.current
+        .put('/divoc/admin/api/v1/facility/users', updatedAdmin).then((res) => {
+            //registry update in ES happening async, so calling search immediately will not get back actual data
+            setTimeout(() => {
+                refreshFacility();
+                fetchFacilityUsers();
+            }, 2000);
+        })
     }
 
     return <Container style={{"paddingBottom": "100px"}}><form>
             <div className="facility-info-section">
                 {isFacilityAdmin() && 
                     <React.Fragment>
-                        <h4 style={{"display":"inline"}}>Bussiness Details</h4>
+                        <h4 style={{"display":"inline-block"}}>Bussiness Details</h4>
                         <span className="begin-edit" onClick={() => setEditFacility(!editFacility)}>
                             {editFacility ? "discard" : "edit"}
                         </span>
@@ -117,7 +156,7 @@ function FacilityForm({facility, setFacility, heading}) {
                     <div>
                         <label>
                             <div><b>Pincode: </b></div>
-                            <input type="text" name="pincode" defaultValue={facility.address?.pincode} disabled={!editFacility} onChange={handleChange}/>
+                            <input type="number" name="pincode" defaultValue={facility.address?.pincode} disabled={!editFacility} onChange={handleChange}/>
                         </label>
                     </div>
                     <div>
@@ -136,16 +175,16 @@ function FacilityForm({facility, setFacility, heading}) {
                         <label>
                             <div><b>Category Type: </b></div>
                             <Row style={{"columnCount": 2}}>
-                                <div className="radio-input"><input type="radio" name="category" defaultChecked={!isGovtFacility} disabled={!editFacility} onChange={handleChange}/> Private</div>
-                                <div className="radio-input"><input type="radio" name="category" defaultChecked={isGovtFacility} disabled={!editFacility} onChange={handleChange}/> Government</div>
+                                <div className="radio-input"><input type="radio" name="category" defaultChecked={facility.category === "PRIVATE"} disabled={!editFacility} onChange={handleChange} value="PRIVATE"/> Private</div>
+                                <div className="radio-input"><input type="radio" name="category" defaultChecked={facility.category === "GOVT"} disabled={!editFacility} onChange={handleChange} value="GOVT"/> Government</div>
                             </Row>
                         </label>
                     </div>
                     <div>
                         <label>
                             <div><b>Operating Hours: </b></div>
-                            <input type="time" className="time-input"  name="operatingHourStart" defaultValue="09:00" disabled={!editFacility} onChange={handleChange}/> 
-                            To <input className="time-input" type="time" name="operatingHourEnd" defaultValue="18:00" disabled={!editFacility} onChange={handleChange}/>
+                            <input type="time" className="time-input"  name="operatingHourStart" defaultValue={facility.operatingHourStart} disabled={!editFacility} onChange={handleChange}/> 
+                            To <input className="time-input" type="time" name="operatingHourEnd" defaultValue={facility.operatingHourEnd} disabled={!editFacility} onChange={handleChange}/>
                         </label>
                     </div>
                     <div>
@@ -162,9 +201,9 @@ function FacilityForm({facility, setFacility, heading}) {
                     </div>
                 </Container>
 
-                <h4>Ongoing Vaccination Programs</h4>
-                <Container style={{"columnCount": 2}}>
-                    { facility.programs?.map(p => 
+                    { facility.programs?.filter(p => p.status === CONSTANTS.ACTIVE).map(p => 
+                        <React.Fragment><h4>Ongoing Vaccination Programs</h4>
+                        <Container style={{"columnCount": 2}}>
                         <div key={p.programId} className="programDiv">
                             <div><label>
                                 <div><b>Name: </b></div>
@@ -180,8 +219,8 @@ function FacilityForm({facility, setFacility, heading}) {
                                 To <input className="time-input" type="time" name={p.programId + "_endTime"} defaultValue={p.schedule?.endTime} disabled={!editFacility} onChange={handleChange}/>
                             </label></div>
                         </div>
+                        </Container></React.Fragment>                    
                     )}
-                </Container>
 
                 {editFacility && 
                     <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleSubmit}>SAVE</Button>
@@ -192,7 +231,7 @@ function FacilityForm({facility, setFacility, heading}) {
                 <Container>
                     <div>
                         <label>
-                            <div><b>Vaccinators: </b>{facility.vaccinatorCount ? facility.vaccinatorCount : " - "}</div>
+                            <div><b>Vaccinators: </b>{vaccinators ? vaccinators : "-"}</div>
                         </label>
                     </div>
                 </Container>
@@ -230,7 +269,7 @@ function FacilityForm({facility, setFacility, heading}) {
                     }
                </Container>
                {editAdmin && 
-                    <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleSubmit}>SAVE</Button>
+                    <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleEditAdmin}>SAVE</Button>
                 }
             </div>
         </form></Container>}

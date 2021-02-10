@@ -2,6 +2,8 @@ package pkg
 
 import (
 	"errors"
+	kernelService "github.com/divoc/kernel_library/services"
+	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -44,14 +46,22 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 	return nil
 }
 
-func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
+func UpdateFacilityUser(user *models.FacilityUser, authHeader, facilityCode string) error {
 	keycloakUserId := user.ID
 
 	// update user in keycloak with newer user details
-	userRequest, e := getKeycloakUserRepFromFacilityUserModel(authHeader, user)
-	if e != nil {
-		return e
+	userRequest := KeyCloakUserRequest{
+		Username:   user.MobileNumber,
+		Enabled:    user.Enabled,
+		Attributes: KeycloakUserAttributes{
+			MobileNumber: []string{user.MobileNumber},
+			EmployeeID: user.EmployeeID,
+			FullName: user.Name,
+			FacilityCode: facilityCode,
+			VaccinationRateLimits: user.VaccinationRateLimits,
+		},
 	}
+
 	resp, err := UpdateKeycloakUser(keycloakUserId, userRequest)
 	if err != nil {
 		log.Errorf("Error while updating user %s", user.MobileNumber)
@@ -70,10 +80,49 @@ func UpdateFacilityUser(user *models.FacilityUser, authHeader string) error {
 					log.Info("Updating roles for the user ", user.MobileNumber)
 					updateUserGroupForUser(keycloakUserId, responseObject, user.Groups)
 				}
+				for _, group := range user.Groups {
+					if group.Name == "facility admin" {
+						return updateRegistryFacilityAdmin(facilityCode, user)
+					}
+				}
 			}
 		} else {
 			return errors.New("update keycloak user call doesn't responded with 204 status")
 		}
+	}
+	return nil
+}
+
+func updateRegistryFacilityAdmin(facilityCode string, user *models.FacilityUser) error {
+	searchResponse, err := services.GetFacilityByCode(facilityCode, 1, 0)
+	if err != nil {
+		return err
+	}
+	facility := searchResponse["Facility"].([]interface{})[0].(map[string]interface{})
+	var facilityAdmins []map[string]interface{}
+	for _, obj := range facility["admins"].([]interface{}) {
+		facilityAdmins = append(facilityAdmins, obj.(map[string]interface{}))
+	}
+
+	var isExistingAdmin bool
+	for _, fa := range facilityAdmins {
+		if fa["mobile"] == user.MobileNumber {
+			isExistingAdmin = true
+			fa["name"] = user.Name
+			fa["email"] = user.Email
+		}
+	}
+	if !isExistingAdmin {
+		facilityAdmins = append(facilityAdmins, map[string]interface{}{
+			"name": user.Name,"mobile": user.MobileNumber, "email": user.Email,
+		})
+	}
+	updatedFacility := map[string]interface{}{
+		"osid": facility["osid"].(string),
+		"admins": facilityAdmins,
+	}
+	if _, err := kernelService.UpdateRegistry("Facility", updatedFacility); err != nil {
+		return err
 	}
 	return nil
 }

@@ -121,6 +121,14 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 
 	if HasResourceRole(portalClientId, "admin", principal) {
 		return kernelService.GetEntityType(entityTypeId)
+	} else if HasResourceRole(portalClientId, "controller", principal) {
+		if params.FacilityCode == nil {
+			return NewGenericForbiddenError()
+		} else {
+			filter["facilityIds"] = map[string]interface{}{
+				"contains": params.FacilityCode,
+			}
+		}
 	} else if HasResourceRole(portalClientId, "facility-admin", principal) {
 		if params.FacilityCode != nil && !strings.EqualFold(*params.FacilityCode, "ALL") {
 			filter["facilityIds"] = map[string]interface{}{
@@ -408,7 +416,15 @@ func createFacilityUserHandler(params operations.CreateFacilityUsersParams, prin
 }
 
 func getFacilityUserHandler(params operations.GetFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
-	users, err := GetFacilityUsers(params.HTTPRequest.Header.Get("Authorization"))
+	var users []*models.FacilityUser
+	var err error
+	if HasResourceRole(portalClientId, "facility-admin", principal) {
+		users, err = GetFacilityUsers(params.HTTPRequest.Header.Get("Authorization"))
+	}else if HasResourceRole(portalClientId, "controller", principal) && params.FacilityCode != nil {
+		users, err = GetUsersByFacilityCode(*params.FacilityCode)
+	} else {
+		return operations.NewCreateFacilityUsersBadRequest()
+	}
 	if err != nil {
 		log.Error(err)
 		return operations.NewCreateFacilityUsersBadRequest()
@@ -431,20 +447,31 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			log.Errorf("Facility update request without OSID %v", updateRequest)
 			continue
 		}
-		searchRespone, err := kernelService.ReadRegistry("Facility", updateRequest.Osid)
+		searchResponse, err := kernelService.ReadRegistry("Facility", updateRequest.Osid)
 		if err == nil {
-			facility := searchRespone["Facility"].(map[string]interface{})
+			facility := searchResponse["Facility"].(map[string]interface{})
 			if facility != nil {
 				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
 				updatedFacility["facilityName"] = updateRequest.FacilityName
-				updatedFacility["address"] = updateRequest.Address
-				updatedFacility["geoLocation"] = updateRequest
-				updatedFacility["websiteUrl"] = updateRequest
-				updatedFacility["email"] = updateRequest
-				updatedFacility["contact"] = updateRequest
-				updatedFacility["operatingHourStart"] = updateRequest
-				updatedFacility["operatingHourEnd"] = updateRequest
-				updatedFacility["category"] = updateRequest
+
+				addressOsid := (facility["address"].(map[string]interface{}))["osid"]
+				if updateRequest.Address != nil {
+					updatedFacility["address"] = map[string]interface{}{
+						"osid": addressOsid,
+						"addressLine1": *updateRequest.Address.AddressLine1,
+						"addressLine2": *updateRequest.Address.AddressLine2,
+						"district": *updateRequest.Address.District,
+						"state": *updateRequest.Address.State,
+						"pincode": *updateRequest.Address.Pincode,
+					}
+				}
+				updatedFacility["geoLocation"] = updateRequest.GeoLocation
+				updatedFacility["websiteUrl"] = updateRequest.WebsiteURL
+				updatedFacility["email"] = updateRequest.Email
+				updatedFacility["contact"] = updateRequest.Contact
+				updatedFacility["operatingHourStart"] = updateRequest.OperatingHourStart
+				updatedFacility["operatingHourEnd"] = updateRequest.OperatingHourEnd
+				updatedFacility["category"] = updateRequest.Category
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
@@ -460,88 +487,82 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 }
 
 func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *models.FacilityUpdateRequestItems0) map[string]interface{} {
+
+	mkSchedule := func (p models.FacilityUpdateRequestItems0ProgramsItems0Schedule) map[string]interface{} {
+		s := map[string]interface{}{
+			"startTime" : p.StartTime, "endTime": p.EndTime,
+		}
+		if len(p.Days) > 0 {
+			s["days"] = p.Days
+		}
+		return s
+	}
+
+	mkProgram := func (p *models.FacilityUpdateRequestItems0ProgramsItems0) map[string]interface{} {
+		newP := map[string]interface{} {
+			"programId":       p.ID,
+			"status":          p.Status,
+			"rate":            p.Rate,
+			"statusUpdatedAt": time.Now().Format(time.RFC3339),
+			"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+		}
+		if p.Schedule != nil {
+			newP["schedule"] = mkSchedule(*p.Schedule)
+		}
+		return newP
+	}
+
 	currentPrograms, ok := facility["programs"].([]interface{})
 	if !ok {
 		currentPrograms = []interface{}{}
 	}
+	var newPrograms []map[string]interface{}
 	var programsTobeUpdated []map[string]interface{}
-	updateFacility := map[string]interface{}{
-		"osid":     updateRequest.Osid,
-		"programs": []interface{}{},
+
+	for _, obj := range currentPrograms {
+		facilityProgram := obj.(map[string]interface{})
+		programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
 	}
-	if len(currentPrograms) == 0 {
-		for _, program := range updateRequest.Programs {
-			var schedule interface{} = struct{}{}
-			if program.Schedule != nil {
-				schedule = program.Schedule
-			}
-			programsTobeUpdated = append(programsTobeUpdated, map[string]interface{}{
-				"programId":       program.ID,
-				"status":          program.Status,
-				"rate":            program.Rate,
-				"statusUpdatedAt": time.Now().Format(time.RFC3339),
-				"rateUpdatedAt":   time.Now().Format(time.RFC3339),
-				"schedule":        schedule,
-			})
-		}
-	} else {
-		for _, obj := range currentPrograms {
-			facilityProgram := obj.(map[string]interface{})
-			programsTobeUpdated = append(programsTobeUpdated, facilityProgram)
-		}
-		for _, updateProgram := range updateRequest.Programs {
-			existingProgram := false
-			for _, facilityProgram := range programsTobeUpdated {
-				if updateProgram.ID == facilityProgram["programId"].(string) {
-					facilityContact := facility["contact"]
-					if facilityContact != nil {
-						facilityContact = facilityContact.(string)
-					} else {
-						facilityContact = ""
-					}
-					facilityEmail := facility["email"]
-					if facilityEmail != nil {
-						facilityEmail = facilityEmail.(string)
-					} else {
-						facilityEmail = ""
-					}
-					if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
-						facilityProgram["status"] = updateProgram.Status
-						facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
-						services.NotifyFacilityUpdate("status", updateProgram.Status,
-							facilityContact.(string), facilityEmail.(string))
-					}
-					if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
-						facilityProgram["rate"] = updateProgram.Rate
-						facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
-						services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),
-							facilityContact.(string), facilityEmail.(string))
-					}
-					if updateProgram.Schedule != nil {
-						facilityProgram["schedule"] = updateProgram.Schedule
-					}
-					existingProgram = true
-					break
+
+	for _, updateProgram := range updateRequest.Programs {
+		existingProgram := false
+		for _, facilityProgram := range programsTobeUpdated {
+			if updateProgram.ID == facilityProgram["programId"].(string) {
+
+				var facilityContact string
+				if facility["contact"] != nil {
+					facilityContact = facility["contact"].(string)
 				}
-			}
-			if !existingProgram {
-				newProgram := map[string]interface{}{
-					"programId":       updateProgram.ID,
-					"status":          updateProgram.Status,
-					"rate":            updateProgram.Rate,
-					"statusUpdatedAt": time.Now().Format(time.RFC3339),
-					"rateUpdatedAt":   time.Now().Format(time.RFC3339),
+				var facilityEmail string
+				if facility["email"] != nil {
+					facilityEmail = facility["email"].(string)
+				}
+
+				if updateProgram.Status != "" && updateProgram.Status != facilityProgram["status"].(string) {
+					facilityProgram["status"] = updateProgram.Status
+					facilityProgram["statusUpdatedAt"] = time.Now().Format(time.RFC3339)
+					services.NotifyFacilityUpdate("status", updateProgram.Status,facilityContact, facilityEmail)
+				}
+				if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
+					facilityProgram["rate"] = updateProgram.Rate
+					facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
+					services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),facilityContact, facilityEmail)
 				}
 				if updateProgram.Schedule != nil {
-					newProgram["schedule"] = updateProgram.Schedule
+					facilityProgram["schedule"] = mkSchedule(*updateProgram.Schedule)
 				}
-				programsTobeUpdated = append(programsTobeUpdated, newProgram)
+				existingProgram = true
+				break
 			}
 		}
-
+		if !existingProgram {
+			newPrograms = append(newPrograms, mkProgram(updateProgram))
+		}
 	}
-	updateFacility["programs"] = programsTobeUpdated
-	return updateFacility
+	return map[string]interface{}{
+		"osid":     updateRequest.Osid,
+		"programs": append(programsTobeUpdated, newPrograms...),
+	}
 }
 
 func getAnalyticsHandler(params operations.GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -557,7 +578,17 @@ func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, princ
 		log.Error("userId is not present in the body")
 		return operations.NewUpdateFacilityUserBadRequest()
 	}
-	err := UpdateFacilityUser(params.Body, params.HTTPRequest.Header.Get("Authorization"))
+
+	var facilityCode string
+	if principal != nil {
+		facilityCode = principal.FacilityCode
+	}
+	if facilityCode == "" && params.Body.FacilityCode == "" {
+		return NewGenericForbiddenError()
+	}
+	facilityCode = params.Body.FacilityCode
+
+	err := UpdateFacilityUser(&params.Body.FacilityUser, params.HTTPRequest.Header.Get("Authorization"), facilityCode)
 	if err != nil {
 		log.Error(err)
 		return operations.NewUpdateFacilityUserBadRequest()

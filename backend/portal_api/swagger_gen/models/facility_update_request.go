@@ -68,10 +68,10 @@ type FacilityUpdateRequestItems0 struct {
 	GeoLocation string `json:"geoLocation,omitempty"`
 
 	// Operating hours end of day
-	OperatingHourEnd int64 `json:"operatingHourEnd,omitempty"`
+	OperatingHourEnd string `json:"operatingHourEnd,omitempty"`
 
 	// Operating hours start of day
-	OperatingHourStart int64 `json:"operatingHourStart,omitempty"`
+	OperatingHourStart string `json:"operatingHourStart,omitempty"`
 
 	// osid
 	Osid string `json:"osid,omitempty"`
@@ -196,7 +196,6 @@ func (m *FacilityUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Regi
 }
 
 func (m *FacilityUpdateRequestItems0ProgramsItems0) validateSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}

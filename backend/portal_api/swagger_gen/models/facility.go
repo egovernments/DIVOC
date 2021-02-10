@@ -51,10 +51,10 @@ type Facility struct {
 	GeoLocation string `json:"geoLocation,omitempty"`
 
 	// Operating hours end of day
-	OperatingHourEnd int64 `json:"operatingHourEnd,omitempty"`
+	OperatingHourEnd string `json:"operatingHourEnd,omitempty"`
 
 	// Operating hours start of day
-	OperatingHourStart int64 `json:"operatingHourStart,omitempty"`
+	OperatingHourStart string `json:"operatingHourStart,omitempty"`
 
 	// programs
 	Programs []*FacilityProgramsItems0 `json:"programs"`
@@ -112,7 +112,6 @@ func (m *Facility) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -130,7 +129,6 @@ func (m *Facility) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validateAdmins(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Admins) { // not required
 		return nil
 	}
@@ -184,7 +182,6 @@ func (m *Facility) validateCategoryEnum(path, location string, value string) err
 }
 
 func (m *Facility) validateCategory(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Category) { // not required
 		return nil
 	}
@@ -198,7 +195,6 @@ func (m *Facility) validateCategory(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validatePrograms(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -255,7 +251,6 @@ func (m *Facility) validateStatusEnum(path, location string, value string) error
 }
 
 func (m *Facility) validateStatus(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -301,7 +296,6 @@ func (m *Facility) validateTypeEnum(path, location string, value string) error {
 }
 
 func (m *Facility) validateType(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Type) { // not required
 		return nil
 	}

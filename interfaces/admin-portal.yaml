@@ -106,7 +106,7 @@ paths:
       summary: Update facility
       operationId: updateFacilities
       security:
-        - hasRole: ["admin", "controller"]
+        - hasRole: ["admin", "controller", "facility-admin"]
       parameters:
         - in: body
           name: body
@@ -184,7 +184,7 @@ paths:
       summary: Get vaccinators
       operationId: getVaccinators
       security:
-        - hasRole: ["facility-admin", "admin", "facility-staff"]
+        - hasRole: ["facility-admin", "admin", "facility-staff", "controller"]
       parameters:
         - in: query
           name: facilityCode
@@ -364,7 +364,12 @@ paths:
       summary: Get users of a facility
       operationId: getFacilityUsers
       security:
-        - hasRole: ["facility-admin"]
+        - hasRole: ["facility-admin", "controller"]
+      parameters:
+        - in: query
+          name: facilityCode
+          type: string
+          description: Facility Code required for controller
       responses:
         '200':
           description: OK
@@ -395,12 +400,17 @@ paths:
       summary: Update Facility User
       operationId: updateFacilityUser
       security:
-        - hasRole: ["facility-admin"]
+        - hasRole: ["facility-admin", "controller"]
       parameters:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/FacilityUser'
+            allOf:
+              - $ref: '#/definitions/FacilityUser'
+              - type: object
+                properties:
+                  facilityCode:
+                    type: string
           description: Update facility user data
       responses:
         '200':
@@ -599,10 +609,10 @@ definitions:
           type: string
           title: Facility Email
         operatingHourStart:
-          type: integer
+          type: string
           title: Operating hours start of day
         operatingHourEnd:
-          type: integer
+          type: string
           title: Operating hours end of day
         category:
           type: string
@@ -725,10 +735,10 @@ definitions:
         type: string
         title: Facility Email
       operatingHourStart:
-        type: integer
+        type: string
         title: Operating hours start of day
       operatingHourEnd:
-        type: integer
+        type: string
         title: Operating hours end of day
       category:
         type: string
@@ -982,6 +992,9 @@ definitions:
       employeeId:
         type: string
         title: Facility User Id
+      email:
+        type: string
+        title: Email of User
       enabled:
         type: boolean
         title: enable/disable user

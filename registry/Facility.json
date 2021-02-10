@@ -72,12 +72,12 @@
         },
         "operatingHourStart": {
           "$id": "#/properties/operatingHourStart",
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "operatingHourEnd": {
           "$id": "#/properties/operatingHourEnd",
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "category": {
@@ -148,6 +148,10 @@
         },
         "mobile": {
           "$id": "#/properties/mobile",
+          "type": "string"
+        },
+        "email": {
+          "$id": "#/properties/email",
           "type": "string"
         },
         "___encryptedFields": {
