@@ -9,6 +9,12 @@
             window.onload = function(e){
                 var mobileNumber = sessionStorage.getItem("mobile_number");
                 document.getElementById("mobile_number").value= mobileNumber;
+                if(window.location.protocol === "https:") {
+                    let formField = document.getElementById("kc-form-login");
+                    if (formField) {
+                        formField.action = formField.action.replace("http","https");
+                    }
+                }
             }
         </script>
     <#elseif section = "form">
