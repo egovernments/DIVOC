@@ -200,11 +200,6 @@ func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityTypeId := "Facility"
 	filter := createFilterObject(params)
-	if HasResourceRole(portalClientId, "facility-admin", principal) {
-		filter[FacilityCodeKey] = map[string]interface{}{
-			"eq": principal.FacilityCode,
-		}
-	}
 	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
 	response, err := kernelService.QueryRegistry(entityTypeId, filter, limit, offset)
 	if err != nil {

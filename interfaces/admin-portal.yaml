@@ -76,7 +76,7 @@ paths:
           name: offset
           type: number
       security:
-        - hasRole: ["admin", "controller", "facility-admin"]
+        - hasRole: ["admin", "controller"]
       responses:
         '200':
           description: OK
