@@ -99,11 +99,11 @@ function FacilityController() {
         if (selectedProgram && facilities.length > 0) {
             let updateFacilities = [];
             facilities.forEach(facility => {
-                let programs = [{
-                    id: selectedProgram,
+                let p = [{
+                    id: programs.filter(p => p.value === selectedProgram).map(p => p.id)[0],
                     status: newStatus
                 }];
-                updateFacilities.push({osid: facility.osid, programs})
+                updateFacilities.push({osid: facility.osid, programs:p})
             });
             axiosInstance.current
                 .put(API_URL.FACILITY_API, updateFacilities)
@@ -158,12 +158,12 @@ function FacilityController() {
                         [
                             {
                                 data: item["programs"],
-                                filterKey: "programId",
+                                filterKey: "name",
                                 filterValue: [selectedProgram],
                                 toBePartiallyChecked: false
                             },
                             {
-                                data: item["programs"].filter(program => program.programId === selectedProgram),
+                                data: item["programs"].filter(program => program.name === selectedProgram),
                                 filterKey: "status",
                                 filterValue: [status],
                                 toBePartiallyChecked: false
@@ -204,12 +204,12 @@ function FacilityController() {
                             }
                         });
                         if(status === CONSTANTS.IN_ACTIVE && !isFiltersMatched) {
-                            if(!findBy(item["programs"], "programId", selectedProgram)) {
+                            if(!findBy(item["programs"], "name", selectedProgram)) {
                                 isFiltersMatched = true
                             }
                         }
                         if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
-                            const program = findBy(item["programs"], "programId", selectedProgram)
+                            const program = findBy(item["programs"], "name", selectedProgram)
                             if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
                                 isFiltersMatched = false
                             }
@@ -231,7 +231,7 @@ function FacilityController() {
     function fetchPrograms() {
         axiosInstance.current.get(API_URL.PROGRAM_API)
             .then(res => {
-                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                const programs = res.data.map(obj => ({value: obj.name, id: obj.osid, label: obj.name}));
                 setPrograms(programs);
                 if (programs.length > 0) {
                     setSelectedProgram(programs[0].value)

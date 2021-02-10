@@ -42,7 +42,7 @@ function FacilityAdjustingRate({
 
     const getFacilityProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.programId === selectedProgram);
+            const program = facility.programs.find(obj => obj.name === selectedProgram);
             if (program) {
                 return program;
             }
@@ -145,11 +145,11 @@ function FacilityAdjustingRate({
             Object.keys(rateWiseFacilities).forEach((rate) => {
                 const facilityIds = rateWiseFacilities[rate].facilityIds;
                 facilityIds.forEach((facilityId) => {
-                    let programs = [{
-                        id: selectedProgram,
+                    let p = [{
+                        id: programs.filter(p => p.value === selectedProgram).map(p => p.id)[0],
                         rate: rateWiseFacilities[rate].newRate
                     }];
-                    updateFacilities.push({osid: facilityId, programs})
+                    updateFacilities.push({osid: facilityId, programs:p})
                 });
 
 

@@ -47,7 +47,7 @@ function FacilityActivation({
 
     const getFacilityStatusForProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.programId === selectedProgram);
+            const program = facility.programs.find(obj => obj.name === selectedProgram);
             if (program) {
                 return program.status;
             }
