@@ -1,13 +1,14 @@
-import React, { useEffect,useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
-import { useAxios } from "../../utils/useAxios";
+import {useAxios} from "../../utils/useAxios";
 import PreEnrollmentUploadCSV from "../PreEnrollmentUploadCSV/PreEnrollmentUploadCSV";
+import {formatDate} from "../../utils/dateutil";
 
 function PreEnrollment() {
 
     const axiosInstance = useAxios("");
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         fetchTableDetails();
@@ -27,6 +28,7 @@ function PreEnrollment() {
                     return {
                         nationalId: item["nationalId"],
                         name: item["name"],
+                        uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
                 })
             })
@@ -35,7 +37,7 @@ function PreEnrollment() {
             });
     }
 
-    const AllFacilitiesHeaderData= [
+    const AllFacilitiesHeaderData = [
         {
             title: "National ID",
             key: "nationalId"
