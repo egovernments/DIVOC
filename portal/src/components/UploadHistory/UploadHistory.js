@@ -18,6 +18,7 @@ const UploadHistory = ({
                            fileUploadHistoryAPI,
                            fileUploadErrorsAPI,
                            infoTitle,
+                           emptyListMessage,
                            UploadComponent = UploadCSV,
                            tableTitle,
                            tableData,
@@ -108,6 +109,7 @@ const UploadHistory = ({
                         data={tableData}
                         headerData={tableHeader}
                         title={tableTitle}
+                        emptyListMessage={emptyListMessage}
                     />
                 </div>
                 <div className="upload-history">

@@ -61,6 +61,7 @@ function Facilities() {
         fileUploadErrorsAPI={API_URL.FACILITY_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Records in the DIVOC Facility Registry"}
         tableTitle="All Facilities"
+        emptyListMessage={"No Facility Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
         onRefresh={() => fetchTableDetails()}

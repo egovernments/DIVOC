@@ -60,6 +60,7 @@ function PreEnrollment() {
         infoTitle={"Records in the DIVOC Pre-Enrollment Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
         tableTitle="All Pre-Enrollments"
+        emptyListMessage={"No Pre-Enrollment Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
         onRefresh={() => fetchTableDetails()}

@@ -57,6 +57,7 @@ function VaccinatorsRegistry() {
         fileUploadErrorsAPI={API_URL.VACCINATOR_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Records in the DIVOC Vaccinator Registry"}
         tableTitle="All Vaccinators"
+        emptyListMessage={"No Vaccinator Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
         onRefresh={() => fetchTableDetails()}
