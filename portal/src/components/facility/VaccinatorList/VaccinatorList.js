@@ -2,7 +2,7 @@ import React, {useEffect, useState} from "react";
 import "./VaccinatorList.css"
 import check from "../../../assets/img/ic_check_circle_24px.svg";
 import info from "../../../assets/img/ic_info_24px.svg";
-import filter from "../../../assets/img/filter.svg";
+import filter from "../../../assets/img/arrow_down.svg";
 import Popover from "@material-ui/core/Popover";
 import {CheckboxItem} from "../../FacilityFilterTab";
 import {API_URL} from "../../../utils/constants";
@@ -115,19 +115,18 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
                 onClose={handleClose}
                 anchorOrigin={{
                     vertical: 'bottom',
-                    horizontal: 'center',
+                    horizontal: 'left',
                 }}
                 transformOrigin={{
                     vertical: 'top',
-                    horizontal: 'center',
+                    horizontal: 'left',
                 }}
             >
                 <div className="custom-popup">
-                    <p>FILTER BY</p>
-                    <hr/>
                     {
                         programs.map(program => (
                             <CheckboxItem
+                                checkedColor={"#5C9EF8"}
                                 text={program}
                                 checked={selectedPrograms.includes(program)}
                                 onSelect={(event) =>

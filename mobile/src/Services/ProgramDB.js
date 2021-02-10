@@ -1,6 +1,7 @@
 import {appIndexDb} from "../AppDatabase";
 import {formatCertifyDate} from "../utils/date_utils";
 import {getSelectedProgram} from "../components/ProgramSelection";
+import {CONSTANT} from "../utils/constants";
 
 const PROGRAMS = "programs";
 const VACCINATORS = "vaccinators";
@@ -82,17 +83,11 @@ class ProgramDB {
     }
 
     async getVaccinators() {
-        const vaccinator = await this.getDB().getAll(VACCINATORS)
+        const vaccinators = await this.getDB().getAll(VACCINATORS)
         const selectProgram = getSelectedProgram();
-        return vaccinator.filter((item, index) => {
-            const supportProgramsName = item[PROGRAMS]
-            for (let i = 0; i < supportProgramsName.length; i++) {
-                const program = supportProgramsName[i]
-                if (program.programId === selectProgram && program.certified) {
-                    return true;
-                }
-            }
-            return false;
+        return vaccinators.filter(vaccinator => {
+            return vaccinator.programs &&
+                vaccinator.programs.filter(p => p.programId === selectProgram && p.status === CONSTANT.ACTIVE).length > 0
         })
     }
 }

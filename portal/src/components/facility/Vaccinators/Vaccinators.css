@@ -68,6 +68,7 @@
 .table thead th {
     font-size: 12px;
     font-weight: bold;
+    width: 250px;
     color: #646D82;
 }
 
