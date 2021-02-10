@@ -6,6 +6,7 @@ import "./FacilityForm.css"
 import {useKeycloak} from "@react-keycloak/web";
 import { API_URL, CONSTANTS } from "../../utils/constants";
 import { update } from "ramda";
+import WeekDaysSelect from "../WeekDaysSelect";
 
 function FacilityForm({facility, refreshFacility, heading}) {
     const [editFacility, setEditFacility] = useState(false);
@@ -74,8 +75,14 @@ function FacilityForm({facility, refreshFacility, heading}) {
         data[event.target.name] = event.target.value;
     }
 
+    const handleDaysChange = (fieldName, days) => {
+        console.log(fieldName);
+        data[fieldName] = days
+        console.log(data[fieldName]);
+    }
+
     const handleSubmit = () => {
-        console.log(data);
+        setEditFacility(false);
         const updatedFacility = {...facility, ...data}
         updatedFacility.address.addressLine1 = data.addressLine1;
         updatedFacility.address.addressLine2 = data.addressLine2;
@@ -88,11 +95,12 @@ function FacilityForm({facility, refreshFacility, heading}) {
         }
 
         updatedFacility.programs?.forEach(p => {
+            p.id = p.programId;
             p.schedule = {
                 "days": data[p.programId+"_days"],
                 "startTime": data[p.programId+"_startTime"],
                 "endTime": data[p.programId+"_endTime"],
-            }
+            };
         })
 
         console.log(updatedFacility);
@@ -107,6 +115,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
     }
 
     const handleEditAdmin = () => {
+        setEditAdmin(false)
         const updatedAdmin = users.filter(u => u.mobileNumber == facility.admins[0].mobile)[0];
         updatedAdmin.name = data.adminName;
         updatedAdmin.mobileNumber = data.adminContact;
@@ -129,7 +138,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                     <React.Fragment>
                         <h4 style={{"display":"inline-block"}}>Bussiness Details</h4>
                         <span className="begin-edit" onClick={() => setEditFacility(!editFacility)}>
-                            {editFacility ? "discard" : "edit"}
+                            {editFacility ? "" : "edit"}
                         </span>
                     </React.Fragment>
                 }
@@ -175,8 +184,8 @@ function FacilityForm({facility, refreshFacility, heading}) {
                         <label>
                             <div><b>Category Type: </b></div>
                             <Row style={{"columnCount": 2}}>
-                                <div className="radio-input"><input type="radio" name="category" defaultChecked={facility.category === "PRIVATE"} disabled={!editFacility} onChange={handleChange} value="PRIVATE"/> Private</div>
-                                <div className="radio-input"><input type="radio" name="category" defaultChecked={facility.category === "GOVT"} disabled={!editFacility} onChange={handleChange} value="GOVT"/> Government</div>
+                                <div className="radio-input"><input type="radio" name="category" checked={facility.category === "PRIVATE"} disabled={!editFacility} onChange={handleChange} value="PRIVATE"/> Private</div>
+                                <div className="radio-input"><input type="radio" name="category" checked={facility.category === "GOVT"} disabled={!editFacility} onChange={handleChange} value="GOVT"/> Government</div>
                             </Row>
                         </label>
                     </div>
@@ -201,8 +210,8 @@ function FacilityForm({facility, refreshFacility, heading}) {
                     </div>
                 </Container>
 
+                    <h4>Ongoing Vaccination Programs</h4>
                     { facility.programs?.filter(p => p.status === CONSTANTS.ACTIVE).map(p => 
-                        <React.Fragment><h4>Ongoing Vaccination Programs</h4>
                         <Container style={{"columnCount": 2}}>
                         <div key={p.programId} className="programDiv">
                             <div><label>
@@ -211,7 +220,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                             </label></div>
                             <div><label>
                                 <div><b>Days: </b></div>
-                                <input type="text" name={p.programId + "_days"} defaultValue={p.schedule?.days} disabled={!editFacility} onChange={handleChange}/>
+                                <WeekDaysSelect name={p.programId + "_days"} days={p.schedule?.days} onChange={handleDaysChange} disabled={!editFacility}/>
                             </label></div>
                             <div><label>
                                 <div><b>Hours: </b></div>
@@ -219,7 +228,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                                 To <input className="time-input" type="time" name={p.programId + "_endTime"} defaultValue={p.schedule?.endTime} disabled={!editFacility} onChange={handleChange}/>
                             </label></div>
                         </div>
-                        </Container></React.Fragment>                    
+                        </Container>                   
                     )}
 
                 {editFacility && 
@@ -241,7 +250,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 <h4 style={{"display":"inline-block"}}>Adminstrator Details</h4>
                 {isFacilityController() && 
                     <span className="begin-edit" onClick={() => setEditAdmin(!editAdmin)}>
-                        {editAdmin ? "discard" : "edit"}
+                        {editAdmin ? "" : "edit"}
                     </span>
                 }
                 <Container>

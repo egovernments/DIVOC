@@ -199,7 +199,7 @@
       "title": "The FacilityProgramSchedule Schema",
       "properties": {
         "days": {
-          "$id": "#/properties/activeDays",
+          "$id": "#/properties/days",
           "type": "array",
           "items": {
             "type": "string"
