@@ -16,3 +16,14 @@ export function getNotificationTemplates() {
             return result["variantAttachment"]
         })
 }
+
+export const APP_CONFIG = Object.freeze({
+    MASKED_DIGITS: 4
+})
+
+export function maskNationalId(input) {
+    if (input && (typeof input === 'string' || input instanceof String)) {
+        const maskRegex = new RegExp('\\d(?=\\d{' +  APP_CONFIG.MASKED_DIGITS + '})', 'g');
+        return input.replace(maskRegex, "X");
+    }
+}

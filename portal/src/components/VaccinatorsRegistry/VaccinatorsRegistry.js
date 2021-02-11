@@ -3,6 +3,7 @@ import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
+import {maskNationalId} from "../../utils/config";
 
 function VaccinatorsRegistry() {
     const axiosInstance = useAxios("");
@@ -23,8 +24,9 @@ function VaccinatorsRegistry() {
             })
             .then((result) => {
                 return result.map((item, index) => {
+                    const nationalId = item["nationalIdentifier"]
                     return {
-                        nationalId: item["nationalIdentifier"],
+                        nationalId: maskNationalId(nationalId),
                         name: item["name"],
                         uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
