@@ -86,7 +86,7 @@ export class AppDatabase {
         let monthName = monthNames[dob.getMonth()];
         let year = dob.getFullYear();
 
-        return `${day}/${monthName}/${year}`;
+        return `${day}-${monthName}-${year}`;
     }
 
     async recipientDetails() {

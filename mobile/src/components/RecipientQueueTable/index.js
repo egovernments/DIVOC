@@ -9,6 +9,7 @@ import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
 import Col from "react-bootstrap/Col";
 import "./index.scss"
 import config from "config.json"
+import {formatDate} from "../../utils/date_utils";
 
 
 export const RecipientQueueTable = () => {
@@ -37,7 +38,7 @@ export const RecipientQueueTable = () => {
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>
-                                    <span style={{fontSize: "12px"}}>{`${data.gender}, ${data.dob}`}</span>
+                                    <span style={{fontSize: "12px"}}>{`${data.gender}, ${formatDate(data.dob)}`}</span>
                                 </div>
                             </td>
                             <td>
