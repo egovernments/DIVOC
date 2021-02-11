@@ -105,6 +105,7 @@ export function useConfirmVaccine() {
             selectedVaccinator: vaccinationDetails.vaccinatorId,
             medicines: medicines || [],
             selectedMedicine: vaccinationDetails.medicineId,
+            selectedDose: vaccinationDetails.selectedDose,
             batchIds: vaccinationDetails.batchIds || [],
             selectedBatchId: vaccinationDetails.lastBatchId,
         }
