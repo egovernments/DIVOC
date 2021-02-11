@@ -6,7 +6,7 @@ export function maskPersonalDetails(personalDetail){
         const length = personalDetail.length * 0.6;
         const firstFragment = personalDetail.substring(0, length);
         const lastFragment = personalDetail.substring(length+1,personalDetail.length);
-        return  firstFragment.replace(/\d/g, 'x')+lastFragment;
+        return  firstFragment.replace(/([a-zA-Z0-9])/g, '*')+lastFragment;
     }
    return ''
 }
