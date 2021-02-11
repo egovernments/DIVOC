@@ -138,6 +138,16 @@ function VaccineRegistration() {
         }
     }
 
+    // make errors more readable based on schema definition if any
+    const transformErrors = errors => {
+        return errors.map(error => {
+            if (error.property && error.property === ".medicineIds") {
+                error.message = "Please select vaccine for the program"
+            }
+            return error;
+        });
+    };
+
     return (
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
@@ -158,6 +168,8 @@ function VaccineRegistration() {
                             handleSubmit();
                         }
                     }}
+                    showErrorList={false}
+                    transformErrors={transformErrors}
                     onChange={(evt) => {
                         setFormData(evt.formData)
                     }}
