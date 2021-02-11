@@ -10,6 +10,8 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
 import {useSelector} from "react-redux";
+import {APP_CONFIG} from "../../../utils/config";
+import {InputMask} from "../../Common/InputMask";
 
 
 export default function VaccinatorDetails({
@@ -117,8 +119,7 @@ export default function VaccinatorDetails({
                 .then(res => {
                     if (res.status === 200) {
                         onSuccessfulSave()
-                    }
-                    else
+                    } else
                         alert("Something went wrong while saving!");
                 });
         } else {
@@ -140,8 +141,7 @@ export default function VaccinatorDetails({
                     .then(res => {
                         if (res.status === 200) {
                             onSuccessfulSave()
-                        }
-                        else
+                        } else
                             alert("Something went wrong while saving!");
                     });
             }
@@ -207,23 +207,24 @@ export default function VaccinatorDetails({
 
     return (
         <>
-        <div className="personal-details-div">
-            <div className="row">
-                <div ><h2>{hasVaccinatorSelected ? "Vaccinator Details" : "Add Vaccinator" }</h2></div>
-                <div className="search-div">
-                {
-                        !hasVaccinatorSelected &&
+            <div className="personal-details-div">
+                <div className="row">
+                    <div><h2>{hasVaccinatorSelected ? "Vaccinator Details" : "Add Vaccinator"}</h2></div>
+                    <div className="search-div">
+                        {
+                            !hasVaccinatorSelected &&
                             <>
                                 <input
                                     className="form-control"
-                                    value = {searchVaccinatorName}
+                                    value={searchVaccinatorName}
                                     type="text"
                                     id="name"
                                     placeholder="Search Registry by Name"
-                                    onKeyDown = {triggerSearchForOnClickEnter}
+                                    onKeyDown={triggerSearchForOnClickEnter}
                                     onChange={(evt) => setSearchVaccinatorName(evt.target.value)}
                                 />
-                                <button disabled={!searchVaccinatorName} className="search-img" onClick={searchVaccinators} ><img src={searchImg} alt={""} /></button>
+                                <button disabled={!searchVaccinatorName} className="search-img"
+                                        onClick={searchVaccinators}><img src={searchImg} alt={""}/></button>
                                 <SearchVaccinatorResultsView
                                     vaccinators={searchVaccinatorResults}
                                     togglePopup={togglePopup}
@@ -232,125 +233,131 @@ export default function VaccinatorDetails({
                                     facilityCode={facilityCode}
                                 />
                             </>
-                    }
-                    <button className="add-vaccinator-button" onClick={exitDetailView} >BACK</button>
+                        }
+                        <button className="add-vaccinator-button" onClick={exitDetailView}>BACK</button>
+                    </div>
                 </div>
-            </div>
 
-            <div className="row">
-                <div className="col-sm-10">
-                    <h3>Personal Details</h3>
-                    <form>
-                        <div className="form-row">
-                            <div className="col-md-6">
-                                <label htmlFor="name">
-                                    Name *
-                                </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.name}
-                                    type="text"
-                                    id="name"
-                                    onChange={(evt) => onValueChange(evt, "name")}
-                                    required />
+                <div className="row">
+                    <div className="col-sm-10">
+                        <h3>Personal Details</h3>
+                        <form>
+                            <div className="form-row">
+                                <div className="col-md-6">
+                                    <label htmlFor="name">
+                                        Name *
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        value={vaccinator.name}
+                                        type="text"
+                                        id="name"
+                                        onFocus={(e) => console.log(e)}
+                                        onBlur={(e) => console.log(e)}
+                                        onChange={(evt) => onValueChange(evt, "name")}
+                                        required/>
+                                </div>
+                                <div className="col-md-6">
+                                    <label htmlFor="email">
+                                        Email *
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        value={vaccinator.email}
+                                        type="email"
+                                        id="email"
+                                        onChange={(evt) => onValueChange(evt, "email")}
+                                        required/>
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label htmlFor="email">
-                                    Email *
-                                </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.email}
-                                    type="email"
-                                    id="email"
-                                    onChange={(evt) => onValueChange(evt, "email")}
-                                    required />
+                            <div className="form-row">
+                                <div className="col-md-6">
+                                    <label htmlFor="mobileNumber">
+                                        Mobile *
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        value={vaccinator.mobileNumber}
+                                        type="text"
+                                        id="mobileNumber"
+                                        onChange={(evt) => onValueChange(evt, "mobileNumber")}
+                                        required/>
+                                </div>
+                                <div className="col-md-6">
+                                    <label htmlFor="nationalIdentifier">
+                                        National Identifier *
+                                    </label>
+                                    <InputMask
+                                        className="form-control"
+                                        value={vaccinator.nationalIdentifier}
+                                        numberOfMaskDigit={APP_CONFIG.MASKED_DIGITS}
+                                        type="text"
+                                        id="nationalIdentifier"
+                                        onChange={(evt) => onValueChange(evt, "nationalIdentifier")}
+                                        required/>
+                                </div>
                             </div>
-                        </div>
-                        <div className="form-row">
-                            <div className="col-md-6">
-                                <label htmlFor="mobileNumber">
-                                    Mobile *
-                                </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.mobileNumber}
-                                    type="text"
-                                    id="mobileNumber"
-                                    onChange={(evt) => onValueChange(evt, "mobileNumber")}
-                                    required />
+                            <div className="form-row">
+                                <div className="col-md-6">
+                                    <label htmlFor="licenseNumber">
+                                        License Number *
+                                    </label>
+                                    <input
+                                        className="form-control"
+                                        value={vaccinator.code}
+                                        type="text"
+                                        id="licenseNumber"
+                                        onChange={(evt) => onValueChange(evt, "code")}
+                                        required/>
+                                </div>
                             </div>
-                            <div className="col-md-6">
-                                <label htmlFor="nationalIdentifier">
-                                    National Identifier *
-                                </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.nationalIdentifier}
-                                    type="text"
-                                    id="nationalIdentifier"
-                                    onChange={(evt) => onValueChange(evt, "nationalIdentifier")}
-                                    required />
-                            </div>
-                        </div>
-                        <div className="form-row">
-                            <div className="col-md-6">
-                                <label htmlFor="licenseNumber">
-                                    License Number *
-                                </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.code}
-                                    type="text"
-                                    id="licenseNumber"
-                                    onChange={(evt) => onValueChange(evt, "code")}
-                                    required />
-                            </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
-            </div>
-            <div className="row">
-                <div className="col-sm-6 training-and-certification">
-                <h3>Training & Certification</h3>
-                    {
-                        vaccinator.programs &&
-                        vaccinator.programs.map(program => (
-                            <div className="row vaccinator-prg-div">
-                                <span className="col-sm-7 vaccinator-prg-span">{program.programId}</span>
+                <div className="row">
+                    <div className="col-sm-6 training-and-certification">
+                        <h3>Training & Certification</h3>
+                        {
+                            vaccinator.programs &&
+                            vaccinator.programs.map(program => (
+                                <div className="row vaccinator-prg-div">
+                                    <span className="col-sm-7 vaccinator-prg-span">{program.programId}</span>
+                                    <CustomSwitch
+                                        checked={program.certified}
+                                        onChange={() => onProgramCertifyChange(program, !program.certified)}
+                                        color="primary"
+                                    />
+                                    <span className="vaccinator-prg-span">Certified</span>
+                                </div>
+                            ))
+                        }
+                        <div>
+                            <span className="filter-header">Certification (if any)</span>
+                            <DropDown
+                                options={programs}
+                                placeholder="Please select Program"
+                                setSelectedOption={onAddProgramChange}
+                            />
+                            <div>
+                                <span>Certified</span>
                                 <CustomSwitch
-                                    checked={program.certified}
-                                    onChange={() => onProgramCertifyChange(program, !program.certified)}
+                                    checked={selectedProgram.certified}
+                                    onChange={() => onAddProgramCertify(!selectedProgram.certified)}
                                     color="primary"
                                 />
-                                <span className="vaccinator-prg-span">Certified</span>
                             </div>
-                        ))
-                    }
-                    <div>
-                        <span className="filter-header">Certification (if any)</span>
-                        <DropDown
-                            options={programs}
-                            placeholder="Please select Program"
-                            setSelectedOption={onAddProgramChange}
-                        />
-                        <div>
-                            <span>Certified</span>
-                            <CustomSwitch
-                                checked={selectedProgram.certified}
-                                onChange={() => onAddProgramCertify(!selectedProgram.certified)}
-                                color="primary"
-                            />
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
             <div style={{marginLeft: "12px"}}>
-                {savedSuccessfully && <span><img src={check}/> <span className="saved-success">Details Saved</span></span>}
-                {!hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={saveVaccinator}>ADD</button>}
-                {hasVaccinatorSelected && <button className="add-vaccinator-button" onClick={editVaccinator}>SAVE</button>}
+                {savedSuccessfully &&
+                <span><img src={check}/> <span className="saved-success">Details Saved</span></span>}
+                {!hasVaccinatorSelected &&
+                <button className="add-vaccinator-button" onClick={saveVaccinator}>ADD</button>}
+                {hasVaccinatorSelected &&
+                <button className="add-vaccinator-button" onClick={editVaccinator}>SAVE</button>}
             </div>
-    </>
+        </>
     );
 }

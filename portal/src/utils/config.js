@@ -1,4 +1,5 @@
 import axios from "axios";
+import React, {useEffect, useState} from "react";
 
 export function getNotificationTemplates() {
     const data = {
@@ -22,8 +23,12 @@ export const APP_CONFIG = Object.freeze({
 })
 
 export function maskNationalId(input) {
+    return maskString(input, APP_CONFIG.MASKED_DIGITS)
+}
+
+export function maskString(input, numberOfMaskDigit) {
     if (input && (typeof input === 'string' || input instanceof String)) {
-        const maskRegex = new RegExp('\\d(?=\\d{' +  APP_CONFIG.MASKED_DIGITS + '})', 'g');
+        const maskRegex = new RegExp('\\w(?=\\w{' + numberOfMaskDigit + '})', 'g');
         return input.replace(maskRegex, "X");
     }
 }
