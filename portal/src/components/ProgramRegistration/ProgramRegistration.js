@@ -13,6 +13,7 @@ import {CustomTextAreaWidget} from '../CustomTextAreaWidget/index';
 import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
 import {formatDate} from "../../utils/dateutil";
 import * as R from "ramda";
+import {TextInCenter} from "../TextInCenter";
 
 function VaccineRegistration() {
     const {keycloak} = useKeycloak();
@@ -181,6 +182,7 @@ function VaccineRegistration() {
                     }}
                 />
             </div>}
+            {programList.length === 0 && <TextInCenter text={"No Program Added"}/>}
         </div>
     );
 }

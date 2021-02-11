@@ -249,7 +249,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -472,12 +473,21 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "controller"
             ]
           }
         ],
         "summary": "Get users of a facility",
         "operationId": "getFacilityUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code required for controller",
+            "name": "facilityCode",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -495,7 +505,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "controller"
             ]
           }
         ],
@@ -507,7 +518,19 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityUser"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/FacilityUser"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "facilityCode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
             }
           }
         ],
@@ -810,7 +833,8 @@ func init() {
             "hasRole": [
               "facility-admin",
               "admin",
-              "facility-staff"
+              "facility-staff",
+              "controller"
             ]
           }
         ],
@@ -1130,11 +1154,11 @@ func init() {
           "title": "Geo Location"
         },
         "operatingHourEnd": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "operatingHourStart": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "programs": {
@@ -1212,6 +1236,38 @@ func init() {
       "items": {
         "type": "object",
         "properties": {
+          "address": {
+            "title": "Address",
+            "$ref": "#/definitions/Address"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "contact": {
+            "type": "string",
+            "title": "Contact number"
+          },
+          "email": {
+            "type": "string",
+            "title": "Facility Email"
+          },
+          "facilityName": {
+            "type": "string",
+            "title": "Facility Name"
+          },
+          "geoLocation": {
+            "type": "string",
+            "title": "Geo Location"
+          },
+          "operatingHourEnd": {
+            "type": "string",
+            "title": "Operating hours end of day"
+          },
+          "operatingHourStart": {
+            "type": "string",
+            "title": "Operating hours start of day"
+          },
           "osid": {
             "type": "string"
           },
@@ -1236,12 +1292,10 @@ func init() {
                       }
                     },
                     "endTime": {
-                      "type": "string",
-                      "x-nullable": true
+                      "type": "string"
                     },
                     "startTime": {
-                      "type": "string",
-                      "x-nullable": true
+                      "type": "string"
                     }
                   }
                 },
@@ -1253,12 +1307,20 @@ func init() {
           },
           "status": {
             "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "title": "Website URL"
           }
         }
       }
     },
     "FacilityUser": {
       "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email of User"
+        },
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
@@ -1844,7 +1906,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -2056,12 +2119,21 @@ func init() {
         "security": [
           {
             "hasRole": [
+              "controller",
               "facility-admin"
             ]
           }
         ],
         "summary": "Get users of a facility",
         "operationId": "getFacilityUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code required for controller",
+            "name": "facilityCode",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2079,6 +2151,7 @@ func init() {
         "security": [
           {
             "hasRole": [
+              "controller",
               "facility-admin"
             ]
           }
@@ -2091,7 +2164,19 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityUser"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/FacilityUser"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "facilityCode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
             }
           }
         ],
@@ -2393,6 +2478,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "controller",
               "facility-admin",
               "facility-staff"
             ]
@@ -2730,11 +2816,11 @@ func init() {
           "title": "Geo Location"
         },
         "operatingHourEnd": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "operatingHourStart": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "programs": {
@@ -2819,6 +2905,38 @@ func init() {
     "FacilityUpdateRequestItems0": {
       "type": "object",
       "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "contact": {
+          "type": "string",
+          "title": "Contact number"
+        },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "string",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "string",
+          "title": "Operating hours start of day"
+        },
         "osid": {
           "type": "string"
         },
@@ -2830,6 +2948,10 @@ func init() {
         },
         "status": {
           "type": "string"
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
         }
       }
     },
@@ -2852,12 +2974,10 @@ func init() {
               }
             },
             "endTime": {
-              "type": "string",
-              "x-nullable": true
+              "type": "string"
             },
             "startTime": {
-              "type": "string",
-              "x-nullable": true
+              "type": "string"
             }
           }
         },
@@ -2876,17 +2996,19 @@ func init() {
           }
         },
         "endTime": {
-          "type": "string",
-          "x-nullable": true
+          "type": "string"
         },
         "startTime": {
-          "type": "string",
-          "x-nullable": true
+          "type": "string"
         }
       }
     },
     "FacilityUser": {
       "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email of User"
+        },
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"

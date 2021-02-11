@@ -27,6 +27,19 @@ func (e Enrollment) MarshalJSON() ([]byte, error) {
 	if err != nil {
 		return nil, errors.New("Detail: DoB is not in required format (Ex: 2006-01-21)")
 	}
-	return json.Marshal(e)
+	attributes := map[string]interface{}{
+		"phone":             e.Phone,
+		"enrollmentScopeId": e.EnrollmentScopeId,
+		"nationalId":        e.NationalId,
+		"dob":               e.Dob,
+		"gender":            e.Gender,
+		"name":              e.Name,
+		"email":             e.Email,
+		"code":              e.Code,
+		"certified":         e.Certified,
+		"programId":         e.ProgramId,
+		"address":           e.Address,
+	}
+	bytes, err := json.Marshal(attributes)
+	return bytes, err
 }
-

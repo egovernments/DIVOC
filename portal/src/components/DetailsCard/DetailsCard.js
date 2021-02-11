@@ -11,13 +11,8 @@ import FacilityForm from "../FacilityForm/FacilityForm";
 
 
 
-function DetailsCard({ showCard, setShowCard, facility, setFacility,status, updateFacilityProgramStatus }) {
+function DetailsCard({ showCard, setShowCard, facility, fetchFacilities,status, updateFacilityProgramStatus }) {
     console.log("data", facility);
-    const [editAdmin, setEditAdmin] = useState(false);  
-    const getInputClass = () => {
-        return editAdmin ? "enabled" : "disabled"
-    }
-
     const box = () => {
         return (<React.Fragment>
             <Row>
@@ -29,7 +24,7 @@ function DetailsCard({ showCard, setShowCard, facility, setFacility,status, upda
                 </Button>
                 </Col>
             </Row>
-            <FacilityForm facility={facility} setFacility={setFacility}/>
+            <FacilityForm facility={facility} refreshFacility={fetchFacilities}/>
             {status===CONSTANTS.ACTIVE && <Button 
                          className="mr-2 blue-btn" variant="outlined" color="primary" 
                          style={{"marginTop": "10px"}}
