@@ -6,9 +6,13 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
@@ -31,7 +35,7 @@ func NewUpdateFacilityUser(ctx *middleware.Context, handler UpdateFacilityUserHa
 	return &UpdateFacilityUser{Context: ctx, Handler: handler}
 }
 
-/*UpdateFacilityUser swagger:route PUT /facility/users updateFacilityUser
+/* UpdateFacilityUser swagger:route PUT /facility/users updateFacilityUser
 
 Update Facility User
 
@@ -47,7 +51,6 @@ func (o *UpdateFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewUpdateFacilityUserParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +70,109 @@ func (o *UpdateFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// UpdateFacilityUserBody update facility user body
+//
+// swagger:model UpdateFacilityUserBody
+type UpdateFacilityUserBody struct {
+	models.FacilityUser
+
+	// facility code
+	FacilityCode string `json:"facilityCode,omitempty"`
+}
+
+// UnmarshalJSON unmarshals this object from a JSON structure
+func (o *UpdateFacilityUserBody) UnmarshalJSON(raw []byte) error {
+	// UpdateFacilityUserParamsBodyAO0
+	var updateFacilityUserParamsBodyAO0 models.FacilityUser
+	if err := swag.ReadJSON(raw, &updateFacilityUserParamsBodyAO0); err != nil {
+		return err
+	}
+	o.FacilityUser = updateFacilityUserParamsBodyAO0
+
+	// UpdateFacilityUserParamsBodyAO1
+	var dataUpdateFacilityUserParamsBodyAO1 struct {
+		FacilityCode string `json:"facilityCode,omitempty"`
+	}
+	if err := swag.ReadJSON(raw, &dataUpdateFacilityUserParamsBodyAO1); err != nil {
+		return err
+	}
+
+	o.FacilityCode = dataUpdateFacilityUserParamsBodyAO1.FacilityCode
+
+	return nil
+}
+
+// MarshalJSON marshals this object to a JSON structure
+func (o UpdateFacilityUserBody) MarshalJSON() ([]byte, error) {
+	_parts := make([][]byte, 0, 2)
+
+	updateFacilityUserParamsBodyAO0, err := swag.WriteJSON(o.FacilityUser)
+	if err != nil {
+		return nil, err
+	}
+	_parts = append(_parts, updateFacilityUserParamsBodyAO0)
+	var dataUpdateFacilityUserParamsBodyAO1 struct {
+		FacilityCode string `json:"facilityCode,omitempty"`
+	}
+
+	dataUpdateFacilityUserParamsBodyAO1.FacilityCode = o.FacilityCode
+
+	jsonDataUpdateFacilityUserParamsBodyAO1, errUpdateFacilityUserParamsBodyAO1 := swag.WriteJSON(dataUpdateFacilityUserParamsBodyAO1)
+	if errUpdateFacilityUserParamsBodyAO1 != nil {
+		return nil, errUpdateFacilityUserParamsBodyAO1
+	}
+	_parts = append(_parts, jsonDataUpdateFacilityUserParamsBodyAO1)
+	return swag.ConcatJSON(_parts...), nil
+}
+
+// Validate validates this update facility user body
+func (o *UpdateFacilityUserBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with models.FacilityUser
+	if err := o.FacilityUser.Validate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// ContextValidate validate this update facility user body based on the context it is used
+func (o *UpdateFacilityUserBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with models.FacilityUser
+	if err := o.FacilityUser.ContextValidate(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *UpdateFacilityUserBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *UpdateFacilityUserBody) UnmarshalBinary(b []byte) error {
+	var res UpdateFacilityUserBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

@@ -31,7 +31,7 @@ func NewUpdateFacilities(ctx *middleware.Context, handler UpdateFacilitiesHandle
 	return &UpdateFacilities{Context: ctx, Handler: handler}
 }
 
-/*UpdateFacilities swagger:route PUT /facilities updateFacilities
+/* UpdateFacilities swagger:route PUT /facilities updateFacilities
 
 Update facility
 
@@ -47,7 +47,6 @@ func (o *UpdateFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewUpdateFacilitiesParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *UpdateFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
