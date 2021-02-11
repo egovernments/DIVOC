@@ -10,6 +10,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import TableHead from "@material-ui/core/TableHead";
 import PropTypes from "prop-types";
 import TablePagination from "@material-ui/core/TablePagination";
+import {maskPersonalDetails} from  "../../utils/maskPersonalDetails";
 
 const useStyles = makeStyles({
         table: {
@@ -138,16 +139,16 @@ export const UploadHistoryTable = ({
                                             }
                                         }}
                                     >
-                                        {headerData.map((field, index) => (
-                                            <TableCell
+                                        {headerData.map((field, index) => {
+                                           return( <TableCell
                                                 component={RowTableCell}
                                                 size="small"
                                                 align="center"
                                                 key={index}
                                             >
-                                                {row[field.key]}
-                                            </TableCell>
-                                        ))}
+                                                {field.key === "nationalId" ? maskPersonalDetails(row[field.key]):row[field.key]}
+                                            </TableCell>)
+                            })}
                                     </TableRow>
                                 ))}
                         </TableBody>
