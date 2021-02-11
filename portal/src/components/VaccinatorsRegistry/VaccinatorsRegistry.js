@@ -2,6 +2,7 @@ import React, { useEffect,useState } from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
 import { useAxios } from "../../utils/useAxios";
+import { maskPersonalDetails } from '../../utils/maskPersonalDetails';
 
 function VaccinatorsRegistry() {
     const axiosInstance = useAxios("");
@@ -23,7 +24,7 @@ function VaccinatorsRegistry() {
             .then((result) => {
                 return result.map((item, index) => {
                     return {
-                        nationalId: item["nationalIdentifier"],
+                        nationalId: maskPersonalDetails(item["nationalIdentifier"]),
                         name: item["name"],
                     }
                 })

@@ -6,7 +6,7 @@ import "./FacilityForm.css"
 import {useKeycloak} from "@react-keycloak/web";
 import { API_URL, CONSTANTS } from "../../utils/constants";
 import { update } from "ramda";
-import { maskPersonalDetails } from "../../utils/maskPersonalDetails";
+import InputMask from "../InputMask/InputMask";
 
 function FacilityForm({facility, setFacility, heading}) {
     const isGovtFacility = facility.category === "GOVT";
@@ -212,13 +212,13 @@ function FacilityForm({facility, setFacility, heading}) {
                             <div>
                                 <label>
                                     <div><b>Name: </b></div>
-                                    <input type="text" name="adminName" defaultValue={facility.admins[0].name} disabled={!editAdmin} onChange={handleChange}/>
+                                    <input className="form-control" type="text" name="adminName" defaultValue={facility.admins[0].name} disabled={!editAdmin} onChange={handleChange}/>
                                 </label>
                             </div>
                             <div>
                                 <label>
                                     <div><b>Contact: </b></div>
-                                    <EditAdminInput 
+                                    <InputMask
                                         type="tel" 
                                         name="adminContact"
                                         defaultValue={facility.admins[0].mobile}
@@ -230,7 +230,7 @@ function FacilityForm({facility, setFacility, heading}) {
                             <div>
                                 <label>
                                     <div><b>Email: </b></div>
-                                    <EditAdminInput 
+                                    <InputMask 
                                         type="text"
                                         name="adminEmail" 
                                         defaultValue={facility.admins[0].email}
@@ -248,16 +248,4 @@ function FacilityForm({facility, setFacility, heading}) {
             </div>
         </form></Container>}
 
-function EditAdminInput({type,name,defaultValue,disabled,handleChange}){
-    return(
-        <input 
-            type={type} 
-            name={name} 
-            defaultValue={maskPersonalDetails(defaultValue)}
-            disabled={disabled} 
-            onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value)}
-            onFocus={(evt) => evt.target.value = defaultValue} 
-            onChange={handleChange}/>
-    )
-}
 export default FacilityForm;

@@ -3,6 +3,7 @@ import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
 import { useAxios } from "../../utils/useAxios";
 import PreEnrollmentUploadCSV from "../PreEnrollmentUploadCSV/PreEnrollmentUploadCSV";
+import { maskPersonalDetails } from '../../utils/maskPersonalDetails';
 
 function PreEnrollment() {
 
@@ -25,7 +26,7 @@ function PreEnrollment() {
             .then((result) => {
                 return result.map((item, index) => {
                     return {
-                        nationalId: item["nationalId"],
+                        nationalId: maskPersonalDetails(item["nationalId"]),
                         name: item["name"],
                     }
                 })

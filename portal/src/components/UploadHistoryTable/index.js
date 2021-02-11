@@ -146,7 +146,7 @@ export const UploadHistoryTable = ({
                                                 align="center"
                                                 key={index}
                                             >
-                                                {field.key === "nationalId" ? maskPersonalDetails(row[field.key]):row[field.key]}
+                                                {row[field.key]}
                                             </TableCell>)
                             })}
                                     </TableRow>

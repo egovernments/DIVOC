@@ -11,6 +11,7 @@ import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
 import {useSelector} from "react-redux";
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
+import InputMask from "../../InputMask/InputMask";
 
 
 export default function VaccinatorDetails({
@@ -259,8 +260,7 @@ export default function VaccinatorDetails({
                                 <label htmlFor="email">
                                     Email *
                                 </label>
-                                <EditAdminInput 
-                                    className="form-control"
+                                <InputMask
                                     type="email"
                                     id="email"
                                     defaultValue={vaccinator.email}
@@ -273,7 +273,7 @@ export default function VaccinatorDetails({
                                 <label htmlFor="mobileNumber">
                                     Mobile *
                                 </label>
-                                <EditAdminInput 
+                                <InputMask
                                     type="text"
                                     id="mobileNumber"
                                     defaultValue={vaccinator.mobileNumber}
@@ -284,7 +284,7 @@ export default function VaccinatorDetails({
                                 <label htmlFor="nationalIdentifier">
                                     National Identifier *
                                 </label>
-                                <EditAdminInput 
+                                <InputMask
                                     type="text"
                                     id="nationalIdentifier"
                                     defaultValue={vaccinator.nationalIdentifier}
@@ -297,7 +297,7 @@ export default function VaccinatorDetails({
                                 <label htmlFor="licenseNumber">
                                     License Number *
                                 </label>
-                                <EditAdminInput 
+                                <InputMask 
                                     type="text"
                                     id="licenseNumber"
                                     defaultValue={vaccinator.code}
@@ -351,19 +351,4 @@ export default function VaccinatorDetails({
             </div>
     </>
     );
-}
-
-function EditAdminInput({type,id,defaultValue,handleChange}){
-    return(
-        <input 
-            className="form-control"
-            type={type} 
-            id={id} 
-            defaultValue={maskPersonalDetails(defaultValue)}
-            onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value)}
-            onFocus={(evt) => evt.target.value = defaultValue} 
-            onChange={handleChange}
-            required
-        />
-    )
 }
