@@ -70,6 +70,10 @@ var Config = struct {
 		DefaultLimit  int `default:"100"`
 		DefaultOffset int `default:"0"`
 	}
+	EnrollmentCreation struct{
+		MaxRetryCount int `default:"5" env:"maxRetryCount"`
+		NumberOfDigits int `default:"13" env:"lengthOfPreEnrollmentCode"`
+	}
 }{}
 
 func Initialize() {

@@ -36,3 +36,6 @@ kafka:
   certifiedTopic: certified
 flagr:
   url: https://divoc.xiv.in/config
+enrollmentCreation:
+  maxRetryCount: 5
+  lengthOfPreEnrollmentCode: 13

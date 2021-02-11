@@ -3,7 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+	"github.com/divoc/portal-api/config"
+	"math/rand"
 	"strconv"
+	"strings"
 )
 
 func isEqual(arr1 []string, arr2 []string) bool {
@@ -73,4 +76,20 @@ func SetMapValueIfNotEmpty(m map[string]interface{}, key string, value string) {
 	if value != "" {
 		m[key] = value
 	}
+}
+
+func generateEnrollmentCode() string {
+	var digits int64 = 0
+	for i := 0; i < config.Config.EnrollmentCreation.NumberOfDigits; i++ {
+		digits = digits*10 + 9
+	}
+	println(digits)
+	code := rand.Int63n(digits)
+	var sb strings.Builder
+	for ; code != 0; {
+		var n = int(code % 10)
+		sb.WriteString(strconv.Itoa(n))
+		code /= 10
+	}
+	return sb.String()
 }

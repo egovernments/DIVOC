@@ -7,8 +7,7 @@ import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
-	"math/rand"
-	"strconv"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -27,6 +26,24 @@ func (preEnrollmentCsv PreEnrollmentCSV) ValidateRow() []string {
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
+	err, enrollment := createPreEnrollmentRegistry(preEnrollmentCsv, 1)
+	if err != nil {
+		errmsg := err.Error()
+		if strings.Contains(errmsg, "Detail:") {
+			split := strings.Split(errmsg, "Detail:")
+			if len(split) > 0 {
+				m1 := split[len(split)-1]
+				return errors.New(m1)
+			}
+		}
+		return errors.New(errmsg)
+	}
+	errNotify := services.NotifyRecipient(enrollment)
+	return errNotify
+}
+
+func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetryCount int) (error, models.Enrollment) {
+	log.Info("Current number of tries for createPreEnrollmentRegistry", currentRetryCount)
 	data := preEnrollmentCsv.Data
 	//Name, Mobile, National Identifier, DOB, facilityId
 	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
@@ -44,25 +61,12 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 		Address:           GetAddressObject(data),
 	}
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	if err != nil {
-		errmsg := err.Error()
-		if strings.Contains(errmsg, "Detail:") {
-			split := strings.Split(errmsg, "Detail:")
-			if len(split) > 0 {
-				m1 := split[len(split)-1]
-				return errors.New(m1)
-			}
-		}
-		return errors.New(errmsg)
+	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
+		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount + 1)
 	}
-	errNotify := services.NotifyRecipient(enrollment)
-	return errNotify
+	return err, enrollment
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
 	preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
-}
-
-func generateEnrollmentCode() string {
-	return strconv.Itoa(10000 + rand.Intn(90000)) //five digit random code
 }

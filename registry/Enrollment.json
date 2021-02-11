@@ -67,7 +67,7 @@
     "privateFields": [],
     "signedFields": [],
     "indexFields": ["(phone, code)"],
-    "uniqueIndexFields": ["(enrollmentScopeId, code)"],
+    "uniqueIndexFields": ["code"],
     "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }
