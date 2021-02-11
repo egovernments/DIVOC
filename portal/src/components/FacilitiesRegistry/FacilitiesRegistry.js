@@ -1,11 +1,12 @@
-import React, { useEffect,useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
-import { useAxios } from "../../utils/useAxios";
+import {useAxios} from "../../utils/useAxios";
+import {formatDate} from "../../utils/dateutil";
 
 function Facilities() {
     const axiosInstance = useAxios("");
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         fetchTableDetails();
@@ -26,6 +27,7 @@ function Facilities() {
                         facilityId: item["facilityCode"],
                         name: item["facilityName"],
                         state: item["address"].state,
+                        uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
                 })
             })
@@ -34,7 +36,7 @@ function Facilities() {
             });
     }
 
-    const AllFacilitiesHeaderData= [
+    const AllFacilitiesHeaderData = [
         {
             title: "FACILITY ID",
             key: "facilityId"
@@ -59,8 +61,10 @@ function Facilities() {
         fileUploadErrorsAPI={API_URL.FACILITY_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Records in the DIVOC Facility Registry"}
         tableTitle="All Facilities"
+        emptyListMessage={"No Facility Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 

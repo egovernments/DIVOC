@@ -9,6 +9,12 @@
             window.onload = function(e){
                 var mobileNumber = sessionStorage.getItem("mobile_number");
                 document.getElementById("mobile_number").value= mobileNumber;
+                if(window.location.protocol === "https:") {
+                    let formField = document.getElementById("kc-form-login");
+                    if (formField) {
+                        formField.action = formField.action.replace("http","https");
+                    }
+                }
             }
         </script>
     <#elseif section = "form">
@@ -30,7 +36,7 @@
                             <div class="input-field otp">
                                 <label for="otp" class="otp-prefix">OTP</label>
                                 <input id="otp" class="login-field" placeholder="XX XX"
-                                       type="password"
+                                       type="password" autofocus
                                        name="otp" tabindex="2">
                             </div>
                         </div>

@@ -10,6 +10,7 @@ import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
 import {CustomTextWidget} from "../CustomTextWidget/index";
 import {CustomTextAreaWidget} from "../CustomTextAreaWidget/index";
 import * as R from "ramda";
+import {TextInCenter} from "../TextInCenter";
 
 
 function VaccineRegistration() {
@@ -93,7 +94,7 @@ function VaccineRegistration() {
     }
 
     const getSchema = () => {
-        if(formData.edited) {
+        if (formData.edited) {
             const updatedSchema = {...schema};
             delete updatedSchema.properties.name
             return updatedSchema
@@ -187,6 +188,7 @@ function VaccineRegistration() {
                     />
                 </>}
             </div>}
+            {medicineList.length === 0 && <TextInCenter text={"No Vaccine Added"}/>}
         </div>
     );
 }

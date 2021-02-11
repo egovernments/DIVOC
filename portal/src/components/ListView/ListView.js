@@ -4,6 +4,7 @@ import AddIconImg from "../../assets/img/add-icon.svg";
 import Button from 'react-bootstrap/Button';
 import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
+import {formatDate} from "../../utils/dateutil";
 
 const CustomSwitch = withStyles({
     switchBase: {
@@ -77,11 +78,11 @@ function ListView({listData, onRegisterBtnClick, title, buttonTitle, showDetails
                                         <div>
                                             <div className="d-inline-flex flex-column">
                                                 <span>Start Date</span>
-                                                <span><b>{data.startDate}</b></span>
+                                                <span><b>{formatDate(data.startDate)}</b></span>
                                             </div>
                                             <div className="d-inline-flex flex-column ml-3">
                                                 <span>End Date</span>
-                                                <span><b>{data.endDate}</b></span>
+                                                <span><b>{formatDate(data.endDate)}</b></span>
                                             </div>
                                         </div>
                                         <div className="custom-switch d-inline-flex flex-column align-items-center">

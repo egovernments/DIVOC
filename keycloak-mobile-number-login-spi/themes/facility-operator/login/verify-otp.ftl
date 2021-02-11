@@ -7,6 +7,12 @@
         <link href="${url.resourcesPath}/img/favicon.png" rel="icon"/>
         <script>
           window.onload = function (e) {
+              if(window.location.protocol === "https:") {
+                  let formField = document.getElementById("kc-form-login");
+                  if (formField) {
+                      formField.action = formField.action.replace("http","https");
+                  }
+              }
             var mobileNumber = sessionStorage.getItem("mobile_number");
             document.getElementById("mobile_number").value = mobileNumber;
             var obj = document.getElementById('otp');
@@ -46,7 +52,7 @@
                           action="${url.loginAction}" method="post">
                         <div id="divOuter">
                             <div id="divInner">
-                                <input id="otp" type="password" name="otp" tabindex="1" maxlength="4"
+                                <input id="otp" autofocus type="password" name="otp" tabindex="1" maxlength="4"
                                        placeholder=""/>
                             </div>
                         </div>
