@@ -6,6 +6,7 @@ import "./FacilityForm.css"
 import {useKeycloak} from "@react-keycloak/web";
 import { API_URL, CONSTANTS } from "../../utils/constants";
 import { update } from "ramda";
+import { maskPersonalDetails } from "../../utils/maskPersonalDetails";
 
 function FacilityForm({facility, setFacility, heading}) {
     const isGovtFacility = facility.category === "GOVT";
@@ -217,13 +218,25 @@ function FacilityForm({facility, setFacility, heading}) {
                             <div>
                                 <label>
                                     <div><b>Contact: </b></div>
-                                    <input type="tel" name="adminContact" defaultValue={facility.admins[0].mobile} disabled={!editAdmin} onChange={handleChange}/>
+                                    <EditAdminInput 
+                                        type="tel" 
+                                        name="adminContact"
+                                        defaultValue={facility.admins[0].mobile}
+                                        disabled={!editAdmin}
+                                        handleChange={handleChange}
+                                    />
                                 </label>
                             </div>
                             <div>
                                 <label>
                                     <div><b>Email: </b></div>
-                                    <input type="text" name="adminEmail" defaultValue={facility.admins[0].email} disabled={!editAdmin} onChange={handleChange}/>
+                                    <EditAdminInput 
+                                        type="text"
+                                        name="adminEmail" 
+                                        defaultValue={facility.admins[0].email}
+                                        disabled={!editAdmin} 
+                                        handleChange={handleChange}
+                                    />
                                 </label>
                             </div>
                         </div>
@@ -234,4 +247,17 @@ function FacilityForm({facility, setFacility, heading}) {
                 }
             </div>
         </form></Container>}
+
+function EditAdminInput({type,name,defaultValue,disabled,handleChange}){
+    return(
+        <input 
+            type={type} 
+            name={name} 
+            defaultValue={maskPersonalDetails(defaultValue)}
+            disabled={disabled} 
+            onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value)}
+            onFocus={(evt) => evt.target.value = defaultValue} 
+            onChange={handleChange}/>
+    )
+}
 export default FacilityForm;
