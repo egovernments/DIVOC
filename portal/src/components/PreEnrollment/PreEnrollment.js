@@ -4,6 +4,7 @@ import UploadHistory from "../UploadHistory/UploadHistory";
 import {useAxios} from "../../utils/useAxios";
 import PreEnrollmentUploadCSV from "../PreEnrollmentUploadCSV/PreEnrollmentUploadCSV";
 import {formatDate} from "../../utils/dateutil";
+import {maskNationalId} from "../../utils/config";
 
 function PreEnrollment() {
 
@@ -25,8 +26,9 @@ function PreEnrollment() {
             })
             .then((result) => {
                 return result.map((item, index) => {
+                    const nationalId = item["nationalId"]
                     return {
-                        nationalId: item["nationalId"],
+                        nationalId: maskNationalId(nationalId),
                         name: item["name"],
                         uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
