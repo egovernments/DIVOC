@@ -65,9 +65,9 @@ class ProgramDB {
         return formatCertifyDate(newDate);
     }
 
-    getPatientGivenMedicine(allPrograms, programName, medicineId) {
+    getPatientGivenMedicine(allPrograms, programId, medicineId) {
         const patientProgram = allPrograms.find((value => {
-            return value["name"] === programName
+            return value["id"] === programId
         }))
         const patientProgramMedicine = patientProgram["medicines"]
         if (patientProgramMedicine && patientProgramMedicine.length > 0) {
