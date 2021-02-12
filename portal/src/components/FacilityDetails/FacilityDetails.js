@@ -155,7 +155,7 @@ function FacilityDetails({
                 {!showCard ?
                 <div>
                     <p className={"highlight"}>
-                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
                     </p>
                     <table className={"table table-hover table-data"}>
                         <thead>
