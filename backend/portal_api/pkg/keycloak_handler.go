@@ -214,6 +214,10 @@ type FacilityUserResponse struct {
 	Enabled    bool                   `json:"enabled"`
 }
 
+func GetUsersByFacilityCode(facilityCode string) ([]*models.FacilityUser, error) {
+	return getFacilityUsers(facilityCode, "")
+}
+
 func getFacilityUsers(facilityCode string, username string) ([]*models.FacilityUser, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/realms/" + config.Config.Keycloak.Realm + "/facility/" + facilityCode + "/users"

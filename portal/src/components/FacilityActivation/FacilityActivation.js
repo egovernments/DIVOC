@@ -46,7 +46,7 @@ function FacilityActivation({
     };
 
     const getFacilityStatusForProgram = (facility) => {
-        if ("programs" in facility) {
+        if (facility.programs) {
             const program = facility.programs.find(obj => obj.name === selectedProgram);
             if (program) {
                 return program.status;
@@ -165,7 +165,7 @@ function FacilityActivation({
                     showCard={showCard}
                     setShowCard={setShowCard}
                     facility={selectedRow}
-                    setFacility={setSelectedRow}
+                    fetchFacilities={fetchFacilities}
                     status={status}
                     updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />

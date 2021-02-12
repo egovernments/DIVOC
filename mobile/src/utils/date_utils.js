@@ -19,3 +19,12 @@ export function formatLoginDate(loginDate) {
         ampm = d.getHours() >= 12 ? 'pm' : 'am';
     return d.getDate() + '-' + monthNames[d.getMonth()] + '-' + d.getFullYear() + ' ' + hours + ':' + minutes + ' ' + ampm;
 }
+
+export function formatDate(givenDate) {
+    const dob = new Date(givenDate)
+    let day = dob.getDate();
+    let monthName = monthNames[dob.getMonth()];
+    let year = dob.getFullYear();
+
+    return `${day}-${monthName}-${year}`;
+}

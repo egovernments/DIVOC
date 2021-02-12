@@ -251,7 +251,7 @@ function FacilityAdjustingRate({
                     showCard={showCard}
                     setShowCard={setShowCard}
                     facility={selectedRow}
-                    setFacility={setSelectedRow}
+                    fetchFacilities={fetchFacilities}
                     status={status}
                     updateFacilityProgramStatus={updateFacilityProgramStatus}
                 />
