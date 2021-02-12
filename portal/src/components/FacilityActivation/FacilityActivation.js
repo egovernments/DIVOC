@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                 setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                status, setStatus, fetchFacilities, resetFilter, updateFacilityProgramStatus, countryName
+                                status, setStatus, fetchFacilities, resetFilter, updateFacilityProgramStatus, countryName, isLoading
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
@@ -129,10 +129,13 @@ function FacilityActivation({
             </div>
 
             <div className={`col-sm-6 ${styles["table"]} ${styles["pad-1rem"]}`}>
-                {!showCard ? (
+                {
+                    isLoading && <div className='d-flex justify-content-center'>Please wait</div>
+                }
+                {!isLoading && !showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
-                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
                         </p>
                         <table
                             className={`table table-hover ${styles["table-data"]}`}

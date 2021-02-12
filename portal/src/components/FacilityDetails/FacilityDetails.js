@@ -12,7 +12,7 @@ import DetailsCard from "../DetailsCard/DetailsCard";
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                              setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                             status, setStatus, resetFilter, updateFacilityProgramStatus, countryName, fetchFacilities
+                             status, setStatus, resetFilter, updateFacilityProgramStatus, countryName, fetchFacilities,isLoading
                          }) {
     const axiosInstance = useAxios('');
     const [modalShow, setModalShow] = useState(false);
@@ -152,10 +152,13 @@ function FacilityDetails({
             </div>
 
             <div className={"col-sm-6 pad-1rem table"}>
-                {!showCard ?
+                {
+                    isLoading && <div className='d-flex justify-content-center'>Please wait</div>
+                }
+                {!isLoading && !showCard ?
                 <div>
                     <p className={"highlight"}>
-                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                    {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
                     </p>
                     <table className={"table table-hover table-data"}>
                         <thead>

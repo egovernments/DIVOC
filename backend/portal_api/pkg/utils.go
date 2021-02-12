@@ -68,3 +68,9 @@ func convertStructToInterface(structToConvert interface{}, result interface{}) e
 	}
 	return nil
 }
+
+func SetMapValueIfNotEmpty(m map[string]interface{}, key string, value string) {
+	if value != "" {
+		m[key] = value
+	}
+}

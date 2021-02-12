@@ -18,6 +18,7 @@ const defaultState = {
 };
 
 function FacilityController() {
+    const [isLoading, setIsLoading] = useState(false);
     const axiosInstance = useAxios('');
     const [facilities, setFacilities] = useState([]);
     const [programs, setPrograms] = useState([]);
@@ -105,16 +106,19 @@ function FacilityController() {
                 }];
                 updateFacilities.push({osid: facility.osid, programs:p})
             });
+            setIsLoading(true);
             axiosInstance.current
                 .put(API_URL.FACILITY_API, updateFacilities)
                 .then((res) => {
                     //registry update in ES happening async, so calling search immediately will not get back actual data
-                    setTimeout(() => fetchFacilities(), 500);
+                    setTimeout(() => fetchFacilities(), 1);
+                    // setIsLoading(false);
                 });
         }
     }
 
     function fetchFacilities() {
+        setIsLoading(true);
         const {lastAdjustedOn, selectedProgram, selectedState, selectedDistrict, status, facilityType} = filter;
         if (selectedProgram) {
             let rateUpdatedFrom = "", rateUpdatedTo = "";
@@ -157,18 +161,6 @@ function FacilityController() {
                         let isFiltersMatched = true;
                         [
                             {
-                                data: item["programs"],
-                                filterKey: "name",
-                                filterValue: [selectedProgram],
-                                toBePartiallyChecked: false
-                            },
-                            {
-                                data: item["programs"].filter(program => program.name === selectedProgram),
-                                filterKey: "status",
-                                filterValue: [status],
-                                toBePartiallyChecked: false
-                            },
-                            {
                                 data: [item],
                                 filterKey: "category",
                                 filterValue: [facilityType],
@@ -203,11 +195,19 @@ function FacilityController() {
                                 }
                             }
                         });
-                        if(status === CONSTANTS.IN_ACTIVE && !isFiltersMatched) {
-                            if(!findBy(item["programs"], "name", selectedProgram)) {
+                        if(status === CONSTANTS.ACTIVE) {
+                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            isFiltersMatched = !!(program && program.status === CONSTANTS.ACTIVE && isFiltersMatched);
+                        }
+                        if(status === CONSTANTS.IN_ACTIVE) {
+                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            if (program && program.status === CONSTANTS.IN_ACTIVE) {
                                 isFiltersMatched = true
+                            } else {
+                                isFiltersMatched = !program && isFiltersMatched;
                             }
                         }
+
                         if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
                             const program = findBy(item["programs"], "name", selectedProgram)
                             if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
@@ -219,6 +219,7 @@ function FacilityController() {
                         }
                     });
                     setFacilities(matchedFacilities)
+                    setIsLoading(false);
                 });
         }
     }
@@ -257,6 +258,7 @@ function FacilityController() {
                     title: "Facility Activation",
                     component: (
                         <FacilityActivation
+                            isLoading={isLoading}
                             countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}
@@ -283,6 +285,7 @@ function FacilityController() {
                     title: "Adjusting Rate",
                     component: (
                         <FacilityAdjustingRate
+                            isLoading={isLoading}
                             countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}
@@ -310,6 +313,7 @@ function FacilityController() {
                     title: "All Facilities",
                     component: (
                         <FacilityDetails
+                            isLoading={isLoading}
                             countryName={countryName}
                             stateList={stateList}
                             onStateSelected={onStateSelected}

@@ -461,8 +461,6 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 			facility := searchResponse["Facility"].(map[string]interface{})
 			if facility != nil {
 				updatedFacility := updateFacilityProgramsData(facility, updateRequest)
-				updatedFacility["facilityName"] = updateRequest.FacilityName
-
 				addressOsid := (facility["address"].(map[string]interface{}))["osid"]
 				if updateRequest.Address != nil {
 					updatedFacility["address"] = map[string]interface{}{
@@ -474,13 +472,14 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						"pincode": *updateRequest.Address.Pincode,
 					}
 				}
-				updatedFacility["geoLocation"] = updateRequest.GeoLocation
-				updatedFacility["websiteUrl"] = updateRequest.WebsiteURL
-				updatedFacility["email"] = updateRequest.Email
-				updatedFacility["contact"] = updateRequest.Contact
-				updatedFacility["operatingHourStart"] = updateRequest.OperatingHourStart
-				updatedFacility["operatingHourEnd"] = updateRequest.OperatingHourEnd
-				updatedFacility["category"] = updateRequest.Category
+				SetMapValueIfNotEmpty(updatedFacility, "facilityName", updateRequest.FacilityName)
+				SetMapValueIfNotEmpty(updatedFacility, "geoLocation", updateRequest.GeoLocation)
+				SetMapValueIfNotEmpty(updatedFacility, "websiteUrl", updateRequest.WebsiteURL)
+				SetMapValueIfNotEmpty(updatedFacility, "email", updateRequest.Email)
+				SetMapValueIfNotEmpty(updatedFacility, "contact", updateRequest.Contact)
+				SetMapValueIfNotEmpty(updatedFacility, "operatingHourStart", updateRequest.OperatingHourStart)
+				SetMapValueIfNotEmpty(updatedFacility, "operatingHourEnd", updateRequest.OperatingHourEnd)
+				SetMapValueIfNotEmpty(updatedFacility, "category", updateRequest.Category)
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
@@ -498,9 +497,9 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *models.FacilityUpdateRequestItems0) map[string]interface{} {
 
 	mkSchedule := func (p models.FacilityUpdateRequestItems0ProgramsItems0Schedule) map[string]interface{} {
-		s := map[string]interface{}{
-			"startTime" : p.StartTime, "endTime": p.EndTime,
-		}
+		s := map[string]interface{}{}
+		SetMapValueIfNotEmpty(s, "startTime", p.StartTime)
+		SetMapValueIfNotEmpty(s, "endTime", p.EndTime)
 		if len(p.Days) > 0 {
 			s["days"] = p.Days
 		}
