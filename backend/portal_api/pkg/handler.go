@@ -579,13 +579,14 @@ func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, princ
 	}
 
 	var facilityCode string
-	if principal != nil {
+	if HasResourceRole(portalClientId, "facility-admin", principal) {
 		facilityCode = principal.FacilityCode
+	} else if HasResourceRole(portalClientId, "controller", principal) {
+		facilityCode = params.Body.FacilityCode
 	}
-	if facilityCode == "" && params.Body.FacilityCode == "" {
+	if facilityCode == "" {
 		return NewGenericForbiddenError()
 	}
-	facilityCode = params.Body.FacilityCode
 
 	err := UpdateFacilityUser(&params.Body.FacilityUser, params.HTTPRequest.Header.Get("Authorization"), facilityCode)
 	if err != nil {
