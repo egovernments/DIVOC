@@ -29,7 +29,7 @@ func NewGetPublicAnalytics(ctx *middleware.Context, handler GetPublicAnalyticsHa
 	return &GetPublicAnalytics{Context: ctx, Handler: handler}
 }
 
-/* GetPublicAnalytics swagger:route GET /public getPublicAnalytics
+/*GetPublicAnalytics swagger:route GET /public getPublicAnalytics
 
 Get public analytics query
 
@@ -45,12 +45,14 @@ func (o *GetPublicAnalytics) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewGetPublicAnalyticsParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

@@ -31,7 +31,7 @@ func NewGetFacilities(ctx *middleware.Context, handler GetFacilitiesHandler) *Ge
 	return &GetFacilities{Context: ctx, Handler: handler}
 }
 
-/* GetFacilities swagger:route GET /facilities getFacilities
+/*GetFacilities swagger:route GET /facilities getFacilities
 
 get facilities
 
@@ -47,6 +47,7 @@ func (o *GetFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetFacilitiesParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

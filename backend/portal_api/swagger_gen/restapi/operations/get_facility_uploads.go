@@ -31,7 +31,7 @@ func NewGetFacilityUploads(ctx *middleware.Context, handler GetFacilityUploadsHa
 	return &GetFacilityUploads{Context: ctx, Handler: handler}
 }
 
-/* GetFacilityUploads swagger:route GET /facility/uploads getFacilityUploads
+/*GetFacilityUploads swagger:route GET /facility/uploads getFacilityUploads
 
 Get all file uploads for facilties for given facility admin
 
@@ -47,6 +47,7 @@ func (o *GetFacilityUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewGetFacilityUploadsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetFacilityUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
