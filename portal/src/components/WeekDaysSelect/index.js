@@ -17,16 +17,14 @@ function WeekDaysSelect({name, days, onChange, disabled}) {
         }
     }
 
-    return <Container>
-        <Row>
+    return <React.Fragment>
             {DAYS.map(d => 
                 <div key={d} className={(selected && selected.includes(d) ? "selected-day" : "ignored-day")}
                     onClick={() => handleClick(d)}>
                     {d}
                 </div>
             )}
-        </Row>
-    </Container>
+    </React.Fragment>
 }
 
 export default WeekDaysSelect;

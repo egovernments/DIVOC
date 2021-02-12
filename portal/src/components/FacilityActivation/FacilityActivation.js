@@ -6,7 +6,7 @@ import {
     RadioItem,
 } from "../FacilityFilterTab";
 import { useAxios } from "../../utils/useAxios";
-import { API_URL , CONSTANTS} from "../../utils/constants";
+import { API_URL , CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
 import DetailsCard from "../DetailsCard/DetailsCard";
 
 function FacilityActivation({
@@ -63,9 +63,9 @@ function FacilityActivation({
                     setShowCard(!showCard);
                     setSelectedRow(facility)
                 }}>{facility["facilityName"]}</td>
-                <td>{facility["category"]}</td>
+                <td>{FACILITY_TYPE[facility["category"]]}</td>
                 <td>{getFacilityStatusForProgram(facility)}</td>
-                <td>
+                <td style={{"textAlign":"right"}}>
                     <CheckboxItem
                         text={facility["id"]}
                         showText={false}
@@ -90,106 +90,109 @@ function FacilityActivation({
 
     return (
         <div className={`row ${styles["container"]}`}>
-            <div className="col-sm-3">
-                <FacilityFilterTab
-                    programs={programs}
-                    selectedProgram={selectedProgram}
-                    setSelectedProgram={setSelectedProgram}
-                    countryName={countryName}
-                    states={stateList}
-                    setSelectedState={onStateSelected}
-                    selectedState={selectedState}
-                    districtList={districtList}
-                    selectedDistrict={selectedDistrict}
-                    setSelectedDistrict={setSelectedDistrict}
-                    facilityType={facilityType}
-                    setFacilityType={setFacilityType}
-                >
-                    <div>
-                        <span className={"filter-header"}>Status</span>
-                        <div className="m-3">
-                            <RadioItem
-                                text={CONSTANTS.ACTIVE}
-                                checked={status === CONSTANTS.ACTIVE}
-                                onSelect={(event) =>
-                                    handleChange(event.target.name, setStatus)
-                                }
-                            />
-                            <RadioItem
-                                text={CONSTANTS.IN_ACTIVE}
-                                checked={status === CONSTANTS.IN_ACTIVE}
-                                onSelect={(event) =>
-                                    handleChange(event.target.name, setStatus)
-                                }
-                            />
+            {!showCard && 
+                <div className="col-sm-3">
+                    <FacilityFilterTab
+                        programs={programs}
+                        selectedProgram={selectedProgram}
+                        setSelectedProgram={setSelectedProgram}
+                        countryName={countryName}
+                        states={stateList}
+                        setSelectedState={onStateSelected}
+                        selectedState={selectedState}
+                        districtList={districtList}
+                        selectedDistrict={selectedDistrict}
+                        setSelectedDistrict={setSelectedDistrict}
+                        facilityType={facilityType}
+                        setFacilityType={setFacilityType}
+                    >
+                        <div>
+                            <span className={"filter-header"}>Status</span>
+                            <div className="m-3">
+                                <RadioItem
+                                    text={CONSTANTS.ACTIVE}
+                                    checked={status === CONSTANTS.ACTIVE}
+                                    onSelect={(event) =>
+                                        handleChange(event.target.name, setStatus)
+                                    }
+                                />
+                                <RadioItem
+                                    text={CONSTANTS.IN_ACTIVE}
+                                    checked={status === CONSTANTS.IN_ACTIVE}
+                                    onSelect={(event) =>
+                                        handleChange(event.target.name, setStatus)
+                                    }
+                                />
+                            </div>
+
                         </div>
+                    </FacilityFilterTab>
+                </div>
+            }
 
-                    </div>
-                </FacilityFilterTab>
-            </div>
-
-            <div className={`col-sm-6 ${styles["table"]} ${styles["pad-1rem"]}`}>
-                {
-                    isLoading && <div className='d-flex justify-content-center'>Please wait</div>
-                }
-                {!isLoading && !showCard ? (
-                    <div>
-                        <p className={styles["highlight"]}>
-                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
-                        </p>
-                        <table
-                            className={`table table-hover ${styles["table-data"]}`}
-                        >
-                            <thead>
-                                <tr>
-                                    <th>CODE</th>
-                                    <th>NAME</th>
-                                    <th>TYPE</th>
-                                    <th>PROGRAM STATUS</th>
-                                    <th>
-                                        <CheckboxItem
-                                            text={"checkAll"}
-                                            checked={allChecked}
-                                            onSelect={(e) => {
-                                                handleAllCheck(e);
-                                            }}
-                                            showText={false}
-                                        />
-                                    </th>
-                                </tr>
-                            </thead>
-                            <tbody>{getFacilityList()}</tbody>
-                        </table>
-                    </div>
-                ) : (
-                    ""
-                )}
-                <DetailsCard
-                    showCard={showCard}
-                    setShowCard={setShowCard}
-                    facility={selectedRow}
-                    fetchFacilities={fetchFacilities}
-                    status={status}
-                    updateFacilityProgramStatus={updateFacilityProgramStatus}
-                />
-            </div>
-            <div className="col-sm-3 container">
-                <div className={`card ${styles["card-continer"]}`}>
-                    {selectedProgram && <div className={`text-center ${styles["pad-1rem"]}`}>
-                        {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
-                        <p>
-                            Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
-                        </p>
-                        <button
-                            onClick={handleActiveClick}
-                            className={styles["button"]}
-                        >
-                            MAKE {oppositeStatus.toUpperCase()}
-                        </button>
-                    </div>
+            {!showCard && 
+                <div className={`col-sm-6 ${styles["table"]} ${styles["pad-1rem"]}`}>
+                    {isLoading ?
+                        <div className='d-flex justify-content-center'>Please wait</div>
+                        :
+                        <div>
+                            <p className={styles["highlight"]}>
+                                {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
+                            </p>
+                            <table
+                                className={`table table-hover ${styles["table-data"]}`}
+                            >
+                                <thead>
+                                    <tr>
+                                        <th>CODE</th>
+                                        <th>NAME</th>
+                                        <th>TYPE</th>
+                                        <th>PROGRAM STATUS</th>
+                                        <th style={{"textAlign":"right"}}>
+                                            <CheckboxItem
+                                                text={"checkAll"}
+                                                checked={allChecked}
+                                                onSelect={(e) => {
+                                                    handleAllCheck(e);
+                                                }}
+                                                showText={false}
+                                            />
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>{getFacilityList()}</tbody>
+                            </table>
+                        </div>
                     }
                 </div>
-            </div>
+            }
+            <DetailsCard
+                showCard={showCard}
+                setShowCard={setShowCard}
+                facility={selectedRow}
+                fetchFacilities={fetchFacilities}
+                status={status}
+                updateFacilityProgramStatus={updateFacilityProgramStatus}
+            />
+            {!showCard && 
+                <div className="col-sm-3 container">
+                    <div className={`card ${styles["card-continer"]}`}>
+                        {selectedProgram && <div className={`text-center ${styles["pad-1rem"]}`}>
+                            {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
+                            <p>
+                                Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
+                            </p>
+                            <button
+                                onClick={handleActiveClick}
+                                className={styles["button"]}
+                            >
+                                MAKE {oppositeStatus.toUpperCase()}
+                            </button>
+                        </div>
+                        }
+                    </div>
+                </div>
+            }
         </div>
     );
 }

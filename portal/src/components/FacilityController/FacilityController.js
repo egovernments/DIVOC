@@ -256,6 +256,33 @@ function FacilityController() {
         <TabPanels
             tabs={[
                 {
+                    title: "All Facilities",
+                    component: (
+                        <FacilityDetails
+                            isLoading={isLoading}
+                            countryName={countryName}
+                            stateList={stateList}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
+                            facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            status={status}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
+                            resetFilter={resetFilter}
+                            updateFacilityProgramStatus={updateFacilityProgramStatus}
+                        />
+                    ),
+                },
+                {
                     title: "Facility Activation",
                     component: (
                         <FacilityActivation
@@ -305,33 +332,6 @@ function FacilityController() {
                             fetchFacilities={fetchFacilities}
                             lastAdjustedOn={lastAdjustedOn}
                             setLastAdjustedOn={setLastAdjustedOn}
-                            resetFilter={resetFilter}
-                            updateFacilityProgramStatus={updateFacilityProgramStatus}
-                        />
-                    ),
-                },
-                {
-                    title: "All Facilities",
-                    component: (
-                        <FacilityDetails
-                            isLoading={isLoading}
-                            countryName={countryName}
-                            stateList={stateList}
-                            onStateSelected={onStateSelected}
-                            districtList={districts}
-                            selectedDistrict={selectedDistrict}
-                            selectedState={selectedState}
-                            setSelectedDistrict={setSelectedDistrict}
-                            programs={programs}
-                            facilities={facilities}
-                            setFacilities={setFacilities}
-                            selectedProgram={selectedProgram}
-                            setSelectedProgram={setSelectedProgram}
-                            facilityType={facilityType}
-                            setFacilityType={setFacilityType}
-                            status={status}
-                            setStatus={setStatus}
-                            fetchFacilities={fetchFacilities}
                             resetFilter={resetFilter}
                             updateFacilityProgramStatus={updateFacilityProgramStatus}
                         />

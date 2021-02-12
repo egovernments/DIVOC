@@ -104,6 +104,7 @@ function VaccineRegistration() {
 
     let blockedVaccines = medicineList.filter(data => data.status === "Blocked");
     let inactiveVaccines = medicineList.filter(data => data.status === "Inactive");
+    let activeVaccines = medicineList.filter(data => data.status === "Active");
     return (
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
@@ -132,12 +133,12 @@ function VaccineRegistration() {
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
                 <ListView
-                    listData={medicineList.filter(data => data.status === "Active")}
+                    listData={activeVaccines}
                     onRegisterBtnClick={() => {
                         setShowForm(true);
                         setFormData({});
                     }}
-                    title="Active Vaccines"
+                    title={activeVaccines.length > 0 ? "Active Vaccines" : ""}
                     buttonTitle="Register New Vaccine"
                     showDetails={false}
                     onActiveSwitchClick={onEdit}

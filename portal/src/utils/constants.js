@@ -14,6 +14,11 @@ export const CONSTANTS = Object.freeze({
     IN_ACTIVE: "Inactive"
 });
 
+export const FACILITY_TYPE = Object.freeze({
+    GOVT: "Government",
+    PRIVATE: "Private",
+});
+
 export const API_URL = Object.freeze({
     FACILITY_API: "/divoc/admin/api/v1/facilities",
     USER_FACILITY_API: "/divoc/admin/api/v1/facility",
