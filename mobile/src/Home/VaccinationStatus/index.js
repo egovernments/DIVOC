@@ -2,6 +2,7 @@ import React, {useEffect, useState} from "react";
 import {BaseCard} from "../../Base/Base";
 import "./index.scss"
 import {appIndexDb} from "../../AppDatabase";
+import {programDb} from "../../Services/ProgramDB";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 
@@ -51,7 +52,10 @@ export function VaccinationStatus() {
 async function getVaccinationStatus() {
     const userDetails = await appIndexDb.getUserDetails()
     const programName = localStorage.getItem("program")
-    const programRate = userDetails[programName + "_rate"] ?? 0
+    const currentProgram = await programDb.getPrograms().find((value => {
+        return value["name"] === programName
+    }))
+    const programRate = userDetails[currentProgram["id"] + "_rate"] ?? 0
     const recipientDetails = await appIndexDb.recipientDetails()
     const certificateIssue = recipientDetails[1].value
     const isExceed = certificateIssue > programRate

@@ -87,7 +87,7 @@ class ProgramDB {
         const selectProgram = getSelectedProgram();
         return vaccinators.filter(vaccinator => {
             return vaccinator.programs &&
-                vaccinator.programs.filter(p => p.programId === selectProgram && p.status === CONSTANT.ACTIVE).length > 0
+                vaccinator.programs.filter(p => p.name === selectProgram && p.status === CONSTANT.ACTIVE).length > 0
         })
     }
 }

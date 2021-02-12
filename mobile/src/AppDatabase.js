@@ -114,10 +114,10 @@ export class AppDatabase {
 
     async getQueue(status) {
         if (status) {
-            const programId = getSelectedProgram()
+            const programName = getSelectedProgram()
             const result = await this.db.getAll(QUEUE);
             const filter = result.filter((item) => {
-                    return item[STATUS] === status && item[PROGRAM_ID] === programId
+                    return item[STATUS] === status && item[PROGRAM_ID] === programName
                 }
             );
             return Promise.resolve(filter)
