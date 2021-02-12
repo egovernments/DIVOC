@@ -132,7 +132,7 @@ function FacilityActivation({
                 {!showCard ? (
                     <div>
                         <p className={styles["highlight"]}>
-                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ities"}
+                            {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
                         </p>
                         <table
                             className={`table table-hover ${styles["table-data"]}`}

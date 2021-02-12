@@ -157,18 +157,6 @@ function FacilityController() {
                         let isFiltersMatched = true;
                         [
                             {
-                                data: item["programs"],
-                                filterKey: "programId",
-                                filterValue: [selectedProgram],
-                                toBePartiallyChecked: false
-                            },
-                            {
-                                data: item["programs"].filter(program => program.programId === selectedProgram),
-                                filterKey: "status",
-                                filterValue: [status],
-                                toBePartiallyChecked: false
-                            },
-                            {
                                 data: [item],
                                 filterKey: "category",
                                 filterValue: [facilityType],
@@ -203,11 +191,20 @@ function FacilityController() {
                                 }
                             }
                         });
-                        if(status === CONSTANTS.IN_ACTIVE && !isFiltersMatched) {
-                            if(!findBy(item["programs"], "programId", selectedProgram)) {
+
+                        if(status === CONSTANTS.ACTIVE) {
+                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            isFiltersMatched = !!(program && program.status === CONSTANTS.ACTIVE && isFiltersMatched);
+                        }
+                        if(status === CONSTANTS.IN_ACTIVE) {
+                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            if (program && program.status === CONSTANTS.IN_ACTIVE) {
                                 isFiltersMatched = true
+                            } else {
+                                isFiltersMatched = !program && isFiltersMatched;
                             }
                         }
+
                         if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
                             const program = findBy(item["programs"], "programId", selectedProgram)
                             if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
