@@ -148,7 +148,10 @@ export const RoleSetup = () => {
                 axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
                     .then(res => {
                         fetchUsers()
-                    });
+                    }).catch((err) => {
+                    console.log(err)
+                    alert("User already exisits")
+                });
             }
         } else {
             alert("Please fill all the values!")
@@ -156,7 +159,7 @@ export const RoleSetup = () => {
     }
 
     function deleteStaff(index) {
-        if(window.confirm('Are you sure to delete this record?')){ 
+        if(window.confirm('Are you sure to delete this record?')){
             const staff = staffs[index];
             axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/' + staff.id)
             .then(res => {

@@ -41,6 +41,7 @@ func CreateFacilityUser(user *models.FacilityUser, authHeader string) error {
 			_ = addUserToGroup(keycloakUserId, user.Groups[0].ID)
 		} else {
 			log.Error("Unable to map keycloak user id for ", user.MobileNumber)
+			return errors.New("Unable to map keycloak user id for " + user.MobileNumber)
 		}
 	}
 	return nil
