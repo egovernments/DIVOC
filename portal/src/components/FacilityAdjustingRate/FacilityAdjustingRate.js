@@ -11,7 +11,7 @@ import FacilityActivation from "../FacilityActivation/FacilityActivation";
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus, countryName
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus, countryName, isLoading
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -218,7 +218,10 @@ function FacilityAdjustingRate({
                 </FacilityFilterTab>
             </div>
             <div className={`col-sm-6 ${styles['facility-grid-container']} ${styles['table']}`}>
-                {!showCard ?
+                {
+                    isLoading && <div className='d-flex justify-content-center'>Please wait</div>
+                }
+                {!isLoading && !showCard ?
                 <>
                     <p className={styles['highlight']}>
                         {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
