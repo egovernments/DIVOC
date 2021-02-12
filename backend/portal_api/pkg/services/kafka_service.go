@@ -14,6 +14,7 @@ type NotificationRequest struct {
 }
 
 var notifications = make(chan []byte)
+var enrollmentMessages = make(chan []byte)
 
 func InitializeKafka() {
 	servers := config.Config.Kafka.BootstrapServers
@@ -38,6 +39,19 @@ func InitializeKafka() {
 	}()
 
 	go func() {
+		topic := "enrollmentTopic"
+		for {
+			msg:= <-enrollmentMessages
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+					Value: msg,
+				}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
+	go func() {
 		for e := range producer.Events() {
 			log.Infof("%+v", e)
 			switch ev := e.(type) {
@@ -51,6 +65,10 @@ func InitializeKafka() {
 		}
 
 	}()
+}
+
+func PublishEnrollmentMessage(enrollment []byte) {
+	enrollmentMessages <- enrollment
 }
 
 func PublishNotificationMessage(recipient string, subject string, message string) {

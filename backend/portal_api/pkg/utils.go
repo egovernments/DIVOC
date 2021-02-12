@@ -83,7 +83,6 @@ func generateEnrollmentCode() string {
 	for i := 0; i < config.Config.EnrollmentCreation.NumberOfDigits; i++ {
 		digits = digits*10 + 9
 	}
-	println(digits)
 	code := rand.Int63n(digits)
 	var sb strings.Builder
 	for ; code != 0; {

@@ -43,7 +43,7 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 }
 
 func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetryCount int) (error, models.Enrollment) {
-	log.Info("Current number of tries for createPreEnrollmentRegistry", currentRetryCount)
+	log.Info("Current number of tries for createPreEnrollmentRegistry ", currentRetryCount)
 	data := preEnrollmentCsv.Data
 	//Name, Mobile, National Identifier, DOB, facilityId
 	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
@@ -61,6 +61,7 @@ func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetry
 		Address:           GetAddressObject(data),
 	}
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	log.Info("Received error response from the create new registry", err)
 	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
 		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount + 1)
 	}

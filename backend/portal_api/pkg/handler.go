@@ -57,6 +57,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
+	api.EnrollRecipientHandler = operations.EnrollRecipientHandlerFunc(enrollRecipient)
 }
 
 type GenericResponse struct {
@@ -113,6 +114,13 @@ func getProgramsHandler(params operations.GetProgramsParams, principal *models.J
 
 func getMedicinesHandler(params operations.GetMedicinesParams, principal *models.JWTClaimBody) middleware.Responder {
 	return kernelService.GetEntityType("Medicine")
+}
+
+func enrollRecipient(params operations.EnrollRecipientParams,  principal *models.JWTClaimBody) middleware.Responder{
+	if recipientData, err := json.Marshal(params.Body); err == nil {
+		services.PublishEnrollmentMessage(recipientData)
+	}
+	return operations.NewEnrollRecipientOK()
 }
 
 func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {

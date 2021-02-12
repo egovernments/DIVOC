@@ -15,40 +15,40 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
-// NewUpdateVaccinatorsParams creates a new UpdateVaccinatorsParams object
+// NewEnrollRecipientParams creates a new EnrollRecipientParams object
 // no default values defined in spec.
-func NewUpdateVaccinatorsParams() UpdateVaccinatorsParams {
+func NewEnrollRecipientParams() EnrollRecipientParams {
 
-	return UpdateVaccinatorsParams{}
+	return EnrollRecipientParams{}
 }
 
-// UpdateVaccinatorsParams contains all the bound params for the update vaccinators operation
+// EnrollRecipientParams contains all the bound params for the enroll recipient operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters updateVaccinators
-type UpdateVaccinatorsParams struct {
+// swagger:parameters enrollRecipient
+type EnrollRecipientParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Vaccinator Update Request
+	/*
 	  In: body
 	*/
-	Body models.VaccinatorUpdateRequest
+	Body *models.Definitions
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewUpdateVaccinatorsParams() beforehand.
-func (o *UpdateVaccinatorsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewEnrollRecipientParams() beforehand.
+func (o *EnrollRecipientParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.VaccinatorUpdateRequest
+		var body models.Definitions
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -58,7 +58,7 @@ func (o *UpdateVaccinatorsParams) BindRequest(r *http.Request, route *middleware
 			}
 
 			if len(res) == 0 {
-				o.Body = body
+				o.Body = &body
 			}
 		}
 	}

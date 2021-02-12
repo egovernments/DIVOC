@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -152,11 +151,11 @@ func (m *Vaccinator) validateMobileNumber(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MinLength("mobileNumber", "body", *m.MobileNumber, 10); err != nil {
+	if err := validate.MinLength("mobileNumber", "body", string(*m.MobileNumber), 10); err != nil {
 		return err
 	}
 
-	if err := validate.MaxLength("mobileNumber", "body", *m.MobileNumber, 10); err != nil {
+	if err := validate.MaxLength("mobileNumber", "body", string(*m.MobileNumber), 10); err != nil {
 		return err
 	}
 
@@ -182,6 +181,7 @@ func (m *Vaccinator) validateNationalIdentifier(formats strfmt.Registry) error {
 }
 
 func (m *Vaccinator) validatePrograms(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -206,6 +206,7 @@ func (m *Vaccinator) validatePrograms(formats strfmt.Registry) error {
 }
 
 func (m *Vaccinator) validateSignatures(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Signatures) { // not required
 		return nil
 	}
@@ -276,60 +277,6 @@ func (m *Vaccinator) validateTrainingCertificate(formats strfmt.Registry) error 
 
 	if err := validate.Required("trainingCertificate", "body", m.TrainingCertificate); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this vaccinator based on the context it is used
-func (m *Vaccinator) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidatePrograms(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateSignatures(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Vaccinator) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Programs); i++ {
-
-		if m.Programs[i] != nil {
-			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Vaccinator) contextValidateSignatures(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Signatures); i++ {
-
-		if m.Signatures[i] != nil {
-			if err := m.Signatures[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("signatures" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -427,6 +374,7 @@ func (m *VaccinatorProgramsItems0) validateStatusEnum(path, location string, val
 }
 
 func (m *VaccinatorProgramsItems0) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -436,11 +384,6 @@ func (m *VaccinatorProgramsItems0) validateStatus(formats strfmt.Registry) error
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this vaccinator programs items0 based on context it is used
-func (m *VaccinatorProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

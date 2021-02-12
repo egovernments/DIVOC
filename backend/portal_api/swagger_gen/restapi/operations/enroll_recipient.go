@@ -13,40 +13,40 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
-// PostVaccinatorsHandlerFunc turns a function with the right signature into a post vaccinators handler
-type PostVaccinatorsHandlerFunc func(PostVaccinatorsParams, *models.JWTClaimBody) middleware.Responder
+// EnrollRecipientHandlerFunc turns a function with the right signature into a enroll recipient handler
+type EnrollRecipientHandlerFunc func(EnrollRecipientParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn PostVaccinatorsHandlerFunc) Handle(params PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn EnrollRecipientHandlerFunc) Handle(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// PostVaccinatorsHandler interface for that can handle valid post vaccinators params
-type PostVaccinatorsHandler interface {
-	Handle(PostVaccinatorsParams, *models.JWTClaimBody) middleware.Responder
+// EnrollRecipientHandler interface for that can handle valid enroll recipient params
+type EnrollRecipientHandler interface {
+	Handle(EnrollRecipientParams, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewPostVaccinators creates a new http.Handler for the post vaccinators operation
-func NewPostVaccinators(ctx *middleware.Context, handler PostVaccinatorsHandler) *PostVaccinators {
-	return &PostVaccinators{Context: ctx, Handler: handler}
+// NewEnrollRecipient creates a new http.Handler for the enroll recipient operation
+func NewEnrollRecipient(ctx *middleware.Context, handler EnrollRecipientHandler) *EnrollRecipient {
+	return &EnrollRecipient{Context: ctx, Handler: handler}
 }
 
-/*PostVaccinators swagger:route POST /vaccinators postVaccinators
+/*EnrollRecipient swagger:route POST /register enrollRecipient
 
-Upload facility csv for bulk ingestion
+Enroll Recipient
 
 */
-type PostVaccinators struct {
+type EnrollRecipient struct {
 	Context *middleware.Context
-	Handler PostVaccinatorsHandler
+	Handler EnrollRecipientHandler
 }
 
-func (o *PostVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *EnrollRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewPostVaccinatorsParams()
+	var Params = NewEnrollRecipientParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

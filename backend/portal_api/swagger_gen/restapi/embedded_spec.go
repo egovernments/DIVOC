@@ -795,6 +795,26 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "../registry/Enrollment.json#definitions"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -2441,6 +2461,26 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/definitions"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -3363,6 +3403,201 @@ func init() {
           ]
         }
       }
+    },
+    "definitions": {
+      "type": "object",
+      "title": "Enrollment",
+      "required": [
+        "Enrollment"
+      ],
+      "properties": {
+        "Facility": {
+          "$ref": "#/definitions/enrollment"
+        }
+      },
+      "definitions": {
+        "Enrollment": {
+          "type": "object",
+          "required": [
+            "phone",
+            "enrollmentScopeId",
+            "nationalId",
+            "dob"
+          ],
+          "properties": {
+            "address": {
+              "$ref": "#/definitions/enrollmentAddress"
+            },
+            "certified": {
+              "type": "boolean",
+              "default": false
+            },
+            "code": {
+              "type": "string"
+            },
+            "dob": {
+              "type": "string",
+              "format": "date"
+            },
+            "email": {
+              "type": "string"
+            },
+            "enrollmentScopeId": {
+              "type": "string"
+            },
+            "gender": {
+              "type": "string",
+              "enum": [
+                "Male",
+                "Female",
+                "Other"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "nationalId": {
+              "type": "string"
+            },
+            "phone": {
+              "type": "string"
+            },
+            "programId": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "$schema": "http://json-schema.org/draft-07/schema",
+      "_osConfig": {
+        "indexFields": [
+          "(phone, code)"
+        ],
+        "osComment": [
+          "This section contains the OpenSABER specific configuration information",
+          "privateFields: Optional; list of field names to be encrypted and stored in database",
+          "signedFields: Optional; list of field names that must be pre-signed",
+          "indexFields: Optional; list of field names used for creating index. Enclose within braces to indicate it is a composite index. In this definition, (serialNum, facilityCode) is a composite index and facilityName is a single column index.",
+          "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
+          "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"
+        ],
+        "privateFields": [],
+        "signedFields": [],
+        "systemFields": [
+          "osCreatedAt",
+          "osUpdatedAt",
+          "osCreatedBy",
+          "osUpdatedBy"
+        ],
+        "uniqueIndexFields": [
+          "code"
+        ]
+      }
+    },
+    "enrollment": {
+      "type": "object",
+      "required": [
+        "phone",
+        "enrollmentScopeId",
+        "nationalId",
+        "dob"
+      ],
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/enrollmentAddress"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "code": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
+    "enrollmentAddress": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "description": "Address line 1",
+          "type": "string",
+          "title": "The address line 1",
+          "default": "",
+          "$id": "#/properties/address/properties/addressLine1"
+        },
+        "addressLine2": {
+          "type": "string",
+          "title": "The address2 schema",
+          "$id": "#/properties/address/properties/addressLine2"
+        },
+        "district": {
+          "type": "string",
+          "title": "The district schema",
+          "$id": "#/properties/address/properties/district"
+        },
+        "pincode": {
+          "type": "integer",
+          "title": "The pincode schema",
+          "$id": "#/properties/address/properties/pincode"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "$id": "#/properties/address/properties/state",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      },
+      "x-go-gen-location": "models",
+      "examples": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": 560000,
+          "state": "Karnataka"
+        }
+      ]
     },
     "signature": {
       "type": "object",

@@ -12,26 +12,27 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Address Address
+// EnrollmentAddress Address
 //
 // Indian address format
 //
-// swagger:model Address
-type Address struct {
+// swagger:model enrollmentAddress
+type EnrollmentAddress struct {
 
-	// address line1
+	// The address line 1
+	//
+	// Address line 1
 	// Required: true
 	AddressLine1 *string `json:"addressLine1"`
 
-	// address line2
-	// Required: true
-	AddressLine2 *string `json:"addressLine2"`
+	// The address2 schema
+	AddressLine2 string `json:"addressLine2,omitempty"`
 
-	// district
+	// The district schema
 	// Required: true
 	District *string `json:"district"`
 
-	// pincode
+	// The pincode schema
 	// Required: true
 	Pincode *int64 `json:"pincode"`
 
@@ -42,15 +43,11 @@ type Address struct {
 	State *string `json:"state"`
 }
 
-// Validate validates this address
-func (m *Address) Validate(formats strfmt.Registry) error {
+// Validate validates this enrollment address
+func (m *EnrollmentAddress) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAddressLine1(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateAddressLine2(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -72,7 +69,7 @@ func (m *Address) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Address) validateAddressLine1(formats strfmt.Registry) error {
+func (m *EnrollmentAddress) validateAddressLine1(formats strfmt.Registry) error {
 
 	if err := validate.Required("addressLine1", "body", m.AddressLine1); err != nil {
 		return err
@@ -81,16 +78,7 @@ func (m *Address) validateAddressLine1(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Address) validateAddressLine2(formats strfmt.Registry) error {
-
-	if err := validate.Required("addressLine2", "body", m.AddressLine2); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Address) validateDistrict(formats strfmt.Registry) error {
+func (m *EnrollmentAddress) validateDistrict(formats strfmt.Registry) error {
 
 	if err := validate.Required("district", "body", m.District); err != nil {
 		return err
@@ -99,7 +87,7 @@ func (m *Address) validateDistrict(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Address) validatePincode(formats strfmt.Registry) error {
+func (m *EnrollmentAddress) validatePincode(formats strfmt.Registry) error {
 
 	if err := validate.Required("pincode", "body", m.Pincode); err != nil {
 		return err
@@ -108,7 +96,7 @@ func (m *Address) validatePincode(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Address) validateState(formats strfmt.Registry) error {
+func (m *EnrollmentAddress) validateState(formats strfmt.Registry) error {
 
 	if err := validate.Required("state", "body", m.State); err != nil {
 		return err
@@ -118,7 +106,7 @@ func (m *Address) validateState(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *Address) MarshalBinary() ([]byte, error) {
+func (m *EnrollmentAddress) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -126,8 +114,8 @@ func (m *Address) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Address) UnmarshalBinary(b []byte) error {
-	var res Address
+func (m *EnrollmentAddress) UnmarshalBinary(b []byte) error {
+	var res EnrollmentAddress
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
