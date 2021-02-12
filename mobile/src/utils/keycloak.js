@@ -76,6 +76,9 @@ async function saveUserAttributes(attributes) {
         userDetails["loginTime"] = new Date().toISOString()
         await appIndexDb.saveUserDetails(userDetails)
     }
+    if (!userDetails["loginTime"]) {
+        userDetails["loginTime"] = new Date().toISOString()
+    }
     for (let attributesKey in attributes) {
         userDetails[attributesKey] = attributes[attributesKey][0]
     }

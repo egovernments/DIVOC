@@ -1,11 +1,12 @@
-import React, { useEffect,useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
-import { useAxios } from "../../utils/useAxios";
+import {useAxios} from "../../utils/useAxios";
+import {formatDate} from "../../utils/dateutil";
 
 function VaccinatorsRegistry() {
     const axiosInstance = useAxios("");
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         fetchTableDetails();
@@ -25,6 +26,7 @@ function VaccinatorsRegistry() {
                     return {
                         nationalId: item["nationalIdentifier"],
                         name: item["name"],
+                        uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
                 })
             })
@@ -33,7 +35,7 @@ function VaccinatorsRegistry() {
             });
     }
 
-    const AllFacilitiesHeaderData= [
+    const AllFacilitiesHeaderData = [
         {
             title: "National ID",
             key: "nationalId"
@@ -55,8 +57,10 @@ function VaccinatorsRegistry() {
         fileUploadErrorsAPI={API_URL.VACCINATOR_FILE_UPLOAD_ERRORS_API}
         infoTitle={"Records in the DIVOC Vaccinator Registry"}
         tableTitle="All Vaccinators"
+        emptyListMessage={"No Vaccinator Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 

@@ -13,6 +13,7 @@ import {CustomTextAreaWidget} from '../CustomTextAreaWidget/index';
 import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
 import {formatDate} from "../../utils/dateutil";
 import * as R from "ramda";
+import {TextInCenter} from "../TextInCenter";
 
 function VaccineRegistration() {
     const {keycloak} = useKeycloak();
@@ -137,6 +138,16 @@ function VaccineRegistration() {
         }
     }
 
+    // make errors more readable based on schema definition if any
+    const transformErrors = errors => {
+        return errors.map(error => {
+            if (error.property && error.property === ".medicineIds") {
+                error.message = "Please select vaccine for the program"
+            }
+            return error;
+        });
+    };
+
     return (
         <div className={styles["container"]}>
             {showForm && <div className={styles["form-container"]}>
@@ -157,6 +168,8 @@ function VaccineRegistration() {
                             handleSubmit();
                         }
                     }}
+                    showErrorList={false}
+                    transformErrors={transformErrors}
                     onChange={(evt) => {
                         setFormData(evt.formData)
                     }}
@@ -181,6 +194,7 @@ function VaccineRegistration() {
                     }}
                 />
             </div>}
+            {programList.length === 0 && <TextInCenter text={"No Program Added"}/>}
         </div>
     );
 }

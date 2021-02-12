@@ -25,7 +25,7 @@ function FacilityInfo() {
     
     return <Container id="facility-details">
     <h2 id="heading">Facility Details</h2>
-        <FacilityForm facility={facility} setFacility={setFacility}/>
+        <FacilityForm facility={facility} refreshFacility={fetchFacility}/>
     </Container>
 }
 
