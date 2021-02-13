@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/portal-api/pkg/utils"
 	"net/http"
 	"strings"
 	"time"
@@ -118,6 +119,7 @@ func getMedicinesHandler(params operations.GetMedicinesParams, principal *models
 
 func enrollRecipient(params operations.EnrollRecipientParams,  principal *models.JWTClaimBody) middleware.Responder{
 	if recipientData, err := json.Marshal(params.Body); err == nil {
+		log.Info("Received Recipient data to enroll", string(recipientData), params.Body)
 		services.PublishEnrollmentMessage(recipientData)
 	}
 	return operations.NewEnrollRecipientOK()
@@ -471,14 +473,14 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						"pincode": *updateRequest.Address.Pincode,
 					}
 				}
-				SetMapValueIfNotEmpty(updatedFacility, "facilityName", updateRequest.FacilityName)
-				SetMapValueIfNotEmpty(updatedFacility, "geoLocation", updateRequest.GeoLocation)
-				SetMapValueIfNotEmpty(updatedFacility, "websiteUrl", updateRequest.WebsiteURL)
-				SetMapValueIfNotEmpty(updatedFacility, "email", updateRequest.Email)
-				SetMapValueIfNotEmpty(updatedFacility, "contact", updateRequest.Contact)
-				SetMapValueIfNotEmpty(updatedFacility, "operatingHourStart", updateRequest.OperatingHourStart)
-				SetMapValueIfNotEmpty(updatedFacility, "operatingHourEnd", updateRequest.OperatingHourEnd)
-				SetMapValueIfNotEmpty(updatedFacility, "category", updateRequest.Category)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "facilityName", updateRequest.FacilityName)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "geoLocation", updateRequest.GeoLocation)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "websiteUrl", updateRequest.WebsiteURL)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "email", updateRequest.Email)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "contact", updateRequest.Contact)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "operatingHourStart", updateRequest.OperatingHourStart)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "operatingHourEnd", updateRequest.OperatingHourEnd)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "category", updateRequest.Category)
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
@@ -497,8 +499,8 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 
 	mkSchedule := func (p models.FacilityUpdateRequestItems0ProgramsItems0Schedule) map[string]interface{} {
 		s := map[string]interface{}{}
-		SetMapValueIfNotEmpty(s, "startTime", p.StartTime)
-		SetMapValueIfNotEmpty(s, "endTime", p.EndTime)
+		utils.SetMapValueIfNotEmpty(s, "startTime", p.StartTime)
+		utils.SetMapValueIfNotEmpty(s, "endTime", p.EndTime)
 		if len(p.Days) > 0 {
 			s["days"] = p.Days
 		}
@@ -553,7 +555,7 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 				if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
 					facilityProgram["rate"] = updateProgram.Rate
 					facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
-					services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),facilityContact, facilityEmail)
+					services.NotifyFacilityUpdate("rate", utils.ToString(updateProgram.Rate),facilityContact, facilityEmail)
 				}
 				if updateProgram.Schedule != nil {
 					facilityProgram["schedule"] = mkSchedule(*updateProgram.Schedule)
@@ -745,7 +747,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 				currentPrograms := vaccinator["programs"].([]interface{})
 				var programsTobeUpdated []map[string]interface{}
 				var updateVaccinator map[string]interface{}
-				e := convertStructToInterface(updateRequest, &updateVaccinator)
+				e := utils.ConvertStructToInterface(updateRequest, &updateVaccinator)
 				if e != nil {
 					log.Errorf("Error which converting to Interface %+v", updateRequest)
 					return NewGenericServerError()

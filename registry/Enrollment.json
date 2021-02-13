@@ -67,7 +67,7 @@
     "privateFields": [],
     "signedFields": [],
     "indexFields": ["(phone, code)"],
-    "uniqueIndexFields": ["code"],
+    "uniqueIndexFields": ["(code, programId)"],
     "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }

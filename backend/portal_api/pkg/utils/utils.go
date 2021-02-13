@@ -1,4 +1,4 @@
-package pkg
+package utils
 
 import (
 	"encoding/json"
@@ -6,10 +6,9 @@ import (
 	"github.com/divoc/portal-api/config"
 	"math/rand"
 	"strconv"
-	"strings"
 )
 
-func isEqual(arr1 []string, arr2 []string) bool {
+func IsEqual(arr1 []string, arr2 []string) bool {
 	// If one is nil, the other must also be nil.
 	if (arr1 == nil) != (arr2 == nil) {
 		return false
@@ -20,14 +19,14 @@ func isEqual(arr1 []string, arr2 []string) bool {
 	}
 
 	for _, e := range arr1 {
-		if !contains(arr2, e) {
+		if !Contains(arr2, e) {
 			return false
 		}
 	}
 	return true
 }
 
-func contains(arr []string, str string) bool {
+func Contains(arr []string, str string) bool {
 	for _, a := range arr {
 		if a == str {
 			return true
@@ -60,7 +59,7 @@ func ToString(arg interface{}) string {
 	}
 }
 
-func convertStructToInterface(structToConvert interface{}, result interface{}) error {
+func ConvertStructToInterface(structToConvert interface{}, result interface{}) error {
 	b, e := json.Marshal(structToConvert)
 	if e != nil {
 		return errors.New("JSON marshelling error")
@@ -78,17 +77,7 @@ func SetMapValueIfNotEmpty(m map[string]interface{}, key string, value string) {
 	}
 }
 
-func generateEnrollmentCode() string {
-	var digits int64 = 0
-	for i := 0; i < config.Config.EnrollmentCreation.NumberOfDigits; i++ {
-		digits = digits*10 + 9
-	}
-	code := rand.Int63n(digits)
-	var sb strings.Builder
-	for ; code != 0; {
-		var n = int(code % 10)
-		sb.WriteString(strconv.Itoa(n))
-		code /= 10
-	}
-	return sb.String()
+func GenerateEnrollmentCode(phoneNumber string) string {
+	code := rand.Intn(config.Config.EnrollmentCreation.NumberOfDigits)
+	return phoneNumber + "-" + strconv.Itoa(code)
 }

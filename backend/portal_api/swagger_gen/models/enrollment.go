@@ -214,3 +214,114 @@ func (m *Enrollment) UnmarshalBinary(b []byte) error {
 	*m = res
 	return nil
 }
+
+// EnrollmentAddress Address
+//
+// Indian address format
+//
+// swagger:model EnrollmentAddress
+type EnrollmentAddress struct {
+
+	// The address line 1
+	//
+	// Address line 1
+	// Required: true
+	AddressLine1 *string `json:"addressLine1"`
+
+	// The address2 schema
+	AddressLine2 string `json:"addressLine2,omitempty"`
+
+	// The district schema
+	// Required: true
+	District *string `json:"district"`
+
+	// The pincode schema
+	// Required: true
+	Pincode *int64 `json:"pincode"`
+
+	// The state schema
+	//
+	// State of address
+	// Required: true
+	State *string `json:"state"`
+}
+
+// Validate validates this enrollment address
+func (m *EnrollmentAddress) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAddressLine1(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateDistrict(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validatePincode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateState(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *EnrollmentAddress) validateAddressLine1(formats strfmt.Registry) error {
+
+	if err := validate.Required("address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *EnrollmentAddress) validateDistrict(formats strfmt.Registry) error {
+
+	if err := validate.Required("address"+"."+"district", "body", m.District); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *EnrollmentAddress) validatePincode(formats strfmt.Registry) error {
+
+	if err := validate.Required("address"+"."+"pincode", "body", m.Pincode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *EnrollmentAddress) validateState(formats strfmt.Registry) error {
+
+	if err := validate.Required("address"+"."+"state", "body", m.State); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *EnrollmentAddress) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *EnrollmentAddress) UnmarshalBinary(b []byte) error {
+	var res EnrollmentAddress
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}

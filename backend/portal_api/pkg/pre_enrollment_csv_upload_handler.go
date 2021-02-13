@@ -7,6 +7,7 @@ import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
+	"github.com/divoc/portal-api/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"strings"
 )
@@ -55,7 +56,7 @@ func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetry
 		Gender:            data.Text("gender"),
 		Name:              data.Text("name"),
 		Email:             data.Text("email"),
-		Code:              generateEnrollmentCode(),
+		Code:              utils.GenerateEnrollmentCode(data.Text("phone")),
 		Certified:         false,
 		ProgramId:         preEnrollmentCsv.ProgramId,
 		Address:           GetAddressObject(data),

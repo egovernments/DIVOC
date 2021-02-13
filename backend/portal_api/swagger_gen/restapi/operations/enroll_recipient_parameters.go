@@ -31,10 +31,10 @@ type EnrollRecipientParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*
+	/*Recipient Details
 	  In: body
 	*/
-	Body *models.Definitions
+	Body *models.Enrollment
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -48,7 +48,7 @@ func (o *EnrollRecipientParams) BindRequest(r *http.Request, route *middleware.M
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.Definitions
+		var body models.Enrollment
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
