@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/divoc/portal-api/config"
+	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
 )
@@ -78,6 +79,13 @@ func SetMapValueIfNotEmpty(m map[string]interface{}, key string, value string) {
 }
 
 func GenerateEnrollmentCode(phoneNumber string) string {
-	code := rand.Intn(config.Config.EnrollmentCreation.NumberOfDigits)
-	return phoneNumber + "-" + strconv.Itoa(code)
+	log.Info("Generating the code for the length : ",
+		config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode, config.Config.EnrollmentCreation.MaxRetryCount)
+	digits := 0
+
+	n:= config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode
+	for ;n>=1;n-- {
+		digits  = digits * 10 + 9
+	}
+	return phoneNumber + "-" + strconv.Itoa(rand.Intn(digits))
 }

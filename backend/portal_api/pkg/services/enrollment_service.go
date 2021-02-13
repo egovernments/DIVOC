@@ -5,6 +5,7 @@ import (
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/models"
+	"github.com/divoc/portal-api/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"text/template"
 )
@@ -12,7 +13,7 @@ import (
 const EnrollmentEntity = "Enrollment"
 const PreEnrollmentRegistered = "preEnrollmentRegistered"
 
-func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": preEnrollmentCode,
@@ -24,7 +25,7 @@ func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 			"eq": name,
 		},
 	}
-	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 
+	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter,
 		config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
@@ -70,4 +71,15 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 		return err
 	}
 	return nil
+}
+
+func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error {
+	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
+	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	// If the generated Code is not unique, try again
+	// code + programId should be unique
+	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
+		return CreateEnrollment(enrollment, currentRetryCount+1)
+	}
+	return err
 }
