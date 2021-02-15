@@ -27,8 +27,12 @@ export const SelectVaccinator = (props) => {
     const [selectedBatchId, setSelectedBatchId] = useState();
     const [tempSelectedBatchId, setTempSelectedBatchId] = useState();
 
+    function isInputValid() {
+        return selectedVaccinatorId && selectedMedicineName && selectedBatchId && selectedDose;
+    }
+
     function onActionBtnClick() {
-        if (selectedVaccinatorId && selectedMedicineName && selectedBatchId) {
+        if (isInputValid()) {
             const payload = {
                 enrollCode: props.enrollCode,
                 vaccinatorId: selectedVaccinatorId,
@@ -139,7 +143,7 @@ export const SelectVaccinator = (props) => {
                     />
                 </div>
             </div>
-            <Button variant="outline-primary" className="action-btn mt-4"
+            <Button variant="outline-primary" className="action-btn mt-4" disabled={!isInputValid()}
                     onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
         </div>
     );

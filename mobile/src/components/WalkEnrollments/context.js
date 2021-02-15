@@ -26,6 +26,7 @@ function walkInEnrollmentReducer(state, action) {
             newState.dob = action.payload.dob;
             newState.email = action.payload.email;
             newState.phone = action.payload.phone;
+            newState.identity = action.payload.identityType + ":" + action.payload.identityValue;
             newState.address = {
                 addressLine1: action.payload.addressLine1,
                 district: action.payload.district,

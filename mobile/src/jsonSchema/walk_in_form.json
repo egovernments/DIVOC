@@ -11,7 +11,9 @@
     "addressLine1",
     "district",
     "state",
-    "pincode"
+    "pincode",
+    "identityType",
+    "identityValue"
   ],
   "properties": {
     "name": {
@@ -55,6 +57,23 @@
       "type": "string",
       "$id": "#/properties/phone",
       "format": "phone-in"
+    },
+    "identityType": {
+      "title": "Identity Type",
+      "$id": "#/properties/identityType",
+      "enum": [
+        "did:in.gov.uidai.aadhaar",
+        "did:PAN"
+      ],
+      "enumNames": [
+        "Aadhaar",
+        "PAN"
+      ]
+    },
+    "identityValue": {
+      "title": "Identity Number",
+      "$id": "#/properties/identityValue",
+      "type": "string"
     },
     "state": {
       "$id": "#/properties/state",
