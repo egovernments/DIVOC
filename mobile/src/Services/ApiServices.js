@@ -77,7 +77,7 @@ export class ApiServices {
                 },
 
                 vaccination: {
-                    batch: item.batchId,
+                    batch: item.vaccination.batchId,
                     date: item.vaccination.date,
                     effectiveStart: item.vaccination.effectiveStart,
                     effectiveUntil: item.vaccination.effectiveUntil,
