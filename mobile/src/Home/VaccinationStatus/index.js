@@ -53,14 +53,14 @@ async function getVaccinationStatus() {
     const programName = localStorage.getItem("program")
     const programRate = userDetails[programName + "_rate"] ?? 0
     const recipientDetails = await appIndexDb.recipientDetails()
-    const certificateIssue = recipientDetails[1].value
-    const isExceed = certificateIssue > programRate
-    const remainingCertificate = programRate - certificateIssue
+    const enrolledCount = recipientDetails[0].value + recipientDetails[1].value
+    const isExceed = enrolledCount > programRate
+    const remainingCertificate = programRate - enrolledCount
     const isLimitToReach = remainingCertificate >= 0 && remainingCertificate <= 10;
     return new VaccinationDetails(
-        certificateIssue,
+        enrolledCount,
         programRate,
-        isExceed ? (certificateIssue - programRate) : 0,
+        isExceed ? (enrolledCount - programRate) : 0,
         isExceed,
         isExceed ? "Exceed Limits" : "Recipients Enrolled",
         isLimitToReach
