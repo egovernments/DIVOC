@@ -1,0 +1,7 @@
+kafka:
+  bootstrapservers: localhost:9092
+  notifyTopic: notify
+  enrollmenttopic: enrollment
+enrollmentcreation:
+  maxretrycount: 10
+  lengthofsuffixedenrollmentcode: 3

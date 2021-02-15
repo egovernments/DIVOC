@@ -12,6 +12,8 @@ services:
       - "9300:9300"
   db:
     image: postgres
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -114,7 +116,19 @@ services:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: 65ade758-8371-49bc-98cd-ef24aaa4c6e1
+      DB_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+      - keycloak
+  registration_api:
+    image: dockerhub/registration_api
+    ports:
+      - "8002:8002"
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
@@ -133,7 +147,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: 65ade758-8371-49bc-98cd-ef24aaa4c6e1
     depends_on:
       - registry
   certificate_signer:
@@ -148,10 +162,11 @@ services:
   nginx:
     image: dockerhub/nginx
     ports:
-      - "81:80"
+      - "80:80"
     depends_on:
       - vaccination_api
       - portal_api
+      - registration_api
   notification-service:
     image: dockerhub/notification-service
     ports:

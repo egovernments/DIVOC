@@ -25,7 +25,6 @@ func InitializeKafka() {
 
 	log.Infof("Connected to kafka on %s", servers)
 	StartCertifiedConsumer()
-	StartEnrollmentConsumer()
 	go func() {
 		topic := config.Config.Kafka.NotifyTopic
 		for {

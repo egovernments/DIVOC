@@ -2,8 +2,8 @@ package services
 
 import (
 	"encoding/json"
-	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/pkg/models"
+	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"time"
@@ -33,16 +33,16 @@ func StartEnrollmentConsumer() {
 				err = json.Unmarshal(msg.Value, &enrollment)
 
 				if err == nil {
-					_, err := time.Parse("2006-01-02", enrollment.Dob)
+					_, err := time.Parse("2006-01-02", enrollment.Dob.String())
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 					err = CreateEnrollment(enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
 						// Push to ack topic
-						err = NotifyRecipient(enrollment)
-						if err != nil {
-							log.Error("Unable to send notification to the enrolled user",  err)
-						}
+						//err = NotifyRecipient(enrollment)
+						//if err != nil {
+						//	log.Error("Unable to send notification to the enrolled user",  err)
+						//}
 					} else {
 						// Push to error topic
 					}
@@ -55,8 +55,6 @@ func StartEnrollmentConsumer() {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
 			}
-
 		}
 	}()
 }
-

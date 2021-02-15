@@ -1,0 +1,26 @@
+swagger: "2.0"
+info:
+  title: Registration API
+  description: Registration API
+  version: 1.0.0
+schemes:
+  - https
+basePath: /divoc/api/citizen
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /register:
+    post:
+      summary: Enroll Recipient
+      operationId: enrollRecipient
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
+          description: Recipient Details
+      responses:
+        '200':
+          description: OK

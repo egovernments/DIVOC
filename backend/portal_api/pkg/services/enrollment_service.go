@@ -5,7 +5,6 @@ import (
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/models"
-	"github.com/divoc/portal-api/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"text/template"
 )
@@ -71,15 +70,4 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 		return err
 	}
 	return nil
-}
-
-func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error {
-	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
-	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	// If the generated Code is not unique, try again
-	// code + programId should be unique
-	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-		return CreateEnrollment(enrollment, currentRetryCount+1)
-	}
-	return err
 }

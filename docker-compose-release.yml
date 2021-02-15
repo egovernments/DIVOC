@@ -106,6 +106,18 @@ services:
     depends_on:
       - kafka
       - keycloak
+  registration_api:
+    image: dockerhub/registration_api
+    ports:
+      - "8002:8002"
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      DB_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+      - keycloak
   portal_api:
     image: dockerhub/portal_api:divoc-0.0.3
     ports:
@@ -152,6 +164,7 @@ services:
     depends_on:
       - vaccination_api
       - portal_api
+      - registration_api
   notification-service:
     image: dockerhub/notification-service:divoc-0.0.3
     ports:
