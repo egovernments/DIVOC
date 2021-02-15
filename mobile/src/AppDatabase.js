@@ -165,7 +165,8 @@ export class AppDatabase {
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
                 code: walkEnrollment.code,
-                programId: walkEnrollment.programId
+                programId: walkEnrollment.programId,
+                identity: walkEnrollment.identity
             }
             await this.addToQueue(queue)
         } else {
@@ -195,7 +196,7 @@ export class AppDatabase {
             vaccinatorName: vaccinator.name,
             patient: patient,
             enrollCode: event.enrollCode,
-            identity: queue.aadhaarNumber,
+            identity: queue.identity || queue.aadhaarNumber,
             vaccination: vaccination
         }
     }
