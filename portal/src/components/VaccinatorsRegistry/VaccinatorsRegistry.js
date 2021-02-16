@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
+import { maskPersonalDetails } from '../../utils/maskPersonalDetails';
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
 
@@ -24,7 +25,7 @@ function VaccinatorsRegistry() {
             .then((result) => {
                 return result.map((item, index) => {
                     return {
-                        nationalId: item["nationalIdentifier"],
+                        nationalId: maskPersonalDetails(item["nationalIdentifier"]),
                         name: item["name"],
                         uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }

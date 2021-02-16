@@ -66,7 +66,7 @@ input[type="radio"]:checked + .wrapper {
 .table-data{
     color: #4E4E4E;
     font-size: smaller;
-    text-align: center;
+    text-align: left;
 }
 
 .card-continer{

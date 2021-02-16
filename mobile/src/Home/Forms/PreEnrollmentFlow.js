@@ -40,7 +40,7 @@ function PreEnrollmentRouteCheck({pageName}) {
             break;
         }
         case FORM_AADHAAR_OTP :
-            if (state.aadhaarNumber) {
+            if (state.identity) {
                 return <VerifyAadhaarOTP/>
             }
             break;
@@ -85,7 +85,7 @@ function preEnrollmentReducer(state, action) {
         }
         case FORM_AADHAAR_NUMBER: {
             const newState = {...state};
-            newState.aadhaarNumber = action.payload.aadhaarNumber;
+            newState.identity = "did:in.gov.uidai.aadhaar:" + action.payload.aadhaarNumber;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
         }

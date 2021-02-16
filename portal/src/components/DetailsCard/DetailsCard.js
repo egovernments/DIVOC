@@ -14,7 +14,7 @@ import FacilityForm from "../FacilityForm/FacilityForm";
 function DetailsCard({ showCard, setShowCard, facility, fetchFacilities,status, updateFacilityProgramStatus }) {
     console.log("data", facility);
     const box = () => {
-        return (<React.Fragment>
+        return (<Container id="details-card">
             <Row>
                 <Col style={{"marginTop": "10px"}}><h4>{facility.facilityName}</h4></Col>
                 <Col style={{"textAlign": "right"}}>
@@ -31,10 +31,10 @@ function DetailsCard({ showCard, setShowCard, facility, fetchFacilities,status, 
                          onClick={()=>{updateFacilityProgramStatus([facility], CONSTANTS.IN_ACTIVE)}}>
                          DELIST FACILITY
             </Button>}
-            </React.Fragment>
+            </Container>
         );
     };
-    return <div>{showCard ? box() : ""}</div>;
+    return <React.Fragment>{showCard ? box() : ""}</React.Fragment>;
 }
 
 export default DetailsCard;

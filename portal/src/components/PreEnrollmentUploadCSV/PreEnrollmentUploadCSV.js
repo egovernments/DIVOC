@@ -34,7 +34,7 @@ function PreEnrollmentUploadCSV({
             .then(res => {
                 const programs = res.data
                     .filter((obj) => obj.status === "Active")
-                    .map(obj => ({value: obj.name, label: obj.name}));
+                    .map(obj => ({value: obj.name, id:obj.osid, label: obj.name}));
                 setProgramList(programs)
             });
     }
@@ -47,7 +47,7 @@ function PreEnrollmentUploadCSV({
         const fileData = evt.target.files[0];
         let dataToSend = new FormData();
         dataToSend.append('file', fileData);
-        dataToSend.append('programId', program);
+        dataToSend.append('programId', programList.filter(p => p.value === program).map(p => p.id)[0]);
 
         const config = {
             headers: {"Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"},

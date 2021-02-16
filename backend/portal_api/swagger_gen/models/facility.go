@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -113,6 +112,7 @@ func (m *Facility) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validateAddress(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -130,6 +130,7 @@ func (m *Facility) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validateAdmins(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Admins) { // not required
 		return nil
 	}
@@ -183,6 +184,7 @@ func (m *Facility) validateCategoryEnum(path, location string, value string) err
 }
 
 func (m *Facility) validateCategory(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Category) { // not required
 		return nil
 	}
@@ -196,6 +198,7 @@ func (m *Facility) validateCategory(formats strfmt.Registry) error {
 }
 
 func (m *Facility) validatePrograms(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -252,6 +255,7 @@ func (m *Facility) validateStatusEnum(path, location string, value string) error
 }
 
 func (m *Facility) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -297,6 +301,7 @@ func (m *Facility) validateTypeEnum(path, location string, value string) error {
 }
 
 func (m *Facility) validateType(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Type) { // not required
 		return nil
 	}
@@ -304,78 +309,6 @@ func (m *Facility) validateType(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this facility based on the context it is used
-func (m *Facility) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateAddress(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateAdmins(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidatePrograms(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Facility) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Address != nil {
-		if err := m.Address.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("address")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *Facility) contextValidateAdmins(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Admins); i++ {
-
-		if m.Admins[i] != nil {
-			if err := m.Admins[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("admins" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *Facility) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Programs); i++ {
-
-		if m.Programs[i] != nil {
-			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -404,6 +337,9 @@ func (m *Facility) UnmarshalBinary(b []byte) error {
 // swagger:model FacilityProgramsItems0
 type FacilityProgramsItems0 struct {
 
+	// name
+	Name string `json:"name,omitempty"`
+
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
 
@@ -422,11 +358,6 @@ type FacilityProgramsItems0 struct {
 
 // Validate validates this facility programs items0
 func (m *FacilityProgramsItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this facility programs items0 based on context it is used
-func (m *FacilityProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

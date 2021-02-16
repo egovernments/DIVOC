@@ -100,11 +100,11 @@ function FacilityController() {
         if (selectedProgram && facilities.length > 0) {
             let updateFacilities = [];
             facilities.forEach(facility => {
-                let programs = [{
-                    id: selectedProgram,
+                let p = [{
+                    id: programs.filter(p => p.value === selectedProgram).map(p => p.id)[0],
                     status: newStatus
                 }];
-                updateFacilities.push({osid: facility.osid, programs})
+                updateFacilities.push({osid: facility.osid, programs:p})
             });
             setIsLoading(true);
             axiosInstance.current
@@ -195,7 +195,6 @@ function FacilityController() {
                                 }
                             }
                         });
-
                         if(status === CONSTANTS.ACTIVE) {
                             const program = item["programs"].find(program => program.programId === selectedProgram)
                             isFiltersMatched = !!(program && program.status === CONSTANTS.ACTIVE && isFiltersMatched);
@@ -210,7 +209,7 @@ function FacilityController() {
                         }
 
                         if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
-                            const program = findBy(item["programs"], "programId", selectedProgram)
+                            const program = findBy(item["programs"], "name", selectedProgram)
                             if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
                                 isFiltersMatched = false
                             }
@@ -233,7 +232,7 @@ function FacilityController() {
     function fetchPrograms() {
         axiosInstance.current.get(API_URL.PROGRAM_API)
             .then(res => {
-                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                const programs = res.data.map(obj => ({value: obj.name, id: obj.osid, label: obj.name}));
                 setPrograms(programs);
                 if (programs.length > 0) {
                     setSelectedProgram(programs[0].value)
@@ -255,6 +254,33 @@ function FacilityController() {
     return (
         <TabPanels
             tabs={[
+                {
+                    title: "All Facilities",
+                    component: (
+                        <FacilityDetails
+                            isLoading={isLoading}
+                            countryName={countryName}
+                            stateList={stateList}
+                            onStateSelected={onStateSelected}
+                            districtList={districts}
+                            selectedDistrict={selectedDistrict}
+                            selectedState={selectedState}
+                            setSelectedDistrict={setSelectedDistrict}
+                            programs={programs}
+                            facilities={facilities}
+                            setFacilities={setFacilities}
+                            selectedProgram={selectedProgram}
+                            setSelectedProgram={setSelectedProgram}
+                            facilityType={facilityType}
+                            setFacilityType={setFacilityType}
+                            status={status}
+                            setStatus={setStatus}
+                            fetchFacilities={fetchFacilities}
+                            resetFilter={resetFilter}
+                            updateFacilityProgramStatus={updateFacilityProgramStatus}
+                        />
+                    ),
+                },
                 {
                     title: "Facility Activation",
                     component: (
@@ -305,33 +331,6 @@ function FacilityController() {
                             fetchFacilities={fetchFacilities}
                             lastAdjustedOn={lastAdjustedOn}
                             setLastAdjustedOn={setLastAdjustedOn}
-                            resetFilter={resetFilter}
-                            updateFacilityProgramStatus={updateFacilityProgramStatus}
-                        />
-                    ),
-                },
-                {
-                    title: "All Facilities",
-                    component: (
-                        <FacilityDetails
-                            isLoading={isLoading}
-                            countryName={countryName}
-                            stateList={stateList}
-                            onStateSelected={onStateSelected}
-                            districtList={districts}
-                            selectedDistrict={selectedDistrict}
-                            selectedState={selectedState}
-                            setSelectedDistrict={setSelectedDistrict}
-                            programs={programs}
-                            facilities={facilities}
-                            setFacilities={setFacilities}
-                            selectedProgram={selectedProgram}
-                            setSelectedProgram={setSelectedProgram}
-                            facilityType={facilityType}
-                            setFacilityType={setFacilityType}
-                            status={status}
-                            setStatus={setStatus}
-                            fetchFacilities={fetchFacilities}
                             resetFilter={resetFilter}
                             updateFacilityProgramStatus={updateFacilityProgramStatus}
                         />

@@ -9,11 +9,14 @@ COPY kernel_library/go.mod ./kernel_library/go.mod
 COPY kernel_library/go.sum ./kernel_library/go.sum
 COPY portal_api/go.mod ./portal_api/go.mod
 COPY portal_api/go.sum ./portal_api/go.sum
+COPY registration_api/go.mod ./registration_api/go.mod
+COPY registration_api/go.sum ./registration_api/go.sum
 COPY notification-service/go.mod ./notification-service/go.mod
 COPY notification-service/go.sum ./notification-service/go.sum
 
 RUN cd vaccination_api && go mod download
 RUN cd portal_api && go mod download
+RUN cd registration_api && go mod download
 RUN cd notification-service && go mod download
 COPY vaccination_api/Makefile ./vaccination_api/Makefile
 RUN cd vaccination_api && make deps
@@ -21,6 +24,7 @@ COPY . .
 RUN find .
 RUN cd vaccination_api && GOFLAGS=" -tags=musl" SPEC_FILE="../dockerdeps/interfaces/vaccination-api.yaml" make all
 RUN cd portal_api && GOFLAGS=" -tags=musl" SPEC_FILE="../dockerdeps/interfaces/admin-portal.yaml" make all
+RUN cd registration_api && GOFLAGS=" -tags=musl" SPEC_FILE="../dockerdeps/interfaces/registration-api.yaml" make all
 RUN cd notification-service && GOFLAGS=" -tags=musl" SPEC_FILE="../dockerdeps/interfaces/notification-service.yaml" make all
 
 # Start fresh from a smaller image
@@ -54,6 +58,15 @@ COPY --from=build_base /tmp/divoc/portal_api/divoc-portal-api-server /app/divoc-
 COPY portal_api/config /config
 EXPOSE 8001
 CMD ["/app/divoc-portal-api-server", "--scheme", "http", "--port", "8001", "--host", "0.0.0.0"]
+
+#registration api
+FROM alpine:3.9 as registration_api
+LABEL name=registration_api
+RUN apk add ca-certificates
+COPY --from=build_base /tmp/divoc/registration_api/divoc-registration-api-server /app/divoc-registration-api-server
+COPY registration_api/config /config
+EXPOSE 8002
+CMD ["/app/divoc-registration-api-server", "--scheme", "http", "--port", "8002", "--host", "0.0.0.0"]
 
 #notification-service
 FROM alpine:3.9 as notification-service

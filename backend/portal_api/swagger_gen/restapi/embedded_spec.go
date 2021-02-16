@@ -795,6 +795,27 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "description": "Recipient Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -1166,6 +1187,9 @@ func init() {
           "items": {
             "type": "object",
             "properties": {
+              "name": {
+                "type": "string"
+              },
               "programId": {
                 "type": "string"
               },
@@ -2441,6 +2465,27 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "description": "Recipient Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enrollment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -2754,6 +2799,59 @@ func init() {
         }
       }
     },
+    "EnrollmentAddress": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "description": "Address line 1",
+          "type": "string",
+          "title": "The address line 1",
+          "default": "",
+          "$id": "#/properties/address/properties/addressLine1"
+        },
+        "addressLine2": {
+          "type": "string",
+          "title": "The address2 schema",
+          "$id": "#/properties/address/properties/addressLine2"
+        },
+        "district": {
+          "type": "string",
+          "title": "The district schema",
+          "$id": "#/properties/address/properties/district"
+        },
+        "pincode": {
+          "type": "integer",
+          "title": "The pincode schema",
+          "$id": "#/properties/address/properties/pincode"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "$id": "#/properties/address/properties/state",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": 560000,
+          "state": "Karnataka"
+        }
+      ]
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -2879,6 +2977,9 @@ func init() {
     "FacilityProgramsItems0": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "programId": {
           "type": "string"
         },
@@ -3361,6 +3462,107 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "enrollment": {
+      "type": "object",
+      "required": [
+        "phone",
+        "enrollmentScopeId",
+        "nationalId",
+        "dob"
+      ],
+      "properties": {
+        "address": {
+          "description": "Indian address format",
+          "type": "object",
+          "title": "Address",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "description": "Address line 1",
+              "type": "string",
+              "title": "The address line 1",
+              "default": "",
+              "$id": "#/properties/address/properties/addressLine1"
+            },
+            "addressLine2": {
+              "type": "string",
+              "title": "The address2 schema",
+              "$id": "#/properties/address/properties/addressLine2"
+            },
+            "district": {
+              "type": "string",
+              "title": "The district schema",
+              "$id": "#/properties/address/properties/district"
+            },
+            "pincode": {
+              "type": "integer",
+              "title": "The pincode schema",
+              "$id": "#/properties/address/properties/pincode"
+            },
+            "state": {
+              "description": "State of address",
+              "type": "string",
+              "title": "The state schema",
+              "$id": "#/properties/address/properties/state",
+              "examples": [
+                "Karnataka"
+              ]
+            }
+          },
+          "examples": [
+            {
+              "addressLine1": "no. 23, some lane, some road",
+              "addressLine2": "some nagar",
+              "district": "bangalore south",
+              "pincode": 560000,
+              "state": "Karnataka"
+            }
+          ]
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "code": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
         }
       }
     },

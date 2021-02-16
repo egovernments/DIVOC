@@ -359,7 +359,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 const StaffProgramRate = (props) => {
     const classes = useStyles();
     const allocatedPrograms = props.vaccinationRateLimits.map(v => v.programName);
-    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.id));
+    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.name));
     return (
         <Modal
             show={props.showModal}
@@ -396,7 +396,7 @@ const StaffProgramRate = (props) => {
                                             {
                                                 (limit.programName === "" ? newPrograms : props.programs).map((program, index) => (
                                                     <MenuItem value={program.programId}
-                                                              name={program.programId}>{program.programId}</MenuItem>
+                                                              name={program.name}>{program.name}</MenuItem>
 
                                                 ))
                                             }

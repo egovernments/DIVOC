@@ -52,6 +52,8 @@
 
 .center-align{
     display: flex !important; 
+    align-items: center;
+    flex-direction: column;
     justify-content: center !important;
 }
 

@@ -65,9 +65,9 @@ class ProgramDB {
         return formatCertifyDate(newDate);
     }
 
-    getPatientGivenMedicine(allPrograms, programName, medicineId) {
+    getPatientGivenMedicine(allPrograms, programId, medicineId) {
         const patientProgram = allPrograms.find((value => {
-            return value["name"] === programName
+            return value["id"] === programId
         }))
         const patientProgramMedicine = patientProgram["medicines"]
         if (patientProgramMedicine && patientProgramMedicine.length > 0) {
@@ -86,7 +86,7 @@ class ProgramDB {
         const selectProgram = getSelectedProgram();
         return vaccinators.filter(vaccinator => {
             return vaccinator.programs &&
-                vaccinator.programs.filter(p => p.programId === selectProgram && p.status === CONSTANT.ACTIVE).length > 0
+                vaccinator.programs.filter(p => p.name === selectProgram && p.status === CONSTANT.ACTIVE).length > 0
         })
     }
 }

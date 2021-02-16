@@ -5,6 +5,7 @@ import {useAxios} from "../../utils/useAxios";
 import {useKeycloak} from "@react-keycloak/web";
 import { CONSTANTS } from "../../utils/constants";
 import FacilityForm from "../FacilityForm/FacilityForm";
+import "./FacilityInfo.scss"
 
 function FacilityInfo() {
     const [facility, setFacility] = useState({});

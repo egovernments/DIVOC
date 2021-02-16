@@ -34,5 +34,9 @@ kafka:
   bootstrapServers: localhost:9092
   notifyTopic: notify
   certifiedTopic: certified
+  enrollmenttopic: enrollment
 flagr:
   url: https://divoc.xiv.in/config
+enrollmentcreation:
+  maxretrycount: 10
+  lengthofsuffixedenrollmentcode: 3

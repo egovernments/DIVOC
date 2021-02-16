@@ -31,7 +31,7 @@ func NewDeleteFacilityUser(ctx *middleware.Context, handler DeleteFacilityUserHa
 	return &DeleteFacilityUser{Context: ctx, Handler: handler}
 }
 
-/* DeleteFacilityUser swagger:route DELETE /facility/users/{userId} deleteFacilityUser
+/*DeleteFacilityUser swagger:route DELETE /facility/users/{userId} deleteFacilityUser
 
 Delete Facility User
 
@@ -47,6 +47,7 @@ func (o *DeleteFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewDeleteFacilityUserParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *DeleteFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

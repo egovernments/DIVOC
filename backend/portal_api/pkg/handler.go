@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/portal-api/pkg/utils"
 	"net/http"
 	"strings"
 	"time"
@@ -120,7 +121,14 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 	filter := map[string]interface{}{}
 
 	if HasResourceRole(portalClientId, "admin", principal) {
-		return kernelService.GetEntityType(entityTypeId)
+		filter := map[string]interface{}{}
+		response, err := kernelService.QueryRegistry(entityTypeId, filter, 100, 0)
+		if err != nil {
+			log.Errorf("Error in querying registry", err)
+			return model.NewGenericServerError()
+		}
+		results := enrichResponseWithProgramDetails(response[entityTypeId])
+		return model.NewGenericJSONResponse(results)
 	} else if HasResourceRole(portalClientId, "controller", principal) {
 		if params.FacilityCode == nil {
 			return NewGenericForbiddenError()
@@ -166,7 +174,8 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 		return model.NewGenericServerError()
 	}
 	responseArr := response[entityTypeId]
-	return model.NewGenericJSONResponse(responseArr)
+	results := enrichResponseWithProgramDetails(responseArr)
+	return model.NewGenericJSONResponse(results)
 }
 
 func createFilterObject(params operations.GetFacilitiesParams) map[string]interface{} {
@@ -232,7 +241,8 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 			responseArr = append(responseArr.([]interface{}), resp.([]interface{})...)
 		}
 	}
-	return model.NewGenericJSONResponse(responseArr)
+	results := enrichResponseWithProgramDetails(responseArr)
+	return model.NewGenericJSONResponse(results)
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -463,14 +473,14 @@ func updateFacilitiesHandler(params operations.UpdateFacilitiesParams, principal
 						"pincode": *updateRequest.Address.Pincode,
 					}
 				}
-				SetMapValueIfNotEmpty(updatedFacility, "facilityName", updateRequest.FacilityName)
-				SetMapValueIfNotEmpty(updatedFacility, "geoLocation", updateRequest.GeoLocation)
-				SetMapValueIfNotEmpty(updatedFacility, "websiteUrl", updateRequest.WebsiteURL)
-				SetMapValueIfNotEmpty(updatedFacility, "email", updateRequest.Email)
-				SetMapValueIfNotEmpty(updatedFacility, "contact", updateRequest.Contact)
-				SetMapValueIfNotEmpty(updatedFacility, "operatingHourStart", updateRequest.OperatingHourStart)
-				SetMapValueIfNotEmpty(updatedFacility, "operatingHourEnd", updateRequest.OperatingHourEnd)
-				SetMapValueIfNotEmpty(updatedFacility, "category", updateRequest.Category)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "facilityName", updateRequest.FacilityName)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "geoLocation", updateRequest.GeoLocation)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "websiteUrl", updateRequest.WebsiteURL)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "email", updateRequest.Email)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "contact", updateRequest.Contact)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "operatingHourStart", updateRequest.OperatingHourStart)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "operatingHourEnd", updateRequest.OperatingHourEnd)
+				utils.SetMapValueIfNotEmpty(updatedFacility, "category", updateRequest.Category)
 				resp, err := kernelService.UpdateRegistry("Facility", updatedFacility)
 				if err != nil {
 					log.Error(err)
@@ -489,8 +499,8 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 
 	mkSchedule := func (p models.FacilityUpdateRequestItems0ProgramsItems0Schedule) map[string]interface{} {
 		s := map[string]interface{}{}
-		SetMapValueIfNotEmpty(s, "startTime", p.StartTime)
-		SetMapValueIfNotEmpty(s, "endTime", p.EndTime)
+		utils.SetMapValueIfNotEmpty(s, "startTime", p.StartTime)
+		utils.SetMapValueIfNotEmpty(s, "endTime", p.EndTime)
 		if len(p.Days) > 0 {
 			s["days"] = p.Days
 		}
@@ -545,7 +555,7 @@ func updateFacilityProgramsData(facility map[string]interface{}, updateRequest *
 				if updateProgram.Rate != 0 && updateProgram.Rate != facilityProgram["rate"].(float64) {
 					facilityProgram["rate"] = updateProgram.Rate
 					facilityProgram["rateUpdatedAt"] = time.Now().Format(time.RFC3339)
-					services.NotifyFacilityUpdate("rate", ToString(updateProgram.Rate),facilityContact, facilityEmail)
+					services.NotifyFacilityUpdate("rate", utils.ToString(updateProgram.Rate),facilityContact, facilityEmail)
 				}
 				if updateProgram.Schedule != nil {
 					facilityProgram["schedule"] = mkSchedule(*updateProgram.Schedule)
@@ -737,7 +747,7 @@ func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, princ
 				currentPrograms := vaccinator["programs"].([]interface{})
 				var programsTobeUpdated []map[string]interface{}
 				var updateVaccinator map[string]interface{}
-				e := convertStructToInterface(updateRequest, &updateVaccinator)
+				e := utils.ConvertStructToInterface(updateRequest, &updateVaccinator)
 				if e != nil {
 					log.Errorf("Error which converting to Interface %+v", updateRequest)
 					return NewGenericServerError()
@@ -810,8 +820,52 @@ func getUserFacilityDetails(params operations.GetUserFacilityParams, claimBody *
 			return model.NewGenericServerError()
 		}
 		responseArr := response[entityTypeId]
-		return model.NewGenericJSONResponse(responseArr)
+		results := enrichResponseWithProgramDetails(responseArr)
+		return model.NewGenericJSONResponse(results)
 	} else {
 		return NewGenericForbiddenError()
 	}
+}
+
+func enrichResponseWithProgramDetails(response interface{}) []interface{}{
+	responseArr := response.([]interface{})
+	if responseArr == nil || len(responseArr) == 0 {
+		return []interface{}{}
+	}
+	limit, offset := getLimitAndOffset(nil, nil)
+	var results []interface{}
+
+	for _,objects := range responseArr {
+		obj := objects.(map[string]interface{})
+		programs := obj["programs"].([]interface{})
+		updatedPrograms := []interface{}{}
+		if programs != nil && len(programs) > 0 {
+			for _,obj := range programs {
+				program := obj.(map[string]interface{})
+				id := program["programId"].(string)
+				response, err := getProgramById(id, limit, offset)
+				if err != nil {
+					log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
+				} else {
+					responseArr := response["Program"].([]interface{})
+					if len(responseArr) != 0 {
+						program["name"] = responseArr[0].(map[string]interface{})["name"]
+						updatedPrograms = append(updatedPrograms, program)
+					}
+				}
+			}
+			obj["programs"] = updatedPrograms
+		}
+		results = append(results, obj)
+	}
+	return results
+}
+
+func getProgramById(osid string, limit int, offset int) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		"osid": map[string]interface{}{
+			"eq": osid,
+		},
+	}
+	return kernelService.QueryRegistry("Program", filter, limit, offset)
 }

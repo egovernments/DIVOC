@@ -15,16 +15,8 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-// PostVaccinatorsMaxParseMemory sets the maximum size in bytes for
-// the multipart form parser for this operation.
-//
-// The default value is 32 MB.
-// The multipart parser stores up to this + 10MB.
-var PostVaccinatorsMaxParseMemory int64 = 32 << 20
-
 // NewPostVaccinatorsParams creates a new PostVaccinatorsParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewPostVaccinatorsParams() PostVaccinatorsParams {
 
 	return PostVaccinatorsParams{}
@@ -54,7 +46,7 @@ func (o *PostVaccinatorsParams) BindRequest(r *http.Request, route *middleware.M
 
 	o.HTTPRequest = r
 
-	if err := r.ParseMultipartForm(PostVaccinatorsMaxParseMemory); err != nil {
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		if err != http.ErrNotMultipart {
 			return errors.New(400, "%v", err)
 		} else if err := r.ParseForm(); err != nil {
@@ -72,6 +64,7 @@ func (o *PostVaccinatorsParams) BindRequest(r *http.Request, route *middleware.M
 	} else {
 		o.File = &runtime.File{Data: file, Header: fileHeader}
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}

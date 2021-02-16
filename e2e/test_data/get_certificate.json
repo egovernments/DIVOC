@@ -1,0 +1,16 @@
+{
+    "id": "open-saber.registry.search",
+    "ver": "1.0",
+    "ets": "11234",
+    "params": {
+        "did": "",
+        "key": "",
+        "msgid": ""
+    },
+    "request": {
+        "entityType":["VaccinationCertificate"],
+        "filters": {
+            "mobile":{"eq":"9880414889"}
+         }
+    } 
+}

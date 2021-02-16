@@ -19,6 +19,7 @@ import DialogTitle from "@material-ui/core/DialogTitle";
 import DialogContent from "@material-ui/core/DialogContent";
 import Typography from "@material-ui/core/Typography";
 import makeStyles from "@material-ui/core/styles/makeStyles";
+import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 
 
 export default function SearchVaccinatorResultsView({vaccinators, togglePopup, setTogglePopup, facilityCode, onSelectVaccinatorBasedOnCode}) {
@@ -96,8 +97,8 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                     <TableCell component="th" scope="row">
                         {row.name}
                     </TableCell>
-                    <TableCell>{row.mobileNumber}</TableCell>
-                    <TableCell>{row.code}</TableCell>
+                    <TableCell>{maskPersonalDetails(row.mobileNumber)}</TableCell>
+                    <TableCell>{maskPersonalDetails(row.code)}</TableCell>
                     <TableCell>
                         <IconButton aria-label="expand row" size="small" onClick={() => setOpen(!open)}>
                             <CheckboxItem
@@ -126,7 +127,7 @@ export default function SearchVaccinatorResultsView({vaccinators, togglePopup, s
                                                     </label>
                                                     <input
                                                         className="form-control"
-                                                        value = {row[pd.value]}
+                                                        value = {pd.value === "name" ? row[pd.value] : maskPersonalDetails(row[pd.value])}
                                                         type="text"
                                                         id="filled-read-only-input"
                                                         disabled

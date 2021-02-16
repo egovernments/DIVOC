@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import "./index.scss";
 import DropDown from "../DropDown/DropDown";
-import {CONSTANTS} from "../../utils/constants";
+import {CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
 
 export const FacilityFilterTab = ({
                                       programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
@@ -77,11 +77,11 @@ export const FacilityFilterTab = ({
                 <div className="m-3">
                     <div className="filter-header mb-1">
                         <RadioItem
-                            text={CONSTANTS.GOVT}
+                            text={FACILITY_TYPE[CONSTANTS.GOVT]}
                             checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
                                 handleChange(
-                                    event.target.name,
+                                    CONSTANTS.GOVT,
                                     setFacilityType
                                 )
                             }
@@ -89,11 +89,11 @@ export const FacilityFilterTab = ({
                     </div>
                     <div className="filter-header mb-1">
                         <RadioItem
-                            text={CONSTANTS.PRIVATE}
+                            text={FACILITY_TYPE[CONSTANTS.PRIVATE]}
                             checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>
                                 handleChange(
-                                    event.target.name,
+                                    CONSTANTS.PRIVATE,
                                     setFacilityType
                                 )
                             }
@@ -109,7 +109,7 @@ export const FacilityFilterTab = ({
 };
 
 export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedColor}) => (
-    <div className="custom-checkbox-item-wrapper">
+    <div className="custom-checkbox-item-wrapper" style={{"display":"inline-block"}}>
         <label
             className="form-check-label d-flex align-items-center"
             htmlFor={text}

@@ -7,8 +7,8 @@ import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
-	"math/rand"
-	"strconv"
+	"github.com/divoc/portal-api/pkg/utils"
+	log "github.com/sirupsen/logrus"
 	"strings"
 )
 
@@ -27,23 +27,7 @@ func (preEnrollmentCsv PreEnrollmentCSV) ValidateRow() []string {
 }
 
 func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
-	data := preEnrollmentCsv.Data
-	//Name, Mobile, National Identifier, DOB, facilityId
-	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
-	enrollment := models.Enrollment{
-		Phone:             data.Text("phone"),
-		EnrollmentScopeId: data.Text("enrollmentScopeId"),
-		NationalId:        data.Text("nationalId"),
-		Dob:               data.Text("dob"),
-		Gender:            data.Text("gender"),
-		Name:              data.Text("name"),
-		Email:             data.Text("email"),
-		Code:              generateEnrollmentCode(),
-		Certified:         false,
-		ProgramId:         preEnrollmentCsv.ProgramId,
-		Address:           GetAddressObject(data),
-	}
-	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	err, enrollment := createPreEnrollmentRegistry(preEnrollmentCsv, 1)
 	if err != nil {
 		errmsg := err.Error()
 		if strings.Contains(errmsg, "Detail:") {
@@ -59,10 +43,32 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 	return errNotify
 }
 
-func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetryCount int) (error, models.Enrollment) {
+	log.Info("Current number of tries for createPreEnrollmentRegistry ", currentRetryCount)
+	data := preEnrollmentCsv.Data
+	//Name, Mobile, National Identifier, DOB, facilityId
+	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
+	enrollment := models.Enrollment{
+		Phone:             data.Text("phone"),
+		EnrollmentScopeId: data.Text("enrollmentScopeId"),
+		NationalId:        data.Text("nationalId"),
+		Dob:               data.Text("dob"),
+		Gender:            data.Text("gender"),
+		Name:              data.Text("name"),
+		Email:             data.Text("email"),
+		Code:              utils.GenerateEnrollmentCode(data.Text("phone")),
+		Certified:         false,
+		ProgramId:         preEnrollmentCsv.ProgramId,
+		Address:           GetAddressObject(data),
+	}
+	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	log.Info("Received error response from the create new registry", err)
+	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
+		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount + 1)
+	}
+	return err, enrollment
 }
 
-func generateEnrollmentCode() string {
-	return strconv.Itoa(10000 + rand.Intn(90000)) //five digit random code
+func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
+	preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
 }

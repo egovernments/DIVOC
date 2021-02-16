@@ -26,7 +26,7 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
         let programList = [];
         vaccinators.map(vaccinator => {
             vaccinator.programs.map(program => {
-                programList.push(program.programId)
+                programList.push(program.name)
             })
         });
         return Array.from(new Set(programList));
@@ -39,12 +39,12 @@ export default function VaccinatorList({vaccinators, onSelectVaccinator, fetchVa
     const getVaccinatorList = () => {
         return vaccinators.map((vaccinator, index) => {
             if (vaccinator.programs && vaccinator.programs.length > 0) {
-                return vaccinator.programs.filter(p => selectedPrograms.includes(p.programId)).map(program => (
+                return vaccinator.programs.filter(p => selectedPrograms.includes(p.name)).map(program => (
                     <tr key={vaccinator.name + program.programId}>
                         <td className="vaccinator-name" onClick={() => {
                             onEditVaccinator(vaccinator)
                         }}>{vaccinator.name}</td>
-                        <td>{program.programId}</td>
+                        <td>{program.name}</td>
                         <td>
                             {program.certified ?
                                 <img src={check}/> :

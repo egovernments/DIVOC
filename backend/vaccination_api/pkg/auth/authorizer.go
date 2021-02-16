@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/swagger_gen/models"
+	apierrors "github.com/go-openapi/errors"
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -43,7 +44,7 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaim
 	if isAuthorized {
 		return claimBody, err
 	}
-	return nil, errors.New("unauthorized")
+	return nil, apierrors.Unauthenticated("access " + strings.Join(expectedRole,","))
 }
 
 func AuthorizeRole(expectedRole []string, claimBody *models.JWTClaimBody) bool {

@@ -189,7 +189,12 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 			}
 			var programsFor []*models.Program
 			if len(programNames) > 0 {
-				programsFor = findProgramsByName(programNames)
+				for _, id := range programNames {
+					program := findProgramsById(id)
+					if program != nil {
+						programsFor = append(programsFor, program[0])
+					}
+				}
 			}
 			return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
 		} else {

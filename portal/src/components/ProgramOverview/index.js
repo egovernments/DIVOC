@@ -84,7 +84,7 @@ export default function ProgramOverview() {
 
 
     function displayProgramDetails(data) {
-        const selectedProgram = programsList.find((program) => program.name.toLowerCase() === data.programId.toLowerCase());
+        const selectedProgram = programsList.find((program) => program.name.toLowerCase() === data.name.toLowerCase());
         if (selectedProgram) {
             return (
                 <Card className="card-container">

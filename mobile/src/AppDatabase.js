@@ -69,8 +69,9 @@ export class AppDatabase {
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
             const selectedProgram = getSelectedProgram();
+            const program = await programDb.getProgramByName(selectedProgram);
             if (patient.phone === mobileNumber
-                && patient[PROGRAM_ID] === selectedProgram) {
+                && patient[PROGRAM_ID] === program.id) {
                 patient.dob = this.formatDate(patient.dob)
                 return patient
             } else {
@@ -95,8 +96,9 @@ export class AppDatabase {
         const programName = getSelectedProgram()
         if (this.db) {
             const result = await this.db.getAll(QUEUE);
+            const currentProgram = await programDb.getProgramByName(programName)
             result.forEach((item) => {
-                if (item[PROGRAM_ID] === programName)
+                if (item[PROGRAM_ID] === currentProgram.id)
                     if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
                         waiting++;
                     } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
@@ -114,10 +116,11 @@ export class AppDatabase {
 
     async getQueue(status) {
         if (status) {
-            const programId = getSelectedProgram()
+            const programName = getSelectedProgram()
+            const program = await programDb.getProgramByName(programName)
             const result = await this.db.getAll(QUEUE);
             const filter = result.filter((item) => {
-                    return item[STATUS] === status && item[PROGRAM_ID] === programId
+                    return item[STATUS] === status && item[PROGRAM_ID] === program.id
                 }
             );
             return Promise.resolve(filter)
@@ -154,7 +157,9 @@ export class AppDatabase {
     async saveWalkInEnrollments(walkEnrollment) {
         if (walkEnrollment) {
             walkEnrollment.code = Date.now().toString()
-            walkEnrollment.programId = getSelectedProgram()
+            const programName = getSelectedProgram()
+            const currentProgram = await programDb.getProgramByName(programName)
+            walkEnrollment.programId = currentProgram.id
             await this.saveEnrollments([walkEnrollment])
             const queue = {
                 enrollCode: walkEnrollment.code,
@@ -191,12 +196,12 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        const vaccination = await programDb.getVaccinationDetails(event, patient.programId)
+        const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
         return {
             vaccinatorName: vaccinator.name,
             patient: patient,
             enrollCode: event.enrollCode,
-            identity: queue.identity || queue.aadhaarNumber,
+            identity: queue.identity || "",
             vaccination: vaccination
         }
     }
