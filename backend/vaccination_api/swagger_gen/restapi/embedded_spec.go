@@ -34,7 +34,7 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
     "/authorize": {
       "post": {
@@ -72,7 +72,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -114,7 +114,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -135,7 +135,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -163,7 +163,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -190,7 +190,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -229,7 +229,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -253,7 +253,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -278,7 +278,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -306,7 +306,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -318,7 +318,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -338,7 +338,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -364,7 +364,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -384,7 +384,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -431,7 +431,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -449,7 +449,7 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -466,7 +466,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -481,6 +481,40 @@ func init() {
               "items": {
                 "$ref": "../registry/Vaccinator.json#/definitions/Vaccinator"
               }
+            }
+          }
+        }
+      }
+    },
+    "/v2/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "./vaccination-api.yaml#/definitions/Error"
             }
           }
         }
@@ -628,6 +662,271 @@ func init() {
         "vaccinator": {
           "type": "object",
           "properties": {
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CertificationRequestV2": {
+      "type": "object",
+      "properties": {
+        "facility": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "operatorId": {
+              "type": "string"
+            },
+            "operatorName": {
+              "type": "string"
+            }
+          }
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "facilityType": {
+              "description": "CG - central govt, SG - State govt, PR - Private Facility",
+              "type": "string",
+              "enum": [
+                "CG",
+                "SG",
+                "PR"
+              ]
+            },
+            "paymentType": {
+              "description": "G for Govt, S for Self, V for Voucher, D for DBT, A for AyushmanBharat, I for Other Insurance",
+              "type": "string",
+              "enum": [
+                "G",
+                "S",
+                "V",
+                "D",
+                "A",
+                "I"
+              ]
+            },
+            "registrationCategory": {
+              "description": "F for frontline officers, C for comorbidity category, R for regular others",
+              "type": "string",
+              "enum": [
+                "F",
+                "C",
+                "R"
+              ]
+            },
+            "registrationDataMode": {
+              "description": "Recipient data capture mode DE for Data Entry, SQ for Signed QR, RQ for Regular QR, PR for Pre Registration",
+              "type": "string",
+              "enum": [
+                "DE",
+                "SQ",
+                "RQ",
+                "PR"
+              ]
+            },
+            "sessionDurationInMinutes": {
+              "description": "Vaccination session duration in minutes",
+              "type": "integer"
+            },
+            "uploadTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "vaccinationApp": {
+              "type": "object",
+              "properties": {
+                "appMode": {
+                  "type": "string",
+                  "enum": [
+                    "Online",
+                    "Offline"
+                  ]
+                },
+                "connectionType": {
+                  "description": "W - Wifi, M - mobile data, L - LAN/WAN",
+                  "type": "string",
+                  "enum": [
+                    "W",
+                    "M",
+                    "L"
+                  ]
+                },
+                "device": {
+                  "description": "Type of device, D - Desktop, M - Mobile, T - Tablet",
+                  "type": "string",
+                  "enum": [
+                    "D",
+                    "M",
+                    "T"
+                  ]
+                },
+                "deviceOS": {
+                  "description": "Type of Operating system on the device, W for Windows, A for Android, L for Linux, M for Mac, I for ios",
+                  "type": "string",
+                  "enum": [
+                    "W",
+                    "A",
+                    "L",
+                    "M",
+                    "I"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "oSVersion": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "P",
+                    "M",
+                    "D"
+                  ]
+                },
+                "version": {
+                  "type": "string"
+                }
+              }
+            },
+            "verificationAttempts": {
+              "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
+              "type": "integer"
+            },
+            "verificationDurationInSeconds": {
+              "description": "ID verification duration (duration in seconds for ID verification)",
+              "type": "integer"
+            },
+            "waitForVaccinationInMinutes": {
+              "description": "Time between verification and vaccination (in minutes)",
+              "type": "integer"
+            }
+          }
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "recipient": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
+            "age": {
+              "type": "string"
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date"
+            },
+            "gender": {
+              "type": "string"
+            },
+            "identity": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "nationality": {
+              "type": "string"
+            }
+          }
+        },
+        "vaccination": {
+          "type": "object",
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "example": 1
+            },
+            "effectiveStart": {
+              "type": "string",
+              "format": "date"
+            },
+            "effectiveUntil": {
+              "type": "string",
+              "format": "date"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "example": 2
+            }
+          }
+        },
+        "vaccinator": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
             "name": {
               "type": "string"
             }
@@ -861,7 +1160,7 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
     "/authorize": {
       "post": {
@@ -899,7 +1198,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -941,7 +1240,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -962,7 +1261,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -990,7 +1289,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -1017,7 +1316,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -1056,7 +1355,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -1080,7 +1379,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -1105,7 +1404,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -1133,7 +1432,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -1145,7 +1444,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -1165,7 +1464,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -1191,7 +1490,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -1211,7 +1510,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -1258,7 +1557,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -1276,7 +1575,7 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -1293,7 +1592,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -1307,6 +1606,52 @@ func init() {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/vaccinator"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV2",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -1576,6 +1921,626 @@ func init() {
           "type": "integer"
         },
         "state": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2": {
+      "type": "object",
+      "properties": {
+        "facility": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "operatorId": {
+              "type": "string"
+            },
+            "operatorName": {
+              "type": "string"
+            }
+          }
+        },
+        "meta": {
+          "type": "object",
+          "properties": {
+            "facilityType": {
+              "description": "CG - central govt, SG - State govt, PR - Private Facility",
+              "type": "string",
+              "enum": [
+                "CG",
+                "SG",
+                "PR"
+              ]
+            },
+            "paymentType": {
+              "description": "G for Govt, S for Self, V for Voucher, D for DBT, A for AyushmanBharat, I for Other Insurance",
+              "type": "string",
+              "enum": [
+                "G",
+                "S",
+                "V",
+                "D",
+                "A",
+                "I"
+              ]
+            },
+            "registrationCategory": {
+              "description": "F for frontline officers, C for comorbidity category, R for regular others",
+              "type": "string",
+              "enum": [
+                "F",
+                "C",
+                "R"
+              ]
+            },
+            "registrationDataMode": {
+              "description": "Recipient data capture mode DE for Data Entry, SQ for Signed QR, RQ for Regular QR, PR for Pre Registration",
+              "type": "string",
+              "enum": [
+                "DE",
+                "SQ",
+                "RQ",
+                "PR"
+              ]
+            },
+            "sessionDurationInMinutes": {
+              "description": "Vaccination session duration in minutes",
+              "type": "integer"
+            },
+            "uploadTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "vaccinationApp": {
+              "type": "object",
+              "properties": {
+                "appMode": {
+                  "type": "string",
+                  "enum": [
+                    "Online",
+                    "Offline"
+                  ]
+                },
+                "connectionType": {
+                  "description": "W - Wifi, M - mobile data, L - LAN/WAN",
+                  "type": "string",
+                  "enum": [
+                    "W",
+                    "M",
+                    "L"
+                  ]
+                },
+                "device": {
+                  "description": "Type of device, D - Desktop, M - Mobile, T - Tablet",
+                  "type": "string",
+                  "enum": [
+                    "D",
+                    "M",
+                    "T"
+                  ]
+                },
+                "deviceOS": {
+                  "description": "Type of Operating system on the device, W for Windows, A for Android, L for Linux, M for Mac, I for ios",
+                  "type": "string",
+                  "enum": [
+                    "W",
+                    "A",
+                    "L",
+                    "M",
+                    "I"
+                  ]
+                },
+                "name": {
+                  "type": "string"
+                },
+                "oSVersion": {
+                  "type": "string"
+                },
+                "type": {
+                  "type": "string",
+                  "enum": [
+                    "P",
+                    "M",
+                    "D"
+                  ]
+                },
+                "version": {
+                  "type": "string"
+                }
+              }
+            },
+            "verificationAttempts": {
+              "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
+              "type": "integer"
+            },
+            "verificationDurationInSeconds": {
+              "description": "ID verification duration (duration in seconds for ID verification)",
+              "type": "integer"
+            },
+            "waitForVaccinationInMinutes": {
+              "description": "Time between verification and vaccination (in minutes)",
+              "type": "integer"
+            }
+          }
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "recipient": {
+          "type": "object",
+          "properties": {
+            "address": {
+              "type": "object",
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string"
+                },
+                "pincode": {
+                  "type": "integer"
+                },
+                "state": {
+                  "type": "string"
+                }
+              }
+            },
+            "age": {
+              "type": "string"
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date"
+            },
+            "gender": {
+              "type": "string"
+            },
+            "identity": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "nationality": {
+              "type": "string"
+            }
+          }
+        },
+        "vaccination": {
+          "type": "object",
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "example": 1
+            },
+            "effectiveStart": {
+              "type": "string",
+              "format": "date"
+            },
+            "effectiveUntil": {
+              "type": "string",
+              "format": "date"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "example": 2
+            }
+          }
+        },
+        "vaccinator": {
+          "type": "object",
+          "properties": {
+            "id": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CertificationRequestV2Facility": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "operatorId": {
+          "type": "string"
+        },
+        "operatorName": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2FacilityAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2Meta": {
+      "type": "object",
+      "properties": {
+        "facilityType": {
+          "description": "CG - central govt, SG - State govt, PR - Private Facility",
+          "type": "string",
+          "enum": [
+            "CG",
+            "SG",
+            "PR"
+          ]
+        },
+        "paymentType": {
+          "description": "G for Govt, S for Self, V for Voucher, D for DBT, A for AyushmanBharat, I for Other Insurance",
+          "type": "string",
+          "enum": [
+            "G",
+            "S",
+            "V",
+            "D",
+            "A",
+            "I"
+          ]
+        },
+        "registrationCategory": {
+          "description": "F for frontline officers, C for comorbidity category, R for regular others",
+          "type": "string",
+          "enum": [
+            "F",
+            "C",
+            "R"
+          ]
+        },
+        "registrationDataMode": {
+          "description": "Recipient data capture mode DE for Data Entry, SQ for Signed QR, RQ for Regular QR, PR for Pre Registration",
+          "type": "string",
+          "enum": [
+            "DE",
+            "SQ",
+            "RQ",
+            "PR"
+          ]
+        },
+        "sessionDurationInMinutes": {
+          "description": "Vaccination session duration in minutes",
+          "type": "integer"
+        },
+        "uploadTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "vaccinationApp": {
+          "type": "object",
+          "properties": {
+            "appMode": {
+              "type": "string",
+              "enum": [
+                "Online",
+                "Offline"
+              ]
+            },
+            "connectionType": {
+              "description": "W - Wifi, M - mobile data, L - LAN/WAN",
+              "type": "string",
+              "enum": [
+                "W",
+                "M",
+                "L"
+              ]
+            },
+            "device": {
+              "description": "Type of device, D - Desktop, M - Mobile, T - Tablet",
+              "type": "string",
+              "enum": [
+                "D",
+                "M",
+                "T"
+              ]
+            },
+            "deviceOS": {
+              "description": "Type of Operating system on the device, W for Windows, A for Android, L for Linux, M for Mac, I for ios",
+              "type": "string",
+              "enum": [
+                "W",
+                "A",
+                "L",
+                "M",
+                "I"
+              ]
+            },
+            "name": {
+              "type": "string"
+            },
+            "oSVersion": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "P",
+                "M",
+                "D"
+              ]
+            },
+            "version": {
+              "type": "string"
+            }
+          }
+        },
+        "verificationAttempts": {
+          "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
+          "type": "integer"
+        },
+        "verificationDurationInSeconds": {
+          "description": "ID verification duration (duration in seconds for ID verification)",
+          "type": "integer"
+        },
+        "waitForVaccinationInMinutes": {
+          "description": "Time between verification and vaccination (in minutes)",
+          "type": "integer"
+        }
+      }
+    },
+    "CertificationRequestV2MetaVaccinationApp": {
+      "type": "object",
+      "properties": {
+        "appMode": {
+          "type": "string",
+          "enum": [
+            "Online",
+            "Offline"
+          ]
+        },
+        "connectionType": {
+          "description": "W - Wifi, M - mobile data, L - LAN/WAN",
+          "type": "string",
+          "enum": [
+            "W",
+            "M",
+            "L"
+          ]
+        },
+        "device": {
+          "description": "Type of device, D - Desktop, M - Mobile, T - Tablet",
+          "type": "string",
+          "enum": [
+            "D",
+            "M",
+            "T"
+          ]
+        },
+        "deviceOS": {
+          "description": "Type of Operating system on the device, W for Windows, A for Android, L for Linux, M for Mac, I for ios",
+          "type": "string",
+          "enum": [
+            "W",
+            "A",
+            "L",
+            "M",
+            "I"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "oSVersion": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enum": [
+            "P",
+            "M",
+            "D"
+          ]
+        },
+        "version": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2Recipient": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string"
+            },
+            "pincode": {
+              "type": "integer"
+            },
+            "state": {
+              "type": "string"
+            }
+          }
+        },
+        "age": {
+          "type": "string"
+        },
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string"
+        },
+        "identity": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationality": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2RecipientAddress": {
+      "type": "object",
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string"
+        },
+        "pincode": {
+          "type": "integer"
+        },
+        "state": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2Vaccination": {
+      "type": "object",
+      "properties": {
+        "batch": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dose": {
+          "description": "Dose number for example 1 for first dose of 2 doses",
+          "type": "number",
+          "example": 1
+        },
+        "effectiveStart": {
+          "type": "string",
+          "format": "date"
+        },
+        "effectiveUntil": {
+          "type": "string",
+          "format": "date"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "totalDoses": {
+          "description": "Total number of doses required for this vaccination.",
+          "type": "number",
+          "example": 2
+        }
+      }
+    },
+    "CertificationRequestV2Vaccinator": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         }
       }

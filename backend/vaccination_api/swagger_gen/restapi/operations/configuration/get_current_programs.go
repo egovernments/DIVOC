@@ -31,7 +31,7 @@ func NewGetCurrentPrograms(ctx *middleware.Context, handler GetCurrentProgramsHa
 	return &GetCurrentPrograms{Context: ctx, Handler: handler}
 }
 
-/*GetCurrentPrograms swagger:route GET /programs/current configuration getCurrentPrograms
+/*GetCurrentPrograms swagger:route GET /v1/programs/current configuration getCurrentPrograms
 
 Get active vaccination programs
 

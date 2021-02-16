@@ -35,11 +35,11 @@ func (o *BulkCertifyURL) SetBasePath(bp string) {
 func (o *BulkCertifyURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/bulkCertify"
+	var _path = "/v1/bulkCertify"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

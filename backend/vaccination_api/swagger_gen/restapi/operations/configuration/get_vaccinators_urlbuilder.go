@@ -35,11 +35,11 @@ func (o *GetVaccinatorsURL) SetBasePath(bp string) {
 func (o *GetVaccinatorsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/vaccinators"
+	var _path = "/v1/vaccinators"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

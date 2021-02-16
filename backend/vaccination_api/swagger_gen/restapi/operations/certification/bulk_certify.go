@@ -31,7 +31,7 @@ func NewBulkCertify(ctx *middleware.Context, handler BulkCertifyHandler) *BulkCe
 	return &BulkCertify{Context: ctx, Handler: handler}
 }
 
-/*BulkCertify swagger:route POST /bulkCertify certification bulkCertify
+/*BulkCertify swagger:route POST /v1/bulkCertify certification bulkCertify
 
 Upload certification csv for bulk ingestion
 

@@ -29,7 +29,7 @@ func NewEvents(ctx *middleware.Context, handler EventsHandler) *Events {
 	return &Events{Context: ctx, Handler: handler}
 }
 
-/*Events swagger:route POST /events events
+/*Events swagger:route POST /v1/events events
 
 Send events for monitoring / tracking purpose.
 

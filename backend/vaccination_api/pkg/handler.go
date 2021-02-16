@@ -31,14 +31,14 @@ import (
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
-	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
+	api.GetV1PingHandler = operations.GetV1PingHandlerFunc(pingResponder)
 
 	api.LoginPostAuthorizeHandler = login.PostAuthorizeHandlerFunc(loginHandler)
 
 	api.ConfigurationGetCurrentProgramsHandler = configuration.GetCurrentProgramsHandlerFunc(getCurrentProgramsResponder)
 	api.ConfigurationGetConfigurationHandler = configuration.GetConfigurationHandlerFunc(getConfigurationResponder)
 
-	api.IdentityPostIdentityVerifyHandler = identity.PostIdentityVerifyHandlerFunc(postIdentityHandler)
+	api.IdentityPostV1IdentityVerifyHandler = identity.PostV1IdentityVerifyHandlerFunc(postIdentityHandler)
 	api.VaccinationGetPreEnrollmentHandler = vaccination.GetPreEnrollmentHandlerFunc(getPreEnrollment)
 	api.VaccinationGetPreEnrollmentsForFacilityHandler = vaccination.GetPreEnrollmentsForFacilityHandlerFunc(getPreEnrollmentForFacility)
 
@@ -53,6 +53,8 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertifyUploadsHandler = certification.GetCertifyUploadsHandlerFunc(getCertifyUploads)
 	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
+
+	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
 }
 
 type GenericResponse struct {
@@ -134,7 +136,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 	return NewGenericServerError()
 }
 
-func pingResponder(params operations.GetPingParams) middleware.Responder {
+func pingResponder(params operations.GetV1PingParams) middleware.Responder {
 	return operations.NewGetPingOK()
 }
 
@@ -188,7 +190,7 @@ func getConfigurationResponder(params configuration.GetConfigurationParams, prin
 	return configuration.NewGetConfigurationOK().WithPayload(payload)
 }
 
-func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
+func postIdentityHandler(params identity.PostV1IdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token) != "" {
 		return identity.NewPostIdentityVerifyOK()
 	}
@@ -216,6 +218,18 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
 	return NewGenericServerError()
+}
+
+func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	fmt.Printf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+		}
+	}
+	return certification.NewCertifyV2OK()
 }
 
 func certify(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
