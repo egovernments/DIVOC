@@ -191,12 +191,12 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        const vaccination = await programDb.getVaccinationDetails(event, patient.programId)
+        const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
         return {
             vaccinatorName: vaccinator.name,
             patient: patient,
             enrollCode: event.enrollCode,
-            identity: queue.identity || queue.aadhaarNumber,
+            identity: queue.identity || "",
             vaccination: vaccination
         }
     }
