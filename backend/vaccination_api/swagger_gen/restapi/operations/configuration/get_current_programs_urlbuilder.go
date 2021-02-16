@@ -35,11 +35,11 @@ func (o *GetCurrentProgramsURL) SetBasePath(bp string) {
 func (o *GetCurrentProgramsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/programs/current"
+	var _path = "/v1/programs/current"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

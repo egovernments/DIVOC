@@ -31,7 +31,7 @@ func NewCertify(ctx *middleware.Context, handler CertifyHandler) *Certify {
 	return &Certify{Context: ctx, Handler: handler}
 }
 
-/*Certify swagger:route POST /certify certification certify
+/*Certify swagger:route POST /v1/certify certification certify
 
 Certify the one or more vaccination
 

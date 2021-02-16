@@ -6,7 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
+	models2 "github.com/divoc/api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
@@ -73,6 +76,57 @@ func main() {
   facilityDistrict String,
   facilityPostalCode String,
   vaccinatorName String
+) engine = MergeTree() order by dt
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_, err = connect.Exec(`
+		CREATE TABLE IF NOT EXISTS certificatesv2 (
+  certificateId String,
+  preEnrollmentCode String,
+  dt DateTime,
+  
+  age UInt8,
+  gender String,
+  district String,
+  state String,
+  
+  batch String,
+  vaccine String,
+  manufacturer String,
+  vaccinationDate DateTime,
+  effectiveStart Date,
+  effectiveUntil Date,
+  dose UInt8,
+  totalDoses UInt8,
+  
+  facilityName String,
+  facilityCountryCode FixedString(2),
+  facilityState String,
+  facilityDistrict String,
+  facilityPostalCode String,
+  vaccinatorName String,
+  
+  vaccinationAppName String,
+  vaccinationAppVersion String,
+  vaccinationAppType FixedString(2),
+  vaccinationAppDevice FixedString(2),
+  vaccinationAppDeviceOs FixedString(2),
+  vaccinationAppOSVersion String,
+  vaccinationAppMode String,
+  vaccinationAppConnectionType FixedString(2),
+  
+  facilityType FixedString(2),
+  paymentType FixedString(2),
+  registrationCategory FixedString(2),
+  registrationDataMode FixedString(2),
+  sessionDurationInMinutes UInt32,
+  uploadTimestamp DateTime,
+  verificationAttempts UInt8,
+  verificationDurationInSeconds UInt32,
+  waitForVaccinationInMinutes UInt32
+  
 ) engine = MergeTree() order by dt
 	`)
 	if err != nil {
@@ -250,6 +304,7 @@ func saveReportedSideEffects(connect *sql.DB, msg string) error {
 }
 
 func saveCertificateEvent(connect *sql.DB, msg string) error {
+	saveCertificateEventV2(connect, msg)
 	var certifyMessage CertifyMessage
 	if err := json.Unmarshal([]byte(msg), &certifyMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
@@ -316,4 +371,130 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	}
 
 	return nil
+}
+
+func saveCertificateEventV2(connect *sql.DB, msg string) {
+	var certifyMessage models2.CertificationRequestV2
+	if err := json.Unmarshal([]byte(msg), &certifyMessage); err == nil {
+		// push to click house - todo: batch it
+		var (
+			tx, _= connect.Begin()
+			stmt, err= tx.Prepare(`INSERT INTO certificatesv2 
+	(  certificateId,
+  preEnrollmentCode,
+  dt,
+
+  age,
+  gender,
+  district,
+  state,
+  
+  batch,
+  vaccine,
+  manufacturer,
+  vaccinationDate,
+  effectiveStart,
+  effectiveUntil,
+  dose,
+  totalDoses,
+  
+  facilityName,
+  facilityCountryCode,
+  facilityState,
+  facilityDistrict,
+  facilityPostalCode,
+  vaccinatorName,
+  
+  vaccinationAppName,
+  vaccinationAppVersion,
+  vaccinationAppType,
+  vaccinationAppDevice,
+  vaccinationAppDeviceOs,
+  vaccinationAppOSVersion,
+  vaccinationAppMode,
+  vaccinationAppConnectionType,
+  
+  facilityType,
+  paymentType,
+  registrationCategory,
+  registrationDataMode,
+  sessionDurationInMinutes,
+  uploadTimestamp,
+  verificationAttempts,
+  verificationDurationInSeconds,
+  waitForVaccinationInMinutes) 
+	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+		)
+
+		if err != nil {
+			log.Infof("Error in preparing stmt %+v", err)
+		}
+		//todo collect n messages and batch write to analytics db.
+		age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
+		if age == 0 {
+			if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob.String()); err == nil {
+				if dobTime.Year() > 1900 {
+					age = time.Now().Year() - dobTime.Year()
+				}
+			}
+		}
+		if _, err := stmt.Exec(
+			"",
+			certifyMessage.PreEnrollmentCode,
+			time.Now(),
+
+			age,
+			certifyMessage.Recipient.Gender,
+			certifyMessage.Recipient.Address.District,
+			certifyMessage.Recipient.Address.State,
+
+			certifyMessage.Vaccination.Batch,
+			certifyMessage.Vaccination.Name,
+			certifyMessage.Vaccination.Manufacturer,
+			getDate(certifyMessage.Vaccination.Date),
+			certifyMessage.Vaccination.EffectiveStart,
+			certifyMessage.Vaccination.EffectiveUntil,
+			pkg.ToInt(certifyMessage.Vaccination.Dose),
+			pkg.ToInt(certifyMessage.Vaccination.TotalDoses),
+
+			certifyMessage.Facility.Name,
+			"IN",
+			certifyMessage.Facility.Address.State,
+			certifyMessage.Facility.Address.District,
+			strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
+			certifyMessage.Vaccinator.Name,
+
+			certifyMessage.Meta.VaccinationApp.Name,
+			certifyMessage.Meta.VaccinationApp.Version,
+			certifyMessage.Meta.VaccinationApp.Type,
+			certifyMessage.Meta.VaccinationApp.Device,
+			certifyMessage.Meta.VaccinationApp.DeviceOS,
+			certifyMessage.Meta.VaccinationApp.OSVersion,
+			certifyMessage.Meta.VaccinationApp.AppMode,
+			certifyMessage.Meta.VaccinationApp.ConnectionType,
+
+			certifyMessage.Meta.FacilityType,
+			certifyMessage.Meta.PaymentType,
+			certifyMessage.Meta.RegistrationCategory,
+			certifyMessage.Meta.RegistrationDataMode,
+			certifyMessage.Meta.SessionDurationInMinutes,
+			getDate(certifyMessage.Meta.UploadTimestamp),
+			certifyMessage.Meta.VerificationAttempts,
+			certifyMessage.Meta.VerificationDurationInSeconds,
+			certifyMessage.Meta.WaitForVaccinationInMinutes,
+		); err != nil {
+			log.Fatal(err)
+		}
+		defer stmt.Close()
+		if err := tx.Commit(); err != nil {
+			log.Fatal(err)
+		}
+	}
+}
+
+func getDate(dateTime strfmt.DateTime) time.Time {
+	if dTime, err := time.Parse(time.RFC3339, dateTime.String()); err == nil {
+		return dTime
+	}
+	return time.Now()
 }

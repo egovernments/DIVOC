@@ -36,3 +36,27 @@ func ToString(arg interface{}) string {
         return ""
     }
 }
+
+func ToInt(i interface{}) (int) {
+    switch s := i.(type) {
+    case float64:
+        return int(s)
+    case float32:
+        return int(s)
+    case string:
+        v, err := strconv.ParseInt(s, 0, 0)
+        if err == nil {
+            return int(v)
+        }
+        return 0
+    case bool:
+        if s {
+            return 1
+        }
+        return 0
+    case nil:
+        return 0
+    default:
+        return 0
+    }
+}
