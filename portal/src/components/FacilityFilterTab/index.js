@@ -1,11 +1,11 @@
 import React, {useState} from "react";
 import "./index.scss";
 import DropDown from "../DropDown/DropDown";
-import {CONSTANTS} from "../../utils/constants";
+import {CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
 
 export const FacilityFilterTab = ({
                                       programs, selectedProgram, setSelectedProgram, states, setSelectedState, selectedState, districtList,
-                                      selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children
+                                      selectedDistrict, setSelectedDistrict, facilityType, setFacilityType, children, countryName
                                   }) => {
 
     const handleChange = (value, setValue) => {
@@ -45,7 +45,7 @@ export const FacilityFilterTab = ({
                 />
             </div>
             <div>
-                <span className="filter-header">All of India</span>
+                <span className="filter-header">All of {countryName}</span>
                 <DropDown
                     selectedOption={selectedState}
                     options={states}
@@ -53,7 +53,7 @@ export const FacilityFilterTab = ({
                     setSelectedOption={setSelectedState}
                 />
             </div>
-            {selectedState != "All" && 
+            {selectedState != "All" &&
                 <React.Fragment>
                     <span className="filter-header">{selectedState}</span>
                     <div className="m-3">
@@ -77,11 +77,11 @@ export const FacilityFilterTab = ({
                 <div className="m-3">
                     <div className="filter-header mb-1">
                         <RadioItem
-                            text={CONSTANTS.GOVT}
+                            text={FACILITY_TYPE[CONSTANTS.GOVT]}
                             checked={facilityType === CONSTANTS.GOVT}
                             onSelect={(event) =>
                                 handleChange(
-                                    event.target.name,
+                                    CONSTANTS.GOVT,
                                     setFacilityType
                                 )
                             }
@@ -89,11 +89,11 @@ export const FacilityFilterTab = ({
                     </div>
                     <div className="filter-header mb-1">
                         <RadioItem
-                            text={CONSTANTS.PRIVATE}
+                            text={FACILITY_TYPE[CONSTANTS.PRIVATE]}
                             checked={facilityType === CONSTANTS.PRIVATE}
                             onSelect={(event) =>
                                 handleChange(
-                                    event.target.name,
+                                    CONSTANTS.PRIVATE,
                                     setFacilityType
                                 )
                             }
@@ -108,8 +108,8 @@ export const FacilityFilterTab = ({
     )
 };
 
-export const CheckboxItem = ({text, checked, onSelect, showText=true}) => (
-    <div className="custom-checkbox-item-wrapper">
+export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedColor}) => (
+    <div className="custom-checkbox-item-wrapper" style={{"display":"inline-block"}}>
         <label
             className="form-check-label d-flex align-items-center"
             htmlFor={text}
@@ -128,7 +128,7 @@ export const CheckboxItem = ({text, checked, onSelect, showText=true}) => (
                 style={{
                     backgroundColor:
                         checked
-                            ? "#DE9D00"
+                            ? checkedColor ? checkedColor : "#DE9D00"
                             : "",
                 }}
             >

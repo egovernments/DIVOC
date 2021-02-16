@@ -16,7 +16,7 @@ export function VerifyAadhaarNumber(props) {
 
 function EnterAadhaarNumber(props) {
     const {state, goNext} = usePreEnrollment()
-    const [aadhaarNumber, setAadhaarNumber] = useState(state.aadhaarNumber)
+    const [aadhaarNumber, setAadhaarNumber] = useState(state.identity)
 
     const handleAadhaarNumberOnChange = (e) => {
         setAadhaarNumber(e.target.value)

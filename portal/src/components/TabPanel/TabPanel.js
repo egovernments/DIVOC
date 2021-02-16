@@ -59,7 +59,7 @@ export const TabPanels = ({tabs}) => {
                 >
                     {
                         tabs.map((tab, index) => (
-                            <StyledTab label={tab.title}/>
+                            <StyledTab label={<h4><b>{tab.title}</b></h4>}/>
                         ))
                     }
                 </StyledTabs>

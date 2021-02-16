@@ -8,10 +8,12 @@
     padding-right: 1.5rem;
     padding-left: 1.5rem;
     border-radius: .25rem;
+    width: 8rem;
 }
 
-.btn-success{
+.btn-success button{
     margin: 1rem;
+    width: 8rem;
 }
 .img{
     float: right;
@@ -50,6 +52,8 @@
 
 .center-align{
     display: flex !important; 
+    align-items: center;
+    flex-direction: column;
     justify-content: center !important;
 }
 

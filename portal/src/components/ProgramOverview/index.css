@@ -1,20 +1,20 @@
-.container{
+.overview-container {
     display: flex;
     flex-wrap: wrap
 }
 
-.card-padding{
+.card-padding {
     padding-left: 0.7rem;
 }
 
-.card-container{
+.card-container {
     width: 30%;
     margin: 1rem;
 }
 
-.list-view-logo-img {
+.list-logo-img {
     font-size: 10px;
-    background: #88C6A9 !important;
+    background: white !important;
     border-radius: 100rem;
     width: 4rem;
     height: 4rem;
@@ -22,17 +22,37 @@
     justify-content: center;
     align-items: center;
     position: relative;
+    overflow: hidden;
+    border: 0.1px solid #88C6A9;
+}
+
+.list-view-logo-text {
+    background: #88C6A9 !important;
+    color: white;
+    font-size: 22px;
 }
 
 .list-view-program-status-img {
     position: absolute;
     bottom: 0;
-    right: 0; 
+    right: 0;
     width: 30%;
     height: 30%;
 }
 
-.table-row{
+.medicine-row {
+    padding: 1rem 2rem;
     background-color: #F2FAF6;
     font-size: large;
+    border-bottom: 3px solid white;
+}
+
+.overview-description {
+    height: 18vh;
+    overflow: hidden;
+}
+
+.medicines-list {
+    height: 30vh;
+    overflow: auto;
 }

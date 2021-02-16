@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { useAxios } from "../../utils/useAxios";
-import { Card } from "@material-ui/core";
+import React, {useEffect, useState} from "react";
+import {useAxios} from "../../utils/useAxios";
+import {Card} from "@material-ui/core";
 import CardContent from "@material-ui/core/CardContent";
 import keycloak from "../../utils/keycloak";
-import { equals, reject } from "ramda";
-import { API_URL } from "../../utils/constants";
-import ProgramActiveImg from "../../assets/img/program-active.svg";
+import {equals, reject} from "ramda";
+import {API_URL} from "../../utils/constants";
+import MedicineImg from "../../assets/img/medicine.svg";
 import "./index.css";
+import {formatDate} from "../../utils/dateutil";
 
 export default function ProgramOverview() {
     const [program, setProgram] = useState([]);
@@ -17,7 +18,7 @@ export default function ProgramOverview() {
 
     useEffect(() => {
         fetchPrograms().then((res) => setProgramsList(res.data));
-        fetchMedicines().then((res)=> {
+        fetchMedicines().then((res) => {
             setMedicinesList(res.data)
         })
     }, []);
@@ -29,10 +30,10 @@ export default function ProgramOverview() {
                 (res) => {
                     res.data.forEach((item) => {
                         if (!("programs" in item)) {
-                            Object.assign(item, { programs: [] });
+                            Object.assign(item, {programs: []});
                         }
                     });
-                    const activeProgramsList = res.data[0].programs.filter((data) => data.status === "Active")
+                    const activeProgramsList = res.data[0].programs.filter((data) => data.status === "Active");
                     setProgram(activeProgramsList);
                 }
             );
@@ -59,59 +60,72 @@ export default function ProgramOverview() {
     }
 
 
-    function showMedicineTable(tableData){
-        return(
+    function showMedicineTable(tableData) {
+        return (
             tableData.map(data => {
-                const selectedMedicine = medicinesList.filter((medicine) => medicine.osid === data)
-                return(
-                    <div className="table-row">
-                        <tr className={"d-flex"}>
-                            <td className="p-2 mr-auto"><b>{selectedMedicine[0]['name']}</b></td>
-                            <td className="p-2"></td>
-                        </tr>
-                        <tr className={"d-flex"}>
-                            <td className="p-2 mr-auto">{selectedMedicine[0]['provider']}</td>
-                            <td className="p-2">{selectedMedicine[0]['price']}</td>
-                        </tr> 
-                    </div>
-                )
+                const selectedMedicine = medicinesList.find((medicine) => medicine.osid === data);
+                if(selectedMedicine) {
+                    return (
+                        <div className="medicine-row">
+                            <div className="d-flex justify-content-between">
+                                <b className="">{selectedMedicine['name']}</b>
+                                <span className="">Validity {selectedMedicine.effectiveUntil} month</span>
+                            </div>
+                            <div className="d-flex justify-content-between">
+                                <span className="">{selectedMedicine['provider']}</span>
+                                <span className="">{selectedMedicine['price']}</span>
+                            </div>
+                        </div>
+                    )
+                }
             })
         )
     }
 
 
     function displayProgramDetails(data) {
-        const selectedProgram = programsList.filter((program) => program.name === data.programId)[0];
-        return (
-            <Card className="card-container">
-                <CardContent>
-                    <span className={'list-view-logo-img card-padding'}>
-                        {"image" in data ? <img alt="" src={selectedProgram.image} width={"100%"}/> : "LOGO"}
-                        <img src={ProgramActiveImg}
-                                className={'list-view-program-status-img'} alt={selectedProgram.status}
-                                title={selectedProgram.status}/>
+        const selectedProgram = programsList.find((program) => program.name.toLowerCase() === data.name.toLowerCase());
+        if (selectedProgram) {
+            return (
+                <Card className="card-container">
+                    <CardContent>
+                        {"logoURL" in selectedProgram && selectedProgram.logoURL.trim() !== "" ?
+                            <span className='list-logo-img'>
+                        <img alt="" src={selectedProgram.logoURL} width={"100%"}/>
+                    </span> : <span className='list-logo-img list-view-logo-text'>
+                        {selectedProgram.name.substr(0, 3)}
                     </span>
-                    <h3 className="card-padding">{selectedProgram.name}</h3>
-                    <p className="card-padding">{selectedProgram.description}</p>
-                    <div className="d-flex">
-                        <p className="p-2 mr-auto">Start Date:</p>
-                        <b className="p-2">{selectedProgram.startDate}</b>
-                    </div>
-                    <div className="d-flex">
-                        <p className="p-2 mr-auto">End Date:</p>
-                        <b className="p-2">{selectedProgram.endDate}</b>
-                    </div>
-                    <h5>Program Medicines</h5>
-                    <table className="table table-borderless">
-                        <tbody>{showMedicineTable(selectedProgram.medicineIds)}</tbody>
-                    </table>
-                </CardContent>
-            </Card>
-        );
+                        }
+
+                        <h3 className="">{selectedProgram.name}</h3>
+                        <p className="overview-description" title={selectedProgram.description}>{
+                            selectedProgram.description.length > 320 ? selectedProgram.description.substr(0, 320) + "..." : selectedProgram.description
+                        }</p>
+                        <div className="d-flex justify-content-between">
+                            <p className="">Start Date:</p>
+                            <b className="">{formatDate(selectedProgram.startDate)}</b>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <p className="">End Date:</p>
+                            <b className="">{formatDate(selectedProgram.endDate)}</b>
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <h5>Program Medicines</h5>
+                            <img src={MedicineImg}/>
+                        </div>
+                        <div className="medicines-list mt-2">
+                            {showMedicineTable(selectedProgram.medicineIds)}
+                        </div>
+                    </CardContent>
+                </Card>
+            );
+        } else {
+            return null
+        }
     }
 
     return (
-        <div className="container">
+        <div className="overview-container">
             {program.map((data) => displayProgramDetails(data))}
         </div>
     );

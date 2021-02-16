@@ -72,12 +72,12 @@
         },
         "operatingHourStart": {
           "$id": "#/properties/operatingHourStart",
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "operatingHourEnd": {
           "$id": "#/properties/operatingHourEnd",
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "category": {
@@ -150,6 +150,10 @@
           "$id": "#/properties/mobile",
           "type": "string"
         },
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string"
+        },
         "___encryptedFields": {
         }
       }
@@ -195,7 +199,7 @@
       "title": "The FacilityProgramSchedule Schema",
       "properties": {
         "days": {
-          "$id": "#/properties/activeDays",
+          "$id": "#/properties/days",
           "type": "array",
           "items": {
             "type": "string"
@@ -224,6 +228,6 @@
     "signedFields": [],
     "indexFields": ["(serialNum, facilityCode)","facilityName"],
     "uniqueIndexFields": ["serialNum", "facilityCode"],
-    "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }

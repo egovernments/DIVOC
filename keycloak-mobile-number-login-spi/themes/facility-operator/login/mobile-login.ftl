@@ -11,7 +11,12 @@
                     console.log(evt.target.value)
                     sessionStorage.setItem("mobile_number", evt.target.value)
                 })
-
+                if(window.location.protocol === "https:") {
+                    let formField = document.getElementById("kc-form-login");
+                    if (formField) {
+                        formField.action = formField.action.replace("http","https");
+                    }
+                }
             }
         </script>
     <#elseif section = "form">
@@ -24,10 +29,10 @@
                         <div class="input-wrapper">
                             <div class="input-field mobile">
                                 <img class="mobile-logo"/>
-                                <label for="mobile_number" class="mobile-prefix">+91</label>
+<#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
-                                       name="mobile_number"
+                                       name="mobile_number" autofocus
                                        tabindex="1"/>
                             </div>
 

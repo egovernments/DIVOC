@@ -18,6 +18,9 @@ import (
 // swagger:model FacilityUser
 type FacilityUser struct {
 
+	// Email of User
+	Email string `json:"email,omitempty"`
+
 	// Facility User Id
 	EmployeeID string `json:"employeeId,omitempty"`
 

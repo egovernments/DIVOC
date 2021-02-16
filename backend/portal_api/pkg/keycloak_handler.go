@@ -114,12 +114,12 @@ func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest) string {
 		log.Info("Key cloak user id is ", keycloakUserId) //d9438bdf-68cb-4630-8093-fd36a5de5db8
 	} else {
 		log.Info("No user id in response checking with keycloak for the userid ", userRequest.Username)
-		keycloakUserId, _ = searchAndGetKeyCloakUserId(userRequest.Username)
+		keycloakUserId, _ = searchAndGetKeyCloakUserId(userRequest.Username, userRequest.Attributes.FacilityCode)
 	}
 	return keycloakUserId
 }
 
-func searchAndGetKeyCloakUserId(username string) (string, error) {
+func searchAndGetKeyCloakUserId(username string, facilityCode string) (string, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users?username=" + username + "&exact=true"
 	log.Info("Checking with keycloak for userid mapping ", url)
@@ -131,7 +131,16 @@ func searchAndGetKeyCloakUserId(username string) (string, error) {
 	type JSONObject map[string]interface{}
 	var responseObject []JSONObject
 	if err := resp.ToJSON(&responseObject); err == nil {
-		if userId, ok := responseObject[0]["id"].(string); ok {
+		attributes := responseObject[0]["attributes"].(map[string]interface{})
+		userFacilityCode := ""
+		userFacilityCodeAttrib, ok := attributes["facility_code"]
+		if ok {
+			userFacilityCodes, ok := userFacilityCodeAttrib.([]interface{})
+			if ok {
+				userFacilityCode = userFacilityCodes[0].(string)
+			}
+		}
+		if userId, ok := responseObject[0]["id"].(string); ok && userFacilityCode == facilityCode{
 			log.Info("Keycloak user id ", userId)
 			return userId, nil
 		}
@@ -212,6 +221,10 @@ type FacilityUserResponse struct {
 	Attributes map[string]interface{} `json:"attributes"`
 	Groups     []*models.UserGroup    `json:"groups"`
 	Enabled    bool                   `json:"enabled"`
+}
+
+func GetUsersByFacilityCode(facilityCode string) ([]*models.FacilityUser, error) {
+	return getFacilityUsers(facilityCode, "")
 }
 
 func getFacilityUsers(facilityCode string, username string) ([]*models.FacilityUser, error) {

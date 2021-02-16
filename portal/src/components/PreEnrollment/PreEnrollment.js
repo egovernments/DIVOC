@@ -1,13 +1,15 @@
-import React, { useEffect,useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {API_URL} from "../../utils/constants";
 import UploadHistory from "../UploadHistory/UploadHistory";
-import { useAxios } from "../../utils/useAxios";
+import {useAxios} from "../../utils/useAxios";
 import PreEnrollmentUploadCSV from "../PreEnrollmentUploadCSV/PreEnrollmentUploadCSV";
+import { maskPersonalDetails } from '../../utils/maskPersonalDetails';
+import {formatDate} from "../../utils/dateutil";
 
 function PreEnrollment() {
 
     const axiosInstance = useAxios("");
-    const [data,setData] = useState([]);
+    const [data, setData] = useState([]);
 
     useEffect(() => {
         fetchTableDetails();
@@ -25,8 +27,9 @@ function PreEnrollment() {
             .then((result) => {
                 return result.map((item, index) => {
                     return {
-                        nationalId: item["nationalId"],
+                        nationalId: maskPersonalDetails(item["nationalId"]),
                         name: item["name"],
+                        uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
                 })
             })
@@ -35,7 +38,7 @@ function PreEnrollment() {
             });
     }
 
-    const AllFacilitiesHeaderData= [
+    const AllFacilitiesHeaderData = [
         {
             title: "National ID",
             key: "nationalId"
@@ -58,8 +61,10 @@ function PreEnrollment() {
         infoTitle={"Records in the DIVOC Pre-Enrollment Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
         tableTitle="All Pre-Enrollments"
+        emptyListMessage={"No Pre-Enrollment Found"}
         tableData={data}
         tableHeader={AllFacilitiesHeaderData}
+        onRefresh={() => fetchTableDetails()}
     />
 }
 

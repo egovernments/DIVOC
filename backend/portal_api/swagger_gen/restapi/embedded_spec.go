@@ -174,8 +174,7 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller",
-              "facility-admin"
+              "controller"
             ]
           }
         ],
@@ -250,7 +249,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -473,12 +473,21 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "controller"
             ]
           }
         ],
         "summary": "Get users of a facility",
         "operationId": "getFacilityUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code required for controller",
+            "name": "facilityCode",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -496,7 +505,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "controller"
             ]
           }
         ],
@@ -508,7 +518,19 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityUser"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/FacilityUser"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "facilityCode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
             }
           }
         ],
@@ -773,6 +795,27 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "description": "Recipient Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -811,7 +854,8 @@ func init() {
             "hasRole": [
               "facility-admin",
               "admin",
-              "facility-staff"
+              "facility-staff",
+              "controller"
             ]
           }
         ],
@@ -1038,6 +1082,9 @@ func init() {
         "schedule": {
           "type": "object",
           "properties": {
+            "osid": {
+              "type": "string"
+            },
             "repeatInterval": {
               "description": "Number of times the vaccination should be taken.",
               "type": "number"
@@ -1128,11 +1175,11 @@ func init() {
           "title": "Geo Location"
         },
         "operatingHourEnd": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "operatingHourStart": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "programs": {
@@ -1140,6 +1187,9 @@ func init() {
           "items": {
             "type": "object",
             "properties": {
+              "name": {
+                "type": "string"
+              },
               "programId": {
                 "type": "string"
               },
@@ -1210,6 +1260,38 @@ func init() {
       "items": {
         "type": "object",
         "properties": {
+          "address": {
+            "title": "Address",
+            "$ref": "#/definitions/Address"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "contact": {
+            "type": "string",
+            "title": "Contact number"
+          },
+          "email": {
+            "type": "string",
+            "title": "Facility Email"
+          },
+          "facilityName": {
+            "type": "string",
+            "title": "Facility Name"
+          },
+          "geoLocation": {
+            "type": "string",
+            "title": "Geo Location"
+          },
+          "operatingHourEnd": {
+            "type": "string",
+            "title": "Operating hours end of day"
+          },
+          "operatingHourStart": {
+            "type": "string",
+            "title": "Operating hours start of day"
+          },
           "osid": {
             "type": "string"
           },
@@ -1224,6 +1306,23 @@ func init() {
                 "rate": {
                   "type": "number"
                 },
+                "schedule": {
+                  "type": "object",
+                  "properties": {
+                    "days": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "endTime": {
+                      "type": "string"
+                    },
+                    "startTime": {
+                      "type": "string"
+                    }
+                  }
+                },
                 "status": {
                   "type": "string"
                 }
@@ -1232,12 +1331,20 @@ func init() {
           },
           "status": {
             "type": "string"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "title": "Website URL"
           }
         }
       }
     },
     "FacilityUser": {
       "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email of User"
+        },
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
@@ -1748,8 +1855,7 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller",
-              "facility-admin"
+              "controller"
             ]
           }
         ],
@@ -1824,7 +1930,8 @@ func init() {
           {
             "hasRole": [
               "admin",
-              "controller"
+              "controller",
+              "facility-admin"
             ]
           }
         ],
@@ -2036,12 +2143,21 @@ func init() {
         "security": [
           {
             "hasRole": [
+              "controller",
               "facility-admin"
             ]
           }
         ],
         "summary": "Get users of a facility",
         "operationId": "getFacilityUsers",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility Code required for controller",
+            "name": "facilityCode",
+            "in": "query"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -2059,6 +2175,7 @@ func init() {
         "security": [
           {
             "hasRole": [
+              "controller",
               "facility-admin"
             ]
           }
@@ -2071,7 +2188,19 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/FacilityUser"
+              "allOf": [
+                {
+                  "$ref": "#/definitions/FacilityUser"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "facilityCode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              ]
             }
           }
         ],
@@ -2336,6 +2465,27 @@ func init() {
         }
       }
     },
+    "/register": {
+      "post": {
+        "summary": "Enroll Recipient",
+        "operationId": "enrollRecipient",
+        "parameters": [
+          {
+            "description": "Recipient Details",
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/enrollment"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/vaccinator": {
       "post": {
         "security": [
@@ -2373,6 +2523,7 @@ func init() {
           {
             "hasRole": [
               "admin",
+              "controller",
               "facility-admin",
               "facility-staff"
             ]
@@ -2601,6 +2752,9 @@ func init() {
         "schedule": {
           "type": "object",
           "properties": {
+            "osid": {
+              "type": "string"
+            },
             "repeatInterval": {
               "description": "Number of times the vaccination should be taken.",
               "type": "number"
@@ -2632,6 +2786,9 @@ func init() {
     "CreateMedicineRequestSchedule": {
       "type": "object",
       "properties": {
+        "osid": {
+          "type": "string"
+        },
         "repeatInterval": {
           "description": "Number of times the vaccination should be taken.",
           "type": "number"
@@ -2641,6 +2798,59 @@ func init() {
           "type": "number"
         }
       }
+    },
+    "EnrollmentAddress": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "description": "Address line 1",
+          "type": "string",
+          "title": "The address line 1",
+          "default": "",
+          "$id": "#/properties/address/properties/addressLine1"
+        },
+        "addressLine2": {
+          "type": "string",
+          "title": "The address2 schema",
+          "$id": "#/properties/address/properties/addressLine2"
+        },
+        "district": {
+          "type": "string",
+          "title": "The district schema",
+          "$id": "#/properties/address/properties/district"
+        },
+        "pincode": {
+          "type": "integer",
+          "title": "The pincode schema",
+          "$id": "#/properties/address/properties/pincode"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "$id": "#/properties/address/properties/state",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": 560000,
+          "state": "Karnataka"
+        }
+      ]
     },
     "Error": {
       "type": "object",
@@ -2704,11 +2914,11 @@ func init() {
           "title": "Geo Location"
         },
         "operatingHourEnd": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours end of day"
         },
         "operatingHourStart": {
-          "type": "integer",
+          "type": "string",
           "title": "Operating hours start of day"
         },
         "programs": {
@@ -2767,6 +2977,9 @@ func init() {
     "FacilityProgramsItems0": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "programId": {
           "type": "string"
         },
@@ -2793,6 +3006,38 @@ func init() {
     "FacilityUpdateRequestItems0": {
       "type": "object",
       "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "category": {
+          "type": "string",
+          "title": "Category"
+        },
+        "contact": {
+          "type": "string",
+          "title": "Contact number"
+        },
+        "email": {
+          "type": "string",
+          "title": "Facility Email"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "string",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "string",
+          "title": "Operating hours start of day"
+        },
         "osid": {
           "type": "string"
         },
@@ -2804,6 +3049,10 @@ func init() {
         },
         "status": {
           "type": "string"
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
         }
       }
     },
@@ -2816,13 +3065,51 @@ func init() {
         "rate": {
           "type": "number"
         },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "endTime": {
+              "type": "string"
+            },
+            "startTime": {
+              "type": "string"
+            }
+          }
+        },
         "status": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityUpdateRequestItems0ProgramsItems0Schedule": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
           "type": "string"
         }
       }
     },
     "FacilityUser": {
       "properties": {
+        "email": {
+          "type": "string",
+          "title": "Email of User"
+        },
         "employeeId": {
           "type": "string",
           "title": "Facility User Id"
@@ -3175,6 +3462,107 @@ func init() {
             "Active",
             "Inactive"
           ]
+        }
+      }
+    },
+    "enrollment": {
+      "type": "object",
+      "required": [
+        "phone",
+        "enrollmentScopeId",
+        "nationalId",
+        "dob"
+      ],
+      "properties": {
+        "address": {
+          "description": "Indian address format",
+          "type": "object",
+          "title": "Address",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "description": "Address line 1",
+              "type": "string",
+              "title": "The address line 1",
+              "default": "",
+              "$id": "#/properties/address/properties/addressLine1"
+            },
+            "addressLine2": {
+              "type": "string",
+              "title": "The address2 schema",
+              "$id": "#/properties/address/properties/addressLine2"
+            },
+            "district": {
+              "type": "string",
+              "title": "The district schema",
+              "$id": "#/properties/address/properties/district"
+            },
+            "pincode": {
+              "type": "integer",
+              "title": "The pincode schema",
+              "$id": "#/properties/address/properties/pincode"
+            },
+            "state": {
+              "description": "State of address",
+              "type": "string",
+              "title": "The state schema",
+              "$id": "#/properties/address/properties/state",
+              "examples": [
+                "Karnataka"
+              ]
+            }
+          },
+          "examples": [
+            {
+              "addressLine1": "no. 23, some lane, some road",
+              "addressLine2": "some nagar",
+              "district": "bangalore south",
+              "pincode": 560000,
+              "state": "Karnataka"
+            }
+          ]
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "code": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
         }
       }
     },

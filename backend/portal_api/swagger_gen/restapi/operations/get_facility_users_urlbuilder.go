@@ -13,7 +13,11 @@ import (
 
 // GetFacilityUsersURL generates an URL for the get facility users operation
 type GetFacilityUsersURL struct {
+	FacilityCode *string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -42,6 +46,18 @@ func (o *GetFacilityUsersURL) Build() (*url.URL, error) {
 		_basePath = "/divoc/admin/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var facilityCodeQ string
+	if o.FacilityCode != nil {
+		facilityCodeQ = *o.FacilityCode
+	}
+	if facilityCodeQ != "" {
+		qs.Set("facilityCode", facilityCodeQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }

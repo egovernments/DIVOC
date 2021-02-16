@@ -1,16 +1,17 @@
 import React, {useEffect, useState} from "react";
 import styles from "./FacilityAdjustingRate.module.css";
 import {CheckboxItem, FacilityFilterTab, RadioItem} from "../FacilityFilterTab";
-import {API_URL, CONSTANTS} from "../../utils/constants";
+import {API_URL, CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
 import {formatDate} from "../../utils/dateutil";
 import DetailsCard from "../DetailsCard/DetailsCard";
+import FacilityActivation from "../FacilityActivation/FacilityActivation";
 
 
 function FacilityAdjustingRate({
                                    facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
                                    setSelectedDistrict, stateList, programs, selectedProgram, setSelectedProgram, facilityType, setFacilityType,
-                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus
+                                   status, fetchFacilities, lastAdjustedOn, setLastAdjustedOn, resetFilter, updateFacilityProgramStatus, countryName, isLoading
                                }) {
 
     const [rateWiseFacilities, setRateWiseFacilities] = useState({});
@@ -41,7 +42,7 @@ function FacilityAdjustingRate({
 
     const getFacilityProgram = (facility) => {
         if ("programs" in facility) {
-            const program = facility.programs.find(obj => obj.programId === selectedProgram);
+            const program = facility.programs.find(obj => obj.name === selectedProgram);
             if (program) {
                 return program;
             }
@@ -58,10 +59,10 @@ function FacilityAdjustingRate({
                     setShowCard(!showCard);
                     setSelectedRow(facility)
                 }}>{facility['facilityName']}</td>
-                <td>{facility['category']}</td>
+                <td>{FACILITY_TYPE[facility['category']]}</td>
                 <td>{getFacilityProgram(facility).rate || '-'}</td>
                 <td>{rateUpdatedAt ? formatDate(rateUpdatedAt) : 'DD/MMM/YYYY'}</td>
-                <td>
+                <td style={{"textAlign":"right"}}>
                     <CheckboxItem
                         text={facility['id']}
                         showText={false}
@@ -144,11 +145,11 @@ function FacilityAdjustingRate({
             Object.keys(rateWiseFacilities).forEach((rate) => {
                 const facilityIds = rateWiseFacilities[rate].facilityIds;
                 facilityIds.forEach((facilityId) => {
-                    let programs = [{
-                        id: selectedProgram,
+                    let p = [{
+                        id: programs.filter(p => p.value === selectedProgram).map(p => p.id)[0],
                         rate: rateWiseFacilities[rate].newRate
                     }];
-                    updateFacilities.push({osid: facilityId, programs})
+                    updateFacilities.push({osid: facilityId, programs:p})
                 });
 
 
@@ -164,124 +165,132 @@ function FacilityAdjustingRate({
 
     return (
         <div className={`row ${styles['container']}`}>
-            <div className="col-sm-3">
-                <FacilityFilterTab
-                    programs={programs}
-                    selectedProgram={selectedProgram}
-                    setSelectedProgram={setSelectedProgram}
-                    states={stateList}
-                    setSelectedState={onStateSelected}
-                    selectedState={selectedState}
-                    districtList={districtList}
-                    selectedDistrict={selectedDistrict}
-                    setSelectedDistrict={setSelectedDistrict}
-                    facilityType={facilityType}
-                    setFacilityType={setFacilityType}
-                >
-                    <div>
-                        <span className={"filter-header"}>Last Adjusted on</span>
-                        <div className="m-3">
-                            <RadioItem
-                                text={CONSTANTS.WEEK}
-                                checked={lastAdjustedOn === CONSTANTS.WEEK}
-                                onSelect={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setLastAdjustedOn
-                                    )
-                                }
-                            />
-                            <RadioItem
-                                text={CONSTANTS.MONTH}
-                                checked={lastAdjustedOn === CONSTANTS.MONTH}
-                                onSelect={(event) =>
-                                    handleChange(
-                                        event.target.name,
-                                        setLastAdjustedOn
-                                    )
-                                }
-                            />
-                        </div>
+            {!showCard && 
+                <div className="col-sm-3">
+                    <FacilityFilterTab
+                        countryName={countryName}
+                        programs={programs}
+                        selectedProgram={selectedProgram}
+                        setSelectedProgram={setSelectedProgram}
+                        states={stateList}
+                        setSelectedState={onStateSelected}
+                        selectedState={selectedState}
+                        districtList={districtList}
+                        selectedDistrict={selectedDistrict}
+                        setSelectedDistrict={setSelectedDistrict}
+                        facilityType={facilityType}
+                        setFacilityType={setFacilityType}
+                    >
                         <div>
-                            <span className={"filter-header"}>Please select date range</span>
+                            <span className={"filter-header"}>Last Adjusted on</span>
                             <div className="m-3">
-                                <input className={styles["custom-date-range"]} type="date" onChange={(event) =>
-                                    handleChange(
-                                        event.target.value,
-                                        setLastAdjustedOn
-                                    )}/>
+                                <RadioItem
+                                    text={CONSTANTS.WEEK}
+                                    checked={lastAdjustedOn === CONSTANTS.WEEK}
+                                    onSelect={(event) =>
+                                        handleChange(
+                                            event.target.name,
+                                            setLastAdjustedOn
+                                        )
+                                    }
+                                />
+                                <RadioItem
+                                    text={CONSTANTS.MONTH}
+                                    checked={lastAdjustedOn === CONSTANTS.MONTH}
+                                    onSelect={(event) =>
+                                        handleChange(
+                                            event.target.name,
+                                            setLastAdjustedOn
+                                        )
+                                    }
+                                />
+                            </div>
+                            <div>
+                                <span className={"filter-header"}>Please select date range</span>
+                                <div className="m-3">
+                                    <input className={styles["custom-date-range"]} type="date" onChange={(event) =>
+                                        handleChange(
+                                            event.target.value,
+                                            setLastAdjustedOn
+                                        )}/>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </FacilityFilterTab>
-            </div>
-            <div className={`col-sm-6 ${styles['facility-grid-container']} ${styles['table']}`}>
-                {!showCard ?
-                <>
-                    <p className={styles['highlight']}>
-                        {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
-                    </p>
-                    <table className={`table table-hover ${styles['table-data']}`}>
-                        <thead>
-                        <tr>
-                            <th>CODE</th>
-                            <th>NAME</th>
-                            <th>TYPE</th>
-                            <th>PROGRAM RATE</th>
-                            <th>LAST ADJUSTED</th>
-                        <th>
-                                <CheckboxItem
-                                    text={"checkAll"}
-                                    checked={allChecked}
-                                    onSelect={(e) => {
-                                        handleAllCheck(e)
-                                    }}
-                                    showText={false}
-                                />
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody>{getFacilityList()}</tbody>
-                    </table>
-                </>
-                 : ""}
-                <DetailsCard
-                    showCard={showCard}
-                    setShowCard={setShowCard}
-                    facility={selectedRow}
-                    setFacility={setSelectedRow}
-                    status={status}
-                    updateFacilityProgramStatus={updateFacilityProgramStatus}
-                />
-            </div>
-            <div className="col-sm-3 pad-1rem">
-                <div className={styles['highlight']}>Set Daily Rate</div>
-                {(selectedProgram && Object.keys(rateWiseFacilities).length > 0)? <div>
-                    <div
-                        className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["set-rate-table"]}`}>
-                        <table className="table table-borderless table-hover">
-                            <thead>
-                            <tr>
-                                <td className="p-1"/>
-                                <td className="p-1">No. Of Facilities</td>
-                                <td className="p-1">Current Rate</td>
-                                <td className="p-1">Set New Rate</td>
-                            </tr>
-                            </thead>
-                            <tbody>{getRatesData()}</tbody>
-                        </table>
-
-                    </div>
-                    <div className="d-flex justify-content-center">
-                        <button className={`${styles['button']} p-2 pl-3 pr-3`} onClick={() => onSubmitBtnClick()}>SET
-                            RATES
-                        </button>
-                    </div>
-                    {/*{submit ? <div>All rates set successfully</div> : ''}*/}
+                    </FacilityFilterTab>
                 </div>
-                :<p>Please select one or more facilities to set daily vaccination rate</p>}
+            }
+            {!showCard && 
+                <div className={`col-sm-6 ${styles['facility-grid-container']} ${styles['table']}`}>
+                    {isLoading ?
+                        <div className='d-flex justify-content-center'>Please wait</div>
+                        :
+                        <>
+                            <p className={styles['highlight']}>
+                                {facilities.length === 0 ? "" : facilities.length} Facilit{facilities.length === 1 ? "y" : "ies"}
+                            </p>
+                            <table className={`table table-hover ${styles['table-data']}`}>
+                                <thead>
+                                <tr>
+                                    <th>CODE</th>
+                                    <th>NAME</th>
+                                    <th>TYPE</th>
+                                    <th>PROGRAM RATE</th>
+                                    <th>LAST ADJUSTED</th>
+                                    <th style={{"textAlign":"right"}}>
+                                        <CheckboxItem
+                                            text={"checkAll"}
+                                            checked={allChecked}
+                                            onSelect={(e) => {
+                                                handleAllCheck(e)
+                                            }}
+                                            showText={false}
+                                        />
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>{getFacilityList()}</tbody>
+                            </table>
+                        </>
+                    }
+                </div>
+            }
+            <DetailsCard
+                showCard={showCard}
+                setShowCard={setShowCard}
+                facility={selectedRow}
+                fetchFacilities={fetchFacilities}
+                status={status}
+                updateFacilityProgramStatus={updateFacilityProgramStatus}
+            />
+            {!showCard && 
+                <div className="col-sm-3 pad-1rem">
+                    <div className={styles['highlight']}>Set Daily Rate</div>
+                    {(selectedProgram && Object.keys(rateWiseFacilities).length > 0)? <div>
+                        <div
+                            className={`overflow-auto text-center table-responsive  ${styles["highlight"]} ${styles["set-rate-table"]}`}>
+                            <table className="table table-borderless table-hover">
+                                <thead>
+                                <tr>
+                                    <td className="p-1"/>
+                                    <td className="p-1">No. Of Facilities</td>
+                                    <td className="p-1">Current Rate</td>
+                                    <td className="p-1">Set New Rate</td>
+                                </tr>
+                                </thead>
+                                <tbody>{getRatesData()}</tbody>
+                            </table>
 
-            </div>
+                        </div>
+                        <div className="d-flex justify-content-center">
+                            <button className={`${styles['button']} p-2 pl-3 pr-3`} onClick={() => onSubmitBtnClick()}>SET
+                                RATES
+                            </button>
+                        </div>
+                        {/*{submit ? <div>All rates set successfully</div> : ''}*/}
+                    </div>
+                    :<p>Please select one or more facilities to set daily vaccination rate</p>}
+                </div>
+            }
         </div>
     );
 }

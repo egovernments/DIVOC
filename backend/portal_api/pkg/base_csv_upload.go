@@ -2,6 +2,7 @@ package pkg
 
 import (
 	"github.com/divoc/portal-api/pkg/db"
+	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -26,7 +27,7 @@ func (baseCsv CSVMetadata) ValidateHeaders() *models.Error {
 	// csv template validation
 	csvHeaders := baseCsv.Data.GetHeaders()
 	for _, c := range baseCsv.Columns {
-		if !contains(csvHeaders, c) {
+		if !utils.Contains(csvHeaders, c) {
 			code := "INVALID_TEMPLATE"
 			message := c + " column doesn't exist in uploaded csv file"
 			e := &models.Error{

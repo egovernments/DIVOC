@@ -1,16 +1,16 @@
 .container{
-    margin-top: 2%;
+    height: 75vh;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    margin: 2% 2rem 0;
+    border-radius: 1rem;
+    overflow: auto;
 }
 .form-container{
-    width: 50%;
-    box-shadow: 0px 6px 20px #C1CFD933;
     padding: 2rem;
 }
 
 .sub-container{
     padding: 2rem;
-    padding-bottom:  40vh;
-    box-shadow: 0px 6px 20px #C1CFD933;
 }
 
 .form{
@@ -46,4 +46,15 @@
 .list-title{
     color: #1D1D1D;
     font-weight: 600;
+}
+
+.form-container>form>div>fieldset{
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+}
+
+.form-container>form>div>fieldset>div{
+    padding-right: 2rem;
 }

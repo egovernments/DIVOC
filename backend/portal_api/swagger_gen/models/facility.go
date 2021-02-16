@@ -51,10 +51,10 @@ type Facility struct {
 	GeoLocation string `json:"geoLocation,omitempty"`
 
 	// Operating hours end of day
-	OperatingHourEnd int64 `json:"operatingHourEnd,omitempty"`
+	OperatingHourEnd string `json:"operatingHourEnd,omitempty"`
 
 	// Operating hours start of day
-	OperatingHourStart int64 `json:"operatingHourStart,omitempty"`
+	OperatingHourStart string `json:"operatingHourStart,omitempty"`
 
 	// programs
 	Programs []*FacilityProgramsItems0 `json:"programs"`
@@ -336,6 +336,9 @@ func (m *Facility) UnmarshalBinary(b []byte) error {
 //
 // swagger:model FacilityProgramsItems0
 type FacilityProgramsItems0 struct {
+
+	// name
+	Name string `json:"name,omitempty"`
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`

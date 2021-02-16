@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { makeStyles } from "@material-ui/core/styles";
+import React, {useState} from "react";
+import {makeStyles} from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
@@ -10,6 +10,7 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import TableHead from "@material-ui/core/TableHead";
 import PropTypes from "prop-types";
 import TablePagination from "@material-ui/core/TablePagination";
+import {maskPersonalDetails} from  "../../utils/maskPersonalDetails";
 
 const useStyles = makeStyles({
         table: {
@@ -63,11 +64,12 @@ export class HeaderData {
 }
 
 export const UploadHistoryTable = ({
-    data,
-    headerData,
-    onCellClicked,
-    title,
-}) => {
+                                       data,
+                                       headerData,
+                                       onCellClicked,
+                                       title,
+                                       emptyListMessage
+                                   }) => {
     const [selectedHistory, setSelectedHistory] = useState();
     const classes = useStyles();
     const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -94,7 +96,7 @@ export const UploadHistoryTable = ({
                 />
                 {data.length === 0 ? (
                     <div className="centered-and-flexed">
-                        No Upload history found
+                        {emptyListMessage ?? "No Upload history found"}
                     </div>
                 ) : (
                     <Table
@@ -128,7 +130,7 @@ export const UploadHistoryTable = ({
                                             selectedHistory.id === row["id"]
                                         }
                                         style={{
-                                            cursor: "pointer",
+                                            cursor: onCellClicked ? "pointer" : "",
                                             background: "none",
                                         }}
                                         onClick={() => {
@@ -138,37 +140,38 @@ export const UploadHistoryTable = ({
                                             }
                                         }}
                                     >
-                                        {headerData.map((field, index) => (
-                                            <TableCell
+                                        {headerData.map((field, index) => {
+                                           return( <TableCell
                                                 component={RowTableCell}
                                                 size="small"
                                                 align="center"
                                                 key={index}
                                             >
                                                 {row[field.key]}
-                                            </TableCell>
-                                        ))}
+                                            </TableCell>)
+                            })}
                                     </TableRow>
                                 ))}
                         </TableBody>
                     </Table>
                 )}
-                
+
             </TableContainer>
             <TablePagination
-                    rowsPerPageOptions={[10, 20, 25]}
-                    component="div"
-                    count={data.length}
-                    rowsPerPage={rowsPerPage}
-                    page={page}
-                    onChangePage={handleChangePage}
-                    onChangeRowsPerPage={handleChangeRowsPerPage}
-                />
+                rowsPerPageOptions={[10, 20, 25]}
+                component="div"
+                count={data.length}
+                rowsPerPage={rowsPerPage}
+                page={page}
+                onChangePage={handleChangePage}
+                onChangeRowsPerPage={handleChangeRowsPerPage}
+            />
         </div>
     );
 };
 
 UploadHistoryTable.propTypes = {
     data: PropTypes.array,
-    headerData: PropTypes.array
+    headerData: PropTypes.array,
+    emptyListMessage: PropTypes.string
 };

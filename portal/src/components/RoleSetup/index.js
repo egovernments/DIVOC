@@ -9,9 +9,7 @@ import Paper from '@material-ui/core/Paper';
 import withStyles from "@material-ui/core/styles/withStyles";
 import FormControl from '@material-ui/core/FormControl';
 import Select from '@material-ui/core/Select';
-import InputLabel from '@material-ui/core/InputLabel';
 import MenuItem from '@material-ui/core/MenuItem';
-import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import {useAxios} from "../../utils/useAxios";
 import AddUserImg from "../../assets/img/add-user.svg";
@@ -20,7 +18,6 @@ import "./index.css"
 import Switch from "@material-ui/core/Switch/Switch";
 import {Modal} from "react-bootstrap";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import FormLabel from "@material-ui/core/FormLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormHelperText from "@material-ui/core/FormHelperText";
 
@@ -151,7 +148,10 @@ export const RoleSetup = () => {
                 axiosInstance.current.post('/divoc/admin/api/v1/facility/users', staff)
                     .then(res => {
                         fetchUsers()
-                    });
+                    }).catch((err) => {
+                    console.log(err)
+                    alert("User already exisits")
+                });
             }
         } else {
             alert("Please fill all the values!")
@@ -159,7 +159,7 @@ export const RoleSetup = () => {
     }
 
     function deleteStaff(index) {
-        if(window.confirm('Are you sure to delete this record?')){ 
+        if(window.confirm('Are you sure to delete this record?')){
             const staff = staffs[index];
             axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/' + staff.id)
             .then(res => {
@@ -241,16 +241,18 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
     return (
         <TableRow key={index}>
             <BorderLessTableCell>
-                <FormControl variant="outlined" fullWidth>
-                    <InputLabel id="demo-simple-select-outlined-label">Role Type</InputLabel>
+                <FormControl variant="outlined" className="selectorHeight" fullWidth>
+                    <label htmlFor="demo-simple-select-outlined">
+                        Role Type
+                    </label>
                     <Select
+                        className="roleTypeMenu"
                         labelId="demo-simple-select-outlined-label"
                         id="demo-simple-select-outlined"
                         value={staff.groups.length > 0 ? staff.groups[0].id : ""}
                         onChange={onRoleChange}
-                        label="Role Type"
                     >
-                        <MenuItem value="">
+                        <MenuItem value="" disabled>
                             <em>Please select</em>
                         </MenuItem>
                         {
@@ -259,26 +261,57 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 
                             ))
                         }
-
                     </Select>
                 </FormControl>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.name} onChange={(evt) => onValueChange(evt, "name")} label="Name"
-                           variant="outlined"/>
+                <>
+                    <label htmlFor="name">
+                        Name
+                    </label>
+                    <input
+                        className="form-control"
+                        value = {staff.name}
+                        type="text"
+                        id="name"
+                        onChange={(evt) => onValueChange(evt, "name")}
+                        required />
+                </>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField disabled={staff.type === OLD_USER} value={staff.mobileNumber}
-                           onChange={(evt) => onValueChange(evt, "mobileNumber")} type="tel"
-                           label="Mobile Number" variant="outlined"/>
+                <>
+                    <label htmlFor="mobileNumber">
+                        Mobile Number
+                    </label>
+                    <input
+                        disabled = {staff.type === OLD_USER}
+                        className="form-control"
+                        value = {staff.mobileNumber}
+                        type="text"
+                        id="mobileNumber"
+                        onChange={(evt) => onValueChange(evt, "mobileNumber")}
+                        required />
+                </>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <TextField value={staff.employeeId} onChange={(evt) => onValueChange(evt, "employeeId")}
-                           label="Employee ID" variant="outlined"/>
+                <>
+                    <label htmlFor="employeeId">
+                        Employee Id
+                    </label>
+                    <input
+                        className="form-control"
+                        value = {staff.employeeId}
+                        type="text"
+                        id="employeeId"
+                        onChange={(evt) => onValueChange(evt, "employeeId")}
+                        required />
+                </>
             </BorderLessTableCell>
             <BorderLessTableCell>
-                <FormControl component="fieldset">
-                    <FormLabel component="legend" style={{fontSize: "1em"}}>Status</FormLabel>
+                <FormControl className="switchInput" component="fieldset">
+                    <label>
+                        Status
+                    </label>
                     <FormGroup>
                         <FormControlLabel
                             control={<CustomSwitch
@@ -326,7 +359,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 const StaffProgramRate = (props) => {
     const classes = useStyles();
     const allocatedPrograms = props.vaccinationRateLimits.map(v => v.programName);
-    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.id));
+    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.name));
     return (
         <Modal
             show={props.showModal}
@@ -348,21 +381,22 @@ const StaffProgramRate = (props) => {
                             <TableRow>
                                 <BorderLessTableCell>
                                     <FormControl variant="outlined" fullWidth>
-                                        <InputLabel id="demo-simple-select-outlined-label">Program</InputLabel>
+                                        <label htmlFor="demo-simple-select-outlined">
+                                            Program
+                                        </label>
                                         <Select
+                                            className="roleTypeMenu rateSelector"
                                             labelId="demo-simple-select-outlined-label"
                                             id="demo-simple-select-outlined"
                                             value={limit.programName}
                                             onChange={(evt) => {
                                                 props.updateProgram(index, "programName", evt.target.value)
                                             }}
-                                            label="Program"
                                         >
-
                                             {
                                                 (limit.programName === "" ? newPrograms : props.programs).map((program, index) => (
                                                     <MenuItem value={program.programId}
-                                                              name={program.programId}>{program.programId}</MenuItem>
+                                                              name={program.name}>{program.name}</MenuItem>
 
                                                 ))
                                             }
@@ -371,14 +405,24 @@ const StaffProgramRate = (props) => {
                                     </FormControl>
                                 </BorderLessTableCell>
                                 <BorderLessTableCell>
-                                    <TextField value={limit.rateLimit}
-                                               onChange={(evt) => {
-                                                   props.updateProgram(index, "rateLimit", parseInt(evt.target.value))
-                                               }} min={0}
-                                               label="Rate" variant="outlined" type={"number"}/>
+                                    <>
+                                        <label htmlFor="rate">
+                                            Rate
+                                        </label>
+                                        <input
+                                            className="form-control"
+                                            value={limit.rateLimit}
+                                            type="number"
+                                            id="rate"
+                                            onChange={(evt) => {
+                                                props.updateProgram(index, "rateLimit", parseInt(evt.target.value))
+                                            }}
+                                            min="0"
+                                        />
+                                    </>
                                 </BorderLessTableCell>
                                 <BorderLessTableCell>
-                                    <Button className="mr-2" variant="outlinedPrimary" onClick={() => {
+                                    <Button className="mr-2 rateDeleteButton" variant="outlinedPrimary" onClick={() => {
                                         props.deleteProgram(index)
                                     }}>
                                         DELETE

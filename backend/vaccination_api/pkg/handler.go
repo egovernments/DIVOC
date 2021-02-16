@@ -183,13 +183,18 @@ func getCurrentProgramsResponder(params configuration.GetCurrentProgramsParams, 
 				for _, programObject := range facility["programs"].([]interface{}) {
 					program := programObject.(map[string]interface{})
 					if strings.EqualFold(program["status"].(string), "active") {
-						programNames = append(programNames, strings.ToLower(program["programId"].(string)))
+						programNames = append(programNames, program["programId"].(string))
 					}
 				}
 			}
 			var programsFor []*models.Program
 			if len(programNames) > 0 {
-				programsFor = findProgramsByName(programNames)
+				for _, id := range programNames {
+					program := findProgramsById(id)
+					if program != nil {
+						programsFor = append(programsFor, program[0])
+					}
+				}
 			}
 			return configuration.NewGetCurrentProgramsOK().WithPayload(programsFor)
 		} else {

@@ -7,10 +7,17 @@ import {useKeycloak} from "@react-keycloak/web";
 import ToastComponent from "../Toast/Toast";
 import Button from 'react-bootstrap/Button';
 import DropDown from "../DropDown/DropDown";
-import { useAxios } from "../../utils/useAxios";
+import {useAxios} from "../../utils/useAxios";
 import {API_URL} from "../../utils/constants";
 
-function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCount,handleShow,errorCount}) {
+function PreEnrollmentUploadCSV({
+                                    sampleCSV,
+                                    fileUploadAPI,
+                                    onUploadComplete,
+                                    uploadHistoryCount,
+                                    handleShow,
+                                    errorCount
+                                }) {
     const [uploadPercentage, setUploadPercentage] = useState(0);
     const [programList, setProgramList] = useState([]);
     const [program, setProgram] = useState("");
@@ -21,22 +28,26 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
     useEffect(() => {
         fetchPrograms();
     }, []);
+
     function fetchPrograms() {
         axiosInstance.current.get(API_URL.PROGRAM_API)
             .then(res => {
-                const programs = res.data.map(obj => ({value: obj.name, label: obj.name}));
+                const programs = res.data
+                    .filter((obj) => obj.status === "Active")
+                    .map(obj => ({value: obj.name, id:obj.osid, label: obj.name}));
                 setProgramList(programs)
             });
     }
+
     const uploadFile = (evt) => {
-        if(program === "") {
+        if (program === "") {
             alert("Select a program");
             return
         }
         const fileData = evt.target.files[0];
         let dataToSend = new FormData();
         dataToSend.append('file', fileData);
-        dataToSend.append('programId', program);
+        dataToSend.append('programId', programList.filter(p => p.value === program).map(p => p.id)[0]);
 
         const config = {
             headers: {"Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"},
@@ -61,8 +72,8 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
         })
     };
 
-    function uploadingToastBody () {
-        return(
+    function uploadingToastBody() {
+        return (
             <div>
                 <span>File Uploaded</span>&emsp;
                 <ProgressBar variant="success" now={uploadPercentage} active/>
@@ -72,10 +83,12 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
     }
 
     function uploadedToastBody() {
-        return(
+        return (
             <div className="d-flex justify-content-between">
                 <p>{errorCount} Errors Found</p>
-                <Button style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
+                <Button style={{background: "#FC573B"}} onClick={() => {
+                    handleShow()
+                }}>VIEW</Button>
             </div>
         )
     }
@@ -83,9 +96,9 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
     return (
         <div className={styles['container'] + " d-flex justify-content-between"}>
             <div className={styles['progress-bar-container']}>
-            {uploadPercentage>0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()} />}
+                {uploadPercentage > 0 && <ToastComponent header={uploadHistoryCount} toastBody={uploadingToastBody()}/>}
             </div>
-            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()} />}
+            {showToast && <ToastComponent header={uploadHistoryCount} toastBody={uploadedToastBody()}/>}
             <div className={styles["select-program-wrapper"]}>
                 <DropDown
                     selectedOption={program}
@@ -106,7 +119,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
                     hidden
                     required
                     onClick={(evt) => {
-                        if(program === "") {
+                        if (program === "") {
                             alert("Select a program");
                             evt.preventDefault()
                         }
@@ -114,7 +127,7 @@ function PreEnrollmentUploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uplo
                 />
                 <label
                     htmlFor='actual-btn'
-                    className={styles['button']+ (program ? '' : ' disabled')}
+                    className={styles['button'] + (program ? '' : ' disabled')}
                 >
                     UPLOAD CSV
                 </label>

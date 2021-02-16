@@ -1,9 +1,8 @@
-.table{
-    box-shadow: 0px 6px 20px #C1CFD933;
+.table {
     border-radius: 10px;
 }
 
-.v-table-data{
+.v-table-data {
     color: #4E4E4E;
     text-align: center;
 }
@@ -14,15 +13,15 @@
     font-weight: bold;
 }
 
-.active{
-     color: #4CA07A;
+.active {
+    color: #4CA07A;
 }
 
-.inactive{
+.inactive {
     color: #5C9EF8;
 }
 
-.action-button{
+.action-button {
     border: 1px solid #646D82;
     border-radius: 22px;
     height: 28px;
@@ -33,6 +32,8 @@
 
 .custom-popup {
     min-width: 170px;
+    max-height: 200px;
+    padding: 8px;
 }
 
 .custom-popup > p {
@@ -45,5 +46,9 @@
 .custom-popup > hr {
     margin-top: 0.5rem;
     margin-bottom: 0.5rem;
+}
+
+.custom-checkbox-item-wrapper .wrapper {
+    border: 1px solid #5C9EF8;
 }
 
