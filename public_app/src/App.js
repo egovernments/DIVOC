@@ -16,6 +16,7 @@ import {store} from "./redux/store";
 import Learn from "./components/Learn";
 import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
+import {Members} from "./components/Registration/Members";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -41,6 +42,7 @@ function App() {
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
+                            <PrivateRoute exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                         </Switch>
                     </div>
                     <Footer/>

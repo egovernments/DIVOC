@@ -1,0 +1,157 @@
+.main-container .container-fluid {
+    height: 100%;
+}
+
+.side-effect-container {
+    padding: 3rem 5rem;
+    height: 100%;
+}
+
+/*.symptoms-container {*/
+/*    max-height: 25rem;*/
+/*    overflow: auto;*/
+/*    overflow-x: hidden;*/
+/*}*/
+
+/*.group-header {*/
+/*    font-size: 12px;*/
+/*    text-decoration: underline;*/
+/*}*/
+
+/*.symptom-wrapper {*/
+/*    padding-top: 0.5rem;*/
+/*    cursor: pointer;*/
+/*}*/
+
+/*.symptom-wrapper .custom-checkbox {*/
+/*    border: 2px solid #88C6A9;*/
+/*    border-radius: 4px;*/
+/*    width: 1rem;*/
+/*    height: 1rem;*/
+/*    display: inline-block;*/
+/*}*/
+
+/*.symptom-wrapper .custom-group {*/
+/*    color: #88C6A9;*/
+/*    font-size: 24px;*/
+/*    font-weight: bold;*/
+/*    user-select: none;*/
+/*    width: 1rem;*/
+/*}*/
+
+/*.symptom-wrapper .active {*/
+/*    background: #88C6A9;*/
+/*}*/
+
+/*.symptom-wrapper .title {*/
+/*    color: #4E4E4E;*/
+/*    padding-left: 1rem;*/
+/*    user-select: none;*/
+/*    font-size: 14px;*/
+/*}*/
+
+/*.others-textarea {*/
+/*    resize: none;*/
+/*    font-size: 14px;*/
+/*    margin-top: 1rem;*/
+/*    border: 1px solid #E6E6E6;*/
+/*    border-radius: 4px;*/
+/*    width: 15rem;*/
+/*    height: 10rem;*/
+/*    padding: 1rem;*/
+/*}*/
+
+/*.confirm-symptoms-btn {*/
+/*    background: transparent linear-gradient(91deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;*/
+/*    color: #fff;*/
+/*    border: none;*/
+/*    padding: 0.5rem 1rem;*/
+/*    border-radius: 4px;*/
+/*    outline: none;*/
+/*    margin-top: 1rem;*/
+/*}*/
+
+/*.instructions-container {*/
+/*    max-height: 25rem;*/
+/*    overflow: auto;*/
+/*    overflow-x: hidden;*/
+/*    padding-right: 1rem;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+1) {*/
+/*    background: #F2FAF6;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+2) {*/
+/*    background: #EFF5FD;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+3) {*/
+/*    background: #F7F8FF;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+1) .instruction-heading {*/
+/*    color: #4CA07A;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+2) .instruction-heading {*/
+/*    color: #5C9EF8;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+3) .instruction-heading {*/
+/*    color: #4E67D1;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+1) .instruction-title {*/
+/*    color: #4CA07A;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+2) .instruction-title {*/
+/*    color: #5C9EF8;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper:nth-child(3n+3) .instruction-title {*/
+/*    color: #4E67D1;*/
+/*}*/
+
+/*.instructions-container .instruction-wrapper {*/
+/*    background-color: #F2FAF6;*/
+/*    border-radius: 10px;*/
+/*    opacity: 1;*/
+/*    padding: 2rem;*/
+/*    margin-top: 1rem;*/
+/*    font-size: 14px;*/
+/*}*/
+
+/*.instruction-wrapper .instruction-title {*/
+/*    color: #4CA07A;*/
+/*}*/
+
+/*.instruction-wrapper .instruction-heading {*/
+/*    color: #4CA07A;*/
+/*    font-size: 12px;*/
+/*}*/
+
+/*.instructions-container::-webkit-scrollbar , .symptoms-container::-webkit-scrollbar {*/
+/*    -webkit-appearance: none;*/
+/*    width: 7px;*/
+/*}*/
+
+/*.instructions-container::-webkit-scrollbar-thumb, .symptoms-container::-webkit-scrollbar-thumb {*/
+/*    border-radius: 4px;*/
+/*    background-color: #88C6A9;*/
+/*    box-shadow: 0 0 1px rgba(255, 255, 255, .5);*/
+/*}*/
+/*.instructions-container::-webkit-scrollbar-track-piece, .symptoms-container::-webkit-scrollbar-track-piece {*/
+/*    background-color: #F8F8F8;*/
+/*}*/
+
+/*.side-effects-input-box input {*/
+/*    padding: 1.5rem 1rem;*/
+/*}*/
+
+/*@media (max-width: 961px) {*/
+/*    .side-effect-container {*/
+/*        padding: 1rem 0;*/
+/*    }*/
+/*}*/
