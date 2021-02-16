@@ -38,4 +38,4 @@ clean:
 
 run: ./divoc-portal-api-server
 	@echo "Running api server"
-	./divoc-portal-api-server --scheme http --port 8005
+	./divoc-portal-api-server --scheme http --port 8001
