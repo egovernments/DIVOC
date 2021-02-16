@@ -31,7 +31,7 @@ func NewGetConfiguration(ctx *middleware.Context, handler GetConfigurationHandle
 	return &GetConfiguration{Context: ctx, Handler: handler}
 }
 
-/*GetConfiguration swagger:route GET /divoc/configuration configuration getConfiguration
+/*GetConfiguration swagger:route GET /v1/divoc/configuration configuration getConfiguration
 
 Get Meta information about the application flow
 

@@ -44,7 +44,7 @@ paths:
         '401':
           description: Unauthorized
 
-  /divoc/configuration:
+  /v1/divoc/configuration:
     get:
       tags:
         - configuration
@@ -60,7 +60,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ApplicationConfiguration'
-  /users/me:
+  /v1/users/me:
     get:
       tags:
         - vaccination
@@ -71,7 +71,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/UserInfo'
-  '/preEnrollments/{preEnrollmentCode}':
+  '/v1/preEnrollments/{preEnrollmentCode}':
     get:
       tags:
         - vaccination
@@ -88,7 +88,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/PreEnrollment'
-  '/preEnrollments':
+  '/v1/preEnrollments':
     get:
       tags:
         - vaccination
@@ -101,7 +101,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/PreEnrollment'
-  /certify:
+  /v1/certify:
     post:
       tags:
         - certification
@@ -122,7 +122,7 @@ paths:
       responses:
         '200':
           description: OK
-  /bulkCertify:
+  /v1/bulkCertify:
     post:
       tags:
         - certification
@@ -147,13 +147,13 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
-  /certify/uploads:
+  /v1/certify/uploads:
     get:
       tags:
         - certification
       summary: Get all file uploads for certification for given facility admin
       operationId: getCertifyUploads
-      security: 
+      security:
         - hasRole: ['facility-admin']
       responses:
         '200':
@@ -162,7 +162,7 @@ paths:
             type: array
             items:
               type: object
-  /certify/uploads/{uploadId}/errors:
+  /v1/certify/uploads/{uploadId}/errors:
     get:
       tags:
         - certification
@@ -185,7 +185,7 @@ paths:
           description: certify upload for given uploadID not found
         '403':
           description: Forbidden for user
-  /programs/current:
+  /v1/programs/current:
     get:
       tags:
         - configuration
@@ -198,7 +198,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Program'
-  /vaccinators:
+  /v1/vaccinators:
     get:
       tags:
         - configuration
@@ -211,7 +211,7 @@ paths:
             type: array
             items:
               $ref: "../registry/Vaccinator.json#/definitions/Vaccinator"
-  /identity/verify:
+  /v1/identity/verify:
     post:
       tags:
         - identity
@@ -228,7 +228,7 @@ paths:
           description: OK
         '206':
           description: Need OTP
-  /certificates:
+  /v1/certificates:
     get:
       summary: Get certificate json
       security:
@@ -239,7 +239,7 @@ paths:
           description: OK
           schema:
             type: object
-  /sideEffects:
+  /v1/sideEffects:
     get:
       tags:
         - sideEffects
@@ -251,7 +251,7 @@ paths:
           description: OK
           schema:
             type: object
-  /report-side-effects:
+  /v1/report-side-effects:
     post:
       tags:
         - reportSideEffects
@@ -278,7 +278,7 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
-  /events:
+  /v1/events:
     post:
       summary: Send events for monitoring / tracking purpose.
       operationId: events
@@ -294,7 +294,7 @@ paths:
       responses:
         '200':
           description: OK
-  /ping:
+  /v1/ping:
     get:
       summary: Server heartbeat operation
       description: >-
@@ -304,7 +304,222 @@ paths:
       responses:
         '200':
           description: OK
+  /v2/certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        athorization and vaccinator should be trained for the vaccination that
+        is being certified.
+      operationId: certifyV2
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequestV2'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: './vaccination-api.yaml#/definitions/Error'
 definitions:
+  CertificationRequestV2:
+    type: object
+    properties:
+      preEnrollmentCode:
+        type: string
+      recipient:
+        type: object
+        properties:
+          name:
+            type: string
+          dob:
+            type: string
+            format: date
+          age:
+            type: string
+          gender:
+            type: string
+          nationality:
+            type: string
+          identity:
+            type: string
+          contact:
+            type: array
+            items:
+              type: string
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: integer
+      vaccination:
+        type: object
+        properties:
+          name:
+            type: string
+          batch:
+            type: string
+          manufacturer:
+            type: string
+          date:
+            type: string
+            format: date-time
+          effectiveStart:
+            type: string
+            format: date
+          effectiveUntil:
+            type: string
+            format: date
+          dose:
+            type: number
+            description: Dose number for example 1 for first dose of 2 doses
+            example:
+              1
+          totalDoses:
+            type: number
+            description: Total number of doses required for this vaccination.
+            example:
+              2
+      vaccinator:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+      facility:
+        type: object
+        properties:
+          id:
+            type: string
+          name:
+            type: string
+          operatorId:
+            type: string
+          operatorName:
+            type: string
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+              state:
+                type: string
+              pincode:
+                type: integer
+      meta:
+        type: object
+        properties:
+          vaccinationApp:
+            type: object
+            properties:
+              name:
+                type: string
+              type:
+                type: string
+                enum:
+                  - P
+                  - M
+                  - D
+              version:
+                type: string
+              device:
+                type: string
+                description: Type of device, D - Desktop, M - Mobile, T - Tablet
+                enum:
+                  - D
+                  - M
+                  - T
+              deviceOS:
+                type: string
+                description: Type of Operating system on the device, W for Windows, A for Android, L for Linux, M for Mac, I for ios
+                enum:
+                  - W
+                  - A
+                  - L
+                  - M
+                  - I
+              oSVersion:
+                type: string
+              appMode:
+                type: string
+                enum:
+                  - Online
+                  - Offline
+              connectionType:
+                type: string
+                description: W - Wifi, M - mobile data, L - LAN/WAN
+                enum:
+                  - W
+                  - M
+                  - L
+          facilityType:
+            type: string
+            description: CG - central govt, SG - State govt, PR - Private Facility
+            enum:
+              - CG
+              - SG
+              - PR
+          paymentType:
+            type: string
+            description: G for Govt, S for Self, V for Voucher, D for DBT, A for AyushmanBharat, I for Other Insurance
+            enum:
+              - G
+              - S
+              - V
+              - D
+              - A
+              - I
+          registrationCategory:
+            type: string
+            description: F for frontline officers, C for comorbidity category, R for regular others
+            enum:
+              - F
+              - C
+              - R
+          sessionDurationInMinutes:
+            type: integer
+            description: Vaccination session duration in minutes
+          waitForVaccinationInMinutes:
+            type: integer
+            description: Time between verification and vaccination (in minutes)
+          verificationDurationInSeconds:
+            type: integer
+            description: ID verification duration (duration in seconds for ID verification)
+          verificationAttempts:
+            type: integer
+            description: ID verification number of attempts (ex number of attempts done for Aadhaar)
+          registrationDataMode:
+            type: string
+            description: Recipient data capture mode DE for Data Entry, SQ for Signed QR, RQ for Regular QR, PR for Pre Registration
+            enum:
+              - DE
+              - SQ
+              - RQ
+              - PR
+          uploadTimestamp:
+            type: string
+            format: 'date-time'
   LoginRequest:
     type: object
     properties:
@@ -525,4 +740,4 @@ definitions:
 host: divoc.xiv.in
 schemes:
   - https
-basePath: /divoc/api/v1
+basePath: /divoc/api

@@ -35,7 +35,7 @@ func NewCreateReportedSideEffects(ctx *middleware.Context, handler CreateReporte
 	return &CreateReportedSideEffects{Context: ctx, Handler: handler}
 }
 
-/*CreateReportedSideEffects swagger:route POST /report-side-effects reportSideEffects createReportedSideEffects
+/*CreateReportedSideEffects swagger:route POST /v1/report-side-effects reportSideEffects createReportedSideEffects
 
 Create reported side effects
 
