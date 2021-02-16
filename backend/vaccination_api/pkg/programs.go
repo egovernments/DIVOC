@@ -23,12 +23,12 @@ type ProgramsRegistryResponse struct {
 	StartDate   string        `json:"startDate"`
 }
 
-func findProgramsByName(programNames []string) []*models.Program {
+func findProgramsById(id string) []*models.Program {
 
 	typeId := "Program"
 	filter := map[string]interface{}{
-		"name": map[string]interface{}{
-			"or": programNames,
+		"osid": map[string]interface{}{
+			"eq": id,
 		},
 		"status": map[string]interface{}{
 			"eq": "Active",

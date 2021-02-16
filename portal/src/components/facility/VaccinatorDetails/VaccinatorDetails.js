@@ -56,25 +56,14 @@ export default function VaccinatorDetails({
     }, [selectedVaccinator]);
 
     function fetchPrograms() {
-        let params = {
-            programStatus: "Active",
-        };
-        params = reject(equals(''))(params);
-        const queryParams = new URLSearchParams(params);
         axiosInstance.current.get(API_URL.USER_FACILITY_API)
             .then(res => {
                 res.data.forEach(item => {
                     if (!("programs" in item)) {
                         setPrograms([]);
                     } else {
-                        let programsAsSet = new Set(programs);
-                        let data = new Array(...programsAsSet);
-                        item.programs.map(p => {
-                            if (!programsAsSet.has(p.programId) && !data.includes(p.programId) && p.status === CONSTANTS.ACTIVE) {
-                                data.push(p.programId);
-                            }
-                        });
-                        setPrograms(data)
+                        const programs = item.programs.map(p => ({name:p.name, id:p.programId}))
+                        setPrograms(programs)
                     }
                 });
             });
@@ -188,7 +177,7 @@ export default function VaccinatorDetails({
 
     function onAddProgramChange(value) {
         let program = {
-            programId: value,
+            programId: programs.filter(p => p.name === value).map(p => p.id)[0],
             certified: false,
             status: "Active"
         };
@@ -203,6 +192,10 @@ export default function VaccinatorDetails({
         if (event.key === 'Enter' && event.target.value) {
             searchVaccinators()
         }
+    }
+
+    function isProgramAssociated(program, vaccinator) {
+        return vaccinator.programs && vaccinator.programs.map(p => p.name).includes(program.name)
     }
 
     return (
@@ -317,7 +310,7 @@ export default function VaccinatorDetails({
                         vaccinator.programs &&
                         vaccinator.programs.map(program => (
                             <div className="row vaccinator-prg-div">
-                                <span className="col-sm-7 vaccinator-prg-span">{program.programId}</span>
+                                <span className="col-sm-7 vaccinator-prg-span">{program.name}</span>
                                 <CustomSwitch
                                     checked={program.certified}
                                     onChange={() => onProgramCertifyChange(program, !program.certified)}
@@ -330,7 +323,7 @@ export default function VaccinatorDetails({
                     <div>
                         <span className="filter-header">Certification (if any)</span>
                         <DropDown
-                            options={programs}
+                            options={programs.filter(p => !isProgramAssociated(p, vaccinator)).map(p => p.name)}
                             placeholder="Please select Program"
                             setSelectedOption={onAddProgramChange}
                         />

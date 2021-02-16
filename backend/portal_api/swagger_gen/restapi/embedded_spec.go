@@ -1187,6 +1187,9 @@ func init() {
           "items": {
             "type": "object",
             "properties": {
+              "name": {
+                "type": "string"
+              },
               "programId": {
                 "type": "string"
               },
@@ -2974,6 +2977,9 @@ func init() {
     "FacilityProgramsItems0": {
       "type": "object",
       "properties": {
+        "name": {
+          "type": "string"
+        },
         "programId": {
           "type": "string"
         },
