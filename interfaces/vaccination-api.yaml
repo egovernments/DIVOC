@@ -41,6 +41,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/LoginResponse'
+        '206':
+          description: Need otp
         '401':
           description: Unauthorized
 
