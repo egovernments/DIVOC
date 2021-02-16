@@ -196,11 +196,11 @@ function FacilityController() {
                             }
                         });
                         if(status === CONSTANTS.ACTIVE) {
-                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            const program = item["programs"].find(program => program.name === selectedProgram)
                             isFiltersMatched = !!(program && program.status === CONSTANTS.ACTIVE && isFiltersMatched);
                         }
                         if(status === CONSTANTS.IN_ACTIVE) {
-                            const program = item["programs"].find(program => program.programId === selectedProgram)
+                            const program = item["programs"].find(program => program.name === selectedProgram)
                             if (program && program.status === CONSTANTS.IN_ACTIVE) {
                                 isFiltersMatched = true
                             } else {
