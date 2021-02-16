@@ -22,6 +22,9 @@ function VaccineRegistration() {
     const [programSchema, setProgramSchema] = useState(schema);
     const [showForm, setShowForm] = useState(false);
 
+    let activePrograms = programList.filter(data => data.status === "Active");
+    let inactivePrograms = programList.filter(data => data.status === "Inactive");
+
     useEffect(() => {
         getListOfRegisteredPrograms();
     }, []);
@@ -179,12 +182,12 @@ function VaccineRegistration() {
             </div>}
             {!showForm && <div className={styles["sub-container"]}>
                 <ListView
-                    listData={programList}
+                    listData={activePrograms}
                     onRegisterBtnClick={() => {
                         setShowForm(true);
                         setFormData({medicineIds: []});
                     }}
-                    title="List of Registered Vaccine Programs"
+                    title={activePrograms.length > 0 ? "Active Vaccine Programs" : ""}
                     buttonTitle="Register New Vaccine Program"
                     showDetails={true}
                     onActiveSwitchClick={onEdit}
@@ -193,6 +196,19 @@ function VaccineRegistration() {
                         setShowForm(true)
                     }}
                 />
+                {inactivePrograms.length > 0 && <>
+                    <div className="mt-3"/>
+                    <ListView
+                        listData={inactivePrograms}
+                        title={"Inactive Vaccine Programs"}
+                        showDetails={true}
+                        onActiveSwitchClick={onEdit}
+                        setSelectedData={(data) => {
+                            setFormData({...data, edited: true});
+                            setShowForm(true)
+                        }}
+                    />
+                </>}
             </div>}
             {programList.length === 0 && <TextInCenter text={"No Program Added"}/>}
         </div>

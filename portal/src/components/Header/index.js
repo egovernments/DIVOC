@@ -29,7 +29,7 @@ export const Header = (props) => {
 
     return (
         <Navbar fixed="top" bg="white">
-            <Navbar.Brand href="/">
+            <Navbar.Brand>
                 <img
                     src={logo ? logo : NavbarLogo}
                     height="28"

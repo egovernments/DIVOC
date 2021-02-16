@@ -2,9 +2,9 @@ import { Button, Container } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import { Row } from "react-bootstrap";
 import {useAxios} from "../../utils/useAxios";
-import "./FacilityForm.css"
+import "./FacilityForm.scss"
 import {useKeycloak} from "@react-keycloak/web";
-import { API_URL, CONSTANTS } from "../../utils/constants";
+import { API_URL, CONSTANTS, FACILITY_TYPE } from "../../utils/constants";
 import { update } from "ramda";
 import WeekDaysSelect from "../WeekDaysSelect";
 
@@ -17,6 +17,19 @@ function FacilityForm({facility, refreshFacility, heading}) {
     const axiosInstance = useAxios('');
     const isFacilityAdmin = () => keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT);
     const isFacilityController = () => keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT);
+
+    let activePrograms = facility.programs?.filter(p => p.status === CONSTANTS.ACTIVE);
+
+    function convertTimeInAMPM(timeStr) {
+        if (timeStr) {
+            const t = timeStr.split(":")
+            const hr = t[0];
+            const min = t[1];
+            const amOrpm = hr < 12 ? "AM" : "PM";
+            const modHr = hr % 12;
+            return (modHr == 0 ? "12" : modHr) + ":" + (min ? min : "00") + " " + amOrpm;
+        }
+    }
 
     
     function fetchFacilityUsers() {
@@ -103,12 +116,10 @@ function FacilityForm({facility, refreshFacility, heading}) {
             };
         })
 
-        console.log(updatedFacility);
-
         axiosInstance.current
         .put(API_URL.FACILITY_API, [updatedFacility])
         .then((res) => {
-            console.log(res);
+            
             //registry update in ES happening async, so calling search immediately will not get back actual data
             setTimeout(() => refreshFacility(), 2000);
         });
@@ -132,13 +143,13 @@ function FacilityForm({facility, refreshFacility, heading}) {
         })
     }
 
-    return <Container style={{"paddingBottom": "100px"}}><form>
+    return <Container style={{"paddingBottom": "100px"}} className="facility-details-form"><form>
             <div className="facility-info-section">
                 {isFacilityAdmin() && 
                     <React.Fragment>
                         <h4 style={{"display":"inline-block"}}>Bussiness Details</h4>
                         <span className="begin-edit" onClick={() => setEditFacility(!editFacility)}>
-                            {editFacility ? "" : "edit"}
+                            {editFacility ? "cancel" : "edit"}
                         </span>
                     </React.Fragment>
                 }
@@ -183,17 +194,32 @@ function FacilityForm({facility, refreshFacility, heading}) {
                     <div>
                         <label>
                             <div><b>Category Type: </b></div>
-                            <Row style={{"columnCount": 2}}>
-                                <div className="radio-input"><input type="radio" name="category" checked={facility.category === "PRIVATE"} disabled={!editFacility} onChange={handleChange} value="PRIVATE"/> Private</div>
-                                <div className="radio-input"><input type="radio" name="category" checked={facility.category === "GOVT"} disabled={!editFacility} onChange={handleChange} value="GOVT"/> Government</div>
-                            </Row>
+                            {editFacility && 
+                                <Row style={{"columnCount": 2}}>
+                                    <div className="radio-input"><input type="radio" name="category" checked={facility.category === "PRIVATE"} disabled={!editFacility} onChange={handleChange} value="PRIVATE"/> Private</div>
+                                    <div className="radio-input"><input type="radio" name="category" checked={facility.category === "GOVT"} disabled={!editFacility} onChange={handleChange} value="GOVT"/> Government</div>
+                                </Row>
+                            }
+                            { !editFacility && 
+                                <input type="text" name="facilityCategory" value={facility.category} disabled={!editFacility} onChange={handleChange}/>
+                            }
                         </label>
                     </div>
                     <div>
                         <label>
                             <div><b>Operating Hours: </b></div>
-                            <input type="time" className="time-input"  name="operatingHourStart" defaultValue={facility.operatingHourStart} disabled={!editFacility} onChange={handleChange}/> 
-                            To <input className="time-input" type="time" name="operatingHourEnd" defaultValue={facility.operatingHourEnd} disabled={!editFacility} onChange={handleChange}/>
+                            {editFacility &&
+                                <React.Fragment>
+                                    <input type="time" className="time-input"  name="operatingHourStart" defaultValue={facility.operatingHourStart} disabled={!editFacility} onChange={handleChange}/> 
+                                    <input className="time-input" type="time" name="operatingHourEnd" defaultValue={facility.operatingHourEnd} disabled={!editFacility} onChange={handleChange}/>
+                                </React.Fragment>
+                            }
+                            {!editFacility &&
+                                <div style={{"fontWeight": "normal"}}>
+                                    {convertTimeInAMPM(facility.operatingHourStart)} - {convertTimeInAMPM(facility.operatingHourEnd)}
+                                </div>
+                            }
+                            
                         </label>
                     </div>
                     <div>
@@ -211,25 +237,34 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 </Container>
 
                     <h4>Ongoing Vaccination Programs</h4>
-                    { facility.programs?.filter(p => p.status === CONSTANTS.ACTIVE).map(p => 
-                        <Container style={{"columnCount": 2}}>
-                        <div key={p.programId} className="programDiv">
-                            <div><label>
+                    <Container  style={{"columnCount": 2}}>
+                    { activePrograms?.map(p => 
+                        <Container key={p.programId} className="programDiv">
+                            <label>
                                 <div><b>Name: </b></div>
                                 <input type="text" name="programName" defaultValue={p.programId} disabled={!editFacility}/>
-                            </label></div>
-                            <div><label>
+                            </label>
+                            <label>
                                 <div><b>Days: </b></div>
                                 <WeekDaysSelect name={p.programId + "_days"} days={p.schedule?.days} onChange={handleDaysChange} disabled={!editFacility}/>
-                            </label></div>
-                            <div><label>
+                            </label>
+                            <label>
                                 <div><b>Hours: </b></div>
-                                <input className="time-input" type="time" name={p.programId + "_startTime"} defaultValue={p.schedule?.startTime} disabled={!editFacility} onChange={handleChange}/>
-                                To <input className="time-input" type="time" name={p.programId + "_endTime"} defaultValue={p.schedule?.endTime} disabled={!editFacility} onChange={handleChange}/>
-                            </label></div>
-                        </div>
-                        </Container>                   
+                                {editFacility &&
+                                    <React.Fragment>
+                                        From : <input className="time-input" type="time" name={p.programId + "_startTime"} defaultValue={p.schedule?.startTime} disabled={!editFacility} onChange={handleChange}/>
+                                        To : <input className="time-input" type="time" name={p.programId + "_endTime"} defaultValue={p.schedule?.endTime} disabled={!editFacility} onChange={handleChange}/>
+                                    </React.Fragment>
+                                }
+                                { !editFacility &&
+                                    <div style={{"fontWeight": "normal"}}>
+                                        {convertTimeInAMPM(p.schedule?.startTime)} - {convertTimeInAMPM(p.schedule?.endTime)}
+                                    </div>
+                                }
+                            </label>
+                        </Container>         
                     )}
+                     </Container>
 
                 {editFacility && 
                     <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleSubmit}>SAVE</Button>
@@ -250,7 +285,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 <h4 style={{"display":"inline-block"}}>Adminstrator Details</h4>
                 {isFacilityController() && 
                     <span className="begin-edit" onClick={() => setEditAdmin(!editAdmin)}>
-                        {editAdmin ? "" : "edit"}
+                        {editAdmin ? "cancel" : "edit"}
                     </span>
                 }
                 <Container>

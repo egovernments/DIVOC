@@ -5,7 +5,7 @@ import styles from "./CertificateView.module.css";
 import QRCode from 'qrcode.react';
 import {toPng, toSvg} from 'html-to-image';
 import download from 'downloadjs'
-import {Dropdown,DropdownButton} from "react-bootstrap"
+import {Container, Dropdown,DropdownButton, Row} from "react-bootstrap"
 import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CERTIFICATE_FILE, CertificateDetailsPaths} from "../../constants";
@@ -256,22 +256,26 @@ function CertificateView() {
 
     const multiCertificateView = () => {
         return (
-            <div>
-                <div className={styles["no-print"] + " " + styles["center-align"]}>
-                    <p>There are multiple certificates associated with phone : {userMobileNumber}</p>
-                    <b>Please choose the certificate for </b>
+            <Container>
+                <Container className={styles["no-print"] + " " + styles["center-align"]}>
+                    <Row>
+                        <p>There are multiple certificates associated with phone : {userMobileNumber + "\n"}</p>
+                    </Row>
+                    <Row>
+                        <b>Please choose the certificate for </b>
+                    </Row>
                     <div>{getListOfCertificateBearers()}</div>
-                </div>
-                <div className={styles["certificate"]}>
+                </Container>
+                <Container className={styles["certificate"]+ " " + styles["center-align"]}>
                         {certificateData ? selectedCertificate(certificateData) : ("")}
-                </div>
-            </div>);
+                </Container>
+            </Container>);
     };
 
 
     return (
-        <div className={"row-cols-lg-1 row-cols-1 nav-pad cert-top"}>
-            <div className="col-12 d-flex d-flex justify-content-center">
+        <div className={"nav-pad cert-top"}>
+            <div className="justify-content-center">
                 <div>
                     <div className={styles["no-print"] + " " + styles["center-align"]}>
                         <h4>Vaccination certificate</h4>

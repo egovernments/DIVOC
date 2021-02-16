@@ -13,6 +13,7 @@
     "@testing-library/user-event": "^12.1.10",
     "axios": "^0.21.1",
     "bootstrap": "^4.5.3",
+    "font-proxima-nova": "^1.0.1",
     "keycloak-js": "^11.0.3",
     "leaflet": "^1.7.1",
     "papaparse": "^5.3.0",
