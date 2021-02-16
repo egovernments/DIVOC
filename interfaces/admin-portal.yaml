@@ -27,6 +27,19 @@ consumes:
 produces:
   - application/json
 paths:
+  /register:
+    post:
+      summary: Enroll Recipient
+      operationId: enrollRecipient
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
+          description: Recipient Details
+      responses:
+        '200':
+          description: OK
   /facility:
     get:
       summary: get user facility details

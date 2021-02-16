@@ -69,6 +69,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		DeleteFacilityUserHandler: DeleteFacilityUserHandlerFunc(func(params DeleteFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteFacilityUser has not yet been implemented")
 		}),
+		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
+		}),
 		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
 		}),
@@ -160,11 +163,9 @@ type DivocPortalAPIAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -203,6 +204,8 @@ type DivocPortalAPIAPI struct {
 	CreateVaccinatorHandler CreateVaccinatorHandler
 	// DeleteFacilityUserHandler sets the operation handler for the delete facility user operation
 	DeleteFacilityUserHandler DeleteFacilityUserHandler
+	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
+	EnrollRecipientHandler EnrollRecipientHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
 	GetAnalyticsHandler GetAnalyticsHandler
 	// GetEnrollmentUploadHistoryHandler sets the operation handler for the get enrollment upload history operation
@@ -247,7 +250,6 @@ type DivocPortalAPIAPI struct {
 	UpdateProgramHandler UpdateProgramHandler
 	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
 	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
-
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -354,6 +356,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.DeleteFacilityUserHandler == nil {
 		unregistered = append(unregistered, "DeleteFacilityUserHandler")
+	}
+	if o.EnrollRecipientHandler == nil {
+		unregistered = append(unregistered, "EnrollRecipientHandler")
 	}
 	if o.GetAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetAnalyticsHandler")
@@ -553,6 +558,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/facility/users/{userId}"] = NewDeleteFacilityUser(o.context, o.DeleteFacilityUserHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/register"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

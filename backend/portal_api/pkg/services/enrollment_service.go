@@ -12,7 +12,7 @@ import (
 const EnrollmentEntity = "Enrollment"
 const PreEnrollmentRegistered = "preEnrollmentRegistered"
 
-func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": preEnrollmentCode,
@@ -24,7 +24,7 @@ func markPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 			"eq": name,
 		},
 	}
-	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 
+	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter,
 		config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})

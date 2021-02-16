@@ -13,7 +13,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["phone", "enrollmentScopeId", "nationalId", "dob", "code"],
+      "required": ["phone", "nationalId", "dob"],
       "properties": {
         "phone" : {
           "type": "string"
@@ -67,7 +67,7 @@
     "privateFields": [],
     "signedFields": [],
     "indexFields": ["(phone, code)"],
-    "uniqueIndexFields": ["(enrollmentScopeId, code)"],
+    "uniqueIndexFields": ["code"],
     "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }

@@ -14,7 +14,7 @@ func init() {
 var Config = struct {
 	Registry struct {
 		Url               string `default:"localhost:8081" env:"REGISTRY_URL"`
-		AddOperationId    string
+		AddOperationId    string `default:"add"`
 		SearchOperationId string `default:"search"`
 		UpdateOperationId string `default:"update"`
 		ReadOperationId   string `default:"read"`

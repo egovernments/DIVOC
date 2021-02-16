@@ -1,12 +1,15 @@
-package pkg
+package utils
 
 import (
 	"encoding/json"
 	"errors"
+	"github.com/divoc/portal-api/config"
+	log "github.com/sirupsen/logrus"
+	"math/rand"
 	"strconv"
 )
 
-func isEqual(arr1 []string, arr2 []string) bool {
+func IsEqual(arr1 []string, arr2 []string) bool {
 	// If one is nil, the other must also be nil.
 	if (arr1 == nil) != (arr2 == nil) {
 		return false
@@ -17,14 +20,14 @@ func isEqual(arr1 []string, arr2 []string) bool {
 	}
 
 	for _, e := range arr1 {
-		if !contains(arr2, e) {
+		if !Contains(arr2, e) {
 			return false
 		}
 	}
 	return true
 }
 
-func contains(arr []string, str string) bool {
+func Contains(arr []string, str string) bool {
 	for _, a := range arr {
 		if a == str {
 			return true
@@ -57,7 +60,7 @@ func ToString(arg interface{}) string {
 	}
 }
 
-func convertStructToInterface(structToConvert interface{}, result interface{}) error {
+func ConvertStructToInterface(structToConvert interface{}, result interface{}) error {
 	b, e := json.Marshal(structToConvert)
 	if e != nil {
 		return errors.New("JSON marshelling error")
@@ -73,4 +76,16 @@ func SetMapValueIfNotEmpty(m map[string]interface{}, key string, value string) {
 	if value != "" {
 		m[key] = value
 	}
+}
+
+func GenerateEnrollmentCode(phoneNumber string) string {
+	log.Info("Generating the code for the length : ",
+		config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode, config.Config.EnrollmentCreation.MaxRetryCount)
+	digits := 0
+
+	n:= config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode
+	for ;n>=1;n-- {
+		digits  = digits * 10 + 9
+	}
+	return phoneNumber + "-" + strconv.Itoa(rand.Intn(digits))
 }

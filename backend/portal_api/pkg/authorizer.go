@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"strings"
@@ -33,7 +34,7 @@ func Init() {
 }
 
 func HasResourceRole(clientId string, role string, principal *models.JWTClaimBody) bool {
-	return contains(principal.ResourceAccess[clientId].Roles, role)
+	return utils.Contains(principal.ResourceAccess[clientId].Roles, role)
 }
 
 func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaimBody, error) {
@@ -42,10 +43,10 @@ func RoleAuthorizer(bearerToken string, expectedRole []string) (*models.JWTClaim
 		return nil, err
 	}
 	for _, role := range expectedRole {
-		if contains(claimBody.ResourceAccess[clientId].Roles, role) {
+		if utils.Contains(claimBody.ResourceAccess[clientId].Roles, role) {
 			return claimBody, err
 		}
-		if contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
+		if utils.Contains(claimBody.ResourceAccess[portalClientId].Roles, role) {
 			return claimBody, err
 		}
 	}

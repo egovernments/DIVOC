@@ -4,6 +4,7 @@ import (
 	"errors"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/pkg/services"
+	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"net/http"
@@ -193,7 +194,7 @@ func hasUserGroupChanged(newGroups []*models.UserGroup, existingGroups []*models
 		}
 	}
 
-	return !isEqual(newGroupIds, existingGroupIds)
+	return !utils.IsEqual(newGroupIds, existingGroupIds)
 
 }
 

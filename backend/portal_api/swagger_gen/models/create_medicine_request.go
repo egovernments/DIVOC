@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/go-openapi/errors"
@@ -67,6 +66,7 @@ func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *CreateMedicineRequest) validateSchedule(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}
@@ -116,6 +116,7 @@ func (m *CreateMedicineRequest) validateStatusEnum(path, location string, value 
 }
 
 func (m *CreateMedicineRequest) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -161,6 +162,7 @@ func (m *CreateMedicineRequest) validateVaccinationModeEnum(path, location strin
 }
 
 func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -168,34 +170,6 @@ func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry)
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this create medicine request based on the context it is used
-func (m *CreateMedicineRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateSchedule(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *CreateMedicineRequest) contextValidateSchedule(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Schedule != nil {
-		if err := m.Schedule.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("schedule")
-			}
-			return err
-		}
 	}
 
 	return nil
@@ -236,11 +210,6 @@ type CreateMedicineRequestSchedule struct {
 
 // Validate validates this create medicine request schedule
 func (m *CreateMedicineRequestSchedule) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this create medicine request schedule based on context it is used
-func (m *CreateMedicineRequestSchedule) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

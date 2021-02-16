@@ -1,4 +1,4 @@
-IMAGES:=portal_api vaccination_api certificate_processor analytics_feed notification-service digilocker_support_api
+IMAGES:=portal_api registration_api vaccination_api certificate_processor analytics_feed notification-service digilocker_support_api
 
 docker:
 	@mkdir dockerdeps || true
