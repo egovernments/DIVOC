@@ -10,6 +10,8 @@ import withStyles from "@material-ui/core/styles/withStyles";
 import Switch from "@material-ui/core/Switch/Switch";
 import SearchVaccinatorResultsView from "../SearchVaccinatorResults/SearchVaccinatorResultsView";
 import {useSelector} from "react-redux";
+import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
+import InputMask from "../../InputMask/InputMask";
 
 
 export default function VaccinatorDetails({
@@ -251,13 +253,12 @@ export default function VaccinatorDetails({
                                 <label htmlFor="email">
                                     Email *
                                 </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.email}
+                                <InputMask
                                     type="email"
                                     id="email"
-                                    onChange={(evt) => onValueChange(evt, "email")}
-                                    required />
+                                    defaultValue={vaccinator.email}
+                                    handleChange={(evt) => onValueChange(evt, "email")}
+                                />
                             </div>
                         </div>
                         <div className="form-row">
@@ -265,25 +266,23 @@ export default function VaccinatorDetails({
                                 <label htmlFor="mobileNumber">
                                     Mobile *
                                 </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.mobileNumber}
+                                <InputMask
                                     type="text"
                                     id="mobileNumber"
-                                    onChange={(evt) => onValueChange(evt, "mobileNumber")}
-                                    required />
+                                    defaultValue={vaccinator.mobileNumber}
+                                    handleChange={(evt) => onValueChange(evt, "mobileNumber")}
+                                />
                             </div>
                             <div className="col-md-6">
                                 <label htmlFor="nationalIdentifier">
                                     National Identifier *
                                 </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.nationalIdentifier}
+                                <InputMask
                                     type="text"
                                     id="nationalIdentifier"
-                                    onChange={(evt) => onValueChange(evt, "nationalIdentifier")}
-                                    required />
+                                    defaultValue={vaccinator.nationalIdentifier}
+                                    handleChange={(evt) => onValueChange(evt, "nationalIdentifier")}
+                                />
                             </div>
                         </div>
                         <div className="form-row">
@@ -291,13 +290,12 @@ export default function VaccinatorDetails({
                                 <label htmlFor="licenseNumber">
                                     License Number *
                                 </label>
-                                <input
-                                    className="form-control"
-                                    value = {vaccinator.code}
+                                <InputMask 
                                     type="text"
                                     id="licenseNumber"
-                                    onChange={(evt) => onValueChange(evt, "code")}
-                                    required />
+                                    defaultValue={vaccinator.code}
+                                    handleChange={(evt) => onValueChange(evt, "code")}
+                                />
                             </div>
                         </div>
                     </form>

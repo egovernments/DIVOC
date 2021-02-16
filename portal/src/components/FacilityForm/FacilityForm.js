@@ -6,6 +6,7 @@ import "./FacilityForm.scss"
 import {useKeycloak} from "@react-keycloak/web";
 import { API_URL, CONSTANTS, FACILITY_TYPE } from "../../utils/constants";
 import { update } from "ramda";
+import InputMask from "../InputMask/InputMask";
 import WeekDaysSelect from "../WeekDaysSelect";
 
 function FacilityForm({facility, refreshFacility, heading}) {
@@ -294,19 +295,31 @@ function FacilityForm({facility, refreshFacility, heading}) {
                             <div>
                                 <label>
                                     <div><b>Name: </b></div>
-                                    <input type="text" name="adminName" defaultValue={facility.admins[0].name} disabled={!editAdmin} onChange={handleChange}/>
+                                    <input className="form-control" type="text" name="adminName" defaultValue={facility.admins[0].name} disabled={!editAdmin} onChange={handleChange}/>
                                 </label>
                             </div>
                             <div>
                                 <label>
                                     <div><b>Contact: </b></div>
-                                    <input type="tel" name="adminContact" defaultValue={facility.admins[0].mobile} disabled={!editAdmin} onChange={handleChange}/>
+                                    <InputMask
+                                        type="tel" 
+                                        name="adminContact"
+                                        defaultValue={facility.admins[0].mobile}
+                                        disabled={!editAdmin}
+                                        handleChange={handleChange}
+                                    />
                                 </label>
                             </div>
                             <div>
                                 <label>
                                     <div><b>Email: </b></div>
-                                    <input type="text" name="adminEmail" defaultValue={facility.admins[0].email} disabled={!editAdmin} onChange={handleChange}/>
+                                    <InputMask 
+                                        type="text"
+                                        name="adminEmail" 
+                                        defaultValue={facility.admins[0].email}
+                                        disabled={!editAdmin} 
+                                        handleChange={handleChange}
+                                    />
                                 </label>
                             </div>
                         </div>
@@ -317,4 +330,5 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 }
             </div>
         </form></Container>}
+
 export default FacilityForm;
