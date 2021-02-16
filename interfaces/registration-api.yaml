@@ -24,3 +24,50 @@ paths:
       responses:
         '200':
           description: OK
+  /generateOTP:
+   post:
+     summary: Generate OTP
+     operationId: generateOTP
+     parameters:
+       - in: body
+         name: body
+         required: true
+         schema:
+          type: object
+          properties:
+            phone:
+              type: string
+     responses:
+       '200':
+         description: OK
+       '204':
+         description: Phone number is empty
+       '500':
+         description: Intern Error
+  /verifyOTP:
+    post:
+      summary: Verify OTP
+      operationId: verifyOTP
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              phone:
+                type: string
+              otp:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '401':
+          description: Invalid OTP
+        '204':
+          description: OTP is empty

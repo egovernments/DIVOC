@@ -18,6 +18,12 @@ var (
 
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "schemes": [
     "https"
   ],
@@ -29,6 +35,38 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
+    "/generateOTP": {
+      "post": {
+        "summary": "Generate OTP",
+        "operationId": "generateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Phone number is empty"
+          },
+          "500": {
+            "description": "Intern Error"
+          }
+        }
+      }
+    },
     "/register": {
       "post": {
         "summary": "Enroll Recipient",
@@ -49,10 +87,59 @@ func init() {
           }
         }
       }
+    },
+    "/verifyOTP": {
+      "post": {
+        "summary": "Verify OTP",
+        "operationId": "verifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "OTP is empty"
+          },
+          "401": {
+            "description": "Invalid OTP"
+          }
+        }
+      }
     }
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "schemes": [
     "https"
   ],
@@ -64,6 +151,38 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
+    "/generateOTP": {
+      "post": {
+        "summary": "Generate OTP",
+        "operationId": "generateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Phone number is empty"
+          },
+          "500": {
+            "description": "Intern Error"
+          }
+        }
+      }
+    },
     "/register": {
       "post": {
         "summary": "Enroll Recipient",
@@ -81,6 +200,49 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/verifyOTP": {
+      "post": {
+        "summary": "Verify OTP",
+        "operationId": "verifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "OTP is empty"
+          },
+          "401": {
+            "description": "Invalid OTP"
           }
         }
       }
@@ -144,7 +306,6 @@ func init() {
       "type": "object",
       "required": [
         "phone",
-        "enrollmentScopeId",
         "nationalId",
         "dob"
       ],
