@@ -63,7 +63,7 @@ export class ApiServices {
                     ],
                     dob: patientDetails.dob,
                     gender: patientDetails.gender,
-                    identity: item.identity ? "did:in.gov.uidai.aadhaar:" + item.identity : "",
+                    identity: item.identity ? item.identity : "",
                     name: patientDetails.name,
                     nationality: patientDetails.nationalId,
 
