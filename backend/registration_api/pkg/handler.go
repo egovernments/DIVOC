@@ -24,7 +24,7 @@ func enrollRecipient(params operations.EnrollRecipientParams) middleware.Respond
 	}
 	return operations.NewEnrollRecipientOK()
 }
-const attemptsKeyPattern = "-attempts"
+
 func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	phone := params.Body.Phone
 	if phone == "" {
