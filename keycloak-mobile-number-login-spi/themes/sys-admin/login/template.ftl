@@ -38,7 +38,7 @@
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
+        <#--<div class="collapse navbar-collapse justify-content-end" id="navbarNavDropdown">
             <ul class="navbar-nav">
                 <li class="nav-item">
                     <a class="nav-link" href="#">MAP</a>
@@ -58,7 +58,7 @@
                 </li>
 
             </ul>
-        </div>
+        </div>-->
     </nav>
     <#nested "header">
     <div class="login-content" style="">
@@ -85,7 +85,7 @@
             <img class="main-img" src="${url.resourcesPath}/img/login-bg.png" alt="">
         </div>
     </div>
-    <div class="footer-content">
+    <#--<div class="footer-content">
         <div>
         </div>
         <div class="d-none d-lg-block">
@@ -93,7 +93,7 @@
             <span class="footer-link">Term of use</span>
             <span class="footer-link">Privacy Policy</span>
         </div>
-    </div>
+    </div>-->
     </body>
     </html>
 </#macro>
