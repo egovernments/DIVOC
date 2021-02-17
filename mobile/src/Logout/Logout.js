@@ -7,6 +7,7 @@ import {SyncFacade} from "../SyncFacade";
 import * as PropTypes from "prop-types";
 import {AuthSafeComponent} from "../utils/keycloak";
 import {Messages} from "../Base/Constants";
+import config from "../config";
 
 function AuthSafeLogout({keycloak}) {
     return <div className="logout-container">
@@ -18,7 +19,7 @@ function AuthSafeLogout({keycloak}) {
                             .push()
                             .catch((e) => console.log(e.message))
                             .then(() => appIndexDb.clearEverything())
-                            .then((() => keycloak.logout({redirectUri: window.location.origin + "/facility_app"})))
+                            .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                             .catch(e => {
                                 console.log(e.message)
                                 if (!navigator.onLine) {

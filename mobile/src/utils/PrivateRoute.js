@@ -19,7 +19,7 @@ function WithKeyCloakRoute({component: Component, ...rest}) {
         if (keycloak.authenticated) {
             if (!keycloak.hasResourceRole(CONSTANT.FACILITY_STAFF_ROLE, CONSTANT.PORTAL_CLIENT)) {
                 alert("Unauthorized. Contact ADMIN");
-                keycloak.logout({redirectUri: window.location.origin + "/facility_app"});
+                keycloak.logout({redirectUri: window.location.origin + config.urlPath});
             }
         }
     }, [keycloak]);

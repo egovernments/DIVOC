@@ -21,7 +21,7 @@ function App({keycloak, initialized}) {
             if (keycloak.authenticated) {
                 if (!keycloak.hasResourceRole(CONSTANT.FACILITY_STAFF_ROLE, CONSTANT.PORTAL_CLIENT)) {
                     alert("Unauthorized. Contact ADMIN");
-                    keycloak.logout({redirectUri: window.location.origin + "/facility_app"});
+                    keycloak.logout({redirectUri: window.location.origin + config.urlPath});
                 } else {
                     localStorage.setItem("token", keycloak.token);
                     SyncFacade.pull().then(value => {
@@ -33,7 +33,7 @@ function App({keycloak, initialized}) {
                 }
             } else {
                 if (!keycloak.authenticated) {
-                    keycloak.login({redirectUri: config.urlPath})
+                    keycloak.login({redirectUri: window.location.origin + config.urlPath})
                 }
             }
             storeApplicationConfigFromFlagr(store.dispatch)
