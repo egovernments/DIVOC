@@ -164,7 +164,7 @@ func getVaccinatorsHandler(params operations.GetVaccinatorsParams, principal *mo
 
 	if params.Name != nil && !strings.EqualFold(*params.Name, "ALL") {
 		filter["name"] = map[string]interface{}{
-			"startsWith": params.Name,
+			"contains": params.Name,
 		}
 	}
 	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
