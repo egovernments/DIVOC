@@ -31,7 +31,7 @@ func NewCertify(ctx *middleware.Context, handler CertifyHandler) *Certify {
 	return &Certify{Context: ctx, Handler: handler}
 }
 
-/*Certify swagger:route POST /certify certification certify
+/* Certify swagger:route POST /certify certification certify
 
 Certify the one or more vaccination
 
@@ -49,7 +49,6 @@ func (o *Certify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewCertifyParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -69,7 +68,6 @@ func (o *Certify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

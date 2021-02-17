@@ -867,8 +867,22 @@ func init() {
             "type": "object",
             "title": "medicine",
             "properties": {
+              "doseIntervals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "max": {
+                      "type": "integer"
+                    },
+                    "min": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
               "effectiveUntil": {
-                "description": "Number of months the vaccination is effective",
+                "description": "Number of days the vaccination is effective after last dose",
                 "type": "integer"
               },
               "name": {
@@ -879,17 +893,6 @@ func init() {
               },
               "provider": {
                 "type": "string"
-              },
-              "schedule": {
-                "type": "object",
-                "properties": {
-                  "repeatInterval": {
-                    "type": "integer"
-                  },
-                  "repeatTimes": {
-                    "type": "integer"
-                  }
-                }
               },
               "status": {
                 "type": "string",
@@ -2047,8 +2050,14 @@ func init() {
       "type": "object",
       "title": "medicine",
       "properties": {
+        "doseIntervals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ProgramMedicinesItems0DoseIntervalsItems0"
+          }
+        },
         "effectiveUntil": {
-          "description": "Number of months the vaccination is effective",
+          "description": "Number of days the vaccination is effective after last dose",
           "type": "integer"
         },
         "name": {
@@ -2059,17 +2068,6 @@ func init() {
         },
         "provider": {
           "type": "string"
-        },
-        "schedule": {
-          "type": "object",
-          "properties": {
-            "repeatInterval": {
-              "type": "integer"
-            },
-            "repeatTimes": {
-              "type": "integer"
-            }
-          }
         },
         "status": {
           "type": "string",
@@ -2089,13 +2087,13 @@ func init() {
         }
       }
     },
-    "ProgramMedicinesItems0Schedule": {
+    "ProgramMedicinesItems0DoseIntervalsItems0": {
       "type": "object",
       "properties": {
-        "repeatInterval": {
+        "max": {
           "type": "integer"
         },
-        "repeatTimes": {
+        "min": {
           "type": "integer"
         }
       }

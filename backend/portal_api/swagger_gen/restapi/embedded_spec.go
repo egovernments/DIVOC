@@ -1262,9 +1262,26 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "doseIntervals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "max": {
+                "type": "integer"
+              },
+              "min": {
+                "type": "integer"
+              },
+              "osid": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "effectiveUntil": {
-          "description": "Effective until n months after the full vaccination schedule is completed",
-          "type": "number"
+          "description": "Effective until n days after the last dose",
+          "type": "integer"
         },
         "name": {
           "type": "string"
@@ -1275,22 +1292,6 @@ func init() {
         },
         "provider": {
           "type": "string"
-        },
-        "schedule": {
-          "type": "object",
-          "properties": {
-            "osid": {
-              "type": "string"
-            },
-            "repeatInterval": {
-              "description": "Number of times the vaccination should be taken.",
-              "type": "number"
-            },
-            "repeatTimes": {
-              "description": "How many times vaccination should be taken",
-              "type": "number"
-            }
-          }
         },
         "status": {
           "type": "string",
@@ -3310,9 +3311,15 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "doseIntervals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateMedicineRequestDoseIntervalsItems0"
+          }
+        },
         "effectiveUntil": {
-          "description": "Effective until n months after the full vaccination schedule is completed",
-          "type": "number"
+          "description": "Effective until n days after the last dose",
+          "type": "integer"
         },
         "name": {
           "type": "string"
@@ -3323,22 +3330,6 @@ func init() {
         },
         "provider": {
           "type": "string"
-        },
-        "schedule": {
-          "type": "object",
-          "properties": {
-            "osid": {
-              "type": "string"
-            },
-            "repeatInterval": {
-              "description": "Number of times the vaccination should be taken.",
-              "type": "number"
-            },
-            "repeatTimes": {
-              "description": "How many times vaccination should be taken",
-              "type": "number"
-            }
-          }
         },
         "status": {
           "type": "string",
@@ -3358,19 +3349,17 @@ func init() {
         }
       }
     },
-    "CreateMedicineRequestSchedule": {
+    "CreateMedicineRequestDoseIntervalsItems0": {
       "type": "object",
       "properties": {
+        "max": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "integer"
+        },
         "osid": {
           "type": "string"
-        },
-        "repeatInterval": {
-          "description": "Number of times the vaccination should be taken.",
-          "type": "number"
-        },
-        "repeatTimes": {
-          "description": "How many times vaccination should be taken",
-          "type": "number"
         }
       }
     },

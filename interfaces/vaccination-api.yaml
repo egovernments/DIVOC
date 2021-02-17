@@ -538,16 +538,18 @@ definitions:
             vaccinationMode:
               type: string
               enum: ["muscular injection", "oral", "nasal"]
-            schedule:
-              type: object
-              properties:
-                repeatTimes:
-                  type: integer
-                repeatInterval:
-                  type: integer
+            doseIntervals:
+              type: array
+              items:
+                type: object
+                properties:
+                  min:
+                    type: integer
+                  max:
+                    type: integer
             effectiveUntil:
               type: integer
-              description: Number of months the vaccination is effective
+              description: Number of days the vaccination is effective after last dose
             status:
               type: string
               enum: ["Active", "Inactive", "Blocked"]

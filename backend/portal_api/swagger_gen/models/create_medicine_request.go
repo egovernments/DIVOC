@@ -6,7 +6,9 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -19,8 +21,11 @@ import (
 // swagger:model CreateMedicineRequest
 type CreateMedicineRequest struct {
 
-	// Effective until n months after the full vaccination schedule is completed
-	EffectiveUntil float64 `json:"effectiveUntil,omitempty"`
+	// dose intervals
+	DoseIntervals []*CreateMedicineRequestDoseIntervalsItems0 `json:"doseIntervals"`
+
+	// Effective until n days after the last dose
+	EffectiveUntil int64 `json:"effectiveUntil,omitempty"`
 
 	// name
 	Name string `json:"name,omitempty"`
@@ -30,9 +35,6 @@ type CreateMedicineRequest struct {
 
 	// provider
 	Provider string `json:"provider,omitempty"`
-
-	// schedule
-	Schedule *CreateMedicineRequestSchedule `json:"schedule,omitempty"`
 
 	// status
 	// Enum: [Active Inactive Blocked]
@@ -47,7 +49,7 @@ type CreateMedicineRequest struct {
 func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateSchedule(formats); err != nil {
+	if err := m.validateDoseIntervals(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -65,19 +67,25 @@ func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *CreateMedicineRequest) validateSchedule(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Schedule) { // not required
+func (m *CreateMedicineRequest) validateDoseIntervals(formats strfmt.Registry) error {
+	if swag.IsZero(m.DoseIntervals) { // not required
 		return nil
 	}
 
-	if m.Schedule != nil {
-		if err := m.Schedule.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("schedule")
-			}
-			return err
+	for i := 0; i < len(m.DoseIntervals); i++ {
+		if swag.IsZero(m.DoseIntervals[i]) { // not required
+			continue
 		}
+
+		if m.DoseIntervals[i] != nil {
+			if err := m.DoseIntervals[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -116,7 +124,6 @@ func (m *CreateMedicineRequest) validateStatusEnum(path, location string, value 
 }
 
 func (m *CreateMedicineRequest) validateStatus(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -162,7 +169,6 @@ func (m *CreateMedicineRequest) validateVaccinationModeEnum(path, location strin
 }
 
 func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -170,6 +176,38 @@ func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry)
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this create medicine request based on the context it is used
+func (m *CreateMedicineRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateDoseIntervals(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CreateMedicineRequest) contextValidateDoseIntervals(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.DoseIntervals); i++ {
+
+		if m.DoseIntervals[i] != nil {
+			if err := m.DoseIntervals[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -193,28 +231,33 @@ func (m *CreateMedicineRequest) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// CreateMedicineRequestSchedule create medicine request schedule
+// CreateMedicineRequestDoseIntervalsItems0 create medicine request dose intervals items0
 //
-// swagger:model CreateMedicineRequestSchedule
-type CreateMedicineRequestSchedule struct {
+// swagger:model CreateMedicineRequestDoseIntervalsItems0
+type CreateMedicineRequestDoseIntervalsItems0 struct {
+
+	// max
+	Max int64 `json:"max,omitempty"`
+
+	// min
+	Min int64 `json:"min,omitempty"`
 
 	// osid
 	Osid string `json:"osid,omitempty"`
-
-	// Number of times the vaccination should be taken.
-	RepeatInterval float64 `json:"repeatInterval,omitempty"`
-
-	// How many times vaccination should be taken
-	RepeatTimes float64 `json:"repeatTimes,omitempty"`
 }
 
-// Validate validates this create medicine request schedule
-func (m *CreateMedicineRequestSchedule) Validate(formats strfmt.Registry) error {
+// Validate validates this create medicine request dose intervals items0
+func (m *CreateMedicineRequestDoseIntervalsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this create medicine request dose intervals items0 based on context it is used
+func (m *CreateMedicineRequestDoseIntervalsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *CreateMedicineRequestSchedule) MarshalBinary() ([]byte, error) {
+func (m *CreateMedicineRequestDoseIntervalsItems0) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -222,8 +265,8 @@ func (m *CreateMedicineRequestSchedule) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *CreateMedicineRequestSchedule) UnmarshalBinary(b []byte) error {
-	var res CreateMedicineRequestSchedule
+func (m *CreateMedicineRequestDoseIntervalsItems0) UnmarshalBinary(b []byte) error {
+	var res CreateMedicineRequestDoseIntervalsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

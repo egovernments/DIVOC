@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetAnalyticsParams creates a new GetAnalyticsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetAnalyticsParams() GetAnalyticsParams {
 
 	return GetAnalyticsParams{}
