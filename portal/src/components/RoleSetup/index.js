@@ -243,7 +243,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
             <BorderLessTableCell>
                 <FormControl variant="outlined" className="selectorHeight" fullWidth>
                     <label htmlFor="demo-simple-select-outlined">
-                        Role Type
+                        Role Type *
                     </label>
                     <Select
                         className="roleTypeMenu"
@@ -267,7 +267,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
             <BorderLessTableCell>
                 <>
                     <label htmlFor="name">
-                        Name
+                        Name *
                     </label>
                     <input
                         className="form-control"
@@ -281,7 +281,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
             <BorderLessTableCell>
                 <>
                     <label htmlFor="mobileNumber">
-                        Mobile Number
+                        Mobile Number *
                     </label>
                     <input
                         disabled = {staff.type === OLD_USER}
@@ -296,7 +296,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
             <BorderLessTableCell>
                 <>
                     <label htmlFor="employeeId">
-                        Employee Id
+                        Employee Id *
                     </label>
                     <input
                         className="form-control"
