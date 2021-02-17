@@ -18,6 +18,11 @@ const defaultState = {
 };
 
 function FacilityController() {
+    Date.prototype.withoutTime = function () {
+        var d = new Date(this);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    };
     const [isLoading, setIsLoading] = useState(false);
     const axiosInstance = useAxios('');
     const [facilities, setFacilities] = useState([]);
@@ -210,7 +215,8 @@ function FacilityController() {
 
                         if(rateUpdatedFrom !== ""  && rateUpdatedTo !== "" && isFiltersMatched) {
                             const program = findBy(item["programs"], "name", selectedProgram)
-                            if (!(new Date(program.rateUpdatedAt) >= rateUpdatedFrom && new Date(program.rateUpdatedAt) <= rateUpdatedTo)) {
+                            let programRateUpdatedAt = new Date(program.rateUpdatedAt);
+                            if (!(programRateUpdatedAt.withoutTime() >= rateUpdatedFrom.withoutTime() && programRateUpdatedAt.withoutTime() <= rateUpdatedTo.withoutTime())) {
                                 isFiltersMatched = false
                             }
                         }
