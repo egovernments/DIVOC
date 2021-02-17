@@ -342,7 +342,7 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
                                 setShowRateModal(true);
                                 setSelectedStaffIndex(index)
                             }}
-                            disabled={staff.groups[0].id !== staffGroup.id}>
+                            disabled={staff.groups.length > 0 && staff.groups[0].id !== staffGroup.id}>
                         SET RATE
                     </Button>
                     <Button className="mr-2" variant="outlinedPrimary" onClick={deleteStaff}>
