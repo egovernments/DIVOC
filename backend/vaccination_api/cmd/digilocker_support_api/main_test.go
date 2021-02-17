@@ -1,6 +1,9 @@
 package main
 
-import "testing"
+import (
+	"testing"
+)
+
 
 func Test_getVaccineValidDays(t *testing.T) {
 	type args struct {
@@ -32,6 +35,30 @@ func Test_getVaccineValidDays(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getVaccineValidDays(tt.args.start, tt.args.end); got != tt.want {
 				t.Errorf("getVaccineValidDays() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_maskId(t *testing.T) {
+	type args struct {
+		id string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{"aadhaar format", args{"123456789012"}, "XXXXXXXX9012",},
+		{"blank id", args{""}, "",},
+		{"one chars", args{"a"}, "X",},
+		{"two chars", args{"aa"}, "XX",},
+		{"three chars", args{"123"}, "XX3",},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := maskId(tt.args.id); got != tt.want {
+				t.Errorf("maskId() = %v, want %v", got, tt.want)
 			}
 		})
 	}

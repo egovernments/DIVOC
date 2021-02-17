@@ -4,23 +4,24 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/divoc/api/pkg"
-	"github.com/divoc/api/pkg/models"
-	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"time"
 )
 
 type ErrorResponse struct {
-	Status  string `json:"status"`
-	ErrorCode    int     `json:"errorCode"`
-	Message string `json:"message"`
+	Status    string `json:"status"`
+	ErrorCode int    `json:"errorCode"`
+	Message   string `json:"message"`
+}
+
+func getCertificatePDFExternalApiHandler(w http.ResponseWriter, r *http.Request) {
+	getCertificatePDFHandler(w, r, EventTagExternal)
 }
 
 
-func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("GET PDF HANDLER REQUEST")
+func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag string) {
+	log.Infof("pdf request %s", eventTag)
 	var requestBody map[string]interface{}
 	err := json.NewDecoder(r.Body).Decode(&requestBody)
 	mobile, found := requestBody[Mobile]
@@ -34,12 +35,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
-		go kafkaService.PublishEvent(models.Event{
-			Date:          time.Now(),
-			Source:        "",
-			TypeOfMessage: ExternalFailedEvent,
-			ExtraInfo:     "Invalid parameters",
-		})
+		publishEvent("", eventTag + EventTagFailed, "Invalid parameters")
 		return
 	}
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
@@ -52,38 +48,31 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 			mobileOnCert := certificateObj["mobile"].(string)
 			if mobile != mobileOnCert {
 				writeResponse(w, 404, mobileNumberMismatchError())
+				publishEvent(pkg.ToString(beneficiaryId), eventTag + EventTagFailed, "Certificate not found")
 				return
 			} else {
 				signedJson := certificateObj["certificate"].(string)
 				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
 					log.Errorf("Error in creating certificate pdf")
+					publishEvent(pkg.ToString(beneficiaryId), eventTag + EventTagFailed, "Unknown " + err.Error())
+					w.WriteHeader(500)
 				} else {
-					//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
-					//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
-					//w.Header().Set("Content-Length", string(len(pdfBytes)))
 					w.WriteHeader(200)
 					_, _ = w.Write(pdfBytes)
-					go kafkaService.PublishEvent(models.Event{
-						Date:          time.Now(),
-						Source:        pkg.ToString(beneficiaryId),
-						TypeOfMessage: ExternalSuccessEvent,
-						ExtraInfo:     "Certificate found",
-					})
+					publishEvent(pkg.ToString(beneficiaryId), eventTag + EventTagSuccess, "Certificate found")
 				}
 			}
 		} else {
 			log.Errorf("No certificates found for request %v", filter)
 			writeResponse(w, 404, certificateNotFoundForBeneficiaryId(pkg.ToString(beneficiaryId)))
+			publishEvent(pkg.ToString(beneficiaryId), eventTag + EventTagFailed, "Certificate not found")
 		}
 	} else {
 		log.Infof("Error %+v", err)
+		publishEvent(pkg.ToString(beneficiaryId), eventTag + EventTagFailed, "Unknown " + err.Error())
+		w.WriteHeader(500)
 	}
-	go kafkaService.PublishEvent(models.Event{
-		Date:          time.Now(),
-		Source:        pkg.ToString(beneficiaryId),
-		TypeOfMessage: ExternalFailedEvent,
-		ExtraInfo:     "Certificate not found",
-	})
+
 }
 
 func mobileNumberMismatchError() ErrorResponse {
@@ -94,7 +83,6 @@ func mobileNumberMismatchError() ErrorResponse {
 	}
 	return payload
 }
-
 
 func getCertificates(w http.ResponseWriter, request *http.Request) {
 	log.Info("GET CERTIFICATES JSON ")
@@ -111,12 +99,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 	if mobile == nil || beneficiaryId == nil {
 		log.Errorf("get certificates requested with no parameters, %v", requestBody)
 		w.WriteHeader(400)
-		go kafkaService.PublishEvent(models.Event{
-			Date:          time.Now(),
-			Source:        "",
-			TypeOfMessage: ExternalFailedEvent,
-			ExtraInfo:     "Invalid parameters",
-		})
+		publishEvent("", EventTagExternal + EventTagFailed, "Invalid parameters")
 		return
 	}
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
@@ -141,31 +124,24 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 					w.WriteHeader(200)
 					w.Header().Set("Content-Type", "application/json")
 					_, _ = w.Write(responseBytes)
-					go kafkaService.PublishEvent(models.Event{
-						Date:          time.Now(),
-						Source:        pkg.ToString(beneficiaryId),
-						TypeOfMessage: ExternalSuccessEvent,
-						ExtraInfo:     "Certificate found",
-					})
+					publishEvent(pkg.ToString(beneficiaryId), EventTagExternal + EventTagSuccess, "Certificate found")
 					return
 				}
 			} else { //no certificate found for this mobile --
 				writeResponse(w, 404, mobileNumberMismatchError())
+				publishEvent(pkg.ToString(beneficiaryId), EventTagExternal + EventTagFailed, "Certificate not found")
 			}
 		} else {
 			log.Errorf("No certificates found for request %v", filter)
 			writeResponse(w, 404, certificateNotFoundForBeneficiaryId(pkg.ToString(beneficiaryId)))
+			publishEvent(pkg.ToString(beneficiaryId), EventTagExternal + EventTagFailed, "Certificate not found")
 		}
 	} else {
 		log.Errorf("Error in querying registry %v , %+v", filter, err)
 		w.WriteHeader(500)
+		publishEvent(pkg.ToString(beneficiaryId), EventTagExternal + EventTagError, err.Error())
+		return
 	}
-	go kafkaService.PublishEvent(models.Event{
-		Date:          time.Now(),
-		Source:        pkg.ToString(beneficiaryId),
-		TypeOfMessage: ExternalFailedEvent,
-		ExtraInfo:     "Certificate not found",
-	})
 }
 
 func certificateNotFoundForBeneficiaryId(beneficiaryId string) ErrorResponse {

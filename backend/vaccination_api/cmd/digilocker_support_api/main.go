@@ -27,6 +27,7 @@ import (
 	"math"
 	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -38,12 +39,15 @@ const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
+
 const DigilockerSuccessEvent = "digilocker-success"
 const DigilockerFailedEvent = "digilocker-failed"
-const InternalSuccessEvent = "internal-success"
-const InternalFailedEvent = "internal-failed"
-const ExternalSuccessEvent = "external-success"
-const ExternalFailedEvent = "external-failed"
+
+const EventTagSuccess = "-success"
+const EventTagFailed = "-failed"
+const EventTagError = "-error"
+const EventTagExternal = "external"
+const EventTagInternal = "internal"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
@@ -286,11 +290,21 @@ func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
 }
 
+func maskId(id string) string {
+	reg, _ := regexp.Compile(".")
+	limit := int(math.Ceil(float64(len(id)) * .6))
+	return reg.ReplaceAllString(id[:limit], "X") + id[limit:]
+}
+
 func formatId(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "aadhaar") {
-		return "Aadhaar # XXXX XXXX XXXX " + lastFragment[len(lastFragment)-4:]
+	if strings.Contains(identity, "adhaar") {
+		if len(lastFragment)>0 {
+			return "Aadhaar  # " + maskId(lastFragment)
+		} else {
+			return "Aadhaar"
+		}
 	}
 	if strings.Contains(identity, "Driving") {
 		return "Driver’s License # " + lastFragment
@@ -376,8 +390,29 @@ func compress(certificateText string) (*bytes.Buffer, error) {
 	return buf, err
 }
 
+func handleFetchPDFPostRequest(w http.ResponseWriter, r *http.Request) {
+	getCertificatePDFHandler(w, r, EventTagInternal)
+}
+
+func headPDFHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	signedJson, err := getSignedJson(preEnrollmentCode)
+	if err != nil {
+		log.Infof("Error %+v", err)
+		w.WriteHeader(500)
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Internal error")
+		return
+	}
+	if signedJson != "" {
+		w.WriteHeader(200);
+	} else {
+		w.WriteHeader(404);
+	}
+}
+
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("GET PDF HANDLER REQUEST")
+	log.Info("get pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	signedJson, err := getSignedJson(preEnrollmentCode)
@@ -385,27 +420,25 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Infof("Error %+v", err)
 		w.WriteHeader(500)
-		publishEvent(preEnrollmentCode, InternalFailedEvent, "Internal error")
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
 		return
 	}
 
 	if signedJson != "" {
 		if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
 			log.Errorf("Error in creating certificate pdf")
-			publishEvent(preEnrollmentCode, InternalFailedEvent, "Error in creating pdf")
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
 		} else {
 			w.WriteHeader(200)
 			_, _ = w.Write(pdfBytes)
-			publishEvent(preEnrollmentCode, InternalSuccessEvent, "Certificate found")
-			return
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate found")
 		}
 	} else {
 		log.Errorf("No certificates found for request %v", preEnrollmentCode)
 		w.WriteHeader(404)
-		publishEvent(preEnrollmentCode, InternalFailedEvent, "Certificate not found")
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
 	}
-
-	publishEvent(preEnrollmentCode, InternalFailedEvent, "Unknown")
 }
 
 var rdb = redis.NewClient(&redis.Options{
@@ -477,7 +510,7 @@ func timed(next http.HandlerFunc) http.HandlerFunc {
 		requestHistogram.Observe(float64(time.Since(startTime).Milliseconds()))
 	}
 }
-func authorize(next http.HandlerFunc, roles []string, eventType string) http.HandlerFunc {
+func authorize(next http.HandlerFunc, roles []string, eventTag string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		claimBody := auth.ExtractClaimBodyFromHeader(r)
 		if claimBody != nil {
@@ -487,12 +520,7 @@ func authorize(next http.HandlerFunc, roles []string, eventType string) http.Han
 				return
 			}
 		}
-		go kafkaService.PublishEvent(models.Event{
-			Date:          time.Now(),
-			Source:        "",
-			TypeOfMessage: eventType,
-			ExtraInfo:     "Unauthorized access",
-		})
+		publishEvent("", eventTag + EventTagFailed, "Unauthorized access")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
 }
@@ -509,11 +537,14 @@ func main() {
 	r.HandleFunc("/cert/api/pullUriRequest", timed(uriRequest)).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", timed(docRequest)).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent))).Methods("GET")
-	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, InternalFailedEvent))).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
+	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
+	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")
+
+	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	//external
-	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
-	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFHandler, []string{ArogyaSetuRole}, ExternalFailedEvent))).Methods("POST")
+	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, EventTagExternal))).Methods("POST")
+	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFExternalApiHandler, []string{ArogyaSetuRole}, EventTagExternal))).Methods("POST")
 
 	http.Handle("/", r)
 	_ = http.ListenAndServe(*addr, nil)
