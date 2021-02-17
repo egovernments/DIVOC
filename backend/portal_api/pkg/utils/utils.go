@@ -87,5 +87,5 @@ func GenerateEnrollmentCode(phoneNumber string) string {
 	for ;n>=1;n-- {
 		digits  = digits * 10 + 9
 	}
-	return phoneNumber + "-" + strconv.Itoa(rand.Intn(digits))
+	return strconv.Itoa(rand.Intn(digits))
 }
