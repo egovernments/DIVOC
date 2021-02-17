@@ -2,16 +2,16 @@ package services
 
 import (
 	"github.com/dgrijalva/jwt-go"
+	"github.com/divoc/registration-api/config"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
-// https://www.sohamkamani.com/golang/jwt-authentication/
+//Reference: https://www.sohamkamani.com/golang/jwt-authentication/
 
 type Claims struct {
 	Phone string
 	jwt.StandardClaims
 }
-
-var jwtKey = []byte("123456123456")
 
 func CreateRecipientToken(phone string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
@@ -21,17 +21,26 @@ func CreateRecipientToken(phone string) (string, error) {
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	keyFromPEM, err := jwt.ParseRSAPrivateKeyFromPEM(config.Config.Auth.PrivateKey)
+	if err != nil {
+		return "", err
+	}
+	log.Info("Got the private key ", keyFromPEM)
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+	tokenString, err := token.SignedString(keyFromPEM)
 	return tokenString, err
 }
 
 // Will be used by the handlers to validate the JWT
 func VerifyRecipientToken(jwtToken string) (string, error) {
+	keyFromPEM, _ := jwt.ParseRSAPublicKeyFromPEM(config.Config.Auth.PublicKey)
 	c := Claims{}
-	_, err := jwt.ParseWithClaims(jwtToken, &c, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+	token, err := jwt.ParseWithClaims(jwtToken, &c, func(token *jwt.Token) (interface{}, error) {
+		return keyFromPEM, nil
 	})
-	return c.Phone, err
+	if err!= nil {
+		log.Info("Unable to get the claims out of token", err)
+	}
+	claims := token.Claims.(*Claims)
+	return claims.Phone, err
 }

@@ -5,3 +5,6 @@ kafka:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
+auth:
+  privatekeypath: config/key.pem
+  publickeypath: config/pubkey.pem

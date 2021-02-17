@@ -1,8 +1,18 @@
 package config
 
-import "github.com/jinzhu/configor"
+import (
+	"github.com/jinzhu/configor"
+	"io/ioutil"
+)
 
 var Config = struct {
+	Auth struct{
+		PublicKeyPath string `yaml:"publickeypath"`
+		PrivateKeyPath string `yaml:"privatekeypath"`
+		PublicKey []byte
+		PrivateKey []byte
+	}
+
 	Kafka struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapservers"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
@@ -20,5 +30,13 @@ func Initialize() {
 
 	if err != nil {
 		panic("Unable to read configurations")
+	}
+	Config.Auth.PrivateKey, err = ioutil.ReadFile(Config.Auth.PrivateKeyPath)
+	if err != nil {
+		panic("Unable to read the private key")
+	}
+	Config.Auth.PublicKey, err = ioutil.ReadFile(Config.Auth.PublicKeyPath)
+	if err != nil {
+		panic("Unable to read the public key")
 	}
 }
