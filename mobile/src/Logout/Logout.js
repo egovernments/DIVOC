@@ -18,7 +18,7 @@ function AuthSafeLogout({keycloak}) {
                             .push()
                             .catch((e) => console.log(e.message))
                             .then(() => appIndexDb.clearEverything())
-                            .then((() => keycloak.logout()))
+                            .then((() => keycloak.logout({redirectUri: window.location.origin + "/facility_app"})))
                             .catch(e => {
                                 console.log(e.message)
                                 if (!navigator.onLine) {

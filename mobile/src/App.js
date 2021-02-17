@@ -11,6 +11,7 @@ import {getSelectedProgram, SelectProgram} from "./components/ProgramSelection";
 import {store} from "../src/redux/store";
 import {Provider} from "react-redux";
 import {storeApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
+import {CONSTANT} from "./utils/constants";
 
 function App({keycloak, initialized}) {
     const [isDBInit, setDBInit] = useState(false);
@@ -18,13 +19,18 @@ function App({keycloak, initialized}) {
     useEffect(() => {
         if (initialized) {
             if (keycloak.authenticated) {
-                localStorage.setItem("token", keycloak.token);
-                SyncFacade.pull().then(value => {
-                    setDBInit(true)
-                }).catch((e) => {
-                    console.log(e);
-                    setDBInit(true)
-                });
+                if (!keycloak.hasResourceRole(CONSTANT.FACILITY_STAFF_ROLE, CONSTANT.PORTAL_CLIENT)) {
+                    alert("Unauthorized. Contact ADMIN");
+                    keycloak.logout({redirectUri: window.location.origin + "/facility_app"});
+                } else {
+                    localStorage.setItem("token", keycloak.token);
+                    SyncFacade.pull().then(value => {
+                        setDBInit(true)
+                    }).catch((e) => {
+                        console.log(e);
+                        setDBInit(true)
+                    });
+                }
             } else {
                 if (!keycloak.authenticated) {
                     keycloak.login({redirectUri: config.urlPath})

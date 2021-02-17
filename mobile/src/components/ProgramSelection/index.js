@@ -145,7 +145,7 @@ function NoProgramFound({keycloak}) {
                     <h6 className="mb-4">There is no vaccination program associated with your facility. Please contact your facility
                         admin.</h6>
                     <Button variant="outline-danger" onClick={() => {
-                        keycloak.logout()
+                        keycloak.logout({redirectUri: window.location.origin + "/facility_app"});
                     }}>Logout</Button>{" "}
                 </div>
             </BaseCard>
