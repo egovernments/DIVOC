@@ -20,6 +20,7 @@ import {Modal} from "react-bootstrap";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormGroup from "@material-ui/core/FormGroup";
 import FormHelperText from "@material-ui/core/FormHelperText";
+import {CONSTANTS} from "../../utils/constants";
 
 const useStyles = makeStyles({
     table: {
@@ -159,14 +160,30 @@ export const RoleSetup = () => {
     }
 
     function deleteStaff(index) {
-        if(window.confirm('Are you sure to delete this record?')){
+        if (window.confirm('Are you sure to delete this record?')) {
             const staff = staffs[index];
             axiosInstance.current.delete('/divoc/admin/api/v1/facility/users/' + staff.id)
-            .then(res => {
-                fetchUsers()
-            });
+                .then(res => {
+                    fetchUsers()
+                });
         }
     }
+
+    function getValidPrograms() {
+        const staff = staffs[selectedStaffIndex];
+        if (staff && staff.vaccinationRateLimits.length === 0) {
+            if (facility.programs) {
+                return facility.programs.filter(program => program.status === CONSTANTS.ACTIVE);
+            }
+        } else if (staff && staff.vaccinationRateLimits.length > 0) {
+            if (facility.programs) {
+                const associatedProgramIds = staff.vaccinationRateLimits.map(prgm => prgm.programName);
+                return facility.programs.filter(program => associatedProgramIds.includes(program.programId) || program.status === CONSTANTS.ACTIVE);
+            }
+        }
+        return []
+    }
+
     return (
         <div>
             <TableContainer component={CustomPaper}>
@@ -188,7 +205,7 @@ export const RoleSetup = () => {
                     </TableBody>
                 </Table>
             </TableContainer>
-            <StaffProgramRate programs={facility.programs || []}
+            <StaffProgramRate programs={getValidPrograms()}
                               showModal={showRateModal}
                               addNewProgram={addNewProgram}
                               vaccinationRateLimits={selectedStaffIndex >= 0 ? staffs[selectedStaffIndex].vaccinationRateLimits : []}
@@ -271,11 +288,11 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
                     </label>
                     <input
                         className="form-control"
-                        value = {staff.name}
+                        value={staff.name}
                         type="text"
                         id="name"
                         onChange={(evt) => onValueChange(evt, "name")}
-                        required />
+                        required/>
                 </>
             </BorderLessTableCell>
             <BorderLessTableCell>
@@ -284,13 +301,13 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
                         Mobile Number *
                     </label>
                     <input
-                        disabled = {staff.type === OLD_USER}
+                        disabled={staff.type === OLD_USER}
                         className="form-control"
-                        value = {staff.mobileNumber}
+                        value={staff.mobileNumber}
                         type="text"
                         id="mobileNumber"
                         onChange={(evt) => onValueChange(evt, "mobileNumber")}
-                        required />
+                        required/>
                 </>
             </BorderLessTableCell>
             <BorderLessTableCell>
@@ -300,11 +317,11 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
                     </label>
                     <input
                         className="form-control"
-                        value = {staff.employeeId}
+                        value={staff.employeeId}
                         type="text"
                         id="employeeId"
                         onChange={(evt) => onValueChange(evt, "employeeId")}
-                        required />
+                        required/>
                 </>
             </BorderLessTableCell>
             <BorderLessTableCell>
@@ -359,7 +376,8 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 const StaffProgramRate = (props) => {
     const classes = useStyles();
     const allocatedPrograms = props.vaccinationRateLimits.map(v => v.programName);
-    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.name));
+    debugger
+    const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.programId));
     return (
         <Modal
             show={props.showModal}
@@ -388,6 +406,7 @@ const StaffProgramRate = (props) => {
                                             className="roleTypeMenu rateSelector"
                                             labelId="demo-simple-select-outlined-label"
                                             id="demo-simple-select-outlined"
+                                            disabled={limit.programName !== ""}
                                             value={limit.programName}
                                             onChange={(evt) => {
                                                 props.updateProgram(index, "programName", evt.target.value)
@@ -431,8 +450,8 @@ const StaffProgramRate = (props) => {
                             </TableRow>))}
                     </TableBody>
                 </Table>
-                <img src={AddProgramImg} alt={""} className="ml-3 add-user-btn" style={{width: "4%"}}
-                     onClick={props.addNewProgram}/>
+                {newPrograms.length > 0 && <img src={AddProgramImg} alt={""} className="ml-3 add-user-btn" style={{width: "4%"}}
+                     onClick={props.addNewProgram}/>}
             </Modal.Body>
             <Modal.Footer className="justify-content-start">
                 <Button className="ml-3" variant="outlinedPrimary"
