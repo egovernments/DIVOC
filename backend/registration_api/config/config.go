@@ -11,6 +11,8 @@ var Config = struct {
 		PrivateKeyPath string `yaml:"privatekeypath"`
 		PublicKey []byte
 		PrivateKey []byte
+		TTLForOtp int `yaml:"ttlforotpinminutes"`
+		MAXOtpVerifyAttempts int `yaml:"maxotpverifyattempts"`
 	}
 
 	Kafka struct {

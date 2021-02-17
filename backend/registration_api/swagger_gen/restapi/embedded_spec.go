@@ -127,6 +127,9 @@ func init() {
           },
           "401": {
             "description": "Invalid OTP"
+          },
+          "429": {
+            "description": "Verify otp attempts exceeded, generate new OTP"
           }
         }
       }
@@ -243,6 +246,9 @@ func init() {
           },
           "401": {
             "description": "Invalid OTP"
+          },
+          "429": {
+            "description": "Verify otp attempts exceeded, generate new OTP"
           }
         }
       }

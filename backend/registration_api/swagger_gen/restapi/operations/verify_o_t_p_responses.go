@@ -102,3 +102,27 @@ func (o *VerifyOTPUnauthorized) WriteResponse(rw http.ResponseWriter, producer r
 
 	rw.WriteHeader(401)
 }
+
+// VerifyOTPTooManyRequestsCode is the HTTP code returned for type VerifyOTPTooManyRequests
+const VerifyOTPTooManyRequestsCode int = 429
+
+/*VerifyOTPTooManyRequests Verify otp attempts exceeded, generate new OTP
+
+swagger:response verifyOTPTooManyRequests
+*/
+type VerifyOTPTooManyRequests struct {
+}
+
+// NewVerifyOTPTooManyRequests creates VerifyOTPTooManyRequests with default headers values
+func NewVerifyOTPTooManyRequests() *VerifyOTPTooManyRequests {
+
+	return &VerifyOTPTooManyRequests{}
+}
+
+// WriteResponse to the client
+func (o *VerifyOTPTooManyRequests) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(429)
+}

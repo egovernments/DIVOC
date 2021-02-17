@@ -25,7 +25,6 @@ func CreateRecipientToken(phone string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	log.Info("Got the private key ", keyFromPEM)
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 	tokenString, err := token.SignedString(keyFromPEM)
 	return tokenString, err

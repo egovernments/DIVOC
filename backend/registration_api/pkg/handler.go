@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"encoding/json"
+	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 func SetupHandlers(api *operations.RegistrationAPIAPI) {
@@ -23,24 +24,21 @@ func enrollRecipient(params operations.EnrollRecipientParams) middleware.Respond
 	}
 	return operations.NewEnrollRecipientOK()
 }
-
+const attemptsKeyPattern = "-attempts"
 func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	phone := params.Body.Phone
 	if phone == "" {
 		return operations.NewGenerateOTPNoContent()
 	}
-	otp, err := services.GetValue(phone)
+	otp := utils.GenerateOTP()
+	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
+	err = services.SetValue(phone, string(cacheOtp))
 	if err == nil {
-		// send SMS to the phone
+		// Send SMS
 		return operations.NewGenerateOTPOK()
-	} else {
-		otp = utils.GenerateOTP()
-		err := services.SetValue(phone, otp, time.Minute * 5)
-		if err == nil {
-			return operations.NewGenerateOTPOK()
-		}
 	}
-	return nil
+	log.Info("Something went wrong ", err)
+	return operations.NewGenerateOTPNoContent()
 }
 
 func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
@@ -49,18 +47,30 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	if receivedOTP == "" {
 		return operations.NewVerifyOTPNoContent()
 	}
-
-	otp, err := services.GetValue(phone)
-	if otp != receivedOTP {
+	value, err := services.GetValue(phone)
+	if value == "" || err != nil {
 		return operations.NewVerifyOTPUnauthorized()
 	}
+
+	cacheOTP := models.CacheOTP{}
+	json.Unmarshal([]byte(value), &cacheOTP)
+	if cacheOTP.VerifyAttemptCount > config.Config.Auth.MAXOtpVerifyAttempts {
+		return operations.NewVerifyOTPTooManyRequests()
+	}
+	if cacheOTP.Otp != receivedOTP {
+		return operations.NewVerifyOTPUnauthorized()
+	}
+
+	cacheOTP.VerifyAttemptCount+=1
+	cacheOtp, err := json.Marshal(cacheOTP)
+	err = services.SetValue(phone, string(cacheOtp))
+
 	if err == nil {
 		token, err := services.CreateRecipientToken(phone)
 		if err != nil {
 			log.Error("Unable to create the jwt token ", err)
 			return operations.NewVerifyOTPUnauthorized()
 		}
-		log.Info("Generated Token ", token)
 		response := operations.VerifyOTPOKBody {
 			Token: token,
 		}

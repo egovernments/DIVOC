@@ -1,6 +1,7 @@
 package services
 
 import (
+	"github.com/divoc/registration-api/config"
 	"github.com/go-redis/redis"
 	"time"
 )
@@ -11,8 +12,9 @@ var redisClient = redis.NewClient(&redis.Options{
 	DB: 0,
 })
 
-func SetValue(key string, val string, expiry time.Duration) error {
-	err := redisClient.Set(key, val, expiry).Err()
+func SetValue(key string, val interface{}) error {
+	duration := time.Minute * time.Duration(config.Config.Auth.TTLForOtp)
+	err := redisClient.Set(key, val, duration).Err()
 	return err
 }
 

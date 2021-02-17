@@ -71,3 +71,5 @@ paths:
           description: Invalid OTP
         '204':
           description: OTP is empty
+        '429':
+          description: Verify otp attempts exceeded, generate new OTP
