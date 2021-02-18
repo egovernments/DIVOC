@@ -10,7 +10,8 @@ export function CitizenLoginComponent() {
         phoneNumber: "",
         otp: "",
         showOnlyOTP: true,
-        invalidOTP: ""
+        invalidOTP: "",
+        invalidMobileNumber: ""
     });
 
     const history = useHistory();
@@ -32,20 +33,30 @@ export function CitizenLoginComponent() {
         });
     };
     const getOTPHandler = () => {
-        const url = '/divoc/api/citizen/generateOTP'
-        axios.post(url, {phone: state.phoneNumber})
-            .then((response) => {
-                setState((prevState) => {
-                    return {
-                        ...prevState,
-                        showOnlyOTP: !prevState.showOnlyOTP,
-                        invalidOTP: ""
-                    }
-                })
-            }).catch((error) => {
+        if (state.phoneNumber.length < 10 || isNaN(state.phoneNumber)) {
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    invalidMobileNumber: "* Invalid mobile number"
+                }
+            })
+        } else {
+            const url = '/divoc/api/citizen/generateOTP'
+            axios.post(url, {phone: state.phoneNumber})
+                .then((response) => {
+                    setState((prevState) => {
+                        return {
+                            ...prevState,
+                            showOnlyOTP: !prevState.showOnlyOTP,
+                            invalidOTP: "",
+                            invalidMobileNumber: ""
+                        }
+                    })
+                }).catch((error) => {
                 console.log(error)
                 alert(error)
-        })
+            })
+        }
     };
     const verifyHandler = () => {
         const url = '/divoc/api/citizen/verifyOTP'
@@ -95,6 +106,9 @@ export function CitizenLoginComponent() {
                                disabled={!state.showOnlyOTP}
                                maxLength={10}
                         />
+                        <div className="invalid-input">
+                            {state.invalidMobileNumber}
+                        </div>
                     </div>
                     <div className="form-group col-md-3">
                         <input placeholder="OTP" maxLength={4}
