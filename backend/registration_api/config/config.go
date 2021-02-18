@@ -7,8 +7,8 @@ import (
 
 var Config = struct {
 	Auth struct{
-		PublicKeyPath string `yaml:"publickeypath"`
-		PrivateKeyPath string `yaml:"privatekeypath"`
+		PublicKeyPath string `env:"AUTH_PUBLIC_KEY_PATH"`
+		PrivateKeyPath string `env:"AUTH_PRIVATE_KEY_PATH"`
 		PublicKey []byte
 		PrivateKey []byte
 		TTLForOtp int `yaml:"ttlforotpinminutes"`

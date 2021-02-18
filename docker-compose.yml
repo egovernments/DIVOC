@@ -133,6 +133,8 @@ services:
     ports:
       - "8002:8002"
     environment:
+      AUTH_PRIVATE_KEY_PATH: "config/key.pem"
+      AUTH_PUBLIC_KEY_PATH: "config/pubkey.pem"
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
