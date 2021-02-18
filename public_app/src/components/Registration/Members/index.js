@@ -3,14 +3,21 @@ import {CardDeck, CardGroup, Col, Container, Row} from "react-bootstrap";
 import "./index.css";
 import {useHistory} from "react-router-dom";
 import {CustomButton} from "../../CustomButton";
-import {useKeycloak} from "@react-keycloak/web";
-import {PROGRAM_API, RECIPIENT_CLIENT_ID, RECIPIENT_ROLE, RECIPIENTS_API, SIDE_EFFECTS_DATA} from "../../../constants";
+import {
+    CITIZEN_TOKEN_COOKIE_NAME,
+    PROGRAM_API,
+    RECIPIENT_CLIENT_ID,
+    RECIPIENT_ROLE,
+    RECIPIENTS_API,
+    SIDE_EFFECTS_DATA
+} from "../../../constants";
 import axios from "axios";
 import Card from "react-bootstrap/Card";
+import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
+import {getCookie} from "../../../utils/cookies";
 
 export const Members = () => {
     const history = useHistory();
-    const {keycloak} = useKeycloak();
     const [members, setMembers] = useState([]);
     const [programs, setPrograms] = useState([]);
 
@@ -27,8 +34,12 @@ export const Members = () => {
                 "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
             }
         ];
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": `Bearer ${token} `, "Content-Type": "application/json"},
+        };
         axios
-            .get(RECIPIENTS_API)
+            .get(RECIPIENTS_API, config)
             .then((res) => {
                 if (res.status === '200') {
                     setMembers(res.body)
@@ -46,10 +57,8 @@ export const Members = () => {
     }, []);
 
     useEffect(() => {
-        if (keycloak.authenticated) {
-            if (!keycloak.hasResourceRole(RECIPIENT_ROLE, RECIPIENT_CLIENT_ID)) {
-                keycloak.logout();
-            }
+        if (!getUserNumberFromRecipientToken()) {
+            history.push("/citizen")
         }
     }, []);
 

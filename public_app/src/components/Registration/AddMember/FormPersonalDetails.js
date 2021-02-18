@@ -2,12 +2,13 @@ import React, {useEffect, useState} from "react";
 import {Row, Col, Container, InputGroup, FormControl} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import {CustomDateWidget} from "../../CustomDateWidget";
-import {useKeycloak} from "@react-keycloak/web";
 import Button from "react-bootstrap/Button";
 import state_and_districts from '../../../DummyData/state_and_districts.json';
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 import axios from "axios";
-import {PROGRAM_API, RECIPIENTS_API} from "../../../constants";
+import {CITIZEN_TOKEN_COOKIE_NAME, PROGRAM_API, RECIPIENTS_API} from "../../../constants";
+import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
+import {getCookie} from "../../../utils/cookies";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -42,7 +43,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
     const { previous, next } = navigation;
     const [errors, setErrors] = useState([]);
-    const {keycloak} = useKeycloak();
 
     const IdDetails = () => {
         function constuctNationalId(idtype, idNumber) {
@@ -230,7 +230,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
     const ContactInfo = () => {
 
-        const userMobileNumber = keycloak.idTokenParsed.preferred_username;
+        const userMobileNumber = getUserNumberFromRecipientToken();
 
         const [beneficiaryNumber, setBeneficiaryNumber] = useState('');
         const [oTPSent, setOTPSent] = useState(false);
@@ -367,14 +367,21 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         delete dataToSend["state"];
         delete dataToSend["district"];
         delete dataToSend["contact"];
-        dataToSend["address"] = {};
+        dataToSend["address"] = {
+            "addressLine1": "",
+            "addressLine2": "",
+            "state": "",
+            "district": "",
+            "pincode": 0
+        };
         dataToSend["address"]["state"] = formData.state;
         dataToSend["address"]["district"] = formData.district;
-        dataToSend["phone"] = keycloak.idTokenParsed.preferred_username;
+        dataToSend["phone"] = getUserNumberFromRecipientToken();
         dataToSend["beneficiaryPhone"] = formData.contact
 
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"},
+            headers: {"Authorization": `Bearer ${token} `, "Content-Type": "application/json"},
         };
         axios.post(RECIPIENTS_API, dataToSend, config)
             .then(res => {

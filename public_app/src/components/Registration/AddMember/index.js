@@ -8,6 +8,7 @@ import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import {Success} from "./Success";
 import {useKeycloak} from "@react-keycloak/web";
 import {PROGRAM_API} from "../../../constants";
+import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_USER_DETAILS = "userDetails";
@@ -34,10 +35,9 @@ const defaultData = {
 }
 
 export const AddMembersFlow = () => {
-    const {keycloak} = useKeycloak();
-    const userMobileNumber = keycloak.idTokenParsed.preferred_username;
-
+    const userMobileNumber = getUserNumberFromRecipientToken();
     defaultData["contact"] = userMobileNumber;
+
     const [formData, setValue] = useForm(defaultData);
     const { step, navigation } = useStep({ initialStep: 0, steps });
     const { id } = step;
@@ -45,6 +45,12 @@ export const AddMembersFlow = () => {
 
     useEffect(() => {
         fetchPrograms()
+    }, []);
+
+    useEffect(() => {
+        if (!getUserNumberFromRecipientToken()) {
+            history.push("/citizen")
+        }
     }, []);
 
     function fetchPrograms() {

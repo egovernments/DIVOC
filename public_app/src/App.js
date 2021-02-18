@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import Header from '../src/components/Header/Header';
 import Footer from '../src/components/Footer/Footer';
 import {PrivateRoute} from "./utils/PrivateRoute";
