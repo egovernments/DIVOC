@@ -133,6 +133,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
         updatedAdmin.mobileNumber = data.adminContact;
         updatedAdmin.email = data.adminEmail;
         updatedAdmin.facilityCode = facility.facilityCode;
+        updatedAdmin.osid = facility.admins[0].osid;
 
         axiosInstance.current
         .put('/divoc/admin/api/v1/facility/users', updatedAdmin).then((res) => {
@@ -243,7 +244,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                         <Container key={p.programId} className="programDiv">
                             <label>
                                 <div><b>Name: </b></div>
-                                <input type="text" name="programName" defaultValue={p.programId} disabled={!editFacility}/>
+                                <input type="text" name="programName" defaultValue={p.name} disabled={true}/>
                             </label>
                             <label>
                                 <div><b>Days: </b></div>
