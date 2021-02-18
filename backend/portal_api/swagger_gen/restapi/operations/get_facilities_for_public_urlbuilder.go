@@ -13,8 +13,8 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// GetFacilities4PublicURL generates an URL for the get facilities4 public operation
-type GetFacilities4PublicURL struct {
+// GetFacilitiesForPublicURL generates an URL for the get facilities for public operation
+type GetFacilitiesForPublicURL struct {
 	Limit   *float64
 	Offset  *float64
 	Pincode *string
@@ -27,7 +27,7 @@ type GetFacilities4PublicURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetFacilities4PublicURL) WithBasePath(bp string) *GetFacilities4PublicURL {
+func (o *GetFacilitiesForPublicURL) WithBasePath(bp string) *GetFacilitiesForPublicURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -35,12 +35,12 @@ func (o *GetFacilities4PublicURL) WithBasePath(bp string) *GetFacilities4PublicU
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetFacilities4PublicURL) SetBasePath(bp string) {
+func (o *GetFacilitiesForPublicURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetFacilities4PublicURL) Build() (*url.URL, error) {
+func (o *GetFacilitiesForPublicURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/public/facilities"
@@ -83,7 +83,7 @@ func (o *GetFacilities4PublicURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetFacilities4PublicURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetFacilitiesForPublicURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -94,17 +94,17 @@ func (o *GetFacilities4PublicURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetFacilities4PublicURL) String() string {
+func (o *GetFacilitiesForPublicURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetFacilities4PublicURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetFacilitiesForPublicURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetFacilities4PublicURL")
+		return nil, errors.New("scheme is required for a full url on GetFacilitiesForPublicURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetFacilities4PublicURL")
+		return nil, errors.New("host is required for a full url on GetFacilitiesForPublicURL")
 	}
 
 	base, err := o.Build()
@@ -118,6 +118,6 @@ func (o *GetFacilities4PublicURL) BuildFull(scheme, host string) (*url.URL, erro
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetFacilities4PublicURL) StringFull(scheme, host string) string {
+func (o *GetFacilitiesForPublicURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

@@ -15,19 +15,19 @@ import (
 	"github.com/go-openapi/swag"
 )
 
-// NewGetFacilities4PublicParams creates a new GetFacilities4PublicParams object
+// NewGetFacilitiesForPublicParams creates a new GetFacilitiesForPublicParams object
 //
 // There are no default values defined in the spec.
-func NewGetFacilities4PublicParams() GetFacilities4PublicParams {
+func NewGetFacilitiesForPublicParams() GetFacilitiesForPublicParams {
 
-	return GetFacilities4PublicParams{}
+	return GetFacilitiesForPublicParams{}
 }
 
-// GetFacilities4PublicParams contains all the bound params for the get facilities4 public operation
+// GetFacilitiesForPublicParams contains all the bound params for the get facilities for public operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters getFacilities4Public
-type GetFacilities4PublicParams struct {
+// swagger:parameters getFacilitiesForPublic
+type GetFacilitiesForPublicParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -49,8 +49,8 @@ type GetFacilities4PublicParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetFacilities4PublicParams() beforehand.
-func (o *GetFacilities4PublicParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetFacilitiesForPublicParams() beforehand.
+func (o *GetFacilitiesForPublicParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
@@ -78,7 +78,7 @@ func (o *GetFacilities4PublicParams) BindRequest(r *http.Request, route *middlew
 }
 
 // bindLimit binds and validates parameter Limit from query.
-func (o *GetFacilities4PublicParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetFacilitiesForPublicParams) bindLimit(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -101,7 +101,7 @@ func (o *GetFacilities4PublicParams) bindLimit(rawData []string, hasKey bool, fo
 }
 
 // bindOffset binds and validates parameter Offset from query.
-func (o *GetFacilities4PublicParams) bindOffset(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetFacilitiesForPublicParams) bindOffset(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -124,7 +124,7 @@ func (o *GetFacilities4PublicParams) bindOffset(rawData []string, hasKey bool, f
 }
 
 // bindPincode binds and validates parameter Pincode from query.
-func (o *GetFacilities4PublicParams) bindPincode(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *GetFacilitiesForPublicParams) bindPincode(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
