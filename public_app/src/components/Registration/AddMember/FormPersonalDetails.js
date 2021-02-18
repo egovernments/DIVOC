@@ -5,6 +5,7 @@ import {CustomDateWidget} from "../../CustomDateWidget";
 import {useKeycloak} from "@react-keycloak/web";
 import Button from "react-bootstrap/Button";
 import state_and_districts from '../../../DummyData/state_and_districts.json';
+import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -322,7 +323,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             <div hidden={verifyDetails}>
                                 <input className="form-control" id="email" name="email" type="text"
                                        placeholder="Enter Email ID"
-                                       value={email}
+                                       defaultValue={maskPersonalDetails(email)}
+                                       onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value)}
+                                       onFocus={(evt) => evt.target.value = email}
                                        onChange={(e) => setEmail(e.target.value)}/>
                                 <div className="pt-2">
                                     <input className="form-control" id="confirmEmail" name="email" type="text"
