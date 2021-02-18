@@ -104,16 +104,17 @@ export const Members = () => {
         }
 
         return (
+            <div className="col-xl-6 pt-3">
             <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
                 <Card.Body style={{fontSize: "14px"}}>
-                    <span className="mb-2" style={{fontSize: "18px", color: "#646D82"}}>{member.name}</span>
+                    <span className="mb-2" style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
                     <div className="mb-2">
                         {program ? program.name : ''}
                     </div>
                     <div className="d-flex justify-content-between align-items-center">
                         <div className="">
-                            <span style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}
-                            <span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}
+                            <div><span style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}</div>
+                            <div><span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}</div>
                         </div>
                         {
                             !appointment && <div className="d-flex justify-content-end">
@@ -139,6 +140,7 @@ export const Members = () => {
                     }
                 </Card.Body>
             </Card>
+            </div>
         )
     };
 
@@ -160,6 +162,7 @@ export const Members = () => {
                         </Row>
                     </div>
                     }
+                    <Row>
                     {
                         members.length > 0 &&
                         members.map(member => {
@@ -167,6 +170,7 @@ export const Members = () => {
                         })
 
                     }
+                    </Row>
                     <Button className="mt-4" variant="link" type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
