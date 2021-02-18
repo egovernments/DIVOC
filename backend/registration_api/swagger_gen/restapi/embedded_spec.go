@@ -18,6 +18,12 @@ var (
 
 func init() {
 	SwaggerJSON = json.RawMessage([]byte(`{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "schemes": [
     "https"
   ],
@@ -29,7 +35,64 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/register": {
+    "/generateOTP": {
+      "post": {
+        "summary": "Generate OTP",
+        "operationId": "generateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Phone number is empty"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      }
+    },
+    "/recipients": {
+      "get": {
+        "summary": "Get all the recipients",
+        "operationId": "getRecipients",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token"
+          },
+          "500": {
+            "description": "Something went wrong"
+          }
+        }
+      },
       "post": {
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
@@ -46,6 +109,58 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/verifyOTP": {
+      "post": {
+        "summary": "Verify OTP",
+        "operationId": "verifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Invalid OTP"
+          },
+          "429": {
+            "description": "Verify otp attempts exceeded, generate new OTP"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
@@ -53,6 +168,12 @@ func init() {
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
   "schemes": [
     "https"
   ],
@@ -64,7 +185,64 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/register": {
+    "/generateOTP": {
+      "post": {
+        "summary": "Generate OTP",
+        "operationId": "generateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "204": {
+            "description": "Phone number is empty"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      }
+    },
+    "/recipients": {
+      "get": {
+        "summary": "Get all the recipients",
+        "operationId": "getRecipients",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/enrollment"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token"
+          },
+          "500": {
+            "description": "Something went wrong"
+          }
+        }
+      },
       "post": {
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
@@ -81,6 +259,58 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/verifyOTP": {
+      "post": {
+        "summary": "Verify OTP",
+        "operationId": "verifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "otp": {
+                  "type": "string"
+                },
+                "phone": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Invalid OTP"
+          },
+          "429": {
+            "description": "Verify otp attempts exceeded, generate new OTP"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
@@ -143,14 +373,15 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "phone",
-        "enrollmentScopeId",
         "nationalId",
         "dob"
       ],
       "properties": {
         "address": {
           "$ref": "#/definitions/address"
+        },
+        "beneficiaryPhone": {
+          "type": "string"
         },
         "certified": {
           "type": "boolean",

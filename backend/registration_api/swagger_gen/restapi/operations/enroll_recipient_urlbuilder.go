@@ -35,7 +35,7 @@ func (o *EnrollRecipientURL) SetBasePath(bp string) {
 func (o *EnrollRecipientURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/register"
+	var _path = "/recipients"
 
 	_basePath := o._basePath
 	if _basePath == "" {

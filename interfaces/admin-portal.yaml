@@ -51,6 +51,29 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Facility'
+  /public/facilities:
+    get:
+      summary: get facilities for public
+      operationId: getFacilitiesForPublic
+      parameters:
+        - in: query
+          name: pincode
+          type: string
+          description: Facility pincode
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PublicFacility'
   /facilities:
     get:
       summary: get facilities
@@ -721,6 +744,85 @@ definitions:
       price:
         type: number
         description: Indicative price if fixed or max price available.
+  PublicFacility:
+    properties:
+      osid:
+        type: string
+        title: Facility uuid
+      facilityCode:
+        type: string
+        title: Facility Code
+      facilityName:
+        type: string
+        title: Facility Name
+      address:
+        "$ref": "#/definitions/Address"
+        title: Address
+      geoLocation:
+        type: string
+        title: Geo Location
+      websiteUrl:
+        type: string
+        title: Website URL
+      operatingHourStart:
+        type: string
+        title: Operating hours start of day
+      operatingHourEnd:
+        type: string
+        title: Operating hours end of day
+      category:
+        type: string
+        title: Category
+        enum:
+          - GOVT
+          - PRIVATE
+      type:
+        type: string
+        title: Type of Facility
+        enum:
+          - Fixed location
+          - Mobile
+          - Both
+      averageRating:
+        type: number
+        title: Average Rating
+        description: Average Rating of Facility 0 to 5, 0 for no rating.
+        default: 0
+      status:
+        type: string
+        title: Status of Facility
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            programId:
+              type: string
+            name:
+              type: string
+            status:
+              type: string
+            rate:
+              type: number
+            statusUpdatedAt:
+              type: string
+            rateUpdatedAt:
+              type: string
+            schedule:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  startTime:
+                    type: string
+                  endTime:
+                    type: string
   Facility:
     properties:
       serialNum:
@@ -998,6 +1100,9 @@ definitions:
       id:
         type: string
         title: Facility User Id
+      osid:
+        type: string
+        title: Osid of the user stored in Facility Entity
       name:
         type: string
         title: Facility User Name

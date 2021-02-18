@@ -45,6 +45,15 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
+		GenerateOTPHandler: GenerateOTPHandlerFunc(func(params GenerateOTPParams) middleware.Responder {
+			return middleware.NotImplemented("operation GenerateOTP has not yet been implemented")
+		}),
+		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
+		}),
+		VerifyOTPHandler: VerifyOTPHandlerFunc(func(params VerifyOTPParams) middleware.Responder {
+			return middleware.NotImplemented("operation VerifyOTP has not yet been implemented")
+		}),
 	}
 }
 
@@ -81,6 +90,12 @@ type RegistrationAPIAPI struct {
 
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
+	// GenerateOTPHandler sets the operation handler for the generate o t p operation
+	GenerateOTPHandler GenerateOTPHandler
+	// GetRecipientsHandler sets the operation handler for the get recipients operation
+	GetRecipientsHandler GetRecipientsHandler
+	// VerifyOTPHandler sets the operation handler for the verify o t p operation
+	VerifyOTPHandler VerifyOTPHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -159,6 +174,15 @@ func (o *RegistrationAPIAPI) Validate() error {
 
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
+	}
+	if o.GenerateOTPHandler == nil {
+		unregistered = append(unregistered, "GenerateOTPHandler")
+	}
+	if o.GetRecipientsHandler == nil {
+		unregistered = append(unregistered, "GetRecipientsHandler")
+	}
+	if o.VerifyOTPHandler == nil {
+		unregistered = append(unregistered, "VerifyOTPHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -251,7 +275,19 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/register"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
+	o.handlers["POST"]["/recipients"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/generateOTP"] = NewGenerateOTP(o.context, o.GenerateOTPHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/recipients"] = NewGetRecipients(o.context, o.GetRecipientsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/verifyOTP"] = NewVerifyOTP(o.context, o.VerifyOTPHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

@@ -111,6 +111,8 @@ services:
     ports:
       - "8002:8002"
     environment:
+      AUTH_PRIVATE_KEY:
+      AUTH_PUBLIC_KEY:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db

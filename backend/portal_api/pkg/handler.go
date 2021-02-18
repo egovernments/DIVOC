@@ -2,10 +2,11 @@ package pkg
 
 import (
 	"encoding/json"
-	"github.com/divoc/portal-api/pkg/utils"
 	"net/http"
 	"strings"
 	"time"
+
+	"github.com/divoc/portal-api/pkg/utils"
 
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
@@ -26,6 +27,7 @@ const ProgramIdKey = "programs.programId"
 const ProgramStatusKey = "programs.status"
 const FacilityCodeKey = "facilityCode"
 const ProgramRateUpdatedAtKey = "programs.rateUpdatedAt"
+const FacilityPincodekey = "address.pincode"
 
 func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.CreateMedicineHandler = operations.CreateMedicineHandlerFunc(createMedicineHandler)
@@ -33,6 +35,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(postFacilitiesHandler)
 	api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(postVaccinatorsHandler)
 	api.GetFacilitiesHandler = operations.GetFacilitiesHandlerFunc(getFacilitiesHandler)
+	api.GetFacilitiesForPublicHandler = operations.GetFacilitiesForPublicHandlerFunc(getFacilitiesForPublic)
 	api.GetVaccinatorsHandler = operations.GetVaccinatorsHandlerFunc(getVaccinatorsHandler)
 	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
@@ -212,6 +215,34 @@ func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 		offset = int(*offsetValue)
 	}
 	return limit, offset
+}
+
+func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) middleware.Responder {
+	entityType := "Facility"
+	filter := make(map[string]interface{})
+	if params.Pincode != nil {
+		filter[FacilityPincodekey] = map[string]interface{}{
+			"eq": *params.Pincode,
+		}
+	}
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
+	response, err := kernelService.QueryRegistry(entityType, filter, limit, offset)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	facilitiesRespStr, err := json.Marshal(response[entityType])
+	if err != nil {
+		log.Errorf("Error reading registry response", err)
+		return model.NewGenericServerError()
+	}
+
+	var facilities []models.PublicFacility
+	if err := json.Unmarshal(facilitiesRespStr, &facilities); err != nil {
+		log.Errorf("Error parsing registry response", err)
+		return model.NewGenericServerError()
+	}
+	return model.NewGenericJSONResponse(facilities)
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {

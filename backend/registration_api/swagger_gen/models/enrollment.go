@@ -22,6 +22,9 @@ type Enrollment struct {
 	// address
 	Address *Address `json:"address,omitempty"`
 
+	// beneficiary phone
+	BeneficiaryPhone string `json:"beneficiaryPhone,omitempty"`
+
 	// certified
 	Certified *bool `json:"certified,omitempty"`
 
@@ -37,8 +40,7 @@ type Enrollment struct {
 	Email string `json:"email,omitempty"`
 
 	// enrollment scope Id
-	// Required: true
-	EnrollmentScopeID *string `json:"enrollmentScopeId"`
+	EnrollmentScopeID string `json:"enrollmentScopeId,omitempty"`
 
 	// gender
 	// Enum: [Male Female Other]
@@ -52,8 +54,7 @@ type Enrollment struct {
 	NationalID *string `json:"nationalId"`
 
 	// phone
-	// Required: true
-	Phone *string `json:"phone"`
+	Phone string `json:"phone,omitempty"`
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
@@ -71,19 +72,11 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateEnrollmentScopeID(formats); err != nil {
-		res = append(res, err)
-	}
-
 	if err := m.validateGender(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validateNationalID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePhone(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -118,15 +111,6 @@ func (m *Enrollment) validateDob(formats strfmt.Registry) error {
 	}
 
 	if err := validate.FormatOf("dob", "body", "date", m.Dob.String(), formats); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Enrollment) validateEnrollmentScopeID(formats strfmt.Registry) error {
-
-	if err := validate.Required("enrollmentScopeId", "body", m.EnrollmentScopeID); err != nil {
 		return err
 	}
 
@@ -182,15 +166,6 @@ func (m *Enrollment) validateGender(formats strfmt.Registry) error {
 func (m *Enrollment) validateNationalID(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalId", "body", m.NationalID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *Enrollment) validatePhone(formats strfmt.Registry) error {
-
-	if err := validate.Required("phone", "body", m.Phone); err != nil {
 		return err
 	}
 

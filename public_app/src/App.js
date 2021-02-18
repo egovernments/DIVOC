@@ -16,6 +16,9 @@ import {store} from "./redux/store";
 import Learn from "./components/Learn";
 import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
+import {Members} from "./components/Registration/Members";
+import {AddMembersFlow} from "./components/Registration/AddMember";
+import {CitizenLoginComponent} from "./CitizenLogin/citizen-login";
 import {PageNotFound} from "./components/PageNotFound";
 import React from "react";
 import {Appointment} from "./components/Appointment";
@@ -52,6 +55,9 @@ function App() {
                             <Route exact path={"/:enrollment_code/appointment/confirm"} component={AppointmentConfirm}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
+                            <Route exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Route exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Route exact path={"/citizen"} component={CitizenLoginComponent}/>
                             <Redirect to={"/not-found"}/>
                         </Switch>
                     </div>
