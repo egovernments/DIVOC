@@ -6,6 +6,8 @@ import {useKeycloak} from "@react-keycloak/web";
 import Button from "react-bootstrap/Button";
 import state_and_districts from '../../../DummyData/state_and_districts.json';
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
+import axios from "axios";
+import {PROGRAM_API, RECIPIENTS_API} from "../../../constants";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -40,6 +42,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
     const { previous, next } = navigation;
     const [errors, setErrors] = useState([]);
+    const {keycloak} = useKeycloak();
 
     const IdDetails = () => {
         function constuctNationalId(idtype, idNumber) {
@@ -227,7 +230,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
     const ContactInfo = () => {
 
-        const {keycloak} = useKeycloak();
         const userMobileNumber = keycloak.idTokenParsed.preferred_username;
 
         const [beneficiaryNumber, setBeneficiaryNumber] = useState('');
@@ -350,7 +352,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     }
 
     const onContinue = () => {
-
         validateUserDetails();
 
         if (errors.length > 0) {
@@ -361,9 +362,28 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     };
 
     const onSubmit = () => {
-        // TODO: call backend and if successful call next
+        // TODO: refactor fields of formData itself to match api body
+        let dataToSend = {...formData};
+        delete dataToSend["state"];
+        delete dataToSend["district"];
+        delete dataToSend["contact"];
+        dataToSend["address"] = {};
+        dataToSend["address"]["state"] = formData.state;
+        dataToSend["address"]["district"] = formData.district;
+        dataToSend["phone"] = keycloak.idTokenParsed.preferred_username;
+        dataToSend["beneficiaryPhone"] = formData.contact
+
+        const config = {
+            headers: {"Authorization": `Bearer ${keycloak.token} `, "Content-Type": "application/json"},
+        };
+        axios.post(RECIPIENTS_API, dataToSend, config)
+            .then(res => {
+                if (res.status === 200) {
+                    next()
+                }
+            });
         next()
-    }
+    };
     return (
         <Container fluid>
             <div className="side-effect-container">
