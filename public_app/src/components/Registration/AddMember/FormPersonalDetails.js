@@ -378,10 +378,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         dataToSend["address"]["district"] = formData.district;
         dataToSend["phone"] = getUserNumberFromRecipientToken();
         dataToSend["beneficiaryPhone"] = formData.contact
-
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"Authorization": `Bearer ${token} `, "Content-Type": "application/json"},
+            headers: {"recipientToken": token, "Content-Type": "application/json"},
         };
         axios.post(RECIPIENTS_API, dataToSend, config)
             .then(res => {
