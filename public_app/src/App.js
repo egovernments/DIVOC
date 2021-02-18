@@ -17,6 +17,7 @@ import Learn from "./components/Learn";
 import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
 import {Members} from "./components/Registration/Members";
+import {AddMembersFlow} from "./components/Registration/AddMember";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -43,6 +44,7 @@ function App() {
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
                             <PrivateRoute exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <PrivateRoute exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                         </Switch>
                     </div>
                     <Footer/>
