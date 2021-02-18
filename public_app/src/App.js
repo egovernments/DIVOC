@@ -49,7 +49,7 @@ function App() {
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
-                            <PrivateRoute exact path={"/:enrollment_code/:program_id/appointment"} component={Appointment}
+                            <Route exact path={"/:enrollment_code/:program_id/appointment"} component={Appointment}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
                             <Route exact path={"/:enrollment_code/appointment/confirm"} component={AppointmentConfirm}

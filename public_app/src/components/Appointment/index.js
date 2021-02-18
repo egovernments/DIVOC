@@ -59,9 +59,9 @@ export const Appointment = (props) => {
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
                 <FacilityAllotment facility={facility} programId={program_id}
-                                   showModal={(facilityId, allotmentDate, allotmentTime, programName) => {
+                                   showModal={(facilityId, allotmentDate, allotmentTime, programName, facilityName, facilityAddress) => {
                                        setShowModal(true)
-                                       setSelectedAllotment({facilityId, allotmentDate, allotmentTime, programName})
+                                       setSelectedAllotment({facilityId, allotmentDate, allotmentTime, programName, facilityName, facilityAddress})
                                    }}/>
             </div>
         )
@@ -199,7 +199,7 @@ const FacilityAllotment = ({facility, programId, showModal}) => {
                 slots.push(<Button
                     variant="outline-primary"
                     onClick={() => {
-                        showModal(facility.osid, allotmentDate, i, program.name)
+                        showModal(facility.osid, allotmentDate, i, program.name, facility.facilityName, facility.address)
                     }}
                     className="mt-3">{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
             }
