@@ -9,7 +9,8 @@ export function CitizenLoginComponent() {
     const [state, setState] = useState({
         phoneNumber: "",
         otp: "",
-        showOnlyOTP: true
+        showOnlyOTP: true,
+        invalidOTP: ""
     });
 
     const history = useHistory();
@@ -37,7 +38,8 @@ export function CitizenLoginComponent() {
                 setState((prevState) => {
                     return {
                         ...prevState,
-                        showOnlyOTP: !prevState.showOnlyOTP
+                        showOnlyOTP: !prevState.showOnlyOTP,
+                        invalidOTP: ""
                     }
                 })
             }).catch((error) => {
@@ -54,8 +56,12 @@ export function CitizenLoginComponent() {
                 history.push("/registration")
 
             }).catch((error) => {
-            console.log(error)
-            alert(error)
+            setState((prevState) => {
+                return {
+                    ...prevState,
+                    invalidOTP: "* Invalid OTP"
+                }
+            })
         })
 
     };
@@ -64,6 +70,7 @@ export function CitizenLoginComponent() {
             return {
                 ...prevState,
                 otp: "",
+                invalidOTP: "",
                 showOnlyOTP: !prevState.showOnlyOTP
             }
         })
@@ -91,11 +98,14 @@ export function CitizenLoginComponent() {
                     </div>
                     <div className="form-group col-md-3">
                         <input placeholder="OTP" maxLength={4}
-                               className="form-control form-control-lg login-otp"
+                               className="login-otp form-control form-control-lg"
                                onChange={setOTP}
                                value={state.otp}
                                disabled={state.showOnlyOTP}
                         />
+                        <div className="invalid-input">
+                            {state.invalidOTP}
+                        </div>
                     </div>
                 </div>
             </form>
