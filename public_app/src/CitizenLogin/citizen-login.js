@@ -86,6 +86,7 @@ export function CitizenLoginComponent() {
                                onChange={setMobileNumber}
                                value={state.phoneNumber}
                                disabled={!state.showOnlyOTP}
+                               maxLength={10}
                         />
                     </div>
                     <div className="form-group col-md-3">

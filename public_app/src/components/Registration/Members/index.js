@@ -22,35 +22,17 @@ export const Members = () => {
     const [programs, setPrograms] = useState([]);
 
     useEffect(() => {
-        const mockMembers = [
-            {
-                "name": "Rajesh Ravi",
-                "code": "001304100",
-                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
-            },
-            {
-                "name": "Asha Ravi",
-                "code": "001304102",
-                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
-            }
-        ];
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"Authorization": `Bearer ${token} `, "Content-Type": "application/json"},
+            headers: {"recipientToken": token, "Content-Type": "application/json"},
         };
         axios
             .get(RECIPIENTS_API, config)
             .then((res) => {
-                if (res.status === '200') {
-                    setMembers(res.body)
-                } else {
-                    setMembers([])
-                }
+                setMembers(res.data)
             })
             .catch(e => {
                 console.log(e);
-                // mock data setup
-                setMembers(mockMembers)
             })
 
         fetchPrograms()
