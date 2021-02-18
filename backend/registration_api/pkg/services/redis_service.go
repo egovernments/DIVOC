@@ -7,11 +7,14 @@ import (
 )
 
 var redisClient = redis.NewClient(&redis.Options{
-	Addr: "redis:6379",
+	Addr: config.Config.Redis.Host + ":" + config.Config.Redis.Port,
 	Password: "",
 	DB: 0,
 })
 
+func DeleteValue(key string) error {
+	return redisClient.Del(key).Err()
+}
 func SetValue(key string, val interface{}) error {
 	duration := time.Minute * time.Duration(config.Config.Auth.TTLForOtp)
 	err := redisClient.Set(key, val, duration).Err()

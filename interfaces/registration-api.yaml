@@ -61,7 +61,9 @@ paths:
        '204':
          description: Phone number is empty
        '500':
-         description: Intern Error
+         description: Internal Error
+       '400':
+         description: Bad request
   /verifyOTP:
     post:
       summary: Verify OTP
@@ -87,7 +89,9 @@ paths:
                 type: string
         '401':
           description: Invalid OTP
-        '204':
-          description: OTP is empty
+        '400':
+          description: Bad request
+        '500':
+          description: Internal error
         '429':
           description: Verify otp attempts exceeded, generate new OTP

@@ -15,6 +15,9 @@
       "type": "object",
       "required": ["nationalId", "dob"],
       "properties": {
+        "beneficiaryPhone" : {
+          "type": "string"
+        },
         "phone" : {
           "type": "string"
         },

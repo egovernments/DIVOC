@@ -28,8 +28,8 @@ func main() {
 	defer server.Shutdown()
 
 	parser := flags.NewParser(server, flags.Default)
-	parser.ShortDescription = "Divoc Portal API"
-	parser.LongDescription = "Digital infra for vaccination certificates"
+	parser.ShortDescription = "Divoc Registration API"
+	parser.LongDescription = "Registration for vaccination (DIVOC)"
 	server.ConfigureFlags()
 	for _, optsGroup := range api.CommandLineOptionsGroups {
 		_, err := parser.AddGroup(optsGroup.ShortDescription, optsGroup.LongDescription, optsGroup.Options)

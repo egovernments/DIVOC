@@ -6,7 +6,6 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"time"
 )
 
 func StartEnrollmentConsumer() {
@@ -33,7 +32,6 @@ func StartEnrollmentConsumer() {
 				err = json.Unmarshal(msg.Value, &enrollment)
 
 				if err == nil {
-					_, err := time.Parse("2006-01-02", enrollment.Dob.String())
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 					err = CreateEnrollment(enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.

@@ -22,6 +22,10 @@ var Config = struct {
 		MaxRetryCount                  int `default:"10" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
+	Redis struct {
+		Host             string  `env:"REDIS_URL"`
+		Port             string  `default:"6379" env:"REDIS_PORT"`
+	}
 }{}
 
 func Initialize() {

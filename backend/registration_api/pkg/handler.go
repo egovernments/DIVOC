@@ -65,7 +65,7 @@ func enrollRecipient(params operations.EnrollRecipientParams) middleware.Respond
 func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	phone := params.Body.Phone
 	if phone == "" {
-		return operations.NewGenerateOTPNoContent()
+		return operations.NewGenerateOTPBadRequest()
 	}
 	otp := utils.GenerateOTP()
 	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
@@ -73,40 +73,53 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	if err == nil {
 		// Send SMS
 		return operations.NewGenerateOTPOK()
+	} else {
+		log.Errorf("Error while setting otp in redis %+v" , err)
+		return operations.NewGenerateOTPInternalServerError()
 	}
-	log.Info("Something went wrong ", err)
-	return operations.NewGenerateOTPNoContent()
 }
 
 func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	phone := params.Body.Phone
 	receivedOTP := params.Body.Otp
 	if receivedOTP == "" {
-		return operations.NewVerifyOTPNoContent()
+		return operations.NewVerifyOTPBadRequest()
 	}
 	value, err := services.GetValue(phone)
-	if value == "" || err != nil {
+	if err != nil {
+		return model.NewGenericServerError()
+	}
+	if value == "" {
 		return operations.NewVerifyOTPUnauthorized()
 	}
 
 	cacheOTP := models.CacheOTP{}
-	json.Unmarshal([]byte(value), &cacheOTP)
+	if err := json.Unmarshal([]byte(value), &cacheOTP); err != nil {
+		log.Errorf("Error in marshalling json %+v", err)
+		return model.NewGenericServerError()
+	}
 	if cacheOTP.VerifyAttemptCount > config.Config.Auth.MAXOtpVerifyAttempts {
 		return operations.NewVerifyOTPTooManyRequests()
 	}
 	if cacheOTP.Otp != receivedOTP {
+		cacheOTP.VerifyAttemptCount+=1
+		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
+			log.Errorf("Error in setting verify count %+v", err)
+		} else {
+			err = services.SetValue(phone, string(cacheOtp))
+		}
 		return operations.NewVerifyOTPUnauthorized()
 	}
 
-	cacheOTP.VerifyAttemptCount+=1
-	cacheOtp, err := json.Marshal(cacheOTP)
-	err = services.SetValue(phone, string(cacheOtp))
 
-	if err == nil {
+	if err = services.DeleteValue(phone); err != nil {
+		log.Errorf("Error in clearing the OTP  after signin %+v", err)
+		return model.NewGenericServerError()
+	} else {
 		token, err := services.CreateRecipientToken(phone)
 		if err != nil {
-			log.Error("Unable to create the jwt token ", err)
-			return operations.NewVerifyOTPUnauthorized()
+			log.Errorf("Unable to create the jwt token %+v", err)
+			return model.NewGenericServerError()
 		}
 		response := operations.VerifyOTPOKBody {
 			Token: token,
