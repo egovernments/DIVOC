@@ -115,3 +115,4 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	}
 	return operations.NewVerifyOTPUnauthorized()
 }
+
