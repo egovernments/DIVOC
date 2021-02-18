@@ -57,6 +57,30 @@ func (o *PostAuthorizeOK) WriteResponse(rw http.ResponseWriter, producer runtime
 	}
 }
 
+// PostAuthorizePartialContentCode is the HTTP code returned for type PostAuthorizePartialContent
+const PostAuthorizePartialContentCode int = 206
+
+/*PostAuthorizePartialContent Need otp
+
+swagger:response postAuthorizePartialContent
+*/
+type PostAuthorizePartialContent struct {
+}
+
+// NewPostAuthorizePartialContent creates PostAuthorizePartialContent with default headers values
+func NewPostAuthorizePartialContent() *PostAuthorizePartialContent {
+
+	return &PostAuthorizePartialContent{}
+}
+
+// WriteResponse to the client
+func (o *PostAuthorizePartialContent) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(206)
+}
+
 // PostAuthorizeUnauthorizedCode is the HTTP code returned for type PostAuthorizeUnauthorized
 const PostAuthorizeUnauthorizedCode int = 401
 

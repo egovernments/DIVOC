@@ -66,6 +66,9 @@ func init() {
               "$ref": "#/definitions/LoginResponse"
             }
           },
+          "206": {
+            "description": "Need otp"
+          },
           "401": {
             "description": "Unauthorized"
           }
@@ -1002,6 +1005,9 @@ func init() {
             "schema": {
               "$ref": "#/definitions/LoginResponse"
             }
+          },
+          "206": {
+            "description": "Need otp"
           },
           "401": {
             "description": "Unauthorized"

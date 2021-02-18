@@ -9,17 +9,25 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+
+	"github.com/go-openapi/swag"
 )
 
-// EnrollRecipientURL generates an URL for the enroll recipient operation
-type EnrollRecipientURL struct {
+// GetFacilities4PublicURL generates an URL for the get facilities4 public operation
+type GetFacilities4PublicURL struct {
+	Limit   *float64
+	Offset  *float64
+	Pincode *string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *EnrollRecipientURL) WithBasePath(bp string) *EnrollRecipientURL {
+func (o *GetFacilities4PublicURL) WithBasePath(bp string) *GetFacilities4PublicURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,27 +35,55 @@ func (o *EnrollRecipientURL) WithBasePath(bp string) *EnrollRecipientURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *EnrollRecipientURL) SetBasePath(bp string) {
+func (o *GetFacilities4PublicURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *EnrollRecipientURL) Build() (*url.URL, error) {
+func (o *GetFacilities4PublicURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/recipients"
+	var _path = "/public/facilities"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/citizen"
+		_basePath = "/divoc/admin/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var limitQ string
+	if o.Limit != nil {
+		limitQ = swag.FormatFloat64(*o.Limit)
+	}
+	if limitQ != "" {
+		qs.Set("limit", limitQ)
+	}
+
+	var offsetQ string
+	if o.Offset != nil {
+		offsetQ = swag.FormatFloat64(*o.Offset)
+	}
+	if offsetQ != "" {
+		qs.Set("offset", offsetQ)
+	}
+
+	var pincodeQ string
+	if o.Pincode != nil {
+		pincodeQ = *o.Pincode
+	}
+	if pincodeQ != "" {
+		qs.Set("pincode", pincodeQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *EnrollRecipientURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetFacilities4PublicURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +94,17 @@ func (o *EnrollRecipientURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *EnrollRecipientURL) String() string {
+func (o *GetFacilities4PublicURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *EnrollRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetFacilities4PublicURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on EnrollRecipientURL")
+		return nil, errors.New("scheme is required for a full url on GetFacilities4PublicURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on EnrollRecipientURL")
+		return nil, errors.New("host is required for a full url on GetFacilities4PublicURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +118,6 @@ func (o *EnrollRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *EnrollRecipientURL) StringFull(scheme, host string) string {
+func (o *GetFacilities4PublicURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }
