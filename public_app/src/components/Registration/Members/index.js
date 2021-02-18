@@ -19,12 +19,12 @@ export const Members = () => {
             {
                 "name": "Rajesh Ravi",
                 "code": "001304100",
-                "programId": "1-7875daad-7ceb-4368-9a4b-7997e3b5b008"
+                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
             },
             {
                 "name": "Asha Ravi",
                 "code": "001304102",
-                "programId": "1-7875daad-7ceb-4368-9a4b-7997e3b5b008"
+                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
             }
         ];
         axios
@@ -59,7 +59,7 @@ export const Members = () => {
                 "description":"Covid 19 program",
                 "endDate":"2021-02-24",
                 "medicineIds":["1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"],
-                "name":"C-19",
+                "name":"Covid-19 program",
                 "osCreatedAt":"2021-02-16T06:51:58.271Z",
                 "osUpdatedAt":"2021-02-17T07:56:29.012Z",
                 "osid":"1-b58ec6ec-c971-455c-ade5-7dce34ea0b09",
