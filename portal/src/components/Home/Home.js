@@ -12,7 +12,6 @@ import 'pure-react-carousel/dist/react-carousel.es.css';
 import {LatestUpdateCard} from "../LatestUpdateCard";
 import {Link, useHistory} from "react-router-dom";
 import {useKeycloak} from "@react-keycloak/web";
-import {CONSTANTS} from "../../utils/constants";
 import config from "../../config"
 
 export default function Home() {
@@ -20,19 +19,8 @@ export default function Home() {
     const history = useHistory();
 
     useEffect(() => {
-        if (keycloak.authenticated) {
-            let redirectUrl = config.urlPath;
-            if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = config.urlPath + "/admin";
-                history.push(redirectUrl)
-            } else if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)) {
-                redirectUrl = config.urlPath + "/facility_admin";
-                history.push(redirectUrl)
-            }
-        } else {
-            history.push(config.urlPath + "/login");
-        }
-    }, [keycloak]);
+        history.push(config.urlPath + "/login");
+    }, {});
     return (
         <div className="home-section">
             <div className="section ">

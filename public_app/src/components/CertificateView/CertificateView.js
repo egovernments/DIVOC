@@ -202,12 +202,11 @@ function CertificateView() {
     }
 
     const singleCertificateView = () => {
-        if (certificateList.length === 1) {
-            // setCertificateData(certificateList[0]);
-            return (selectedCertificate(certificateList[0]));
-        } else {
-            return <></>;
-        }
+        return (
+            <Container className={styles["certificate"]+ " " + styles["center-align"]}>
+                {certificateList.length === 1 ? selectedCertificate(certificateList[0]) : ("")}
+            </Container>
+        );
     };
 
 

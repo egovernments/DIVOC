@@ -14,6 +14,7 @@ import {SyncFacade} from "../../SyncFacade";
 import {appIndexDb} from "../../AppDatabase";
 import {Messages} from "../../Base/Constants";
 import {BaseCard} from "../../Base/Base";
+import config from "../../config";
 
 export function ProgramSelection() {
     const [programs, setPrograms] = useState([])
@@ -145,7 +146,7 @@ function NoProgramFound({keycloak}) {
                     <h6 className="mb-4">There is no vaccination program associated with your facility. Please contact your facility
                         admin.</h6>
                     <Button variant="outline-danger" onClick={() => {
-                        keycloak.logout()
+                        keycloak.logout({redirectUri: window.location.origin + config.urlPath});
                     }}>Logout</Button>{" "}
                 </div>
             </BaseCard>

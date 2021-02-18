@@ -31,10 +31,10 @@
 
     <body>
     <nav class="navbar navbar-expand-lg navbar-light">
-        <a class="navbar-brand" href="#">
+        <a class="navbar-brand" href="/">
             <img src="${url.resourcesPath}/img/nav-logo.png" width="200px" alt="">
         </a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+        <#--<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -58,7 +58,7 @@
                 </li>
 
             </ul>
-        </div>
+        </div>-->
     </nav>
     <#nested "header">
     <div class="login-content" style="">
@@ -85,7 +85,7 @@
             <img class="main-img" src="${url.resourcesPath}/img/login-bg.png" alt="">
         </div>
     </div>
-    <div class="footer-content">
+    <#--<div class="footer-content">
         <div>
         </div>
         <div class="d-none d-lg-block">
@@ -93,7 +93,7 @@
             <span class="footer-link">Term of use</span>
             <span class="footer-link">Privacy Policy</span>
         </div>
-    </div>
+    </div>-->
     </body>
     </html>
 </#macro>

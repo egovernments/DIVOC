@@ -52,7 +52,8 @@ export function VaccinationStatus() {
 async function getVaccinationStatus() {
     const userDetails = await appIndexDb.getUserDetails()
     const programName = localStorage.getItem("program")
-    const currentProgram = await programDb.getPrograms().find((value => {
+    let programs = await programDb.getPrograms();
+    const currentProgram = programs.find((value => {
         return value["name"] === programName
     }))
     const programRate = userDetails[currentProgram["id"] + "_rate"] ?? 0

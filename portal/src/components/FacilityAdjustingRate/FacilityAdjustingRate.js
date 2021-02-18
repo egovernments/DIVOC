@@ -206,11 +206,11 @@ function FacilityAdjustingRate({
                                 />
                             </div>
                             <div>
-                                <span className={"filter-header"}>Please select date range</span>
+                                <span className={"filter-header"}>Please select date</span>
                                 <div className="m-3">
                                     <input className={styles["custom-date-range"]} type="date" onChange={(event) =>
                                         handleChange(
-                                            event.target.value,
+                                            new Date(event.target.value),
                                             setLastAdjustedOn
                                         )}/>
                                 </div>

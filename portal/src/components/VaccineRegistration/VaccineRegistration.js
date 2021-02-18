@@ -18,6 +18,12 @@ function VaccineRegistration() {
     const [formData, setFormData] = useState(null);
     const [medicineList, setMedicineList] = useState([]);
     const [showForm, setShowForm] = useState(false);
+    const [uiSchema, setUiSchema] = useState({
+        classNames: styles["form-conatiner"],
+        title: {
+            classNames: styles["form-title"],
+        },
+    });
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -29,14 +35,6 @@ function VaccineRegistration() {
             "Content-Type": "application/json",
         },
     };
-
-    const uiSchema = {
-        classNames: styles["form-conatiner"],
-        title: {
-            classNames: styles["form-title"],
-        },
-    };
-
 
     const widgets = {
         TextWidget: CustomTextWidget,
@@ -93,15 +91,6 @@ function VaccineRegistration() {
         }
     }
 
-    const getSchema = () => {
-        if (formData.edited) {
-            const updatedSchema = {...schema};
-            delete updatedSchema.properties.name
-            return updatedSchema
-        }
-        return schema;
-    }
-
     let blockedVaccines = medicineList.filter(data => data.status === "Blocked");
     let inactiveVaccines = medicineList.filter(data => data.status === "Inactive");
     let activeVaccines = medicineList.filter(data => data.status === "Active");
@@ -110,11 +99,14 @@ function VaccineRegistration() {
             {showForm && <div className={styles["form-container"]}>
                 <div className="d-flex">
                     <h5 className={"mr-auto"}>{formData.edited ? formData.name : "Register New Vaccine"}</h5>
-                    <Button variant="outline-primary" onClick={() => setShowForm(!showForm)}>BACK</Button>
+                    <Button variant="outline-primary" onClick={() => {
+                        setShowForm(!showForm);
+                        setUiSchema({...uiSchema, "name": {}})
+                    }}>BACK</Button>
                 </div>
                 <Form
                     widgets={widgets}
-                    schema={getSchema()}
+                    schema={schema}
                     uiSchema={uiSchema}
                     formData={formData}
                     onChange={(e) => {
@@ -146,6 +138,7 @@ function VaccineRegistration() {
                         (data) => {
                             setFormData({...data, edited: true});
                             setShowForm(true)
+                            setUiSchema({...uiSchema, "name": {"ui:widget": "hidden"}})
                         }
                     }
                 />

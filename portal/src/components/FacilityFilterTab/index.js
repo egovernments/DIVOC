@@ -36,7 +36,7 @@ export const FacilityFilterTab = ({
     return (
         <div className="filter-tab-container">
             <div className="select-program-wrapper">
-                <span className="filter-header">Program Name</span>
+                <span className="filter-header">Program</span>
                 <DropDown
                     selectedOption={selectedProgram}
                     options={programs}
@@ -45,7 +45,7 @@ export const FacilityFilterTab = ({
                 />
             </div>
             <div>
-                <span className="filter-header">All of {countryName}</span>
+                <span className="filter-header">Region</span>
                 <DropDown
                     selectedOption={selectedState}
                     options={states}

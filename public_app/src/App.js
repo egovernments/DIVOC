@@ -1,5 +1,5 @@
 import './App.css';
-import {BrowserRouter as Router, Route, Switch} from "react-router-dom";
+import {BrowserRouter as Router, Redirect, Route, Switch} from "react-router-dom";
 import Header from '../src/components/Header/Header';
 import Footer from '../src/components/Footer/Footer';
 import {PrivateRoute} from "./utils/PrivateRoute";
@@ -18,6 +18,8 @@ import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
 import {Members} from "./components/Registration/Members";
 import {AddMembersFlow} from "./components/Registration/AddMember";
+import {PageNotFound} from "./components/PageNotFound";
+import React from "react";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -40,11 +42,13 @@ function App() {
                             <Route exact path={"/dashboard"} component={Dashboard}/>
                             <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
                             <Route exact path={"/learn"} component={Learn}/>
+                            <Route exact path={"/not-found"} component={PageNotFound}/>
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
                             <PrivateRoute exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <PrivateRoute exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Redirect to={"/not-found"}/>
                         </Switch>
                     </div>
                     <Footer/>
