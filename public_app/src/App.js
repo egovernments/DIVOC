@@ -18,6 +18,8 @@ import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
 import {PageNotFound} from "./components/PageNotFound";
 import React from "react";
+import {Appointment} from "./components/Appointment";
+import {AppointmentConfirm} from "./components/AppointmentConfirm";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -42,6 +44,12 @@ function App() {
                             <Route exact path={"/learn"} component={Learn}/>
                             <Route exact path={"/not-found"} component={PageNotFound}/>
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
+                                          role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
+                            />
+                            <PrivateRoute exact path={"/:enrollment_code/:program_id/appointment"} component={Appointment}
+                                          role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
+                            />
+                            <Route exact path={"/:enrollment_code/appointment/confirm"} component={AppointmentConfirm}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
                             <Redirect to={"/not-found"}/>

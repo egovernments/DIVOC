@@ -12,3 +12,7 @@ export function formatDate(givenDate) {
 
     return `${day}-${monthName}-${year}`;
 }
+
+export function padDigit(digit, totalDigits = 2) {
+    return String(digit).padStart(totalDigits, '0')
+}

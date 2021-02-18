@@ -1,0 +1,11 @@
+<svg id="icon_search" data-name="icon/search" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="25" height="25" viewBox="0 0 25 25">
+  <defs>
+    <clipPath id="clip-path">
+      <rect id="Rectangle_228" data-name="Rectangle 228" width="25" height="25" fill="#cecece"/>
+    </clipPath>
+  </defs>
+  <g id="Group_2429" data-name="Group 2429" clip-path="url(#clip-path)">
+    <path id="Path_2146" data-name="Path 2146" d="M10.914,0A10.914,10.914,0,1,0,21.829,10.914,10.927,10.927,0,0,0,10.914,0m0,19.814a8.9,8.9,0,1,1,8.9-8.9,8.91,8.91,0,0,1-8.9,8.9" transform="translate(0.521 0.521)" fill="#cecece"/>
+    <path id="Path_2147" data-name="Path 2147" d="M358.541,357.117l-5.776-5.776a1.007,1.007,0,0,0-1.425,1.425l5.776,5.776a1.007,1.007,0,0,0,1.425-1.425" transform="translate(-333.531 -333.532)" fill="#cecece"/>
+  </g>
+</svg>
