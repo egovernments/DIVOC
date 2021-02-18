@@ -39,6 +39,9 @@ type FacilityUser struct {
 	// Facility User Name
 	Name string `json:"name,omitempty"`
 
+	// Osid of the user stored in Facility Entity
+	Osid string `json:"osid,omitempty"`
+
 	// vaccination rate limits
 	VaccinationRateLimits []*VaccinationRateLimit `json:"vaccinationRateLimits"`
 }
@@ -62,7 +65,6 @@ func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Groups) { // not required
 		return nil
 	}
@@ -87,7 +89,6 @@ func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateVaccinationRateLimits(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.VaccinationRateLimits) { // not required
 		return nil
 	}

@@ -998,6 +998,9 @@ definitions:
       id:
         type: string
         title: Facility User Id
+      osid:
+        type: string
+        title: Osid of the user stored in Facility Entity
       name:
         type: string
         title: Facility User Name
