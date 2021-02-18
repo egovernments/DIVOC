@@ -2,6 +2,7 @@ import {Component} from "react";
 import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../utils/cookies";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../constants";
 
 export class CitizenLoginComponent extends Component{
     state = {
@@ -38,7 +39,7 @@ export class CitizenLoginComponent extends Component{
         const url = '/divoc/api/citizen/verifyOTP'
         axios.post(url, {phone: this.state.phoneNumber, otp: this.state.otp})
             .then((response) => {
-                setCookie("citizenToken", response.data.token, 1)
+                setCookie(CITIZEN_TOKEN_COOKIE_NAME, response.data.token, 1)
                 // redirect to add member
                 this.setState((prevState) => {
                     return {
