@@ -1,31 +1,41 @@
-import {Component} from "react";
+import {Component, useState} from "react";
 import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../utils/cookies";
+import {useHistory} from "react-router";
 
-export class CitizenLoginComponent extends Component{
-    state = {
+export function CitizenLoginComponent() {
+    const [state, setState] = useState({
         phoneNumber: "",
         otp: "",
         showOnlyOTP: true
-    }
+    });
 
-    setMobileNumber = (event) => {
-        this.setState({
+    const history = useHistory();
+
+    const setMobileNumber = (event) => {
+        setState((prevState)=>{
+            return {
+            ...prevState,
             phoneNumber: event.target.value
+         };
         })
-    }
-    setOTP = (event) => {
-        this.setState({
-            otp: event.target.value
-        })
-    }
-    getOTPHandler = () => {
+    };
+    const setOTP = (event) => {
+        setState(prevState => {
+            return {
+                ...prevState,
+                otp: event.target.value
+            }
+        });
+    };
+    const getOTPHandler = () => {
         const url = '/divoc/api/citizen/generateOTP'
-        axios.post(url, {phone: this.state.phoneNumber})
+        axios.post(url, {phone: state.phoneNumber})
             .then((response) => {
-                this.setState((prevState) => {
+                setState((prevState) => {
                     return {
+                        ...prevState,
                         showOnlyOTP: !prevState.showOnlyOTP
                     }
                 })
@@ -34,32 +44,30 @@ export class CitizenLoginComponent extends Component{
                 alert(error)
         })
     };
-    verifyHandler = () => {
+    const verifyHandler = () => {
         const url = '/divoc/api/citizen/verifyOTP'
-        axios.post(url, {phone: this.state.phoneNumber, otp: this.state.otp})
+        axios.post(url, {phone: state.phoneNumber, otp: state.otp})
             .then((response) => {
                 setCookie("citizenToken", response.data.token, 1)
                 // redirect to add member
-                this.setState((prevState) => {
-                    return {
-                        showOnlyOTP: !prevState.showOnlyOTP
-                    }
-                })
+                history.push("/registration")
+
             }).catch((error) => {
             console.log(error)
             alert(error)
         })
 
     };
-    backBtnHandler = () => {
-        this.setState((prevState) => {
+    const backBtnHandler = () => {
+        setState((prevState) => {
             return {
+                ...prevState,
                 otp: "",
                 showOnlyOTP: !prevState.showOnlyOTP
             }
         })
     };
-    render() {
+    {
         const infoText = <>
             <h2>
                 Registration & Appointment Portal
@@ -74,35 +82,35 @@ export class CitizenLoginComponent extends Component{
                     <div className="form-group col-md-3">
                         <input placeholder="Mobile number"
                                className="form-control form-control-lg"
-                               onChange={this.setMobileNumber}
-                               value={this.state.phoneNumber}
-                               disabled={!this.state.showOnlyOTP}
+                               onChange={setMobileNumber}
+                               value={state.phoneNumber}
+                               disabled={!state.showOnlyOTP}
                         />
                     </div>
                     <div className="form-group col-md-3">
                         <input placeholder="OTP"
                                className="form-control form-control-lg"
-                               onChange={this.setOTP}
-                               value={this.state.otp}
-                               disabled={this.state.showOnlyOTP}
+                               onChange={setOTP}
+                               value={state.otp}
+                               disabled={state.showOnlyOTP}
                         />
                     </div>
                 </div>
             </form>
         </>
 
-        const getOTPButton = <button disabled={this.state.phoneNumber.length === 0} className={"custom-button purple-btn"} onClick={this.getOTPHandler}>Get OTP</button>;
-        const verifyButton = <button disabled={this.state.otp.length === 0} className={"custom-button purple-btn"} onClick={this.verifyHandler}>Verify</button>;
-        const backButton = <button className="btn btn-link transparent-button" onClick={this.backBtnHandler}>Back</button>;
+        const getOTPButton = <button disabled={state.phoneNumber.length === 0} className={"custom-button purple-btn"} onClick={getOTPHandler}>Get OTP</button>;
+        const verifyButton = <button disabled={state.otp.length === 0} className={"custom-button purple-btn"} onClick={verifyHandler}>Verify</button>;
+        const backButton = <button className="btn btn-link transparent-button" onClick={backBtnHandler}>Back</button>;
 
         return <div className="citizen-login">
             {infoText}
             {inputs}
             <br/>
-            {this.state.showOnlyOTP && getOTPButton}
+            {state.showOnlyOTP && getOTPButton}
             <div>
-                {!this.state.showOnlyOTP && backButton}
-                {!this.state.showOnlyOTP && verifyButton}
+                {!state.showOnlyOTP && backButton}
+                {!state.showOnlyOTP && verifyButton}
             </div>
         </div>
     }
