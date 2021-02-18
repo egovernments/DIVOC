@@ -107,7 +107,7 @@ export const Members = () => {
             <div className="col-xl-6 pt-3">
             <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
                 <Card.Body style={{fontSize: "14px"}}>
-                    <span className="mb-2" style={{fontSize: "18px", color: "#646D82"}}>{member.name}</span>
+                    <span className="mb-2" style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
                     <div className="mb-2">
                         {program ? program.name : ''}
                     </div>
