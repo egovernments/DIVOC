@@ -2,15 +2,12 @@ package config
 
 import (
 	"github.com/jinzhu/configor"
-	"io/ioutil"
 )
 
 var Config = struct {
 	Auth struct{
-		PublicKeyPath string `env:"AUTH_PUBLIC_KEY_PATH"`
-		PrivateKeyPath string `env:"AUTH_PRIVATE_KEY_PATH"`
-		PublicKey []byte
-		PrivateKey []byte
+		PublicKey string `env:"AUTH_PUBLIC_KEY"`
+		PrivateKey string `env:"AUTH_PRIVATE_KEY"`
 		TTLForOtp int `yaml:"ttlforotpinminutes"`
 		MAXOtpVerifyAttempts int `yaml:"maxotpverifyattempts"`
 	}
@@ -32,13 +29,5 @@ func Initialize() {
 
 	if err != nil {
 		panic("Unable to read configurations")
-	}
-	Config.Auth.PrivateKey, err = ioutil.ReadFile(Config.Auth.PrivateKeyPath)
-	if err != nil {
-		panic("Unable to read the private key")
-	}
-	Config.Auth.PublicKey, err = ioutil.ReadFile(Config.Auth.PublicKeyPath)
-	if err != nil {
-		panic("Unable to read the public key")
 	}
 }

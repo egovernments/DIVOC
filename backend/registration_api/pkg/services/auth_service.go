@@ -21,7 +21,7 @@ func CreateRecipientToken(phone string) (string, error) {
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
-	keyFromPEM, err := jwt.ParseRSAPrivateKeyFromPEM(config.Config.Auth.PrivateKey)
+	keyFromPEM, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(config.Config.Auth.PrivateKey))
 	if err != nil {
 		return "", err
 	}
@@ -32,7 +32,7 @@ func CreateRecipientToken(phone string) (string, error) {
 
 // Will be used by the handlers to validate the JWT
 func VerifyRecipientToken(jwtToken string) (string, error) {
-	keyFromPEM, _ := jwt.ParseRSAPublicKeyFromPEM(config.Config.Auth.PublicKey)
+	keyFromPEM, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(config.Config.Auth.PublicKey))
 	c := Claims{}
 	token, err := jwt.ParseWithClaims(jwtToken, &c, func(token *jwt.Token) (interface{}, error) {
 		return keyFromPEM, nil

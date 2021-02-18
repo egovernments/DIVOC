@@ -6,7 +6,5 @@ enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
 auth:
-  privatekeypath: config/key.pem
-  publickeypath: config/pubkey.pem
   maxotpverifyattempts: 3
   ttlforotpinminutes: 5
