@@ -3,6 +3,7 @@ import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../utils/cookies";
 import {useHistory} from "react-router";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../constants";
 
 export function CitizenLoginComponent() {
     const [state, setState] = useState({
@@ -88,8 +89,8 @@ export function CitizenLoginComponent() {
                         />
                     </div>
                     <div className="form-group col-md-3">
-                        <input placeholder="OTP"
-                               className="form-control form-control-lg"
+                        <input placeholder="OTP" maxLength={4}
+                               className="form-control form-control-lg login-otp"
                                onChange={setOTP}
                                value={state.otp}
                                disabled={state.showOnlyOTP}

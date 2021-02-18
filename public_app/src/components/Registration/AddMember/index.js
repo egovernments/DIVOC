@@ -6,9 +6,9 @@ import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import {Success} from "./Success";
-import {useKeycloak} from "@react-keycloak/web";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
+import {useHistory} from "react-router";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_USER_DETAILS = "userDetails";
@@ -35,6 +35,7 @@ const defaultData = {
 }
 
 export const AddMembersFlow = () => {
+    const history = useHistory();
     const userMobileNumber = getUserNumberFromRecipientToken();
     defaultData["contact"] = userMobileNumber;
 

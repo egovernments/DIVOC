@@ -47,8 +47,8 @@ function App() {
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
                                           role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}
                             />
-                            <PrivateRoute exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
-                            <PrivateRoute exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Route exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Route exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/citizen"} component={CitizenLoginComponent}/>
                             <Redirect to={"/not-found"}/>
                         </Switch>
