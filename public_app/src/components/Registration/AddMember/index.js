@@ -9,6 +9,7 @@ import {Success} from "./Success";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
+import "./index.css"
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_USER_DETAILS = "userDetails";

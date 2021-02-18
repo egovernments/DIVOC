@@ -116,16 +116,15 @@ export const Members = () => {
     return (
         <div className="main-container">
             <Container fluid>
-                <div className="side-effect-container">
+                <div className="members-container">
                     <div style={{display:"flex"}}>
                         <h5>Registered Members <span className="font-italic" style={{fontSize:"small"}}>(You can add upto 4 members)</span></h5>
                     </div>
                     {members.length === 0 &&
                         <div>
                             <Row>
-                                <Col className="col-sm-4">
-                                    <p>You have not enrolled any members.</p>
-                                    <p>Get Started by adding members to enrol and book them for vaccination.</p>
+                                <Col className="col-sm-4 mt-3">
+                                    <p>No members have enrolled yet.</p>
                                 </Col>
                             </Row>
                         </div>

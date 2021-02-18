@@ -2,7 +2,7 @@
     height: 100%;
 }
 
-.side-effect-container {
+.members-container {
     padding: 3rem 5rem;
     height: 100%;
 }
@@ -16,6 +16,6 @@
     padding-top: 5px;
 }
 
-.side-effect-container .card {
+.members-container .card {
     border: 0;
 }
