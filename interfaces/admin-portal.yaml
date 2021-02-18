@@ -54,7 +54,7 @@ paths:
   /public/facilities:
     get:
       summary: get facilities for public
-      operationId: getFacilities4Public
+      operationId: getFacilitiesForPublic
       parameters:
         - in: query
           name: pincode

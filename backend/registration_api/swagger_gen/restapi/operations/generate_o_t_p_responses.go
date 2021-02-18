@@ -59,10 +59,34 @@ func (o *GenerateOTPNoContent) WriteResponse(rw http.ResponseWriter, producer ru
 	rw.WriteHeader(204)
 }
 
+// GenerateOTPBadRequestCode is the HTTP code returned for type GenerateOTPBadRequest
+const GenerateOTPBadRequestCode int = 400
+
+/*GenerateOTPBadRequest Bad request
+
+swagger:response generateOTPBadRequest
+*/
+type GenerateOTPBadRequest struct {
+}
+
+// NewGenerateOTPBadRequest creates GenerateOTPBadRequest with default headers values
+func NewGenerateOTPBadRequest() *GenerateOTPBadRequest {
+
+	return &GenerateOTPBadRequest{}
+}
+
+// WriteResponse to the client
+func (o *GenerateOTPBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(400)
+}
+
 // GenerateOTPInternalServerErrorCode is the HTTP code returned for type GenerateOTPInternalServerError
 const GenerateOTPInternalServerErrorCode int = 500
 
-/*GenerateOTPInternalServerError Intern Error
+/*GenerateOTPInternalServerError Internal Error
 
 swagger:response generateOTPInternalServerError
 */

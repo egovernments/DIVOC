@@ -133,6 +133,7 @@ services:
     ports:
       - "8002:8002"
     environment:
+      REDIS_URL: redis://redis:6379
       AUTH_PRIVATE_KEY:
       AUTH_PUBLIC_KEY:
       REGISTRY_URL: "http://registry:8081"

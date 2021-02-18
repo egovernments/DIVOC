@@ -22,6 +22,9 @@ type Enrollment struct {
 	// address
 	Address *Address `json:"address,omitempty"`
 
+	// beneficiary phone
+	BeneficiaryPhone string `json:"beneficiaryPhone,omitempty"`
+
 	// certified
 	Certified *bool `json:"certified,omitempty"`
 

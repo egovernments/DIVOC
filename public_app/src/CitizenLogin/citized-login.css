@@ -38,3 +38,7 @@
   outline:none;
   margin-right: 10vh;
 }
+.login-otp{
+  width: 7em;
+  letter-spacing: 1em;
+}

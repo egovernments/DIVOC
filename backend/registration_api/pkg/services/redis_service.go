@@ -6,12 +6,19 @@ import (
 	"time"
 )
 
-var redisClient = redis.NewClient(&redis.Options{
-	Addr: "redis:6379",
-	Password: "",
-	DB: 0,
-})
+var redisClient *redis.Client
 
+func InitRedis() {
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     config.Config.Redis.Url,
+		Password: "",
+		DB:       0,
+	})
+}
+
+func DeleteValue(key string) error {
+	return redisClient.Del(key).Err()
+}
 func SetValue(key string, val interface{}) error {
 	duration := time.Minute * time.Duration(config.Config.Auth.TTLForOtp)
 	err := redisClient.Set(key, val, duration).Err()

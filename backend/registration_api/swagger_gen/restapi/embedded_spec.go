@@ -61,8 +61,11 @@ func init() {
           "204": {
             "description": "Phone number is empty"
           },
+          "400": {
+            "description": "Bad request"
+          },
           "500": {
-            "description": "Intern Error"
+            "description": "Internal Error"
           }
         }
       }
@@ -147,14 +150,17 @@ func init() {
               }
             }
           },
-          "204": {
-            "description": "OTP is empty"
+          "400": {
+            "description": "Bad request"
           },
           "401": {
             "description": "Invalid OTP"
           },
           "429": {
             "description": "Verify otp attempts exceeded, generate new OTP"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
@@ -205,8 +211,11 @@ func init() {
           "204": {
             "description": "Phone number is empty"
           },
+          "400": {
+            "description": "Bad request"
+          },
           "500": {
-            "description": "Intern Error"
+            "description": "Internal Error"
           }
         }
       }
@@ -291,14 +300,17 @@ func init() {
               }
             }
           },
-          "204": {
-            "description": "OTP is empty"
+          "400": {
+            "description": "Bad request"
           },
           "401": {
             "description": "Invalid OTP"
           },
           "429": {
             "description": "Verify otp attempts exceeded, generate new OTP"
+          },
+          "500": {
+            "description": "Internal error"
           }
         }
       }
@@ -367,6 +379,9 @@ func init() {
       "properties": {
         "address": {
           "$ref": "#/definitions/address"
+        },
+        "beneficiaryPhone": {
+          "type": "string"
         },
         "certified": {
           "type": "boolean",

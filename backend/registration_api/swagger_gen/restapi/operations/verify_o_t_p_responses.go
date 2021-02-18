@@ -55,28 +55,28 @@ func (o *VerifyOTPOK) WriteResponse(rw http.ResponseWriter, producer runtime.Pro
 	}
 }
 
-// VerifyOTPNoContentCode is the HTTP code returned for type VerifyOTPNoContent
-const VerifyOTPNoContentCode int = 204
+// VerifyOTPBadRequestCode is the HTTP code returned for type VerifyOTPBadRequest
+const VerifyOTPBadRequestCode int = 400
 
-/*VerifyOTPNoContent OTP is empty
+/*VerifyOTPBadRequest Bad request
 
-swagger:response verifyOTPNoContent
+swagger:response verifyOTPBadRequest
 */
-type VerifyOTPNoContent struct {
+type VerifyOTPBadRequest struct {
 }
 
-// NewVerifyOTPNoContent creates VerifyOTPNoContent with default headers values
-func NewVerifyOTPNoContent() *VerifyOTPNoContent {
+// NewVerifyOTPBadRequest creates VerifyOTPBadRequest with default headers values
+func NewVerifyOTPBadRequest() *VerifyOTPBadRequest {
 
-	return &VerifyOTPNoContent{}
+	return &VerifyOTPBadRequest{}
 }
 
 // WriteResponse to the client
-func (o *VerifyOTPNoContent) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+func (o *VerifyOTPBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
-	rw.WriteHeader(204)
+	rw.WriteHeader(400)
 }
 
 // VerifyOTPUnauthorizedCode is the HTTP code returned for type VerifyOTPUnauthorized
@@ -125,4 +125,28 @@ func (o *VerifyOTPTooManyRequests) WriteResponse(rw http.ResponseWriter, produce
 	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
 
 	rw.WriteHeader(429)
+}
+
+// VerifyOTPInternalServerErrorCode is the HTTP code returned for type VerifyOTPInternalServerError
+const VerifyOTPInternalServerErrorCode int = 500
+
+/*VerifyOTPInternalServerError Internal error
+
+swagger:response verifyOTPInternalServerError
+*/
+type VerifyOTPInternalServerError struct {
+}
+
+// NewVerifyOTPInternalServerError creates VerifyOTPInternalServerError with default headers values
+func NewVerifyOTPInternalServerError() *VerifyOTPInternalServerError {
+
+	return &VerifyOTPInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *VerifyOTPInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
 }
