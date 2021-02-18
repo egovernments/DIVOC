@@ -35,7 +35,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.PostFacilitiesHandler = operations.PostFacilitiesHandlerFunc(postFacilitiesHandler)
 	api.PostVaccinatorsHandler = operations.PostVaccinatorsHandlerFunc(postVaccinatorsHandler)
 	api.GetFacilitiesHandler = operations.GetFacilitiesHandlerFunc(getFacilitiesHandler)
-	api.GetFacilities4PublicHandler = operations.GetFacilities4PublicHandlerFunc(getFacilities4Public)
+	api.GetFacilitiesForPublicHandler = operations.GetFacilitiesForPublicHandlerFunc(getFacilitiesForPublic)
 	api.GetVaccinatorsHandler = operations.GetVaccinatorsHandlerFunc(getVaccinatorsHandler)
 	api.GetMedicinesHandler = operations.GetMedicinesHandlerFunc(getMedicinesHandler)
 	api.GetProgramsHandler = operations.GetProgramsHandlerFunc(getProgramsHandler)
@@ -217,7 +217,7 @@ func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 	return limit, offset
 }
 
-func getFacilities4Public(params operations.GetFacilities4PublicParams) middleware.Responder {
+func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) middleware.Responder {
 	entityType := "Facility"
 	filter := make(map[string]interface{})
 	if params.Pincode != nil {
