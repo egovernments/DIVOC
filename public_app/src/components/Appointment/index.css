@@ -1,0 +1,63 @@
+.appointment-container {
+    height: 85vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.appointment-container .card-container {
+    width: 90%;
+    height: 100%;
+    padding: 2rem;
+}
+
+.appointment-container .header-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.appointment-container .header-group img {
+    transform: scale(-1);
+}
+
+.header-group .appointment-back-btn {
+    color: #5C9EF8;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.facility-list-wrapper {
+}
+
+.facility-list {
+    max-height: 60vh;
+    overflow: auto;
+}
+
+.facility-list .active {
+    background-color: #F4F4F4;
+}
+
+.facility-list .facility-card {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #D8D8D8;
+    padding: 1rem;
+    cursor: pointer;
+}
+
+.facility-list .facility-card:hover {
+    background-color: #F4F4F4;
+}
+
+.facility-list .facility-card .facility-list-detail {
+    color: #707070;
+}
+
+.allotment-wrapper .days-list-wrapper {
+    display: flex;
+    justify-content: space-around;
+    height: 53vh;
+    overflow: auto;
+}

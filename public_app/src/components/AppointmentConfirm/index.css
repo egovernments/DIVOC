@@ -1,0 +1,6 @@
+.confirm-container {
+    padding: 5rem 5rem 5rem 10rem;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
