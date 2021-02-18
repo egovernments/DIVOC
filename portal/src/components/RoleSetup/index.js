@@ -376,7 +376,6 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
 const StaffProgramRate = (props) => {
     const classes = useStyles();
     const allocatedPrograms = props.vaccinationRateLimits.map(v => v.programName);
-    debugger
     const newPrograms = props.programs.filter(program => !allocatedPrograms.includes(program.programId));
     return (
         <Modal
