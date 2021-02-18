@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// EnrollRecipientURL generates an URL for the enroll recipient operation
-type EnrollRecipientURL struct {
+// GetRecipientsURL generates an URL for the get recipients operation
+type GetRecipientsURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *EnrollRecipientURL) WithBasePath(bp string) *EnrollRecipientURL {
+func (o *GetRecipientsURL) WithBasePath(bp string) *GetRecipientsURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,12 +27,12 @@ func (o *EnrollRecipientURL) WithBasePath(bp string) *EnrollRecipientURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *EnrollRecipientURL) SetBasePath(bp string) {
+func (o *GetRecipientsURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *EnrollRecipientURL) Build() (*url.URL, error) {
+func (o *GetRecipientsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/recipients"
@@ -47,7 +47,7 @@ func (o *EnrollRecipientURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *EnrollRecipientURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetRecipientsURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *EnrollRecipientURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *EnrollRecipientURL) String() string {
+func (o *GetRecipientsURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *EnrollRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetRecipientsURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on EnrollRecipientURL")
+		return nil, errors.New("scheme is required for a full url on GetRecipientsURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on EnrollRecipientURL")
+		return nil, errors.New("host is required for a full url on GetRecipientsURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *EnrollRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *EnrollRecipientURL) StringFull(scheme, host string) string {
+func (o *GetRecipientsURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

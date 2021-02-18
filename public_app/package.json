@@ -39,7 +39,8 @@
     "redux": "^4.0.5",
     "vaccination-context": "^1.0.7",
     "web-vitals": "^0.2.4",
-    "zbar.wasm": "^2.0.3"
+    "zbar.wasm": "^2.0.3",
+    "react-cookie": "^4.0.3"
   },
   "scripts": {
     "start": "react-scripts start",

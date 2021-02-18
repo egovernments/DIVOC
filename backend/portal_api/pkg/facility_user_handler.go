@@ -2,12 +2,13 @@ package pkg
 
 import (
 	"errors"
+	"net/http"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"net/http"
 )
 
 func GetFacilityUsers(authHeader string) ([]*models.FacilityUser, error) {
@@ -106,22 +107,18 @@ func updateRegistryFacilityAdmin(facilityCode string, user *models.FacilityUser)
 		facilityAdmins = append(facilityAdmins, obj.(map[string]interface{}))
 	}
 
-	var isExistingAdmin bool
 	for _, fa := range facilityAdmins {
-		if fa["mobile"] == user.MobileNumber {
-			isExistingAdmin = true
+		if fa["osid"] == user.Osid {
 			fa["name"] = user.Name
 			fa["email"] = user.Email
+			fa["mobile"] = user.MobileNumber
 		}
 	}
-	if !isExistingAdmin {
-		facilityAdmins = append(facilityAdmins, map[string]interface{}{
-			"name": user.Name,"mobile": user.MobileNumber, "email": user.Email,
-		})
-	}
+	
 	updatedFacility := map[string]interface{}{
 		"osid": facility["osid"].(string),
 		"admins": facilityAdmins,
+		"programs": facility["programs"],
 	}
 	if _, err := kernelService.UpdateRegistry("Facility", updatedFacility); err != nil {
 		return err

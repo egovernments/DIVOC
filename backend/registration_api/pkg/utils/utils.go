@@ -18,3 +18,8 @@ func GenerateEnrollmentCode(phoneNumber string) string {
 	}
 	return phoneNumber + "-" + strconv.Itoa(rand.Intn(digits))
 }
+
+func GenerateOTP() string {
+	//return strconv.Itoa(rand.Intn(1234))
+	return strconv.Itoa(1234)
+}
