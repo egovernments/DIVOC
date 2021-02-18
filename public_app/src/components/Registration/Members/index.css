@@ -2,7 +2,20 @@
     height: 100%;
 }
 
-.side-effect-container {
+.members-container {
     padding: 3rem 5rem;
     height: 100%;
+}
+
+.reciepient-card span {
+    margin-right: 10px;
+    font-size: smaller;
+}
+
+.reciepient-card > div {
+    padding-top: 5px;
+}
+
+.members-container .card {
+    border: 0;
 }
