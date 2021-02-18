@@ -1,6 +1,6 @@
 export function maskPersonalDetails(personalDetail){
     if(personalDetail && personalDetail.includes("@")){
-       return personalDetail.replace(/^(.)(.*)(.@.*)$/,(_, a, b, c) => a + b.replace(/./g, '*') + c);
+       return personalDetail.replace(/^(.)(.*)$/,(_, a, b) => a + b.replace(/./g, '*'));
     }
     if(personalDetail){
         const length = personalDetail.length * 0.6;

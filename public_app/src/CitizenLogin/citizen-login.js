@@ -48,7 +48,7 @@ export function CitizenLoginComponent() {
         const url = '/divoc/api/citizen/verifyOTP'
         axios.post(url, {phone: state.phoneNumber, otp: state.otp})
             .then((response) => {
-                setCookie("citizenToken", response.data.token, 1)
+                setCookie(CITIZEN_TOKEN_COOKIE_NAME, response.data.token, 1)
                 // redirect to add member
                 history.push("/registration")
 
