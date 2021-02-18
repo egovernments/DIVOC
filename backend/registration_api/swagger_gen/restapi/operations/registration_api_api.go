@@ -48,6 +48,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		GenerateOTPHandler: GenerateOTPHandlerFunc(func(params GenerateOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation GenerateOTP has not yet been implemented")
 		}),
+		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
+		}),
 		VerifyOTPHandler: VerifyOTPHandlerFunc(func(params VerifyOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation VerifyOTP has not yet been implemented")
 		}),
@@ -89,6 +92,8 @@ type RegistrationAPIAPI struct {
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
 	GenerateOTPHandler GenerateOTPHandler
+	// GetRecipientsHandler sets the operation handler for the get recipients operation
+	GetRecipientsHandler GetRecipientsHandler
 	// VerifyOTPHandler sets the operation handler for the verify o t p operation
 	VerifyOTPHandler VerifyOTPHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -172,6 +177,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.GenerateOTPHandler == nil {
 		unregistered = append(unregistered, "GenerateOTPHandler")
+	}
+	if o.GetRecipientsHandler == nil {
+		unregistered = append(unregistered, "GetRecipientsHandler")
 	}
 	if o.VerifyOTPHandler == nil {
 		unregistered = append(unregistered, "VerifyOTPHandler")
@@ -267,11 +275,15 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/register"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
+	o.handlers["POST"]["/recipients"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/generateOTP"] = NewGenerateOTP(o.context, o.GenerateOTPHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/recipients"] = NewGetRecipients(o.context, o.GetRecipientsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

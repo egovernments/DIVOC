@@ -67,7 +67,29 @@ func init() {
         }
       }
     },
-    "/register": {
+    "/recipients": {
+      "get": {
+        "summary": "Get all the recipients",
+        "operationId": "getRecipients",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token"
+          },
+          "500": {
+            "description": "Something went wrong"
+          }
+        }
+      },
       "post": {
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
@@ -84,6 +106,9 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Invalid token"
           }
         }
       }
@@ -186,7 +211,29 @@ func init() {
         }
       }
     },
-    "/register": {
+    "/recipients": {
+      "get": {
+        "summary": "Get all the recipients",
+        "operationId": "getRecipients",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/enrollment"
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid token"
+          },
+          "500": {
+            "description": "Something went wrong"
+          }
+        }
+      },
       "post": {
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
@@ -203,6 +250,9 @@ func init() {
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Invalid token"
           }
         }
       }
@@ -311,7 +361,6 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "phone",
         "nationalId",
         "dob"
       ],

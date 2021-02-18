@@ -39,6 +39,7 @@ func VerifyRecipientToken(jwtToken string) (string, error) {
 	})
 	if err!= nil {
 		log.Info("Unable to get the claims out of token", err)
+		return "", err
 	}
 	claims := token.Claims.(*Claims)
 	return claims.Phone, err
