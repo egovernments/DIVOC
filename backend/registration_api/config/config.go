@@ -23,8 +23,7 @@ var Config = struct {
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
 	Redis struct {
-		Host             string  `env:"REDIS_URL"`
-		Port             string  `default:"6379" env:"REDIS_PORT"`
+		Url             string  `env:"REDIS_URL"`
 	}
 }{}
 

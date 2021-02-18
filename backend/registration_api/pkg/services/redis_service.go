@@ -6,11 +6,15 @@ import (
 	"time"
 )
 
-var redisClient = redis.NewClient(&redis.Options{
-	Addr: config.Config.Redis.Host + ":" + config.Config.Redis.Port,
-	Password: "",
-	DB: 0,
-})
+var redisClient *redis.Client
+
+func InitRedis() {
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     config.Config.Redis.Url,
+		Password: "",
+		DB:       0,
+	})
+}
 
 func DeleteValue(key string) error {
 	return redisClient.Del(key).Err()

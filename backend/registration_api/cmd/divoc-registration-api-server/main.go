@@ -17,6 +17,7 @@ func main() {
 	config.Initialize()
 	services.InitializeKafka()
 	kernelServices.InitializeFlagr()
+	services.InitRedis()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
