@@ -190,7 +190,6 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	}
 
 	pdf := gopdf.GoPdf{}
-	//pdf.Start(gopdf.Config{PageSize: gopdf.Rect{W: 595.28, H: 841.89}}) //595.28, 841.89 = A4
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
 
@@ -198,10 +197,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	}
-	/* if err := pdf.AddTTFFont("arapey", "./Arapey-Italic.ttf"); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	} */
+
 	tpl1 := pdf.ImportPage(templateType(certificate), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
@@ -210,11 +206,6 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 		log.Print(err.Error())
 		return nil, err
 	}
-
-	/*if err := pdf.SetFont("arapey", "", 14); err != nil {
-		log.Print(err.Error())
-		return nil, err
-	}*/
 
 	offsetX := 58.0
 	offsetY := 330.0
@@ -452,7 +443,7 @@ func getSignedJson(preEnrollmentCode string) (string, error) {
 		log.Infof("Error while looking up cache %+v", err)
 	} else {
 		if cachedCertificate != "" {
-			//log.Infof("Got certificate from cache %s", preEnrollmentCode)
+			log.Infof("Got certificate from cache %s", preEnrollmentCode)
 			return cachedCertificate, nil
 		}
 	}
