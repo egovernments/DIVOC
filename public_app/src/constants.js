@@ -1,4 +1,4 @@
-public_app/src/constants.jsimport {formatDate} from "./utils/CustomDate";
+import {formatDate} from "./utils/CustomDate";
 
 export const RECIPIENT_CLIENT_ID = "certificate-login";
 export const RECIPIENT_ROLE = "recipient";
