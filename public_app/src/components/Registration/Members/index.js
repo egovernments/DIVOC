@@ -15,6 +15,9 @@ import axios from "axios";
 import Card from "react-bootstrap/Card";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
+import Button from "react-bootstrap/Button";
+import iconLocation from "../../../assets/img/icon-location.svg"
+import iconTime from "../../../assets/img/icon-time.svg"
 
 export const Members = () => {
     const history = useHistory();
@@ -26,12 +29,14 @@ export const Members = () => {
             {
                 "name": "Rajesh Ravi",
                 "code": "001304100",
-                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
+                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a",
+                "osCreatedAt": "2021-02-18T09:09:32.272Z"
             },
             {
                 "name": "Asha Ravi",
                 "code": "001304102",
-                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"
+                "programId": "1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a",
+                "osCreatedAt": "2021-02-18T09:09:32.272Z"
             }
         ];
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
@@ -107,13 +112,23 @@ export const Members = () => {
         const member = props.member;
         const program = programs.filter(p => p.id === member.programId)[0];
         return (
-            <Card style={{ width: '18rem' }}>
-                <Card.Body>
-                    <Card.Title>{member.name}</Card.Title>
-                    <Card.Subtitle>Enrollment number: {member.code}</Card.Subtitle>
-                    <Card.Text>
-                        {program ? program.name: ''}
-                    </Card.Text>
+            <Card className="mt-3 shadow bg-white rounded">
+                <Card.Body className="reciepient-card">
+                    <h5>{member.name}</h5>
+                    <div>{program ? program.name: 'Covid-19'}</div>
+                    <div>
+                        <span>Enrollment number: <b>{member.code}</b></span>
+                        <span>Registration Date: <b>{member.osCreatedAt.substring(0, 10)}</b></span>
+                    </div>
+                    <div>
+                        <span><img src={iconLocation}/> <b>No facility selected</b></span>
+                        <span><img src={iconTime}/> <b>No bookings done</b></span>
+                        <CustomButton className="blue-btn mt-0 float-right" type="submit" onClick={() => {history.push("/appointment")
+                        }}>
+                            Book Appointment
+                        </CustomButton>
+                    </div>
+
                 </Card.Body>
             </Card>
         )
@@ -123,8 +138,9 @@ export const Members = () => {
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
-                    <h5>Enrolled Members</h5>
-                    <span className="font-italic">(You can add upto 4 members)</span>
+                    <div style={{display:"flex"}}>
+                        <h5>Registered Members <span className="font-italic" style={{fontSize:"small"}}>(You can add upto 4 members)</span></h5>
+                    </div>
                     {members.length === 0 &&
                         <div>
                             <Row>
@@ -137,19 +153,15 @@ export const Members = () => {
                     }
                     {
                         members.length > 0 &&
-                            <CardDeck>
-                                {
-                                    members.map(member => {
-                                        return <MemberCard member={member} />
-                                    })
-                                }
-                            </CardDeck>
+                            members.map(member => {
+                                return <MemberCard member={member} />
+                            })
 
                     }
-                    <CustomButton className="blue-btn" type="submit" onClick={() => {history.push("/addMember")
+                    <Button className="mt-4" variant="link" type="submit" onClick={() => {history.push("/addMember")
                     }}>
-                        <span>Add Member</span>
-                    </CustomButton>
+                        <b style={{fontSize: "larger"}}>+ Member</b>
+                    </Button>
                 </div>
             </Container>
         </div>

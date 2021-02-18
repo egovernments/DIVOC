@@ -6,3 +6,16 @@
     padding: 3rem 5rem;
     height: 100%;
 }
+
+.reciepient-card span {
+    margin-right: 10px;
+    font-size: smaller;
+}
+
+.reciepient-card > div {
+    padding-top: 5px;
+}
+
+.side-effect-container .card {
+    border: 0;
+}
