@@ -9,6 +9,12 @@ import axios from "axios";
 import {CITIZEN_TOKEN_COOKIE_NAME, PROGRAM_API, RECIPIENTS_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
+import {
+    AADHAAR_ERROR_MESSAGE, DISTRICT_ERROR_MSG, DOB_ERROR_MSG, GENDER_ERROR_MSG,
+    NAME_ERROR_MSG,
+    NATIONAL_ID_ERROR_MSG,
+    NATIONAL_ID_TYPE_ERROR_MSG, STATE_ERROR_MSG
+} from "./error-constants";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -31,7 +37,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     const GENDERS = [
         "Male",
         "Female",
-        "others"
+        "Others"
     ];
     const MANDATORY_FIELDS = [
         "name",
@@ -42,8 +48,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     ];
 
     const { previous, next } = navigation;
-    const [errors, setErrors] = useState([]);
-
+    const [errors, setErrors] = useState({});
     const IdDetails = () => {
         function constuctNationalId(idtype, idNumber) {
             return ["did", idtype, idNumber].join(":")
@@ -89,6 +94,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                     ID_TYPES.map(d => <option selected={d.name === getSelectedIdType()} value={d.value}>{d.name}</option>)
                                 }
                             </select>
+                            <div className="invalid-input">
+                                {errors.nationalIDType}
+                            </div>
                             {
                                 verifyDetails &&
                                 <p>{getSelectedIdType()}</p>
@@ -103,6 +111,13 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                    type="text" placeholder="Enter ID Number"
                                    defaultValue={formData.nationalId.split(":")[2]}
                                    onBlur={(e) => onIdChange(e, "idNumber")}/>
+                            <div className="invalid-input">
+                                {errors.nationalID}
+
+                            </div>
+                            <div className="invalid-input">
+                                {errors.aadhaar}
+                            </div>
                             {
                                 verifyDetails &&
                                 <p>{formData.nationalId.split(":")[2]}</p>
@@ -153,6 +168,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                    placeholder="Enter Name"
                                    defaultValue={formData.name}
                                    onBlur={setValue}/>
+                            <div className="invalid-input">
+                                {errors.name}
+                            </div>
                             {
                                 verifyDetails &&
                                     <p>{formData.name}</p>
@@ -161,7 +179,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                     </div>
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="state">State</label>
+                            <label htmlFor="state">State *</label>
                             <select className="form-control" name="state" id="state"
                                     onChange={(e) => onStateSelected(e.target.value)}
                                     hidden={verifyDetails}>
@@ -170,6 +188,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                     STATES.map(id => <option selected={id === formData.state} value={id}>{id}</option>)
                                 }
                             </select>
+                            <div className="invalid-input">
+                                {errors.state}
+                            </div>
                             {
                                 verifyDetails &&
                                     <p>{formData.state}</p>
@@ -180,7 +201,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 <Row className="pt-2">
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="name">Date of Birth</label>
+                            <label htmlFor="name">Date of Birth *</label>
                             { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
                                               value={formData.dob}
                                               onChange={d => setDobValue(d)} />}
@@ -188,17 +209,23 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                 verifyDetails &&
                                 <p>{formData.dob}</p>
                             }
+                            <div className="invalid-input">
+                                {errors.dob}
+                            </div>
                         </Col>
                     </div>
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="district">District</label>
+                            <label htmlFor="district">District *</label>
                             <select className="form-control" id="district" name="district" onChange={setValue} hidden={verifyDetails}>
                                 <option disabled selected={!formData.district} value>Select District</option>
                                 {
                                     districts.map(d => <option selected={d.name === formData.district} value={d.name}>{d.name}</option>)
                                 }
                             </select>
+                            <div className="invalid-input">
+                                {errors.district}
+                            </div>
                             {
                                 verifyDetails &&
                                 <p>{formData.district}</p>
@@ -209,7 +236,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 <Row className="pt-2">
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="gender">Gender</label>
+                            <label htmlFor="gender">Gender *</label>
                             <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
                                 <option disabled selected={!formData.gender} value>Select Gender</option>
                                 {
@@ -220,6 +247,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                 verifyDetails &&
                                 <p>{formData.gender}</p>
                             }
+                            <div className="invalid-input">
+                                {errors.gender}
+                            </div>
                         </Col>
                     </div>
                 </Row>
@@ -348,14 +378,44 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     };
 
     function validateUserDetails() {
+        const errors = {}
+        const nationalIDType = formData.nationalId.split(":")[1]
+        const nationIDNumber = formData.nationalId.split(":")[2]
+
+        if(!nationalIDType) {
+            errors.nationalIDType = NATIONAL_ID_TYPE_ERROR_MSG
+        }
+        if(!nationIDNumber) {
+            errors.nationalID = NATIONAL_ID_ERROR_MSG;
+        } else {
+            console.log("IDDDD", nationalIDType, ID_TYPES[0])
+          if(nationalIDType === ID_TYPES[0].value && (nationIDNumber.length !== 12 || isNaN(nationIDNumber))) {
+              errors.aadhaar = AADHAAR_ERROR_MESSAGE
+          }
+        }
+        if(!formData.name) {
+            errors.name = NAME_ERROR_MSG
+        }
+        if(!formData.state) {
+            errors.state = STATE_ERROR_MSG
+        }
+        if(!formData.district) {
+            errors.district = DISTRICT_ERROR_MSG
+        }
+        if(!formData.dob) {
+            errors.dob = DOB_ERROR_MSG
+        }
+        if(!formData.gender) {
+            errors.gender = GENDER_ERROR_MSG
+        }
+        setErrors(errors)
+        return Object.values(errors).filter(e => e).length > 0
         // TODO: add validations before going to confirm screen
     }
 
     const onContinue = () => {
-        validateUserDetails();
-
-        if (errors.length > 0) {
-            alert(errors.join(", "))
+        if (validateUserDetails()) {
+            alert("Please fill all the required field")
         } else {
             next()
         }
