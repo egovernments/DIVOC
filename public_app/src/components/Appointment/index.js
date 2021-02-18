@@ -8,10 +8,13 @@ import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
 import axios from "axios";
+import {equals, reject} from "ramda";
+import {Loader} from "../Loader";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
     const history = useHistory();
+    const [isLoading, setIsLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [searchDate, setSearchDate] = useState("");
     const [facilities, setFacilities] = useState([]);
@@ -20,28 +23,39 @@ export const Appointment = (props) => {
     const [selectedAllotment, setSelectedAllotment] = useState({});
 
     useEffect(() => {
-        axios.get("/divoc/admin/api/v1/public/facilities")
+        setIsLoading(true);
+        let params = {
+            // pincode: searchText
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+
+        axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
             .then(res => {
-                const data = res.data.map(d => {
-                   return {
-                       ...d,
-                       programs: d.programs.map(p => {
-                           if(p.programId === program_id) {
-                               return {...p, "schedule": {
-                                       "days": [
-                                           "Th",
-                                           "F",
-                                           "Sa"
-                                       ],
-                                       "endTime": "23:00",
-                                       "startTime": "11:00"
-                                   }}
-                           }
-                           return p;
-                       })
-                   }
+                let data = res.data.map(d => {
+                    return {
+                        ...d,
+                        programs: d.programs.map(p => {
+                            if (p.programId === program_id) {
+                                return {
+                                    ...p, "schedule": {
+                                        "days": [
+                                            "Th",
+                                            "F",
+                                            "Sa"
+                                        ],
+                                        "endTime": "23:00",
+                                        "startTime": "11:00"
+                                    }
+                                }
+                            }
+                            return p;
+                        })
+                    }
                 });
+                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText))
                 setFacilities(data)
+                setIsLoading(false);
             });
     }, [searchText, searchDate]);
 
@@ -61,7 +75,14 @@ export const Appointment = (props) => {
                 <FacilityAllotment facility={facility} programId={program_id}
                                    showModal={(facilityId, allotmentDate, allotmentTime, programName, facilityName, facilityAddress) => {
                                        setShowModal(true)
-                                       setSelectedAllotment({facilityId, allotmentDate, allotmentTime, programName, facilityName, facilityAddress})
+                                       setSelectedAllotment({
+                                           facilityId,
+                                           allotmentDate,
+                                           allotmentTime,
+                                           programName,
+                                           facilityName,
+                                           facilityAddress
+                                       })
                                    }}/>
             </div>
         )
@@ -82,6 +103,7 @@ export const Appointment = (props) => {
 
     return (
         <div className="appointment-container">
+            {isLoading && <Loader/>}
             <div className="card-container">
                 <div className="header-group">
                     <h3>Select Facility</h3>

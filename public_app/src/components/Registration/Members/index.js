@@ -12,13 +12,16 @@ import Button from "react-bootstrap/Button";
 import IconLocation from "../../../assets/img/icon-location.svg"
 import IconTime from "../../../assets/img/icon-time.svg"
 import {formatDate, padDigit} from "../../../utils/CustomDate";
+import {Loader} from "../../Loader";
 
 export const Members = () => {
     const history = useHistory();
+    const [isLoading, setIsLoading] = useState(false);
     const [members, setMembers] = useState([]);
     const [programs, setPrograms] = useState([]);
 
     useEffect(() => {
+        setIsLoading(true);
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"recipientToken": token, "Content-Type": "application/json"},
@@ -26,7 +29,8 @@ export const Members = () => {
         axios
             .get(RECIPIENTS_API, config)
             .then((res) => {
-                setMembers(res.data)
+                setMembers(res.data);
+                setIsLoading(false);
             })
             .catch(e => {
                 console.log(e);
@@ -140,6 +144,7 @@ export const Members = () => {
 
     return (
         <div className="main-container">
+            {isLoading && <Loader/>}
             <Container fluid>
                 <div className="members-container">
                     <div style={{display: "flex"}}>
