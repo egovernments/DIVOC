@@ -8,7 +8,7 @@ import (
 )
 
 func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error {
-	enrollment.Code = utils.GenerateEnrollmentCode(*enrollment.Phone)
+	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	// If the generated Code is not unique, try again
 	// code + programId should be unique

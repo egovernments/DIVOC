@@ -1,0 +1,40 @@
+.citizen-login {
+  padding: 10vh;
+}
+
+.citizen-login body {
+  font-family: Avenir, serif;
+}
+
+.citizen-login input {
+  height: 70px;
+  background: #FFFFFF 0% 0% no-repeat padding-box;
+  border: 1px solid #5C9EF8;
+  border-radius: 4px;
+  opacity: 1;
+  text-align: left;
+  letter-spacing: 0px;
+  color: #4D4F5C;
+  margin-right: 60px;
+}
+.citizen-login h2{
+  margin-bottom: 40px;
+}
+.citizen-login h4{
+  margin-bottom: 60px;
+}
+.citizen-login button {
+  top: 554px;
+  left: 177px;
+  height: 73px;
+  background: transparent linear-gradient(91deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+  opacity: 1;
+}
+
+.transparent-button {
+  background: Transparent none no-repeat !important;
+  cursor:pointer;
+  overflow: hidden;
+  outline:none;
+  margin-right: 10vh;
+}

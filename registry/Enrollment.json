@@ -13,7 +13,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["phone", "nationalId", "dob"],
+      "required": ["nationalId", "dob"],
       "properties": {
         "phone" : {
           "type": "string"
