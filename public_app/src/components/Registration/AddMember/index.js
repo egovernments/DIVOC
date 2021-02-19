@@ -11,6 +11,7 @@ import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
+import check from "../../../assets/img/check.png";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_USER_DETAILS = "userDetails";
@@ -127,7 +128,7 @@ const SelectProgram = ({ setValue, formData, navigation, programs }) => {
         <Container fluid>
             <div className="select-program-container">
                 <div className="d-flex justify-content-between align-items-center">
-                    <h3>Please select Vaccination program</h3>
+                    <h3>Please select vaccination program</h3>
                     <span className="back-btn cursor-pointer" onClick={() => {history.goBack()}}>Back</span>
                 </div>
                 <CardGroup className="mt-5">

@@ -12,6 +12,22 @@
     font-weight: bold;
     font-size: 18px;
 }
+@media (max-width: 961px) {
+    .side-effect-container {
+        padding: 1rem 0;
+    }
+}
+
+.program-card {
+    text-align: center;
+}
+
+.program-tick {
+    z-index: 1;
+    position: absolute;
+    top: -9px;
+    right: -9px;
+}
 
 .selected-program-img {
     position: absolute;

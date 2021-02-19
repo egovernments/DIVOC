@@ -216,15 +216,25 @@ const FacilityAllotment = ({facility, programId, showModal}) => {
         function getTimeSlots(allotmentDate) {
             const startHour = parseInt(program.schedule.startTime.split(":")[0]);
             const endHour = parseInt(program.schedule.endTime.split(":")[0]);
+            const lunchHour = 13;
             let slots = [];
             for (let i = startHour; i < endHour; i++) {
+
                 let time = padDigit(i > 12 ? i % 12 : i, 2);
-                slots.push(<Button
-                    variant="outline-primary"
-                    onClick={() => {
-                        showModal(facility.osid, allotmentDate, i, program.name, facility.facilityName, facility.address)
-                    }}
-                    className="mt-3">{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
+                let available = ((i + allotmentDate.getDay() + parseInt(facility.osid.substring(0,4).replace(/[a-z\-]/g,''))));
+                console.log("Time " + i + " " + available + " " + facility.osid.substr(0,4)) ;
+                if (i != lunchHour && available%3!==1) {
+                    slots.push(<Button
+                      variant="outline-primary"
+                      onClick={() => {
+                          showModal(facility.osid, allotmentDate, i, program.name, facility.facilityName, facility.address)
+                      }}
+                      className="mt-3">{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
+                } else if (i === lunchHour) {
+                    slots.push(<Button variant="outline-light" className="mt-3" >{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
+                }else {
+                    slots.push(<Button variant="outline-secondary" className="mt-3" >{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
+                }
             }
             return slots;
         }
@@ -260,16 +270,16 @@ const FacilityAllotment = ({facility, programId, showModal}) => {
         return (
             <div className="w-50">
                 <Row className="mb-2">
-                    <Col lg={6}>Monday</Col><Col lg={6}>10:00 AM to 05:00 PM</Col>
+                    <Col lg={6}>Monday</Col><Col lg={6}>10:00 AM to 12:00 PM</Col>
                 </Row>
                 <Row className="mb-2">
-                    <Col lg={6}>Tuesday</Col><Col lg={6}>10:00 AM to 05:00 PM</Col>
+                    <Col lg={6}>Tuesday</Col><Col lg={6}>9:00 AM to 11:00 PM</Col>
                 </Row>
                 <Row className="mb-2">
                     <Col lg={6}>Wednesday</Col><Col lg={6}>10:00 AM to 05:00 PM</Col>
                 </Row>
                 <Row className="mb-2">
-                    <Col lg={6}>Thursday</Col><Col lg={6}>10:00 AM to 05:00 PM</Col>
+                    <Col lg={6}>Thursday</Col><Col lg={6}>-</Col>
                 </Row>
                 <Row className="mb-2">
                     <Col lg={6}>Friday</Col><Col lg={6}>10:00 AM to 05:00 PM</Col>
