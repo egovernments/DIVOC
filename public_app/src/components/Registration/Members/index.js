@@ -13,6 +13,7 @@ import IconLocation from "../../../assets/img/icon-location.svg"
 import IconTime from "../../../assets/img/icon-time.svg"
 import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
+import {pathOr} from "ramda";
 
 export const Members = () => {
     const history = useHistory();
@@ -105,47 +106,41 @@ export const Members = () => {
 
         return (
             <div className="col-xl-6 pt-3">
-            <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
-                <Card.Body style={{fontSize: "14px"}}>
-                    <span className="mb-2" style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
-                    <div className="mb-2">
-                        {program ? program.name : ''}
-                    </div>
-                    <div className="d-flex justify-content-between align-items-center">
-                        <div className="">
-                            <div><span style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}</div>
-                            <div><span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}</div>
+                <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
+                    <Card.Body style={{fontSize: "14px"}}>
+                        <span className="mb-2"
+                              style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
+                        <div className="mb-2">
+                            {program ? program.name : ''}
+                        </div>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div className="">
+                                <div><span
+                                    style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}
+                                </div>
+                                <div><span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}</div>
+                            </div>
                         </div>
                         {
-                            !appointment && <div className="d-flex justify-content-end">
+                            <div className="d-flex justify-content-between align-items-center">
+                                <div className={`d-flex justify-content-center align-items-center ${appointment ? "visible": "invisible"}`}>
+                                    <img src={IconLocation}/>
+                                    <span
+                                        className="pl-2 pr-2">{pathOr("", ["facilityName"], appointment)} ,{formatAddress(pathOr({}, ["facilityAddress"], appointment))}</span>
+                                    <img src={IconTime}/>
+                                    <span
+                                        className="pl-2 pr-2">{formatDate(pathOr({}, ["allotmentDate"], appointment))} {getTime(formatDate(pathOr({}, ["allotmentTime"], appointment)))} - {getTime(formatDate(pathOr({}, ["allotmentTime"], appointment) + 1))}</span>
+                                </div>
                                 <CustomButton className="blue-btn m-0" onClick={() => {
                                     history.push({
                                         pathname: `/${member.code}/${member.programId}/appointment`,
-                                        state: { name: member.name }
+                                        state: {name: member.name}
                                     })
-                                }}>Book Appointment</CustomButton>
+                                }}>{appointment ? "Edit": "Book"} <br/>Appointment</CustomButton>
                             </div>
                         }
-                    </div>
-                    {
-                        appointment && <div className="d-flex justify-content-between align-items-center">
-                            <div className="d-flex justify-content-center align-items-center">
-                                <img src={IconLocation}/>
-                                <span
-                                    className="pl-2 pr-2">{appointment.facilityName} ,{formatAddress(appointment.facilityAddress)}</span>
-                                <img src={IconTime}/>
-                                <span className="pl-2 pr-2">{formatDate(appointment.allotmentDate)} {getTime(appointment.allotmentTime)} - {getTime(appointment.allotmentTime+1)}</span>
-                            </div>
-                            <CustomButton className="blue-btn m-0" onClick={() => {
-                                history.push({
-                                    pathname: `/${member.code}/${member.programId}/appointment`,
-                                    state: { name: member.name }
-                                })
-                            }}>Edit Appointment</CustomButton>
-                        </div>
-                    }
-                </Card.Body>
-            </Card>
+                    </Card.Body>
+                </Card>
             </div>
         )
     };
@@ -169,13 +164,13 @@ export const Members = () => {
                     </div>
                     }
                     <Row>
-                    {
-                        members.length > 0 &&
-                        members.map(member => {
-                            return <MemberCard member={member}/>
-                        })
+                        {
+                            members.length > 0 &&
+                            members.map(member => {
+                                return <MemberCard member={member}/>
+                            })
 
-                    }
+                        }
                     </Row>
                     <Button className="mt-4" variant="link" type="submit" onClick={() => {
                         history.push("/addMember")
