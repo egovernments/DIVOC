@@ -51,6 +51,12 @@
         "programId": {
           "type": "string"
         },
+        "appointmentTime": {
+          "type": "string"
+        },
+        "appointmentDate": {
+          "type": "string"
+        },
         "address": {
           "$id": "#/properties/address",
           "$ref": "Common.json#/definitions/Address",

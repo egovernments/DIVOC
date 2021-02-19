@@ -17,7 +17,7 @@ func InitializeKafka() {
 
 	log.Infof("Connected to kafka on %s", servers)
 	StartEnrollmentConsumer()
-
+	StartRecipientsAppointmentConsumer()
 	go func() {
 		topic := config.Config.Kafka.EnrollmentTopic
 		for {

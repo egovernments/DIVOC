@@ -22,6 +22,12 @@ type Enrollment struct {
 	// address
 	Address *Address `json:"address,omitempty"`
 
+	// appointment date
+	AppointmentDate string `json:"appointmentDate,omitempty"`
+
+	// appointment time
+	AppointmentTime string `json:"appointmentTime,omitempty"`
+
 	// beneficiary phone
 	BeneficiaryPhone string `json:"beneficiaryPhone,omitempty"`
 

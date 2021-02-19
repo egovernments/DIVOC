@@ -16,6 +16,7 @@ var Config = struct {
 		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapservers"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
 		EnrollmentTopic  string `default:"enrollment" yaml:"enrollmenttopic"`
+		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
 	}
 
 	EnrollmentCreation struct {
