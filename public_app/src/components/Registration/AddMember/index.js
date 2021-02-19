@@ -5,6 +5,7 @@ import axios from "axios";
 import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
+import SelectedLogo from "../../../assets/img/check.png"
 import {Success} from "./Success";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
@@ -134,8 +135,9 @@ const SelectProgram = ({ setValue, formData, navigation, programs }) => {
                         programs.map(p =>
                             <div className="p-2">
                             <a key={p.osid} style={{ cursor: 'pointer' }} onClick={() => onProgramSelect(p.osid)}>
-                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="text-center">
-                                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4" style={{ maxHeight: '9rem' }} />
+                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="text-center h-100">
+                                    {p.osid === formData.programId&& <img src={SelectedLogo} className="selected-program-img"/>}
+                                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4" style={{ maxHeight: '9rem', height: '9rem' }} />
                                     <Card.Body>
                                         <Card.Title>{p.name}</Card.Title>
                                     </Card.Body>
