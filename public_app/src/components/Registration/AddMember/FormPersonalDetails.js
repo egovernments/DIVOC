@@ -303,7 +303,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 <Row className="pt-2">
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="mobile">Mobile Number</label>
+                            <label htmlFor="mobile">Mobile Number *</label>
                             { !verifyDetails && <div className="radio-group">
                                 <div className="form-check radio pb-2">
                                     <input className="form-check-input" type="radio" name="contact" id="defaultContact"
