@@ -1,6 +1,6 @@
 {
     "realm": "divoc",
-    "auth-server-url": "/auth/",
+    "auth-server-url": "https://divoc.togosafe.gouv.tg/auth/",
     "ssl-required": "external",
     "resource": "certificate-login",
     "public-client": true,
