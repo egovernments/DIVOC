@@ -9,6 +9,7 @@ import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
 import config from "../../config";
 import {useSelector} from "react-redux";
+import {NavLink} from "react-router-dom";
 
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
@@ -48,6 +49,9 @@ export const Header = (props) => {
                                 <span>{getFacilityAddress()}</span>
                             </div>
                         </div>
+                    }
+                    {
+                        isFacilityUser() && facility && <NavLink to={"/portal/facility_info"} >PROFILE</NavLink>
                     }
                     {/*{!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}*/}
                     {/*<Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>*/}
