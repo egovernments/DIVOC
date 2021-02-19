@@ -66,7 +66,8 @@ var Config = struct {
 		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
 	Redis struct {
-		Url 		string `env:"REDIS_URL"`
+		Host 		string `env:"REDIS_HOST"`
+		Port 		string `default:"6379" env:"REDIS_PORT"`
 		Password 	string `default:"" env:"REDIS_PASSWORD"`
 		DB          int `default:"0" env:"REDIS_DB"`
 	}
