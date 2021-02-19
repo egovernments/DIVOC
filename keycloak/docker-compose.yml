@@ -20,6 +20,8 @@ services:
       - DB_PASSWORD=keycloak
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_FRONTEND_URL=https://divoc.togosafe.gouv.tg/auth/
+      - PROXY_ADDRESS_FORWARDING=true
       - KEYCLOAK_IMPORT=/config/divoc-realm.json
     volumes:
       - .:/config
