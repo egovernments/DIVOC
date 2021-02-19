@@ -117,7 +117,7 @@ export const Appointment = (props) => {
 
                 </Row>
                 <br/>
-                <h4>Facilities availability for next 1 week</h4>
+                <h4>Facilities availability for next 3 days</h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
