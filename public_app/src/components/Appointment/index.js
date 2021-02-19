@@ -13,6 +13,7 @@ import {Loader} from "../Loader";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
+    const {name} = props.location.state;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
@@ -117,7 +118,7 @@ export const Appointment = (props) => {
 
                 </Row>
                 <br/>
-                <h4>Facilities availability for next 1 week</h4>
+                <h4>Facilities availability for next 3 days</h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
@@ -170,7 +171,7 @@ export const Appointment = (props) => {
                     </div>
                     <div className="d-flex flex-column justify-content-center align-items-center">
                         {/*TODO: replace with name*/}
-                        <span>For Beneficiary Name</span>
+                        <span>For {name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
                         <span
