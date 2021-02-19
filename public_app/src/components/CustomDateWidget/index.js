@@ -25,10 +25,12 @@ export const CustomDateWidget = (props) => {
     <div className="date-picker">
     <DatePicker
             selected={startDate} 
-            onChange={updateValue} 
+            onChange={updateValue}
             dateFormat="dd-MM-yyyy"
             id="date-picker"
             customInput={<CustomInput />}
+            maxDate={new Date()}
+            showYearDropdown
         />
     </div>
   );
