@@ -100,7 +100,7 @@ export const Members = () => {
             if (fromTime > 11) {
                 return padDigit(fromTime > 12 ? fromTime % 12 : fromTime) + ":00 PM"
             } else {
-                return fromTime
+                return fromTime + ":00 AM"
             }
         }
 
@@ -122,21 +122,27 @@ export const Members = () => {
                             </div>
                         </div>
                         {
-                            <div className="d-flex justify-content-between align-items-center">
-                                <div className={`d-flex justify-content-center align-items-center ${appointment ? "visible": "invisible"}`}>
-                                    <img src={IconLocation}/>
-                                    <span
-                                        className="pl-2 pr-2">{pathOr("", ["facilityName"], appointment)} ,{formatAddress(pathOr({}, ["facilityAddress"], appointment))}</span>
-                                    <img src={IconTime}/>
-                                    <span
-                                        className="pl-2 pr-2">{formatDate(pathOr({}, ["allotmentDate"], appointment))} {getTime(formatDate(pathOr({}, ["allotmentTime"], appointment)))} - {getTime(formatDate(pathOr({}, ["allotmentTime"], appointment) + 1))}</span>
-                                </div>
+                            <div className={`d-flex ${appointment ? "justify-content-between" : "justify-content-end"} align-items-center`}>
+                                <Row
+                                    className={` justify-content-center align-items-center ${appointment ? "d-flex" : "d-none"}`}>
+                                    <Col lg={6}>
+                                        <img src={IconLocation}/>
+                                        <span
+                                            className="pl-2 pr-2">{pathOr("", ["facilityName"], appointment)} ,{formatAddress(pathOr({}, ["facilityAddress"], appointment))}</span>
+                                    </Col>
+                                    <Col lg={6}>
+                                        <img src={IconTime}/>
+                                        <span
+                                            className="pl-2 pr-2">{formatDate(pathOr({}, ["allotmentDate"], appointment))}
+                                            <br/>{getTime(pathOr("", ["allotmentTime"], appointment))} - {getTime(pathOr("", ["allotmentTime"], appointment) + 1)}</span>
+                                    </Col>
+                                </Row>
                                 <CustomButton className="blue-btn m-0" onClick={() => {
                                     history.push({
                                         pathname: `/${member.code}/${member.programId}/appointment`,
                                         state: {name: member.name}
                                     })
-                                }}>{appointment ? "Edit": "Book"} <br/>Appointment</CustomButton>
+                                }}>{appointment ? "Edit" : "Book"} <br/>Appointment</CustomButton>
                             </div>
                         }
                     </Card.Body>

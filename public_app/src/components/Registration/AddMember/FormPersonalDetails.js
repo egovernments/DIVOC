@@ -15,6 +15,7 @@ import {
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG, STATE_ERROR_MSG
 } from "./error-constants";
+import {formatDate} from "../../../utils/CustomDate";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -207,7 +208,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                               onChange={d => setDobValue(d)} />}
                             {
                                 verifyDetails &&
-                                <p>{formData.dob}</p>
+                                <p>{formatDate(formData.dob)}</p>
                             }
                             <div className="invalid-input">
                                 {errors.dob}
@@ -355,8 +356,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             <div hidden={verifyDetails}>
                                 <input className="form-control" id="email" name="email" type="text"
                                        placeholder="Enter Email ID"
-                                       defaultValue={maskPersonalDetails(email)}
-                                       onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value)}
+                                       defaultValue={maskPersonalDetails(email, true)}
+                                       onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value, true)}
                                        onFocus={(evt) => evt.target.value = email}
                                        onChange={(e) => setEmail(e.target.value)}/>
                                 <div className="pt-2">

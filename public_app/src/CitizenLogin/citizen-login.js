@@ -1,4 +1,4 @@
-import {Component, useState} from "react";
+import {Component, useEffect, useRef, useState} from "react";
 import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../utils/cookies";
@@ -13,8 +13,6 @@ export function CitizenLoginComponent() {
         invalidOTP: "",
         invalidMobileNumber: ""
     });
-
-    const history = useHistory();
 
     const setMobileNumber = (event) => {
         setState((prevState)=>{
@@ -98,6 +96,7 @@ export function CitizenLoginComponent() {
                 <div className="form-row">
                     <div className="form-group col-md-3">
                         <input placeholder="Mobile number"
+                               ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
                                onChange={setMobileNumber}
                                value={state.phoneNumber}
@@ -108,8 +107,9 @@ export function CitizenLoginComponent() {
                             {state.invalidMobileNumber}
                         </div>
                     </div>
-                    <div className="form-group col-md-3">
+                    <div className="form-group col-md-3" >
                         <input placeholder="OTP" maxLength={4}
+                               ref={ref => ref && ref.focus()}
                                className="login-otp form-control form-control-lg"
                                onChange={setOTP}
                                value={state.otp}

@@ -3,6 +3,7 @@ import React from "react";
 import {CustomButton} from "../../CustomButton";
 import {useHistory} from "react-router-dom";
 import check from "../../../assets/img/check.png";
+import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 
 export const Success = ({ formData, programs}) => {
     const history = useHistory();
@@ -17,7 +18,9 @@ export const Success = ({ formData, programs}) => {
                     <h4>Beneficiary Name: {formData.name}</h4>
                 </div>
                 <div className="pt-3">
-                    <p>Enrolment details will be sent to <br/> {formData.email ? formData.email.concat(" and"): ''} {formData.contact}</p>
+                    <p>Enrolment details will be sent to <br/>
+                    {formData.email ? maskPersonalDetails(formData.email).concat(" and "): ''}
+                    {maskPersonalDetails(formData.contact)}</p>
                 </div>
                 <div className="pt-3">
                     <p>On day of vaccination, please carry same ID proof used for registration</p>
