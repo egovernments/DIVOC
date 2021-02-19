@@ -15,6 +15,7 @@ import {
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG, STATE_ERROR_MSG
 } from "./error-constants";
+import {formatDate} from "../../../utils/CustomDate";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
@@ -99,7 +100,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                <p>{getSelectedIdType()}</p>
+                                <b>{getSelectedIdType()}</b>
                             }
                         </Col>
                     </div>
@@ -120,7 +121,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                <p>{formData.nationalId.split(":")[2]}</p>
+                                <b>{formData.nationalId.split(":")[2]}</b>
                             }
                         </Col>
                     </div>
@@ -173,7 +174,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                    <p>{formData.name}</p>
+                                    <b>{formData.name}</b>
                             }
                         </Col>
                     </div>
@@ -193,7 +194,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                    <p>{formData.state}</p>
+                                    <b>{formData.state}</b>
                             }
                         </Col>
                     </div>
@@ -207,7 +208,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                               onChange={d => setDobValue(d)} />}
                             {
                                 verifyDetails &&
-                                <p>{formData.dob}</p>
+                                <><br/><b>{formatDate(formData.dob)}</b></>
                             }
                             <div className="invalid-input">
                                 {errors.dob}
@@ -228,7 +229,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                <p>{formData.district}</p>
+                                <b>{formData.district}</b>
                             }
                         </Col>
                     </div>
@@ -245,7 +246,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </select>
                             {
                                 verifyDetails &&
-                                <p>{formData.gender}</p>
+                                <><br/><b>{formData.gender}</b></>
                             }
                             <div className="invalid-input">
                                 {errors.gender}
@@ -345,7 +346,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             }
                             {
                                 verifyDetails &&
-                                    <p>{formData.contact}</p>
+                                    <><br/><b>{formData.contact}</b></>
                             }
                         </Col>
                     </div>
@@ -368,7 +369,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             </div>
                             {
                                 verifyDetails &&
-                                    <p>{formData.email}</p>
+                                    <><br/><b>{formData.email}</b></>
                             }
                         </Col>
                     </div>
@@ -453,7 +454,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>Provide details to complete enrollment</h3>
+                <h3>{verifyDetails ? "Verify beneficiary details" : "Provide details to complete enrollment"}</h3>
                 <IdDetails/>
                 <BeneficiaryDetails/>
                 <ContactInfo/>

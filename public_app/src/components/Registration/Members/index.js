@@ -157,7 +157,7 @@ export const Members = () => {
             <Container fluid>
                 <div className="members-container">
                     <div style={{display: "flex"}}>
-                        <h5>Registered Members <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
+                        <h5>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
                         </h5>
                     </div>
                     {members.length === 0 &&
