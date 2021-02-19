@@ -29,6 +29,31 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             "id": "driverLicense",
             "name": "Driver License",
             "value": "in.gov.driverlicense"
+        },
+        {
+            "id": "panCard",
+            "name": "Pan Card",
+            "value": "in.gov.pancard"
+        },
+        {
+            "id": "passport",
+            "name": "Passport",
+            "value": "in.gov.passport"
+        },
+        {
+            "id": "healthInsurance",
+            "name": "Health Insurance Smart Card",
+            "value": "in.gov.healthInsurance"
+        },
+        {
+            "id": "mnrega",
+            "name": "MNREGA Job Card",
+            "value": "in.gov.mnrega"
+        },
+        {
+            "id": "id",
+            "name": "Official Identity Card issued to MPs/MLAs",
+            "value": "in.gov.id"
         }
     ];
 
