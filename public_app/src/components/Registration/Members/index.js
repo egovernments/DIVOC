@@ -119,7 +119,10 @@ export const Members = () => {
                         {
                             !appointment && <div className="d-flex justify-content-end">
                                 <CustomButton className="blue-btn m-0" onClick={() => {
-                                    history.push(`/${member.code}/${member.programId}/appointment`)
+                                    history.push({
+                                        pathname: `/${member.code}/${member.programId}/appointment`,
+                                        state: { name: member.name }
+                                    })
                                 }}>Book Appointment</CustomButton>
                             </div>
                         }
@@ -134,7 +137,10 @@ export const Members = () => {
                                 <span className="pl-2 pr-2">{formatDate(appointment.allotmentDate)} {getTime(appointment.allotmentTime)} - {getTime(appointment.allotmentTime+1)}</span>
                             </div>
                             <CustomButton className="blue-btn m-0" onClick={() => {
-                                history.push(`/${member.code}/${member.programId}/appointment`)
+                                history.push({
+                                    pathname: `/${member.code}/${member.programId}/appointment`,
+                                    state: { name: member.name }
+                                })
                             }}>Edit Appointment</CustomButton>
                         </div>
                     }
