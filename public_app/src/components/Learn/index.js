@@ -32,7 +32,7 @@ const videoHeaderDetails = {
     title: "Learn about the C-19 Program",
     description: "You can find information about the vaccination program, learn about side-effect and how you access your digital vaccination certificate.",
     videoTitle: "Mobile technology to be used for COVID-19",
-    videoUrl: "https://divoc.xiv.in/video/learn/vaccination.m4v"
+    videoUrl: "https://divoc.togosafe.gouv.tg/video/learn/vaccination.m4v"
 }
 
 function Learn(props) {

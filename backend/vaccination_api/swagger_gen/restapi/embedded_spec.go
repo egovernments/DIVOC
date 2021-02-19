@@ -940,8 +940,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",
@@ -2321,8 +2321,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",

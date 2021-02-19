@@ -83,7 +83,7 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
               "subject": "DIVOC - Facility Pending Tasks"
               },
               "facilityRegistered": {
-              "message": "Welcome {{.FacilityName}}. Your facility has been registered under divoc. You can login at https://divoc.xiv.in/portal using {{.Admins}} contact numbers.",
+              "message": "Welcome {{.FacilityName}}. Your facility has been registered under divoc. You can login at https://divoc.togosafe.gouv.tg/portal using {{.Admins}} contact numbers.",
               "subject": "DIVOC - Facility Registered"
               },
               "facilityUpdate": {
@@ -95,7 +95,7 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
               "subject": "DIVOC - Pre-Enrollment"
               },
               "recipientCertified": {
-              "message": "{{.Name}}, your {{.VaccineName}} vaccine certificate can be viewed and downloaded at: https://divoc.xiv.in/certificate/ ",
+              "message": "{{.Name}}, your {{.VaccineName}} vaccine certificate can be viewed and downloaded at: https://divoc.togosafe.gouv.tg/certificate/ ",
               "subject": "DIVOC - Vaccination Certificate"
               }
           }

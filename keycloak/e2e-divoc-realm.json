@@ -810,8 +810,8 @@
     {
       "id": "cd59dfa9-6289-40f9-b5c1-d76b1565501d",
       "clientId": "admin-api",
-      "rootUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
-      "adminUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
+      "rootUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/account/",
+      "adminUrl": "https://divoc.togosafe.gouv.tg/auth/realms/divoc/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -819,7 +819,7 @@
       "secret": "a1832880-059a-40d0-86b1-e318ced82613",
       "redirectUris": [
         "https://divoc.xiv.in",
-        "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/*",
+        "https://divoc.togosafe.gouv.tg/auth/realms/divoc/account/*",
         "https://oauth.pstmn.io/v1/callback"
       ],
       "webOrigins": [
@@ -1092,7 +1092,7 @@
     {
       "id": "ac354645-3c3c-4592-879b-20a2f4f48302",
       "clientId": "certificate-login",
-      "rootUrl": "https://divoc.xiv.in/certificate/",
+      "rootUrl": "https://divoc.togosafe.gouv.tg/certificate/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -1100,12 +1100,12 @@
       "secret": "**********",
       "redirectUris": [
         "http://192.168.0.103:3000/*",
-        "https://divoc.xiv.in/*",
+        "https://divoc.togosafe.gouv.tg/*",
         "http://localhost:3000/*",
         "*",
-        "https://divoc.xiv.in/certificate/",
+        "https://divoc.togosafe.gouv.tg/certificate/",
         "http://localhost/certificate/*",
-        "https://divoc.xiv.in/certificate/*"
+        "https://divoc.togosafe.gouv.tg/certificate/*"
       ],
       "webOrigins": [
         "https://divoc.xiv.in",
@@ -1269,7 +1269,7 @@
         "https://divoc-app.xiv.in/*",
         "http://divoc-portal.xiv.in/*",
         "https://divoc-portal.xiv.in/*",
-        "https://divoc.xiv.in/*",
+        "https://divoc.togosafe.gouv.tg/*",
         "http://localhost:3000/*",
         "*",
         "http://localhost:5000/*"

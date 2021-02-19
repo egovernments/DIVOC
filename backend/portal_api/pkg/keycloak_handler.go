@@ -106,7 +106,7 @@ func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
 }
 
 func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest) string {
-	userUrl := resp.Response().Header.Get("Location") //https://divoc.xiv.in/keycloak/auth/admin/realms/divoc/users/f8c7067d-c0c8-4518-95b1-6681afbbf986
+	userUrl := resp.Response().Header.Get("Location") //https://divoc.togosafe.gouv.tg/auth/admin/realms/divoc/users/f8c7067d-c0c8-4518-95b1-6681afbbf986
 	slices := strings.Split(userUrl, "/")
 	var keycloakUserId = ""
 	if len(slices) > 1 {

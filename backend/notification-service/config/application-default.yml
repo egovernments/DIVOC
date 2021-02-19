@@ -14,4 +14,4 @@ emailsmtp:
   enable: true
 
 flagr:
-  url: https://divoc.xiv.in/config
+  url:  https://divoc/xiv/in/config

@@ -4,7 +4,7 @@ registry:
   searchoperationid: search
   readoperationid: read
 keycloak:
-  url: https://divoc.xiv.in/keycloak/auth
+  url: https://divoc.togosafe.gouv.tg/auth
   realm: divoc
   facilityAdmin:
     roleName: facility-admin
@@ -36,7 +36,7 @@ kafka:
   certifiedTopic: certified
   enrollmenttopic: enrollment
 flagr:
-  url: https://divoc.xiv.in/config
+  url: https://divoc/xiv/in/config
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
