@@ -10,6 +10,7 @@ import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
+import check from "../../../assets/img/check.png";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_USER_DETAILS = "userDetails";
@@ -124,13 +125,14 @@ const SelectProgram = ({ setValue, formData, navigation, programs }) => {
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>Please select Vaccination program</h3>
+                <h3>Please select vaccination program</h3>
                 <CardGroup className="mt-5">
                     {
                         programs.map(p =>
                             <div className="p-2">
                             <a key={p.osid} style={{ cursor: 'pointer' }} onClick={() => onProgramSelect(p.osid)}>
-                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="text-center">
+                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="program-card">
+                                    {p.osid === formData.programId && <img className="program-tick" src={check}/>}
                                     <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4" style={{ maxHeight: '9rem' }} />
                                     <Card.Body>
                                         <Card.Title>{p.name}</Card.Title>
