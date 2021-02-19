@@ -115,6 +115,7 @@ export const AddMembersFlow = () => {
 }
 
 const SelectProgram = ({ setValue, formData, navigation, programs }) => {
+    const history = useHistory();
     const { next } = navigation;
 
     function onProgramSelect(osid) {
@@ -123,8 +124,11 @@ const SelectProgram = ({ setValue, formData, navigation, programs }) => {
 
     return (
         <Container fluid>
-            <div className="side-effect-container">
-                <h3>Please select Vaccination program</h3>
+            <div className="select-program-container">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h3>Please select Vaccination program</h3>
+                    <span className="back-btn cursor-pointer" onClick={() => {history.goBack()}}>Back</span>
+                </div>
                 <CardGroup className="mt-5">
                     {
                         programs.map(p =>

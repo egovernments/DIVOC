@@ -1,9 +1,14 @@
-.side-effect-container {
+.select-program-container {
     padding: 3rem 5rem;
     height: 100%;
 }
 
-.side-effect-container .container-fluid {
+.select-program-container .container-fluid {
     height: 100%;
 }
 
+.select-program-container .back-btn{
+    color: #5C9EF8;
+    font-weight: bold;
+    font-size: 18px;
+}
