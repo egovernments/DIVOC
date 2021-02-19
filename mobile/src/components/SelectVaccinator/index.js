@@ -63,7 +63,7 @@ export const SelectVaccinator = (props) => {
     function fetchDoseOptions() {
         const selectedMedicine = medicines.filter( item => item.name === selectedMedicineName)[0]
         let doseCounts = [];
-        for(let i = 1; i <= selectedMedicine.schedule.repeatInterval; i++){
+        for(let i = 1; i <= selectedMedicine.doseIntervals.length + 1; i++){
             doseCounts.push({label: i,value: i})
         }
         return doseCounts;
