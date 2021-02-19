@@ -107,7 +107,7 @@ export const Appointment = (props) => {
             <div className="card-container">
                 <div className="header-group">
                     <h3>Select Facility</h3>
-                    <span className="appointment-back-btn">Back</span>
+                    <span className="appointment-back-btn cursor-pointer" onClick={() => {history.push("/registration")}}>Back</span>
                 </div>
                 <Row>
                     <Col lg={6}>
