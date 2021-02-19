@@ -157,7 +157,7 @@ export const Members = () => {
             <Container fluid>
                 <div className="members-container">
                     <div style={{display: "flex"}}>
-                        <h5>Registered Members <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
+                        <h5>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
                         </h5>
                     </div>
                     {members.length === 0 &&
@@ -178,11 +178,11 @@ export const Members = () => {
 
                         }
                     </Row>
-                    <Button className="mt-4" variant="link" type="submit" onClick={() => {
+                    {members.length < 4 && <Button className="mt-4" variant="link" type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
                         <b style={{fontSize: "larger"}}>+ Member</b>
-                    </Button>
+                    </Button>}
                 </div>
             </Container>
         </div>

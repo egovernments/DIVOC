@@ -5,6 +5,7 @@ import axios from "axios";
 import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
+import SelectedLogo from "../../../assets/img/check.png"
 import {Success} from "./Success";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
@@ -116,6 +117,7 @@ export const AddMembersFlow = () => {
 }
 
 const SelectProgram = ({ setValue, formData, navigation, programs }) => {
+    const history = useHistory();
     const { next } = navigation;
 
     function onProgramSelect(osid) {
@@ -124,16 +126,19 @@ const SelectProgram = ({ setValue, formData, navigation, programs }) => {
 
     return (
         <Container fluid>
-            <div className="side-effect-container">
-                <h3>Please select vaccination program</h3>
+            <div className="select-program-container">
+                <div className="d-flex justify-content-between align-items-center">
+                    <h3>Please select vaccination program</h3>
+                    <span className="back-btn cursor-pointer" onClick={() => {history.goBack()}}>Back</span>
+                </div>
                 <CardGroup className="mt-5">
                     {
                         programs.map(p =>
                             <div className="p-2">
                             <a key={p.osid} style={{ cursor: 'pointer' }} onClick={() => onProgramSelect(p.osid)}>
-                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="program-card">
-                                    {p.osid === formData.programId && <img className="program-tick" src={check}/>}
-                                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4" style={{ maxHeight: '9rem' }} />
+                                <Card border={p.osid === formData.programId ? "success" : "light"} style={{ width: '15rem' }} className="text-center h-100">
+                                    {p.osid === formData.programId&& <img src={SelectedLogo} className="selected-program-img"/>}
+                                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4" style={{ maxHeight: '9rem', height: '9rem' }} />
                                     <Card.Body>
                                         <Card.Title>{p.name}</Card.Title>
                                     </Card.Body>
