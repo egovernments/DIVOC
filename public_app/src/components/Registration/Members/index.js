@@ -178,11 +178,11 @@ export const Members = () => {
 
                         }
                     </Row>
-                    <Button className="mt-4" variant="link" type="submit" onClick={() => {
+                    {members.length < 4 && <Button className="mt-4" variant="link" type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
                         <b style={{fontSize: "larger"}}>+ Member</b>
-                    </Button>
+                    </Button>}
                 </div>
             </Container>
         </div>
