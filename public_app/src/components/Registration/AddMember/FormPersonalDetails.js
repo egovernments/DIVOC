@@ -29,6 +29,31 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             "id": "driverLicense",
             "name": "Driver License",
             "value": "in.gov.driverlicense"
+        },
+        {
+            "id": "panCard",
+            "name": "Pan Card",
+            "value": "in.gov.pancard"
+        },
+        {
+            "id": "passport",
+            "name": "Passport",
+            "value": "in.gov.passport"
+        },
+        {
+            "id": "healthInsurance",
+            "name": "Health Insurance Smart Card",
+            "value": "in.gov.healthInsurance"
+        },
+        {
+            "id": "mnrega",
+            "name": "MNREGA Job Card",
+            "value": "in.gov.mnrega"
+        },
+        {
+            "id": "id",
+            "name": "Official Identity Card issued to MPs/MLAs",
+            "value": "in.gov.id"
         }
     ];
 
@@ -133,9 +158,27 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     const BeneficiaryDetails = () => {
 
         const [districts, setDistricts] = useState([]);
+        const [maxAge, setMaxAge] = useState(50);
 
         useEffect(() => {
             setDistictsForState(formData.state)
+            const data = {
+                "entityContext": {
+
+                },
+                "flagKey": "country_specific_features"
+            }
+            axios
+                .post("/config/api/v1/evaluation", data)
+                .then((res) => {
+                    return res.data;
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+                .then((result) => {
+                    setMaxAge(result["variantAttachment"].registrationMaxAge)
+                })
         }, []);
 
         function onStateSelected(stateSelected) {
@@ -156,7 +199,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         function setDobValue(dob) {
             setValue({target: {name:"dob", value:dob}})
         }
-
+        const minDate = new Date();
+        minDate.setYear(minDate.getYear() - maxAge);
         return (
             <div className="pt-5">
                 <h5>Beneficiary Details</h5>
@@ -204,8 +248,12 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                         <Col className="col-6">
                             <label htmlFor="name">Date of Birth *</label>
                             { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
-                                              value={formData.dob}
-                                              onChange={d => setDobValue(d)} />}
+                                              value={minDate}
+                                              minDate={minDate}
+                                              maxDate={minDate}
+                                              onChange={d => {
+                                                  setDobValue(d)
+                                              }} />}
                             {
                                 verifyDetails &&
                                 <><br/><b>{formatDate(formData.dob)}</b></>

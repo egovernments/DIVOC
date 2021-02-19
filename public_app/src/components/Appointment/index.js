@@ -268,7 +268,7 @@ const FacilityAllotment = ({facility, programId, showModal}) => {
         )
     } else {
         return (
-            <div className="w-50">
+            <div className="w-100">
                 <Row className="mb-2">
                     <Col lg={6}>Monday</Col><Col lg={6}>10:00 AM to 12:00 PM</Col>
                 </Row>

@@ -20,6 +20,7 @@ export const Members = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [members, setMembers] = useState([]);
     const [programs, setPrograms] = useState([]);
+    const [marqueeMsg, setMarqueeMsg] = useState("Registrations are open only for citizens 50 years and above.");
 
     useEffect(() => {
         setIsLoading(true);
@@ -44,6 +45,23 @@ export const Members = () => {
         if (!getUserNumberFromRecipientToken()) {
             history.push("/citizen")
         }
+        const data = {
+            "entityContext": {
+
+            },
+            "flagKey": "country_specific_features"
+        }
+        axios
+            .post("/config/api/v1/evaluation", data)
+            .then((res) => {
+                return res.data;
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+            .then((result) => {
+                setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
+            })
     }, []);
 
     function fetchPrograms() {
@@ -156,6 +174,7 @@ export const Members = () => {
             {isLoading && <Loader/>}
             <Container fluid>
                 <div className="members-container">
+                    <marquee style={{color: ""}}>{marqueeMsg}</marquee>
                     <div style={{display: "flex"}}>
                         <h5>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
                         </h5>
