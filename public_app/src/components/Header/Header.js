@@ -1,14 +1,26 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import Navbar from "react-bootstrap/Navbar";
 import NavbarLogo from "../../assets/img/nav-logo.png";
 import "./Header.css";
 import Nav from "react-bootstrap/Nav";
-import NavDropdown from "react-bootstrap/NavDropdown";
 import {useKeycloak} from "@react-keycloak/web";
-import config from "../../config"
+import {getUserNumberFromRecipientToken} from "../../utils/reciepientAuth";
+import {removeCookie, setCookie} from "../../utils/cookies";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 function Header() {
     const {initialized, keycloak} = useKeycloak();
+    const [reciepientUser, setReciepientUser] = useState('');
+
+    useEffect(() => {
+        const rUser = getUserNumberFromRecipientToken();
+        setReciepientUser(rUser);
+    }, []);
+    
+    function logoutRecipient() {
+        removeCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        window.location.href = "/citizen"
+    }
     return(
         <Navbar fixed="top" bg="white">
             <Navbar.Brand href={"/"}>
@@ -27,6 +39,7 @@ function Header() {
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
                     {/*</NavDropdown>*/}
                     {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin});}}>LOGOUT</Nav.Link>}
+                    {reciepientUser && <Nav.Link onClick={() => logoutRecipient()}>LOGOUT</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

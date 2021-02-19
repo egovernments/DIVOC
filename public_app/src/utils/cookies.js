@@ -12,3 +12,7 @@ export const setCookie = (cname, cvalue, exdays) => {
 export const getCookie = (cname) => {
     return cookies.get(cname);
 }
+
+export const removeCookie = (cname) => {
+    return cookies.remove(cname)
+}
