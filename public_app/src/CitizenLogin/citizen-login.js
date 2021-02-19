@@ -63,7 +63,7 @@ export function CitizenLoginComponent() {
         axios.post(url, {phone: state.phoneNumber, otp: state.otp})
             .then((response) => {
                 setCookie(CITIZEN_TOKEN_COOKIE_NAME, response.data.token, 1)
-                history.push("/registration")
+                window.location.href = "/registration";
             }).catch((error) => {
             setState((prevState) => {
                 return {
