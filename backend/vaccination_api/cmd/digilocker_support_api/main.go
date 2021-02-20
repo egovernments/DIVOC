@@ -423,7 +423,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			w.WriteHeader(200)
 			_, _ = w.Write(pdfBytes)
-			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate found")
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
 		}
 	} else {
 		log.Errorf("No certificates found for request %v", preEnrollmentCode)
