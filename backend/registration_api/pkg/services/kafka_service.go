@@ -3,7 +3,6 @@ package services
 import (
 	"encoding/json"
 	"github.com/divoc/registration-api/config"
-	"github.com/divoc/registration-api/pkg/consumers"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -19,8 +18,6 @@ func InitializeKafka() {
 	}
 
 	log.Infof("Connected to kafka on %s", servers)
-	consumers.StartEnrollmentConsumer()
-	consumers.StartRecipientsAppointmentBookingConsumer()
 	go func() {
 		topic := config.Config.Kafka.EnrollmentTopic
 		for {
