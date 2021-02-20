@@ -1,14 +1,18 @@
-package services
+package consumers
 
 import (
 	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/services"
+	"github.com/divoc/registration-api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"time"
 )
 
-func StartRecipientsAppointmentConsumer() {
+func StartRecipientsAppointmentBookingConsumer() {
 	servers := config.Config.Kafka.BootstrapServers
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  servers,
@@ -39,21 +43,25 @@ func StartRecipientsAppointmentConsumer() {
 					}
 					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil {
 						appointmentTData := make(map[string]interface{})
-						osid := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})["osid"]
-						appointmentTData["appointmentTime"] = recipientAppointmentMessage.Time
-						appointmentTData["osid"] = osid
+						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
+
+						appointmentTData["appointmentSlot"] = recipientAppointmentMessage.Time
+						appointmentTData["osid"] = enrollment["osid"]
 						appointmentTData["appointmentDate"] = recipientAppointmentMessage.Date
 						appointmentTData["enrollmentScopeId"] = recipientAppointmentMessage.FacilityId
+
 						log.Infof("Message on %s: %v \n", msg.TopicPartition, appointmentTData)
+
 						_, err := kernelService.UpdateRegistry("Enrollment", appointmentTData)
 						if err == nil {
-							// Send notification message
-							//if err != nil {
-							//	log.Error("Unable to send notification to the enrolled user",  err)
-							//}
+							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, recipientAppointmentMessage.Date,
+								recipientAppointmentMessage.Time))
+							if err != nil {
+								log.Error("Unable to send notification to the enrolled user",  err)
+							}
 						} else {
-							log.Error("Booking appointment is failed ", err)
 							// Push to error topic
+							log.Error("Booking appointment is failed ", err)
 						}
 						_, _ = consumer.CommitMessage(msg)
 					} else {
@@ -69,6 +77,23 @@ func StartRecipientsAppointmentConsumer() {
 			}
 		}
 	}()
+}
+
+func CreateEnrollmentFromInterface(enrollmentMap map[string]interface{}, appointmentDate string, appointmentTime string) models.Enrollment {
+
+	appointmentDateFormat, err := time.Parse("2006-01-02", appointmentDate)
+	if err != nil {
+		log.Errorf("Invalid date format (%v) (%v)", appointmentDate, err)
+		return models.Enrollment{}
+	} else {
+		return models.Enrollment{
+			Name:            enrollmentMap["name"].(string),
+			Phone:           enrollmentMap["phone"].(string),
+			Email:           enrollmentMap["email"].(string),
+			AppointmentDate: strfmt.Date(appointmentDateFormat),
+			AppointmentSlot: appointmentTime,
+		}
+	}
 }
 
 type RecipientAppointmentMessage struct {

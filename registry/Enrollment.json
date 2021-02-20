@@ -51,11 +51,12 @@
         "programId": {
           "type": "string"
         },
-        "appointmentTime": {
+        "appointmentSlot": {
           "type": "string"
         },
         "appointmentDate": {
-          "type": "string"
+          "type": "string",
+          "format": "date"
         },
         "address": {
           "$id": "#/properties/address",

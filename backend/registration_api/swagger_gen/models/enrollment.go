@@ -23,10 +23,11 @@ type Enrollment struct {
 	Address *Address `json:"address,omitempty"`
 
 	// appointment date
-	AppointmentDate string `json:"appointmentDate,omitempty"`
+	// Format: date
+	AppointmentDate strfmt.Date `json:"appointmentDate,omitempty"`
 
-	// appointment time
-	AppointmentTime string `json:"appointmentTime,omitempty"`
+	// appointment slot
+	AppointmentSlot string `json:"appointmentSlot,omitempty"`
 
 	// beneficiary phone
 	BeneficiaryPhone string `json:"beneficiaryPhone,omitempty"`
@@ -74,6 +75,10 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateAppointmentDate(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDob(formats); err != nil {
 		res = append(res, err)
 	}
@@ -105,6 +110,19 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AppointmentDate) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("appointmentDate", "body", "date", m.AppointmentDate.String(), formats); err != nil {
+		return err
 	}
 
 	return nil

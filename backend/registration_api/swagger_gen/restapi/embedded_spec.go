@@ -381,9 +381,10 @@ func init() {
           "$ref": "#/definitions/address"
         },
         "appointmentDate": {
-          "type": "string"
+          "type": "string",
+          "format": "date"
         },
-        "appointmentTime": {
+        "appointmentSlot": {
           "type": "string"
         },
         "beneficiaryPhone": {

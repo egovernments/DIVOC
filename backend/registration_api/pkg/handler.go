@@ -7,7 +7,6 @@ import (
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/models"
 	"github.com/divoc/registration-api/pkg/services"
-	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
