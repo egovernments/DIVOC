@@ -60,7 +60,7 @@ func NotifyAppointmentBooked(enrollment models.Enrollment) error {
 	err := appointmentBookedTemplate.Execute(&buf, enrollment)
 	if err == nil {
 		if len(enrollment.Phone) > 0 {
-			PublishNotificationMessage("tel:"+enrollment.Email, subject, buf.String())
+			PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
 		}
 		if len(enrollment.Email) > 0 {
 			PublishNotificationMessage("mailto:"+enrollment.Email, subject, buf.String())
