@@ -22,17 +22,17 @@ func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error
 }
 
 func NotifyRecipient(enrollment models.Enrollment) error {
-	EnrollmentRegistered := "EnrollmentRegistered"
-	preEnrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	EnrollmentRegistered := "enrollmentRegistered"
+	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
 	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
 
-	var preEnrollmentTemplate = template.Must(template.New("").Parse(preEnrollmentTemplateString))
+	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 
 	recipient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
 	log.Infof("Sending SMS %s %s", recipient, message)
 	buf := bytes.Buffer{}
-	err := preEnrollmentTemplate.Execute(&buf, enrollment)
+	err := enrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {
 		if len(enrollment.Phone) > 0 {
 			PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
