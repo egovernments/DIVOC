@@ -1,8 +1,7 @@
-import {Component, useEffect, useRef, useState} from "react";
+import {useState} from "react";
 import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../utils/cookies";
-import {useHistory} from "react-router";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../constants";
 
 export function CitizenLoginComponent() {
@@ -85,7 +84,7 @@ export function CitizenLoginComponent() {
     {
         const infoText = <>
             <h2>
-                Registration & Appointment Portal
+                Registration and Appointment Portal
             </h2>
             <h4>
                 Get Started by entering your mobile number
