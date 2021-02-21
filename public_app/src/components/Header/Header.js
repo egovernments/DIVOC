@@ -39,7 +39,6 @@ function Header() {
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
                     {/*</NavDropdown>*/}
                     {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin});}}>LOGOUT</Nav.Link>}
-                    {reciepientUser && <Nav.Link onClick={() => logoutRecipient()}>LOGOUT</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
