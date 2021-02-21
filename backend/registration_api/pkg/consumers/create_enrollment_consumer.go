@@ -1,8 +1,9 @@
-package services
+package consumers
 
 import (
 	"encoding/json"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -17,7 +18,7 @@ func StartEnrollmentConsumer() {
 		"enable.auto.commit": "false",
 	})
 	if err != nil {
-		log.Errorf("Failed connecting to kafka %v", err)
+		log.Errorf("Failed connecting to kafka %+v", err)
 	}
 	go func() {
 		err := consumer.SubscribeTopics([]string{config.Config.Kafka.EnrollmentTopic}, nil)
@@ -33,16 +34,16 @@ func StartEnrollmentConsumer() {
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					err = CreateEnrollment(enrollment, 1)
+					err = services.CreateEnrollment(enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
-						// Push to ack topic
-						//err = NotifyRecipient(enrollment)
-						//if err != nil {
-						//	log.Error("Unable to send notification to the enrolled user",  err)
-						//}
+						err = services.NotifyRecipient(enrollment)
+						if err != nil {
+							log.Error("Unable to send notification to the enrolled user",  err)
+						}
 					} else {
 						// Push to error topic
+						log.Errorf("Error occured while trying to create the enrollment (%v)",  err)
 					}
 					_, _ = consumer.CommitMessage(msg)
 				} else {

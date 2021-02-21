@@ -3,6 +3,7 @@ package main
 import (
 	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/consumers"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/swagger_gen/restapi"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
@@ -17,6 +18,8 @@ func main() {
 	services.InitializeKafka()
 	kernelServices.InitializeFlagr()
 	services.InitRedis()
+	consumers.Init()
+
 	services.InitializeAppointmentScheduler()
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {

@@ -2,6 +2,7 @@ kafka:
   bootstrapservers: localhost:9092
   notifyTopic: notify
   enrollmenttopic: enrollment
+  recipientappointmenttopic: recipientappointment
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3

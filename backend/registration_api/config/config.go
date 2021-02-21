@@ -17,6 +17,7 @@ var Config = struct {
 		NotifyTopic         string `default:"notify" yaml:"notifyTopic"`
 		EnrollmentTopic     string `default:"enrollment" yaml:"enrollmenttopic"`
 		AppointmentAckTopic string `default:"appointment_ack" yaml:"appointmentacktopic"`
+		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
 	}
 
 	EnrollmentCreation struct {
