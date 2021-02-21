@@ -655,6 +655,64 @@ func init() {
           }
         }
       },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "update schedule for program in facility",
+        "operationId": "updateFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "appointmentSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityAppointmentSchedule"
+                  },
+                  "x-omitempty": true
+                },
+                "walkInSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityWalkInSchedule"
+                  },
+                  "x-omitempty": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      },
       "post": {
         "security": [
           {
@@ -2642,6 +2700,64 @@ func init() {
           },
           "404": {
             "description": "schedult for given facility and program not found"
+          }
+        }
+      },
+      "put": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "update schedule for program in facility",
+        "operationId": "updateFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "appointmentSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityAppointmentSchedule"
+                  },
+                  "x-omitempty": true
+                },
+                "walkInSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityWalkInSchedule"
+                  },
+                  "x-omitempty": true
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       },
