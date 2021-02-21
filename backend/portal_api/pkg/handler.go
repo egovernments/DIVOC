@@ -61,6 +61,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
+	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
 }
 
 type GenericResponse struct {
@@ -899,4 +900,13 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 		},
 	}
 	return kernelService.QueryRegistry("Program", filter, limit, offset)
+}
+
+func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+	err := kernelService.CreateNewRegistry(params.Body, "FacilityProgramSlot")
+	if err != nil {
+		log.Error(err)
+		return operations.NewConfigureSlotFacilityBadRequest()
+	}
+	return operations.NewConfigureSlotFacilityOK()
 }

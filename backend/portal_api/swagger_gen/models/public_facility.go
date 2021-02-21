@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -32,12 +31,6 @@ type PublicFacility struct {
 	// Category
 	// Enum: [GOVT PRIVATE]
 	Category string `json:"category,omitempty"`
-
-	// Contact number
-	Contact string `json:"contact,omitempty"`
-
-	// Facility Email
-	Email string `json:"email,omitempty"`
 
 	// Facility Code
 	FacilityCode string `json:"facilityCode,omitempty"`
@@ -103,6 +96,7 @@ func (m *PublicFacility) Validate(formats strfmt.Registry) error {
 }
 
 func (m *PublicFacility) validateAddress(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -149,6 +143,7 @@ func (m *PublicFacility) validateCategoryEnum(path, location string, value strin
 }
 
 func (m *PublicFacility) validateCategory(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Category) { // not required
 		return nil
 	}
@@ -162,6 +157,7 @@ func (m *PublicFacility) validateCategory(formats strfmt.Registry) error {
 }
 
 func (m *PublicFacility) validatePrograms(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -218,6 +214,7 @@ func (m *PublicFacility) validateStatusEnum(path, location string, value string)
 }
 
 func (m *PublicFacility) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -263,6 +260,7 @@ func (m *PublicFacility) validateTypeEnum(path, location string, value string) e
 }
 
 func (m *PublicFacility) validateType(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Type) { // not required
 		return nil
 	}
@@ -270,56 +268,6 @@ func (m *PublicFacility) validateType(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateTypeEnum("type", "body", m.Type); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this public facility based on the context it is used
-func (m *PublicFacility) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateAddress(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidatePrograms(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PublicFacility) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Address != nil {
-		if err := m.Address.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("address")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-func (m *PublicFacility) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Programs); i++ {
-
-		if m.Programs[i] != nil {
-			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -385,40 +333,13 @@ func (m *PublicFacilityProgramsItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *PublicFacilityProgramsItems0) validateSchedule(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}
 
 	if m.Schedule != nil {
 		if err := m.Schedule.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("schedule")
-			}
-			return err
-		}
-	}
-
-	return nil
-}
-
-// ContextValidate validate this public facility programs items0 based on the context it is used
-func (m *PublicFacilityProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateSchedule(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PublicFacilityProgramsItems0) contextValidateSchedule(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Schedule != nil {
-		if err := m.Schedule.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("schedule")
 			}
@@ -464,11 +385,6 @@ type PublicFacilityProgramsItems0Schedule struct {
 
 // Validate validates this public facility programs items0 schedule
 func (m *PublicFacilityProgramsItems0Schedule) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this public facility programs items0 schedule based on context it is used
-func (m *PublicFacilityProgramsItems0Schedule) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
