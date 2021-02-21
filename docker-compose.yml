@@ -142,6 +142,8 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # in min
+      CACHE_TTL: 60
     depends_on:
       - kafka
       - keycloak

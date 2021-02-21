@@ -26,28 +26,33 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 		facilityDetails := make(map[string]interface{})
 		facilityCode := enrollment["enrollmentScopeId"]
 		if facilityCode  != nil {
-			filter := map[string]interface{}{}
-			filter["facilityCode"] = map[string]interface{}{
-				"eq": facilityCode,
-			}
-			// TODO: Add cache mechanism
-			if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
-				facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
-				facilityDetails["facilityName"] = facility["facilityName"]
-				address := facility["address"].(map[string]interface{})
-				facilityDetails["state"] = address["state"]
-				facilityDetails["pincode"] = address["pincode"]
-				facilityDetails["district"] = address["district"]
-				enrollment["facilityDetails"] = facilityDetails
+			err := GetObjectValue(facilityCode.(string), &facilityDetails)
+			if err != nil || facilityDetails == nil{
+				log.Errorf("Unable to get the value in Cache (%v)", err)
+				filter := map[string]interface{}{}
+				filter["facilityCode"] = map[string]interface{}{
+					"eq": facilityCode,
+				}
+				if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
+					facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
+					facilityDetails["facilityName"] = facility["facilityName"]
+					address := facility["address"].(map[string]interface{})
+					facilityDetails["state"] = address["state"]
+					facilityDetails["pincode"] = address["pincode"]
+					facilityDetails["district"] = address["district"]
+					enrollment["facilityDetails"] = facilityDetails
+					err := SetObjectValue(facilityCode.(string), facilityDetails)
+					if err != nil{
+						log.Errorf("Unable to set the value in Cache (%v)", err)
+					}
+				} else {
+					log.Errorf("Error occurred while fetching the details of facility (%v)", err)
+				}
 			} else {
-				log.Errorf("Error occurred while fetching the details of facility (%v)", err)
+				enrollment["facilityDetails"] = facilityDetails
 			}
-
-
 		}
-
 	}
-
 }
 
 func NotifyRecipient(enrollment models.Enrollment) error {

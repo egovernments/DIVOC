@@ -19,6 +19,7 @@ func main() {
 	kernelServices.InitializeFlagr()
 	services.InitRedis()
 	consumers.Init()
+	services.InitCache()
 
 	services.InitializeAppointmentScheduler()
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
