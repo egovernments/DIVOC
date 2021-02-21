@@ -29,5 +29,9 @@ func getFacilityProgramSchedule(facilityId string, programId string) (map[string
 		return nil, errors.New("error while converting to interface")
 	}
 
-	return respArr[0].(map[string]interface{}), nil
+	if len(respArr) > 0 {
+		return respArr[0].(map[string]interface{}), nil
+	}
+
+	return nil, errors.New("no entry found in DB")
 }

@@ -940,7 +940,7 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
-		operations.NewGetFacilityProgramScheduleNotFound()
+		return operations.NewGetFacilityProgramScheduleNotFound()
 	}
 	return model.NewGenericJSONResponse(response)
 }
