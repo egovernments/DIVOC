@@ -9,11 +9,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+	"strings"
 )
 
 // ConfigureSlotFacilityURL generates an URL for the configure slot facility operation
 type ConfigureSlotFacilityURL struct {
+	FacilityID string
+	ProgramID  string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
@@ -35,7 +41,21 @@ func (o *ConfigureSlotFacilityURL) SetBasePath(bp string) {
 func (o *ConfigureSlotFacilityURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/facility/confiureSlot"
+	var _path = "/facility/{facilityId}/program/{programId}/schedule"
+
+	facilityID := o.FacilityID
+	if facilityID != "" {
+		_path = strings.Replace(_path, "{facilityId}", facilityID, -1)
+	} else {
+		return nil, errors.New("facilityId is required on ConfigureSlotFacilityURL")
+	}
+
+	programID := o.ProgramID
+	if programID != "" {
+		_path = strings.Replace(_path, "{programId}", programID, -1)
+	} else {
+		return nil, errors.New("programId is required on ConfigureSlotFacilityURL")
+	}
 
 	_basePath := o._basePath
 	if _basePath == "" {

@@ -377,36 +377,6 @@ func init() {
         }
       }
     },
-    "/facility/confiureSlot": {
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-admin"
-            ]
-          }
-        ],
-        "summary": "configure slot for program in facility",
-        "operationId": "configureSlotFacility",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/FacilityConfigureSlot"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          }
-        }
-      }
-    },
     "/facility/groups": {
       "get": {
         "security": [
@@ -679,6 +649,65 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "schedult for given facility and program not found"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "configure slot for program in facility",
+        "operationId": "configureSlotFacility",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "appointmentSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityAppointmentSchedule"
+                  }
+                },
+                "walkInSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityWalkInSchedule"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }
@@ -1393,10 +1422,6 @@ func init() {
     },
     "FacilityConfigureSlot": {
       "type": "object",
-      "required": [
-        "facilityId",
-        "programId"
-      ],
       "properties": {
         "appointmentSchedule": {
           "type": "array",
@@ -2342,36 +2367,6 @@ func init() {
         }
       }
     },
-    "/facility/confiureSlot": {
-      "post": {
-        "security": [
-          {
-            "hasRole": [
-              "facility-admin"
-            ]
-          }
-        ],
-        "summary": "configure slot for program in facility",
-        "operationId": "configureSlotFacility",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "$ref": "#/definitions/FacilityConfigureSlot"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Invalid input"
-          }
-        }
-      }
-    },
     "/facility/groups": {
       "get": {
         "security": [
@@ -2644,6 +2639,65 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "404": {
+            "description": "schedult for given facility and program not found"
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "configure slot for program in facility",
+        "operationId": "configureSlotFacility",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "appointmentSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityAppointmentSchedule"
+                  }
+                },
+                "walkInSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/FacilityWalkInSchedule"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
           }
         }
       }
@@ -3410,10 +3464,6 @@ func init() {
     },
     "FacilityConfigureSlot": {
       "type": "object",
-      "required": [
-        "facilityId",
-        "programId"
-      ],
       "properties": {
         "appointmentSchedule": {
           "type": "array",

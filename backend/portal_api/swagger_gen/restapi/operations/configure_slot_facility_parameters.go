@@ -11,8 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/divoc/portal-api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 )
 
 // NewConfigureSlotFacilityParams creates a new ConfigureSlotFacilityParams object
@@ -34,7 +33,17 @@ type ConfigureSlotFacilityParams struct {
 	/*
 	  In: body
 	*/
-	Body *models.FacilityConfigureSlot
+	Body ConfigureSlotFacilityBody
+	/*Id of facility
+	  Required: true
+	  In: path
+	*/
+	FacilityID string
+	/*Id of program
+	  Required: true
+	  In: path
+	*/
+	ProgramID string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -48,7 +57,7 @@ func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middle
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.FacilityConfigureSlot
+		var body ConfigureSlotFacilityBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -58,12 +67,52 @@ func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middle
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}
+	rFacilityID, rhkFacilityID, _ := route.Params.GetOK("facilityId")
+	if err := o.bindFacilityID(rFacilityID, rhkFacilityID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	rProgramID, rhkProgramID, _ := route.Params.GetOK("programId")
+	if err := o.bindProgramID(rProgramID, rhkProgramID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// bindFacilityID binds and validates parameter FacilityID from path.
+func (o *ConfigureSlotFacilityParams) bindFacilityID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: true
+	// Parameter is provided by construction from the route
+
+	o.FacilityID = raw
+
+	return nil
+}
+
+// bindProgramID binds and validates parameter ProgramID from path.
+func (o *ConfigureSlotFacilityParams) bindProgramID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: true
+	// Parameter is provided by construction from the route
+
+	o.ProgramID = raw
+
 	return nil
 }

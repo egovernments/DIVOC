@@ -904,7 +904,13 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 }
 
 func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
-	err := kernelService.CreateNewRegistry(params.Body, "FacilityProgramSlot")
+	facilityProgramSlot := models.FacilityConfigureSlot{
+		FacilityID:          params.FacilityID,
+		ProgramID:           params.ProgramID,
+		AppointmentSchedule: params.Body.AppointmentSchedule,
+		WalkInSchedule:      params.Body.WalkInSchedule,
+	}
+	err := kernelService.CreateNewRegistry(facilityProgramSlot, "FacilityProgramSlot")
 	if err != nil {
 		log.Error(err)
 		return operations.NewConfigureSlotFacilityBadRequest()
@@ -912,7 +918,7 @@ func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacility
 	return operations.NewConfigureSlotFacilityOK()
 }
 
-func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, pricipal *models.JWTClaimBody) middleware.Responder {
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
 	entityType := "FacilityProgramSlot"
 	limit, offset := getLimitAndOffset(nil, nil)
 	filter := map[string]interface{}{
@@ -936,5 +942,5 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 	if len(respArr) > 0 {
 		return model.NewGenericJSONResponse(respArr[0])
 	}
-	return operations.NewGetFacilityProgramScheduleBadRequest()
+	return operations.NewGetFacilityProgramScheduleNotFound()
 }

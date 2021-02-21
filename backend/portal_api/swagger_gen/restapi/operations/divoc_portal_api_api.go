@@ -565,7 +565,7 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/facility/confiureSlot"] = NewConfigureSlotFacility(o.context, o.ConfigureSlotFacilityHandler)
+	o.handlers["POST"]["/facility/{facilityId}/program/{programId}/schedule"] = NewConfigureSlotFacility(o.context, o.ConfigureSlotFacilityHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
