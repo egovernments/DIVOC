@@ -10,7 +10,8 @@ import {useAxios} from "../../utils/useAxios";
 import {API_URL} from "../../utils/constants";
 
 
-export default function FacilityConfigureSlot ({facilityId, programId, programName}) {
+export default function FacilityConfigureSlot ({location}) {
+    const [facilityId, programId, programName] = [location.facilityOsid, location.programId, location.programName];
     // mocking backend
     const mockSchedule = {
         osid: "jjbgt768i",
