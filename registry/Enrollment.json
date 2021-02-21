@@ -51,6 +51,13 @@
         "programId": {
           "type": "string"
         },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
         "address": {
           "$id": "#/properties/address",
           "$ref": "Common.json#/definitions/Address",
