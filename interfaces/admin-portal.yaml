@@ -506,6 +506,33 @@ paths:
           description: OK
         '400':
           description: Invalid input
+  /facility/{facilityId}/program/{programId}/schedule:
+    get:
+      summary: Get slots for given program and facility
+      operationId: getFacilityProgramSchedule
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/FacilityConfigureSlot'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /analytics:
     get:
       summary: Get analytics query

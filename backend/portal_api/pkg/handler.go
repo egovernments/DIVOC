@@ -62,6 +62,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
 	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
+	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 }
 
 type GenericResponse struct {
@@ -909,4 +910,31 @@ func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacility
 		return operations.NewConfigureSlotFacilityBadRequest()
 	}
 	return operations.NewConfigureSlotFacilityOK()
+}
+
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, pricipal *models.JWTClaimBody) middleware.Responder {
+	entityType := "FacilityProgramSlot"
+	limit, offset := getLimitAndOffset(nil, nil)
+	filter := map[string]interface{}{
+		"facilityId": map[string]interface{}{
+			"eq": params.FacilityID,
+		},
+		"programId": map[string]interface{}{
+			"eq": params.ProgramID,
+		},
+	}
+	response, err := kernelService.QueryRegistry(entityType, filter, limit, offset)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+
+	respArr, ok := response[entityType].([]interface{})
+	if !ok {
+		return model.NewGenericServerError()
+	}
+	if len(respArr) > 0 {
+		return model.NewGenericJSONResponse(respArr[0])
+	}
+	return operations.NewGetFacilityProgramScheduleBadRequest()
 }

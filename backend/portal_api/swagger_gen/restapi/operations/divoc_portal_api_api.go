@@ -96,6 +96,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
 		}),
+		GetFacilityProgramScheduleHandler: GetFacilityProgramScheduleHandlerFunc(func(params GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityProgramSchedule has not yet been implemented")
+		}),
 		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
 		}),
@@ -228,6 +231,8 @@ type DivocPortalAPIAPI struct {
 	GetFacilitiesForPublicHandler GetFacilitiesForPublicHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
+	// GetFacilityProgramScheduleHandler sets the operation handler for the get facility program schedule operation
+	GetFacilityProgramScheduleHandler GetFacilityProgramScheduleHandler
 	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
 	GetFacilityUploadsHandler GetFacilityUploadsHandler
 	// GetFacilityUploadsErrorsHandler sets the operation handler for the get facility uploads errors operation
@@ -393,6 +398,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetFacilityGroupsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityGroupsHandler")
+	}
+	if o.GetFacilityProgramScheduleHandler == nil {
+		unregistered = append(unregistered, "GetFacilityProgramScheduleHandler")
 	}
 	if o.GetFacilityUploadsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUploadsHandler")
@@ -610,6 +618,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/facility/groups"] = NewGetFacilityGroups(o.context, o.GetFacilityGroupsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/{facilityId}/program/{programId}/schedule"] = NewGetFacilityProgramSchedule(o.context, o.GetFacilityProgramScheduleHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

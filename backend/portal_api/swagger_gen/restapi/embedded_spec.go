@@ -639,6 +639,50 @@ func init() {
         }
       }
     },
+    "/facility/{facilityId}/program/{programId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -2556,6 +2600,50 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          }
+        }
+      }
+    },
+    "/facility/{facilityId}/program/{programId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
