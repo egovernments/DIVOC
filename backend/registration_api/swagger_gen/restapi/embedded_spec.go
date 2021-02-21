@@ -35,6 +35,108 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
+    "/facility/slot/book": {
+      "post": {
+        "summary": "Book a slot in facility",
+        "operationId": "bookSlotOfFacility",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "facilitySlotId",
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                },
+                "facilitySlotId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/slots": {
+      "get": {
+        "summary": "Get slots for facilites",
+        "operationId": "getSlotsForFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "facilityId",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "default": 0,
+            "name": "pageNumber",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/slots/init": {
+      "post": {
+        "summary": "Initialize facility slots",
+        "operationId": "initializeFacilitySlots",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/generateOTP": {
       "post": {
         "summary": "Generate OTP",
@@ -185,6 +287,108 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
+    "/facility/slot/book": {
+      "post": {
+        "summary": "Book a slot in facility",
+        "operationId": "bookSlotOfFacility",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "facilitySlotId",
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                },
+                "facilitySlotId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/slots": {
+      "get": {
+        "summary": "Get slots for facilites",
+        "operationId": "getSlotsForFacilities",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "facilityId",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "default": 0,
+            "name": "pageNumber",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/facility/slots/init": {
+      "post": {
+        "summary": "Initialize facility slots",
+        "operationId": "initializeFacilitySlots",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "apiKey": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/generateOTP": {
       "post": {
         "summary": "Generate OTP",

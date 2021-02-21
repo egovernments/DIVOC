@@ -42,6 +42,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams) middleware.Responder {
+			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
+		}),
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
@@ -50,6 +53,12 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		}),
 		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
+		}),
+		GetSlotsForFacilitiesHandler: GetSlotsForFacilitiesHandlerFunc(func(params GetSlotsForFacilitiesParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetSlotsForFacilities has not yet been implemented")
+		}),
+		InitializeFacilitySlotsHandler: InitializeFacilitySlotsHandlerFunc(func(params InitializeFacilitySlotsParams) middleware.Responder {
+			return middleware.NotImplemented("operation InitializeFacilitySlots has not yet been implemented")
 		}),
 		VerifyOTPHandler: VerifyOTPHandlerFunc(func(params VerifyOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation VerifyOTP has not yet been implemented")
@@ -88,12 +97,18 @@ type RegistrationAPIAPI struct {
 	//   - application/json
 	JSONProducer runtime.Producer
 
+	// BookSlotOfFacilityHandler sets the operation handler for the book slot of facility operation
+	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
 	GenerateOTPHandler GenerateOTPHandler
 	// GetRecipientsHandler sets the operation handler for the get recipients operation
 	GetRecipientsHandler GetRecipientsHandler
+	// GetSlotsForFacilitiesHandler sets the operation handler for the get slots for facilities operation
+	GetSlotsForFacilitiesHandler GetSlotsForFacilitiesHandler
+	// InitializeFacilitySlotsHandler sets the operation handler for the initialize facility slots operation
+	InitializeFacilitySlotsHandler InitializeFacilitySlotsHandler
 	// VerifyOTPHandler sets the operation handler for the verify o t p operation
 	VerifyOTPHandler VerifyOTPHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -172,6 +187,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.BookSlotOfFacilityHandler == nil {
+		unregistered = append(unregistered, "BookSlotOfFacilityHandler")
+	}
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
 	}
@@ -180,6 +198,12 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.GetRecipientsHandler == nil {
 		unregistered = append(unregistered, "GetRecipientsHandler")
+	}
+	if o.GetSlotsForFacilitiesHandler == nil {
+		unregistered = append(unregistered, "GetSlotsForFacilitiesHandler")
+	}
+	if o.InitializeFacilitySlotsHandler == nil {
+		unregistered = append(unregistered, "InitializeFacilitySlotsHandler")
 	}
 	if o.VerifyOTPHandler == nil {
 		unregistered = append(unregistered, "VerifyOTPHandler")
@@ -275,6 +299,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/facility/slot/book"] = NewBookSlotOfFacility(o.context, o.BookSlotOfFacilityHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/recipients"] = NewEnrollRecipient(o.context, o.EnrollRecipientHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -284,6 +312,14 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/recipients"] = NewGetRecipients(o.context, o.GetRecipientsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/slots"] = NewGetSlotsForFacilities(o.context, o.GetSlotsForFacilitiesHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/facility/slots/init"] = NewInitializeFacilitySlots(o.context, o.InitializeFacilitySlotsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
