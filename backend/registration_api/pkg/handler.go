@@ -166,8 +166,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
-		limit := 1000
-		offset := -1000
+		limit := 1
+		offset := -1
 		for {
 			offset += limit
 			facilitiesResponse, err := kernelService.QueryRegistry(FacilityEntity, filters, limit, offset)
@@ -188,34 +188,37 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 						log.Infof("Initializing facility %s slots", facilityCode)
 
 						facilityProgramArr, ok := facility["programs"].([]interface{})
+						facilityProgramWiseSchedule := services.GetFacilityAppointmentSchedule(facilityCode)
 						if ok && len(facilityProgramArr) > 0 {
 							for _, facilityProgramObj := range facilityProgramArr {
 								facilityProgram, ok := facilityProgramObj.(map[string]interface{})
 								if ok {
 									programId, ok := facilityProgram["programId"].(string)
-									if ok {
-										facilityWorkingDays := []string{"Mo", "Tu", "We"}
-										workingDays := make(map[time.Weekday]string)
-										for _, workingDay := range facilityWorkingDays {
-											workingDays[DaysMap[workingDay]] = workingDay
-										}
-										vaccinationStartTime := "09:00AM"
-										vaccinationSlots := 100
-										currentDate := time.Now()
-										for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
-											slotDate := currentDate.AddDate(0, 0, i)
-											_, isFacilityAvailableForSlot := workingDays[slotDate.Weekday()]
-											if isFacilityAvailableForSlot {
-												schedule := services.FacilitySchedule{
-													FacilityCode: facilityCode,
-													ProgramId:    programId,
-													Date:         slotDate,
-													Time:         vaccinationStartTime,
-													Slots:        vaccinationSlots,
+									programStatus, ok := facilityProgram["status"].(string)
+									if ok && programStatus == "Active" {
+										programSchedule, ok := facilityProgramWiseSchedule[programId]
+										if ok {
+											currentDate := time.Now()
+											for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
+												slotDate := currentDate.AddDate(0, 0, i)
+												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
+												for _, programSchedule := range programSchedulesForDay {
+													if isFacilityAvailableForSlot {
+														startTime := programSchedule["startTime"]
+														endTime := programSchedule["endTime"]
+														maxAppointments := programSchedule["maxAppointments"]
+														schedule := services.FacilitySchedule{
+															FacilityCode: facilityCode,
+															ProgramId:    programId,
+															Date:         slotDate,
+															Time:         startTime + "_" + endTime,
+															Slots:        maxAppointments,
+														}
+														log.Infof("Initializing facility slot %v", schedule)
+														services.AddFacilityScheduleToChannel(schedule)
+														log.Infof("Initialized facility slot %v", schedule)
+													}
 												}
-												log.Infof("Initializing facility slot %v", schedule)
-												services.AddFacilityScheduleToChannel(schedule)
-												log.Infof("Initialized facility slot %v", schedule)
 											}
 										}
 									}

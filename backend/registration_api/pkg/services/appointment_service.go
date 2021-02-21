@@ -14,7 +14,7 @@ type FacilitySchedule struct {
 	ProgramId    string
 	Date         time.Time
 	Time         string
-	Slots        int
+	Slots        string
 }
 
 var (
@@ -52,10 +52,10 @@ func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
 	if err == nil {
 		err = SetValueWithoutExpiry(key, schedule.Slots)
 		if err != nil {
-			log.Print("Error while creating key: %s slots: %s", key, schedule.Slots, err)
+			log.Errorf("Error while creating key: %s slots: %d %v", key, schedule.Slots, err)
 		}
 	} else {
-		log.Errorf("Error while inserting %s to set %s", key, schedule.FacilityCode, err)
+		log.Errorf("Error while inserting %s to set %s %v", key, schedule.FacilityCode, err)
 
 	}
 }
@@ -64,7 +64,7 @@ func BookAppointmentSlot(slotId string) error {
 	log.Infof("Blocking appointment slot: %s", slotId)
 	remainingSlotsStr, err := GetValue(slotId)
 	if err != nil {
-		log.Errorf("Failed getting slots info: %s", slotId, err)
+		log.Errorf("Failed getting slots info: %s %v", slotId, err)
 		return nil
 	}
 	remainingSlots, err := strconv.Atoi(remainingSlotsStr)
@@ -81,7 +81,7 @@ func BookAppointmentSlot(slotId string) error {
 func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
 	success, err := SetHash(enrollmentCode, "slotId", slotId)
 	if err != nil {
-		log.Errorf("Failed to mark %s code for slot %s as booked", enrollmentCode, slotId, err)
+		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
 	} else {
 		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
 	}
