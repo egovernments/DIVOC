@@ -11,7 +11,6 @@ import (
 var cacheClient *cache.Cache
 var ctx context.Context
 
-// TODO: config for cache ttl, buffer size, value ttl
 func InitCache() {
 	ctx = context.TODO()
 	ring := redis.NewRing(&redis.RingOptions{
