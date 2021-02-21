@@ -54,6 +54,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		PostVaccinatorsHandler: PostVaccinatorsHandlerFunc(func(params PostVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation PostVaccinators has not yet been implemented")
 		}),
+		ConfigureSlotFacilityHandler: ConfigureSlotFacilityHandlerFunc(func(params ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation ConfigureSlotFacility has not yet been implemented")
+		}),
 		CreateFacilityUsersHandler: CreateFacilityUsersHandlerFunc(func(params CreateFacilityUsersParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation CreateFacilityUsers has not yet been implemented")
 		}),
@@ -87,8 +90,14 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilitiesHandler: GetFacilitiesHandlerFunc(func(params GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilities has not yet been implemented")
 		}),
+		GetFacilitiesForPublicHandler: GetFacilitiesForPublicHandlerFunc(func(params GetFacilitiesForPublicParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilitiesForPublic has not yet been implemented")
+		}),
 		GetFacilityGroupsHandler: GetFacilityGroupsHandlerFunc(func(params GetFacilityGroupsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityGroups has not yet been implemented")
+		}),
+		GetFacilityProgramScheduleHandler: GetFacilityProgramScheduleHandlerFunc(func(params GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilityProgramSchedule has not yet been implemented")
 		}),
 		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
@@ -194,6 +203,8 @@ type DivocPortalAPIAPI struct {
 	PostFacilitiesHandler PostFacilitiesHandler
 	// PostVaccinatorsHandler sets the operation handler for the post vaccinators operation
 	PostVaccinatorsHandler PostVaccinatorsHandler
+	// ConfigureSlotFacilityHandler sets the operation handler for the configure slot facility operation
+	ConfigureSlotFacilityHandler ConfigureSlotFacilityHandler
 	// CreateFacilityUsersHandler sets the operation handler for the create facility users operation
 	CreateFacilityUsersHandler CreateFacilityUsersHandler
 	// CreateMedicineHandler sets the operation handler for the create medicine operation
@@ -216,8 +227,12 @@ type DivocPortalAPIAPI struct {
 	GetEnrollmentsUploadsErrorsHandler GetEnrollmentsUploadsErrorsHandler
 	// GetFacilitiesHandler sets the operation handler for the get facilities operation
 	GetFacilitiesHandler GetFacilitiesHandler
+	// GetFacilitiesForPublicHandler sets the operation handler for the get facilities for public operation
+	GetFacilitiesForPublicHandler GetFacilitiesForPublicHandler
 	// GetFacilityGroupsHandler sets the operation handler for the get facility groups operation
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
+	// GetFacilityProgramScheduleHandler sets the operation handler for the get facility program schedule operation
+	GetFacilityProgramScheduleHandler GetFacilityProgramScheduleHandler
 	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
 	GetFacilityUploadsHandler GetFacilityUploadsHandler
 	// GetFacilityUploadsErrorsHandler sets the operation handler for the get facility uploads errors operation
@@ -342,6 +357,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.PostVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "PostVaccinatorsHandler")
 	}
+	if o.ConfigureSlotFacilityHandler == nil {
+		unregistered = append(unregistered, "ConfigureSlotFacilityHandler")
+	}
 	if o.CreateFacilityUsersHandler == nil {
 		unregistered = append(unregistered, "CreateFacilityUsersHandler")
 	}
@@ -375,8 +393,14 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.GetFacilitiesHandler == nil {
 		unregistered = append(unregistered, "GetFacilitiesHandler")
 	}
+	if o.GetFacilitiesForPublicHandler == nil {
+		unregistered = append(unregistered, "GetFacilitiesForPublicHandler")
+	}
 	if o.GetFacilityGroupsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityGroupsHandler")
+	}
+	if o.GetFacilityProgramScheduleHandler == nil {
+		unregistered = append(unregistered, "GetFacilityProgramScheduleHandler")
 	}
 	if o.GetFacilityUploadsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUploadsHandler")
@@ -541,6 +565,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/facility/confiureSlot"] = NewConfigureSlotFacility(o.context, o.ConfigureSlotFacilityHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/facility/users"] = NewCreateFacilityUsers(o.context, o.CreateFacilityUsersHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -585,7 +613,15 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
+	o.handlers["GET"]["/public/facilities"] = NewGetFacilitiesForPublic(o.context, o.GetFacilitiesForPublicHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
 	o.handlers["GET"]["/facility/groups"] = NewGetFacilityGroups(o.context, o.GetFacilityGroupsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/{facilityId}/program/{programId}/schedule"] = NewGetFacilityProgramSchedule(o.context, o.GetFacilityProgramScheduleHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

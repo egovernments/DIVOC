@@ -22,6 +22,7 @@ import {getApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
 import FacilityInfo from './components/FacilityInfo/FacilityInfo';
 import {addFacilityDetails} from "./redux/reducers/facilityReducer";
 import {useAxios} from "./utils/useAxios";
+import FacilityConfigureSlot from "./components/FacilityConfigureSlot";
 
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -74,6 +75,8 @@ export default function App() {
                             <PrivateRoute exact path={config.urlPath + "/facility_admin"} component={FacilityAdmin}
                                           role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/facility_info"} component={FacilityInfo}
+                                          role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
+                            <PrivateRoute exact path={config.urlPath + "/facility_configure_slot"} component={FacilityConfigureSlot}
                                           role={CONSTANTS.FACILITY_ADMIN_ROLE} clientId={CONSTANTS.PORTAL_CLIENT}/>
                             <PrivateRoute exact path={config.urlPath + "/facility_controller"}
                                           component={FacilityController} role={CONSTANTS.ROLE_CONTROLLER}

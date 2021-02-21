@@ -61,6 +61,8 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetUserFacilityHandler = operations.GetUserFacilityHandlerFunc(getUserFacilityDetails)
 	api.UpdateProgramHandler = operations.UpdateProgramHandlerFunc(updateProgramsHandler)
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
+	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
+	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 }
 
 type GenericResponse struct {
@@ -899,4 +901,40 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 		},
 	}
 	return kernelService.QueryRegistry("Program", filter, limit, offset)
+}
+
+func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+	err := kernelService.CreateNewRegistry(params.Body, "FacilityProgramSlot")
+	if err != nil {
+		log.Error(err)
+		return operations.NewConfigureSlotFacilityBadRequest()
+	}
+	return operations.NewConfigureSlotFacilityOK()
+}
+
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, pricipal *models.JWTClaimBody) middleware.Responder {
+	entityType := "FacilityProgramSlot"
+	limit, offset := getLimitAndOffset(nil, nil)
+	filter := map[string]interface{}{
+		"facilityId": map[string]interface{}{
+			"eq": params.FacilityID,
+		},
+		"programId": map[string]interface{}{
+			"eq": params.ProgramID,
+		},
+	}
+	response, err := kernelService.QueryRegistry(entityType, filter, limit, offset)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+
+	respArr, ok := response[entityType].([]interface{})
+	if !ok {
+		return model.NewGenericServerError()
+	}
+	if len(respArr) > 0 {
+		return model.NewGenericJSONResponse(respArr[0])
+	}
+	return operations.NewGetFacilityProgramScheduleBadRequest()
 }

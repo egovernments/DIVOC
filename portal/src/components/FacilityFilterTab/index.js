@@ -108,7 +108,7 @@ export const FacilityFilterTab = ({
     )
 };
 
-export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedColor}) => (
+export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedColor, disabled}) => (
     <div className="custom-checkbox-item-wrapper" style={{"display":"inline-block"}}>
         <label
             className="form-check-label d-flex align-items-center"
@@ -122,6 +122,7 @@ export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedC
                 value={text}
                 onChange={onSelect}
                 checked={checked}
+                disabled={disabled}
             />
             <div
                 className="wrapper"
@@ -130,6 +131,9 @@ export const CheckboxItem = ({text, checked, onSelect, showText = true, checkedC
                         checked
                             ? checkedColor ? checkedColor : "#DE9D00"
                             : "",
+                    borderColor:
+                        disabled
+                            ? "#EBEBEB": checkedColor ? checkedColor : "#DE9D00"
                 }}
             >
                 &nbsp;

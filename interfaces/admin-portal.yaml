@@ -490,6 +490,49 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
+  /facility/confiureSlot:
+    post:
+      summary: configure slot for program in facility
+      operationId: configureSlotFacility
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            "$ref": "#/definitions/FacilityConfigureSlot"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+  /facility/{facilityId}/program/{programId}/schedule:
+    get:
+      summary: Get slots for given program and facility
+      operationId: getFacilityProgramSchedule
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/FacilityConfigureSlot'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
   /analytics:
     get:
       summary: Get analytics query
@@ -1142,6 +1185,52 @@ definitions:
       name:
         type: string
         title: group name
+  FacilityConfigureSlot:
+    type: object
+    required:
+      - facilityId
+      - programId
+    properties:
+      facilityId:
+        type: string
+      programId:
+        type: string
+      appointmentSchedule:
+        type: array
+        items:
+          "$ref": "#/definitions/FacilityAppointmentSchedule"
+      walkInSchedule:
+        type: array
+        items:
+          "$ref": "#/definitions/FacilityWalkInSchedule"
+  FacilityAppointmentSchedule:
+    properties:
+      startTime:
+        type: string
+      endTime:
+        type: string
+      days:
+        type: array
+        items:
+          type: object
+          properties:
+            day:
+              type: string
+              title: day (mon, tue, wed, thr, fri, sat, sun)
+            maxAppointments:
+              type: integer
+              title: Maximum appointment per day
+  FacilityWalkInSchedule:
+    properties:
+      days:
+        type: array
+        items:
+          type: string
+          title: day (mon, tue, wed, thr, fri, sat, sun)
+      startTime:
+        type: string
+      endTime:
+        type: string
   Error:
     type: object
     properties:

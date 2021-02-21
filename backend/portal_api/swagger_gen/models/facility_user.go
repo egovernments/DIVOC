@@ -65,6 +65,7 @@ func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Groups) { // not required
 		return nil
 	}
@@ -89,6 +90,7 @@ func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateVaccinationRateLimits(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.VaccinationRateLimits) { // not required
 		return nil
 	}

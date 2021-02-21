@@ -377,6 +377,36 @@ func init() {
         }
       }
     },
+    "/facility/confiureSlot": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "configure slot for program in facility",
+        "operationId": "configureSlotFacility",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/facility/groups": {
       "get": {
         "security": [
@@ -609,6 +639,50 @@ func init() {
         }
       }
     },
+    "/facility/{facilityId}/program/{programId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -791,6 +865,42 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/public/facilities": {
+      "get": {
+        "security": [],
+        "summary": "get facilities for public",
+        "operationId": "getFacilitiesForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility pincode",
+            "name": "pincode",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PublicFacility"
+              }
+            }
           }
         }
       }
@@ -1255,6 +1365,59 @@ func init() {
         }
       }
     },
+    "FacilityAppointmentSchedule": {
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "day": {
+                "type": "string",
+                "title": "day (mon, tue, wed, thr, fri, sat, sun)"
+              },
+              "maxAppointments": {
+                "type": "integer",
+                "title": "Maximum appointment per day"
+              }
+            }
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityConfigureSlot": {
+      "type": "object",
+      "required": [
+        "facilityId",
+        "programId"
+      ],
+      "properties": {
+        "appointmentSchedule": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityAppointmentSchedule"
+          }
+        },
+        "facilityId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "walkInSchedule": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityWalkInSchedule"
+          }
+        }
+      }
+    },
     "FacilityUpdateRequest": {
       "type": "array",
       "items": {
@@ -1371,11 +1534,32 @@ func init() {
           "type": "string",
           "title": "Facility User Name"
         },
+        "osid": {
+          "type": "string",
+          "title": "Osid of the user stored in Facility Entity"
+        },
         "vaccinationRateLimits": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/VaccinationRateLimit"
           }
+        }
+      }
+    },
+    "FacilityWalkInSchedule": {
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "day (mon, tue, wed, thr, fri, sat, sun)"
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
         }
       }
     },
@@ -1474,6 +1658,117 @@ func init() {
           }
         }
       ]
+    },
+    "PublicFacility": {
+      "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "averageRating": {
+          "description": "Average Rating of Facility 0 to 5, 0 for no rating.",
+          "type": "number",
+          "title": "Average Rating",
+          "default": 0
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "enum": [
+            "GOVT",
+            "PRIVATE"
+          ]
+        },
+        "facilityCode": {
+          "type": "string",
+          "title": "Facility Code"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "string",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "string",
+          "title": "Operating hours start of day"
+        },
+        "osid": {
+          "type": "string",
+          "title": "Facility uuid"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "programId": {
+                "type": "string"
+              },
+              "rate": {
+                "type": "number"
+              },
+              "rateUpdatedAt": {
+                "type": "string"
+              },
+              "schedule": {
+                "type": "object",
+                "properties": {
+                  "days": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "endTime": {
+                    "type": "string"
+                  },
+                  "startTime": {
+                    "type": "string"
+                  }
+                }
+              },
+              "status": {
+                "type": "string"
+              },
+              "statusUpdatedAt": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of Facility",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of Facility",
+          "enum": [
+            "Fixed location",
+            "Mobile",
+            "Both"
+          ]
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
+        }
+      }
     },
     "UpdateMedicineRequest": {
       "allOf": [
@@ -2047,6 +2342,36 @@ func init() {
         }
       }
     },
+    "/facility/confiureSlot": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "configure slot for program in facility",
+        "operationId": "configureSlotFacility",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        }
+      }
+    },
     "/facility/groups": {
       "get": {
         "security": [
@@ -2279,6 +2604,50 @@ func init() {
         }
       }
     },
+    "/facility/{facilityId}/program/{programId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilityProgramSchedule",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "description": "Id of program",
+            "name": "programId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/FacilityConfigureSlot"
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -2461,6 +2830,42 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/public/facilities": {
+      "get": {
+        "security": [],
+        "summary": "get facilities for public",
+        "operationId": "getFacilitiesForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Facility pincode",
+            "name": "pincode",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "limit",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "name": "offset",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/PublicFacility"
+              }
+            }
           }
         }
       }
@@ -2974,6 +3379,62 @@ func init() {
         }
       }
     },
+    "FacilityAppointmentSchedule": {
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityAppointmentScheduleDaysItems0"
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        }
+      }
+    },
+    "FacilityAppointmentScheduleDaysItems0": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "string",
+          "title": "day (mon, tue, wed, thr, fri, sat, sun)"
+        },
+        "maxAppointments": {
+          "type": "integer",
+          "title": "Maximum appointment per day"
+        }
+      }
+    },
+    "FacilityConfigureSlot": {
+      "type": "object",
+      "required": [
+        "facilityId",
+        "programId"
+      ],
+      "properties": {
+        "appointmentSchedule": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityAppointmentSchedule"
+          }
+        },
+        "facilityId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "walkInSchedule": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityWalkInSchedule"
+          }
+        }
+      }
+    },
     "FacilityProgramsItems0": {
       "type": "object",
       "properties": {
@@ -3136,11 +3597,32 @@ func init() {
           "type": "string",
           "title": "Facility User Name"
         },
+        "osid": {
+          "type": "string",
+          "title": "Osid of the user stored in Facility Entity"
+        },
         "vaccinationRateLimits": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/VaccinationRateLimit"
           }
+        }
+      }
+    },
+    "FacilityWalkInSchedule": {
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "title": "day (mon, tue, wed, thr, fri, sat, sun)"
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
         }
       }
     },
@@ -3253,6 +3735,137 @@ func init() {
           }
         }
       ]
+    },
+    "PublicFacility": {
+      "properties": {
+        "address": {
+          "title": "Address",
+          "$ref": "#/definitions/Address"
+        },
+        "averageRating": {
+          "description": "Average Rating of Facility 0 to 5, 0 for no rating.",
+          "type": "number",
+          "title": "Average Rating",
+          "default": 0
+        },
+        "category": {
+          "type": "string",
+          "title": "Category",
+          "enum": [
+            "GOVT",
+            "PRIVATE"
+          ]
+        },
+        "facilityCode": {
+          "type": "string",
+          "title": "Facility Code"
+        },
+        "facilityName": {
+          "type": "string",
+          "title": "Facility Name"
+        },
+        "geoLocation": {
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "operatingHourEnd": {
+          "type": "string",
+          "title": "Operating hours end of day"
+        },
+        "operatingHourStart": {
+          "type": "string",
+          "title": "Operating hours start of day"
+        },
+        "osid": {
+          "type": "string",
+          "title": "Facility uuid"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/PublicFacilityProgramsItems0"
+          }
+        },
+        "status": {
+          "type": "string",
+          "title": "Status of Facility",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "type": {
+          "type": "string",
+          "title": "Type of Facility",
+          "enum": [
+            "Fixed location",
+            "Mobile",
+            "Both"
+          ]
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website URL"
+        }
+      }
+    },
+    "PublicFacilityProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        },
+        "rate": {
+          "type": "number"
+        },
+        "rateUpdatedAt": {
+          "type": "string"
+        },
+        "schedule": {
+          "type": "object",
+          "properties": {
+            "days": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "endTime": {
+              "type": "string"
+            },
+            "startTime": {
+              "type": "string"
+            }
+          }
+        },
+        "status": {
+          "type": "string"
+        },
+        "statusUpdatedAt": {
+          "type": "string"
+        }
+      }
+    },
+    "PublicFacilityProgramsItems0Schedule": {
+      "type": "object",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "endTime": {
+          "type": "string"
+        },
+        "startTime": {
+          "type": "string"
+        }
+      }
     },
     "UpdateMedicineRequest": {
       "allOf": [
@@ -3468,8 +4081,6 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "phone",
-        "enrollmentScopeId",
         "nationalId",
         "dob"
       ],
@@ -3526,6 +4137,16 @@ func init() {
               "state": "Karnataka"
             }
           ]
+        },
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "beneficiaryPhone": {
+          "type": "string"
         },
         "certified": {
           "type": "boolean",
