@@ -904,11 +904,26 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 }
 
 func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+	var appointmentSchedule []*models.FacilityAppointmentSchedule
+	var walkInSchedule []*models.FacilityWalkInSchedule
+
+	if params.Body.AppointmentSchedule != nil {
+		appointmentSchedule = params.Body.AppointmentSchedule
+	} else {
+		appointmentSchedule = make([]*models.FacilityAppointmentSchedule, 0)
+	}
+
+	if params.Body.WalkInSchedule != nil {
+		walkInSchedule = params.Body.WalkInSchedule
+	} else {
+		walkInSchedule = make([]*models.FacilityWalkInSchedule, 0)
+	}
+
 	facilityProgramSlot := models.FacilityConfigureSlot{
 		FacilityID:          params.FacilityID,
 		ProgramID:           params.ProgramID,
-		AppointmentSchedule: params.Body.AppointmentSchedule,
-		WalkInSchedule:      params.Body.WalkInSchedule,
+		AppointmentSchedule: appointmentSchedule,
+		WalkInSchedule:      walkInSchedule,
 	}
 	err := kernelService.CreateNewRegistry(facilityProgramSlot, "FacilityProgramSlot")
 	if err != nil {
