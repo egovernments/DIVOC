@@ -61,7 +61,20 @@ func getRecipients(params operations.GetRecipientsParams) middleware.Responder {
 		log.Error("Error occurred while querying Enrollment registry ", err)
 		return operations.NewGetRecipientsInternalServerError()
 	}
-	return model.NewGenericJSONResponse(responseFromRegistry[EnrollmentEntity])
+	if enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]); err == nil {
+		var enrollments []map[string]interface{}
+		err := json.Unmarshal(enrollmentArr, &enrollments)
+		if err != nil {
+			log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+			return model.NewGenericServerError()
+		} else {
+			services.EnrichFacilityDetails(enrollments)
+			return model.NewGenericJSONResponse(enrollments)
+		}
+	} else {
+		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
+		return model.NewGenericServerError()
+	}
 }
 
 func enrollRecipient(params operations.EnrollRecipientParams) middleware.Responder {
@@ -146,7 +159,6 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		}
 		return operations.NewVerifyOTPOK().WithPayload(&response)
 	}
-	return operations.NewVerifyOTPUnauthorized()
 }
 
 func canInitializeSlots() bool {

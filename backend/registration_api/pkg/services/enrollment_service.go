@@ -10,7 +10,7 @@ import (
 	"text/template"
 )
 
-func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error {
+func CreateEnrollment(enrollment *models.Enrollment, currentRetryCount int) error {
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
 	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	// If the generated Code is not unique, try again
@@ -21,6 +21,35 @@ func CreateEnrollment(enrollment models.Enrollment, currentRetryCount int) error
 	return err
 }
 
+func EnrichFacilityDetails(enrollments []map[string]interface{}) {
+	for _, enrollment := range enrollments {
+		facilityDetails := make(map[string]interface{})
+		facilityCode := enrollment["enrollmentScopeId"]
+		if facilityCode  != nil {
+			filter := map[string]interface{}{}
+			filter["facilityCode"] = map[string]interface{}{
+				"eq": facilityCode,
+			}
+			// TODO: Add cache mechanism
+			if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
+				facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
+				facilityDetails["facilityName"] = facility["facilityName"]
+				address := facility["address"].(map[string]interface{})
+				facilityDetails["state"] = address["state"]
+				facilityDetails["pincode"] = address["pincode"]
+				facilityDetails["district"] = address["district"]
+				enrollment["facilityDetails"] = facilityDetails
+			} else {
+				log.Errorf("Error occurred while fetching the details of facility (%v)", err)
+			}
+
+
+		}
+
+	}
+
+}
+
 func NotifyRecipient(enrollment models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
 	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
@@ -29,7 +58,7 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 
 	recipient := "sms:" + enrollment.Phone
-	message := "Your pre enrollment for vaccination is " + enrollment.Code
+	message := "Your enrollment code for vaccination is " + enrollment.Code
 	log.Infof("Sending SMS %s %s", recipient, message)
 	buf := bytes.Buffer{}
 	err := enrollmentTemplate.Execute(&buf, enrollment)
