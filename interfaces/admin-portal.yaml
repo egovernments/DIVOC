@@ -553,6 +553,42 @@ paths:
           description: OK
         '400':
           description: Invalid input
+    put:
+      summary: update schedule for program in facility
+      operationId: updateFacilityProgramSchedule
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              appointmentSchedule:
+                type: array
+                x-omitempty: true
+                items:
+                  "$ref": "#/definitions/FacilityAppointmentSchedule"
+              walkInSchedule:
+                type: array
+                x-omitempty: true
+                items:
+                  "$ref": "#/definitions/FacilityWalkInSchedule"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
   /analytics:
     get:
       summary: Get analytics query
