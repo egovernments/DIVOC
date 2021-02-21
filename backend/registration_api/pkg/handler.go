@@ -6,11 +6,13 @@ import (
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/models"
+	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 
@@ -166,8 +168,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
-		limit := 1
-		offset := -1
+		limit := 1000
+		offset := -1000
 		for {
 			offset += limit
 			facilitiesResponse, err := kernelService.QueryRegistry(FacilityEntity, filters, limit, offset)
@@ -277,6 +279,16 @@ func bookSlot(params operations.BookSlotOfFacilityParams) middleware.Responder {
 			} else {
 				isMarked := services.MarkEnrollmentCodeAsBooked(*params.Body.EnrollmentCode, *params.Body.FacilitySlotID)
 				if isMarked {
+					facilityDetails := strings.Split(*params.Body.FacilitySlotID, "_")
+					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
+						EnrollmentCode:  *params.Body.EnrollmentCode,
+						SlotID:          *params.Body.FacilitySlotID,
+						FacilityCode:    facilityDetails[0],
+						AppointmentDate: facilityDetails[2],
+						AppointmentTime: facilityDetails[3] + "-" + facilityDetails[4],
+						CreatedAt:       time.Now(),
+					})
+
 					return operations.NewGetSlotsForFacilitiesOK()
 				}
 			}
