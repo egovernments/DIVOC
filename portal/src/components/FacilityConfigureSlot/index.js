@@ -57,6 +57,9 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
             }
         ]
     };
+    // facilityId = "1223";
+    // programId = "4556";
+    // programName = "Covid-19";
 
     const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
     const MORNING_SCHEDULE = "morningSchedule";
@@ -72,7 +75,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
 
     const axiosInstance = useAxios('');
 
-    function getFacilityProgramSchedules(facilityId, programId) {
+    function getFacilityProgramSchedules() {
         let schedule = {
             appointmentSchedule: [],
             walkInSchedule: []
@@ -100,7 +103,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
     }
 
     useEffect(() => {
-        getFacilityProgramSchedules(facilityId, programId)
+        getFacilityProgramSchedules()
 
     }, []);
 
@@ -362,6 +365,14 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
             // update
             if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
                 data["appointmentSchedule"] = [...morningSchedules, ...afternoonSchedules]
+                let appSch = [];
+                if (morningSchedules[0].startTime) {
+                    appSch = [...appSch, ...morningSchedules];
+                }
+                if (afternoonSchedules[0].startTime) {
+                    appSch = [...appSch, ...afternoonSchedules]
+                }
+                data["appointmentSchedule"] = appSch
             }
             if (isWalkImSchedulesChanged) {
                 data["walkInSchedule"] = [...walkInSchedules]
@@ -384,7 +395,14 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
         } else {
             // post
             if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
-                data["appointmentSchedule"] = [...morningSchedules, ...afternoonSchedules]
+                let appSch = [];
+                if (isMorningSchedulesChanged) {
+                    appSch = morningSchedules;
+                }
+                if (isAfternoonSchedulesChanged) {
+                    appSch = [...appSch, ...afternoonSchedules]
+                }
+                data["appointmentSchedule"] = appSch
             }
             if (isWalkImSchedulesChanged) {
                 data["walkInSchedule"] = [...walkInSchedules]
@@ -404,12 +422,6 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
                 alert("Nothing has changed!")
             }
         }
-        if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
-            if (facilityProgramSchedules.osid) {
-
-            }
-        }
-        console.log(morningSchedules, afternoonSchedules, walkInSchedules)
     }
 
     return (
