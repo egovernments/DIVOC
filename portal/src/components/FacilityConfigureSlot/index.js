@@ -6,11 +6,14 @@ import Button from "react-bootstrap/Button";
 import {CheckboxItem} from "../FacilityFilterTab";
 import {useHistory} from "react-router-dom";
 import config from "../../config"
+import {useAxios} from "../../utils/useAxios";
+import {API_URL} from "../../utils/constants";
 
 
-export default function FacilityConfigureSlot () {
+export default function FacilityConfigureSlot ({facilityId, programId, programName}) {
     // mocking backend
-    const program = {
+    const mockSchedule = {
+        osid: "jjbgt768i",
         name: "C-19 program",
         programId: "t7uj789",
         appointmentSchedule: [
@@ -47,6 +50,7 @@ export default function FacilityConfigureSlot () {
         ],
         walkInSchedule: [
             {
+                osid: "juy5678",
                 days: ["wed", "thu"],
                 startTime: "17:00",
                 endTime: "18:00"
@@ -57,15 +61,70 @@ export default function FacilityConfigureSlot () {
     const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
     const MORNING_SCHEDULE = "morningSchedule";
     const AFTERNOON_SCHEDULE = "afternoonSchedule";
+    const MAX_APPOINTMENTS = 200;
 
     const history = useHistory();
     const [selectedDays, setSelectedDays] = useState([]);
-    const [morningSchedule, setMorningSchedule] = useState([]);
-    const [afternoonSchedule, setAfternoonSchedule] = useState([]);
+    const [facilityProgramSchedules, setFacilityProgramSchedules] = useState({});
+    const [morningSchedules, setMorningSchedules] = useState([]);
+    const [afternoonSchedules, setAfternoonSchedules] = useState([]);
+    const [walkInSchedules, setWalkInSchedules] = useState([]);
 
-    function setSelectedDaysFromSchedule() {
+    const axiosInstance = useAxios('');
+
+    function getFacilityProgramSchedules(facilityId, programId) {
+        let schedule = {
+            appointmentSchedule: [],
+            walkInSchedule: []
+        };
+        axiosInstance.current.get(API_URL.FACILITY_PROGRAM_SCHEDULE_API
+            .replace(":facilityId", facilityId)
+            .replace(":programId", programId)
+        ).then(res => {
+            if (res.status === 200) {
+                schedule = res.data;
+            }
+            setFacilityProgramSchedules(schedule);
+            setSelectedDaysFromSchedule(schedule);
+            setMorningScheduleFromSchedule(schedule);
+            setAfternoonScheduleFromSchedule(schedule);
+            setWalkInScheduleFromSchedule(schedule);
+        }).catch(err => {
+            console.log("API request errored with ", err);
+            setFacilityProgramSchedules(schedule);
+            setSelectedDaysFromSchedule(schedule);
+            setMorningScheduleFromSchedule(schedule);
+            setAfternoonScheduleFromSchedule(schedule);
+            setWalkInScheduleFromSchedule(schedule);
+        })
+    }
+
+    useEffect(() => {
+        getFacilityProgramSchedules(facilityId, programId)
+
+    }, []);
+
+    function setWalkInScheduleFromSchedule(program) {
+        if (program.walkInSchedule.length === 0) {
+            setWalkInSchedules([
+                {
+                    startTime: "",
+                    endTime: "",
+                    days: [],
+                    edited: false
+                }
+            ])
+        } else {
+            let schedule = program.walkInSchedule.map(sd => {
+                return {...sd, edited: false}
+            });
+            setWalkInSchedules(schedule)
+        }
+    }
+
+    function setSelectedDaysFromSchedule(schedule) {
         let daysInAppointmentSchedule = [];
-        program.appointmentSchedule.forEach(as => {
+        schedule.appointmentSchedule.forEach(as => {
             let days = as.days.map(d => d.day);
             days.forEach(d => {
                 if (!daysInAppointmentSchedule.includes(d) && !selectedDays.includes(d)) {
@@ -73,7 +132,7 @@ export default function FacilityConfigureSlot () {
                 }
             })
         });
-        program.walkInSchedule.forEach(ws => {
+        schedule.walkInSchedule.forEach(ws => {
             ws.days.forEach(d => {
                 if (!daysInAppointmentSchedule.includes(d) && !selectedDays.includes(d)) {
                     daysInAppointmentSchedule.push(d)
@@ -81,38 +140,56 @@ export default function FacilityConfigureSlot () {
             })
         });
         setSelectedDays([...selectedDays].concat(daysInAppointmentSchedule))
-        setSelectedDays([...selectedDays].concat(daysInAppointmentSchedule))
     }
 
-    useEffect(() => {
-        setSelectedDaysFromSchedule();
+    function setMorningScheduleFromSchedule(schedule) {
+        let schedules = [];
+        schedule.appointmentSchedule.forEach(as => {
+            if (Number(as.startTime.split(":")[0]) <= 12) {
+                schedules.push({...as, scheduleType: MORNING_SCHEDULE, edited: false})
+            }
+        });
+        if (schedules.length === 0) {
+            schedules.push({
+                startTime: "",
+                endTime: "",
+                days: [],
+                scheduleType: MORNING_SCHEDULE,
+                edited: false
+            })
+        }
+        setMorningSchedules(schedules)
+    }
 
-        // TODO: filter appointment schedule with start and end time to get morning schedule
-        setMorningSchedule([{...program.appointmentSchedule[0], scheduleType: MORNING_SCHEDULE}]);
-        setAfternoonSchedule([{...program.appointmentSchedule[1], scheduleType: AFTERNOON_SCHEDULE}]);
-    }, []);
+    function setAfternoonScheduleFromSchedule(schedule) {
+        let schedules = [];
+        schedule.appointmentSchedule.forEach(as => {
+            if (Number(as.startTime.split(":")[0]) > 12) {
+                schedules.push({...as, scheduleType: AFTERNOON_SCHEDULE, edited: false})
+            }
+        });
+        if (schedules.length === 0) {
+            schedules.push({
+                startTime: "",
+                endTime: "",
+                days: [],
+                scheduleType: AFTERNOON_SCHEDULE,
+                edited: false
+            })
+        }
+        setAfternoonSchedules(schedules)
+    }
 
     function AppointmentScheduleRow({schedule}) {
 
         function onValueChange(evt, field) {
-            if (schedule.osid && schedule.scheduleType === MORNING_SCHEDULE) {
-                let updatedSchedule = morningSchedule.map(ms => {
-                    if (ms.osid === schedule.osid) {
-                        ms[field] = evt.target.value
-                    }
-                    return ms
-                });
-                setMorningSchedule(updatedSchedule);
-            } else if (schedule.osid && schedule.scheduleType === AFTERNOON_SCHEDULE) {
-                let updatedSchedule = afternoonSchedule.map(ms => {
-                    if (ms.osid === schedule.osid) {
-                        ms[field] = evt.target.value
-                    }
-                    return ms
-                });
-                setAfternoonSchedule(updatedSchedule);
+            if (schedule.scheduleType === MORNING_SCHEDULE) {
+                // assuming only one row
+                setMorningSchedules([{...morningSchedules[0], [field]: evt.target.value, edited: true}])
+            } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
+                // assuming only one row
+                setAfternoonSchedules([{...afternoonSchedules[0], [field]: evt.target.value, edited: true}])
             }
-            // TODO: handle new schedule update
         }
 
         function getMaxAppointments(day) {
@@ -121,7 +198,36 @@ export default function FacilityConfigureSlot () {
         }
 
         function onMaxAppointmentsChange(evt, day) {
-            // TODO : handle max appointments change
+            let value = Number(evt.target.value);
+            if (schedule.scheduleType === MORNING_SCHEDULE) {
+                // assuming only one row
+                let schedule = {...morningSchedules[0], edited: true};
+                if (schedule.days.map(d => d.day).includes(day)) {
+                    schedule.days = schedule.days.map(d => {
+                        if (d.day === day) {
+                            d.maxAppointments = value
+                        }
+                        return d
+                    });
+                } else {
+                    schedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
+                }
+                setMorningSchedules([schedule]);
+            } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
+                // assuming only one row
+                let schedule = {...afternoonSchedules[0], edited: true};
+                if (schedule.days.map(d => d.day).includes(day)) {
+                    schedule.days = schedule.days.map(d => {
+                        if (d.day === day) {
+                            d.maxAppointments = value
+                        }
+                        return d
+                    });
+                } else {
+                    schedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
+                }
+                setAfternoonSchedules([schedule])
+            }
         }
 
         return (
@@ -136,7 +242,7 @@ export default function FacilityConfigureSlot () {
                                 className="form-control"
                                 defaultValue={schedule.startTime}
                                 type="text"
-                                id="startTime"
+                                name="startTime"
                                 onBlur={(evt) => onValueChange(evt, "startTime")}
                                 required/>
                         </Col>
@@ -148,7 +254,7 @@ export default function FacilityConfigureSlot () {
                                 className="form-control"
                                 defaultValue={schedule.endTime}
                                 type="text"
-                                id="endTime"
+                                name="endTime"
                                 onBlur={(evt) => onValueChange(evt, "endTime")}
                                 required/>
                         </Col>
@@ -162,8 +268,8 @@ export default function FacilityConfigureSlot () {
                                 className="form-control"
                                 defaultValue={getMaxAppointments(d)}
                                 disabled={!selectedDays.includes(d)}
-                                type="text"
-                                id="maxAppointments"
+                                type="number"
+                                name="maxAppointments"
                                 onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
                                 required/>
                         </Col>
@@ -175,11 +281,15 @@ export default function FacilityConfigureSlot () {
     function WalkInScheduleRow({schedule}) {
 
         function onValueChange(evt, field) {
-            // TODO : handle start and end time change
+            setWalkInSchedules([{...walkInSchedules[0], [field]: evt.target.value, edited: true}])
         }
 
         function handleDayChange(day) {
-            // TODO : handle day change
+            // assuming only one row
+            let schedule = {...walkInSchedules[0], edited: true};
+            let days = schedule.days.includes(day) ? schedule.days.filter(s => s !== day) : schedule.days.concat(day);
+            schedule.days = days;
+            setWalkInSchedules([schedule])
         }
 
         return (
@@ -194,7 +304,7 @@ export default function FacilityConfigureSlot () {
                                 className="form-control"
                                 defaultValue={schedule.startTime}
                                 type="text"
-                                id="startTime"
+                                name="startTime"
                                 onBlur={(evt) => onValueChange(evt, "startTime")}
                                 required/>
                         </Col>
@@ -206,7 +316,7 @@ export default function FacilityConfigureSlot () {
                                 className="form-control"
                                 defaultValue={schedule.endTime}
                                 type="text"
-                                id="endTime"
+                                name="endTime"
                                 onBlur={(evt) => onValueChange(evt, "endTime")}
                                 required/>
                         </Col>
@@ -236,14 +346,76 @@ export default function FacilityConfigureSlot () {
         setSelectedDays(updatedSelection);
     }
 
+    function onSuccessfulSave() {
+        alert("Slot successfully added")
+    }
+
     function handleOnSave() {
+        let data = {};
         // TODO: handle on save click
+        let isMorningSchedulesChanged = morningSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+        let isAfternoonSchedulesChanged = afternoonSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+        let isWalkImSchedulesChanged = walkInSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+
+        console.log(isMorningSchedulesChanged, isAfternoonSchedulesChanged, isWalkImSchedulesChanged);
+        if (facilityProgramSchedules.osid) {
+            // update
+            if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
+                data["appointmentSchedule"] = [...morningSchedules, ...afternoonSchedules]
+            }
+            if (isWalkImSchedulesChanged) {
+                data["walkInSchedule"] = [...walkInSchedules]
+            }
+
+            if (data["appointmentSchedule"] || data["walkInSchedule"]) {
+                let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
+                axiosInstance.current.put(apiUrl, data)
+                    .then(res => {
+                        if (res.status === 200) {
+                            onSuccessfulSave();
+                            getFacilityProgramSchedules()
+                        }
+                        else
+                            alert("Something went wrong while saving!");
+                    });
+            } else {
+                alert("Nothing has changed!")
+            }
+        } else {
+            // post
+            if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
+                data["appointmentSchedule"] = [...morningSchedules, ...afternoonSchedules]
+            }
+            if (isWalkImSchedulesChanged) {
+                data["walkInSchedule"] = [...walkInSchedules]
+            }
+            if (data["appointmentSchedule"] || data["walkInSchedule"]) {
+                let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
+                axiosInstance.current.post(apiUrl, data)
+                    .then(res => {
+                        if (res.status === 200) {
+                            onSuccessfulSave();
+                            getFacilityProgramSchedules()
+                        }
+                        else
+                            alert("Something went wrong while saving!");
+                    });
+            } else {
+                alert("Nothing has changed!")
+            }
+        }
+        if (isMorningSchedulesChanged || isAfternoonSchedulesChanged) {
+            if (facilityProgramSchedules.osid) {
+
+            }
+        }
+        console.log(morningSchedules, afternoonSchedules, walkInSchedules)
     }
 
     return (
         <div className="container-fluid mt-4">
             <Row>
-                <Col><h3>Program: {program.name} / Config Slot</h3></Col>
+                <Col><h3>{programName ? "Program: "+programName+" / ": ""} Config Slot</h3></Col>
                 <Col style={{"textAlign": "right"}}>
                     <Button className='add-vaccinator-button mr-4' variant="outlined" color="primary" onClick={() => history.push(config.urlPath +'/facility_admin')}>
                         BACK
@@ -270,21 +442,21 @@ export default function FacilityConfigureSlot () {
                     <div>
                         <Row>
                             <Col className="col-3">Morning Hours</Col>
-                            <Col>Maximum # of appointments allowed</Col>
+                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
                         </Row>
                         {
-                            morningSchedule.length > 0 &&
-                                morningSchedule.map(ms => <AppointmentScheduleRow schedule={ms} />)
+                            morningSchedules.length > 0 &&
+                                morningSchedules.map(ms => <AppointmentScheduleRow key={ms.osid} schedule={ms} />)
                         }
                     </div>
                     <div>
                         <Row className="mt-4">
                             <Col className="col-3">Afternoon Hours</Col>
-                            <Col>Maximum # of appointments allowed</Col>
+                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
                         </Row>
                         {
-                            afternoonSchedule.length > 0 &&
-                                afternoonSchedule.map(ms => <AppointmentScheduleRow schedule={ms} />)
+                            afternoonSchedules.length > 0 &&
+                                afternoonSchedules.map(ms => <AppointmentScheduleRow key={ms.osid} schedule={ms} />)
                         }
                     </div>
                 </div>
@@ -292,8 +464,8 @@ export default function FacilityConfigureSlot () {
                     <Col><h5>Walk-in Scheduler</h5></Col>
                     <div>
                         {
-                            program.walkInSchedule.length > 0 &&
-                                program.walkInSchedule.map(ws => <WalkInScheduleRow schedule={ws} />)
+                            walkInSchedules.length > 0 &&
+                                walkInSchedules.map(ws => <WalkInScheduleRow key={ws.osid} schedule={ws} />)
                         }
                     </div>
                 </div>
