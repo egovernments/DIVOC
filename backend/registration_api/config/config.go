@@ -5,11 +5,11 @@ import (
 )
 
 var Config = struct {
-	Auth struct{
-		PublicKey string `env:"AUTH_PUBLIC_KEY"`
-		PrivateKey string `env:"AUTH_PRIVATE_KEY"`
-		TTLForOtp int `yaml:"ttlforotpinminutes"`
-		MAXOtpVerifyAttempts int `yaml:"maxotpverifyattempts"`
+	Auth struct {
+		PublicKey            string `env:"AUTH_PUBLIC_KEY"`
+		PrivateKey           string `env:"AUTH_PRIVATE_KEY"`
+		TTLForOtp            int    `yaml:"ttlforotpinminutes"`
+		MAXOtpVerifyAttempts int    `yaml:"maxotpverifyattempts"`
 	}
 
 	Kafka struct {
@@ -23,7 +23,12 @@ var Config = struct {
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
 	Redis struct {
-		Url             string  `env:"REDIS_URL"`
+		Url string `yaml:"redisurl" env:"REDIS_URL"`
+	}
+	AppointmentScheduler struct {
+		ChannelSize    int `default:"100"`
+		ChannelWorkers int `default:"10"`
+		ScheduleDays   int `default:"30"`
 	}
 }{}
 

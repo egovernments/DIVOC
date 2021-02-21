@@ -8,3 +8,10 @@ enrollmentcreation:
 auth:
   maxotpverifyattempts: 3
   ttlforotpinminutes: 5
+redis:
+  redisurl: "redis://0.0.0.0:6379"
+registry:
+  url: http://localhost:8081
+  addoperationid: add
+  searchoperationid: search
+  readoperationid: read

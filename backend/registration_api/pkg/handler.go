@@ -11,13 +11,32 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
+	"time"
 )
+
+const FacilityEntity = "Facility"
+const EnrollmentEntity = "Enrollment"
+const LastInitializedKey = "LAST_FACILITY_SLOTS_INITIALIZED"
+const YYYYMMDD = "2006-01-02"
+
+var DaysMap = map[string]time.Weekday{
+	"Su": time.Sunday,
+	"Mo": time.Monday,
+	"Tu": time.Tuesday,
+	"We": time.Wednesday,
+	"Th": time.Thursday,
+	"Fr": time.Friday,
+	"Sa": time.Saturday,
+}
 
 func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.EnrollRecipientHandler = operations.EnrollRecipientHandlerFunc(enrollRecipient)
 	api.GenerateOTPHandler = operations.GenerateOTPHandlerFunc(generateOTP)
 	api.VerifyOTPHandler = operations.VerifyOTPHandlerFunc(verifyOTP)
 	api.GetRecipientsHandler = operations.GetRecipientsHandlerFunc(getRecipients)
+	api.InitializeFacilitySlotsHandler = operations.InitializeFacilitySlotsHandlerFunc(initializeFacilitySlots)
+	api.GetSlotsForFacilitiesHandler = operations.GetSlotsForFacilitiesHandlerFunc(getFacilitySlots)
+	api.BookSlotOfFacilityHandler = operations.BookSlotOfFacilityHandlerFunc(bookSlot)
 }
 
 func getRecipients(params operations.GetRecipientsParams) middleware.Responder {
@@ -35,15 +54,15 @@ func getRecipients(params operations.GetRecipientsParams) middleware.Responder {
 	filter["phone"] = map[string]interface{}{
 		"eq": phone,
 	}
-	responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0)
+	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
 	if err != nil {
 		log.Error("Error occurred while querying Enrollment registry ", err)
 		return operations.NewGetRecipientsInternalServerError()
 	}
-	return model.NewGenericJSONResponse(responseFromRegistry["Enrollment"])
+	return model.NewGenericJSONResponse(responseFromRegistry[EnrollmentEntity])
 }
 
-func enrollRecipient(params operations.EnrollRecipientParams) middleware.Responder{
+func enrollRecipient(params operations.EnrollRecipientParams) middleware.Responder {
 	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
 	if recipientToken == "" {
 		log.Error("Recipient Token is empty")
@@ -74,7 +93,7 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 		// Send SMS
 		return operations.NewGenerateOTPOK()
 	} else {
-		log.Errorf("Error while setting otp in redis %+v" , err)
+		log.Errorf("Error while setting otp in redis %+v", err)
 		return operations.NewGenerateOTPInternalServerError()
 	}
 }
@@ -102,7 +121,7 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		return operations.NewVerifyOTPTooManyRequests()
 	}
 	if cacheOTP.Otp != receivedOTP {
-		cacheOTP.VerifyAttemptCount+=1
+		cacheOTP.VerifyAttemptCount += 1
 		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
 			log.Errorf("Error in setting verify count %+v", err)
 		} else {
@@ -110,7 +129,6 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		}
 		return operations.NewVerifyOTPUnauthorized()
 	}
-
 
 	if err = services.DeleteValue(phone); err != nil {
 		log.Errorf("Error in clearing the OTP  after signin %+v", err)
@@ -121,7 +139,7 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 			log.Errorf("Unable to create the jwt token %+v", err)
 			return model.NewGenericServerError()
 		}
-		response := operations.VerifyOTPOKBody {
+		response := operations.VerifyOTPOKBody{
 			Token: token,
 		}
 		return operations.NewVerifyOTPOK().WithPayload(&response)
@@ -129,3 +147,117 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	return operations.NewVerifyOTPUnauthorized()
 }
 
+func canInitializeSlots() bool {
+	lastInitializedDate, err := services.GetValue(LastInitializedKey)
+	if err != nil {
+		return true
+	} else {
+		initializedDate, _ := time.Parse(YYYYMMDD, lastInitializedDate)
+		currentDate := time.Now()
+		if initializedDate.YearDay() == currentDate.YearDay() && initializedDate.Year() == currentDate.Year() {
+			return false
+		}
+		return true
+	}
+}
+
+func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
+
+	if canInitializeSlots() {
+		log.Infof("Initializing facility slots")
+		filters := map[string]interface{}{}
+		limit := 1000
+		offset := -1000
+		for {
+			offset += limit
+			facilitiesResponse, err := kernelService.QueryRegistry(FacilityEntity, filters, limit, offset)
+			facilities, ok := facilitiesResponse[FacilityEntity].([]interface{})
+			if err != nil || !ok {
+				if err != nil {
+					log.Error("Fetching facilities failed", err)
+				}
+				return operations.NewGenerateOTPBadRequest()
+			} else if len(facilities) == 0 {
+				_ = services.SetValueWithoutExpiry(LastInitializedKey, time.Now().Format(YYYYMMDD))
+				return operations.NewInitializeFacilitySlotsOK()
+			} else {
+				for _, facilityObj := range facilities {
+					facility, ok := facilityObj.(map[string]interface{})
+					if ok {
+						facilityCode := facility["facilityCode"].(string)
+						log.Infof("Initializing facility %s slots", facilityCode)
+
+						facilityProgramArr, ok := facility["programs"].([]interface{})
+						if ok && len(facilityProgramArr) > 0 {
+							for _, facilityProgramObj := range facilityProgramArr {
+								facilityProgram, ok := facilityProgramObj.(map[string]interface{})
+								if ok {
+									programId, ok := facilityProgram["programId"].(string)
+									if ok {
+										facilityWorkingDays := []string{"Mo", "Tu", "We"}
+										workingDays := make(map[time.Weekday]string)
+										for _, workingDay := range facilityWorkingDays {
+											workingDays[DaysMap[workingDay]] = workingDay
+										}
+										vaccinationStartTime := "09:00AM"
+										vaccinationSlots := 100
+										currentDate := time.Now()
+										for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
+											slotDate := currentDate.AddDate(0, 0, i)
+											_, isFacilityAvailableForSlot := workingDays[slotDate.Weekday()]
+											if isFacilityAvailableForSlot {
+												schedule := services.FacilitySchedule{
+													FacilityCode: facilityCode,
+													ProgramId:    programId,
+													Date:         slotDate,
+													Time:         vaccinationStartTime,
+													Slots:        vaccinationSlots,
+												}
+												log.Infof("Initializing facility slot %v", schedule)
+												services.AddFacilityScheduleToChannel(schedule)
+												log.Infof("Initialized facility slot %v", schedule)
+											}
+										}
+									}
+								}
+							}
+						}
+
+					}
+				}
+			}
+		}
+	}
+	return operations.NewInitializeFacilitySlotsUnauthorized()
+}
+
+func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams) middleware.Responder {
+	const SlotsToReturn = 5
+	if paras.FacilityID == nil {
+		return operations.NewGenerateOTPBadRequest()
+	}
+	startPosition := int64(*paras.PageNumber) * SlotsToReturn
+	slotKeys, err := services.GetValuesFromSet(*paras.FacilityID, startPosition, startPosition+SlotsToReturn-1)
+	if err == nil && len(slotKeys) > 0 {
+		slotsAvailable, err := services.GetValues(slotKeys...)
+		if err == nil {
+			return &operations.GetSlotsForFacilitiesOK{
+				Payload: map[string]interface{}{
+					"keys":  slotKeys,
+					"slots": slotsAvailable,
+				},
+			}
+		}
+	}
+	return operations.NewGetSlotsForFacilitiesBadRequest()
+}
+
+func bookSlot(params operations.BookSlotOfFacilityParams) middleware.Responder {
+	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
+	if recipientToken == "" {
+		log.Error("Recipient Token is empty")
+		return operations.NewGetRecipientsUnauthorized()
+	}
+	_, _ = services.VerifyRecipientToken(recipientToken)
+	return operations.NewGetSlotsForFacilitiesBadRequest()
+}

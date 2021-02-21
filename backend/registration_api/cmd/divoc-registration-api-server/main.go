@@ -4,13 +4,12 @@ import (
 	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
-	log "github.com/sirupsen/logrus"
-	"os"
-
 	"github.com/divoc/registration-api/swagger_gen/restapi"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/loads"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 func main() {
@@ -18,7 +17,7 @@ func main() {
 	services.InitializeKafka()
 	kernelServices.InitializeFlagr()
 	services.InitRedis()
-
+	services.InitializeAppointmentScheduler()
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
 		log.Fatalln(err)
