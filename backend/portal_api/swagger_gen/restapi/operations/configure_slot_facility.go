@@ -7,8 +7,12 @@ package operations
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
@@ -31,7 +35,7 @@ func NewConfigureSlotFacility(ctx *middleware.Context, handler ConfigureSlotFaci
 	return &ConfigureSlotFacility{Context: ctx, Handler: handler}
 }
 
-/*ConfigureSlotFacility swagger:route POST /facility/confiureSlot configureSlotFacility
+/*ConfigureSlotFacility swagger:route POST /facility/{facilityId}/program/{programId}/schedule configureSlotFacility
 
 configure slot for program in facility
 
@@ -70,4 +74,102 @@ func (o *ConfigureSlotFacility) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// ConfigureSlotFacilityBody configure slot facility body
+//
+// swagger:model ConfigureSlotFacilityBody
+type ConfigureSlotFacilityBody struct {
+
+	// appointment schedule
+	AppointmentSchedule []*models.FacilityAppointmentSchedule `json:"appointmentSchedule"`
+
+	// walk in schedule
+	WalkInSchedule []*models.FacilityWalkInSchedule `json:"walkInSchedule"`
+}
+
+// Validate validates this configure slot facility body
+func (o *ConfigureSlotFacilityBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateAppointmentSchedule(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateWalkInSchedule(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *ConfigureSlotFacilityBody) validateAppointmentSchedule(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.AppointmentSchedule) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.AppointmentSchedule); i++ {
+		if swag.IsZero(o.AppointmentSchedule[i]) { // not required
+			continue
+		}
+
+		if o.AppointmentSchedule[i] != nil {
+			if err := o.AppointmentSchedule[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "appointmentSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *ConfigureSlotFacilityBody) validateWalkInSchedule(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.WalkInSchedule) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.WalkInSchedule); i++ {
+		if swag.IsZero(o.WalkInSchedule[i]) { // not required
+			continue
+		}
+
+		if o.WalkInSchedule[i] != nil {
+			if err := o.WalkInSchedule[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "walkInSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *ConfigureSlotFacilityBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *ConfigureSlotFacilityBody) UnmarshalBinary(b []byte) error {
+	var res ConfigureSlotFacilityBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }
