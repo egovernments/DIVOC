@@ -187,10 +187,11 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 					facility, ok := facilityObj.(map[string]interface{})
 					if ok {
 						facilityCode := facility["facilityCode"].(string)
+						facilityOSID := facility["osid"].(string)
 						log.Infof("Initializing facility %s slots", facilityCode)
 
 						facilityProgramArr, ok := facility["programs"].([]interface{})
-						facilityProgramWiseSchedule := services.GetFacilityAppointmentSchedule(facilityCode)
+						facilityProgramWiseSchedule := services.GetFacilityAppointmentSchedule(facilityOSID)
 						if ok && len(facilityProgramArr) > 0 {
 							for _, facilityProgramObj := range facilityProgramArr {
 								facilityProgram, ok := facilityProgramObj.(map[string]interface{})

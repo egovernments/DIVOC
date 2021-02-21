@@ -1,13 +1,13 @@
 package services
 
 import (
-	"encoding/json"
+	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
 )
 
-const FacilityEntity = "Facility"
+const FacilityProgramSlot = "FacilityProgramSlot"
 
 type daySchedule map[time.Weekday][]map[string]string
 type ProgramDaySchedule map[string]daySchedule
@@ -23,79 +23,27 @@ var DaysMap = map[string]time.Weekday{
 }
 
 func GetFacilityAppointmentSchedule(facilityId string) ProgramDaySchedule {
-	/*filter := map[string]interface{}{
+	filter := map[string]interface{}{
 		"facilityId": map[string]interface{}{
 			"eq": facilityId,
 		},
 	}
-	facilitySchedulesArr, err := services.QueryRegistry(FacilityEntity, filter, 100, 0)
+	facilitySchedulesArr, err := services.QueryRegistry(FacilityProgramSlot, filter, 100, 0)
 	if err == nil {
-		facilitySchedules := facilitySchedulesArr[FacilityEntity].([]interface{})
+		facilitySchedules := facilitySchedulesArr[FacilityProgramSlot].([]interface{})
 		if len(facilitySchedules) > 0 {
-			convertToProgramWiseDaySchedule(facilitySchedules)
+			programWiseDaySchedules := convertToProgramWiseDaySchedule(facilitySchedules)
+			log.Infof("%v", programWiseDaySchedules)
+			return programWiseDaySchedules
 		}
-	}*/
-	facilitySchedules := `
-[
-  {
-    "facilityId": "7589hrfi756asdr4589",
-    "programId": "1-b58ec6ec-c971-455c-ade5-7dce34ea0b09",
-    "appointmentSchedule": [
-      {
-        "osid": "yu76ht656tg",
-        "startTime": "09:00",
-        "endTime": "12:00",
-        "days": [
-          {
-            "day": "mon",
-            "maxAppointments": 100
-          },
-          {
-            "day": "tue",
-            "maxAppointments": 100
-          }
-        ]
-      },
-      {
-        "osid": "hgr67yhu898iu",
-        "startTime": "14:00",
-        "endTime": "18:00",
-        "days": [
-          {
-            "day": "mon",
-            "maxAppointments": 80
-          },
-          {
-            "day": "tue",
-            "maxAppointments": 80
-          }
-        ]
-      }
-    ],
-    "walkInSchedule": [
-      {
-        "days": ["wed", "thu"],
-        "startTime": "17:00",
-        "endTime": "18:00"
-      }
-    ]
-  }
-]
-`
-	var result []map[string]interface{}
-
-	err := json.Unmarshal([]byte(facilitySchedules), &result)
-	if err != nil {
-		log.Errorf("%v", err)
 	}
-	programWiseDaySchedules := convertToProgramWiseDaySchedule(result)
-	log.Infof("%v", programWiseDaySchedules)
-	return programWiseDaySchedules
+	return ProgramDaySchedule{}
 }
 
-func convertToProgramWiseDaySchedule(schedules []map[string]interface{}) ProgramDaySchedule {
+func convertToProgramWiseDaySchedule(schedules []interface{}) ProgramDaySchedule {
 	programWiseDaySchedule := make(ProgramDaySchedule)
-	for _, schedule := range schedules {
+	for _, scheduleObj := range schedules {
+		schedule := scheduleObj.(map[string]interface{})
 		programId := schedule["programId"].(string)
 		programWiseDaySchedule[programId] = make(daySchedule)
 		for _, appointmentScheduleObj := range schedule["appointmentSchedule"].([]interface{}) {
