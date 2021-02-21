@@ -1,9 +1,11 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"github.com/divoc/registration-api/config"
 	log "github.com/sirupsen/logrus"
+	"strconv"
 	"time"
 )
 
@@ -56,4 +58,32 @@ func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
 		log.Errorf("Error while inserting %s to set %s", key, schedule.FacilityCode, err)
 
 	}
+}
+
+func BookAppointmentSlot(slotId string) error {
+	log.Infof("Blocking appointment slot: %s", slotId)
+	remainingSlotsStr, err := GetValue(slotId)
+	if err != nil {
+		log.Errorf("Failed getting slots info: %s", slotId, err)
+		return nil
+	}
+	remainingSlots, err := strconv.Atoi(remainingSlotsStr)
+	if remainingSlots <= 0 {
+		return errors.New("no slots available to book")
+	}
+	slotsAvailable, err := DecrValue(slotId)
+	if slotsAvailable == 0 {
+		//TODO: mark/process slot is empty
+	}
+	return err
+}
+
+func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
+	success, err := SetHash(enrollmentCode, "slotId", slotId)
+	if err != nil {
+		log.Errorf("Failed to mark %s code for slot %s as booked", enrollmentCode, slotId, err)
+	} else {
+		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
+	}
+	return success
 }

@@ -45,6 +45,10 @@ func init() {
             "in": "body",
             "schema": {
               "type": "object",
+              "required": [
+                "facilitySlotId",
+                "enrollmentCode"
+              ],
               "properties": {
                 "enrollmentCode": {
                   "type": "string"
@@ -293,6 +297,10 @@ func init() {
             "in": "body",
             "schema": {
               "type": "object",
+              "required": [
+                "facilitySlotId",
+                "enrollmentCode"
+              ],
               "properties": {
                 "enrollmentCode": {
                   "type": "string"

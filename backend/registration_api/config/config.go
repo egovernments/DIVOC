@@ -6,8 +6,8 @@ import (
 
 var Config = struct {
 	Auth struct {
-		PublicKey            string `env:"AUTH_PUBLIC_KEY"`
-		PrivateKey           string `env:"AUTH_PRIVATE_KEY"`
+		PublicKey            string `yaml:"publickey" env:"AUTH_PUBLIC_KEY"`
+		PrivateKey           string `yaml:"privatekey" env:"AUTH_PRIVATE_KEY"`
 		TTLForOtp            int    `yaml:"ttlforotpinminutes"`
 		MAXOtpVerifyAttempts int    `yaml:"maxotpverifyattempts"`
 	}

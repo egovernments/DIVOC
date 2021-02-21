@@ -20,6 +20,9 @@ paths:
           name: body
           schema:
             type: object
+            required:
+              - facilitySlotId
+              - enrollmentCode
             properties:
               facilitySlotId:
                 type: string

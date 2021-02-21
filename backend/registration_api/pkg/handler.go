@@ -254,10 +254,63 @@ func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams) middleware.R
 
 func bookSlot(params operations.BookSlotOfFacilityParams) middleware.Responder {
 	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
+	if params.Body.EnrollmentCode == nil || params.Body.FacilitySlotID == nil {
+		return operations.NewBookSlotOfFacilityBadRequest()
+	}
 	if recipientToken == "" {
 		log.Error("Recipient Token is empty")
 		return operations.NewGetRecipientsUnauthorized()
 	}
-	_, _ = services.VerifyRecipientToken(recipientToken)
+	phone, err := services.VerifyRecipientToken(recipientToken)
+	if err != nil {
+		log.Error("Invalid Token")
+		return operations.NewGetRecipientsUnauthorized()
+	}
+	if isValidEnrollmentCode(*params.Body.EnrollmentCode, phone) {
+		if !checkIfAlreadyAppointed(*params.Body.EnrollmentCode) {
+			err := services.BookAppointmentSlot(*params.Body.FacilitySlotID)
+			if err != nil {
+				return operations.NewBookSlotOfFacilityBadRequest()
+			} else {
+				isMarked := services.MarkEnrollmentCodeAsBooked(*params.Body.EnrollmentCode, *params.Body.FacilitySlotID)
+				if isMarked {
+					return operations.NewGetSlotsForFacilitiesOK()
+				}
+			}
+		} else {
+			log.Errorf("Already booked %s, %s", *params.Body.EnrollmentCode, phone)
+		}
+	} else {
+		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, phone)
+	}
 	return operations.NewGetSlotsForFacilitiesBadRequest()
+}
+
+func checkIfAlreadyAppointed(enrollmentCode string) bool {
+	exists, err := services.HashFieldExists(enrollmentCode, "slotId")
+	if err != nil {
+		return false
+	} else {
+		return exists
+	}
+}
+
+func isValidEnrollmentCode(enrollmentCode string, phone string) bool {
+	//TODO: check in cache, store the registered enrolled users in cache as map
+	filter := map[string]interface{}{
+		"code": map[string]interface{}{
+			"eq": enrollmentCode,
+		},
+		"phone": map[string]interface{}{
+			"eq": phone,
+		},
+	}
+	enrollmentsArr, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+	if err == nil {
+		enrollments := enrollmentsArr[EnrollmentEntity].([]interface{})
+		if len(enrollments) > 0 {
+			return true
+		}
+	}
+	return false
 }

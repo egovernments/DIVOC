@@ -58,3 +58,19 @@ func SetValueWithoutExpiry(key string, val interface{}) error {
 func GetValuesFromSet(key string, startPosition int64, stopPosition int64) ([]string, error) {
 	return redisClient.ZRange(key, startPosition, stopPosition).Result()
 }
+
+func KeyExists(key string) (int64, error) {
+	return redisClient.Exists(key).Result()
+}
+
+func DecrValue(key string) (int64, error) {
+	return redisClient.Decr(key).Result()
+}
+
+func SetHash(key string, field string, value string) (bool, error) {
+	return redisClient.HSetNX(key, field, value).Result()
+}
+
+func HashFieldExists(key string, field string) (bool, error) {
+	return redisClient.HExists(key, field).Result()
+}

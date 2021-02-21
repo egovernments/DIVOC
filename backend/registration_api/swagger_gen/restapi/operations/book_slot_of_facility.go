@@ -8,9 +8,11 @@ package operations
 import (
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // BookSlotOfFacilityHandlerFunc turns a function with the right signature into a book slot of facility handler
@@ -65,14 +67,47 @@ func (o *BookSlotOfFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 type BookSlotOfFacilityBody struct {
 
 	// enrollment code
-	EnrollmentCode string `json:"enrollmentCode,omitempty"`
+	// Required: true
+	EnrollmentCode *string `json:"enrollmentCode"`
 
 	// facility slot Id
-	FacilitySlotID string `json:"facilitySlotId,omitempty"`
+	// Required: true
+	FacilitySlotID *string `json:"facilitySlotId"`
 }
 
 // Validate validates this book slot of facility body
 func (o *BookSlotOfFacilityBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateEnrollmentCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateFacilitySlotID(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *BookSlotOfFacilityBody) validateEnrollmentCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"enrollmentCode", "body", o.EnrollmentCode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *BookSlotOfFacilityBody) validateFacilitySlotID(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"facilitySlotId", "body", o.FacilitySlotID); err != nil {
+		return err
+	}
+
 	return nil
 }
 
