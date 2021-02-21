@@ -103,7 +103,7 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	}
 	otp := utils.GenerateOTP()
 	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
-	err = services.SetValue(phone, string(cacheOtp))
+	err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
 	if err == nil {
 		// Send SMS
 		return operations.NewGenerateOTPOK()
@@ -140,7 +140,7 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
 			log.Errorf("Error in setting verify count %+v", err)
 		} else {
-			err = services.SetValue(phone, string(cacheOtp))
+			err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
 		}
 		return operations.NewVerifyOTPUnauthorized()
 	}

@@ -3,6 +3,7 @@ package services
 import (
 	"github.com/divoc/registration-api/config"
 	"github.com/go-redis/redis"
+	log "github.com/sirupsen/logrus"
 	"time"
 )
 
@@ -23,13 +24,15 @@ func InitRedis() {
 func DeleteValue(key string) error {
 	return redisClient.Del(key).Err()
 }
-func SetValue(key string, val interface{}) error {
-	duration := time.Minute * time.Duration(config.Config.Auth.TTLForOtp)
+func SetValue(key string, val interface{}, ttlInMin time.Duration) error {
+	log.Info("Set value for ", key)
+	duration := time.Minute * ttlInMin
 	err := redisClient.Set(key, val, duration).Err()
 	return err
 }
 
 func GetValue(key string) (string, error) {
+	log.Info("Get value for ", key)
 	result, err := redisClient.Get(key).Result()
 	return result, err
 }

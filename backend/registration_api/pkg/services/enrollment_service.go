@@ -2,12 +2,14 @@ package services
 
 import (
 	"bytes"
+	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"text/template"
+	"time"
 )
 
 func CreateEnrollment(enrollment *models.Enrollment, currentRetryCount int) error {
@@ -26,8 +28,11 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 		facilityDetails := make(map[string]interface{})
 		facilityCode := enrollment["enrollmentScopeId"]
 		if facilityCode  != nil {
-			err := GetObjectValue(facilityCode.(string), &facilityDetails)
-			if err != nil || facilityDetails == nil{
+			value, err := GetValue(facilityCode.(string))
+			if err := json.Unmarshal([]byte(value), &facilityDetails); err != nil {
+				log.Errorf("Error in marshalling json %+v", err)
+			}
+			if err != nil || len(facilityDetails) == 0 {
 				log.Errorf("Unable to get the value in Cache (%v)", err)
 				filter := map[string]interface{}{}
 				filter["facilityCode"] = map[string]interface{}{
@@ -36,14 +41,19 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 				if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
 					facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
 					facilityDetails["facilityName"] = facility["facilityName"]
-					address := facility["address"].(map[string]interface{})
-					facilityDetails["state"] = address["state"]
-					facilityDetails["pincode"] = address["pincode"]
-					facilityDetails["district"] = address["district"]
+					facilityAddress := facility["address"].(map[string]interface{})
+					facilityDetails["state"] = facilityAddress["state"]
+					facilityDetails["pincode"] = facilityAddress["pincode"]
+					facilityDetails["district"] = facilityAddress["district"]
 					enrollment["facilityDetails"] = facilityDetails
-					err := SetObjectValue(facilityCode.(string), facilityDetails)
-					if err != nil{
-						log.Errorf("Unable to set the value in Cache (%v)", err)
+
+					if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
+						log.Errorf("Error in Marshaling the facility details %+v", err)
+					} else {
+						err:=SetValue(facilityCode.(string), facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
+						if err != nil {
+							log.Errorf("Unable to set the value in Cache (%v)", err)
+						}
 					}
 				} else {
 					log.Errorf("Error occurred while fetching the details of facility (%v)", err)
