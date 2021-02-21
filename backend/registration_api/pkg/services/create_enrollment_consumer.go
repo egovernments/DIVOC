@@ -17,7 +17,7 @@ func StartEnrollmentConsumer() {
 		"enable.auto.commit": "false",
 	})
 	if err != nil {
-		log.Errorf("Failed connecting to kafka", err)
+		log.Errorf("Failed connecting to kafka %+v", err)
 	}
 	go func() {
 		err := consumer.SubscribeTopics([]string{config.Config.Kafka.EnrollmentTopic}, nil)
