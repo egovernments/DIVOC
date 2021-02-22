@@ -10,7 +10,7 @@ import {CITIZEN_TOKEN_COOKIE_NAME, PROGRAM_API, RECIPIENTS_API} from "../../../c
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
 import {
-    AADHAAR_ERROR_MESSAGE, DISTRICT_ERROR_MSG, DOB_ERROR_MSG, GENDER_ERROR_MSG,
+    AADHAAR_ERROR_MESSAGE, DISTRICT_ERROR_MSG, DOB_ERROR_MSG, EMAIL_ERROR_MESSAGE, GENDER_ERROR_MSG,
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG, STATE_ERROR_MSG
@@ -158,28 +158,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     const BeneficiaryDetails = () => {
 
         const [districts, setDistricts] = useState([]);
-        const [maxAge, setMaxAge] = useState(50);
 
         useEffect(() => {
             setDistictsForState(formData.state)
-            const data = {
-                "entityContext": {
-
-                },
-                "flagKey": "country_specific_features"
-            }
-            axios
-                .post("/config/api/v1/evaluation", data)
-                .then((res) => {
-                    return res.data;
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
-                .then((result) => {
-                    setMaxAge(result["variantAttachment"].registrationMaxAge)
-                })
-        }, []);
+        });
 
         function onStateSelected(stateSelected) {
             setValue({target: {name:"state", value:stateSelected}});
@@ -199,8 +181,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         function setDobValue(dob) {
             setValue({target: {name:"dob", value:dob}})
         }
-        const minDate = new Date();
-        minDate.setYear(minDate.getYear() - maxAge);
+        // const minDate = new Date();
+        // minDate.setYear(minDate.getYear() - maxAge);
         return (
             <div className="pt-5">
                 <h5>Beneficiary Details</h5>
@@ -246,7 +228,23 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 <Row className="pt-2">
                     <div className="p-0 col-6">
                         <Col className="col-6">
-                            <label htmlFor="name">Date of Birth *</label>
+                            <label htmlFor="gender">Gender *</label>
+                            <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
+                                <option disabled selected={!formData.gender} value>Select Gender</option>
+                                {
+                                    GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
+                                }
+                            </select>
+                            {
+                                verifyDetails &&
+                                <><br/><b>{formData.gender}</b></>
+                            }
+                            <div className="invalid-input">
+                                {errors.gender}
+                            </div>
+                            <label htmlFor="name" className="pt-2">Age</label>
+                            <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
+                            {/*<label htmlFor="name">Date of Birth *</label>
                             { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
                                               value={minDate}
                                               minDate={minDate}
@@ -260,7 +258,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             }
                             <div className="invalid-input">
                                 {errors.dob}
-                            </div>
+                            </div>*/}
                         </Col>
                     </div>
                     <div className="p-0 col-6">
@@ -282,26 +280,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                         </Col>
                     </div>
                 </Row>
-                <Row className="pt-2">
-                    <div className="p-0 col-6">
-                        <Col className="col-6">
-                            <label htmlFor="gender">Gender *</label>
-                            <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
-                                <option disabled selected={!formData.gender} value>Select Gender</option>
-                                {
-                                    GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
-                                }
-                            </select>
-                            {
-                                verifyDetails &&
-                                <><br/><b>{formData.gender}</b></>
-                            }
-                            <div className="invalid-input">
-                                {errors.gender}
-                            </div>
-                        </Col>
-                    </div>
-                </Row>
             </div>
         )
     };
@@ -311,39 +289,28 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
         const userMobileNumber = getUserNumberFromRecipientToken();
 
-        const [beneficiaryNumber, setBeneficiaryNumber] = useState('');
-        const [oTPSent, setOTPSent] = useState(false);
-        const [otp, setOtp] = useState('');
+        // const [beneficiaryNumber, setBeneficiaryNumber] = useState('');
+        // const [oTPSent, setOTPSent] = useState(false);
+        // const [otp, setOtp] = useState('');
 
-        const [email, setEmail] = useState(formData.email);
-        const [confirmEmail, setConfirmEmail] = useState(formData.email);
+        // useEffect(() => {
+        //     if (formData.contact && userMobileNumber !== formData.contact) {
+        //         setBeneficiaryNumber(formData.contact);
+        //     }
+        // }, []);
 
-        useEffect(() => {
-            if (formData.contact && userMobileNumber !== formData.contact) {
-                setBeneficiaryNumber(formData.contact);
-            }
-        }, []);
-
-        function sendOTP() {
-            // TODO add logic to call backend to send the OTP
-            setOTPSent(true)
-        }
-
-        function verifyOTP(value) {
-            setOtp(value);
-            if (value === "1234") {
-                alert("OTP verified!");
-                setValue({target: {name:"contact", value:beneficiaryNumber}});
-            }
-        }
-
-        function verifyEmail(confirmEmail) {
-            setConfirmEmail(confirmEmail)
-            if (email === confirmEmail) {
-                alert("Email confirmed")
-                setValue({target: {name:"email", value:email}});
-            }
-        }
+        // function sendOTP() {
+        //     // TODO add logic to call backend to send the OTP
+        //     setOTPSent(true)
+        // }
+        //
+        // function verifyOTP(value) {
+        //     setOtp(value);
+        //     if (value === "1234") {
+        //         alert("OTP verified!");
+        //         setValue({target: {name:"contact", value:beneficiaryNumber}});
+        //     }
+        // }
 
         return (
             <div className="pt-5">
@@ -362,35 +329,35 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                                         {userMobileNumber}
                                     </label>
                                 </div>
-                                <div className="form-check radio pb-2 d-none">
-                                    <input className="form-check-input" type="radio" name="contact" id="otherContact"
-                                           checked={beneficiaryNumber === formData.contact}
-                                           value={beneficiaryNumber} onChange={()=> alert("Fill the beneficiary number before selecting")}/>
-                                    <label className="form-check-label" htmlFor="otherContact">
-                                        Use Beneficiary Number
-                                    </label>
-                                    <InputGroup>
-                                        <input className="form-control" id="mobileNumber" type="text"
-                                               value={beneficiaryNumber}
-                                               onChange={e => setBeneficiaryNumber(e.target.value)}
-                                               placeholder="Enter Mobile number" />
-                                        <InputGroup.Append>
-                                            <Button hidden={!beneficiaryNumber || userMobileNumber !== formData.contact} variant="link" onClick={() => sendOTP()}>Verify</Button>
-                                        </InputGroup.Append>
-                                    </InputGroup>
-                                    {
-                                        oTPSent &&
-                                        <InputGroup className="mt-3">
-                                            <InputGroup.Prepend>
-                                                <InputGroup.Text>OTP</InputGroup.Text>
-                                            </InputGroup.Prepend>
-                                            <input className="form-control" id="OTP" type="text"
-                                                   value={otp}
-                                                   placeholder="Enter OTP" onChange={(e) => verifyOTP(e.target.value)}
-                                            />
-                                        </InputGroup>
-                                    }
-                                </div>
+                                {/*<div className="form-check radio pb-2 ">*/}
+                                {/*    <input className="form-check-input" type="radio" name="contact" id="otherContact"*/}
+                                {/*           checked={beneficiaryNumber === formData.contact}*/}
+                                {/*           value={beneficiaryNumber} onChange={()=> alert("Fill the beneficiary number before selecting")}/>*/}
+                                {/*    <label className="form-check-label" htmlFor="otherContact">*/}
+                                {/*        Use Beneficiary Number*/}
+                                {/*    </label>*/}
+                                {/*    <InputGroup>*/}
+                                {/*        <input className="form-control" id="mobileNumber" type="text"*/}
+                                {/*               value={beneficiaryNumber}*/}
+                                {/*               onChange={e => setBeneficiaryNumber(e.target.value)}*/}
+                                {/*               placeholder="Enter Mobile number" />*/}
+                                {/*        <InputGroup.Append>*/}
+                                {/*            <Button hidden={!beneficiaryNumber || userMobileNumber !== formData.contact} variant="link" onClick={() => sendOTP()}>Verify</Button>*/}
+                                {/*        </InputGroup.Append>*/}
+                                {/*    </InputGroup>*/}
+                                {/*    {*/}
+                                {/*        oTPSent &&*/}
+                                {/*        <InputGroup className="mt-3">*/}
+                                {/*            <InputGroup.Prepend>*/}
+                                {/*                <InputGroup.Text>OTP</InputGroup.Text>*/}
+                                {/*            </InputGroup.Prepend>*/}
+                                {/*            <input className="form-control" id="OTP" type="text"*/}
+                                {/*                   value={otp}*/}
+                                {/*                   placeholder="Enter OTP" onChange={(e) => verifyOTP(e.target.value)}*/}
+                                {/*            />*/}
+                                {/*        </InputGroup>*/}
+                                {/*    }*/}
+                                {/*</div>*/}
                             </div>
                             }
                             {
@@ -405,15 +372,19 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                             <div hidden={verifyDetails}>
                                 <input className="form-control" id="email" name="email" type="text"
                                        placeholder="Enter Email ID"
-                                       defaultValue={maskPersonalDetails(email, true)}
+                                       defaultValue={maskPersonalDetails(formData.email, true)}
                                        onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value, true)}
-                                       onFocus={(evt) => evt.target.value = email}
-                                       onChange={(e) => setEmail(e.target.value)}/>
+                                       onFocus={(evt) => evt.target.value = formData.email}
+                                       onChange={(e) => setValue({target: {name:"email", value:e.target.value}})}/>
                                 <div className="pt-2">
                                     <input className="form-control" id="confirmEmail" name="email" type="text"
                                            placeholder="Confirm Email ID"
-                                           value={confirmEmail}
-                                           onChange={(e) => verifyEmail(e.target.value)}/>
+                                           value={formData.confirmEmail}
+                                           onChange={(e) => setValue({target: {name:"confirmEmail", value:e.target.value}})}
+                                    />
+                                </div>
+                                <div className="invalid-input">
+                                    {errors.email}
                                 </div>
                             </div>
                             {
@@ -452,12 +423,15 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         if(!formData.district) {
             errors.district = DISTRICT_ERROR_MSG
         }
-        if(!formData.dob) {
-            errors.dob = DOB_ERROR_MSG
-        }
+        // if(!formData.dob) {errors.dob = DOB_ERROR_MSG}
+
         if(!formData.gender) {
             errors.gender = GENDER_ERROR_MSG
         }
+        if (formData.email != "" && formData.email != formData.confirmEmail) {
+            errors.email = EMAIL_ERROR_MESSAGE
+        }
+
         setErrors(errors)
         return Object.values(errors).filter(e => e).length > 0
         // TODO: add validations before going to confirm screen
@@ -497,8 +471,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 if (res.status === 200) {
                     next()
                 }
-            });
-        next()
+            })
+          .catch(err => {
+              alert("Error while registering, please try again later.\n" + err);
+          });
     };
     return (
         <Container fluid>

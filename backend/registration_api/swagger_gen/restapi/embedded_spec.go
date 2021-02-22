@@ -630,6 +630,9 @@ func init() {
         },
         "programId": {
           "type": "string"
+        },
+        "yob": {
+          "type": "integer"
         }
       }
     }

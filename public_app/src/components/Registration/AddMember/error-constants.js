@@ -6,3 +6,4 @@ export const DISTRICT_ERROR_MSG = "* District is required";
 export const DOB_ERROR_MSG = "* Date of birth is invalid";
 export const GENDER_ERROR_MSG = "* Gender is required";
 export const AADHAAR_ERROR_MESSAGE = "* Invalid Aadhaar number";
+export const EMAIL_ERROR_MESSAGE = "* Email ID is not matching";
