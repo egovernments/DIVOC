@@ -106,9 +106,10 @@ export const Members = () => {
     }
 
     const MemberCard = (props) => {
+        debugger
         const member = props.member;
         const program = programs.filter(p => p.id === member.programId)[0];
-        const appointment = JSON.parse(localStorage.getItem(member.code));
+        const isAppointmentBooked = !!member.enrollmentScopeId;
 
         function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
             return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -140,27 +141,17 @@ export const Members = () => {
                             </div>
                         </div>
                         {
-                            <div className={`d-flex ${appointment ? "justify-content-between" : "justify-content-end"} align-items-center`}>
-                                <Row
-                                    className={` justify-content-center align-items-center ${appointment ? "d-flex" : "d-none"}`}>
-                                    <Col lg={6}>
-                                        <img src={IconLocation}/>
-                                        <span
-                                            className="pl-2 pr-2">{pathOr("", ["facilityName"], appointment)} ,{formatAddress(pathOr({}, ["facilityAddress"], appointment))}</span>
-                                    </Col>
-                                    <Col lg={6}>
-                                        <img src={IconTime}/>
-                                        <span
-                                            className="pl-2 pr-2">{formatDate(pathOr({}, ["allotmentDate"], appointment))}
-                                            <br/>{getTime(pathOr("", ["allotmentTime"], appointment))} - {getTime(pathOr("", ["allotmentTime"], appointment) + 1)}</span>
-                                    </Col>
-                                </Row>
-                                <CustomButton className="blue-btn m-0" onClick={() => {
+                            <div className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
+                                <div className={`${!isAppointmentBooked && "invisible"}`}>
+                                    <span style={{color: "#646D82"}}> Appointment: </span>
+                                    <span className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
+                                </div>
+                                <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "invisible"}`} onClick={() => {
                                     history.push({
                                         pathname: `/${member.code}/${member.programId}/appointment`,
                                         state: {name: member.name}
                                     })
-                                }}>{appointment ? "Edit" : "Book"} <br/>Appointment</CustomButton>
+                                }}>{isAppointmentBooked ? "Edit" : "Book"} <br/>Appointment</CustomButton>
                             </div>
                         }
                     </Card.Body>
