@@ -9,11 +9,8 @@ import Card from "react-bootstrap/Card";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
 import Button from "react-bootstrap/Button";
-import IconLocation from "../../../assets/img/icon-location.svg"
-import IconTime from "../../../assets/img/icon-time.svg"
 import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
-import {pathOr} from "ramda";
 
 export const Members = () => {
     const history = useHistory();
@@ -46,9 +43,7 @@ export const Members = () => {
             history.push("/citizen")
         }
         const data = {
-            "entityContext": {
-
-            },
+            "entityContext": {},
             "flagKey": "country_specific_features"
         }
         axios
@@ -106,7 +101,6 @@ export const Members = () => {
     }
 
     const MemberCard = (props) => {
-        debugger
         const member = props.member;
         const program = programs.filter(p => p.id === member.programId)[0];
         const isAppointmentBooked = !!member.enrollmentScopeId;
@@ -141,17 +135,27 @@ export const Members = () => {
                             </div>
                         </div>
                         {
-                            <div className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
-                                <div className={`${!isAppointmentBooked && "invisible"}`}>
-                                    <span style={{color: "#646D82"}}> Appointment: </span>
-                                    <span className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
-                                </div>
-                                <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "invisible"}`} onClick={() => {
-                                    history.push({
-                                        pathname: `/${member.code}/${member.programId}/appointment`,
-                                        state: {name: member.name}
-                                    })
-                                }}>{isAppointmentBooked ? "Edit" : "Book"} <br/>Appointment</CustomButton>
+                            <div className={"w-100"}>
+                                <Row className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
+                                    <Col lg={isAppointmentBooked ? 12 : 6}
+                                         className={`${!isAppointmentBooked && "invisible"}`}>
+                                        <span style={{color: "#646D82"}}> Appointment: </span>
+                                        <span>{isAppointmentBooked && `${member.facilityDetails.facilityName}, ${member.facilityDetails.district}, ${member.facilityDetails.state}, ${member.facilityDetails.pincode}`}</span>
+                                        <br/>
+                                        <span className="invisible"> Appointment: </span>
+                                        <span className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
+                                    </Col>
+                                    <Col lg={6} className="d-flex justify-content-end">
+                                        <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "d-none"}`}
+                                                      onClick={() => {
+                                                          history.push({
+                                                              pathname: `/${member.code}/${member.programId}/appointment`,
+                                                              state: {name: member.name}
+                                                          })
+                                                      }}>{isAppointmentBooked ? "Edit" : "Book"}
+                                            <br/>Appointment</CustomButton>
+                                    </Col>
+                                </Row>
                             </div>
                         }
                     </Card.Body>

@@ -13,7 +13,7 @@ export const AppointmentConfirm = (props) => {
     const history = useHistory();
     useEffect(() => {
         if (Object.keys(appointment).length === 0) {
-            history.push("/")
+            // history.push("/")
         }
     }, [appointment]);
     return (
