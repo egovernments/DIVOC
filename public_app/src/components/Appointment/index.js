@@ -3,6 +3,8 @@ import "./index.css";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
+import PrivateSvg from "../../assets/img/icon-private.svg"
+import GovernmentSvg from "../../assets/img/icon-government.svg"
 import {formatDate, padDigit} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
@@ -25,6 +27,7 @@ export const Appointment = (props) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedAllotment, setSelectedAllotment] = useState({});
     const [facilitySlots, setFacilitySlots] = useState({});
+    const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
     useEffect(() => {
         setIsLoading(true);
@@ -36,11 +39,19 @@ export const Appointment = (props) => {
 
         axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
             .then(res => {
-                let data = res.data.map(d => {
+                const {facilities, facilitiesSchedule} = res.data;
+                let data = facilities.map(d => {
                     return d
                 });
-                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText))
-                setFacilities(data)
+                let schedule = {};
+                facilitiesSchedule.map(d => {
+                    if (d.facilityId) {
+                        schedule[d.facilityId] = d
+                    }
+                });
+                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
+                setFacilities(data);
+                setFacilitiesSchedule(schedule);
                 setIsLoading(false);
             });
     }, [searchText, searchDate]);
@@ -85,10 +96,6 @@ export const Appointment = (props) => {
         }
     }
 
-    function getMeridian(hour) {
-        return hour > 11 ? "PM" : "AM";
-    }
-
     function getSlotsForFacility(facilityIndex, pageNumber = 0) {
         setSelectedFacilityIndex(facilityIndex);
         const facilityId = facilities[facilityIndex].facilityCode;
@@ -118,6 +125,10 @@ export const Appointment = (props) => {
                     }
                 }
                 setFacilitySlots(dayWiseSlotsInfo);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                alert("something went wrong");
                 setIsLoading(false);
             });
     }
@@ -173,19 +184,14 @@ export const Appointment = (props) => {
                                         <div className="d-flex justify-content-between">
                                             <b>{facility.facilityName}</b>
                                             {
-                                                getProgramIfAppointmentIsAvailable(facility, program_id) && <span
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        color: "#2CD889"
-                                                    }}>Appointment Available</span>
-                                            }
-                                            {
-                                                !getProgramIfAppointmentIsAvailable(facility, program_id) &&
-                                                <span style={{fontSize: "10px", color: "#FF7C2B"}}>Walkin</span>
+                                                facility.category === "GOVT" ? <img src={GovernmentSvg} title={facility.category}/> : <img src={PrivateSvg} title={facility.category}/>
                                             }
                                         </div>
-                                        <div><span
-                                            className="facility-list-detail mr-2">Address:</span>{formatAddress(facility.address)}
+                                        <div>{formatAddress(facility.address)}
+                                        <div>
+                                            <span className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
+                                            <span className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
+                                        </div>
                                         </div>
 
                                     </div>
@@ -224,26 +230,6 @@ export const Appointment = (props) => {
         </div>
     )
 };
-
-const Days = {
-    Su: 0,
-    M: 1,
-    Tu: 2,
-    W: 3,
-    Th: 4,
-    F: 5,
-    Sa: 6,
-};
-let MAX_DAYS = 3;
-
-function getProgramIfAppointmentIsAvailable(facility, programId) {
-    const program = (facility.programs || []).find(program => program.programId === programId);
-    if (program && program.schedule && program.schedule.days.length > 0 && program.schedule.startTime && program.schedule.endTime) {
-        return program
-    } else {
-        return undefined
-    }
-}
 
 function getProgramInfo(facility, programId) {
     const program = (facility.programs || []).find(program => program.programId === programId);
