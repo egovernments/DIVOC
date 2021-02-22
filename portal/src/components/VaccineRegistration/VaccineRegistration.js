@@ -3,27 +3,16 @@ import styles from "./VaccineRegistration.module.css";
 import {useKeycloak} from "@react-keycloak/web";
 import axios from "axios";
 import ListView from '../ListView/ListView';
-import Form from "@rjsf/core";
-import schema from '../../jsonSchema/vaccineSchema.json';
-import Button from 'react-bootstrap/Button';
-import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
-import {CustomTextWidget} from "../CustomTextWidget/index";
-import {CustomTextAreaWidget} from "../CustomTextAreaWidget/index";
 import * as R from "ramda";
 import {TextInCenter} from "../TextInCenter";
+import VaccineRegistrationForm from "../VaccineRegistrationForm"
 
 
 function VaccineRegistration() {
     const {keycloak} = useKeycloak();
-    const [formData, setFormData] = useState(null);
+    const [formData, setFormData] = useState({});
     const [medicineList, setMedicineList] = useState([]);
     const [showForm, setShowForm] = useState(false);
-    const [uiSchema, setUiSchema] = useState({
-        classNames: styles["form-conatiner"],
-        title: {
-            classNames: styles["form-title"],
-        },
-    });
 
     useEffect(() => {
         getListOfRegisteredVaccines();
@@ -36,34 +25,14 @@ function VaccineRegistration() {
         },
     };
 
-    const widgets = {
-        TextWidget: CustomTextWidget,
-        TextareaWidget: CustomTextAreaWidget,
-        SelectWidget: CustomDropdownWidget,
-    };
-
-    const validateFields = (data) => {
-        const requiredFields = ["name", "provider", "price"];
-        let valid = true;
-        requiredFields.forEach(field => {
-            if (!R.pathOr(false, [field], data)) {
-                valid = false;
-                alert(`${field} is a required field`)
-            }
-        });
-        return valid
-    };
-
-    const handleSubmit = () => {
-        if (validateFields(formData)) {
-            axios
-                .post("/divoc/admin/api/v1/medicines", {...formData, status: "Active"}, config)
-                .then((res) => {
-                    alert("Successfully Registered");
-                    getListOfRegisteredVaccines()
-                });
-            setShowForm(!showForm)
-        }
+    const handleSubmit = (data) => {
+        axios
+            .post("/divoc/admin/api/v1/medicines", {...data, status: "Active"}, config)
+            .then((res) => {
+                alert("Successfully Registered");
+                getListOfRegisteredVaccines()
+            });
+        setShowForm(!showForm)
     };
 
     const getListOfRegisteredVaccines = async () => {
@@ -80,49 +49,38 @@ function VaccineRegistration() {
     };
 
     function onEdit(data) {
-        if (validateFields(data)) {
-            axios
-                .put("/divoc/admin/api/v1/medicines", {...data}, config)
-                .then((res) => {
-                    alert("Successfully Registered");
-                    getListOfRegisteredVaccines()
-                });
-            setShowForm(false)
-        }
+        axios
+            .put("/divoc/admin/api/v1/medicines", {...data}, config)
+            .then((res) => {
+                alert("Successfully Updated");
+                getListOfRegisteredVaccines()
+            });
+        setShowForm(false)
     }
 
+
+    // custom widget to handle time Intreval (instead of number widget)
+    // custom template to handle the doses
     let blockedVaccines = medicineList.filter(data => data.status === "Blocked");
     let inactiveVaccines = medicineList.filter(data => data.status === "Inactive");
     let activeVaccines = medicineList.filter(data => data.status === "Active");
     return (
         <div className={styles["container"]}>
-            {showForm && <div className={styles["form-container"]}>
-                <div className="d-flex">
-                    <h5 className={"mr-auto"}>{formData.edited ? formData.name : "Register New Vaccine"}</h5>
-                    <Button variant="outline-primary" onClick={() => {
-                        setShowForm(!showForm);
-                        setUiSchema({...uiSchema, "name": {}})
-                    }}>BACK</Button>
-                </div>
-                <Form
-                    widgets={widgets}
-                    schema={schema}
-                    uiSchema={uiSchema}
-                    formData={formData}
-                    onChange={(e) => {
-                        setFormData(e.formData)
-                    }}
-                    onSubmit={(e) => {
-                        if (e.formData.edited) {
-                            onEdit(e.formData)
+            {showForm &&
+                <VaccineRegistrationForm
+                    vaccine={formData}
+                    onSubmit={(vaccine) => {
+                        if (vaccine.edited) {
+                            onEdit(vaccine)
                         } else {
-                            handleSubmit();
+                            handleSubmit(vaccine);
                         }
                     }}
-                >
-                    <button type="submit" className={styles['button']}>SAVE</button>
-                </Form>
-            </div>}
+                    onBackClick={() => {
+                        setShowForm(!showForm);
+                    }}
+                />
+            }
             {!showForm && <div className={styles["sub-container"]}>
                 <ListView
                     listData={activeVaccines}
@@ -137,8 +95,7 @@ function VaccineRegistration() {
                     setSelectedData={
                         (data) => {
                             setFormData({...data, edited: true});
-                            setShowForm(true)
-                            setUiSchema({...uiSchema, "name": {"ui:widget": "hidden"}})
+                            setShowForm(true);
                         }
                     }
                 />
@@ -182,7 +139,7 @@ function VaccineRegistration() {
                     />
                 </>}
             </div>}
-            {medicineList.length === 0 && <TextInCenter text={"No Vaccine Added"}/>}
+            {medicineList.length === 0 && !showForm && <TextInCenter text={"No Vaccine Added"}/>}
         </div>
     );
 }

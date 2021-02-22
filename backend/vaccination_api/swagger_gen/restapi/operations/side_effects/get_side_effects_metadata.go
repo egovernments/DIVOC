@@ -29,7 +29,7 @@ func NewGetSideEffectsMetadata(ctx *middleware.Context, handler GetSideEffectsMe
 	return &GetSideEffectsMetadata{Context: ctx, Handler: handler}
 }
 
-/*GetSideEffectsMetadata swagger:route GET /sideEffects sideEffects getSideEffectsMetadata
+/* GetSideEffectsMetadata swagger:route GET /sideEffects sideEffects getSideEffectsMetadata
 
 Get Side Effects Metadata
 
@@ -45,14 +45,12 @@ func (o *GetSideEffectsMetadata) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 		r = rCtx
 	}
 	var Params = NewGetSideEffectsMetadataParams()
-
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

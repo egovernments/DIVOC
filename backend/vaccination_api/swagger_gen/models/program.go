@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 
@@ -51,7 +52,6 @@ func (m *Program) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Program) validateMedicines(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Medicines) { // not required
 		return nil
 	}
@@ -63,6 +63,38 @@ func (m *Program) validateMedicines(formats strfmt.Registry) error {
 
 		if m.Medicines[i] != nil {
 			if err := m.Medicines[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("medicines" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this program based on the context it is used
+func (m *Program) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateMedicines(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Program) contextValidateMedicines(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Medicines); i++ {
+
+		if m.Medicines[i] != nil {
+			if err := m.Medicines[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("medicines" + "." + strconv.Itoa(i))
 				}
@@ -98,7 +130,10 @@ func (m *Program) UnmarshalBinary(b []byte) error {
 // swagger:model ProgramMedicinesItems0
 type ProgramMedicinesItems0 struct {
 
-	// Number of months the vaccination is effective
+	// dose intervals
+	DoseIntervals []*ProgramMedicinesItems0DoseIntervalsItems0 `json:"doseIntervals"`
+
+	// Number of days the vaccination is effective after last dose
 	EffectiveUntil int64 `json:"effectiveUntil,omitempty"`
 
 	// name
@@ -109,9 +144,6 @@ type ProgramMedicinesItems0 struct {
 
 	// provider
 	Provider string `json:"provider,omitempty"`
-
-	// schedule
-	Schedule *ProgramMedicinesItems0Schedule `json:"schedule,omitempty"`
 
 	// status
 	// Enum: [Active Inactive Blocked]
@@ -126,7 +158,7 @@ type ProgramMedicinesItems0 struct {
 func (m *ProgramMedicinesItems0) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	if err := m.validateSchedule(formats); err != nil {
+	if err := m.validateDoseIntervals(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -144,19 +176,25 @@ func (m *ProgramMedicinesItems0) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *ProgramMedicinesItems0) validateSchedule(formats strfmt.Registry) error {
-
-	if swag.IsZero(m.Schedule) { // not required
+func (m *ProgramMedicinesItems0) validateDoseIntervals(formats strfmt.Registry) error {
+	if swag.IsZero(m.DoseIntervals) { // not required
 		return nil
 	}
 
-	if m.Schedule != nil {
-		if err := m.Schedule.Validate(formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("schedule")
-			}
-			return err
+	for i := 0; i < len(m.DoseIntervals); i++ {
+		if swag.IsZero(m.DoseIntervals[i]) { // not required
+			continue
 		}
+
+		if m.DoseIntervals[i] != nil {
+			if err := m.DoseIntervals[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -195,7 +233,6 @@ func (m *ProgramMedicinesItems0) validateStatusEnum(path, location string, value
 }
 
 func (m *ProgramMedicinesItems0) validateStatus(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -241,7 +278,6 @@ func (m *ProgramMedicinesItems0) validateVaccinationModeEnum(path, location stri
 }
 
 func (m *ProgramMedicinesItems0) validateVaccinationMode(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -249,6 +285,38 @@ func (m *ProgramMedicinesItems0) validateVaccinationMode(formats strfmt.Registry
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this program medicines items0 based on the context it is used
+func (m *ProgramMedicinesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateDoseIntervals(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ProgramMedicinesItems0) contextValidateDoseIntervals(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.DoseIntervals); i++ {
+
+		if m.DoseIntervals[i] != nil {
+			if err := m.DoseIntervals[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -272,25 +340,30 @@ func (m *ProgramMedicinesItems0) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// ProgramMedicinesItems0Schedule program medicines items0 schedule
+// ProgramMedicinesItems0DoseIntervalsItems0 program medicines items0 dose intervals items0
 //
-// swagger:model ProgramMedicinesItems0Schedule
-type ProgramMedicinesItems0Schedule struct {
+// swagger:model ProgramMedicinesItems0DoseIntervalsItems0
+type ProgramMedicinesItems0DoseIntervalsItems0 struct {
 
-	// repeat interval
-	RepeatInterval int64 `json:"repeatInterval,omitempty"`
+	// max
+	Max int64 `json:"max,omitempty"`
 
-	// repeat times
-	RepeatTimes int64 `json:"repeatTimes,omitempty"`
+	// min
+	Min int64 `json:"min,omitempty"`
 }
 
-// Validate validates this program medicines items0 schedule
-func (m *ProgramMedicinesItems0Schedule) Validate(formats strfmt.Registry) error {
+// Validate validates this program medicines items0 dose intervals items0
+func (m *ProgramMedicinesItems0DoseIntervalsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this program medicines items0 dose intervals items0 based on context it is used
+func (m *ProgramMedicinesItems0DoseIntervalsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (m *ProgramMedicinesItems0Schedule) MarshalBinary() ([]byte, error) {
+func (m *ProgramMedicinesItems0DoseIntervalsItems0) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -298,8 +371,8 @@ func (m *ProgramMedicinesItems0Schedule) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *ProgramMedicinesItems0Schedule) UnmarshalBinary(b []byte) error {
-	var res ProgramMedicinesItems0Schedule
+func (m *ProgramMedicinesItems0DoseIntervalsItems0) UnmarshalBinary(b []byte) error {
+	var res ProgramMedicinesItems0DoseIntervalsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

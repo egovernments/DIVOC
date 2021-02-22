@@ -1,12 +1,13 @@
 package pkg
 
 import (
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/kernel_library/services"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 type ProgramsRegistryResponse struct {
@@ -101,20 +102,7 @@ type ReadMedicineResponse struct {
 	} `json:"params"`
 	ResponseCode string `json:"responseCode"`
 	Result       struct {
-		Medicine struct {
-			EffectiveUntil int     `json:"effectiveUntil"`
-			Provider       string  `json:"provider"`
-			Price          float64 `json:"price"`
-			Name           string  `json:"name"`
-			Schedule       struct {
-				Osid           string `json:"osid"`
-				RepeatTimes    int64  `json:"repeatTimes"`
-				RepeatInterval int64  `json:"repeatInterval"`
-			} `json:"schedule"`
-			Osid            string `json:"osid"`
-			Status          string `json:"status"`
-			VaccinationMode string `json:"vaccinationMode"`
-		} `json:"Medicine"`
+		Medicine models.ProgramMedicinesItems0 `json:"Medicine"`
 	} `json:"result"`
 }
 
@@ -146,18 +134,7 @@ func getMedicine(id string) (*models.ProgramMedicinesItems0, error) {
 		} else {
 			//return &readMedicineResponse, nil
 			m := readMedicineResponse.Result.Medicine
-			return &models.ProgramMedicinesItems0{
-				EffectiveUntil: int64(m.EffectiveUntil),
-				Name:           m.Name,
-				Price:          m.Price,
-				Provider:       m.Provider,
-				Schedule: &models.ProgramMedicinesItems0Schedule{
-					RepeatInterval: m.Schedule.RepeatInterval,
-					RepeatTimes:    m.Schedule.RepeatTimes,
-				},
-				Status:          m.Status,
-				VaccinationMode: m.VaccinationMode,
-			}, nil
+			return &m, nil
 		}
 	}
 	return nil, nil

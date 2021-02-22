@@ -9,8 +9,13 @@ import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
 import {API_URL} from "../../utils/constants";
 
+const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+const MORNING_SCHEDULE = "morningSchedule";
+const AFTERNOON_SCHEDULE = "afternoonSchedule";
+const MAX_APPOINTMENTS = 200;
 
-export default function FacilityConfigureSlot ({facilityId, programId, programName}) {
+export default function FacilityConfigureSlot ({location}) {
+    const [facilityId, programId, programName] = [location.facilityOsid, location.programId, location.programName];
     // mocking backend
     const mockSchedule = {
         osid: "jjbgt768i",
@@ -61,10 +66,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
     // programId = "4556";
     // programName = "Covid-19";
 
-    const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-    const MORNING_SCHEDULE = "morningSchedule";
-    const AFTERNOON_SCHEDULE = "afternoonSchedule";
-    const MAX_APPOINTMENTS = 200;
+    
 
     const history = useHistory();
     const [selectedDays, setSelectedDays] = useState([]);
@@ -104,8 +106,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
 
     useEffect(() => {
         getFacilityProgramSchedules()
-
-    }, []);
+    }, [location]);
 
     function setWalkInScheduleFromSchedule(program) {
         if (program.walkInSchedule.length === 0) {
@@ -148,7 +149,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
     function setMorningScheduleFromSchedule(schedule) {
         let schedules = [];
         schedule.appointmentSchedule.forEach(as => {
-            if (Number(as.startTime.split(":")[0]) <= 12) {
+            if (Number(as.startTime?.split(":")[0]) <= 12) {
                 schedules.push({...as, scheduleType: MORNING_SCHEDULE, edited: false})
             }
         });
@@ -167,7 +168,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
     function setAfternoonScheduleFromSchedule(schedule) {
         let schedules = [];
         schedule.appointmentSchedule.forEach(as => {
-            if (Number(as.startTime.split(":")[0]) > 12) {
+            if (Number(as.startTime?.split(":")[0]) > 12) {
                 schedules.push({...as, scheduleType: AFTERNOON_SCHEDULE, edited: false})
             }
         });
@@ -183,165 +184,24 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
         setAfternoonSchedules(schedules)
     }
 
-    function AppointmentScheduleRow({schedule}) {
-
-        function onValueChange(evt, field) {
-            if (schedule.scheduleType === MORNING_SCHEDULE) {
-                // assuming only one row
-                setMorningSchedules([{...morningSchedules[0], [field]: evt.target.value, edited: true}])
-            } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
-                // assuming only one row
-                setAfternoonSchedules([{...afternoonSchedules[0], [field]: evt.target.value, edited: true}])
-            }
+    function onScheduleChange(schedule) {
+        if(schedule.scheduleType === MORNING_SCHEDULE) {
+            console.log(morningSchedules, afternoonSchedules);
+            setMorningSchedules([schedule]);
+        } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
+            setAfternoonSchedules([schedule]);
         }
-
-        function getMaxAppointments(day) {
-            return schedule.days.filter(d => d.day === day).length > 0 ?
-                schedule.days.filter(d => d.day === day)[0].maxAppointments : ''
-        }
-
-        function onMaxAppointmentsChange(evt, day) {
-            let value = Number(evt.target.value);
-            if (schedule.scheduleType === MORNING_SCHEDULE) {
-                // assuming only one row
-                let schedule = {...morningSchedules[0], edited: true};
-                if (schedule.days.map(d => d.day).includes(day)) {
-                    schedule.days = schedule.days.map(d => {
-                        if (d.day === day) {
-                            d.maxAppointments = value
-                        }
-                        return d
-                    });
-                } else {
-                    schedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
-                }
-                setMorningSchedules([schedule]);
-            } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
-                // assuming only one row
-                let schedule = {...afternoonSchedules[0], edited: true};
-                if (schedule.days.map(d => d.day).includes(day)) {
-                    schedule.days = schedule.days.map(d => {
-                        if (d.day === day) {
-                            d.maxAppointments = value
-                        }
-                        return d
-                    });
-                } else {
-                    schedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
-                }
-                setAfternoonSchedules([schedule])
-            }
-        }
-
-        return (
-            <Row>
-                <Col className="col-3 timings-div">
-                    <Row>
-                        <Col className="mt-0">
-                            <label className="mb-0" htmlFor="startTime">
-                                From
-                            </label>
-                            <input
-                                className="form-control"
-                                defaultValue={schedule.startTime}
-                                type="text"
-                                name="startTime"
-                                onBlur={(evt) => onValueChange(evt, "startTime")}
-                                required/>
-                        </Col>
-                        <Col className="mt-0">
-                            <label className="mb-0" htmlFor="endTime">
-                                To
-                            </label>
-                            <input
-                                className="form-control"
-                                defaultValue={schedule.endTime}
-                                type="text"
-                                name="endTime"
-                                onBlur={(evt) => onValueChange(evt, "endTime")}
-                                required/>
-                        </Col>
-                    </Row>
-                </Col>
-                {
-                    DAYS.map(d =>
-                        <Col key={d}>
-                            <input
-                                style={{marginTop: "19px"}}
-                                className="form-control"
-                                defaultValue={getMaxAppointments(d)}
-                                disabled={!selectedDays.includes(d)}
-                                type="number"
-                                name="maxAppointments"
-                                onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
-                                required/>
-                        </Col>
-                )}
-            </Row>
-        )
     }
 
-    function WalkInScheduleRow({schedule}) {
-
-        function onValueChange(evt, field) {
-            setWalkInSchedules([{...walkInSchedules[0], [field]: evt.target.value, edited: true}])
-        }
-
-        function handleDayChange(day) {
-            // assuming only one row
-            let schedule = {...walkInSchedules[0], edited: true};
-            let days = schedule.days.includes(day) ? schedule.days.filter(s => s !== day) : schedule.days.concat(day);
-            schedule.days = days;
-            setWalkInSchedules([schedule])
-        }
-
-        return (
-            <Row>
-                <Col className="col-3 timings-div">
-                    <Row>
-                        <Col className="mt-0">
-                            <label className="mt-0" htmlFor="startTime">
-                                From
-                            </label>
-                            <input
-                                className="form-control"
-                                defaultValue={schedule.startTime}
-                                type="text"
-                                name="startTime"
-                                onBlur={(evt) => onValueChange(evt, "startTime")}
-                                required/>
-                        </Col>
-                        <Col className="mt-0">
-                            <label className="mt-0" htmlFor="endTime">
-                                To
-                            </label>
-                            <input
-                                className="form-control"
-                                defaultValue={schedule.endTime}
-                                type="text"
-                                name="endTime"
-                                onBlur={(evt) => onValueChange(evt, "endTime")}
-                                required/>
-                        </Col>
-                    </Row>
-                </Col>
-                {
-                    DAYS.map(d =>
-                        <Col style={{marginTop: "31px"}}  key={d}>
-                            <CheckboxItem
-                                checkedColor={"#5C9EF8"}
-                                text={d}
-                                disabled={!selectedDays.includes(d)}
-                                checked={schedule.days.includes(d)}
-                                onSelect={(event) =>
-                                    handleDayChange(event.target.name)
-                                }
-                                showText={false}
-                            />
-                        </Col>
-                    )}
-            </Row>
-        )
+    function onWalkInScheduleChange(schedule) {
+        const newWalkInSchedules = walkInSchedules.map(s => {
+            if(s.osid === schedule.osid) {
+                return schedule;
+            } else {
+                return s;
+            }
+        });
+        setWalkInSchedules(newWalkInSchedules);
     }
 
     function onSelectDay(d) {
@@ -453,21 +313,21 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
                     <div>
                         <Row>
                             <Col className="col-3">Morning Hours</Col>
-                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
+                            <Col>Maximum number of appointments allowed</Col>
                         </Row>
                         {
                             morningSchedules.length > 0 &&
-                                morningSchedules.map(ms => <AppointmentScheduleRow key={ms.osid} schedule={ms} />)
+                                morningSchedules.map((ms, i) => <AppointmentScheduleRow key={"ms_"+i} schedule={ms} onChange={onScheduleChange} selectedDays={selectedDays}/>)
                         }
                     </div>
                     <div>
                         <Row className="mt-4">
                             <Col className="col-3">Afternoon Hours</Col>
-                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
+                            <Col>Maximum number of appointments allowed</Col>
                         </Row>
                         {
                             afternoonSchedules.length > 0 &&
-                                afternoonSchedules.map(ms => <AppointmentScheduleRow key={ms.osid} schedule={ms} />)
+                                afternoonSchedules.map((ms, i) => <AppointmentScheduleRow key={"afs_"+i} schedule={ms} onChange={onScheduleChange} selectedDays={selectedDays}/>)
                         }
                     </div>
                 </div>
@@ -476,7 +336,7 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
                     <div>
                         {
                             walkInSchedules.length > 0 &&
-                                walkInSchedules.map(ws => <WalkInScheduleRow key={ws.osid} schedule={ws} />)
+                                walkInSchedules.map((ws, i) => <WalkInScheduleRow key={"wis_"+i} schedule={ws} onChange={onWalkInScheduleChange} selectedDays={selectedDays}/>)
                         }
                     </div>
                 </div>
@@ -488,5 +348,159 @@ export default function FacilityConfigureSlot ({facilityId, programId, programNa
                 </Button>
             </div>
         </div>
+    )
+}
+
+function AppointmentScheduleRow({schedule, onChange, selectedDays}) {
+    function onValueChange(evt, field) {
+        onChange({...schedule, [field]: evt.target.value, edited: true});
+        // TODO: handle new schedule update
+    }
+
+    function getMaxAppointments(day) {
+        return schedule.days.filter(d => d.day === day).length > 0 ?
+            schedule.days.filter(d => d.day === day)[0].maxAppointments : ''
+    }
+
+    function onMaxAppointmentsChange(evt, day) {
+        let value = Number(evt.target.value);
+        if (schedule.scheduleType === MORNING_SCHEDULE) {
+            // assuming only one row
+            let newSchedule = {...schedule, edited: true};
+            if (schedule.days.map(d => d.day).includes(day)) {
+                schedule.days = schedule.days.map(d => {
+                    if (d.day === day) {
+                        d.maxAppointments = value
+                    }
+                    return d
+                });
+            } else {
+                schedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
+            }
+            onChange(schedule);
+        } else if (schedule.scheduleType === AFTERNOON_SCHEDULE) {
+            // assuming only one row
+            let newSchedule = {...schedule, edited: true};
+            if (schedule.days.map(d => d.day).includes(day)) {
+                newSchedule.days = schedule.days.map(d => {
+                    if (d.day === day) {
+                        d.maxAppointments = value
+                    }
+                    return d
+                });
+            } else {
+                newSchedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
+            }
+            onChange(newSchedule)
+        }
+    }
+
+    return (
+        <Row>
+            <Col className="col-3 timings-div">
+                <Row>
+                    <Col className="mt-0">
+                        <label className="mb-0" htmlFor="startTime">
+                            From
+                        </label>
+                        <input
+                            className="form-control"
+                            defaultValue={schedule.startTime}
+                            type="time"
+                            name="startTime"
+                            onChange={(evt) => onValueChange(evt, "startTime")}
+                            required/>
+                    </Col>
+                    <Col className="mt-0">
+                        <label className="mb-0" htmlFor="endTime">
+                            To
+                        </label>
+                        <input
+                            className="form-control"
+                            defaultValue={schedule.endTime}
+                            type="time"
+                            name="endTime"
+                            onBlur={(evt) => onValueChange(evt, "endTime")}
+                            required/>
+                    </Col>
+                </Row>
+            </Col>
+            {
+                DAYS.map(d =>
+                    <Col key={d}>
+                        <input
+                            style={{marginTop: "19px"}}
+                            className="form-control"
+                            defaultValue={getMaxAppointments(d)}
+                            disabled={!selectedDays.includes(d)}
+                            type="number"
+                            name="maxAppointments"
+                            onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
+                            required/>
+                    </Col>
+            )}
+        </Row>
+    )
+}
+
+function WalkInScheduleRow({schedule, onChange, selectedDays}) {
+    function onValueChange(evt, field) {
+        onChange({...schedule, [field]: evt.target.value, edited: true});
+    }
+
+    function handleDayChange(day) {
+        // assuming only one row
+        let newSchedule = {...schedule, edited: true};
+        let days = schedule.days.includes(day) ? schedule.days.filter(s => s !== day) : schedule.days.concat(day);
+        newSchedule.days = days;
+        onChange(newSchedule);
+    }
+
+    return (
+        <Row>
+            <Col className="col-3 timings-div">
+                <Row>
+                    <Col className="mt-0">
+                        <label className="mt-0" htmlFor="startTime">
+                            From
+                        </label>
+                        <input
+                            className="form-control"
+                            defaultValue={schedule.startTime}
+                            type="time"
+                            name="startTime"
+                            onBlur={(evt) => onValueChange(evt, "startTime")}
+                            required/>
+                    </Col>
+                    <Col className="mt-0">
+                        <label className="mt-0" htmlFor="endTime">
+                            To
+                        </label>
+                        <input
+                            className="form-control"
+                            defaultValue={schedule.endTime}
+                            type="time"
+                            name="endTime"
+                            onBlur={(evt) => onValueChange(evt, "endTime")}
+                            required/>
+                    </Col>
+                </Row>
+            </Col>
+            {
+                DAYS.map(d =>
+                    <Col style={{marginTop: "31px"}}  key={d}>
+                        <CheckboxItem
+                            checkedColor={"#5C9EF8"}
+                            text={d}
+                            disabled={!selectedDays.includes(d)}
+                            checked={schedule.days.includes(d)}
+                            onSelect={(event) =>
+                                handleDayChange(event.target.name)
+                            }
+                            showText={false}
+                        />
+                    </Col>
+                )}
+        </Row>
     )
 }

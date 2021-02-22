@@ -3,7 +3,8 @@
   "type": "object",
   "required": [
     "name",
-    "provider"
+    "provider",
+    "effectiveUntil"
   ],
   "properties": {
     "name": {
@@ -30,19 +31,27 @@
       "title": "Approximate Price",
       "type": "number"
     },
-    "schedule": {
-      "title": "",
-      "type": "object",
-      "properties": {
-        "repeatInterval": {
-          "title": "Total doses",
-          "type": "number"
+    "doseIntervals": {
+      "title": "Doses of Vaccine",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["min"],
+        "properties": {
+          "min": {
+            "title": "Minimum Interval",
+            "type": "integer"
+          },
+          "max": {
+            "title": "Maximum Interval",
+            "type": "integer"
+          }
         }
       }
     },
     "effectiveUntil": {
-      "type": "number",
-      "title": "Effective until (months)"
+      "title": "Validity of Vaccine (last dose)",
+      "type": "integer"
     }
   }
 }
