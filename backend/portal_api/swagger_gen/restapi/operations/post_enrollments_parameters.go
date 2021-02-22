@@ -16,16 +16,8 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// PostEnrollmentsMaxParseMemory sets the maximum size in bytes for
-// the multipart form parser for this operation.
-//
-// The default value is 32 MB.
-// The multipart parser stores up to this + 10MB.
-var PostEnrollmentsMaxParseMemory int64 = 32 << 20
-
 // NewPostEnrollmentsParams creates a new PostEnrollmentsParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewPostEnrollmentsParams() PostEnrollmentsParams {
 
 	return PostEnrollmentsParams{}
@@ -59,7 +51,7 @@ func (o *PostEnrollmentsParams) BindRequest(r *http.Request, route *middleware.M
 
 	o.HTTPRequest = r
 
-	if err := r.ParseMultipartForm(PostEnrollmentsMaxParseMemory); err != nil {
+	if err := r.ParseMultipartForm(32 << 20); err != nil {
 		if err != http.ErrNotMultipart {
 			return errors.New(400, "%v", err)
 		} else if err := r.ParseForm(); err != nil {
@@ -83,6 +75,7 @@ func (o *PostEnrollmentsParams) BindRequest(r *http.Request, route *middleware.M
 	if err := o.bindProgramID(fdProgramID, fdhkProgramID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -108,6 +101,7 @@ func (o *PostEnrollmentsParams) bindProgramID(rawData []string, hasKey bool, for
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.ProgramID = &raw
 
 	return nil

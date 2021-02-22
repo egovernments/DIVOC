@@ -14,41 +14,41 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewGetFacilityUsersParams creates a new GetFacilityUsersParams object
+// NewGetProgramsForPublicParams creates a new GetProgramsForPublicParams object
 // no default values defined in spec.
-func NewGetFacilityUsersParams() GetFacilityUsersParams {
+func NewGetProgramsForPublicParams() GetProgramsForPublicParams {
 
-	return GetFacilityUsersParams{}
+	return GetProgramsForPublicParams{}
 }
 
-// GetFacilityUsersParams contains all the bound params for the get facility users operation
+// GetProgramsForPublicParams contains all the bound params for the get programs for public operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters getFacilityUsers
-type GetFacilityUsersParams struct {
+// swagger:parameters getProgramsForPublic
+type GetProgramsForPublicParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Facility Code required for controller
+	/*Status of the program (Active / Inactive)
 	  In: query
 	*/
-	FacilityCode *string
+	Status *string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewGetFacilityUsersParams() beforehand.
-func (o *GetFacilityUsersParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewGetProgramsForPublicParams() beforehand.
+func (o *GetProgramsForPublicParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	qs := runtime.Values(r.URL.Query())
 
-	qFacilityCode, qhkFacilityCode, _ := qs.GetOK("facilityCode")
-	if err := o.bindFacilityCode(qFacilityCode, qhkFacilityCode, route.Formats); err != nil {
+	qStatus, qhkStatus, _ := qs.GetOK("status")
+	if err := o.bindStatus(qStatus, qhkStatus, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -58,8 +58,8 @@ func (o *GetFacilityUsersParams) BindRequest(r *http.Request, route *middleware.
 	return nil
 }
 
-// bindFacilityCode binds and validates parameter FacilityCode from query.
-func (o *GetFacilityUsersParams) bindFacilityCode(rawData []string, hasKey bool, formats strfmt.Registry) error {
+// bindStatus binds and validates parameter Status from query.
+func (o *GetProgramsForPublicParams) bindStatus(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -71,7 +71,7 @@ func (o *GetFacilityUsersParams) bindFacilityCode(rawData []string, hasKey bool,
 		return nil
 	}
 
-	o.FacilityCode = &raw
+	o.Status = &raw
 
 	return nil
 }

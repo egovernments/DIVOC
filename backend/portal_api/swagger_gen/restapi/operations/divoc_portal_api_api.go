@@ -114,6 +114,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetProgramsHandler: GetProgramsHandlerFunc(func(params GetProgramsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetPrograms has not yet been implemented")
 		}),
+		GetProgramsForPublicHandler: GetProgramsForPublicHandlerFunc(func(params GetProgramsForPublicParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetProgramsForPublic has not yet been implemented")
+		}),
 		GetPublicAnalyticsHandler: GetPublicAnalyticsHandlerFunc(func(params GetPublicAnalyticsParams) middleware.Responder {
 			return middleware.NotImplemented("operation GetPublicAnalytics has not yet been implemented")
 		}),
@@ -175,11 +178,9 @@ type DivocPortalAPIAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -248,6 +249,8 @@ type DivocPortalAPIAPI struct {
 	GetMedicinesHandler GetMedicinesHandler
 	// GetProgramsHandler sets the operation handler for the get programs operation
 	GetProgramsHandler GetProgramsHandler
+	// GetProgramsForPublicHandler sets the operation handler for the get programs for public operation
+	GetProgramsForPublicHandler GetProgramsForPublicHandler
 	// GetPublicAnalyticsHandler sets the operation handler for the get public analytics operation
 	GetPublicAnalyticsHandler GetPublicAnalyticsHandler
 	// GetUserFacilityHandler sets the operation handler for the get user facility operation
@@ -272,7 +275,6 @@ type DivocPortalAPIAPI struct {
 	UpdateProgramHandler UpdateProgramHandler
 	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
 	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
-
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -424,6 +426,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetProgramsHandler == nil {
 		unregistered = append(unregistered, "GetProgramsHandler")
+	}
+	if o.GetProgramsForPublicHandler == nil {
+		unregistered = append(unregistered, "GetProgramsForPublicHandler")
 	}
 	if o.GetPublicAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetPublicAnalyticsHandler")
@@ -653,6 +658,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/programs"] = NewGetPrograms(o.context, o.GetProgramsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/public/programs"] = NewGetProgramsForPublic(o.context, o.GetProgramsForPublicHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

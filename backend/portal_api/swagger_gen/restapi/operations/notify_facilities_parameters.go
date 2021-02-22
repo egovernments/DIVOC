@@ -14,8 +14,7 @@ import (
 )
 
 // NewNotifyFacilitiesParams creates a new NotifyFacilitiesParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewNotifyFacilitiesParams() NotifyFacilitiesParams {
 
 	return NotifyFacilitiesParams{}
@@ -51,7 +50,6 @@ func (o *NotifyFacilitiesParams) BindRequest(r *http.Request, route *middleware.
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
-
 			// validate array of body objects
 			for i := range body {
 				if body[i] == nil {
@@ -62,7 +60,6 @@ func (o *NotifyFacilitiesParams) BindRequest(r *http.Request, route *middleware.
 					break
 				}
 			}
-
 			if len(res) == 0 {
 				o.Body = body
 			}

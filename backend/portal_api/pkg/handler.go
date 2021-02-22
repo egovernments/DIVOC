@@ -64,6 +64,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
+	api.GetProgramsForPublicHandler = operations.GetProgramsForPublicHandlerFunc(getProgramsForPublic)
 }
 
 type GenericResponse struct {
@@ -977,4 +978,20 @@ func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgra
 		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
 
+}
+
+func getProgramsForPublic(params operations.GetProgramsForPublicParams) middleware.Responder {
+	entityType := "Program"
+	filter := make(map[string]interface{})
+	if params.Status != nil {
+		filter["status"] = map[string]interface{}{
+			"eq": params.Status,
+		}
+	}
+	response, err := kernelService.QueryRegistry(entityType, filter, 100, 0)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	return model.NewGenericJSONResponse(response[entityType])
 }
