@@ -313,7 +313,7 @@ export default function FacilityConfigureSlot ({location}) {
                     <div>
                         <Row>
                             <Col className="col-3">Morning Hours</Col>
-                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
+                            <Col>Maximum number of appointments allowed</Col>
                         </Row>
                         {
                             morningSchedules.length > 0 &&
@@ -323,7 +323,7 @@ export default function FacilityConfigureSlot ({location}) {
                     <div>
                         <Row className="mt-4">
                             <Col className="col-3">Afternoon Hours</Col>
-                            <Col>Maximum {MAX_APPOINTMENTS} of appointments allowed</Col>
+                            <Col>Maximum number of appointments allowed</Col>
                         </Row>
                         {
                             afternoonSchedules.length > 0 &&
@@ -406,7 +406,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays}) {
                         <input
                             className="form-control"
                             defaultValue={schedule.startTime}
-                            type="text"
+                            type="time"
                             name="startTime"
                             onChange={(evt) => onValueChange(evt, "startTime")}
                             required/>
@@ -418,7 +418,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays}) {
                         <input
                             className="form-control"
                             defaultValue={schedule.endTime}
-                            type="text"
+                            type="time"
                             name="endTime"
                             onBlur={(evt) => onValueChange(evt, "endTime")}
                             required/>
@@ -467,7 +467,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays}) {
                         <input
                             className="form-control"
                             defaultValue={schedule.startTime}
-                            type="text"
+                            type="time"
                             name="startTime"
                             onBlur={(evt) => onValueChange(evt, "startTime")}
                             required/>
@@ -479,7 +479,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays}) {
                         <input
                             className="form-control"
                             defaultValue={schedule.endTime}
-                            type="text"
+                            type="time"
                             name="endTime"
                             onBlur={(evt) => onValueChange(evt, "endTime")}
                             required/>
