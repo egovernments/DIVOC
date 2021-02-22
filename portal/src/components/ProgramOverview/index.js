@@ -8,10 +8,12 @@ import {API_URL} from "../../utils/constants";
 import MedicineImg from "../../assets/img/medicine.svg";
 import "./index.css";
 import {formatDate} from "../../utils/dateutil";
+import { Link } from "react-router-dom";
 
 export default function ProgramOverview() {
     const [program, setProgram] = useState([]);
     const [facilityCode, setFacilityCode] = useState("");
+    const [facilityOsid, setFacilityOsid] = useState("");
     const [programsList, setProgramsList] = useState([]);
     const [medicinesList, setMedicinesList] = useState([]);
     const axiosInstance = useAxios("");
@@ -34,6 +36,7 @@ export default function ProgramOverview() {
                         }
                     });
                     const activeProgramsList = res.data[0].programs.filter((data) => data.status === "Active");
+                    setFacilityOsid(res.data[0].osid);
                     setProgram(activeProgramsList);
                 }
             );
@@ -108,6 +111,14 @@ export default function ProgramOverview() {
                         <div className="d-flex justify-content-between">
                             <p className="">End Date:</p>
                             <b className="">{formatDate(selectedProgram.endDate)}</b>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <Link to={{
+                                "pathname": "/portal/facility_configure_slot",
+                                "programId": selectedProgram.osid,
+                                "programName": selectedProgram.name,
+                                "facilityOsid": facilityOsid
+                            }}><b style={{"fontSize": "12px"}}>CONFIGURE SLOTS</b></Link>
                         </div>
                         <div className="d-flex justify-content-between align-items-center">
                             <h5>Program Medicines</h5>
