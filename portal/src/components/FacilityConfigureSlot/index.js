@@ -285,7 +285,7 @@ export default function FacilityConfigureSlot ({location}) {
 
     return (
         <div className="container-fluid mt-4">
-            <Row>
+            <Row className="pb-0">
                 <Col><h3>{programName ? "Program: "+programName+" / ": ""} Config Slot</h3></Col>
                 <Col style={{"textAlign": "right"}}>
                     <Button className='add-vaccinator-button mr-4' variant="outlined" color="primary" onClick={() => history.push(config.urlPath +'/facility_admin')}>
@@ -295,11 +295,11 @@ export default function FacilityConfigureSlot ({location}) {
             </Row>
             <div className="config-slot">
                 <Row>
-                    <Col className="col-3"><h5>Vaccination Days</h5></Col>
+                    <Col className="col-3"><p style={{fontSize: "large", fontWeight: 900}}>Vaccination Days</p></Col>
                     {DAYS.map(d =>
                         <Col key={d}>
                             <Button className={(selectedDays && selectedDays.includes(d) ? "selected-slot-day" : "ignored-slot-day")}
-                                    style={{textTransform: "capitalize"}}
+
                                 onClick={() => onSelectDay(d)}
                             >
                                 {d}
@@ -307,12 +307,12 @@ export default function FacilityConfigureSlot ({location}) {
                         </Col>
                     )}
                 </Row>
-                <hr/>
+                <hr className="mt-0"/>
                 <div>
-                    <Col><h5>Appointment Scheduler</h5></Col>
+                    <Col><p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Appointment Scheduler</p></Col>
                     <div>
-                        <Row>
-                            <Col className="col-3">Morning Hours</Col>
+                        <Row style={{ fontWeight: "bold", color: "#646D82"}}>
+                            <Col className="col-3" >Morning Hours</Col>
                             <Col>Maximum number of appointments allowed</Col>
                         </Row>
                         {
@@ -321,7 +321,7 @@ export default function FacilityConfigureSlot ({location}) {
                         }
                     </div>
                     <div>
-                        <Row className="mt-4">
+                        <Row className="mt-2" style={{ fontWeight: "bold", color: "#646D82"}}>
                             <Col className="col-3">Afternoon Hours</Col>
                             <Col>Maximum number of appointments allowed</Col>
                         </Row>
@@ -331,8 +331,8 @@ export default function FacilityConfigureSlot ({location}) {
                         }
                     </div>
                 </div>
-                <div className="mt-5">
-                    <Col><h5>Walk-in Scheduler</h5></Col>
+                <div className="mt-4">
+                    <Col><p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Walk-in Scheduler</p></Col>
                     <div>
                         {
                             walkInSchedules.length > 0 &&
