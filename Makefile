@@ -1,11 +1,11 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/registration_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry-es dockerhub/keycloak
+IMAGES:=bindock/nginx bindock/portal_api bindock/registration_api bindock/vaccination_api bindock/certificate_processor bindock/analytics_feed bindock/notification-service bindock/digilocker_support_api bindock/certificate_signer bindock/registry-es bindock/keycloak
 ifeq ($(RELEASE_VERSION), )
-RELEASE_VERSION := divoc-0.0.3
+RELEASE_VERSION := latest
 endif
 $(info RELEASE VERSION $(RELEASE_VERSION))
 
 docker:
-	docker build -t dockerhub/nginx .
+	docker build -t bindock/nginx .
 	$(MAKE) -C backend
 	$(MAKE) -C registry
 test:
