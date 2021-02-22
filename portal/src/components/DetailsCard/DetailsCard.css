@@ -1,0 +1,58 @@
+.table-sub-section {
+    background: #FFFFFF 0% 0% no-repeat padding-box;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    opacity: 1;
+    margin-top: 10px;
+    padding-left: 15px;
+}
+
+
+.row, .col {
+    margin: 5px;
+}
+
+.row {
+    padding-bottom: 10px;
+    padding-top: 10px;
+}
+
+.row>.col:first-child {
+    width: 55%;
+}
+
+.container>.row>.col:not(:first-child) {
+    margin-left: 10%;    
+}
+
+.table-sub-section>.row:not(:first-child), form {
+    font-family: avenir;
+}
+
+.col b, label {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.edit-admin {
+    color: dodgerblue;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+.disabled {
+    background-color: #F8F8F8;
+    border: 0;
+}
+
+#add-admin-img {
+    cursor: pointer;
+    height: 40px;
+}
+
+#details-card {
+    display: flex ; 
+    flex-direction: column;
+    justify-content: center ;
+}

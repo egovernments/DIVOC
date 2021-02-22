@@ -1,0 +1,65 @@
+@import "styles/colors.scss";
+
+.new-enroll-container {
+  height: 100%;
+  margin: 2rem 1rem 0.2rem;
+  text-align: center;
+
+  .content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+
+    .payment-container {
+      width: 100%;
+      padding: 4px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+
+      .payment-item {
+        cursor: pointer;
+        margin: 4px;
+        border: solid 1px gray;
+        border-radius: 4px;
+
+        .logo {
+          padding: 20%;
+        }
+
+        .title {
+          font-size: 12px;
+          padding-bottom: 8px;
+          padding-top: -8px;
+        }
+
+        &.active {
+          border: solid 1px $primaryThemeColorLight;
+          border-radius: 4px;
+
+          .title {
+            color: $primaryThemeColorLight
+          }
+        }
+      }
+    }
+  }
+}
+
+.form-container {
+  text-align: start;
+}
+
+.action-btn {
+  color: #5C9EF8;
+  border-color: #5C9EF8;
+  font-size: 14px;
+  padding: 0.5rem 2rem;
+
+  &:hover, &:active {
+    background-color: #fff !important;
+    color: #5C9EF8;
+    border-color: #5C9EF8 !important;
+    box-shadow: none !important;
+  }
+}

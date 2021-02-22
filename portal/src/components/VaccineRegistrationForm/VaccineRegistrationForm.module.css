@@ -1,0 +1,80 @@
+.time-interval-count {
+    display: inline-block;
+    width: 100px; 
+    margin-right: 10px;
+}
+
+.time-interval-unit {
+    display: inline-block;
+    width: 120px; 
+}
+
+.time-interval-label {
+    display: block;
+}
+
+.add-dose-block {
+    background-color: whitesmoke;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    border: 1px solid #E6E6E6;
+}
+
+.add-dose-content {
+    font-size: 29px;
+    font-weight: 300;
+    padding-top: 2px;
+}
+
+.connecting-line-bottom {
+    height: 30px;
+    margin-left: 25px;
+    margin-right: 50px;
+    border-left: 2px dotted grey;
+}
+
+.connecting-line-dynamic {
+    height: 100;
+    margin-left: 28px;
+    margin-right: 40px;
+    border-left: 2px dotted grey;
+}
+
+.remove-dose-icon {
+    display: inline-block;
+    padding-left: 10px;
+    vertical-align: bottom;
+}
+
+.remove-dose-block {
+    background-color: grey;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    color: white;
+    display: inline-block;
+}
+
+.first-dose-block {
+    background-color: grey;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    color: white;
+}
+
+.right-form-col {
+    height: 500px;
+    overflow: auto;
+    box-shadow: 0px 6px 20px #c1cfd933;
+    padding-left: 30px !important;
+    padding-top: 20px;
+}
+
+.error-message {
+    font-size: 12px;
+    color: red;
+    display: inline;
+}
+ 

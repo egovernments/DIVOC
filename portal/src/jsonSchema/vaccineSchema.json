@@ -1,0 +1,57 @@
+{
+  "$id": "#properties/Medicine",
+  "type": "object",
+  "required": [
+    "name",
+    "provider",
+    "effectiveUntil"
+  ],
+  "properties": {
+    "name": {
+      "$id": "#/properties/name",
+      "type": "string",
+      "title": "Name of Vaccine"
+    },
+    "provider": {
+      "title": "Manufacturer",
+      "type": "string",
+      "$id": "#/properties/provider"
+    },
+    "vaccinationMode": {
+      "title": "Administration Type",
+      "type": "string",
+      "enum": [
+        "muscular injection",
+        "oral",
+        "nasal"
+      ],
+      "default": "muscular injection"
+    },
+    "price": {
+      "title": "Approximate Price",
+      "type": "number"
+    },
+    "doseIntervals": {
+      "title": "Doses of Vaccine",
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required":["min"],
+        "properties": {
+          "min": {
+            "title": "Minimum Interval",
+            "type": "integer"
+          },
+          "max": {
+            "title": "Maximum Interval",
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "effectiveUntil": {
+      "title": "Validity of Vaccine (last dose)",
+      "type": "integer"
+    }
+  }
+}

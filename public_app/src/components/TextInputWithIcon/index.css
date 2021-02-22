@@ -1,0 +1,18 @@
+.text-input-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.text-input-container .custom-input-wrapper {
+    border: 1px solid #E9E9F0;
+    padding: 1rem;
+    display: flex;
+    justify-content: center;
+}
+
+.text-input-container .custom-input-wrapper input {
+    border: none;
+    outline: none;
+    user-select: none;
+    width: 100%;
+}

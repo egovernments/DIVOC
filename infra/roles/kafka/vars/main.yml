@@ -1,0 +1,18 @@
+---
+
+# Visit https://kafka.apache.org/documentation/#brokerconfigs
+# for all possible parameters
+sansible_kafka_server_properties_defaults:
+  broker.id: "{{ broker_id }}"
+  listeners: "PLAINTEXT://0.0.0.0:{{ sansible_kafka_port }}"
+  advertised.listeners: "PLAINTEXT://{{adv_ip}}:{{ sansible_kafka_port }}"
+
+  # A comma seperated list of directories under which to store log files
+  log.dirs: /home/kafka/data
+
+  # Zookeeper connection string (see zookeeper docs for details).
+  # This is a comma separated host:port pairs, each corresponding to a zk
+  # server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
+  # You can also append an optional chroot string to the urls to specify the
+  # root directory for all kafka znodes.
+  zookeeper.connect: "{{ sansible_kafka_zookeeper_hosts | join(',') }}"

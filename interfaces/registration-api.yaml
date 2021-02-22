@@ -1,0 +1,162 @@
+swagger: "2.0"
+info:
+  title: Registration API
+  description: Registration API
+  version: 1.0.0
+schemes:
+  - https
+basePath: /divoc/api/citizen
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /facility/slot/book:
+    post:
+      summary: Book a slot in facility
+      operationId: bookSlotOfFacility
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - facilitySlotId
+              - enrollmentCode
+            properties:
+              facilitySlotId:
+                type: string
+              enrollmentCode:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /facility/slots:
+    get:
+      summary: Get slots for facilites
+      operationId: getSlotsForFacilities
+      parameters:
+        - in: query
+          name: facilityId
+          type: string
+        - in: query
+          name: pageNumber
+          type: number
+          default: 0
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+  /facility/slots/init:
+    post:
+      summary: Initialize facility slots
+      operationId: initializeFacilitySlots
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              apiKey:
+                type: string
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+
+  /recipients:
+    post:
+      summary: Enroll Recipient
+      operationId: enrollRecipient
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
+          description: Recipient Details
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Invalid token
+    get:
+      summary: Get all the recipients
+      operationId: getRecipients
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '../registry/Enrollment.json#/definitions/Enrollment'
+        '401':
+          description: Invalid token
+        '500':
+          description: Something went wrong
+
+  /generateOTP:
+   post:
+     summary: Generate OTP
+     operationId: generateOTP
+     parameters:
+       - in: body
+         name: body
+         required: true
+         schema:
+          type: object
+          properties:
+            phone:
+              type: string
+     responses:
+       '200':
+         description: OK
+       '204':
+         description: Phone number is empty
+       '500':
+         description: Internal Error
+       '400':
+         description: Bad request
+  /verifyOTP:
+    post:
+      summary: Verify OTP
+      operationId: verifyOTP
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            properties:
+              phone:
+                type: string
+              otp:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '401':
+          description: Invalid OTP
+        '400':
+          description: Bad request
+        '500':
+          description: Internal error
+        '429':
+          description: Verify otp attempts exceeded, generate new OTP

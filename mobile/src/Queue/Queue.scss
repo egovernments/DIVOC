@@ -1,0 +1,43 @@
+//.App {
+//  background: linear-gradient(0deg, #F3F6F9 70%, #4E67D1 30%);
+//}
+
+.queue-container {
+  height: 100%;
+  margin: 2rem 1rem 0.2rem;
+  overflow: auto;
+
+  .card {
+    .card-body {
+      .table {
+        font-size: 14px;
+
+        thead {
+          tr {
+            th {
+              border: none !important;
+              color: #646D82;
+            }
+          }
+        }
+
+        tbody {
+          color: #646D82;
+        }
+      }
+
+    }
+  }
+
+  .verify-btn {
+    width: 100%;
+    background: #4CA07A;
+    border: none;
+    color: white;
+    border-radius: 10px;
+    padding: 1rem;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+  }
+}

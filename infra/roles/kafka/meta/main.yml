@@ -1,0 +1,25 @@
+---
+
+galaxy_info:
+  author: sansible
+  description: "Install Kafka server."
+  license: MIT
+  min_ansible_version: 2.8
+  min_ansible_container_version: 2.8
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+        - bionic
+  galaxy_tags:
+    - development
+
+dependencies:
+  - role: java
+
+  - role: users_and_groups
+    sansible_users_and_groups_groups:
+      - name: "{{ sansible_kafka_group }}"
+    sansible_users_and_groups_users:
+      - name: "{{ sansible_kafka_user }}"
+        group: "{{ sansible_kafka_group }}"

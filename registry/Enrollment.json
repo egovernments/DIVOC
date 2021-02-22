@@ -1,0 +1,83 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Facility": {
+      "$ref": "#/definitions/Enrollment"
+    }
+  },
+  "required": [
+    "Enrollment"
+  ],
+  "title":"Enrollment",
+  "definitions": {
+    "Enrollment": {
+      "type": "object",
+      "required": ["nationalId", "dob"],
+      "properties": {
+        "beneficiaryPhone" : {
+          "type": "string"
+        },
+        "phone" : {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "gender": {
+          "type": "string",
+          "enum": ["Male", "Female", "Other"]
+        },
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "programId": {
+          "type": "string"
+        },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "address": {
+          "$id": "#/properties/address",
+          "$ref": "Common.json#/definitions/Address",
+          "title": "Address"
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "osComment": ["This section contains the OpenSABER specific configuration information",
+      "privateFields: Optional; list of field names to be encrypted and stored in database",
+      "signedFields: Optional; list of field names that must be pre-signed",
+      "indexFields: Optional; list of field names used for creating index. Enclose within braces to indicate it is a composite index. In this definition, (serialNum, facilityCode) is a composite index and facilityName is a single column index.",
+      "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
+      "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"],
+
+    "privateFields": [],
+    "signedFields": [],
+    "indexFields": ["(phone, code)"],
+    "uniqueIndexFields": ["code"],
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Vaccinator": {
+      "$ref": "#/definitions/Vaccinator"
+    }
+  },
+  "required": [
+    "Vaccinator"
+  ],
+  "title":"Vaccinator",
+  "definitions": {
+    "Vaccinator": {
+      "$id": "#/properties/Vaccinator",
+      "type": "object",
+      "title": "The Vaccinator Schema",
+      "required": [
+        "code",
+        "nationalIdentifier",
+        "name",
+        "facilityIds",
+        "mobileNumber",
+        "status",
+        "email"
+      ],
+      "properties": {
+        "signatures": {
+          "$id": "#/properties/signatures",
+          "type": "array",
+          "items": {
+            "$ref": "Signature.json#/definitions/Signature"
+          },
+          "$comment": "Placeholder for all verifiable claims"
+        },
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "$comment": "Email Id"
+        },
+        "code": {
+          "$id": "#/properties/code",
+          "type": "string",
+          "$comment": "Code"
+        },
+        "nationalIdentifier": {
+          "$id": "#/properties/nationalIdentifier",
+          "type": "string",
+          "$comment": "Nationality"
+        },
+        "name": {
+          "$id": "#/properties/name",
+          "type": "string",
+          "title": "Full name"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "averageRating": {
+          "type": "number"
+        },
+        "trainingCertificate": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["Active", "Inactive"]
+        },
+        "programs": {
+          "$id": "#/properties/programs",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id":{
+                "type": "string"
+              },
+              "certified": {
+                "type": "boolean"
+              },
+              "statusUpdatedAt": {
+                "$id": "#/properties/statusUpdatedAt",
+                "type": "string",
+                "format": "date"
+              },
+              "certifiedUpdatedAt": {
+                "$id": "#/properties/certifiedUpdatedAt",
+                "type": "string",
+                "format": "date"
+              }
+            }
+          }
+        },
+        "___encryptedFields": {
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "osComment": ["This section contains the OpenSABER specific configuration information",
+      "privateFields: Optional; list of field names to be encrypted and stored in database",
+      "signedFields: Optional; list of field names that must be pre-signed",
+      "indexFields: Optional; list of field names used for creating index. Enclose within braces to indicate it is a composite index. In this definition, (serialNum, code) is a composite index and name is a single column index.",
+      "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
+      "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"],
+
+    "indexFields": ["code","name"],
+    "uniqueIndexFields": ["code"],
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
+  }
+}

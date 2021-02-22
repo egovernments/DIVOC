@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    k8s-app: vaccination-api
+  name: vaccination-api
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: "tcp-8000"
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+  selector:
+    k8s-app: vaccination-api
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}

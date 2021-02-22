@@ -1,0 +1,13 @@
+.progress {
+    border-radius: 10rem;
+    background-color: #E6F2FF;
+}
+
+.progress-bar {
+    background-color: #5C9EF8;
+}
+
+.sample-link {
+    margin-left: 8px;
+    text-align: center;
+}

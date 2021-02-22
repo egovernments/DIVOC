@@ -1,0 +1,233 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Facility": {
+      "$ref": "#/definitions/Facility"
+    }
+  },
+  "required": [
+    "Facility"
+  ],
+  "title":"Facility",
+  "definitions": {
+    "Facility": {
+      "$id": "#/properties/Facility",
+      "type": "object",
+      "title": "The Facility Schema",
+      "required": [
+        "serialNum",
+        "facilityCode",
+        "facilityName",
+        "address",
+        "geoLocation",
+        "contact",
+        "operatingHourStart",
+        "operatingHourEnd",
+        "category",
+        "type",
+        "status",
+        "admins"
+      ],
+      "properties": {
+        "serialNum": {
+          "$id": "#/properties/serialNum",
+          "type": "integer",
+          "$comment": "Serial number"
+        },
+        "facilityCode": {
+          "$id": "#/properties/facilityCode",
+          "type": "string",
+          "$comment": "Code"
+        },
+        "facilityName": {
+          "$id": "#/properties/facilityName",
+          "type": "string",
+          "title": "Full name"
+        },
+        "address": {
+          "$id": "#/properties/address",
+          "$ref": "Common.json#/definitions/Address",
+          "title": "Address"
+        },
+        "geoLocation": {
+          "$id": "#/properties/geoLocation",
+          "type": "string",
+          "title": "Geo Location"
+        },
+        "websiteUrl": {
+          "$id": "#/properties/websiteUrl",
+          "type": "string",
+          "title": "Website URL"
+        },
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string",
+          "title": "Facility Email"
+        },
+        "contact": {
+          "$id": "#/properties/contact",
+          "type": "string",
+          "title": "Contact number"
+        },
+        "operatingHourStart": {
+          "$id": "#/properties/operatingHourStart",
+          "type": "string",
+          "title": "Operating hours start of day"
+        },
+        "operatingHourEnd": {
+          "$id": "#/properties/operatingHourEnd",
+          "type": "string",
+          "title": "Operating hours end of day"
+        },
+        "category": {
+          "$id": "#/properties/category",
+          "type": "string",
+          "title": "Category",
+          "enum": [
+            "GOVT",
+            "PRIVATE"
+          ]
+        },
+        "type": {
+          "$id": "#/properties/type",
+          "type": "string",
+          "title": "Type of Facility",
+          "enum": [
+            "Fixed location",
+            "Mobile",
+            "Both"
+          ]
+        },
+        "averageRating": {
+          "$id": "#/properties/averageRating",
+          "type": "number",
+          "title": "Average Rating",
+          "description": "Average Rating of Facility 0 to 5, 0 for no rating.",
+          "default": 0.0,
+          "examples": [
+            2.5
+          ]
+        },
+        "status": {
+          "$id": "#/properties/status",
+          "type": "string",
+          "title": "Status of Facility",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "admins": {
+          "$id": "#/properties/admins",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityAdmin"
+          }
+        },
+        "programs": {
+          "$id": "#/properties/programs",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/FacilityProgram"
+          }
+        },
+        "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityAdmin": {
+      "$id": "#/properties/FacilityAdmin",
+      "type": "object",
+      "title": "The FacilityProgram Schema",
+      "properties": {
+        "name":{
+          "$id": "#/properties/name",
+          "type": "string"
+        },
+        "mobile": {
+          "$id": "#/properties/mobile",
+          "type": "string"
+        },
+        "email": {
+          "$id": "#/properties/email",
+          "type": "string"
+        },
+        "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityProgram": {
+      "$id": "#/properties/FacilityProgram",
+      "type": "object",
+      "title": "The FacilityProgram Schema",
+      "properties": {
+        "programId":{
+          "$id": "#/properties/programId",
+          "type": "string"
+        },
+        "status": {
+          "$id": "#/properties/status",
+          "type": "string"
+        },
+        "rate": {
+          "$id": "#/properties/rate",
+          "type": "number"
+        },
+        "statusUpdatedAt": {
+          "$id": "#/properties/statusUpdatedAt",
+          "type": "string",
+          "format": "date"
+        },
+        "rateUpdatedAt": {
+          "$id": "#/properties/rateUpdatedAt",
+          "type": "string",
+          "format": "date"
+        },
+        "schedule": {
+          "$id": "#/properties/schedule",
+          "$ref": "#/definitions/FacilityProgramSchedule"
+        },
+        "___encryptedFields": {
+        }
+      }
+    },
+    "FacilityProgramSchedule": {
+      "$id": "#/properties/FacilityProgramSchedule",
+      "type": "object",
+      "title": "The FacilityProgramSchedule Schema",
+      "properties": {
+        "days": {
+          "$id": "#/properties/days",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "startTime": {
+          "$id": "#/properties/operatingHourStart",
+          "type": "string"
+        },
+        "endTime": {
+          "$id": "#/properties/operatingHourEnd",
+          "type": "string"
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "osComment": ["This section contains the OpenSABER specific configuration information",
+      "privateFields: Optional; list of field names to be encrypted and stored in database",
+      "signedFields: Optional; list of field names that must be pre-signed",
+      "indexFields: Optional; list of field names used for creating index. Enclose within braces to indicate it is a composite index. In this definition, (serialNum, facilityCode) is a composite index and facilityName is a single column index.",
+      "uniqueIndexFields: Optional; list of field names used for creating unique index. Field names must be different from index field name",
+      "systemFields: Optional; list of fields names used for system standard information like created, updated timestamps and userid"],
+
+    "privateFields": [],
+    "signedFields": [],
+    "indexFields": ["(serialNum, facilityCode)","facilityName"],
+    "uniqueIndexFields": ["serialNum", "facilityCode"],
+    "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
+  }
+}

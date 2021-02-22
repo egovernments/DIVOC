@@ -1,0 +1,69 @@
+.container{
+    color: #4D4F5C;
+}
+.district-table {
+    height: 350px;
+    overflow: scroll;
+    border: 1px solid #E8E9EC; 
+    margin-bottom: 20px;
+}
+
+.tbody{
+    color: #B1B1B1;
+    font-size: smaller;
+}
+
+.highlight{
+    color: #1D1D1D;
+    font-weight: bold;
+}
+
+.button {
+    background: #4CA07A 0% 0% no-repeat padding-box;
+    border-radius: 6px;
+    border: none;
+    color: #FFFFFF;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+input[type="checkbox"]:checked + .wrapper {
+}
+
+input[type="radio"]:checked + .wrapper {
+}
+
+.wrapper{
+    width: 1em;
+    height: 1em;
+    display: inline-block;
+    margin-right: 1em;
+    border: 1px solid lightgray; 
+    border-radius: 0.3em;
+}
+
+
+.radio{
+    border-radius: 0.5em;
+}
+
+.table{
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;    
+}
+
+.table-data{
+    color: #4E4E4E;
+    font-size: smaller;
+    text-align: left;
+}
+
+.card-continer{
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    border: none;
+}
+
+.pad-1rem {
+    padding: 1rem;
+}

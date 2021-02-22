@@ -1,0 +1,10 @@
+NAME=kafka
+
+USER=$NAME
+GROUP=$NAME
+
+KAFKA_HEAP_OPTS="{{ sansible_kafka_heap_opts }}"
+JMX_PORT="{{ sansible_kafka_jmx_port }}"
+MAX_OPEN_FILES="{{ sansible_kafka_max_open_files }}"
+
+{{ sansible_kafka_environment_vars | join("\n") }}

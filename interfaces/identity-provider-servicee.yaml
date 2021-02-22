@@ -1,0 +1,64 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Identity provider interface for DIVOC
+  description: Identity provider service can be abstracted with this interface so that DIVOC can integrate seemlessly.
+#https://app.swaggerhub.com/apis/divoc/Identity-Provider/1.0.0
+# Under securityDefinitions we declare which security schemes can be used.
+# These definitions do not affect to the operations, but can be applied
+# using the 'security' key at the global level or the operation level.
+# In this sample, we'll see how to apply the security definition globally,
+# and override it at the operation level.
+#
+# Note that for Access Code Flow, you must provide the Token URL.
+securityDefinitions: #TODO check security for provider
+  accessCode:
+    type: oauth2
+    # This should be updated to the Token URL of your OAuth provider.
+    tokenUrl: http://example.com/oauth/token
+    # This should be updated to the Authorization URL of your OAuth provider.
+    authorizationUrl: http://example.com/oauth/auth
+    flow: accessCode
+    scopes:
+      write: allows modifying resources
+      read: allows reading resources
+
+# Here we apply the security flow called 'accessCode' globally to all the operations in the spec.
+# This security scheme is defined above in the 'securityDefinitions' section.
+# Global security can be overridden an operation level as seen in the example below
+security:
+  - accessCode:
+      - read
+      - write
+paths:
+  /identity/validate:
+    # In this operation we do not apply the security, because it was applied globally above.
+    # The security will be applied to this operation for that reason.
+    post:
+      tags:
+        - identity
+      summary: Validate identity of the subject
+      description: Identity validation api, given subject id and credentials service should be able to validate the claimed identity with the help of given credential.
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/IdentityRequest'
+      responses:
+        200:
+          description: OK
+        206:
+          description: partial content, need additional information or action for identity assertion.
+        401:
+          description: Invalid identity assertion.
+        400:
+          description: Invalid format of the claim or identity
+
+definitions:
+  IdentityRequest:
+    type: object
+    properties:
+      identityClaim:
+        type: string
+      credential:
+        type: string

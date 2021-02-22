@@ -1,0 +1,18 @@
+kafka:
+  bootstrapservers: localhost:9092
+  notifyTopic: notify
+  enrollmenttopic: enrollment
+  recipientappointmenttopic: recipientappointment
+enrollmentcreation:
+  maxretrycount: 10
+  lengthofsuffixedenrollmentcode: 3
+auth:
+  maxotpverifyattempts: 3
+  ttlforotpinminutes: 5
+redis:
+  redisurl: "redis://0.0.0.0:6379"
+registry:
+  url: http://localhost:8081
+  addoperationid: add
+  searchoperationid: search
+  readoperationid: read

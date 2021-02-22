@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: keycloak-service
+  name: keycloak-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: keycloak-service
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: keycloak-service
+    spec:
+      containers:
+        - image: dockerhub/keycloak:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "500m"
+          name: keycloak-service
+          env:
+            - name: DB_ADDR
+              value: keycloak
+            - name: DB_DATABASE
+              value: keycloak
+            - name: DB_PASSWORD
+              value: keycloak
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: keycloak
+            - name: DB_VENDOR
+              value: postgres
+            - name: KEYCLOAK_PASSWORD
+              value: admin
+            - name: KEYCLOAK_USER
+              value: admin
+      restartPolicy: Always

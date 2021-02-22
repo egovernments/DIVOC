@@ -1,0 +1,131 @@
+---
+
+- name: Manage system groups
+  become: yes
+  group:
+    gid: "{{ item.gid | default(omit) }}"
+    name: "{{ item.name }}"
+    system: "{{ item.system | default(omit) }}"
+  with_items: "{{ sansible_users_and_groups_groups }}"
+
+- name: Ensure /etc/sudoers.d exists
+  become: yes
+  file:
+    path: /etc/sudoers.d
+    state: directory
+    owner: root
+    group: root
+    mode: 0750
+
+- name: Enable include of /etc/sudoers.d
+  become: yes
+  lineinfile:
+    name: /etc/sudoers
+    regexp: "^#includedir"
+    line: "#includedir /etc/sudoers.d"
+    state: present
+
+- name: Create sudoers configure
+  become: yes
+  template:
+    src: sudoers.j2
+    dest: "/etc/sudoers.d/{{ item.name }}"
+  with_items: "{{ sansible_users_and_groups_sudoers }}"
+
+- name: Manage systems users
+  become: yes
+  user:
+    comment: "{{ item.gecos | default(item.name) }}"
+    createhome: "{{ item.createhome | default('yes') }}"
+    home: "{{ item.home | default('/home/' ~ item.name) }}"
+    group: "{{ item.group | default(omit) }}"
+    groups: "{{ item.groups | default([ ]) | join(',') | default(omit) }}"
+    name: "{{ item.name }}"
+    password: "{{ item.password | default(omit) }}"
+    update_password: "{{ item.update_password | default(omit) }}"
+    remove: "{{ 'yes' if item.state is defined and item.state == 'absent' else 'no' }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    state: "{{ item.state | default(omit) }}"
+    system: "{{ item.system | default(omit) }}"
+    uid: "{{ item.uid | default(omit) }}"
+  with_items: "{{ sansible_users_and_groups_users }}"
+  when: (sansible_users_and_groups_whitelist_groups == [])
+    or ( item.groups is defined and ( item.groups | intersect(sansible_users_and_groups_whitelist_groups )))
+    or ( item.group is defined and item.group in sansible_users_and_groups_whitelist_groups)
+
+- name: Update home directory permissions
+  become: yes
+  file:
+    group: "{{ item.group | default(omit) }}"
+    mode: 0750
+    owner: "{{ item.name }}"
+    path: "{{ item.home | default('/home/' ~ item.name) }}"
+    state: directory
+  with_items: "{{ sansible_users_and_groups_users }}"
+  when: (item.state is not defined or item.state != "absent")
+    and (item.createhome is not defined or item.createhome)
+    and (
+      (not sansible_users_and_groups_whitelist_groups)
+      or ( item.groups is defined and ( item.groups | intersect(sansible_users_and_groups_whitelist_groups )))
+      or ( item.group is defined and item.group in sansible_users_and_groups_whitelist_groups)
+    )
+
+- name: Create .ssh directory in default user home directory
+  become: yes
+  file:
+    path: "{{ item.home | default('/home/' ~ item.name) }}/.ssh"
+    owner: "{{ item.name }}"
+    group: "{{ item.group | default(omit) }}"
+    mode: 0700
+    state: directory
+  with_items: "{{ sansible_users_and_groups_users }}"
+  when: (sansible_users_and_groups_authorized_keys_dir is none)
+    and (item.state is not defined or item.state != "absent")
+    and (
+      (not sansible_users_and_groups_whitelist_groups)
+      or ( item.groups is defined and ( item.groups | intersect(sansible_users_and_groups_whitelist_groups )))
+      or ( item.group is defined and item.group in sansible_users_and_groups_whitelist_groups)
+    )
+
+- name: Copy ssh auth keys to default user home directory
+  become: yes
+  authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', item.ssh_key) }}"
+    manage_dir: yes
+  with_items: "{{ sansible_users_and_groups_users }}"
+  when: (sansible_users_and_groups_authorized_keys_dir is none)
+    and (item.state is not defined or item.state != "absent")
+    and (item.ssh_key is defined)
+    and (
+      (not sansible_users_and_groups_whitelist_groups)
+      or (item.groups is defined and (item.groups | intersect(sansible_users_and_groups_whitelist_groups)))
+      or (item.group is defined and item.group in sansible_users_and_groups_whitelist_groups)
+    )
+
+- name: Create alternate authorized_keys directory
+  become: yes
+  file:
+    path: "{{ sansible_users_and_groups_authorized_keys_dir }}"
+    owner: "root"
+    group: "root"
+    mode: 0755
+    state: directory
+  when: sansible_users_and_groups_authorized_keys_dir is not none
+
+- name: Copy ssh auth keys to alternate authorized_keys directory
+  become: yes
+  authorized_key:
+    user: "{{ item.name }}"
+    key: "{{ lookup('file', item.ssh_key) }}"
+    path: "{{ sansible_users_and_groups_authorized_keys_dir ~ '/' ~ item.name }}"
+    manage_dir: no
+  with_items: "{{ sansible_users_and_groups_users }}"
+  when: (sansible_users_and_groups_authorized_keys_dir is not none)
+    and (item.state is not defined or item.state != "absent")
+    and (item.ssh_key is defined)
+    and (
+      (not sansible_users_and_groups_whitelist_groups)
+      or (item.groups is defined and (item.groups | intersect(sansible_users_and_groups_whitelist_groups)))
+      or (item.group is defined and item.group in sansible_users_and_groups_whitelist_groups)
+    )

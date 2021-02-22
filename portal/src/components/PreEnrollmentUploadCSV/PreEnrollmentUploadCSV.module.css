@@ -1,0 +1,49 @@
+.container {
+    /* background: #ffffff;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    display: inline-flex;
+    width: calc(50% - 1rem);
+    margin-right: 1rem;
+    align-items: center;
+    width: 100%; */
+    width: 100%;
+}
+
+.button {
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    color: #5C9EF8;
+    white-space: nowrap;
+    margin: 15px;
+    cursor: pointer;
+    font-size: 12px;
+    padding: 0.5em 2em;
+}
+
+.progress-bar-container {
+    padding: 1em;
+    width: 100%;
+}
+.progress-bar-container .progress {
+    border-radius: 10rem;
+    background-color: #E6F2FF;
+}
+.progress-bar {
+    color: #5C9EF8;
+    text-align: right;
+}
+
+
+.select-program-wrapper>div>div>div  {
+      border-color: #5C9EF8;
+      color: #5C9EF8;
+      white-space: nowrap;
+      width: 10rem;
+      cursor: pointer;
+  }
+
+  .select-program-wrapper>div>div>div>div {
+    border-color: #5C9EF8;
+  }

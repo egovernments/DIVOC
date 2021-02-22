@@ -1,0 +1,1300 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Divoc Portal API
+  description: Digital infra for vaccination certificates
+securityDefinitions:
+  hasRole:
+    # This scheme uses the header: "Authorization: Bearer {base64 encoded string representing a JWT}"
+    # Alternatively, the query param: "access_token" may be used.
+    #
+    # In our scenario, we must use the query param version in order to avoid
+    # passing several headers with key 'Authorization'
+    type: oauth2
+    # The flow and URLs in spec are for documentary purpose: go-swagger does not implement OAuth workflows
+    flow: accessCode
+    authorizationUrl: 'https://dummy.oauth.net/auth'
+    tokenUrl: 'https://dumy.oauth.net/token'
+    # Required scopes are passed by the runtime to the authorizer
+    scopes:
+      admin: scope of super admin
+      facility-admin: scope of facility admin
+
+security:
+  - hasRole: ['admin']
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /register:
+    post:
+      summary: Enroll Recipient
+      operationId: enrollRecipient
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
+          description: Recipient Details
+      responses:
+        '200':
+          description: OK
+  /facility:
+    get:
+      summary: get user facility details
+      operationId: getUserFacility
+      security:
+        - hasRole: ["facility-admin", "facility-staff"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/Facility'
+  /public/facilities:
+    get:
+      summary: get facilities for public
+      operationId: getFacilitiesForPublic
+      parameters:
+        - in: query
+          name: pincode
+          type: string
+          description: Facility pincode
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PublicFacility'
+  /facilities:
+    get:
+      summary: get facilities
+      operationId: getFacilities
+      parameters:
+        - in: query
+          name: state
+          type: string
+          description: Facility State
+        - in: query
+          name: district
+          type: string
+          description: Facility District
+        - in: query
+          name: type
+          type: string
+          description: Facility Type
+        - in: query
+          name: programId
+          type: string
+          description: Program
+        - in: query
+          name: programStatus
+          type: string
+          description: Program Status
+        - in: query
+          name: rateUpdatedFrom
+          type: string
+        - in: query
+          name: rateUpdatedTo
+          type: string
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
+      security:
+        - hasRole: ["admin", "controller"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Facility'
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update facility
+      operationId: updateFacilities
+      security:
+        - hasRole: ["admin", "controller", "facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityUpdateRequest'
+          description: Facility Update Request
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facilities/notify:
+    post:
+      summary: notify facilities
+      operationId: notifyFacilities
+      security:
+        - hasRole: ["admin", "controller"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                facilityId:
+                  type: string
+                pendingTasks:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /enrollments:
+    get:
+      summary: get enrollments
+      operationId: getEnrollments
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+    post:
+      summary: Upload facility csv for bulk ingestion of pre enrollment
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+        - in: formData
+          name: programId
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+  /vaccinators:
+    get:
+      summary: Get vaccinators
+      operationId: getVaccinators
+      security:
+        - hasRole: ["facility-admin", "admin", "facility-staff", "controller"]
+      parameters:
+        - in: query
+          name: facilityCode
+          type: string
+          description: Facility Code
+        - in: query
+          name: name
+          type: string
+          description: Vaccinator Name
+        - in: query
+          name: limit
+          type: number
+        - in: query
+          name: offset
+          type: number
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Vaccinator'
+    post:
+      summary: Upload facility csv for bulk ingestion
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Facility data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update Vaccinator
+      operationId: updateVaccinators
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/VaccinatorUpdateRequest'
+          description: Vaccinator Update Request
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /vaccinator:
+    post:
+      summary: Create vaccinator user
+      operationId: createVaccinator
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/Vaccinator'
+          description: Vaccinator Details
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+  /programs:
+    get:
+      summary: get program list
+      operationId: getPrograms
+      security:
+        - hasRole:
+            - admin
+            - user
+            - controller
+            - facility-admin
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
+    post:
+      summary: Create program
+      operationId: createProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramRequest'
+          description: Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update program
+      operationId: updateProgram
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/ProgramUpdateRequest'
+          description: Update Vaccination Program
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /medicines:
+    get:
+      summary: Get medicines
+      operationId: getMedicines
+      security:
+        - hasRole: ["user", "admin","facility-admin"]
+      responses:
+        '200':
+          description: Get medicine
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/CreateMedicineRequest'
+    post:
+      summary: Create Medicine
+      operationId: createMedicine
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/CreateMedicineRequest'
+          description: Create Medicine
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update Medicine
+      operationId: updateMedicine
+      security:
+        - hasRole: ["admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/UpdateMedicineRequest'
+          description: Upadte Medicine
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facility/users:
+    get:
+      summary: Get users of a facility
+      operationId: getFacilityUsers
+      security:
+        - hasRole: ["facility-admin", "controller"]
+      parameters:
+        - in: query
+          name: facilityCode
+          type: string
+          description: Facility Code required for controller
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/FacilityUser'
+    post:
+      summary: Create Facility User
+      operationId: createFacilityUsers
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/FacilityUser'
+          description: Create facility user data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+    put:
+      summary: Update Facility User
+      operationId: updateFacilityUser
+      security:
+        - hasRole: ["facility-admin", "controller"]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            allOf:
+              - $ref: '#/definitions/FacilityUser'
+              - type: object
+                properties:
+                  facilityCode:
+                    type: string
+          description: Update facility user data
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facility/users/{userId}:
+    delete:
+      summary: Delete Facility User
+      operationId: deleteFacilityUser
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          type: string
+          description: Id of facility user to delete
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+  /facility/groups:
+    get:
+      summary: Get facility groups
+      operationId: getFacilityGroups
+      security:
+        - hasRole: ["facility-admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '#/definitions/UserGroup'
+        '400':
+          description: Invalid input
+        '401':
+          description: Unauthorized
+  /facility/{facilityId}/program/{programId}/schedule:
+    get:
+      summary: Get slots for given program and facility
+      operationId: getFacilityProgramSchedule
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            $ref: '#/definitions/FacilityConfigureSlot'
+        '400':
+          description: Invalid input
+        '404':
+          description: schedult for given facility and program not found
+        '401':
+          description: Unauthorized
+    post:
+      summary: configure slot for program in facility
+      operationId: configureSlotFacility
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              appointmentSchedule:
+                type: array
+                items:
+                  "$ref": "#/definitions/FacilityAppointmentSchedule"
+              walkInSchedule:
+                type: array
+                items:
+                  "$ref": "#/definitions/FacilityWalkInSchedule"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+    put:
+      summary: update schedule for program in facility
+      operationId: updateFacilityProgramSchedule
+      security:
+        - hasRole: ["facility-admin"]
+      parameters:
+        - name: facilityId
+          in: path
+          required: true
+          type: string
+          description: Id of facility
+        - name: programId
+          in: path
+          required: true
+          type: string
+          description: Id of program
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              appointmentSchedule:
+                type: array
+                x-omitempty: true
+                items:
+                  "$ref": "#/definitions/FacilityAppointmentSchedule"
+              walkInSchedule:
+                type: array
+                x-omitempty: true
+                items:
+                  "$ref": "#/definitions/FacilityWalkInSchedule"
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+  /analytics:
+    get:
+      summary: Get analytics query
+      operationId: getAnalytics
+      security:
+        - hasRole: ["admin", "monitoring"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+  /public:
+    get:
+      summary: Get public analytics query
+      operationId: getPublicAnalytics
+      security: []
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+
+  /facility/uploads:
+    get:
+      summary: Get all file uploads for facilties for given facility admin
+      operationId: getFacilityUploads
+      security:
+        - hasRole: ['admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /facility/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getFacilityUploadsErrors
+      security:
+        - hasRole: [ 'admin' ]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: facility upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+  /enrollments/uploads:
+    get:
+      summary: Get Enrollments uploads
+      operationId: getEnrollmentUploadHistory
+      security:
+        - hasRole: ['admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /enrollments/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getEnrollmentsUploadsErrors
+      security:
+        - hasRole: [ 'admin' ]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: enrollments upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+  /vaccinators/uploads:
+    get:
+      summary: Get Vaccinators uploads
+      operationId: getVaccinatorsUploadHistory
+      security:
+        - hasRole: ["facility-admin", "admin"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+  /vaccinators/uploads/{uploadId}/errors:
+    get:
+      summary: Get all the error rows associated with given uploadId
+      operationId: getVaccinatorsUploadsErrors
+      security:
+        - hasRole: ["facility-admin", "admin"]
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: vaccinators upload for given uploadID not found
+        '403':
+          description: Forbidden for user
+
+
+definitions:
+  FacilityUpdateRequest:
+    type: array
+    items:
+      type: object
+      properties:
+        osid:
+          type: string
+        status:
+          type: string
+        facilityName:
+          type: string
+          title: Facility Name
+        address:
+          "$ref": "#/definitions/Address"
+          title: Address
+        geoLocation:
+          type: string
+          title: Geo Location
+        websiteUrl:
+          type: string
+          title: Website URL
+        contact:
+          type: string
+          title: Contact number
+        email:
+          type: string
+          title: Facility Email
+        operatingHourStart:
+          type: string
+          title: Operating hours start of day
+        operatingHourEnd:
+          type: string
+          title: Operating hours end of day
+        category:
+          type: string
+          title: Category
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              status:
+                type: string
+              rate:
+                type: number
+              schedule:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  startTime:
+                    type: string
+                  endTime:
+                    type: string
+  ProgramRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      description:
+        type: string
+      logoURL:
+        type: string
+      startDate:
+        type: string
+        format: date
+      endDate:
+        type: string
+        format: date
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
+  ProgramUpdateRequest:
+    allOf:
+      - $ref: "#/definitions/ProgramRequest"
+      - properties:
+          osid:
+            type: string
+  UpdateMedicineRequest:
+    allOf:
+      - $ref: "#/definitions/CreateMedicineRequest"
+      - properties:
+          osid:
+            type: string
+  CreateMedicineRequest:
+    type: object
+    properties:
+      name:
+        type: string
+      provider:
+        type: string
+      vaccinationMode:
+        type: string
+        enum: ["muscular injection", "oral", "nasal"]
+      doseIntervals:
+        type: array
+        items:
+          type: object
+          properties:
+            osid:
+              type: string
+            min:
+              type: integer
+            max:
+              type: integer
+      effectiveUntil:
+        type: integer
+        description: Effective until n days after the last dose
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      price:
+        type: number
+        description: Indicative price if fixed or max price available.
+  PublicFacility:
+    properties:
+      osid:
+        type: string
+        title: Facility uuid
+      facilityCode:
+        type: string
+        title: Facility Code
+      facilityName:
+        type: string
+        title: Facility Name
+      address:
+        "$ref": "#/definitions/Address"
+        title: Address
+      geoLocation:
+        type: string
+        title: Geo Location
+      websiteUrl:
+        type: string
+        title: Website URL
+      operatingHourStart:
+        type: string
+        title: Operating hours start of day
+      operatingHourEnd:
+        type: string
+        title: Operating hours end of day
+      category:
+        type: string
+        title: Category
+        enum:
+          - GOVT
+          - PRIVATE
+      type:
+        type: string
+        title: Type of Facility
+        enum:
+          - Fixed location
+          - Mobile
+          - Both
+      averageRating:
+        type: number
+        title: Average Rating
+        description: Average Rating of Facility 0 to 5, 0 for no rating.
+        default: 0
+      status:
+        type: string
+        title: Status of Facility
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            programId:
+              type: string
+            name:
+              type: string
+            status:
+              type: string
+            rate:
+              type: number
+            statusUpdatedAt:
+              type: string
+            rateUpdatedAt:
+              type: string
+            schedule:
+                type: object
+                properties:
+                  days:
+                    type: array
+                    items:
+                      type: string
+                  startTime:
+                    type: string
+                  endTime:
+                    type: string
+  Facility:
+    properties:
+      serialNum:
+        type: integer
+        title: Serial Number
+      facilityCode:
+        type: string
+        title: Facility Code
+      facilityName:
+        type: string
+        title: Facility Name
+      address:
+        "$ref": "#/definitions/Address"
+        title: Address
+      geoLocation:
+        type: string
+        title: Geo Location
+      websiteUrl:
+        type: string
+        title: Website URL
+      contact:
+        type: string
+        title: Contact number
+      email:
+        type: string
+        title: Facility Email
+      operatingHourStart:
+        type: string
+        title: Operating hours start of day
+      operatingHourEnd:
+        type: string
+        title: Operating hours end of day
+      category:
+        type: string
+        title: Category
+        enum:
+          - GOVT
+          - PRIVATE
+      type:
+        type: string
+        title: Type of Facility
+        enum:
+          - Fixed location
+          - Mobile
+          - Both
+      averageRating:
+        type: number
+        title: Average Rating
+        description: Average Rating of Facility 0 to 5, 0 for no rating.
+        default: 0
+      status:
+        type: string
+        title: Status of Facility
+        enum:
+          - Active
+          - Inactive
+          - Blocked
+      admins:
+        type: array
+        items:
+          "$ref": "#/definitions/FacilityAdmin"
+      stamp:
+        type: string
+      programs:
+        type: array
+        items:
+          type: object
+          properties:
+            programId:
+              type: string
+            name:
+              type: string
+            status:
+              type: string
+            rate:
+              type: number
+            statusUpdatedAt:
+              type: string
+            rateUpdatedAt:
+              type: string
+  Address:
+    type: object
+    title: Address
+    description: Indian address format
+    example:
+      - addressLine1: no. 23, some lane, some road
+        addressLine2: some nagar
+        district: bangalore south
+        state: Karnataka
+        pincode: 560000
+    required:
+      - addressLine1
+      - addressLine2
+      - district
+      - state
+      - pincode
+    properties:
+      addressLine1:
+        type: string
+      addressLine2:
+        type: string
+      district:
+        type: string
+      pincode:
+        type: integer
+      state:
+        type: string
+        title: The state schema
+        description: State of address
+        example:
+          - Karnataka
+  Vaccinator:
+    type: object
+    title: The Vaccinator Schema
+    required:
+      - code
+      - nationalIdentifier
+      - name
+      - facilityIds
+      - mobileNumber
+      - averageRating
+      - trainingCertificate
+      - status
+    properties:
+      signatures:
+        type: array
+        items:
+          "$ref": Signature.json#/definitions/Signature
+      signatureString:
+        type: string
+      code:
+        type: string
+      nationalIdentifier:
+        type: string
+      name:
+        type: string
+        title: Full name
+      email:
+        type: string
+        title: vaccinator email
+      facilityIds:
+        type: array
+        items:
+          type: string
+      mobileNumber:
+        type: string
+        maxLength: 10
+        minLength: 10
+      averageRating:
+        type: number
+      trainingCertificate:
+        type: string
+      status:
+        type: string
+        enum:
+          - Active
+          - Inactive
+      programs:
+        type: array
+        items:
+          type: object
+          required:
+            - certified
+          properties:
+            programId:
+              type: string
+              title: Id of the program
+            status:
+              type: string
+              enum:
+                - Active
+                - Inactive
+            certified:
+              type: boolean
+              title: if vaccinator has certificate for program
+  VaccinatorUpdateRequest:
+    type: array
+    items:
+      type: object
+      required:
+        - osid
+      properties:
+        osid:
+          type: string
+        signatureString:
+          type: string
+        code:
+          type: string
+        nationalIdentifier:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        facilityIds:
+          type: array
+          x-omitempty: true
+          items:
+            type: string
+        mobileNumber:
+          type: string
+          maxLength: 10
+          minLength: 10
+        averageRating:
+          type: number
+        trainingCertificate:
+          type: string
+        status:
+          type: string
+          enum:
+            - Active
+            - Inactive
+        programs:
+          type: array
+          items:
+            type: object
+            properties:
+              programId:
+                type: string
+              status:
+                type: string
+                enum:
+                  - Active
+                  - Inactive
+              certified:
+                type: boolean
+  Program:
+    type: object
+    title: Program
+    required:
+      - name
+      - description
+      - startDate
+    properties:
+      name:
+        type: string
+        title: Name
+      description:
+        type: string
+        title: Description
+      logoURL:
+        type: string
+        title: Logo URL
+      startDate:
+        type: string
+        title: Start Date
+        format: date
+      endDate:
+        type: string
+        title: End Date
+        format: date
+      status:
+        type: string
+        title: Status
+        enum:
+          - Active
+          - Inactive
+      medicineIds:
+        type: array
+        items:
+          type: string
+  FacilityAdmin:
+    properties:
+      name:
+        type: string
+        title: Facility Admin Name
+      mobile:
+        type: string
+        title: Facility Admin Mobile Number
+      status:
+        type: string
+        title: Facility Admin Status
+  FacilityUser:
+    properties:
+      id:
+        type: string
+        title: Facility User Id
+      osid:
+        type: string
+        title: Osid of the user stored in Facility Entity
+      name:
+        type: string
+        title: Facility User Name
+      mobileNumber:
+        type: string
+        title: Facility User Mobile Number
+      employeeId:
+        type: string
+        title: Facility User Id
+      email:
+        type: string
+        title: Email of User
+      enabled:
+        type: boolean
+        title: enable/disable user
+      vaccinationRateLimits:
+        type: array
+        items:
+          "$ref": "#/definitions/VaccinationRateLimit"
+      groups:
+        type: array
+        items:
+          "$ref": "#/definitions/UserGroup"
+  VaccinationRateLimit:
+    properties:
+      programName:
+        type: string
+        title: Program Name
+      rateLimit:
+        type: integer
+        title: Maximum rate of vaccination
+  UserGroup:
+    properties:
+      id:
+        type: string
+        title: group id
+      name:
+        type: string
+        title: group name
+  FacilityConfigureSlot:
+    type: object
+    properties:
+      facilityId:
+        type: string
+      programId:
+        type: string
+      appointmentSchedule:
+        type: array
+        items:
+          "$ref": "#/definitions/FacilityAppointmentSchedule"
+      walkInSchedule:
+        type: array
+        items:
+          "$ref": "#/definitions/FacilityWalkInSchedule"
+  FacilityAppointmentSchedule:
+    properties:
+      startTime:
+        type: string
+      endTime:
+        type: string
+      days:
+        type: array
+        items:
+          type: object
+          properties:
+            day:
+              type: string
+              title: day (mon, tue, wed, thr, fri, sat, sun)
+            maxAppointments:
+              type: integer
+              title: Maximum appointment per day
+  FacilityWalkInSchedule:
+    properties:
+      days:
+        type: array
+        items:
+          type: string
+          title: day (mon, tue, wed, thr, fri, sat, sun)
+      startTime:
+        type: string
+      endTime:
+        type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message
+host: 52.172.216.52
+schemes:
+  - https
+basePath: /divoc/admin/api/v1

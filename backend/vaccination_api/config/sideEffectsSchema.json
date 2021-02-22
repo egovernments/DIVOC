@@ -1,0 +1,109 @@
+{
+  "schema": {
+    "properties": {
+      "Flu-like symptoms": {
+        "type": "boolean",
+        "title": "Flu-like symptoms",
+        "enumNames": ["Yes", "No"]
+      },
+      "Temperature": {
+        "type": "number",
+        "title": "Temperature",
+        "minimum": 90,
+        "maximum": 108,
+        "multipleOf": 0.1,
+        "unit": "°F"
+      },
+      "Rapid Heartbeat": {
+        "type": "boolean",
+        "title": "Rapid Heartbeat",
+        "enumNames": ["Yes", "No"]
+      },
+      "Fatigue": {
+        "type": "boolean",
+        "title": "Fatigue",
+        "enumNames": ["Yes", "No"]
+      },
+      "Headache": {
+        "type": "boolean",
+        "title": "Headache",
+        "enumNames": ["Yes", "No"]
+      },
+      "Muscle/Joint Pain": {
+        "type": "boolean",
+        "title": "Muscle/Joint Pain",
+        "enumNames": ["Yes", "No"]
+      },
+      "Chills": {
+        "type": "boolean",
+        "title": "Chills",
+        "enumNames": ["Yes", "No"]
+      },
+      "Cough": {
+        "type": "boolean",
+        "title": "Cough",
+        "enumNames": ["Yes", "No"]
+      },
+      "Paralysis": {
+        "type": "boolean",
+        "title": "Paralysis",
+        "enumNames": ["Yes", "No"]
+      },
+      "Arm Soreness": {
+        "type": "boolean",
+        "title": "Arm Soreness",
+        "enumNames": ["Yes", "No"]
+      },
+      "Nausea": {
+        "type": "boolean",
+        "title": "Nausea",
+        "enumNames": ["Yes", "No"]
+      },
+      "Migraine": {
+        "type": "boolean",
+        "title": "Migraine",
+        "enumNames": ["Yes", "No"]
+      },
+      "Swollen Glands": {
+        "type": "boolean",
+        "title": "Swollen Glands",
+        "enumNames": ["Yes", "No"]
+      }
+    },
+    "dependencies": {
+      "Muscle/Joint Pain": {
+        "oneOf": [
+          {
+            "properties": {
+              "Muscle/Joint Pain": {"enum": [false]}
+            }
+          },
+          {
+            "properties": {
+              "Muscle/Joint Pain": {"enum": [true]},
+              "Pain Scale": {
+                "type": "number",
+                "title": "Pain Scale",
+                "minimum": 0,
+                "maximum": 10,
+                "multipleOf": 1,
+                "unit": ""
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "uiSchema": {
+    "Temperature": {
+      "ui:options": {"label": false},
+      "ui:widget": "range"
+    },
+    "Pain Scale": {
+      "ui:options": {"label": false},
+      "ui:widget": "range"
+    },
+    "ui:order": ["Temperature","*","Muscle/Joint Pain","Pain Scale"]
+  }
+}

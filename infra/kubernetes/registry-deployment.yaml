@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (HEAD)
+  labels:
+    k8s-app: registry
+  name: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (HEAD)
+      labels:
+        k8s-app: registry
+    spec:
+      containers:
+        - env:
+            - name: connectionInfo_password
+              value: postgres
+            - name: connectionInfo_uri
+              value: jdbc:postgresql://172.31.25.17:5432/postgres
+            - name: connectionInfo_username
+              value: postgres
+          image: dockerhub/registry-es:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: 500m
+              memory: 2Gi
+#            limits:
+#              cpu: 500m
+          name: registry
+          ports:
+            - containerPort: 8081
+      restartPolicy: Always
+

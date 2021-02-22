@@ -1,0 +1,17 @@
+---
+---
+
+@import "{{ site.theme }}";
+
+a {
+  color:#2f9c92;
+  font-weight:bold;
+  text-decoration:none;
+}
+
+p.focus {
+  font-weight:bold;
+  font-size:large;
+  background-color:#ddc87a4b;
+}
+

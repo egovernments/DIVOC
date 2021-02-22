@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="{{ site.lang | default: "en-US" }}">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+{% seo %}
+    <link rel="stylesheet" href="{{ "/assets/css/style.css?v=" | append: site.github.build_revision | relative_url }}">
+    <!--[if lt IE 9]>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <img src="resources/divoc-logo.png" alt="DIVOC Logo" width="91px" height="25px"/>
+
+        <p>Digital Infrastructure for Vaccination and Open Certification. An open source digital platform for large scale vaccination rollouts.</p>
+
+        <p class="view"><a href="/DIVOC/">Docs Home</a></p>
+        <p class="view"><a href="/DIVOC/presentations.html">Presentations</a></p>
+        <p class="view"><a href="/DIVOC/sw-docs.html">Software Docs</a></p>
+        <p class="view"><a href="/DIVOC/faqs.html">FAQs</a></p>
+        <p class="view"><a href="/DIVOC/about.html">About</a></p>
+        <p><hr></hr></p>
+        <p class="view"><a class="buttons github" href="https://github.com/egovernments/DIVOC/discussions">Discussions</a></p>
+        <p class="view"><a class="buttons github" href="{{ site.github.repository_url }}">Project Repo</a></p>
+        
+      </header>
+    
+      <section>
+
+      {{ content }}
+
+      </section>
+ 
+      <footer>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="{{ "/assets/js/scale.fix.js" | relative_url }}"></script>
+    {% if site.google_analytics %}
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+      ga('create', '{{ site.google_analytics }}', 'auto');
+      ga('send', 'pageview');
+    </script>
+    {% endif %}
+  </body>
+</html>

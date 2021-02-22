@@ -1,0 +1,58 @@
+swagger: '2.0'
+info:
+  version: '1.0.0'
+  title: Notification service
+  description: Notification service to integrate with DIVOC
+
+securityDefinitions:
+  hasRole:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/auth'
+    tokenUrl: 'https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/token'
+    scopes:
+      admin: scope of super admin
+      facility-admin: scope of facility admin
+      facility-staff: scope of facility staff
+
+security: []
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /notification:
+    post:
+      tags:
+        - notification
+      summary: Notify the intended person using different channels
+      description: Common notification service for different channels like eSMS, email etc. Target address can depict specifics about mode and channel
+      parameters:
+        - in: body
+          name: body
+          schema:
+            $ref: '#/definitions/NotificationRequest'
+      responses:
+        200:
+          description: OK
+definitions:
+  NotificationRequest:
+    type: object
+    required:
+      - recipient
+      - message
+    properties:
+      recipient:
+        type: string
+        description: this can use address like tel:234343434 or mailto:user@example.com
+      message:
+        type: string
+      subject:
+        type: string
+      #attachment:
+      #  type:
+
+host: divoc.k8s.sandboxaddis.com
+basePath: /divoc/notification-service/v1
+schemes:
+  - https

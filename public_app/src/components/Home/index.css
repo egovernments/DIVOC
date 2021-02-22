@@ -1,0 +1,231 @@
+.home-section {
+}
+
+.home-section .section .title{
+    font-size: 3rem;
+    padding: 0 10rem;
+    text-align: center;
+    font-weight: bold;
+}
+
+.welcome-wrapper {
+    height: 70%;
+}
+
+.welcome-title-wrapper {
+    width: 55%;
+    padding: 4rem 5rem;
+}
+
+.welcome-title {
+    font-size: 25px;
+}
+
+.welcome-subtitle {
+    font-size: 35px;
+}
+
+.welcome-image-wrapper {
+    width: 45%;
+}
+
+.welcome-image-wrapper img {
+    height: 80%;
+}
+
+.certificate-wrapper {
+    height: 30%;
+    background: #FFFBF0;
+    padding: 0 5rem;
+}
+
+.facilities-wrapper {
+}
+
+.login-button {
+    background: transparent linear-gradient(90deg, #2CD889 0%, #4CA07A 100%) 0 0 no-repeat padding-box;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 3rem;
+}
+
+.outline-button {
+    padding: 0.5rem 3rem;
+    border-radius: 4px;
+    border: 2px solid #4E67D1;
+    color: #4e67d1;
+}
+
+.yellow-outline {
+    border: 2px solid #DE9D00;
+    color: #DE9D00;
+}
+
+.download-certificate-button {
+    background: transparent linear-gradient(91deg, #59BCF9 0%, #4E67D1 100%) 0 0 no-repeat padding-box;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+}
+
+.certificate-info-wrapper {
+    width: 60%;
+    padding: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.certificate-img-rapper {
+    width: 40%;
+}
+
+.half-section {
+}
+
+.divoc-video-wrapper {
+    width: 50%;
+    background: #040E28;
+}
+
+.divoc-info-wrapper {
+    width: 50%;
+    padding: 3rem;
+    background-color: #F8F8F8;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+.updates-section {
+    background: #F8FBFF;
+    padding: 5rem;
+    height: 60vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.latest-update-nav-btn {
+    background: white;
+    color: #2CD889;
+    border: none;
+    font-size: 20px;
+}
+
+.footer-section {
+    height: 12vh;
+    border-top: 1px solid #d3d3d3;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.footer-gov-logo {
+    width: 25%;
+    margin: 0 5px;
+}
+
+.footer-link {
+    color: #040E28;
+    margin: 0 5px;
+}
+
+.dashboard-section {
+}
+
+.dashboard-subtitle {
+    padding-left: 15rem;
+    padding-right: 15rem;
+    text-align: center;
+}
+
+@media (max-width: 961px) {
+    .home-section .section {
+        height: 100%;
+    }
+    .home-section .section .title{
+        font-size: 16px;
+        padding: 0 1rem;
+    }
+    .welcome-wrapper {
+        height: 100%;
+        flex-direction: column-reverse;
+    }
+
+    .welcome-title-wrapper {
+        width: 100%;
+        padding: 0;
+    }
+
+    .welcome-title {
+        font-size: 15px;
+    }
+
+    .welcome-subtitle {
+        font-size: 25px;
+    }
+
+    .welcome-image-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .welcome-image-wrapper img {
+        width: 70%;
+    }
+
+    .dashboard-subtitle {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .certificate-wrapper {
+        padding: 1rem;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .certificate-img-rapper {
+        width: 100%;
+    }
+
+    .certificate-info-wrapper {
+        width: 100%;
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .half-section {
+        height: 100%;
+    }
+
+    .divoc-info-wrapper {
+        width: 100%;
+        padding: 2rem 0;
+        justify-content: center;
+        align-items: center;
+    }
+    .divoc-info-wrapper img{
+        width: 50%;
+    }
+    .divoc-video-wrapper {
+        width: 100%;
+
+    }
+    .dashboard-section {
+        height: 100%;
+    }
+    .updates-section{
+        height: 100%;
+        padding: 0;
+    }
+    .outline-button {
+        padding: 0.5rem 1rem;
+        font-size: 12px;
+    }
+}

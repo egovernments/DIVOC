@@ -1,0 +1,17 @@
+.a {
+  fill: gray;
+
+  .b {
+    clip-path: url(#a);
+  }
+}
+
+.active {
+  .a {
+    fill: #2CD889;
+  }
+}
+
+
+
+

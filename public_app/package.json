@@ -1,0 +1,71 @@
+{
+  "name": "certificate_app",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@material-ui/core": "^4.11.2",
+    "@react-keycloak/web": "^3.4.0",
+    "@rjsf/core": "^2.4.0",
+    "@testing-library/jest-dom": "^5.11.6",
+    "@testing-library/react": "^11.2.2",
+    "@testing-library/user-event": "^12.3.0",
+    "axios": "^0.21.1",
+    "bootstrap": "^4.5.3",
+    "date-fns": "^2.16.1",
+    "downloadjs": "^1.4.7",
+    "html-to-image": "^1.3.20",
+    "jsonld-signatures": "^6.0.0",
+    "jszip": "^3.5.0",
+    "jwt-decode": "^3.1.2",
+    "keycloak-js": "^11.0.3",
+    "leaflet": "^1.7.1",
+    "lodash.throttle": "^4.1.1",
+    "prop-types": "^15.7.2",
+    "pure-react-carousel": "^1.27.6",
+    "qrcode.react": "^1.0.0",
+    "ramda": "^0.27.1",
+    "react": "^17.0.1",
+    "react-bootstrap": "^1.4.0",
+    "react-cookie": "^4.0.3",
+    "react-datepicker": "^3.4.1",
+    "react-dom": "^17.0.1",
+    "react-dropdown": "^1.9.0",
+    "react-hooks-helper": "^1.6.0",
+    "react-leaflet": "^3.0.4",
+    "react-pdf": "^5.1.0",
+    "react-qr-reader": "^2.2.1",
+    "react-redux": "^7.2.2",
+    "react-router-dom": "^5.2.0",
+    "react-scripts": "4.0.1",
+    "react-tabs": "^3.1.1",
+    "redux": "^4.0.5",
+    "vaccination-context": "^1.0.7",
+    "web-vitals": "^0.2.4",
+    "zbar.wasm": "^2.0.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "proxy": "https://divoc.k8s.sandboxaddis.com"
+}

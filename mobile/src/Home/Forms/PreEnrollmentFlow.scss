@@ -1,0 +1,19 @@
+.pre-enrollment-container {
+  height: 100%;
+  margin: 2rem 1rem 0.2rem;
+  overflow: auto;
+  .action-btn {
+    padding: 0.5rem 2rem;
+  }
+  .form-label {
+    font-size: 20px;
+    font-weight: bold;
+  }
+  .form-control {
+    border-color: #4CA07A;
+    text-align: center;
+    padding: 2rem 0;
+    font-size: 20px;
+    margin-top: 1rem;
+  }
+}

@@ -1,0 +1,11 @@
+---
+
+- name: Install Zookeeper
+  include: build.yml
+  tags:
+    - build
+
+- name: Configure Zookeeper
+  include: configure.yml
+  tags:
+    - configure

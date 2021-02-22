@@ -1,0 +1,10 @@
+.loader-wrapper {
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10;
+    background: rgb(222 226 230 / 60%);
+}

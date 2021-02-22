@@ -1,0 +1,17 @@
+kafka:
+  bootstrapServers: localhost
+  certifyTopic: certify
+  notifyTopic: notify
+
+smsapi:
+  url: https://api.msg91.com/api/v2/sendsms
+  authKey: secret
+  enable: true
+
+emailsmtp:
+  fromAddress: from@gmail.com
+  password: secret
+  enable: true
+
+flagr:
+  url: https://divoc.k8s.sandboxaddis.com/config

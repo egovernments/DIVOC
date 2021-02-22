@@ -1,0 +1,19 @@
+---
+
+- name: start zookeeper
+  become: yes
+  service:
+    name: zookeeper
+    state: started
+
+- name: stop zookeeper
+  become: yes
+  service:
+    name: zookeeper
+    state: stopped
+
+- name: restart zookeeper
+  become: yes
+  service:
+    name: zookeeper
+    state: restarted

@@ -1,0 +1,24 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-vaccination-api
+  annotations:
+    # use the shared ingress-nginx
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  rules:
+  - host: "perf-divoc.k8s.sandboxaddis.com"
+    http:
+      paths:
+      - path: /divoc
+        backend:
+          serviceName: vaccination-api
+          servicePort: 8000
+      - path: /auth
+        backend:
+          serviceName: keycloak-service
+          servicePort: 8080
+      - path: /cert
+        backend:
+          serviceName: digilocker-support-api
+          servicePort: 8003

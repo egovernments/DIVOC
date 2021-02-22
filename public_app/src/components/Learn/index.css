@@ -1,0 +1,77 @@
+.learn-container {
+    width: 100%;
+}
+
+.video-container {
+}
+
+.video-section {
+    width: 100%;
+}
+
+.video-info-wrapper {
+    width: 100%;
+}
+
+.video-wrapper {
+    width: 100%;
+    background: black;
+}
+
+.related-video {
+    width: 100%;
+}
+
+.related-video-item {
+    background: #F8F8F8;
+}
+
+.related-video img {
+    width: 100%;
+}
+
+.related-video .related-image {
+    padding: 0;
+}
+
+.play-icon {
+    position: absolute;
+    top: 25%;
+    height: 50%;
+    left: 0;
+    text-align: center;
+}
+
+.related-text {
+    text-align: center;
+    height: 100%;
+}
+
+.bottom-container {
+}
+
+@media (min-width: 961px) {
+    .video-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .video-wrapper {
+        height: 100%;
+        margin-left: 8px;
+    }
+
+    .video-section {
+        display: flex;
+        flex-direction: column-reverse;
+    }
+
+    .bottom-container {
+        display: flex;
+        flex-direction: row;
+    }
+
+    .small-info-card-wrapper {
+        margin: 8px;
+    }
+}

@@ -1,0 +1,77 @@
+.container {
+    color: #4D4F5C;
+    border-radius: 10px;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.add-vaccinator-button {
+    border: 1px solid #5C9EF8;
+    border-radius: 6px;
+    letter-spacing: 1.5px;
+    color: #5C9EF8;
+    white-space: nowrap;
+    margin: 15px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0.5em 2em;
+    background-color: white;
+}
+
+.vaccinator-name {
+    color: #5C9EF8;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.assign-button {
+    border-radius: 14px;
+    color: white;
+    letter-spacing: 1px;
+    max-width: 100px;
+    white-space: nowrap;
+    margin: auto;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 12px;
+    padding: 0.5em 2em;
+    background-color: #5C9EF8;
+}
+
+.title-vaccinator {
+    font-weight: 500;
+    font-size: 1em;
+    color: #1D1D1D;
+}
+
+.vaccinator-list-container {
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    width: 100%;
+}
+
+.MuiSwitch-input {
+    color: #2CD889;
+}
+
+.table {
+    box-shadow: none !important;
+    border-radius: 10px;
+}
+
+.table > tbody > td,
+.table > thead > tr > th {
+    border: 0 !important
+}
+
+.table thead th {
+    font-size: 12px;
+    font-weight: bold;
+    width: 250px;
+    color: #646D82;
+}
+
+.table td {
+    vertical-align: middle;
+}
