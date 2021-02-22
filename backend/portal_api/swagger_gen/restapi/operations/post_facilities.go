@@ -31,7 +31,7 @@ func NewPostFacilities(ctx *middleware.Context, handler PostFacilitiesHandler) *
 	return &PostFacilities{Context: ctx, Handler: handler}
 }
 
-/*PostFacilities swagger:route POST /facilities postFacilities
+/* PostFacilities swagger:route POST /facilities postFacilities
 
 Upload facility csv for bulk ingestion
 
@@ -47,7 +47,6 @@ func (o *PostFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewPostFacilitiesParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *PostFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

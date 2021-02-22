@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -29,6 +30,29 @@ func (m FacilityUpdateRequest) Validate(formats strfmt.Registry) error {
 
 		if m[i] != nil {
 			if err := m[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName(strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// ContextValidate validate this facility update request based on the context it is used
+func (m FacilityUpdateRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	for i := 0; i < len(m); i++ {
+
+		if m[i] != nil {
+			if err := m[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName(strconv.Itoa(i))
 				}
@@ -105,7 +129,6 @@ func (m *FacilityUpdateRequestItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUpdateRequestItems0) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -123,7 +146,6 @@ func (m *FacilityUpdateRequestItems0) validateAddress(formats strfmt.Registry) e
 }
 
 func (m *FacilityUpdateRequestItems0) validatePrograms(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -135,6 +157,56 @@ func (m *FacilityUpdateRequestItems0) validatePrograms(formats strfmt.Registry) 
 
 		if m.Programs[i] != nil {
 			if err := m.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this facility update request items0 based on the context it is used
+func (m *FacilityUpdateRequestItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidatePrograms(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Programs); i++ {
+
+		if m.Programs[i] != nil {
+			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
 				}
@@ -198,13 +270,40 @@ func (m *FacilityUpdateRequestItems0ProgramsItems0) Validate(formats strfmt.Regi
 }
 
 func (m *FacilityUpdateRequestItems0ProgramsItems0) validateSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}
 
 	if m.Schedule != nil {
 		if err := m.Schedule.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("schedule")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this facility update request items0 programs items0 based on the context it is used
+func (m *FacilityUpdateRequestItems0ProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityUpdateRequestItems0ProgramsItems0) contextValidateSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Schedule != nil {
+		if err := m.Schedule.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("schedule")
 			}
@@ -250,6 +349,11 @@ type FacilityUpdateRequestItems0ProgramsItems0Schedule struct {
 
 // Validate validates this facility update request items0 programs items0 schedule
 func (m *FacilityUpdateRequestItems0ProgramsItems0Schedule) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this facility update request items0 programs items0 schedule based on context it is used
+func (m *FacilityUpdateRequestItems0ProgramsItems0Schedule) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

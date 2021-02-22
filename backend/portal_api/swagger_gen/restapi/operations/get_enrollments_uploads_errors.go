@@ -31,7 +31,7 @@ func NewGetEnrollmentsUploadsErrors(ctx *middleware.Context, handler GetEnrollme
 	return &GetEnrollmentsUploadsErrors{Context: ctx, Handler: handler}
 }
 
-/*GetEnrollmentsUploadsErrors swagger:route GET /enrollments/uploads/{uploadId}/errors getEnrollmentsUploadsErrors
+/* GetEnrollmentsUploadsErrors swagger:route GET /enrollments/uploads/{uploadId}/errors getEnrollmentsUploadsErrors
 
 Get all the error rows associated with given uploadId
 
@@ -47,7 +47,6 @@ func (o *GetEnrollmentsUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.
 		r = rCtx
 	}
 	var Params = NewGetEnrollmentsUploadsErrorsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetEnrollmentsUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
