@@ -136,12 +136,12 @@ services:
       - "8002:8002"
     environment:
       REDIS_URL: redis://redis:6379
-      AUTH_PRIVATE_KEY:
-      AUTH_PUBLIC_KEY:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # in min
+      CACHE_TTL: 60
       AUTH_PRIVATE_KEY: |
         -----BEGIN RSA PRIVATE KEY-----
         MIIEpAIBAAKCAQEA1mIX9SFluySnfIfT6Jz5LdORWO+O0j3L7cF+BLaAdX7JuiN1
