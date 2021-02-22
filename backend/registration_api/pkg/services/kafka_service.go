@@ -79,7 +79,6 @@ type NotificationRequest struct {
 }
 
 func PublishNotificationMessage(recipient string, subject string, message string) {
-	log.Info("Got the message ", message)
 	request := NotificationRequest{
 		Recipient: recipient,
 		Subject:   subject,

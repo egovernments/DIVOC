@@ -39,23 +39,23 @@ func StartRecipientsAppointmentBookingConsumer() {
 				if err == nil {
 					filter := map[string]interface{}{}
 					filter["code"] = map[string]interface{}{
-						"eq": recipientAppointmentMessage.Code,
+						"eq": recipientAppointmentMessage.EnrollmentCode,
 					}
 					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil {
 						appointmentTData := make(map[string]interface{})
 						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
 
-						appointmentTData["appointmentSlot"] = recipientAppointmentMessage.Time
+						appointmentTData["appointmentSlot"] = recipientAppointmentMessage.AppointmentTime
 						appointmentTData["osid"] = enrollment["osid"]
-						appointmentTData["appointmentDate"] = recipientAppointmentMessage.Date
-						appointmentTData["enrollmentScopeId"] = recipientAppointmentMessage.FacilityId
+						appointmentTData["appointmentDate"] = recipientAppointmentMessage.AppointmentDate
+						appointmentTData["enrollmentScopeId"] = recipientAppointmentMessage.FacilityCode
 
 						log.Infof("Message on %s: %v \n", msg.TopicPartition, appointmentTData)
 
 						_, err := kernelService.UpdateRegistry("Enrollment", appointmentTData)
 						if err == nil {
-							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, recipientAppointmentMessage.Date,
-								recipientAppointmentMessage.Time))
+							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, recipientAppointmentMessage.AppointmentDate,
+								recipientAppointmentMessage.AppointmentTime))
 							if err != nil {
 								log.Error("Unable to send notification to the enrolled user",  err)
 							}
@@ -97,8 +97,8 @@ func CreateEnrollmentFromInterface(enrollmentMap map[string]interface{}, appoint
 }
 
 type RecipientAppointmentMessage struct {
-	Code       string
-	FacilityId string
-	Date       string
-	Time       string
+	EnrollmentCode  string
+	FacilityCode    string
+	AppointmentDate string
+	AppointmentTime string
 }

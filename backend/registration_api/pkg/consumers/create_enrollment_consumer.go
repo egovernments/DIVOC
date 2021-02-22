@@ -34,7 +34,7 @@ func StartEnrollmentConsumer() {
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					err = services.CreateEnrollment(enrollment, 1)
+					err = services.CreateEnrollment(&enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
 						err = services.NotifyRecipient(enrollment)

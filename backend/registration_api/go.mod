@@ -3,7 +3,7 @@ module github.com/divoc/registration-api
 go 1.15
 
 require (
-	github.com/confluentinc/confluent-kafka-go v1.5.2
+	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
 	github.com/go-openapi/errors v0.19.7
@@ -13,6 +13,7 @@ require (
 	github.com/go-openapi/strfmt v0.19.8
 	github.com/go-openapi/swag v0.19.11
 	github.com/go-openapi/validate v0.19.12
+	github.com/go-redis/cache/v8 v8.3.1
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/jessevdk/go-flags v1.4.0
