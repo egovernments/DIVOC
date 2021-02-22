@@ -35,7 +35,6 @@ const defaultData = {
   "programId": "",
   "nationalId": "",
   "name": "",
-  "dob": "",
   "yob": "",
   "gender": "",
   "district": "",

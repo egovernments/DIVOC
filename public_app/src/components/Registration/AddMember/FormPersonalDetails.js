@@ -451,6 +451,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         delete dataToSend["state"];
         delete dataToSend["district"];
         delete dataToSend["contact"];
+        dataToSend["yob"] = parseInt(dataToSend["yob"]);
         dataToSend["address"] = {
             "addressLine1": "",
             "addressLine2": "",
