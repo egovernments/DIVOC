@@ -31,7 +31,7 @@ func NewCreateProgram(ctx *middleware.Context, handler CreateProgramHandler) *Cr
 	return &CreateProgram{Context: ctx, Handler: handler}
 }
 
-/* CreateProgram swagger:route POST /programs createProgram
+/*CreateProgram swagger:route POST /programs createProgram
 
 Create program
 
@@ -47,6 +47,7 @@ func (o *CreateProgram) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewCreateProgramParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *CreateProgram) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

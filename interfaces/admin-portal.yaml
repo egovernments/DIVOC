@@ -615,6 +615,23 @@ paths:
         '401':
           description: Unauthorized
 
+  /public/programs:
+    get:
+      summary: get program list for public
+      operationId: getProgramsForPublic
+      security: []
+      parameters:
+        - in: query
+          name: status
+          type: string
+          description: Status of the program (Active / Inactive)
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
   /facility/uploads:
     get:
       summary: Get all file uploads for facilties for given facility admin

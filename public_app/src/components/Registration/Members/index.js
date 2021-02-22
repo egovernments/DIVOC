@@ -9,11 +9,8 @@ import Card from "react-bootstrap/Card";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
 import Button from "react-bootstrap/Button";
-import IconLocation from "../../../assets/img/icon-location.svg"
-import IconTime from "../../../assets/img/icon-time.svg"
 import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
-import {pathOr} from "ramda";
 
 export const Members = () => {
     const history = useHistory();
@@ -46,9 +43,7 @@ export const Members = () => {
             history.push("/citizen")
         }
         const data = {
-            "entityContext": {
-
-            },
+            "entityContext": {},
             "flagKey": "country_specific_features"
         }
         axios
@@ -108,7 +103,7 @@ export const Members = () => {
     const MemberCard = (props) => {
         const member = props.member;
         const program = programs.filter(p => p.id === member.programId)[0];
-        const appointment = JSON.parse(localStorage.getItem(member.code));
+        const isAppointmentBooked = !!member.enrollmentScopeId;
 
         function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
             return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -140,27 +135,27 @@ export const Members = () => {
                             </div>
                         </div>
                         {
-                            <div className={`d-flex ${appointment ? "justify-content-between" : "justify-content-end"} align-items-center`}>
-                                <Row
-                                    className={` justify-content-center align-items-center ${appointment ? "d-flex" : "d-none"}`}>
-                                    <Col lg={6}>
-                                        <img src={IconLocation}/>
-                                        <span
-                                            className="pl-2 pr-2">{pathOr("", ["facilityName"], appointment)} ,{formatAddress(pathOr({}, ["facilityAddress"], appointment))}</span>
+                            <div className={"w-100"}>
+                                <Row className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
+                                    <Col lg={isAppointmentBooked ? 12 : 6}
+                                         className={`${!isAppointmentBooked && "invisible"}`}>
+                                        <span style={{color: "#646D82"}}> Appointment: </span>
+                                        <span>{isAppointmentBooked && `${member.facilityDetails.facilityName}, ${member.facilityDetails.district}, ${member.facilityDetails.state}, ${member.facilityDetails.pincode}`}</span>
+                                        <br/>
+                                        <span className="invisible"> Appointment: </span>
+                                        <span className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
                                     </Col>
-                                    <Col lg={6}>
-                                        <img src={IconTime}/>
-                                        <span
-                                            className="pl-2 pr-2">{formatDate(pathOr({}, ["allotmentDate"], appointment))}
-                                            <br/>{getTime(pathOr("", ["allotmentTime"], appointment))} - {getTime(pathOr("", ["allotmentTime"], appointment) + 1)}</span>
+                                    <Col lg={6} className="d-flex justify-content-end">
+                                        <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "d-none"}`}
+                                                      onClick={() => {
+                                                          history.push({
+                                                              pathname: `/${member.code}/${member.programId}/appointment`,
+                                                              state: {name: member.name}
+                                                          })
+                                                      }}>{isAppointmentBooked ? "Edit" : "Book"}
+                                            <br/>Appointment</CustomButton>
                                     </Col>
                                 </Row>
-                                <CustomButton className="blue-btn m-0" onClick={() => {
-                                    history.push({
-                                        pathname: `/${member.code}/${member.programId}/appointment`,
-                                        state: {name: member.name}
-                                    })
-                                }}>{appointment ? "Edit" : "Book"} <br/>Appointment</CustomButton>
                             </div>
                         }
                     </Card.Body>

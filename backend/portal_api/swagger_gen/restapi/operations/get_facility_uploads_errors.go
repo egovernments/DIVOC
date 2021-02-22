@@ -31,7 +31,7 @@ func NewGetFacilityUploadsErrors(ctx *middleware.Context, handler GetFacilityUpl
 	return &GetFacilityUploadsErrors{Context: ctx, Handler: handler}
 }
 
-/* GetFacilityUploadsErrors swagger:route GET /facility/uploads/{uploadId}/errors getFacilityUploadsErrors
+/*GetFacilityUploadsErrors swagger:route GET /facility/uploads/{uploadId}/errors getFacilityUploadsErrors
 
 Get all the error rows associated with given uploadId
 
@@ -47,6 +47,7 @@ func (o *GetFacilityUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.Req
 		r = rCtx
 	}
 	var Params = NewGetFacilityUploadsErrorsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetFacilityUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.Req
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

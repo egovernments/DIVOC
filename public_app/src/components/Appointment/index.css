@@ -61,3 +61,42 @@
     height: 53vh;
     overflow: auto;
 }
+.slot-booking-btn {
+    color: #65E8AC !important;
+    border-color: #65E8AC !important;
+    width: 5rem;
+    border-width: 2px !important;
+    font-weight: bold !important;
+}
+.slot-booking-btn:hover {
+    color: #fff !important;
+    border-color: #65E8AC !important;
+    background-color: #65E8AC !important;
+    width: 5rem
+}
+.slot-booking-btn-disabled {
+    opacity: 0.4;
+    cursor: not-allowed !important;
+}
+.slot-booking-header {
+    border-bottom: 1px solid #D8D8D8;
+    padding-bottom: 0.5rem;
+}
+
+.facility-list .badge {
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 25px;
+    margin: 0 5px;
+}
+
+.facility-list .purple {
+    background: #A7B8FF;
+}
+
+
+.facility-list .green {
+    background: #65E8AC;
+}
+

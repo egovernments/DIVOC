@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -34,7 +33,7 @@ func NewNotifyFacilities(ctx *middleware.Context, handler NotifyFacilitiesHandle
 	return &NotifyFacilities{Context: ctx, Handler: handler}
 }
 
-/* NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
+/*NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
 
 notify facilities
 
@@ -50,6 +49,7 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewNotifyFacilitiesParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -69,6 +69,7 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -87,11 +88,6 @@ type NotifyFacilitiesParamsBodyItems0 struct {
 
 // Validate validates this notify facilities params body items0
 func (o *NotifyFacilitiesParamsBodyItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this notify facilities params body items0 based on context it is used
-func (o *NotifyFacilitiesParamsBodyItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

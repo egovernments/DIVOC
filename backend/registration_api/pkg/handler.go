@@ -20,6 +20,7 @@ const FacilityEntity = "Facility"
 const EnrollmentEntity = "Enrollment"
 const LastInitializedKey = "LAST_FACILITY_SLOTS_INITIALIZED"
 const YYYYMMDD = "2006-01-02"
+const SlotsToReturn = 100
 
 var DaysMap = map[string]time.Weekday{
 	"Su": time.Sunday,
@@ -255,7 +256,6 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 }
 
 func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams) middleware.Responder {
-	const SlotsToReturn = 5
 	if paras.FacilityID == nil {
 		return operations.NewGenerateOTPBadRequest()
 	}
