@@ -27,6 +27,9 @@
         "nationalId": {
           "type": "string"
         },
+        "yob": {
+          "type": "integer"
+        },
         "dob": {
           "type": "string",
           "format": "date"

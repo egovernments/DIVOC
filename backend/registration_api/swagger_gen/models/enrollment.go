@@ -65,6 +65,9 @@ type Enrollment struct {
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
+
+	// yob
+	Yob int64 `json:"yob,omitempty"`
 }
 
 // Validate validates this enrollment
