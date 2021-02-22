@@ -577,8 +577,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId",
-        "dob"
+        "nationalId"
       ],
       "properties": {
         "address": {
