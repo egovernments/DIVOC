@@ -25,9 +25,13 @@ func GenerateEnrollmentCode(phoneNumber string) string {
 }
 
 func GenerateOTP() string {
-	n:=config.Config.Auth.OTPLength
-	otp := int(math.Pow10(n-1)) + rand.Intn(int(math.Pow10(n)-math.Pow10(n-1)))
-	return strconv.Itoa(otp)
+	if config.Config.MockOtp {
+		return "1234"
+	} else {
+		n := config.Config.Auth.OTPLength
+		otp := int(math.Pow10(n-1)) + rand.Intn(int(math.Pow10(n)-math.Pow10(n-1)))
+		return strconv.Itoa(otp)
+	}
 }
 
 //todo: move to notification service with priority as transactional

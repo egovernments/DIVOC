@@ -34,6 +34,7 @@ var Config = struct {
 		ChannelWorkers int `default:"10"`
 		ScheduleDays   int `default:"30"`
 	}
+	MockOtp bool `default:"true" env:"MOCK_OTP"`
 }{}
 
 func Initialize() {

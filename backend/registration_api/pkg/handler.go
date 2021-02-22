@@ -105,6 +105,9 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	otp := utils.GenerateOTP()
 	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
 	err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
+	if config.Config.MockOtp {
+		return operations.NewGenerateOTPOK()
+	}
 	if err == nil {
 		// Send SMS
 		if _, err := utils.SendOTP("+91", phone, otp); err == nil {
