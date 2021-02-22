@@ -871,26 +871,27 @@ func enrichResponseWithProgramDetails(response interface{}) []interface{}{
 
 	for _,objects := range responseArr {
 		obj := objects.(map[string]interface{})
-		programs := obj["programs"].([]interface{})
-		updatedPrograms := []interface{}{}
-		if programs != nil && len(programs) > 0 {
-			for _,obj := range programs {
-				program := obj.(map[string]interface{})
-				id := program["programId"].(string)
-				response, err := getProgramById(id, limit, offset)
-				if err != nil {
-					log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
-				} else {
-					responseArr := response["Program"].([]interface{})
-					if len(responseArr) != 0 {
-						program["name"] = responseArr[0].(map[string]interface{})["name"]
-						updatedPrograms = append(updatedPrograms, program)
+		if programs, ok := obj["programs"].([]interface{}); ok {
+			updatedPrograms := []interface{}{}
+			if programs != nil && len(programs) > 0 {
+				for _, obj := range programs {
+					program := obj.(map[string]interface{})
+					id := program["programId"].(string)
+					response, err := getProgramById(id, limit, offset)
+					if err != nil {
+						log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
+					} else {
+						responseArr := response["Program"].([]interface{})
+						if len(responseArr) != 0 {
+							program["name"] = responseArr[0].(map[string]interface{})["name"]
+							updatedPrograms = append(updatedPrograms, program)
+						}
 					}
 				}
+				obj["programs"] = updatedPrograms
 			}
-			obj["programs"] = updatedPrograms
+			results = append(results, obj)
 		}
-		results = append(results, obj)
 	}
 	return results
 }
