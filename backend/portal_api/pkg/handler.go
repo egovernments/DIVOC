@@ -63,6 +63,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.UpdateMedicineHandler = operations.UpdateMedicineHandlerFunc(updateMedicineHandler)
 	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
+	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
 }
 
 type GenericResponse struct {
@@ -904,7 +905,29 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 }
 
 func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
-	err := kernelService.CreateNewRegistry(params.Body, "FacilityProgramSlot")
+	// TODO: check if user and updated facility belongs to same facilityCode
+	var appointmentSchedule []*models.FacilityAppointmentSchedule
+	var walkInSchedule []*models.FacilityWalkInSchedule
+
+	if params.Body.AppointmentSchedule != nil {
+		appointmentSchedule = params.Body.AppointmentSchedule
+	} else {
+		appointmentSchedule = make([]*models.FacilityAppointmentSchedule, 0)
+	}
+
+	if params.Body.WalkInSchedule != nil {
+		walkInSchedule = params.Body.WalkInSchedule
+	} else {
+		walkInSchedule = make([]*models.FacilityWalkInSchedule, 0)
+	}
+
+	facilityProgramSlot := models.FacilityConfigureSlot{
+		FacilityID:          params.FacilityID,
+		ProgramID:           params.ProgramID,
+		AppointmentSchedule: appointmentSchedule,
+		WalkInSchedule:      walkInSchedule,
+	}
+	err := kernelService.CreateNewRegistry(facilityProgramSlot, "FacilityProgramSlot")
 	if err != nil {
 		log.Error(err)
 		return operations.NewConfigureSlotFacilityBadRequest()
@@ -912,29 +935,46 @@ func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacility
 	return operations.NewConfigureSlotFacilityOK()
 }
 
-func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, pricipal *models.JWTClaimBody) middleware.Responder {
-	entityType := "FacilityProgramSlot"
-	limit, offset := getLimitAndOffset(nil, nil)
-	filter := map[string]interface{}{
-		"facilityId": map[string]interface{}{
-			"eq": params.FacilityID,
-		},
-		"programId": map[string]interface{}{
-			"eq": params.ProgramID,
-		},
-	}
-	response, err := kernelService.QueryRegistry(entityType, filter, limit, offset)
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+	// TODO: check if user and updated facility belongs to same facilityCode
+
+	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
-		log.Errorf("Error in querying registry", err)
-		return model.NewGenericServerError()
+		return operations.NewGetFacilityProgramScheduleNotFound()
+	}
+	return model.NewGenericJSONResponse(response)
+}
+
+func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+	// TODO: check if user and updated facility belongs to same facilityCode
+
+	objectId := "FacilityProgramSlot"
+
+	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
+	if err != nil {
+		operations.NewUpdateFacilityProgramScheduleBadRequest()
+	}
+	osid := response["osid"].(string)
+
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		return operations.NewUpdateFacilityProgramScheduleBadRequest()
+	}
+	requestMap := make(map[string]interface{})
+	err = json.Unmarshal(requestBody, &requestMap)
+	if err != nil {
+		log.Info(err)
+		return NewGenericServerError()
+	}
+	requestMap["osid"] = osid
+
+	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if err != nil {
+		log.Error(err)
+		return operations.NewUpdateFacilityProgramScheduleBadRequest()
+	} else {
+		log.Print(resp)
+		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
 
-	respArr, ok := response[entityType].([]interface{})
-	if !ok {
-		return model.NewGenericServerError()
-	}
-	if len(respArr) > 0 {
-		return model.NewGenericJSONResponse(respArr[0])
-	}
-	return operations.NewGetFacilityProgramScheduleBadRequest()
 }

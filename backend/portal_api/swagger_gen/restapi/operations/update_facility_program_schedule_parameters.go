@@ -14,18 +14,18 @@ import (
 	"github.com/go-openapi/strfmt"
 )
 
-// NewConfigureSlotFacilityParams creates a new ConfigureSlotFacilityParams object
+// NewUpdateFacilityProgramScheduleParams creates a new UpdateFacilityProgramScheduleParams object
 // no default values defined in spec.
-func NewConfigureSlotFacilityParams() ConfigureSlotFacilityParams {
+func NewUpdateFacilityProgramScheduleParams() UpdateFacilityProgramScheduleParams {
 
-	return ConfigureSlotFacilityParams{}
+	return UpdateFacilityProgramScheduleParams{}
 }
 
-// ConfigureSlotFacilityParams contains all the bound params for the configure slot facility operation
+// UpdateFacilityProgramScheduleParams contains all the bound params for the update facility program schedule operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters configureSlotFacility
-type ConfigureSlotFacilityParams struct {
+// swagger:parameters updateFacilityProgramSchedule
+type UpdateFacilityProgramScheduleParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -33,7 +33,7 @@ type ConfigureSlotFacilityParams struct {
 	/*
 	  In: body
 	*/
-	Body ConfigureSlotFacilityBody
+	Body UpdateFacilityProgramScheduleBody
 	/*Id of facility
 	  Required: true
 	  In: path
@@ -49,15 +49,15 @@ type ConfigureSlotFacilityParams struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewConfigureSlotFacilityParams() beforehand.
-func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewUpdateFacilityProgramScheduleParams() beforehand.
+func (o *UpdateFacilityProgramScheduleParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body ConfigureSlotFacilityBody
+		var body UpdateFacilityProgramScheduleBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -88,7 +88,7 @@ func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middle
 }
 
 // bindFacilityID binds and validates parameter FacilityID from path.
-func (o *ConfigureSlotFacilityParams) bindFacilityID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *UpdateFacilityProgramScheduleParams) bindFacilityID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -103,7 +103,7 @@ func (o *ConfigureSlotFacilityParams) bindFacilityID(rawData []string, hasKey bo
 }
 
 // bindProgramID binds and validates parameter ProgramID from path.
-func (o *ConfigureSlotFacilityParams) bindProgramID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+func (o *UpdateFacilityProgramScheduleParams) bindProgramID(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]

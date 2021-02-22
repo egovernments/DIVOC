@@ -17,40 +17,40 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
-// ConfigureSlotFacilityHandlerFunc turns a function with the right signature into a configure slot facility handler
-type ConfigureSlotFacilityHandlerFunc func(ConfigureSlotFacilityParams, *models.JWTClaimBody) middleware.Responder
+// UpdateFacilityProgramScheduleHandlerFunc turns a function with the right signature into a update facility program schedule handler
+type UpdateFacilityProgramScheduleHandlerFunc func(UpdateFacilityProgramScheduleParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn ConfigureSlotFacilityHandlerFunc) Handle(params ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn UpdateFacilityProgramScheduleHandlerFunc) Handle(params UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// ConfigureSlotFacilityHandler interface for that can handle valid configure slot facility params
-type ConfigureSlotFacilityHandler interface {
-	Handle(ConfigureSlotFacilityParams, *models.JWTClaimBody) middleware.Responder
+// UpdateFacilityProgramScheduleHandler interface for that can handle valid update facility program schedule params
+type UpdateFacilityProgramScheduleHandler interface {
+	Handle(UpdateFacilityProgramScheduleParams, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewConfigureSlotFacility creates a new http.Handler for the configure slot facility operation
-func NewConfigureSlotFacility(ctx *middleware.Context, handler ConfigureSlotFacilityHandler) *ConfigureSlotFacility {
-	return &ConfigureSlotFacility{Context: ctx, Handler: handler}
+// NewUpdateFacilityProgramSchedule creates a new http.Handler for the update facility program schedule operation
+func NewUpdateFacilityProgramSchedule(ctx *middleware.Context, handler UpdateFacilityProgramScheduleHandler) *UpdateFacilityProgramSchedule {
+	return &UpdateFacilityProgramSchedule{Context: ctx, Handler: handler}
 }
 
-/*ConfigureSlotFacility swagger:route POST /facility/{facilityId}/program/{programId}/schedule configureSlotFacility
+/*UpdateFacilityProgramSchedule swagger:route PUT /facility/{facilityId}/program/{programId}/schedule updateFacilityProgramSchedule
 
-configure slot for program in facility
+update schedule for program in facility
 
 */
-type ConfigureSlotFacility struct {
+type UpdateFacilityProgramSchedule struct {
 	Context *middleware.Context
-	Handler ConfigureSlotFacilityHandler
+	Handler UpdateFacilityProgramScheduleHandler
 }
 
-func (o *ConfigureSlotFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *UpdateFacilityProgramSchedule) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewConfigureSlotFacilityParams()
+	var Params = NewUpdateFacilityProgramScheduleParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
@@ -76,20 +76,20 @@ func (o *ConfigureSlotFacility) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 
 }
 
-// ConfigureSlotFacilityBody configure slot facility body
+// UpdateFacilityProgramScheduleBody update facility program schedule body
 //
-// swagger:model ConfigureSlotFacilityBody
-type ConfigureSlotFacilityBody struct {
+// swagger:model UpdateFacilityProgramScheduleBody
+type UpdateFacilityProgramScheduleBody struct {
 
 	// appointment schedule
-	AppointmentSchedule []*models.FacilityAppointmentSchedule `json:"appointmentSchedule"`
+	AppointmentSchedule []*models.FacilityAppointmentSchedule `json:"appointmentSchedule,omitempty"`
 
 	// walk in schedule
-	WalkInSchedule []*models.FacilityWalkInSchedule `json:"walkInSchedule"`
+	WalkInSchedule []*models.FacilityWalkInSchedule `json:"walkInSchedule,omitempty"`
 }
 
-// Validate validates this configure slot facility body
-func (o *ConfigureSlotFacilityBody) Validate(formats strfmt.Registry) error {
+// Validate validates this update facility program schedule body
+func (o *UpdateFacilityProgramScheduleBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateAppointmentSchedule(formats); err != nil {
@@ -106,7 +106,7 @@ func (o *ConfigureSlotFacilityBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *ConfigureSlotFacilityBody) validateAppointmentSchedule(formats strfmt.Registry) error {
+func (o *UpdateFacilityProgramScheduleBody) validateAppointmentSchedule(formats strfmt.Registry) error {
 
 	if swag.IsZero(o.AppointmentSchedule) { // not required
 		return nil
@@ -131,7 +131,7 @@ func (o *ConfigureSlotFacilityBody) validateAppointmentSchedule(formats strfmt.R
 	return nil
 }
 
-func (o *ConfigureSlotFacilityBody) validateWalkInSchedule(formats strfmt.Registry) error {
+func (o *UpdateFacilityProgramScheduleBody) validateWalkInSchedule(formats strfmt.Registry) error {
 
 	if swag.IsZero(o.WalkInSchedule) { // not required
 		return nil
@@ -157,7 +157,7 @@ func (o *ConfigureSlotFacilityBody) validateWalkInSchedule(formats strfmt.Regist
 }
 
 // MarshalBinary interface implementation
-func (o *ConfigureSlotFacilityBody) MarshalBinary() ([]byte, error) {
+func (o *UpdateFacilityProgramScheduleBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -165,8 +165,8 @@ func (o *ConfigureSlotFacilityBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *ConfigureSlotFacilityBody) UnmarshalBinary(b []byte) error {
-	var res ConfigureSlotFacilityBody
+func (o *UpdateFacilityProgramScheduleBody) UnmarshalBinary(b []byte) error {
+	var res UpdateFacilityProgramScheduleBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

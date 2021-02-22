@@ -104,3 +104,27 @@ func (o *GetFacilityProgramScheduleUnauthorized) WriteResponse(rw http.ResponseW
 
 	rw.WriteHeader(401)
 }
+
+// GetFacilityProgramScheduleNotFoundCode is the HTTP code returned for type GetFacilityProgramScheduleNotFound
+const GetFacilityProgramScheduleNotFoundCode int = 404
+
+/*GetFacilityProgramScheduleNotFound schedult for given facility and program not found
+
+swagger:response getFacilityProgramScheduleNotFound
+*/
+type GetFacilityProgramScheduleNotFound struct {
+}
+
+// NewGetFacilityProgramScheduleNotFound creates GetFacilityProgramScheduleNotFound with default headers values
+func NewGetFacilityProgramScheduleNotFound() *GetFacilityProgramScheduleNotFound {
+
+	return &GetFacilityProgramScheduleNotFound{}
+}
+
+// WriteResponse to the client
+func (o *GetFacilityProgramScheduleNotFound) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(404)
+}

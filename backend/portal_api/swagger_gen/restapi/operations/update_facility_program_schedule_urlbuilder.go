@@ -12,8 +12,8 @@ import (
 	"strings"
 )
 
-// ConfigureSlotFacilityURL generates an URL for the configure slot facility operation
-type ConfigureSlotFacilityURL struct {
+// UpdateFacilityProgramScheduleURL generates an URL for the update facility program schedule operation
+type UpdateFacilityProgramScheduleURL struct {
 	FacilityID string
 	ProgramID  string
 
@@ -25,7 +25,7 @@ type ConfigureSlotFacilityURL struct {
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ConfigureSlotFacilityURL) WithBasePath(bp string) *ConfigureSlotFacilityURL {
+func (o *UpdateFacilityProgramScheduleURL) WithBasePath(bp string) *UpdateFacilityProgramScheduleURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -33,12 +33,12 @@ func (o *ConfigureSlotFacilityURL) WithBasePath(bp string) *ConfigureSlotFacilit
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *ConfigureSlotFacilityURL) SetBasePath(bp string) {
+func (o *UpdateFacilityProgramScheduleURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *ConfigureSlotFacilityURL) Build() (*url.URL, error) {
+func (o *UpdateFacilityProgramScheduleURL) Build() (*url.URL, error) {
 	var _result url.URL
 
 	var _path = "/facility/{facilityId}/program/{programId}/schedule"
@@ -47,14 +47,14 @@ func (o *ConfigureSlotFacilityURL) Build() (*url.URL, error) {
 	if facilityID != "" {
 		_path = strings.Replace(_path, "{facilityId}", facilityID, -1)
 	} else {
-		return nil, errors.New("facilityId is required on ConfigureSlotFacilityURL")
+		return nil, errors.New("facilityId is required on UpdateFacilityProgramScheduleURL")
 	}
 
 	programID := o.ProgramID
 	if programID != "" {
 		_path = strings.Replace(_path, "{programId}", programID, -1)
 	} else {
-		return nil, errors.New("programId is required on ConfigureSlotFacilityURL")
+		return nil, errors.New("programId is required on UpdateFacilityProgramScheduleURL")
 	}
 
 	_basePath := o._basePath
@@ -67,7 +67,7 @@ func (o *ConfigureSlotFacilityURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *ConfigureSlotFacilityURL) Must(u *url.URL, err error) *url.URL {
+func (o *UpdateFacilityProgramScheduleURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -78,17 +78,17 @@ func (o *ConfigureSlotFacilityURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *ConfigureSlotFacilityURL) String() string {
+func (o *UpdateFacilityProgramScheduleURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *ConfigureSlotFacilityURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *UpdateFacilityProgramScheduleURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on ConfigureSlotFacilityURL")
+		return nil, errors.New("scheme is required for a full url on UpdateFacilityProgramScheduleURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on ConfigureSlotFacilityURL")
+		return nil, errors.New("host is required for a full url on UpdateFacilityProgramScheduleURL")
 	}
 
 	base, err := o.Build()
@@ -102,6 +102,6 @@ func (o *ConfigureSlotFacilityURL) BuildFull(scheme, host string) (*url.URL, err
 }
 
 // StringFull returns the string representation of a complete url
-func (o *ConfigureSlotFacilityURL) StringFull(scheme, host string) string {
+func (o *UpdateFacilityProgramScheduleURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

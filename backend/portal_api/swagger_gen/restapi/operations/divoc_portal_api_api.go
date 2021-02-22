@@ -135,6 +135,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		UpdateFacilitiesHandler: UpdateFacilitiesHandlerFunc(func(params UpdateFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilities has not yet been implemented")
 		}),
+		UpdateFacilityProgramScheduleHandler: UpdateFacilityProgramScheduleHandlerFunc(func(params UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation UpdateFacilityProgramSchedule has not yet been implemented")
+		}),
 		UpdateFacilityUserHandler: UpdateFacilityUserHandlerFunc(func(params UpdateFacilityUserParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation UpdateFacilityUser has not yet been implemented")
 		}),
@@ -257,6 +260,8 @@ type DivocPortalAPIAPI struct {
 	NotifyFacilitiesHandler NotifyFacilitiesHandler
 	// UpdateFacilitiesHandler sets the operation handler for the update facilities operation
 	UpdateFacilitiesHandler UpdateFacilitiesHandler
+	// UpdateFacilityProgramScheduleHandler sets the operation handler for the update facility program schedule operation
+	UpdateFacilityProgramScheduleHandler UpdateFacilityProgramScheduleHandler
 	// UpdateFacilityUserHandler sets the operation handler for the update facility user operation
 	UpdateFacilityUserHandler UpdateFacilityUserHandler
 	// UpdateMedicineHandler sets the operation handler for the update medicine operation
@@ -438,6 +443,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	if o.UpdateFacilitiesHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilitiesHandler")
 	}
+	if o.UpdateFacilityProgramScheduleHandler == nil {
+		unregistered = append(unregistered, "UpdateFacilityProgramScheduleHandler")
+	}
 	if o.UpdateFacilityUserHandler == nil {
 		unregistered = append(unregistered, "UpdateFacilityUserHandler")
 	}
@@ -565,7 +573,7 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/facility/confiureSlot"] = NewConfigureSlotFacility(o.context, o.ConfigureSlotFacilityHandler)
+	o.handlers["POST"]["/facility/{facilityId}/program/{programId}/schedule"] = NewConfigureSlotFacility(o.context, o.ConfigureSlotFacilityHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -670,6 +678,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/facilities"] = NewUpdateFacilities(o.context, o.UpdateFacilitiesHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/facility/{facilityId}/program/{programId}/schedule"] = NewUpdateFacilityProgramSchedule(o.context, o.UpdateFacilityProgramScheduleHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

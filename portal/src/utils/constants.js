@@ -32,7 +32,8 @@ export const API_URL = Object.freeze({
     VACCINATOR_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/vaccinators/uploads/:id/errors',
     PRE_ENROLLMENT_FILE_UPLOAD_API: '/divoc/admin/api/v1/enrollments',
     PRE_ENROLLMENT_FILE_UPLOAD_HISTORY_API: '/divoc/admin/api/v1/enrollments/uploads',
-    PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/enrollments/uploads/:id/errors'
+    PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/enrollments/uploads/:id/errors',
+    FACILITY_PROGRAM_SCHEDULE_API: '/divoc/admin/api/v1/facility/:facilityId/program/:programId/schedule'
 });
 
 export class SampleCSV {

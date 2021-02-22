@@ -11,7 +11,6 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // FacilityConfigureSlot facility configure slot
@@ -23,12 +22,10 @@ type FacilityConfigureSlot struct {
 	AppointmentSchedule []*FacilityAppointmentSchedule `json:"appointmentSchedule"`
 
 	// facility Id
-	// Required: true
-	FacilityID *string `json:"facilityId"`
+	FacilityID string `json:"facilityId,omitempty"`
 
 	// program Id
-	// Required: true
-	ProgramID *string `json:"programId"`
+	ProgramID string `json:"programId,omitempty"`
 
 	// walk in schedule
 	WalkInSchedule []*FacilityWalkInSchedule `json:"walkInSchedule"`
@@ -39,14 +36,6 @@ func (m *FacilityConfigureSlot) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateAppointmentSchedule(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateFacilityID(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateProgramID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -80,24 +69,6 @@ func (m *FacilityConfigureSlot) validateAppointmentSchedule(formats strfmt.Regis
 			}
 		}
 
-	}
-
-	return nil
-}
-
-func (m *FacilityConfigureSlot) validateFacilityID(formats strfmt.Registry) error {
-
-	if err := validate.Required("facilityId", "body", m.FacilityID); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *FacilityConfigureSlot) validateProgramID(formats strfmt.Registry) error {
-
-	if err := validate.Required("programId", "body", m.ProgramID); err != nil {
-		return err
 	}
 
 	return nil
