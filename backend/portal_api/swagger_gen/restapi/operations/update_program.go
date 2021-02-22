@@ -31,7 +31,7 @@ func NewUpdateProgram(ctx *middleware.Context, handler UpdateProgramHandler) *Up
 	return &UpdateProgram{Context: ctx, Handler: handler}
 }
 
-/* UpdateProgram swagger:route PUT /programs updateProgram
+/*UpdateProgram swagger:route PUT /programs updateProgram
 
 Update program
 
@@ -47,6 +47,7 @@ func (o *UpdateProgram) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewUpdateProgramParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *UpdateProgram) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

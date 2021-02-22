@@ -31,7 +31,7 @@ func NewGetFacilityGroups(ctx *middleware.Context, handler GetFacilityGroupsHand
 	return &GetFacilityGroups{Context: ctx, Handler: handler}
 }
 
-/* GetFacilityGroups swagger:route GET /facility/groups getFacilityGroups
+/*GetFacilityGroups swagger:route GET /facility/groups getFacilityGroups
 
 Get facility groups
 
@@ -47,6 +47,7 @@ func (o *GetFacilityGroups) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetFacilityGroupsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetFacilityGroups) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

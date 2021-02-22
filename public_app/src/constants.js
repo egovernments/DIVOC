@@ -5,7 +5,7 @@ export const RECIPIENT_ROLE = "recipient";
 export const SIDE_EFFECTS_DATA = "SIDE_EFFECTS_DATA";
 export const API_ROOT_URL = 'https://api.covid19india.org/v4';
 export const CERTIFICATE_FILE = "certificate.json";
-export const PROGRAM_API = "/divoc/admin/api/v1/programs";
+export const PROGRAM_API = "/divoc/admin/api/v1/public/programs?status=Active";
 export const RECIPIENTS_API = "/divoc/api/citizen/recipients";
 export const CITIZEN_TOKEN_COOKIE_NAME = "citizenToken";
 export const STATE_NAMES = {
