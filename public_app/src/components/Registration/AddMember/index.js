@@ -134,15 +134,41 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   const conditions = ["Heart Problem", "Diabetes", "Asthma", "Cystic fibrosis", "Hypertension or BP", "Liver disease", "Pulmonary fibrosis", "Neurologic conditions"];
   const years = [];
   const curYear = new Date().getFullYear();
+
+  const [minAge, setMinAge] = useState(50);
+
+  useEffect(() => {
+    const data = {
+      "entityContext": {
+
+      },
+      "flagKey": "country_specific_features"
+    };
+    axios
+      .post("/config/api/v1/evaluation", data)
+      .then((res) => {
+        return res.data;
+      })
+      .catch((err) => {
+        console.log(err)
+      })
+      .then((result) => {
+        setMinAge(result["variantAttachment"].registrationMinAge)
+      })
+  }, []);
+
   for (let i = 1920; i < curYear; i++) {
     years.push("" + i)
   }
   const {previous, next} = navigation;
 
   function onNext() {
-    if (formData.yob && formData.yob > 1900) {
+    if (formData.yob && formData.yob > 1900 &&
+      ((curYear - formData.yob) >= minAge || formData.comorbidities.length>0)) {
       next()
-    } else {
+    } else if (formData.yob) {
+      setErrors({...errors, "yob":"Without any below mentioned conditions, minimum age for eligibility is " + minAge});
+    }else {
       // errors.yob = "Please select year of birth";
       setErrors({...errors, "yob":"Please select year of birth"});
     }

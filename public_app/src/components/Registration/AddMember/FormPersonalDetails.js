@@ -158,28 +158,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     const BeneficiaryDetails = () => {
 
         const [districts, setDistricts] = useState([]);
-        const [maxAge, setMaxAge] = useState(50);
 
         useEffect(() => {
             setDistictsForState(formData.state)
-            const data = {
-                "entityContext": {
-
-                },
-                "flagKey": "country_specific_features"
-            }
-            axios
-                .post("/config/api/v1/evaluation", data)
-                .then((res) => {
-                    return res.data;
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
-                .then((result) => {
-                    setMaxAge(result["variantAttachment"].registrationMaxAge)
-                })
-        }, []);
+        });
 
         function onStateSelected(stateSelected) {
             setValue({target: {name:"state", value:stateSelected}});
@@ -199,8 +181,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         function setDobValue(dob) {
             setValue({target: {name:"dob", value:dob}})
         }
-        const minDate = new Date();
-        minDate.setYear(minDate.getYear() - maxAge);
+        // const minDate = new Date();
+        // minDate.setYear(minDate.getYear() - maxAge);
         return (
             <div className="pt-5">
                 <h5>Beneficiary Details</h5>
