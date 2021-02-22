@@ -10,6 +10,7 @@ var Config = struct {
 		PrivateKey           string `yaml:"privatekey" env:"AUTH_PRIVATE_KEY"`
 		TTLForOtp            int    `yaml:"ttlforotpinminutes"`
 		MAXOtpVerifyAttempts int    `yaml:"maxotpverifyattempts"`
+		OTPLength			 int    `yaml:"otp_length" env:"OTP_LENGTH" default:"4"`
 	}
 
 	Kafka struct {
