@@ -56,8 +56,14 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
     #### DIVOC Walkthrough
 
     In this section we will go through the steps involved in a typical flow. Starting from
-    setting up facilities to generating a certificate after vaccination.
-   
+    setting up facilities to generating a certificate after vaccination. 
+      
+   * Set up Keycloack
+      * Login to Keycloak console (`localhost/auth/admin`) as `admin` (password : `admin`)
+      * Hover on `Master` on the left top corner and click on `Add realm`
+      * Click on `Select File` button (import option)
+      * Select `realm-export.json` in the keycloak directory. `path:DIVOC/keycloak`
+      * Click on create.
    * Set up CLIENT_SECRET for `admin-api`
       * Login to Keycloak console (`localhost/auth/admin`) as `admin` (password : `admin`)
       * Click on `Clients` in Configure section on the left pane and click on `admin-api`
