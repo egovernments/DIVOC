@@ -114,7 +114,7 @@ function VaccineRegistration() {
                 return res.data
             })
         let vaccineIds = [], vaccineNames = [];
-        res.forEach(r => {
+        res.filter(r => r.status === "Active").forEach(r => {
             vaccineIds.push(r.osid);
             vaccineNames.push(r.name);
         });
