@@ -5,7 +5,7 @@ import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
 import PrivateSvg from "../../assets/img/icon-private.svg"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
-import {formatDate, padDigit} from "../../utils/CustomDate";
+import {formatDate} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
@@ -13,7 +13,7 @@ import axios from "axios";
 import {equals, reject} from "ramda";
 import {Loader} from "../Loader";
 import {getCookie} from "../../utils/cookies";
-import {CITIZEN_TOKEN_COOKIE_NAME, RECIPIENTS_API} from "../../constants";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
@@ -70,7 +70,7 @@ export const Appointment = (props) => {
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
-                <FacilityAllotment facilitySlots={facilitySlots}
+                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility.osid]}
                                    showModal={(allotmentDate, allotmentTime, slotKey) => {
                                        setShowModal(true)
                                        setSelectedAllotment({
@@ -184,14 +184,18 @@ export const Appointment = (props) => {
                                         <div className="d-flex justify-content-between">
                                             <b>{facility.facilityName}</b>
                                             {
-                                                facility.category === "GOVT" ? <img src={GovernmentSvg} title={facility.category}/> : <img src={PrivateSvg} title={facility.category}/>
+                                                facility.category === "GOVT" ?
+                                                    <img src={GovernmentSvg} title={facility.category}/> :
+                                                    <img src={PrivateSvg} title={facility.category}/>
                                             }
                                         </div>
                                         <div>{formatAddress(facility.address)}
-                                        <div>
-                                            <span className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
-                                            <span className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
-                                        </div>
+                                            <div>
+                                                <span
+                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
+                                                <span
+                                                    className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
+                                            </div>
                                         </div>
 
                                     </div>
@@ -223,7 +227,9 @@ export const Appointment = (props) => {
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
                         <span className="mt-1">{selectedAllotment.allotmentTime}</span>
-                        <CustomButton className="blue-btn" onClick={() => {bookSlot()}}>CONFIRM</CustomButton>
+                        <CustomButton className="blue-btn" onClick={() => {
+                            bookSlot()
+                        }}>CONFIRM</CustomButton>
                     </div>
                 </div>
             </Modal>
@@ -240,11 +246,11 @@ function getProgramInfo(facility, programId) {
     }
 }
 
-const FacilityAllotment = ({facilitySlots, showModal}) => {
+const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
     if (Object.keys(facilitySlots).length > 0) {
         const dates = Object.keys(facilitySlots);
         const timeStamps = new Set();
-        const timeStampWiseSlots = {}
+        const timeStampWiseSlots = {};
         for (const [key, value] of Object.entries(facilitySlots)) {
             Object.values(value).forEach(v => {
                 timeStamps.add(v.time);
@@ -253,6 +259,27 @@ const FacilityAllotment = ({facilitySlots, showModal}) => {
                 }
                 timeStampWiseSlots[v.time][key] = v;
             });
+        }
+        const dateWiseWalkinInfo = {};
+        const weekdays = {
+            0: "sun",
+            1: "mon",
+            2: "tue",
+            3: "wed",
+            4: "thu",
+            5: "fri",
+            6: "sat",
+        };
+        if (facilitySchedule && facilitySchedule.walkInSchedule.length > 0 && facilitySchedule.walkInSchedule[0].days.length > 0) {
+            dates.forEach(d => {
+                const toDate = new Date(d);
+                let schedule = facilitySchedule.walkInSchedule[0];
+                if (schedule.days.includes(weekdays[toDate.getDay()])) {
+                    dateWiseWalkinInfo[d] = `${schedule.startTime} - ${schedule.endTime}`
+                } else {
+                    dateWiseWalkinInfo[d] = "-"
+                }
+            })
         }
         return (
             <div className="overflow-auto">
@@ -292,6 +319,16 @@ const FacilityAllotment = ({facilitySlots, showModal}) => {
                                 }
                             </tr>
                         ))
+                    }
+                    {
+                        Object.keys(dateWiseWalkinInfo).length > 0 && <tr>
+                            <td className="text-nowrap text-center">Walkin</td>
+                            {
+                                dates.map(date => {
+                                    return <td className="text-nowrap text-center">{dateWiseWalkinInfo[date]}</td>
+                                })
+                            }
+                        </tr>
                     }
                     </tbody>
                 </table>
