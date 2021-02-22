@@ -5,6 +5,7 @@ import Form from "react-bootstrap/Form";
 import "./EnterPreEnrollment.scss"
 import {BaseFormCard} from "../../components/BaseFormCard";
 import {useSelector} from "react-redux";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 export const PHONE_NUMBER_MAX = 10
 
@@ -35,13 +36,14 @@ function EnterPreEnrollmentContent(props) {
     }
     return (
         <div className="enroll-code-container">
-            <h4 className="title text-center">Enter Mobile Number & Pre Enrolment Code</h4>
+            <h4 className="title text-center">{getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT_ENTER_MOBILE_AND_VERIFICATION_CODE)}</h4>
             <div className={"input-container"}>
                 <div className="divOuter">
                     <div className="divInner">
 
                         <Form.Group>
-                            <Form.Control type="text" placeholder={countryCode+"-XXXXXXXXX"} tabIndex="1" value={phoneNumber}
+                            <Form.Control type="text" placeholder={countryCode + "-XXXXXXXXX"} tabIndex="1"
+                                          value={phoneNumber}
                                           onChange={handlePhoneNumberOnChange}/>
                             <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode}
                                           onChange={handleEnrollCodeOnChange}/>
@@ -59,7 +61,7 @@ function EnterPreEnrollmentContent(props) {
                     mobileNumber: phoneNumber,
                     enrollCode: enrollCode
                 })
-            }}>CONFIRM</Button>
+            }}>{getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT_CONFIRM_BUTTON)}</Button>
         </div>
     );
 }
