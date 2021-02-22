@@ -82,3 +82,21 @@
     border-bottom: 1px solid #D8D8D8;
     padding-bottom: 0.5rem;
 }
+
+.facility-list .badge {
+    color: #fff;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 25px;
+    margin: 0 5px;
+}
+
+.facility-list .purple {
+    background: #A7B8FF;
+}
+
+
+.facility-list .green {
+    background: #65E8AC;
+}
+
