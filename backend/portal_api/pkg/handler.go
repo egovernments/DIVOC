@@ -245,7 +245,18 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	return model.NewGenericJSONResponse(facilities)
+	var facilityIds []string
+	for _, facility := range facilities {
+		facilityIds = append(facilityIds, facility.Osid)
+	}
+	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
+	responseData := map[string]interface{}{
+		"facilities": facilities,
+	}
+	if err2 == nil {
+		responseData["facilitiesSchedule"] = facilitySlotsResponse["FacilityProgramSlot"]
+	}
+	return model.NewGenericJSONResponse(responseData)
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {

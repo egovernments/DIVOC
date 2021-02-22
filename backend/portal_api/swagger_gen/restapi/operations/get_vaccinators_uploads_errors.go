@@ -31,7 +31,7 @@ func NewGetVaccinatorsUploadsErrors(ctx *middleware.Context, handler GetVaccinat
 	return &GetVaccinatorsUploadsErrors{Context: ctx, Handler: handler}
 }
 
-/* GetVaccinatorsUploadsErrors swagger:route GET /vaccinators/uploads/{uploadId}/errors getVaccinatorsUploadsErrors
+/*GetVaccinatorsUploadsErrors swagger:route GET /vaccinators/uploads/{uploadId}/errors getVaccinatorsUploadsErrors
 
 Get all the error rows associated with given uploadId
 
@@ -47,6 +47,7 @@ func (o *GetVaccinatorsUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.
 		r = rCtx
 	}
 	var Params = NewGetVaccinatorsUploadsErrorsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetVaccinatorsUploadsErrors) ServeHTTP(rw http.ResponseWriter, r *http.
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

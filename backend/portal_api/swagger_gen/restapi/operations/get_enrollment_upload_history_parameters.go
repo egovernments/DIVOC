@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetEnrollmentUploadHistoryParams creates a new GetEnrollmentUploadHistoryParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetEnrollmentUploadHistoryParams() GetEnrollmentUploadHistoryParams {
 
 	return GetEnrollmentUploadHistoryParams{}
