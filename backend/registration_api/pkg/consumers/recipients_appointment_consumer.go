@@ -87,10 +87,14 @@ func CreateEnrollmentFromInterface(enrollmentMap map[string]interface{}, appoint
 		log.Errorf("Invalid date format (%v) (%v)", appointmentDate, err)
 		return models.Enrollment{}
 	} else {
+		email, emailOk := enrollmentMap["email"].(string)
+		if !emailOk {
+			email = ""
+		}
 		return models.Enrollment{
 			Name:            enrollmentMap["name"].(string),
 			Phone:           enrollmentMap["phone"].(string),
-			Email:           enrollmentMap["email"].(string),
+			Email:           email,
 			AppointmentDate: strfmt.Date(appointmentDateFormat),
 			AppointmentSlot: appointmentTime,
 		}
