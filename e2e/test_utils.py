@@ -17,8 +17,26 @@ def fetch_auth_token():
     assert resp.status_code == 200, "Failed to fetch Auth Token. Response code : {code}".format(code = resp.status_code)
     return resp.json()['access_token']
 
-def fetch_certificates(data_file):
-    get_cert_response = r.post(REGISTRY_SEARCH, headers={"Content-Type": "application/json"}, data=open(data_file))
+def fetch_certificates(enrollmentCode):
+    body = """{
+    "id": "open-saber.registry.search",
+    "ver": "1.0",
+    "ets": "11234",
+    "params": {
+        "did": "",
+        "key": "",
+        "msgid": ""
+    },
+    "request": {
+        "entityType":["VaccinationCertificate"],
+        "filters": {
+            "preEnrollmentCode":{"eq":"%s"}
+         }
+    } 
+}"""%enrollmentCode
+    print("Posting %s"%body)
+    get_cert_response = r.post(REGISTRY_SEARCH, headers={"Content-Type": "application/json"}, data=body)
+    print("Resp %s"%get_cert_response.content)
     assert get_cert_response.status_code == 200, "Failed to fetch Certificates from registry. Response code : {c}".format(c=get_cert_response.status_code)
     response_json = get_cert_response.json()
     assert response_json["params"]["status"] == "SUCCESSFUL", "Request unsuccessful"    

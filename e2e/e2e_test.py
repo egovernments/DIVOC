@@ -4,6 +4,7 @@ import logging
 import sys
 import time
 import test_utils
+import random
 
 log = logging.getLogger();
 log.setLevel(logging.DEBUG);
@@ -24,7 +25,9 @@ def service_check():
     return (vacc_api_resp.status_code == 200) and (registry_resp.status_code == 200)
 
 def test_certify():
-    old_certs = test_utils.fetch_certificates(GET_CERTIFICATE_BODY);
+    cid = str(random.randint(1e11, 1e12))
+    print("Creating certificate %s"%cid)
+    old_certs = test_utils.fetch_certificates(cid);
     log.info("User has %s old certificates", len(old_certs))
 
     headers = {
@@ -32,7 +35,8 @@ def test_certify():
         'Content-Type': 'application/json'
     }
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
-    certify_res = r.post(VACCINATION_API + "certify", headers=headers, data=open(CERTIFY_REQUEST_BODY))
+    certify_data["preEnrollmentCode"] = cid
+    certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
     assert certify_res.status_code == 200, "post /cerify call failed. Response code : {code}".format(code = certify_res.status_code)
     log.info("Cerify request sent")
     
@@ -40,7 +44,7 @@ def test_certify():
     max_tries = 5
     for i in range(max_tries):
         log.info("Fetching certificates...., try no : %s", i+1)
-        new_certs = test_utils.fetch_certificates(GET_CERTIFICATE_BODY)
+        new_certs = test_utils.fetch_certificates(cid)
         if(len(new_certs) == len(old_certs) + 1):
             latest_cert = [x for x in new_certs if x not in old_certs][0]
             assert latest_cert["name"] == certify_data["recipient"]["name"], "recipient name mismatch"
