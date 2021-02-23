@@ -20,7 +20,7 @@ import {
     STATE_ERROR_MSG
 } from "./error-constants";
 import {formatDate} from "../../../utils/CustomDate";
-import {isAllLetter, isValidAadhaarNumber} from "../../../utils/validations";
+import {isAllLetter, isInValidAadhaarNumber} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -94,7 +94,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
             console.log("IDDDD", nationalIDType, ID_TYPES[0])
-            if(nationalIDType === ID_TYPES[0].value && isValidAadhaarNumber(nationIDNumber)) {
+            if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
                 errors.aadhaar = AADHAAR_ERROR_MESSAGE
             }
         }

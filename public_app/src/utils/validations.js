@@ -77,7 +77,7 @@ function validate(array) {
     return (c === 0);
 }
 
-export const isValidAadhaarNumber = (aadhaarString) => {
+export const isInValidAadhaarNumber = (aadhaarString) => {
     if (aadhaarString.length !== 12) {
         return true;
     }
@@ -86,5 +86,5 @@ export const isValidAadhaarNumber = (aadhaarString) => {
     }
     const aadhaarArray = aadhaarString.split('');
     const toCheckChecksum = aadhaarArray.pop();
-    return generate(aadhaarArray) === toCheckChecksum;
+    return generate(aadhaarArray) !== parseInt(toCheckChecksum);
 }
