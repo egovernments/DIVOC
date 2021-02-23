@@ -19,7 +19,6 @@ import {
     NATIONAL_ID_TYPE_ERROR_MSG,
     STATE_ERROR_MSG
 } from "./error-constants";
-import {formatDate} from "../../../utils/CustomDate";
 import {isAllLetter, isInValidAadhaarNumber} from "../../../utils/validations";
 
 const ID_TYPES = [
@@ -114,7 +113,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         if(!formData.district) {
             errors.district = DISTRICT_ERROR_MSG
         }
-        // if(!formData.dob) {errors.dob = DOB_ERROR_MSG}
 
         if(!formData.gender) {
             errors.gender = GENDER_ERROR_MSG
@@ -339,7 +337,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
 
     useEffect(() => {
         setDistictsForState(formData.state)
-    });
+    }, []);
 
     function onStateSelected(stateSelected) {
         setValue({target: {name:"state", value:stateSelected}});
@@ -355,10 +353,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             setDistricts([])
         }
     }
-
-        function setDobValue(dob) {
-            setValue({target: {name:"dob", value:dob}})
-        }
         // const minDate = new Date();
         // minDate.setYear(minDate.getYear() - maxAge);
         return (
@@ -423,88 +417,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                             </div>
                             <label htmlFor="name" className="pt-2">Age</label>
                             <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
-                            {/*<label htmlFor="name">Date of Birth *</label>
-    function setDobValue(dob) {
-        setValue({target: {name:"dob", value:dob}})
-    }
-    // const minDate = new Date();
-    // minDate.setYear(minDate.getYear() - maxAge);
-    return (
-        <div className="pt-5">
-            <h5>Beneficiary Details</h5>
-            <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="name">Name * (As per ID card)</label>
-                        <input className="form-control" name="name" id="name" type="text"
-                               hidden={verifyDetails}
-                               placeholder="Enter Name"
-                               defaultValue={formData.name}
-                               onBlur={setValue}/>
-                        <div className="invalid-input">
-                            {errors.name}
-                        </div>
-                        {
-                            verifyDetails &&
-                            <b>{formData.name}</b>
-                        }
-                    </Col>
-                </div>
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="state">State *</label>
-                        <select className="form-control" name="state" id="state"
-                                onChange={(e) => onStateSelected(e.target.value)}
-                                hidden={verifyDetails}>
-                            <option disabled selected={!formData.state} value>Select State</option>
-                            {
-                                STATES.map(id => <option selected={id === formData.state} value={id}>{id}</option>)
-                            }
-                        </select>
-                        <div className="invalid-input">
-                            {errors.state}
-                        </div>
-                        {
-                            verifyDetails &&
-                            <b>{formData.state}</b>
-                        }
-                    </Col>
-                </div>
-            </Row>
-            <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="gender">Gender *</label>
-                        <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
-                            <option disabled selected={!formData.gender} value>Select Gender</option>
-                            {
-                                GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
-                            }
-                        </select>
-                        {
-                            verifyDetails &&
-                            <><br/><b>{formData.gender}</b></>
-                        }
-                        <div className="invalid-input">
-                            {errors.gender}
-                        </div>
-                        <label htmlFor="name" className="pt-2">Age</label>
-                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
-                        {/*<label htmlFor="name">Date of Birth *</label>
-                            { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
-                                              value={minDate}
-                                              minDate={minDate}
-                                              maxDate={minDate}
-                                              onChange={d => {
-                                                  setDobValue(d)
-                                              }} />}
-                            {
-                                verifyDetails &&
-                                <><br/><b>{formatDate(formData.dob)}</b></>
-                            }
-                            <div className="invalid-input">
-                                {errors.dob}
-                            </div>*/}
                     </Col>
                 </div>
                 <div className="p-0 col-6">
