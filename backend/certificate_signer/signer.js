@@ -1,11 +1,12 @@
-import {CERTIFICATE_CONTROLLER_ID,
+const {CERTIFICATE_CONTROLLER_ID,
   CERTIFICATE_DID,
   CERTIFICATE_NAMESPACE,
   CERTIFICATE_ISSUER,
   CERTIFICATE_BASE_URL,
   CERTIFICATE_FEEDBACK_BASE_URL,
-  CERTIFICATE_INFO_BASE_URL
-} from "./config/config";
+  CERTIFICATE_INFO_BASE_URL,
+  CERTIFICATE_PUBKEY_ID
+} = require ("./config/config");
 
 const jsigs = require('jsonld-signatures');
 const config = require('./config/config');
