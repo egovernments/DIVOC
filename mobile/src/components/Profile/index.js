@@ -59,6 +59,7 @@ function AuthSafeUserProfile({keycloak}) {
                                     SyncFacade
                                         .push()
                                         .catch((e) => console.log(e.message))
+                                        .then(() => appIndexDb.stashData())
                                         .then(() => appIndexDb.clearEverything())
                                         .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                                         .catch(e => {

@@ -27,6 +27,8 @@ export class SyncFacade {
 
         const vaccinators = await ApiServices.fetchVaccinators();
         await appIndexDb.saveVaccinators(vaccinators);
+
+        await appIndexDb.popData()
     }
 
     static async push() {

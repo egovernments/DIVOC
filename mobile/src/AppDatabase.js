@@ -5,10 +5,11 @@ import {programDb} from "./Services/ProgramDB";
 import {monthNames} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 11;
+const DATABASE_VERSION = 13;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
+const STASH_DATA = "stash_data";
 const EVENTS = "events";
 const VACCINATORS = "vaccinators";
 const STATUS = "status";
@@ -50,6 +51,10 @@ export class AppDatabase {
 
                 if (!objectNames.contains(PROGRAMS)) {
                     database.createObjectStore(PROGRAMS, {keyPath: "name"});
+                }
+
+                if (!objectNames.contains(STASH_DATA)) {
+                    database.createObjectStore(STASH_DATA, {keyPath: "userId"});
                 }
                 console.log("DB upgraded from " + oldVersion + " to " + newVersion)
             }
@@ -189,21 +194,26 @@ export class AppDatabase {
         const events = await this.db.getAll(EVENTS) || [];
         const certifyObjects = events.map((item, index) => this.getCertifyObject(item));
         const result = await Promise.all(certifyObjects);
-        return result;
+        const filterObjects = result.filter((item) => item.hasOwnProperty("patient"));
+        return filterObjects;
     }
 
     async getCertifyObject(event) {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
-        return {
-            vaccinatorName: vaccinator.name,
-            patient: patient,
-            enrollCode: event.enrollCode,
-            identity: queue.identity || "",
-            vaccination: vaccination
+        console.log(patient, vaccinator, queue)
+        if (patient && vaccinator && queue) {
+            const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
+            return {
+                vaccinatorName: vaccinator.name,
+                patient: patient,
+                enrollCode: event.enrollCode,
+                identity: queue.identity || "",
+                vaccination: vaccination
+            }
         }
+        return {}
     }
 
     async cleanEvents() {
@@ -228,6 +238,47 @@ export class AppDatabase {
                 deleteUserDetails
             ]);
     }
+
+    async stashData() {
+        const userDetails = await this.getUserDetails()
+        if (userDetails && userDetails.mobile_number) {
+            const queue = await this.db.getAll(QUEUE);
+            const patients = await this.db.getAll(PATIENTS);
+
+            const stashUserData = {
+                userId: userDetails["mobile_number"],
+                queue: queue,
+                patients: patients
+            }
+            await this.db.put(STASH_DATA, stashUserData);
+        }
+    }
+
+    async popData() {
+        const userDetails = await this.getUserDetails()
+        if (userDetails && userDetails["mobile_number"]) {
+            const userId = userDetails["mobile_number"]
+            const stashQueue = await this.db.get(STASH_DATA, userId);
+            if (stashQueue) {
+                const queue = stashQueue.queue
+                if (queue && queue.length > 0) {
+                    for (const queueItem of queue) {
+                        await this.db.put(QUEUE, queueItem);
+                    }
+                }
+
+                const patients = stashQueue.patients
+                if (patients && patients.length > 0) {
+                    for (const patientItem of patients) {
+                        await this.db.put(PATIENTS, patientItem);
+                    }
+                }
+
+                await this.db.delete(STASH_DATA, userId);
+            }
+        }
+    }
+
 
     async getAllEvents() {
         return await this.db.getAll(EVENTS) || [];
