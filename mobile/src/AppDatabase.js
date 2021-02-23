@@ -239,47 +239,6 @@ export class AppDatabase {
             ]);
     }
 
-    async stashData() {
-        const userDetails = await this.getUserDetails()
-        if (userDetails && userDetails.mobile_number) {
-            const queue = await this.db.getAll(QUEUE);
-            const patients = await this.db.getAll(PATIENTS);
-
-            const stashUserData = {
-                userId: userDetails["mobile_number"],
-                queue: queue,
-                patients: patients
-            }
-            await this.db.put(STASH_DATA, stashUserData);
-        }
-    }
-
-    async popData() {
-        const userDetails = await this.getUserDetails()
-        if (userDetails && userDetails["mobile_number"]) {
-            const userId = userDetails["mobile_number"]
-            const stashQueue = await this.db.get(STASH_DATA, userId);
-            if (stashQueue) {
-                const queue = stashQueue.queue
-                if (queue && queue.length > 0) {
-                    for (const queueItem of queue) {
-                        await this.db.put(QUEUE, queueItem);
-                    }
-                }
-
-                const patients = stashQueue.patients
-                if (patients && patients.length > 0) {
-                    for (const patientItem of patients) {
-                        await this.db.put(PATIENTS, patientItem);
-                    }
-                }
-
-                await this.db.delete(STASH_DATA, userId);
-            }
-        }
-    }
-
-
     async getAllEvents() {
         return await this.db.getAll(EVENTS) || [];
     }

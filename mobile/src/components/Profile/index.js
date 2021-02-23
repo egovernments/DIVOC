@@ -8,8 +8,8 @@ import Button from "react-bootstrap/Button";
 import {Messages} from "../../Base/Constants";
 import {AuthSafeComponent} from "../../utils/keycloak";
 import Col from "react-bootstrap/Col";
-import Row from "react-bootstrap/Row";
 import config from "../../config";
+import {queueDb} from "../../Services/QueueDB";
 
 function AuthSafeUserProfile({keycloak}) {
     const [userDetails, setUserDetails] = useState();
@@ -59,7 +59,7 @@ function AuthSafeUserProfile({keycloak}) {
                                     SyncFacade
                                         .push()
                                         .catch((e) => console.log(e.message))
-                                        .then(() => appIndexDb.stashData())
+                                        .then(() => queueDb.stashData())
                                         .then(() => appIndexDb.clearEverything())
                                         .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                                         .catch(e => {
