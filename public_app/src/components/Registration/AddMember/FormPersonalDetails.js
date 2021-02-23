@@ -418,21 +418,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         <label htmlFor="name" className="pt-2">Age</label>
                         <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
-                        {/*<label htmlFor="name">Date of Birth *</label>
-                            { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
-                                              value={minDate}
-                                              minDate={minDate}
-                                              maxDate={minDate}
-                                              onChange={d => {
-                                                  setDobValue(d)
-                                              }} />}
-                            {
-                                verifyDetails &&
-                                <><br/><b>{formatDate(formData.dob)}</b></>
-                            }
-                            <div className="invalid-input">
-                                {errors.dob}
-                            </div>*/}
                     </Col>
                 </div>
                 <div className="p-0 col-6">
