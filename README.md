@@ -1,7 +1,7 @@
 # DIVOC
 Open source digital platform for large scale vaccination and certification programs. Built for India scale.
 
-> __Active and Generic branch is orchestration__
+> __[Latest changes are on orchestration branch](https://github.com/egovernments/DIVOC/tree/orchestration)__
 
 ## [Documentation](https://divoc.egov.org.in)
 
