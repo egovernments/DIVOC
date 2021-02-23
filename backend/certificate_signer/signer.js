@@ -44,7 +44,6 @@ documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
 
 const customLoader = url => {
   console.log("checking " + url);
-
   let context = documentLoaderMapping[url];
   if (context === undefined) {
     context = contexts[url];
