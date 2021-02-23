@@ -94,7 +94,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
             console.log("IDDDD", nationalIDType, ID_TYPES[0])
-            if(nationalIDType === ID_TYPES[0].value && (nationIDNumber.length !== 12 || isNaN(nationIDNumber))) {
+            if(nationalIDType === ID_TYPES[0].value && isValidAadhaarNumber(nationIDNumber)) {
                 errors.aadhaar = AADHAAR_ERROR_MESSAGE
             }
         }
