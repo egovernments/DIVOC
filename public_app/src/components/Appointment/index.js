@@ -301,11 +301,11 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                                                     <Button
                                                         variant="outline-primary"
                                                         onClick={() => {
-                                                            if (slots !== 0) {
+                                                            if (slots != 0) {
                                                                 showModal(date, ts, timeStampWiseSlots[ts][date].key)
                                                             }
                                                         }}
-                                                        className={`slot-booking-btn mt-3 mb-3 ${slots === 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
+                                                        className={`slot-booking-btn mt-3 mb-3 ${slots == 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
                                                 </td>
                                             )
                                         } else {

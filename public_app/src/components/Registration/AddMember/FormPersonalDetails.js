@@ -20,7 +20,7 @@ import {
     STATE_ERROR_MSG
 } from "./error-constants";
 import {formatDate} from "../../../utils/CustomDate";
-import {isAllLetter} from "../../../utils/validations";
+import {isAllLetter, isValidAadhaarNumber} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -528,4 +528,4 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             </Row>
         </div>
     )
-};
+}

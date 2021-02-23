@@ -3,7 +3,6 @@ export const NATIONAL_ID_ERROR_MSG = "* ID Number is required";
 export const NAME_ERROR_MSG = "* Beneficiary Name is required";
 export const INVALID_NAME_ERR_MSG = "* Beneficiary Name should have only alphabets"
 export const MINIMUM_LENGTH_OF_NAME_ERROR_MSG = "* Name should have at least 1 characters"
-export const MINIMUM_LENGTH_OF_NAME = "* Name should have at least 2 characters"
 export const STATE_ERROR_MSG = "* State is required";
 export const DISTRICT_ERROR_MSG = "* District is required";
 export const DOB_ERROR_MSG = "* Date of birth is invalid";
