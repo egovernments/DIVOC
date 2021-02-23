@@ -83,24 +83,9 @@ function FacilityDetails({
         }
     };
 
-    const sendNotification = () => {
+    const sendNotification = (notification) => {
         const selectedFacilities = facilities.filter(facility => facility.isChecked);
-        const notifyRequest = selectedFacilities.map(facility => {
-            let req = {
-                facilityId: facility.osid,
-                pendingTasks: []
-            };
-            if(!facility.admins) {
-                req.pendingTasks.push("vaccinators")
-            }
-            if(!facility.seal) {
-                req.pendingTasks.push("seal")
-            }
-            if(!facility.roleSetup) {
-                req.pendingTasks.push("roles")
-            }
-            return req
-        });
+        const notifyRequest = {...notification, "facilities": selectedFacilities.map(f => f.osid)}
         axiosInstance.current.post(API_URL.FACILITY_NOTIFY_API, notifyRequest)
             .then(res => {
                 //registry update in ES happening async, so calling search immediately will not get back actual data
@@ -209,14 +194,11 @@ function FacilityDetails({
                                 NOTIFY
                             </button>
                             <NotifyPopup
-                                message={notificationTemplate}
                                 show={modalShow}
-                                onHide={() => {
-                                    setModalShow(false)
-                                }}
-                                onSend={()=>{
-                                    setModalShow(false)
-                                    sendNotification()
+                                onHide={() => {setModalShow(false)}}
+                                onSend={(notification)=>{
+                                    setModalShow(false);
+                                    sendNotification(notification);
                                 }}
                             />
                         </div>}
