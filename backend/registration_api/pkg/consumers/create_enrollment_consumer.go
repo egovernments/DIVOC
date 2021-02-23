@@ -37,6 +37,10 @@ func StartEnrollmentConsumer() {
 					err = services.CreateEnrollment(&enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
+						_, err := services.SetHash(enrollment.Code, "phone", enrollment.Phone)
+						if err != nil {
+							log.Error("Unable to store enrollment code in redis",  err)
+						}
 						err = services.NotifyRecipient(enrollment)
 						if err != nil {
 							log.Error("Unable to send notification to the enrolled user",  err)

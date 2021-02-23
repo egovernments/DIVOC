@@ -332,19 +332,9 @@ func checkIfAlreadyAppointed(enrollmentCode string) bool {
 }
 
 func isValidEnrollmentCode(enrollmentCode string, phone string) bool {
-	//TODO: check in cache, store the registered enrolled users in cache as map
-	filter := map[string]interface{}{
-		"code": map[string]interface{}{
-			"eq": enrollmentCode,
-		},
-		"phone": map[string]interface{}{
-			"eq": phone,
-		},
-	}
-	enrollmentsArr, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+	value, err := services.GetHashFieldValue(enrollmentCode, "phone")
 	if err == nil {
-		enrollments := enrollmentsArr[EnrollmentEntity].([]interface{})
-		if len(enrollments) > 0 {
+		if value == phone {
 			return true
 		}
 	}

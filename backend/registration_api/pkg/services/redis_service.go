@@ -77,3 +77,7 @@ func SetHash(key string, field string, value string) (bool, error) {
 func HashFieldExists(key string, field string) (bool, error) {
 	return redisClient.HExists(key, field).Result()
 }
+
+func GetHashFieldValue(key string, field string) (string, error) {
+	return redisClient.HGet(key, field).Result()
+}

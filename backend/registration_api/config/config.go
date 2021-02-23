@@ -26,7 +26,7 @@ var Config = struct {
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
 	Redis struct {
-		Url             string  `env:"REDIS_URL"`
+		Url             string  `env:"REDIS_URL" yaml:"redisurl"`
 		CacheTTL		int     `default:"60" env:"CACHE_TTL"`
 	}
 	AppointmentScheduler struct {
