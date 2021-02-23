@@ -1,3 +1,12 @@
+const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
+const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://cowin.gov.in/';
+const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
+const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:india';
+const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://cowin.gov.in/";
+const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://cowin.gov.in/vaccine/";
+const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://cowin.gov.in/?";
+const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "https://cowin.gov.in/?";
+
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
 const CERTIFY_TOPIC = 'certify';
@@ -11,7 +20,16 @@ const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMEN
 const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
 const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
 const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
+
 module.exports = {
+  CERTIFICATE_NAMESPACE,
+  CERTIFICATE_CONTROLLER_ID,
+  CERTIFICATE_DID,
+  CERTIFICATE_PUBKEY_ID,
+  CERTIFICATE_ISSUER,
+  CERTIFICATE_BASE_URL,
+  CERTIFICATE_FEEDBACK_BASE_URL,
+  CERTIFICATE_INFO_BASE_URL,
   KAFKA_BOOTSTRAP_SERVER,
   CERTIFY_TOPIC,
   REGISTRY_URL,
@@ -24,5 +42,6 @@ module.exports = {
   KAFKA_CONSUMER_SESSION_TIMEOUT,
   REDIS_URL,
   REDIS_KEY_EXPIRE,
-  DUPLICATE_CERTIFICATE_TOPIC
+  DUPLICATE_CERTIFICATE_TOPIC,
+
 };
