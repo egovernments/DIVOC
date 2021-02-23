@@ -918,7 +918,11 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 }
 
 func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
+
 	var appointmentSchedule []*models.FacilityAppointmentSchedule
 	var walkInSchedule []*models.FacilityWalkInSchedule
 
@@ -948,9 +952,50 @@ func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacility
 	return operations.NewConfigureSlotFacilityOK()
 }
 
-func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+func validateIfUserHasPermissionsForFacilityProgram(facilityId string, programId string, principal *models.JWTClaimBody) (middleware.Responder, bool) {
+	resp, e := kernelService.ReadRegistry("Facility", facilityId)
+	if e != nil {
+		log.Infof("Facility for given osid doesn't exist %d", facilityId)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	facility, ok := resp["Facility"].(map[string]interface{})
+	if !ok {
+		log.Errorf("Error reading registry response", e)
+		return model.NewGenericServerError(), true
+	}
+	if facility["facilityCode"] != principal.FacilityCode {
+		log.Infof("User doesnt belong to the facility which is being updated")
+		return operations.NewConfigureSlotFacilityUnauthorized(), true
+	}
 
+	currentPrograms, ok := facility["programs"].([]interface{})
+	if !ok {
+		log.Infof("No programs exist for given facility %s", principal.FacilityCode)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	hasGivenProgram := false
+	for _, p := range currentPrograms {
+		prg, ok := p.(map[string]interface{})
+		if !ok {
+			log.Errorf("Error converting program to interface", e)
+			return model.NewGenericServerError(), true
+		}
+		if prg["programId"] == programId {
+			hasGivenProgram = true
+		}
+	}
+	if !hasGivenProgram {
+		log.Infof("Given program %s doesn't exist for facility %s", programId, principal.FacilityCode)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	return nil, false
+}
+
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
 		return operations.NewGetFacilityProgramScheduleNotFound()
@@ -959,10 +1004,13 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 }
 
 func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
 
 	objectId := "FacilityProgramSlot"
-
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
 		operations.NewUpdateFacilityProgramScheduleBadRequest()

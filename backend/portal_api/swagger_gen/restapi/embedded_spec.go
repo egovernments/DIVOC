@@ -766,6 +766,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -2841,6 +2844,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -4288,8 +4294,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId",
-        "dob"
+        "nationalId"
       ],
       "properties": {
         "address": {
@@ -4362,6 +4367,12 @@ func init() {
         "code": {
           "type": "string"
         },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dob": {
           "type": "string",
           "format": "date"
@@ -4391,6 +4402,9 @@ func init() {
         },
         "programId": {
           "type": "string"
+        },
+        "yob": {
+          "type": "integer"
         }
       }
     },
