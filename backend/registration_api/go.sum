@@ -163,6 +163,8 @@ github.com/google/uuid v1.0.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+
 github.com/google/uuid v1.1.1/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/google/uuid v1.1.2 h1:EVhdT+1Kseyi1/pUmXKaFxYsDNy9RQYkMWRH68J/W7Y=
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gospotcheck/jwt-go v4.0.0+incompatible h1:IFJXoMKFNfEoZE7cXgs5pWcK2AEQyDISXMkr1jaaJBg=
+github.com/gospotcheck/jwt-go v4.0.0+incompatible/go.mod h1:xV77fUnYqYQM9PwY+P7tnFw/ALG6ijfKbvbFE66O8mI=
 github.com/hpcloud/tail v1.0.0/go.mod h1:ab1qPbhIpdTxEkNHXyeSf5vhxWSCs/tWer42PpOxQnU=
 github.com/imroc/req v0.3.0 h1:3EioagmlSG+z+KySToa+Ylo3pTFZs+jh3Brl7ngU12U=
 github.com/imroc/req v0.3.0/go.mod h1:F+NZ+2EFSo6EFXdeIbpfE9hcC233id70kf0byW97Caw=

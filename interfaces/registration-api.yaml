@@ -3,6 +3,11 @@ info:
   title: Registration API
   description: Registration API
   version: 1.0.0
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 schemes:
   - https
 basePath: /divoc/api/citizen
@@ -15,6 +20,8 @@ paths:
     post:
       summary: Book a slot in facility
       operationId: bookSlotOfFacility
+      security:
+        - Bearer: [ ]
       parameters:
         - in: body
           name: body
@@ -41,6 +48,7 @@ paths:
     get:
       summary: Get slots for facilites
       operationId: getSlotsForFacilities
+      security: [ ]
       parameters:
         - in: query
           name: facilityId
@@ -62,6 +70,7 @@ paths:
     post:
       summary: Initialize facility slots
       operationId: initializeFacilitySlots
+      security: [ ]
       parameters:
         - in: body
           name: body
@@ -80,6 +89,8 @@ paths:
     post:
       summary: Enroll Recipient
       operationId: enrollRecipient
+      security:
+        - Bearer: [ ]
       parameters:
         - in: body
           name: body
@@ -94,6 +105,8 @@ paths:
     get:
       summary: Get all the recipients
       operationId: getRecipients
+      security:
+        - Bearer: [ ]
       responses:
         '200':
           description: OK
@@ -111,6 +124,7 @@ paths:
    post:
      summary: Generate OTP
      operationId: generateOTP
+     security: []
      parameters:
        - in: body
          name: body
@@ -133,6 +147,7 @@ paths:
     post:
       summary: Verify OTP
       operationId: verifyOTP
+      security: []
       parameters:
         - in: body
           name: body

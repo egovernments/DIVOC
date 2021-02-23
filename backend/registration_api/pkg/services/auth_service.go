@@ -3,19 +3,17 @@ package services
 import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
+	"strings"
 	"time"
 )
 //Reference: https://www.sohamkamani.com/golang/jwt-authentication/
 
-type Claims struct {
-	Phone string
-	jwt.StandardClaims
-}
 
 func CreateRecipientToken(phone string) (string, error) {
 	expirationTime := time.Now().Add(24 * time.Hour)
-	claims := Claims{
+	claims := models.JWTClaimBody{
 		Phone: phone,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
@@ -31,16 +29,17 @@ func CreateRecipientToken(phone string) (string, error) {
 }
 
 // Will be used by the handlers to validate the JWT
-func VerifyRecipientToken(jwtToken string) (string, error) {
+func VerifyRecipientToken(bearerHeader string) (*models.JWTClaimBody, error) {
+	jwtToken := strings.Split(bearerHeader, " ")[1]
 	keyFromPEM, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(config.Config.Auth.PublicKey))
-	c := Claims{}
+	c := models.JWTClaimBody{}
 	token, err := jwt.ParseWithClaims(jwtToken, &c, func(token *jwt.Token) (interface{}, error) {
 		return keyFromPEM, nil
 	})
 	if err!= nil {
 		log.Info("Unable to get the claims out of token", err)
-		return "", err
+		return nil, err
 	}
-	claims := token.Claims.(*Claims)
-	return claims.Phone, err
+	claims := token.Claims.(*models.JWTClaimBody)
+	return claims, err
 }

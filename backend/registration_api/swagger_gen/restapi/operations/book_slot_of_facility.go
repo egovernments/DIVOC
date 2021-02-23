@@ -13,19 +13,21 @@ import (
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 	"github.com/go-openapi/validate"
+
+	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
 // BookSlotOfFacilityHandlerFunc turns a function with the right signature into a book slot of facility handler
-type BookSlotOfFacilityHandlerFunc func(BookSlotOfFacilityParams) middleware.Responder
+type BookSlotOfFacilityHandlerFunc func(BookSlotOfFacilityParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn BookSlotOfFacilityHandlerFunc) Handle(params BookSlotOfFacilityParams) middleware.Responder {
-	return fn(params)
+func (fn BookSlotOfFacilityHandlerFunc) Handle(params BookSlotOfFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
+	return fn(params, principal)
 }
 
 // BookSlotOfFacilityHandler interface for that can handle valid book slot of facility params
 type BookSlotOfFacilityHandler interface {
-	Handle(BookSlotOfFacilityParams) middleware.Responder
+	Handle(BookSlotOfFacilityParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewBookSlotOfFacility creates a new http.Handler for the book slot of facility operation
@@ -50,12 +52,25 @@ func (o *BookSlotOfFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 	var Params = NewBookSlotOfFacilityParams()
 
+	uprinc, aCtx, err := o.Context.Authorize(r, route)
+	if err != nil {
+		o.Context.Respond(rw, r, route.Produces, route, err)
+		return
+	}
+	if aCtx != nil {
+		r = aCtx
+	}
+	var principal *models.JWTClaimBody
+	if uprinc != nil {
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
+	}
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
-	res := o.Handler.Handle(Params) // actually handle the request
+	res := o.Handler.Handle(Params, principal) // actually handle the request
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
