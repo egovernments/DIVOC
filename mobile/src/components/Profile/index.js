@@ -90,8 +90,3 @@ export function UserProfile(props) {
         </AuthSafeComponent>
     );
 }
-
-/*
-UserProfile.contextTypes = {
-    intl: React.PropTypes.object.isRequired
-}*/

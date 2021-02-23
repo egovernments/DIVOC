@@ -21,7 +21,6 @@
   "app.scanIdentityNumber": "आधार के साथ स्कैन",
   "app.limitReachMessage": "चेतावनी: आप दैनिक नामांकन सीमा तक पहुंच रहे हैं।",
   "app.name": "नाम",
-
   "app.recipientsEnrolled": "लाभार्थी नामांकित",
   "app.exceedLimits": "Exceed Limits",
   "app.verifyRecipient.enterMobileAndVerificationCode": "अपना मोबाइल नंबर एवं ओ.टी.पी. लिखें",
@@ -35,15 +34,17 @@
   "app.profile.facility": "अस्पताल",
   "app.profile.confirmLogout.message": "कृपया पुष्टि करें",
 
-
   "app.enrollment.title": "Enroll Recipient",
-  "app.enrollment.selectGender": "लिङ्ग चुनें",
-  "app.enrollment.nationality": "राष्ट्रीयता",
-  "app.enrollment.dateOfBirth": "जन्मतिथि",
+
+  "app.enrollment.name": "नाम",
+  "app.enrollment.gender": "ङ्ग चुनें",
+  "app.enrollment.nationalId": "राष्ट्रीयता",
+  "app.enrollment.dob": "जन्मतिथि",
   "app.enrollment.email": "ईमेल",
-  "app.enrollment.mobileNo": "मोबाइल",
+  "app.enrollment.phone": "मोबाइल",
   "app.enrollment.identityType": "पहचान पत्र",
-  "app.enrollment.identityNo": "पहचान पत्र क्रमांक",
+  "app.enrollment.identityValue": "पहचान पत्र क्रमांक",
+  "app.enrollment.addressLine1": "Address",
   "app.enrollment.state": "प्रदेश",
   "app.enrollment.district": "जनपद",
   "app.enrollment.locality": "इलाका",

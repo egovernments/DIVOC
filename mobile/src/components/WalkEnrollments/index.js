@@ -11,6 +11,7 @@ import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 import config from "config.json"
 import {useSelector} from "react-redux";
+import {useLocale} from "../../lang/LocaleContext";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -46,6 +47,7 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 function WalkEnrollment(props) {
     const {state, goNext} = useWalkInEnrollment();
+    const {getText,selectLanguage} = useLocale()
     const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
     const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
@@ -53,7 +55,16 @@ function WalkEnrollment(props) {
 
     useEffect(() => {
         setStateListInSchema();
-    }, []);
+        for (let index in enrollmentSchema.required) {
+            const property = enrollmentSchema.required[index]
+            const labelText = getText("app.enrollment." + property);
+            console.log(labelText)
+            enrollmentSchema.properties[property].title = labelText
+        }
+        console.log(enrollmentSchema)
+        setEnrollmentSchema(enrollmentSchema)
+
+    }, [selectLanguage]);
 
     const customFormats = {
         'phone-in': /\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$/
@@ -78,7 +89,7 @@ function WalkEnrollment(props) {
     function setStateListInSchema() {
         let customeSchema = {...enrollmentSchema};
         customeSchema.properties.state.enum = stateAndDistricts['states'].map(obj => obj.name);
-        setFormData({...formData, state:customeSchema.properties.state.enum[0]});
+        setFormData({...formData, state: customeSchema.properties.state.enum[0]});
         setEnrollmentSchema(customeSchema)
     }
 
