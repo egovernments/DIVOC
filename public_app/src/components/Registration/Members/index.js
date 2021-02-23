@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Col, Container, Row} from "react-bootstrap";
+import {Col, Container, Modal, Row} from "react-bootstrap";
 import "./index.css";
 import {useHistory} from "react-router-dom";
 import {CustomButton} from "../../CustomButton";
@@ -11,6 +11,8 @@ import {getCookie} from "../../../utils/cookies";
 import Button from "react-bootstrap/Button";
 import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
+import {CustomDropdown} from "../../CustomDropdown";
+import CloseImg from "../../../assets/img/icon-cross.svg";
 
 export const Members = () => {
     const history = useHistory();
@@ -18,8 +20,10 @@ export const Members = () => {
     const [members, setMembers] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [marqueeMsg, setMarqueeMsg] = useState("Registrations are open only for citizens 50 years and above.");
+    const [showModal, setShowModal] = useState(false);
+    const [selectedMemberIndex, setSelectedMemberIndex] = useState(-1);
 
-    useEffect(() => {
+    function fetchRecipients() {
         setIsLoading(true);
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
@@ -34,7 +38,10 @@ export const Members = () => {
             .catch(e => {
                 console.log(e);
             })
+    }
 
+    useEffect(() => {
+        fetchRecipients();
         fetchPrograms()
     }, []);
 
@@ -99,70 +106,30 @@ export const Members = () => {
                 setPrograms(ps)
             })
     }
+    
+    function callCancelAppointment() {
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"recipientToken": token, "Content-Type": "application/json"},
+            data: {enrollmentCode: members[selectedMemberIndex].code}
+        };
 
-    const MemberCard = (props) => {
-        const member = props.member;
-        const program = programs.filter(p => p.id === member.programId)[0];
-        const isAppointmentBooked = !!member.enrollmentScopeId;
+        axios.delete("/divoc/api/citizen/appointment", config)
+            .then(res => {
+                setIsLoading(true);
+                setTimeout(() => {
+                    fetchRecipients();
+                    fetchPrograms()
+                }, 3000);
 
-        function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
-            return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
-        }
-
-        function getTime(fromTime) {
-            if (fromTime > 11) {
-                return padDigit(fromTime > 12 ? fromTime % 12 : fromTime) + ":00 PM"
-            } else {
-                return fromTime + ":00 AM"
-            }
-        }
-
-        return (
-            <div className="col-xl-6 pt-3">
-                <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
-                    <Card.Body style={{fontSize: "14px"}}>
-                        <span className="mb-2"
-                              style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
-                        <div className="mb-2">
-                            {program ? program.name : ''}
-                        </div>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div className="">
-                                <div><span
-                                    style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}
-                                </div>
-                                <div><span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}</div>
-                            </div>
-                        </div>
-                        {
-                            <div className={"w-100"}>
-                                <Row className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
-                                    <Col lg={isAppointmentBooked ? 12 : 6}
-                                         className={`${!isAppointmentBooked && "invisible"}`}>
-                                        <span style={{color: "#646D82"}}> Appointment: </span>
-                                        <span>{isAppointmentBooked && `${member.facilityDetails.facilityName}, ${member.facilityDetails.district}, ${member.facilityDetails.state}, ${member.facilityDetails.pincode}`}</span>
-                                        <br/>
-                                        <span className="invisible"> Appointment: </span>
-                                        <span className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
-                                    </Col>
-                                    <Col lg={6} className="d-flex justify-content-end">
-                                        <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "d-none"}`}
-                                                      onClick={() => {
-                                                          history.push({
-                                                              pathname: `/${member.code}/${member.programId}/appointment`,
-                                                              state: {name: member.name}
-                                                          })
-                                                      }}>{isAppointmentBooked ? "Edit" : "Book"}
-                                            <br/>Appointment</CustomButton>
-                                    </Col>
-                                </Row>
-                            </div>
-                        }
-                    </Card.Body>
-                </Card>
-            </div>
-        )
-    };
+            })
+            .catch(() => {
+                alert("Something went wrong. Please try again");
+            })
+            .finally(() => {
+                setShowModal(false)
+            });
+    }
 
     return (
         <div className="main-container">
@@ -186,8 +153,12 @@ export const Members = () => {
                     <Row>
                         {
                             members.length > 0 &&
-                            members.map(member => {
-                                return <MemberCard member={member}/>
+                            members.map((member, index) => {
+                                return <MemberCard member={member} programs={programs} onDelete={() => {
+                                    setShowModal(true)
+                                    setSelectedMemberIndex(index)
+                                }
+                                }/>
                             })
 
                         }
@@ -198,7 +169,106 @@ export const Members = () => {
                         <b style={{fontSize: "larger"}}>+ Member</b>
                     </Button>}
                 </div>
+                {selectedMemberIndex > -1 && members.length > 0 && <Modal show={showModal} onHide={() => {
+                    setShowModal(false)
+                }} centered backdrop="static" keyboard={false}>
+                    <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
+                        <div className="d-flex justify-content-between align-items-center">
+                            <div/>
+                            <h5>Confirm Cancelling Appointment </h5>
+                            <img src={CloseImg} className="cursor-pointer" alt={""}
+                                 onClick={() => {
+                                     setShowModal(false)
+                                 }}/>
+                        </div>
+                        <div className="d-flex flex-column justify-content-center align-items-center">
+                            <b>{members[selectedMemberIndex].name}</b>
+                            <b className="text-center mt-1">Enrollment number: {members[selectedMemberIndex].code}</b>
+                            <span className="mt-1">{`${members[selectedMemberIndex].facilityDetails.facilityName}, ${members[selectedMemberIndex].facilityDetails.district}, ${members[selectedMemberIndex].facilityDetails.state}, ${members[selectedMemberIndex].facilityDetails.pincode}`}</span>
+                            <span className="mt-1">{formatDate(members[selectedMemberIndex].appointmentDate || "")}, {members[selectedMemberIndex].appointmentSlot || ""}</span>
+                            <CustomButton className="blue-btn" onClick={() => {callCancelAppointment()}}>CONFIRM</CustomButton>
+                        </div>
+                    </div>
+                </Modal>}
             </Container>
         </div>
     );
+};
+
+const MemberCard = (props) => {
+    const history = useHistory();
+    const member = props.member;
+    const program = props.programs.filter(p => p.id === member.programId)[0];
+    const isAppointmentBooked = !!member.enrollmentScopeId;
+
+    function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
+        return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
+    }
+
+    function getTime(fromTime) {
+        if (fromTime > 11) {
+            return padDigit(fromTime > 12 ? fromTime % 12 : fromTime) + ":00 PM"
+        } else {
+            return fromTime + ":00 AM"
+        }
+    }
+
+    function showDeleteConfirmation() {
+        props.onDelete()
+    }
+
+    return (
+        <div className="col-xl-6 pt-3">
+            <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
+                <Card.Body style={{fontSize: "14px"}}>
+                    <div className="d-flex justify-content-between">
+                            <span className="mb-2"
+                                  style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
+                        {isAppointmentBooked ? <CustomDropdown items={[{
+                            name: "Delete Appointment", onClick: () => {
+                                showDeleteConfirmation()
+                            }
+                        }]}/> : <span/>}
+                    </div>
+                    <div className="mb-2">
+                        {program ? program.name : ''}
+                    </div>
+                    <div className="d-flex justify-content-between align-items-center">
+                        <div className="">
+                            <div><span
+                                style={{color: "#646D82"}}>Registration Date:</span> {formatDate(member.osCreatedAt)}
+                            </div>
+                            <div><span style={{color: "#646D82"}}> Enrollment number:</span> {member.code}</div>
+                        </div>
+                    </div>
+                    {
+                        <div className={"w-100"}>
+                            <Row
+                                className={`d-flex ${isAppointmentBooked ? "justify-content-between" : "justify-content-end"} align-items-center`}>
+                                <Col lg={isAppointmentBooked ? 12 : 6}
+                                     className={`${!isAppointmentBooked && "invisible"}`}>
+                                    <span style={{color: "#646D82"}}> Appointment: </span>
+                                    <span>{isAppointmentBooked && `${member.facilityDetails.facilityName}, ${member.facilityDetails.district}, ${member.facilityDetails.state}, ${member.facilityDetails.pincode}`}</span>
+                                    <br/>
+                                    <span className="invisible"> Appointment: </span>
+                                    <span
+                                        className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
+                                </Col>
+                                <Col lg={6} className="d-flex justify-content-end">
+                                    <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "d-none"}`}
+                                                  onClick={() => {
+                                                      history.push({
+                                                          pathname: `/${member.code}/${member.programId}/appointment`,
+                                                          state: {name: member.name}
+                                                      })
+                                                  }}>{isAppointmentBooked ? "Edit" : "Book"}
+                                        <br/>Appointment</CustomButton>
+                                </Col>
+                            </Row>
+                        </div>
+                    }
+                </Card.Body>
+            </Card>
+        </div>
+    )
 };
