@@ -12,12 +12,13 @@ import {
     AADHAAR_ERROR_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
-    GENDER_ERROR_MSG,
+    GENDER_ERROR_MSG, INVALID_NAME_ERR_MSG, MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
     STATE_ERROR_MSG
 } from "./error-constants";
+import {isAllLetter, isInValidAadhaarNumber} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -91,12 +92,18 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
             console.log("IDDDD", nationalIDType, ID_TYPES[0])
-          if(nationalIDType === ID_TYPES[0].value && (nationIDNumber.length !== 12 || isNaN(nationIDNumber))) {
-              errors.aadhaar = AADHAAR_ERROR_MESSAGE
-          }
+            if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
+                errors.aadhaar = AADHAAR_ERROR_MESSAGE
+            }
         }
         if(!formData.name) {
             errors.name = NAME_ERROR_MSG
+        } else if (formData.name.length < 2){
+            errors.name = MINIMUM_LENGTH_OF_NAME_ERROR_MSG
+        } else {
+            if(!isAllLetter(formData.name)) {
+                errors.name = INVALID_NAME_ERR_MSG
+            }
         }
         if(!formData.state) {
             errors.state = STATE_ERROR_MSG
@@ -104,7 +111,6 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         if(!formData.district) {
             errors.district = DISTRICT_ERROR_MSG
         }
-        // if(!formData.dob) {errors.dob = DOB_ERROR_MSG}
 
         if(!formData.gender) {
             errors.gender = GENDER_ERROR_MSG
@@ -154,9 +160,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                     next()
                 }
             })
-          .catch(err => {
-              alert("Error while registering, please try again later.\n" + err);
-          });
+            .catch(err => {
+                alert("Error while registering, please try again later.\n" + err);
+            });
     };
     return (
         <Container fluid>
@@ -169,14 +175,14 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                     <span>Back</span>
                 </Button>
                 { !verifyDetails &&
-                    <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
-                        <span>Continue &#8594;</span>
-                    </CustomButton>
+                <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
+                    <span>Continue &#8594;</span>
+                </CustomButton>
                 }
                 { verifyDetails &&
-                    <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
-                        <span>Confirm</span>
-                    </CustomButton>
+                <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
+                    <span>Confirm</span>
+                </CustomButton>
                 }
             </div>
         </Container>
@@ -329,7 +335,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
 
     useEffect(() => {
         setDistictsForState(formData.state)
-    });
+    }, []);
 
     function onStateSelected(stateSelected) {
         setValue({target: {name:"state", value:stateSelected}});
@@ -412,21 +418,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         <label htmlFor="name" className="pt-2">Age</label>
                         <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
-                        {/*<label htmlFor="name">Date of Birth *</label>
-                            { !verifyDetails && <CustomDateWidget id="dob" placeholder="Select Date"
-                                              value={minDate}
-                                              minDate={minDate}
-                                              maxDate={minDate}
-                                              onChange={d => {
-                                                  setDobValue(d)
-                                              }} />}
-                            {
-                                verifyDetails &&
-                                <><br/><b>{formatDate(formData.dob)}</b></>
-                            }
-                            <div className="invalid-input">
-                                {errors.dob}
-                            </div>*/}
                     </Col>
                 </div>
                 <div className="p-0 col-6">
