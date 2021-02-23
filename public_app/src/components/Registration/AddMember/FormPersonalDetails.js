@@ -12,12 +12,15 @@ import {
     AADHAAR_ERROR_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
-    GENDER_ERROR_MSG,
+    GENDER_ERROR_MSG, INVALID_NAME_ERR_MSG,
+    MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
     STATE_ERROR_MSG
 } from "./error-constants";
+import {formatDate} from "../../../utils/CustomDate";
+import {isAllLetter} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -91,13 +94,20 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
             console.log("IDDDD", nationalIDType, ID_TYPES[0])
-          if(nationalIDType === ID_TYPES[0].value && (nationIDNumber.length !== 12 || isNaN(nationIDNumber))) {
-              errors.aadhaar = AADHAAR_ERROR_MESSAGE
-          }
+            if(nationalIDType === ID_TYPES[0].value && (nationIDNumber.length !== 12 || isNaN(nationIDNumber))) {
+                errors.aadhaar = AADHAAR_ERROR_MESSAGE
+            }
         }
         if(!formData.name) {
             errors.name = NAME_ERROR_MSG
+        } else if (formData.name.length < 2){
+            errors.name = MINIMUM_LENGTH_OF_NAME_ERROR_MSG
+        } else {
+            if(!isAllLetter(formData.name)) {
+                errors.name = INVALID_NAME_ERR_MSG
+            }
         }
+
         if(!formData.state) {
             errors.state = STATE_ERROR_MSG
         }
@@ -346,6 +356,74 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
         }
     }
 
+        function setDobValue(dob) {
+            setValue({target: {name:"dob", value:dob}})
+        }
+        // const minDate = new Date();
+        // minDate.setYear(minDate.getYear() - maxAge);
+        return (
+            <div className="pt-5">
+                <h5>Beneficiary Details</h5>
+                <Row className="pt-2">
+                    <div className="p-0 col-6">
+                        <Col className="col-6">
+                            <label htmlFor="name">Name * (As per ID card)</label>
+                            <input className="form-control" name="name" id="name" type="text"
+                                   hidden={verifyDetails}
+                                   placeholder="Enter Name"
+                                   defaultValue={formData.name}
+                                   maxLength={100}
+                                   onBlur={setValue}/>
+                            <div className="invalid-input">
+                                {errors.name}
+                            </div>
+                            {
+                                verifyDetails &&
+                                    <b>{formData.name}</b>
+                            }
+                        </Col>
+                    </div>
+                    <div className="p-0 col-6">
+                        <Col className="col-6">
+                            <label htmlFor="state">State *</label>
+                            <select className="form-control" name="state" id="state"
+                                    onChange={(e) => onStateSelected(e.target.value)}
+                                    hidden={verifyDetails}>
+                                <option disabled selected={!formData.state} value>Select State</option>
+                                {
+                                    STATES.map(id => <option selected={id === formData.state} value={id}>{id}</option>)
+                                }
+                            </select>
+                            <div className="invalid-input">
+                                {errors.state}
+                            </div>
+                            {
+                                verifyDetails &&
+                                    <b>{formData.state}</b>
+                            }
+                        </Col>
+                    </div>
+                </Row>
+                <Row className="pt-2">
+                    <div className="p-0 col-6">
+                        <Col className="col-6">
+                            <label htmlFor="gender">Gender *</label>
+                            <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
+                                <option disabled selected={!formData.gender} value>Select Gender</option>
+                                {
+                                    GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
+                                }
+                            </select>
+                            {
+                                verifyDetails &&
+                                <><br/><b>{formData.gender}</b></>
+                            }
+                            <div className="invalid-input">
+                                {errors.gender}
+                            </div>
+                            <label htmlFor="name" className="pt-2">Age</label>
+                            <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
+                            {/*<label htmlFor="name">Date of Birth *</label>
     function setDobValue(dob) {
         setValue({target: {name:"dob", value:dob}})
     }
