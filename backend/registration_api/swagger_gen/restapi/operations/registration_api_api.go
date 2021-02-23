@@ -45,6 +45,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams) middleware.Responder {
 			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
 		}),
+		DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteAppointment has not yet been implemented")
+		}),
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
@@ -99,6 +102,8 @@ type RegistrationAPIAPI struct {
 
 	// BookSlotOfFacilityHandler sets the operation handler for the book slot of facility operation
 	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
+	// DeleteAppointmentHandler sets the operation handler for the delete appointment operation
+	DeleteAppointmentHandler DeleteAppointmentHandler
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
@@ -189,6 +194,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 
 	if o.BookSlotOfFacilityHandler == nil {
 		unregistered = append(unregistered, "BookSlotOfFacilityHandler")
+	}
+	if o.DeleteAppointmentHandler == nil {
+		unregistered = append(unregistered, "DeleteAppointmentHandler")
 	}
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
@@ -299,7 +307,11 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/facility/slot/book"] = NewBookSlotOfFacility(o.context, o.BookSlotOfFacilityHandler)
+	o.handlers["POST"]["/appointment"] = NewBookSlotOfFacility(o.context, o.BookSlotOfFacilityHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/appointment"] = NewDeleteAppointment(o.context, o.DeleteAppointmentHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -55,10 +55,12 @@ func StartRecipientsAppointmentBookingConsumer() {
 
 						_, err := kernelService.UpdateRegistry("Enrollment", appointmentTData)
 						if err == nil {
-							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, appointmentAckMessage.AppointmentDate,
-								appointmentAckMessage.AppointmentTime))
-							if err != nil {
-								log.Error("Unable to send notification to the enrolled user",  err)
+							if appointmentAckMessage.Status == models2.AllottedStatus {
+								err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, appointmentAckMessage.AppointmentDate,
+									appointmentAckMessage.AppointmentTime))
+								if err != nil {
+									log.Error("Unable to send notification to the enrolled user", err)
+								}
 							}
 						} else {
 							// Push to error topic

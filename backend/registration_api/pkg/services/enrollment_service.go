@@ -27,7 +27,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
 		facilityDetails := make(map[string]interface{})
 		facilityCode := enrollment["enrollmentScopeId"]
-		if facilityCode  != nil {
+		if facilityCode != nil && len(facilityCode.(string)) > 0 {
 			redisKey := facilityCode.(string) + "-info"
 			value, err := GetValue(redisKey)
 			if err := json.Unmarshal([]byte(value), &facilityDetails); err != nil {

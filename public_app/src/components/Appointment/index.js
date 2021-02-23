@@ -17,7 +17,7 @@ import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
-    const {name} = props.location.state;
+    const {state} = props.location;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
@@ -30,6 +30,9 @@ export const Appointment = (props) => {
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
     useEffect(() => {
+        if (state === undefined) {
+            history.push("/registration")
+        }
         setIsLoading(true);
         let params = {
             // pincode: searchText
@@ -66,22 +69,24 @@ export const Appointment = (props) => {
         return (
             <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
-                    <h5>Available Time Slot for {facility.facilityName}</h5>
+                    <h5>Available Time Slots for {facility.facilityName}</h5>
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
                 <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility.osid]}
                                    showModal={(allotmentDate, allotmentTime, slotKey) => {
-                                       setShowModal(true)
-                                       setSelectedAllotment({
-                                           facilityId: facility.osid,
-                                           facilityName: facility.facilityName,
-                                           facilityAddress: facility.address,
-                                           programName: program.name,
-                                           allotmentDate,
-                                           allotmentTime,
-                                           slotKey
-                                       })
+                                       if (facility && program) {
+                                           setShowModal(true)
+                                           setSelectedAllotment({
+                                               facilityId: facility.osid,
+                                               facilityName: facility.facilityName,
+                                               facilityAddress: facility.address,
+                                               programName: program.name,
+                                               allotmentDate,
+                                               allotmentTime,
+                                               slotKey
+                                           })
+                                       }
                                    }}/>
             </div>
         )
@@ -139,7 +144,7 @@ export const Appointment = (props) => {
             headers: {"recipientToken": token, "Content-Type": "application/json"},
         };
 
-        axios.post("/divoc/api/citizen/facility/slot/book", {
+        axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
             facilitySlotId: selectedAllotment.slotKey
         }, config)
@@ -171,7 +176,7 @@ export const Appointment = (props) => {
 
                 </Row>
                 <br/>
-                <h4>Facilities availability for next 3 days</h4>
+                <h4>Facilities availability for next few days</h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
@@ -223,7 +228,7 @@ export const Appointment = (props) => {
                     </div>
                     <div className="d-flex flex-column justify-content-center align-items-center">
                         {/*TODO: replace with name*/}
-                        <span>For {name}</span>
+                        <span>For {state && state.name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
                         <span className="mt-1">{selectedAllotment.allotmentTime}</span>

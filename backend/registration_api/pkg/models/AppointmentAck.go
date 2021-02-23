@@ -9,4 +9,8 @@ type AppointmentAck struct {
 	AppointmentDate string
 	AppointmentTime string
 	CreatedAt       time.Time
+	Status          string
 }
+
+const AllottedStatus = "ALLOTTED"
+const CancelledStatus = "CANCELLED"
