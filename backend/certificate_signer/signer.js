@@ -35,17 +35,17 @@ const publicKey = {
   publicKeyPem
 };
 
+const documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
+documentLoaderMapping[CERTIFICATE_DID] = publicKey;
+documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
+documentLoaderMapping['https://www.w3.org/2018/credentials#'] = credentialsv1;
+documentLoaderMapping["https://www.w3.org/2018/credentials/v1"] = credentialsv1;
+documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
+
 const customLoader = url => {
   console.log("checking " + url);
-  const c = {
-    CERTIFICATE_DID: publicKey,
-    CERTIFICATE_PUBKEY_ID: publicKey,
-    "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
-    'https://www.w3.org/2018/credentials#': credentialsv1,
-    "https://www.w3.org/2018/credentials/v1": credentialsv1,
-    CERTIFICATE_NAMESPACE: vaccinationContext,
-  };
-  let context = c[url];
+
+  let context = documentLoaderMapping[url];
   if (context === undefined) {
     context = contexts[url];
   }
