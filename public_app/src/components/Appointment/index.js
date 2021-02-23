@@ -29,32 +29,40 @@ export const Appointment = (props) => {
     const [facilitySlots, setFacilitySlots] = useState({});
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
-    useEffect(() => {
-        setIsLoading(true);
-        let params = {
-            // pincode: searchText
-        };
-        params = reject(equals(''))(params);
-        const queryParams = new URLSearchParams(params);
+    function triggerSearchFacilityAPI() {
+        if (searchText && searchText.length <= 3) {
+            return;
+        }
+        if (searchText === "" || searchText.length > 3) {
+            setIsLoading(true);
+            let params = {
+                // pincode: searchText
+            };
+            params = reject(equals(''))(params);
+            const queryParams = new URLSearchParams(params);
+            axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
+                .then(res => {
+                    const {facilities, facilitiesSchedule} = res.data;
+                    let data = facilities.map(d => {
+                        return d
+                    });
+                    let schedule = {};
+                    facilitiesSchedule.map(d => {
+                        if (d.facilityId) {
+                            schedule[d.facilityId] = d
+                        }
+                    });
+                    data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
+                    setFacilities(data);
+                    setFacilitiesSchedule(schedule);
+                    setIsLoading(false);
+                });
+        }
+    }
 
-        axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
-            .then(res => {
-                const {facilities, facilitiesSchedule} = res.data;
-                let data = facilities.map(d => {
-                    return d
-                });
-                let schedule = {};
-                facilitiesSchedule.map(d => {
-                    if (d.facilityId) {
-                        schedule[d.facilityId] = d
-                    }
-                });
-                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
-                setFacilities(data);
-                setFacilitiesSchedule(schedule);
-                setIsLoading(false);
-            });
-    }, [searchText, searchDate]);
+    useEffect(() => {
+        triggerSearchFacilityAPI();
+    }, []);
 
     function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
         return [addressLine1, addressLine2, district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -163,7 +171,7 @@ export const Appointment = (props) => {
                 </div>
                 <Row>
                     <Col lg={6}>
-                        <TextInputWithIcon title={"Search by Pincode"} value={searchText} onChange={setSearchText}
+                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"} value={searchText} onChange={setSearchText}
                                            img={Img}/>
                     </Col>
 

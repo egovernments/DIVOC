@@ -10,6 +10,10 @@
     justify-content: center;
 }
 
+.text-input-container .custom-input-wrapper img:hover {
+    cursor: pointer;
+}
+
 .text-input-container .custom-input-wrapper input {
     border: none;
     outline: none;
