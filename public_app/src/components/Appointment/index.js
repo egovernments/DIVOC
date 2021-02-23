@@ -62,7 +62,6 @@ export const Appointment = (props) => {
 
     function getAvailableAllotments() {
         let facility = facilities[selectedFacilityIndex];
-        const program = getProgramInfo(facility, program_id)
         return (
             <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
@@ -77,7 +76,6 @@ export const Appointment = (props) => {
                                            facilityId: facility.osid,
                                            facilityName: facility.facilityName,
                                            facilityAddress: facility.address,
-                                           programName: program.name,
                                            allotmentDate,
                                            allotmentTime,
                                            slotKey
@@ -222,7 +220,6 @@ export const Appointment = (props) => {
                              onClick={() => setShowModal(false)}/>
                     </div>
                     <div className="d-flex flex-column justify-content-center align-items-center">
-                        {/*TODO: replace with name*/}
                         <span>For {name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
@@ -236,15 +233,6 @@ export const Appointment = (props) => {
         </div>
     )
 };
-
-function getProgramInfo(facility, programId) {
-    const program = (facility.programs || []).find(program => program.programId === programId);
-    if (program) {
-        return program
-    } else {
-        return undefined
-    }
-}
 
 const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
     if (Object.keys(facilitySlots).length > 0) {
@@ -305,11 +293,11 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                                                     <Button
                                                         variant="outline-primary"
                                                         onClick={() => {
-                                                            if (slots != 0) {
+                                                            if (slots !== 0) {
                                                                 showModal(date, ts, timeStampWiseSlots[ts][date].key)
                                                             }
                                                         }}
-                                                        className={`slot-booking-btn mt-3 mb-3 ${slots == 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
+                                                        className={`slot-booking-btn mt-3 mb-3 ${slots === 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
                                                 </td>
                                             )
                                         } else {
