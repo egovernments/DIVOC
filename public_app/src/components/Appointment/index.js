@@ -29,32 +29,40 @@ export const Appointment = (props) => {
     const [facilitySlots, setFacilitySlots] = useState({});
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
-    useEffect(() => {
-        setIsLoading(true);
-        let params = {
-            // pincode: searchText
-        };
-        params = reject(equals(''))(params);
-        const queryParams = new URLSearchParams(params);
+    function triggerSearchFacilityAPI() {
+        if (searchText && searchText.length <= 3) {
+            return;
+        }
+        if (searchText === "" || searchText.length > 3) {
+            setIsLoading(true);
+            let params = {
+                // pincode: searchText
+            };
+            params = reject(equals(''))(params);
+            const queryParams = new URLSearchParams(params);
+            axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
+                .then(res => {
+                    const {facilities, facilitiesSchedule} = res.data;
+                    let data = facilities.map(d => {
+                        return d
+                    });
+                    let schedule = {};
+                    facilitiesSchedule.map(d => {
+                        if (d.facilityId) {
+                            schedule[d.facilityId] = d
+                        }
+                    });
+                    data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
+                    setFacilities(data);
+                    setFacilitiesSchedule(schedule);
+                    setIsLoading(false);
+                });
+        }
+    }
 
-        axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
-            .then(res => {
-                const {facilities, facilitiesSchedule} = res.data;
-                let data = facilities.map(d => {
-                    return d
-                });
-                let schedule = {};
-                facilitiesSchedule.map(d => {
-                    if (d.facilityId) {
-                        schedule[d.facilityId] = d
-                    }
-                });
-                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
-                setFacilities(data);
-                setFacilitiesSchedule(schedule);
-                setIsLoading(false);
-            });
-    }, [searchText, searchDate]);
+    useEffect(() => {
+        triggerSearchFacilityAPI();
+    }, []);
 
     function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
         return [addressLine1, addressLine2, district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -62,7 +70,6 @@ export const Appointment = (props) => {
 
     function getAvailableAllotments() {
         let facility = facilities[selectedFacilityIndex];
-        const program = getProgramInfo(facility, program_id)
         return (
             <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
@@ -77,7 +84,6 @@ export const Appointment = (props) => {
                                            facilityId: facility.osid,
                                            facilityName: facility.facilityName,
                                            facilityAddress: facility.address,
-                                           programName: program.name,
                                            allotmentDate,
                                            allotmentTime,
                                            slotKey
@@ -165,7 +171,7 @@ export const Appointment = (props) => {
                 </div>
                 <Row>
                     <Col lg={6}>
-                        <TextInputWithIcon title={"Search by Pincode"} value={searchText} onChange={setSearchText}
+                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"} value={searchText} onChange={setSearchText}
                                            img={Img}/>
                     </Col>
 
@@ -222,7 +228,6 @@ export const Appointment = (props) => {
                              onClick={() => setShowModal(false)}/>
                     </div>
                     <div className="d-flex flex-column justify-content-center align-items-center">
-                        {/*TODO: replace with name*/}
                         <span>For {name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
@@ -236,15 +241,6 @@ export const Appointment = (props) => {
         </div>
     )
 };
-
-function getProgramInfo(facility, programId) {
-    const program = (facility.programs || []).find(program => program.programId === programId);
-    if (program) {
-        return program
-    } else {
-        return undefined
-    }
-}
 
 const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
     if (Object.keys(facilitySlots).length > 0) {
