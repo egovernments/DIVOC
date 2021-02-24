@@ -22,7 +22,6 @@ const FacilityEntity = "Facility"
 const EnrollmentEntity = "Enrollment"
 const LastInitializedKey = "LAST_FACILITY_SLOTS_INITIALIZED"
 const YYYYMMDD = "2006-01-02"
-const SlotsToReturn = 100
 
 var DaysMap = map[string]time.Weekday{
 	"Su": time.Sunday,
@@ -241,12 +240,12 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	return operations.NewInitializeFacilitySlotsUnauthorized()
 }
 
-func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams) middleware.Responder {
+func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams, principal *models3.JWTClaimBody) middleware.Responder {
 	if paras.FacilityID == nil {
 		return operations.NewGenerateOTPBadRequest()
 	}
-	startPosition := int64(*paras.PageNumber) * SlotsToReturn
-	slotKeys, err := services.GetValuesFromSet(*paras.FacilityID, startPosition, startPosition+SlotsToReturn-1)
+	startPosition := int64(*paras.PageNumber) * int64(*paras.PageSize)
+	slotKeys, err := services.GetValuesFromSet(*paras.FacilityID, startPosition, startPosition+int64(*paras.PageSize)-1)
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {
