@@ -2,7 +2,7 @@ import {Container} from "react-bootstrap";
 import React from "react";
 import {CustomButton} from "../../CustomButton";
 import {useHistory} from "react-router-dom";
-import check from "../../../assets/img/check.png";
+import check from "../../../assets/img/check.svg";
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 
 export const Success = ({ formData, programs}) => {
@@ -12,7 +12,7 @@ export const Success = ({ formData, programs}) => {
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <img className="pb-1" src={check}/>
+                <img className="pb-3" style={{height: "50px"}} src={check}/>
                 <h3>Successfully registered for {programName ? programName : ''}</h3>
                 <div className="pt-3">
                     <h4>Beneficiary Name: {formData.name}</h4>

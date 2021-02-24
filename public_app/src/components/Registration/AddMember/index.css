@@ -14,7 +14,10 @@
 }
 @media (max-width: 961px) {
     .side-effect-container {
-        padding: 1rem 0;
+        padding: 1rem 0.5rem;
+    }
+    .select-program-container {
+        padding: 1rem 0.5rem;
     }
 }
 

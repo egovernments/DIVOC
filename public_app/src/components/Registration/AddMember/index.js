@@ -5,17 +5,13 @@ import axios from "axios";
 import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
-import SelectedLogo from "../../../assets/img/check.png"
+import SelectedLogo from "../../../assets/img/check.svg"
 import {Success} from "./Success";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
-import check from "../../../assets/img/check.png";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import {func} from "prop-types";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_SELECT_COMORBIDITY = "selectComorbidity";
