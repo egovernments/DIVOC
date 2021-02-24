@@ -35,7 +35,7 @@ func NewBookSlotOfFacility(ctx *middleware.Context, handler BookSlotOfFacilityHa
 	return &BookSlotOfFacility{Context: ctx, Handler: handler}
 }
 
-/*BookSlotOfFacility swagger:route POST /facility/slot/book bookSlotOfFacility
+/*BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
 
 Book a slot in facility
 

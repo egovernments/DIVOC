@@ -16,7 +16,34 @@ consumes:
 produces:
   - application/json
 paths:
-  /facility/slot/book:
+  /appointment:
+    delete:
+      summary: Delete the appointment
+      operationId: deleteAppointment
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - enrollmentCode
+            properties:
+              enrollmentCode:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '401':
+          description: Unauthorized
     post:
       summary: Book a slot in facility
       operationId: bookSlotOfFacility

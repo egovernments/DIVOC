@@ -35,7 +35,7 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/facility/slot/book": {
+    "/appointment": {
       "post": {
         "security": [
           {
@@ -74,6 +74,49 @@ func init() {
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete the appointment",
+        "operationId": "deleteAppointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
@@ -313,7 +356,7 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/facility/slot/book": {
+    "/appointment": {
       "post": {
         "security": [
           {
@@ -352,6 +395,49 @@ func init() {
           },
           "400": {
             "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete the appointment",
+        "operationId": "deleteAppointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "401": {
             "description": "Unauthorized"
