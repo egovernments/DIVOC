@@ -47,22 +47,23 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 function WalkEnrollment(props) {
     const {state, goNext} = useWalkInEnrollment();
-    const {getText,selectLanguage} = useLocale()
+    const {getText, selectLanguage} = useLocale()
     const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
     const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
     const [formData, setFormData] = useState(state);
+    const [isFormTranslated, setFormTranslated] = useState(false);
 
     useEffect(() => {
         setStateListInSchema();
         for (let index in enrollmentSchema.required) {
             const property = enrollmentSchema.required[index]
             const labelText = getText("app.enrollment." + property);
-            console.log(labelText)
             enrollmentSchema.properties[property].title = labelText
         }
         console.log(enrollmentSchema)
         setEnrollmentSchema(enrollmentSchema)
+        setFormTranslated(true)
 
     }, [selectLanguage]);
 
@@ -98,6 +99,7 @@ function WalkEnrollment(props) {
             <BaseFormCard title={"Enroll Recipient"}>
                 <div className="pt-3 form-wrapper">
                     <Form
+                        key={isFormTranslated}
                         schema={enrollmentSchema}
                         customFormats={customFormats}
                         uiSchema={uiSchema}
