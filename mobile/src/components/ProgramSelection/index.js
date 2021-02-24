@@ -119,7 +119,7 @@ export function SelectProgram({onDone}) {
                             saveSelectedProgram(selectedProgram)
                             onDone(selectedProgram)
                         }
-                    }}>Done</Button>
+                    }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_DONE)}</Button>
             </div>
         </div>
     );

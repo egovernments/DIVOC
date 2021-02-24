@@ -123,4 +123,12 @@ export const LANGUAGE_KEYS = Object.freeze({
     ENROLLMENT_DISTRICT: "app.enrollment.district",
     ENROLLMENT_LOCALITY: "app.enrollment.locality",
     ENROLLMENT_PINCODE: "app.enrollment.pincode",
+    PAYMENT_TITLE: "app.payment.title",
+    PAYMENT_GOVT: "app.payment.govt",
+    PAYMENT_VOUCHER: "app.payment.voucher",
+    PAYMENT_DIRECT: "app.payment.direct",
+
+    BUTTON_DONE: "app.button.done",
+    BUTTON_CONFIRM: "app.button.confirm",
+    BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination"
 });

@@ -113,7 +113,8 @@ function WalkEnrollment(props) {
                             goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, e.formData)
                         }}
                     >
-                        <Button type={"submit"} variant="outline-primary" className="action-btn">Done</Button>
+                        <Button type={"submit"} variant="outline-primary"
+                                className="action-btn">{getMessageComponent(LANGUAGE_KEYS.BUTTON_DONE)}</Button>
                     </Form>
                 </div>
 
@@ -124,7 +125,8 @@ function WalkEnrollment(props) {
 
 const paymentMode = [
     {
-        name: "Government",
+        key: "government",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_GOVT),
         logo: function (selected) {
             return <ImgGovernment selected={selected}/>
         }
@@ -132,7 +134,8 @@ const paymentMode = [
     }
     ,
     {
-        name: "Voucher",
+        key: "voucher",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_VOUCHER),
         logo: function (selected) {
             return <ImgVoucher selected={selected}/>
         }
@@ -140,7 +143,8 @@ const paymentMode = [
     }
     ,
     {
-        name: "Direct",
+        key: "direct",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_DIRECT),
         logo: function (selected) {
             return <ImgDirect selected={selected}/>
         }
@@ -154,18 +158,19 @@ function WalkEnrollmentPayment(props) {
     const [selectPaymentMode, setSelectPaymentMode] = useState()
     return (
         <div className="new-enroll-container">
-            <BaseFormCard title={"Enroll Recipient"}>
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
                 <div className="content">
-                    <h3>Please select mode of payment</h3>
+                    <h3>{getMessageComponent(LANGUAGE_KEYS.PAYMENT_TITLE)}</h3>
                     <Row className="payment-container">
                         {
                             paymentMode.map((item, index) => {
                                 return <PaymentItem
                                     title={item.name}
+                                    key={item.key}
                                     logo={item.logo}
-                                    selected={item.name === selectPaymentMode}
-                                    onClick={(value) => {
-                                        setSelectPaymentMode(value)
+                                    selected={selectPaymentMode && item.name === selectPaymentMode.name}
+                                    onClick={(value, key) => {
+                                        setSelectPaymentMode({name: value, key: key})
                                     }}/>
                             })
                         }
@@ -173,11 +178,11 @@ function WalkEnrollmentPayment(props) {
                     <Button variant="outline-primary"
                             className="action-btn"
                             onClick={() => {
-                                saveWalkInEnrollment(selectPaymentMode)
+                                saveWalkInEnrollment(selectPaymentMode.key)
                                     .then(() => {
                                         goNext(FORM_WALK_IN_ENROLL_PAYMENTS, "/", {})
                                     })
-                            }}>Send for vaccination</Button>
+                            }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</Button>
                 </div>
             </BaseFormCard>
         </div>
@@ -196,7 +201,7 @@ function PaymentItem(props) {
     return (
         <div onClick={() => {
             if (props.onClick) {
-                props.onClick(props.title)
+                props.onClick(props.title, props.key)
             }
         }}>
             <div className={`payment-item ${props.selected ? "active" : ""}`}>
