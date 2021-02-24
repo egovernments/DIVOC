@@ -108,17 +108,24 @@ export const Appointment = (props) => {
         }
     }
 
-    function getSlotsForFacility(facilityIndex, pageNumber = 0) {
+    function getSlotsForFacility(facilityIndex, pageNumber = 0, pageSize=12) {
         setSelectedFacilityIndex(facilityIndex);
         const facilityId = facilities[facilityIndex].facilityCode;
         setIsLoading(true);
         let params = {
             facilityId,
-            pageNumber
+            pageNumber,
+            pageSize
         };
         params = reject(equals(''))(params);
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const queryParams = new URLSearchParams(params);
-        axios.get("/divoc/api/citizen/facility/slots", {params: queryParams})
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
+            params: queryParams
+        };
+
+        axios.get("/divoc/api/citizen/facility/slots", config)
             .then(res => {
                 const {keys, slots} = res.data;
                 const dayWiseSlotsInfo = {};
