@@ -114,7 +114,7 @@ function WalkEnrollment(props) {
                         }}
                     >
                         <Button type={"submit"} variant="outline-primary"
-                                className="action-btn">{getMessageComponent(LANGUAGE_KEYS.BUTTON_DONE)}</Button>
+                                className="action-btn">{getMessageComponent(LANGUAGE_KEYS.BUTTON_NEXT)}</Button>
                     </Form>
                 </div>
 

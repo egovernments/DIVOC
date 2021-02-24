@@ -108,8 +108,12 @@ export const LANGUAGE_KEYS = Object.freeze({
     PROFILE_CONFIRM_LOGOUT_OK: "app.profile.confirmLogout.ok",
     PROFILE_CONFIRM_LOGOUT_CANCEL: "app.profile.confirmLogout.cancel",
 
-    ENROLLMENT_TITLE: "app.enrollment.title",
     PRE_ENROLLMENT_TITLE: "app.preenrollment.title",
+    PRE_ENROLLMENT_DETAILS: "app.preenrollment.details",
+    PRE_ENROLLMENT_ENTER_MANUALLY: "app.preenrollment.enterManually",
+    PRE_ENROLLMENT_NO_PATIENTS: "app.preenrollment.noPatient",
+
+    ENROLLMENT_TITLE: "app.enrollment.title",
     ENROLLMENT_NAME: "app.enrollment.name",
     ENROLLMENT_SELECT_GENDER: "app.enrollment.gender",
     ENROLLMENT_NATIONALITY: "app.enrollment.nationalId",
@@ -123,12 +127,14 @@ export const LANGUAGE_KEYS = Object.freeze({
     ENROLLMENT_DISTRICT: "app.enrollment.district",
     ENROLLMENT_LOCALITY: "app.enrollment.locality",
     ENROLLMENT_PINCODE: "app.enrollment.pincode",
+
     PAYMENT_TITLE: "app.payment.title",
     PAYMENT_GOVT: "app.payment.govt",
     PAYMENT_VOUCHER: "app.payment.voucher",
     PAYMENT_DIRECT: "app.payment.direct",
 
     BUTTON_DONE: "app.button.done",
+    BUTTON_NEXT: "app.button.next",
     BUTTON_CONFIRM: "app.button.confirm",
     BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination"
 });
