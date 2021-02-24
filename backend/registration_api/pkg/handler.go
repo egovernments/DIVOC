@@ -10,6 +10,7 @@ import (
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
+	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
@@ -44,20 +45,10 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
 }
 
-func getRecipients(params operations.GetRecipientsParams) middleware.Responder {
-	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
-	if recipientToken == "" {
-		log.Error("Recipient Token is empty")
-		return operations.NewGetRecipientsUnauthorized()
-	}
-	phone, err := services.VerifyRecipientToken(recipientToken)
-	if err != nil {
-		log.Error("Error occurred while verifying the token ", err)
-		return operations.NewGetRecipientsUnauthorized()
-	}
+func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
 	filter := map[string]interface{}{}
 	filter["phone"] = map[string]interface{}{
-		"eq": phone,
+		"eq": principal.Phone,
 	}
 	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
 	if err != nil {
@@ -80,18 +71,8 @@ func getRecipients(params operations.GetRecipientsParams) middleware.Responder {
 	}
 }
 
-func enrollRecipient(params operations.EnrollRecipientParams) middleware.Responder {
-	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
-	if recipientToken == "" {
-		log.Error("Recipient Token is empty")
-		return operations.NewEnrollRecipientUnauthorized()
-	}
-	phone, err := services.VerifyRecipientToken(recipientToken)
-	if err != nil {
-		log.Error("Error occurred while verifying the token ", err)
-		return operations.NewEnrollRecipientUnauthorized()
-	}
-	params.Body.Phone = phone
+func enrollRecipient(params operations.EnrollRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
+	params.Body.Phone = principal.Phone
 	if recipientData, err := json.Marshal(params.Body); err == nil {
 		log.Info("Received Recipient data to enroll", string(recipientData), params.Body)
 		services.PublishEnrollmentMessage(recipientData)
@@ -280,21 +261,12 @@ func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams) middleware.R
 	return operations.NewGetSlotsForFacilitiesBadRequest()
 }
 
-func bookSlot(params operations.BookSlotOfFacilityParams) middleware.Responder {
-	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
+func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWTClaimBody) middleware.Responder {
 	if params.Body.EnrollmentCode == nil || params.Body.FacilitySlotID == nil {
 		return operations.NewBookSlotOfFacilityBadRequest()
 	}
-	if recipientToken == "" {
-		log.Error("Recipient Token is empty")
-		return operations.NewGetRecipientsUnauthorized()
-	}
-	phone, err := services.VerifyRecipientToken(recipientToken)
-	if err != nil {
-		log.Error("Invalid Token")
-		return operations.NewGetRecipientsUnauthorized()
-	}
-	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, phone)
+
+	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, principal.Phone)
 	if enrollmentInfo != nil {
 		if !checkIfAlreadyAppointed(enrollmentInfo) {
 			err := services.BookAppointmentSlot(*params.Body.FacilitySlotID)
@@ -318,10 +290,10 @@ func bookSlot(params operations.BookSlotOfFacilityParams) middleware.Responder {
 				}
 			}
 		} else {
-			log.Errorf("Already booked %s, %s", *params.Body.EnrollmentCode, phone)
+			log.Errorf("Already booked %s, %s", *params.Body.EnrollmentCode, principal.Phone)
 		}
 	} else {
-		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, phone)
+		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
 	}
 	return operations.NewGetSlotsForFacilitiesBadRequest()
 }

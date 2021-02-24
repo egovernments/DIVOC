@@ -27,7 +27,7 @@ export const Members = () => {
         setIsLoading(true);
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"recipientToken": token, "Content-Type": "application/json"},
+            headers: {"Authorization": token, "Content-Type": "application/json"},
         };
         axios
             .get(RECIPIENTS_API, config)

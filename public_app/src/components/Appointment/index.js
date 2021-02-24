@@ -148,7 +148,7 @@ export const Appointment = (props) => {
     function bookSlot() {
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"recipientToken": token, "Content-Type": "application/json"},
+            headers: {"Authorization": token, "Content-Type": "application/json"},
         };
 
         axios.post("/divoc/api/citizen/appointment", {

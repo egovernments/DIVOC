@@ -18,6 +18,8 @@ import (
 	"github.com/go-openapi/spec"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+
+	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
 // NewRegistrationAPIAPI creates a new RegistrationAPI instance
@@ -42,19 +44,19 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams) middleware.Responder {
+		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
 		}),
-		DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams) middleware.Responder {
+    DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteAppointment has not yet been implemented")
 		}),
-		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams) middleware.Responder {
+		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams,  principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
 		GenerateOTPHandler: GenerateOTPHandlerFunc(func(params GenerateOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation GenerateOTP has not yet been implemented")
 		}),
-		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams) middleware.Responder {
+		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
 		}),
 		GetSlotsForFacilitiesHandler: GetSlotsForFacilitiesHandlerFunc(func(params GetSlotsForFacilitiesParams) middleware.Responder {
@@ -66,6 +68,13 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		VerifyOTPHandler: VerifyOTPHandlerFunc(func(params VerifyOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation VerifyOTP has not yet been implemented")
 		}),
+
+		// Applies when the "Authorization" header is set
+		BearerAuth: func(token string) (*models.JWTClaimBody, error) {
+			return nil, errors.NotImplemented("api key auth (Bearer) Authorization from header param [Authorization] has not yet been implemented")
+		},
+		// default authorizer is authorized meaning no requests are blocked
+		APIAuthorizer: security.Authorized(),
 	}
 }
 
@@ -99,6 +108,13 @@ type RegistrationAPIAPI struct {
 	// JSONProducer registers a producer for the following mime types:
 	//   - application/json
 	JSONProducer runtime.Producer
+
+	// BearerAuth registers a function that takes a token and returns a principal
+	// it performs authentication based on an api key Authorization provided in the header
+	BearerAuth func(string) (*models.JWTClaimBody, error)
+
+	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
+	APIAuthorizer runtime.Authorizer
 
 	// BookSlotOfFacilityHandler sets the operation handler for the book slot of facility operation
 	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
@@ -192,6 +208,10 @@ func (o *RegistrationAPIAPI) Validate() error {
 		unregistered = append(unregistered, "JSONProducer")
 	}
 
+	if o.BearerAuth == nil {
+		unregistered = append(unregistered, "AuthorizationAuth")
+	}
+
 	if o.BookSlotOfFacilityHandler == nil {
 		unregistered = append(unregistered, "BookSlotOfFacilityHandler")
 	}
@@ -231,12 +251,23 @@ func (o *RegistrationAPIAPI) ServeErrorFor(operationID string) func(http.Respons
 
 // AuthenticatorsFor gets the authenticators for the specified security schemes
 func (o *RegistrationAPIAPI) AuthenticatorsFor(schemes map[string]spec.SecurityScheme) map[string]runtime.Authenticator {
-	return nil
+	result := make(map[string]runtime.Authenticator)
+	for name := range schemes {
+		switch name {
+		case "Bearer":
+			scheme := schemes[name]
+			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
+				return o.BearerAuth(token)
+			})
+
+		}
+	}
+	return result
 }
 
 // Authorizer returns the registered authorizer
 func (o *RegistrationAPIAPI) Authorizer() runtime.Authorizer {
-	return nil
+	return o.APIAuthorizer
 }
 
 // ConsumersFor gets the consumers for the specified media types.

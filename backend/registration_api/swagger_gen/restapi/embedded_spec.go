@@ -37,6 +37,11 @@ func init() {
   "paths": {
     "/appointment": {
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Book a slot in facility",
         "operationId": "bookSlotOfFacility",
         "parameters": [
@@ -121,6 +126,7 @@ func init() {
     },
     "/facility/slots": {
       "get": {
+        "security": [],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -154,6 +160,7 @@ func init() {
     },
     "/facility/slots/init": {
       "post": {
+        "security": [],
         "summary": "Initialize facility slots",
         "operationId": "initializeFacilitySlots",
         "parameters": [
@@ -182,6 +189,7 @@ func init() {
     },
     "/generateOTP": {
       "post": {
+        "security": [],
         "summary": "Generate OTP",
         "operationId": "generateOTP",
         "parameters": [
@@ -217,6 +225,11 @@ func init() {
     },
     "/recipients": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get all the recipients",
         "operationId": "getRecipients",
         "responses": {
@@ -239,6 +252,11 @@ func init() {
         }
       },
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
         "parameters": [
@@ -263,6 +281,7 @@ func init() {
     },
     "/verifyOTP": {
       "post": {
+        "security": [],
         "summary": "Verify OTP",
         "operationId": "verifyOTP",
         "parameters": [
@@ -310,6 +329,13 @@ func init() {
         }
       }
     }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
@@ -332,6 +358,11 @@ func init() {
   "paths": {
     "/appointment": {
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Book a slot in facility",
         "operationId": "bookSlotOfFacility",
         "parameters": [
@@ -416,6 +447,7 @@ func init() {
     },
     "/facility/slots": {
       "get": {
+        "security": [],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -449,6 +481,7 @@ func init() {
     },
     "/facility/slots/init": {
       "post": {
+        "security": [],
         "summary": "Initialize facility slots",
         "operationId": "initializeFacilitySlots",
         "parameters": [
@@ -477,6 +510,7 @@ func init() {
     },
     "/generateOTP": {
       "post": {
+        "security": [],
         "summary": "Generate OTP",
         "operationId": "generateOTP",
         "parameters": [
@@ -512,6 +546,11 @@ func init() {
     },
     "/recipients": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get all the recipients",
         "operationId": "getRecipients",
         "responses": {
@@ -534,6 +573,11 @@ func init() {
         }
       },
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
         "parameters": [
@@ -558,6 +602,7 @@ func init() {
     },
     "/verifyOTP": {
       "post": {
+        "security": [],
         "summary": "Verify OTP",
         "operationId": "verifyOTP",
         "parameters": [
@@ -726,6 +771,13 @@ func init() {
           "type": "integer"
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   }
 }`))
