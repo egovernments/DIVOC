@@ -58,3 +58,27 @@ func (o *ConfigureSlotFacilityBadRequest) WriteResponse(rw http.ResponseWriter, 
 
 	rw.WriteHeader(400)
 }
+
+// ConfigureSlotFacilityUnauthorizedCode is the HTTP code returned for type ConfigureSlotFacilityUnauthorized
+const ConfigureSlotFacilityUnauthorizedCode int = 401
+
+/*ConfigureSlotFacilityUnauthorized Unauthorized
+
+swagger:response configureSlotFacilityUnauthorized
+*/
+type ConfigureSlotFacilityUnauthorized struct {
+}
+
+// NewConfigureSlotFacilityUnauthorized creates ConfigureSlotFacilityUnauthorized with default headers values
+func NewConfigureSlotFacilityUnauthorized() *ConfigureSlotFacilityUnauthorized {
+
+	return &ConfigureSlotFacilityUnauthorized{}
+}
+
+// WriteResponse to the client
+func (o *ConfigureSlotFacilityUnauthorized) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(401)
+}
