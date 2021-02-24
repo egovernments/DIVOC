@@ -239,7 +239,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 </Container>
 
                     <h4>Ongoing Vaccination Programs</h4>
-                    <Container  style={{"columnCount": 2}}>
+                    <Container  style={{"columnCount": activePrograms?.length === 1 ? 1 : 2}}>
                     { activePrograms?.map(p => 
                         <Container key={p.programId} className="programDiv">
                             <label>

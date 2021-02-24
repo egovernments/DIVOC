@@ -91,6 +91,10 @@ export function SelectProgram({onDone}) {
             .then((result) => {
                 setLoading(false);
                 setPrograms(result);
+                if (result?.length === 1) {
+                    saveSelectedProgram(result[0].name);
+                    onDone(result[0].name);
+                }
             })
             .catch(e => {
                 setLoading(false);

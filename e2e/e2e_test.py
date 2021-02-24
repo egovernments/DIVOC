@@ -41,7 +41,7 @@ def test_certify():
     log.info("Cerify request sent")
     
     new_certs = []
-    max_tries = 5
+    max_tries = 12
     for i in range(max_tries):
         log.info("Fetching certificates...., try no : %s", i+1)
         new_certs = test_utils.fetch_certificates(cid)
@@ -59,7 +59,7 @@ def run_tests():
     test_certify()
 
 tests_ran = False
-ping_retries = 10
+ping_retries = 24
 for i in range(ping_retries):
     log.info("Trying to ping...., try no : %s", i+1)
     if(service_check()):
