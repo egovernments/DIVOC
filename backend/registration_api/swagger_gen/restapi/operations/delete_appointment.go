@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -35,7 +36,7 @@ func NewDeleteAppointment(ctx *middleware.Context, handler DeleteAppointmentHand
 	return &DeleteAppointment{Context: ctx, Handler: handler}
 }
 
-/*DeleteAppointment swagger:route DELETE /appointment deleteAppointment
+/* DeleteAppointment swagger:route DELETE /appointment deleteAppointment
 
 Delete the appointment
 
@@ -90,6 +91,11 @@ func (o *DeleteAppointmentBadRequestBody) Validate(formats strfmt.Registry) erro
 	return nil
 }
 
+// ContextValidate validates this delete appointment bad request body based on context it is used
+func (o *DeleteAppointmentBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (o *DeleteAppointmentBadRequestBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
@@ -138,6 +144,11 @@ func (o *DeleteAppointmentBody) validateEnrollmentCode(formats strfmt.Registry) 
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this delete appointment body based on context it is used
+func (o *DeleteAppointmentBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

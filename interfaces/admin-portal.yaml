@@ -1035,7 +1035,7 @@ definitions:
         addressLine2: some nagar
         district: bangalore south
         state: Karnataka
-        pincode: 560000
+        pincode: "560000"
     required:
       - addressLine1
       - addressLine2
@@ -1050,7 +1050,7 @@ definitions:
       district:
         type: string
       pincode:
-        type: integer
+        type: string
       state:
         type: string
         title: The state schema

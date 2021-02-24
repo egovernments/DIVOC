@@ -581,7 +581,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -629,7 +629,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -801,7 +801,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -1524,7 +1524,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -1572,7 +1572,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -1691,7 +1691,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -1722,7 +1722,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "type": "string"
@@ -1759,7 +1759,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -1813,7 +1813,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "type": "string"
@@ -1955,7 +1955,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -2016,7 +2016,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "type": "string"

@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 
 	"github.com/go-openapi/errors"
@@ -103,7 +104,6 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -121,7 +121,6 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppointmentDate) { // not required
 		return nil
 	}
@@ -134,7 +133,6 @@ func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateDob(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
@@ -179,7 +177,6 @@ func (m *Enrollment) validateGenderEnum(path, location string, value string) err
 }
 
 func (m *Enrollment) validateGender(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -196,6 +193,34 @@ func (m *Enrollment) validateNationalID(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalId", "body", m.NationalID); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this enrollment based on the context it is used
+func (m *Enrollment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Enrollment) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
 	}
 
 	return nil

@@ -711,7 +711,7 @@ func init() {
           "$id": "#/properties/address/properties/district"
         },
         "pincode": {
-          "type": "integer",
+          "type": "string",
           "title": "The pincode schema",
           "$id": "#/properties/address/properties/pincode"
         },
@@ -730,7 +730,7 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]

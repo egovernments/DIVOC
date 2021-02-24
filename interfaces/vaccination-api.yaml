@@ -385,7 +385,7 @@ definitions:
           state:
             type: string
           pincode:
-            type: integer
+            type: string
   CertificationRequest:
     type: object
     properties:
@@ -424,7 +424,7 @@ definitions:
               state:
                 type: string
               pincode:
-                type: integer
+                type: string
             required:
               - addressLine1
               - district
@@ -497,7 +497,7 @@ definitions:
               state:
                 type: string
               pincode:
-                type: integer
+                type: string
             required:
               - addressLine1
               - district

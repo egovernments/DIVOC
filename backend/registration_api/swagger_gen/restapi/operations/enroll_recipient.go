@@ -31,7 +31,7 @@ func NewEnrollRecipient(ctx *middleware.Context, handler EnrollRecipientHandler)
 	return &EnrollRecipient{Context: ctx, Handler: handler}
 }
 
-/*EnrollRecipient swagger:route POST /recipients enrollRecipient
+/* EnrollRecipient swagger:route POST /recipients enrollRecipient
 
 Enroll Recipient
 

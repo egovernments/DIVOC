@@ -148,7 +148,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             "addressLine2": "",
             "state": "",
             "district": "",
-            "pincode": 0
+            "pincode": ""
         };
         dataToSend["address"]["state"] = formData.state;
         dataToSend["address"]["district"] = formData.district;
