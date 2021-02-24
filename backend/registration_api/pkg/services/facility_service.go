@@ -27,9 +27,6 @@ func GetFacilityAppointmentSchedule(facilityId string) ProgramDaySchedule {
 		"facilityId": map[string]interface{}{
 			"eq": facilityId,
 		},
-		"osCreatedAt": map[string]interface{}{
-			"lt": time.Now().Format("2006-01-02"),
-		},
 	}
 	facilitySchedulesArr, err := services.QueryRegistry(FacilityProgramSlot, filter, 100, 0)
 	if err == nil {
