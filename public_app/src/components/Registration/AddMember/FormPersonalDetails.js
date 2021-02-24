@@ -63,7 +63,7 @@ const STATES = Object.values(state_and_districts['states']).map(obj => obj.name)
 const GENDERS = [
     "Male",
     "Female",
-    "Others"
+    "Other"
 ];
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
