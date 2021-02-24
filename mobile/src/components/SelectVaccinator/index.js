@@ -122,7 +122,7 @@ export const SelectVaccinator = (props) => {
                         setSelectedMedicineName(option.value)
                     }}/>
                 {selectedMedicineName && <div>
-                    <div className="select-title">SELECT DOSE*</div>
+                    <div className="select-title">{getMessageComponent(LANGUAGE_KEYS.VACCINATION_DOSE)}*</div>
                     <Select
                         key={selectedDose ?? "doseId"}
                         isSearchable={false}
