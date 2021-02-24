@@ -61,7 +61,6 @@ function WalkEnrollment(props) {
             const labelText = getText("app.enrollment." + property);
             enrollmentSchema.properties[property].title = labelText
         }
-        console.log(enrollmentSchema)
         setEnrollmentSchema(enrollmentSchema)
         setFormTranslated(true)
 
