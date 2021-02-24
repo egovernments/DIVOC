@@ -202,7 +202,6 @@ export class AppDatabase {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        console.log(patient, vaccinator, queue)
         if (patient && vaccinator && queue) {
             const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
             return {
@@ -245,5 +244,3 @@ export class AppDatabase {
 }
 
 export const appIndexDb = new AppDatabase();
-
-
