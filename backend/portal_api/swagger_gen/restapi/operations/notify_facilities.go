@@ -6,11 +6,14 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
@@ -33,7 +36,7 @@ func NewNotifyFacilities(ctx *middleware.Context, handler NotifyFacilitiesHandle
 	return &NotifyFacilities{Context: ctx, Handler: handler}
 }
 
-/*NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
+/* NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
 
 notify facilities
 
@@ -49,7 +52,6 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewNotifyFacilitiesParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -69,30 +71,82 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
 
-// NotifyFacilitiesParamsBodyItems0 notify facilities params body items0
+// NotifyFacilitiesBody notify facilities body
 //
-// swagger:model NotifyFacilitiesParamsBodyItems0
-type NotifyFacilitiesParamsBodyItems0 struct {
+// swagger:model NotifyFacilitiesBody
+type NotifyFacilitiesBody struct {
 
-	// facility Id
-	FacilityID string `json:"facilityId,omitempty"`
+	// facilities
+	// Required: true
+	// Min Items: 1
+	Facilities []string `json:"facilities"`
 
-	// pending tasks
-	PendingTasks []string `json:"pendingTasks"`
+	// message
+	// Required: true
+	// Min Length: 5
+	Message *string `json:"message"`
+
+	// subject
+	Subject string `json:"subject,omitempty"`
 }
 
-// Validate validates this notify facilities params body items0
-func (o *NotifyFacilitiesParamsBodyItems0) Validate(formats strfmt.Registry) error {
+// Validate validates this notify facilities body
+func (o *NotifyFacilitiesBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateFacilities(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMessage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *NotifyFacilitiesBody) validateFacilities(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"facilities", "body", o.Facilities); err != nil {
+		return err
+	}
+
+	iFacilitiesSize := int64(len(o.Facilities))
+
+	if err := validate.MinItems("body"+"."+"facilities", "body", iFacilitiesSize, 1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *NotifyFacilitiesBody) validateMessage(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"message", "body", o.Message); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("body"+"."+"message", "body", *o.Message, 5); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validates this notify facilities body based on context it is used
+func (o *NotifyFacilitiesBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (o *NotifyFacilitiesParamsBodyItems0) MarshalBinary() ([]byte, error) {
+func (o *NotifyFacilitiesBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -100,8 +154,8 @@ func (o *NotifyFacilitiesParamsBodyItems0) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *NotifyFacilitiesParamsBodyItems0) UnmarshalBinary(b []byte) error {
-	var res NotifyFacilitiesParamsBodyItems0
+func (o *NotifyFacilitiesBody) UnmarshalBinary(b []byte) error {
+	var res NotifyFacilitiesBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

@@ -166,16 +166,21 @@ paths:
         - in: body
           name: body
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                facilityId:
+            type: object
+            properties:
+              subject:
+                type: string
+              message:
+                type: string
+                minLength: 5
+              facilities:
+                type: array
+                items:
                   type: string
-                pendingTasks:
-                  type: array
-                  items:
-                    type: string
+                minItems: 1
+            required:
+              - message
+              - facilities
       responses:
         '200':
           description: OK

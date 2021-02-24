@@ -2,12 +2,13 @@ package services
 
 import (
 	"bytes"
+	"text/template"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/divoc/portal-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"text/template"
 )
 
 const FacilityEntity string = "Facility"
@@ -23,30 +24,21 @@ func GetFacilityByCode(facilityCode string, limit int, offset int) (map[string]i
 	return kernelService.QueryRegistry(FacilityEntity, filter, limit, offset)
 }
 
-func NotifyFacilitiesPendingTasks(params operations.NotifyFacilitiesParams, claimBody *models.JWTClaimBody) middleware.Responder {
-	pendingTasksTemplateString := kernelService.FlagrConfigs.NotificationTemplates[FacilityPendingTasks].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[FacilityPendingTasks].Subject
-	var pendingTasksTemplate = template.Must(template.New("").Parse(pendingTasksTemplateString))
+func NotifyFacilities(params operations.NotifyFacilitiesParams, claimBody *models.JWTClaimBody) middleware.Responder {
 
-	for _, facilityNotifyRequest := range params.Body {
-		searchRespone, err := kernelService.ReadRegistry("Facility", facilityNotifyRequest.FacilityID)
+	for _, facilityID := range params.Body.Facilities {
+		searchRespone, err := kernelService.ReadRegistry("Facility", facilityID)
 		if err == nil {
 			facility := searchRespone["Facility"].(map[string]interface{})
 			if facility != nil {
-				log.Infof("Notifying facility %s", facilityNotifyRequest.FacilityID)
-				buf := bytes.Buffer{}
-				err := pendingTasksTemplate.Execute(&buf, facilityNotifyRequest)
-				if err == nil {
-					contact := facility["contact"].(string)
-					email := facility["email"].(string)
-					if len(contact) > 0 {
-						PublishNotificationMessage("tel:"+contact, subject, buf.String())
-					}
-					if len(email) > 0 {
-						PublishNotificationMessage("mailto:"+email, subject, buf.String())
-					}
-				} else {
-					return operations.NewGetFacilityGroupsBadRequest()
+				log.Infof("Notifying facility %s", facilityID)				
+				contact := facility["contact"].(string)
+				email := facility["email"].(string)
+				if len(contact) > 0 {
+					PublishNotificationMessage("tel:"+contact, params.Body.Subject, *params.Body.Message)
+				}
+				if len(email) > 0 {
+					PublishNotificationMessage("mailto:"+email, params.Body.Subject, *params.Body.Message)
 				}
 			}
 		}
