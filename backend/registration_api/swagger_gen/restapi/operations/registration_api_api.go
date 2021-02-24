@@ -59,7 +59,7 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
 		}),
-		GetSlotsForFacilitiesHandler: GetSlotsForFacilitiesHandlerFunc(func(params GetSlotsForFacilitiesParams) middleware.Responder {
+		GetSlotsForFacilitiesHandler: GetSlotsForFacilitiesHandlerFunc(func(params GetSlotsForFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetSlotsForFacilities has not yet been implemented")
 		}),
 		InitializeFacilitySlotsHandler: InitializeFacilitySlotsHandlerFunc(func(params InitializeFacilitySlotsParams) middleware.Responder {

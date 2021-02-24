@@ -131,7 +131,11 @@ func init() {
     },
     "/facility/slots": {
       "get": {
-        "security": [],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -144,6 +148,12 @@ func init() {
             "type": "number",
             "default": 0,
             "name": "pageNumber",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "default": 0,
+            "name": "pageSize",
             "in": "query"
           }
         ],
@@ -457,7 +467,11 @@ func init() {
     },
     "/facility/slots": {
       "get": {
-        "security": [],
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -470,6 +484,12 @@ func init() {
             "type": "number",
             "default": 0,
             "name": "pageNumber",
+            "in": "query"
+          },
+          {
+            "type": "number",
+            "default": 0,
+            "name": "pageSize",
             "in": "query"
           }
         ],
