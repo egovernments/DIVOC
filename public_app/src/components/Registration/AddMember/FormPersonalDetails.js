@@ -171,9 +171,9 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                 <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                 <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <Button className="mr-3 btn-link" variant="link" type="submit" onClick={previous}>
+                <CustomButton isLink={true} type="submit" onClick={previous}>
                     <span>Back</span>
-                </Button>
+                </CustomButton>
                 { !verifyDetails &&
                 <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
                     <span>Continue &#8594;</span>

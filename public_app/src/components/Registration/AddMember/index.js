@@ -222,16 +222,16 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
                   <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
                          value={x} id={x} onChange={(e) => {
                     selectComorbidity(e.target);
-                  }}></input>
+                  }}/>
                   <label className="form-check-label" htmlFor={x}>{x}</label>
                 </div>)
             }
           </Row>
         </div>
         <div className="pt-3">
-          <Button className="mr-3 btn-link" variant="link" type="submit" onClick={previous}>
+          <CustomButton isLink={true} type="submit" onClick={previous}>
             <span>Back</span>
-          </Button>
+          </CustomButton>
           <CustomButton className="blue-btn" type="submit" onClick={() => onNext()}>
             <span>Continue &#8594;</span>
           </CustomButton>
@@ -254,9 +254,6 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
           <h3>Please select vaccination program</h3>
-          <span className="back-btn cursor-pointer" onClick={() => {
-            history.goBack()
-          }}>Back</span>
         </div>
         <CardGroup className="mt-5">
           {
@@ -277,6 +274,9 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
             )
           }
         </CardGroup>
+        <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
+          <span>Back</span>
+        </CustomButton>
         <CustomButton className="blue-btn" type="submit" onClick={next}>
           <span>Continue &#8594;</span>
         </CustomButton>

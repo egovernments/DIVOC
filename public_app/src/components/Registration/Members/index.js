@@ -163,11 +163,11 @@ export const Members = () => {
 
                         }
                     </Row>
-                    {members.length < 4 && <Button className="mt-4" variant="link" type="submit" onClick={() => {
+                    {members.length < 4 && <CustomButton className="mt-4" isLink={true} type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
-                        <b style={{fontSize: "larger"}}>+ Member</b>
-                    </Button>}
+                        <span>+ Member</span>
+                    </CustomButton>}
                 </div>
                 {selectedMemberIndex > -1 && members.length > 0 && <Modal show={showModal} onHide={() => {
                     setShowModal(false)
