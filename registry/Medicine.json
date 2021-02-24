@@ -34,27 +34,28 @@
           "enum": ["muscular injection", "oral", "nasal"],
           "default": "muscular injection"
         },
-        "schedule": {
-          "title": "Schedule Details",
-          "type": "object",
-          "description": "How many times and how often vaccination should be repeated",
-          "properties": {
-            "repeatTimes": {
-              "type": "number",
-              "title": "Repeat times",
-              "description": "How many times vaccination should be taken"
-            },
-            "repeatInterval": {
-              "title": "Repeat interval",
-              "type": "number",
-              "description": "Number of times the vaccination should be taken."
+        "doseIntervals": {
+          "title": "Interval for Doses",
+          "type": "array",
+          "description": "How many days to wait after each dose",
+          "items": {
+            "type": "object",
+            "properties": {
+              "min": {
+                "type": "integer",
+                "description": "Minimum Interval"
+              },
+              "max": {
+                "type": "integer",
+                "description": "Maximum Interval"
+              }              
             }
           }
         },
         "effectiveUntil": {
-          "type": "number",
-          "description": "Effective until n months after the full vaccination schedule is completed",
-          "title": "Effective until (months)"
+          "type": "integer",
+          "description": "Effective until n days after the last dose",
+          "title": "Effective until (Days)"
         },
         "status": {
           "type": "string",

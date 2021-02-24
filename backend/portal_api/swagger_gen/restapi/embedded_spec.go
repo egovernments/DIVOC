@@ -766,6 +766,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -986,6 +989,32 @@ func init() {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/PublicFacility"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/programs": {
+      "get": {
+        "security": [],
+        "summary": "get program list for public",
+        "operationId": "getProgramsForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Status of the program (Active / Inactive)",
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
               }
             }
           }
@@ -1262,9 +1291,26 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "doseIntervals": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "max": {
+                "type": "integer"
+              },
+              "min": {
+                "type": "integer"
+              },
+              "osid": {
+                "type": "string"
+              }
+            }
+          }
+        },
         "effectiveUntil": {
-          "description": "Effective until n months after the full vaccination schedule is completed",
-          "type": "number"
+          "description": "Effective until n days after the last dose",
+          "type": "integer"
         },
         "name": {
           "type": "string"
@@ -1275,22 +1321,6 @@ func init() {
         },
         "provider": {
           "type": "string"
-        },
-        "schedule": {
-          "type": "object",
-          "properties": {
-            "osid": {
-              "type": "string"
-            },
-            "repeatInterval": {
-              "description": "Number of times the vaccination should be taken.",
-              "type": "number"
-            },
-            "repeatTimes": {
-              "description": "How many times vaccination should be taken",
-              "type": "number"
-            }
-          }
         },
         "status": {
           "type": "string",
@@ -2814,6 +2844,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -3034,6 +3067,32 @@ func init() {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/PublicFacility"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/programs": {
+      "get": {
+        "security": [],
+        "summary": "get program list for public",
+        "operationId": "getProgramsForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Status of the program (Active / Inactive)",
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
               }
             }
           }
@@ -3310,9 +3369,15 @@ func init() {
     "CreateMedicineRequest": {
       "type": "object",
       "properties": {
+        "doseIntervals": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CreateMedicineRequestDoseIntervalsItems0"
+          }
+        },
         "effectiveUntil": {
-          "description": "Effective until n months after the full vaccination schedule is completed",
-          "type": "number"
+          "description": "Effective until n days after the last dose",
+          "type": "integer"
         },
         "name": {
           "type": "string"
@@ -3323,22 +3388,6 @@ func init() {
         },
         "provider": {
           "type": "string"
-        },
-        "schedule": {
-          "type": "object",
-          "properties": {
-            "osid": {
-              "type": "string"
-            },
-            "repeatInterval": {
-              "description": "Number of times the vaccination should be taken.",
-              "type": "number"
-            },
-            "repeatTimes": {
-              "description": "How many times vaccination should be taken",
-              "type": "number"
-            }
-          }
         },
         "status": {
           "type": "string",
@@ -3358,19 +3407,17 @@ func init() {
         }
       }
     },
-    "CreateMedicineRequestSchedule": {
+    "CreateMedicineRequestDoseIntervalsItems0": {
       "type": "object",
       "properties": {
+        "max": {
+          "type": "integer"
+        },
+        "min": {
+          "type": "integer"
+        },
         "osid": {
           "type": "string"
-        },
-        "repeatInterval": {
-          "description": "Number of times the vaccination should be taken.",
-          "type": "number"
-        },
-        "repeatTimes": {
-          "description": "How many times vaccination should be taken",
-          "type": "number"
         }
       }
     },
@@ -4247,8 +4294,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId",
-        "dob"
+        "nationalId"
       ],
       "properties": {
         "address": {
@@ -4321,6 +4367,12 @@ func init() {
         "code": {
           "type": "string"
         },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dob": {
           "type": "string",
           "format": "date"
@@ -4350,6 +4402,9 @@ func init() {
         },
         "programId": {
           "type": "string"
+        },
+        "yob": {
+          "type": "integer"
         }
       }
     },

@@ -166,16 +166,21 @@ paths:
         - in: body
           name: body
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                facilityId:
+            type: object
+            properties:
+              subject:
+                type: string
+              message:
+                type: string
+                minLength: 5
+              facilities:
+                type: array
+                items:
                   type: string
-                pendingTasks:
-                  type: array
-                  items:
-                    type: string
+                minItems: 1
+            required:
+              - message
+              - facilities
       responses:
         '200':
           description: OK
@@ -553,6 +558,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+        '401':
+          description: Unauthorized
     put:
       summary: update schedule for program in facility
       operationId: updateFacilityProgramSchedule
@@ -615,6 +622,23 @@ paths:
         '401':
           description: Unauthorized
 
+  /public/programs:
+    get:
+      summary: get program list for public
+      operationId: getProgramsForPublic
+      security: []
+      parameters:
+        - in: query
+          name: status
+          type: string
+          description: Status of the program (Active / Inactive)
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Program'
   /facility/uploads:
     get:
       summary: Get all file uploads for facilties for given facility admin
@@ -820,20 +844,20 @@ definitions:
       vaccinationMode:
         type: string
         enum: ["muscular injection", "oral", "nasal"]
-      schedule:
-        type: object
-        properties:
-          osid:
-            type: string
-          repeatTimes:
-            type: number
-            description: How many times vaccination should be taken
-          repeatInterval:
-            type: number
-            description: Number of times the vaccination should be taken.
+      doseIntervals:
+        type: array
+        items:
+          type: object
+          properties:
+            osid:
+              type: string
+            min:
+              type: integer
+            max:
+              type: integer
       effectiveUntil:
-        type: number
-        description: Effective until n months after the full vaccination schedule is completed
+        type: integer
+        description: Effective until n days after the last dose
       status:
         type: string
         enum:

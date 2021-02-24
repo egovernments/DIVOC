@@ -53,7 +53,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetEnrollmentsUploadsErrorsHandler = operations.GetEnrollmentsUploadsErrorsHandlerFunc(getPreEnrollmentUploadErrorsHandler)
 	api.GetVaccinatorsUploadHistoryHandler = operations.GetVaccinatorsUploadHistoryHandlerFunc(getVaccinatorUploadHandler)
 	api.GetVaccinatorsUploadsErrorsHandler = operations.GetVaccinatorsUploadsErrorsHandlerFunc(getVaccinatorUploadErrorsHandler)
-	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilitiesPendingTasks)
+	api.NotifyFacilitiesHandler = operations.NotifyFacilitiesHandlerFunc(services.NotifyFacilities)
 	api.UpdateFacilityUserHandler = operations.UpdateFacilityUserHandlerFunc(updateFacilityUserHandler)
 	api.DeleteFacilityUserHandler = operations.DeleteFacilityUserHandlerFunc(deleteFacilityUserHandler)
 	api.CreateVaccinatorHandler = operations.CreateVaccinatorHandlerFunc(createVaccinatorHandler)
@@ -64,6 +64,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
+	api.GetProgramsForPublicHandler = operations.GetProgramsForPublicHandlerFunc(getProgramsForPublic)
 }
 
 type GenericResponse struct {
@@ -245,7 +246,18 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	return model.NewGenericJSONResponse(facilities)
+	var facilityIds []string
+	for _, facility := range facilities {
+		facilityIds = append(facilityIds, facility.Osid)
+	}
+	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
+	responseData := map[string]interface{}{
+		"facilities": facilities,
+	}
+	if err2 == nil {
+		responseData["facilitiesSchedule"] = facilitySlotsResponse["FacilityProgramSlot"]
+	}
+	return model.NewGenericJSONResponse(responseData)
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -871,26 +883,27 @@ func enrichResponseWithProgramDetails(response interface{}) []interface{}{
 
 	for _,objects := range responseArr {
 		obj := objects.(map[string]interface{})
-		programs := obj["programs"].([]interface{})
-		updatedPrograms := []interface{}{}
-		if programs != nil && len(programs) > 0 {
-			for _,obj := range programs {
-				program := obj.(map[string]interface{})
-				id := program["programId"].(string)
-				response, err := getProgramById(id, limit, offset)
-				if err != nil {
-					log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
-				} else {
-					responseArr := response["Program"].([]interface{})
-					if len(responseArr) != 0 {
-						program["name"] = responseArr[0].(map[string]interface{})["name"]
-						updatedPrograms = append(updatedPrograms, program)
+		if programs, ok := obj["programs"].([]interface{}); ok {
+			updatedPrograms := []interface{}{}
+			if programs != nil && len(programs) > 0 {
+				for _, obj := range programs {
+					program := obj.(map[string]interface{})
+					id := program["programId"].(string)
+					response, err := getProgramById(id, limit, offset)
+					if err != nil {
+						log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
+					} else {
+						responseArr := response["Program"].([]interface{})
+						if len(responseArr) != 0 {
+							program["name"] = responseArr[0].(map[string]interface{})["name"]
+							updatedPrograms = append(updatedPrograms, program)
+						}
 					}
 				}
+				obj["programs"] = updatedPrograms
 			}
-			obj["programs"] = updatedPrograms
+			results = append(results, obj)
 		}
-		results = append(results, obj)
 	}
 	return results
 }
@@ -905,7 +918,11 @@ func getProgramById(osid string, limit int, offset int) (map[string]interface{},
 }
 
 func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
+
 	var appointmentSchedule []*models.FacilityAppointmentSchedule
 	var walkInSchedule []*models.FacilityWalkInSchedule
 
@@ -935,9 +952,50 @@ func createSlotForProgramFacilityHandler(params operations.ConfigureSlotFacility
 	return operations.NewConfigureSlotFacilityOK()
 }
 
-func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+func validateIfUserHasPermissionsForFacilityProgram(facilityId string, programId string, principal *models.JWTClaimBody) (middleware.Responder, bool) {
+	resp, e := kernelService.ReadRegistry("Facility", facilityId)
+	if e != nil {
+		log.Infof("Facility for given osid doesn't exist %d", facilityId)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	facility, ok := resp["Facility"].(map[string]interface{})
+	if !ok {
+		log.Errorf("Error reading registry response", e)
+		return model.NewGenericServerError(), true
+	}
+	if facility["facilityCode"] != principal.FacilityCode {
+		log.Infof("User doesnt belong to the facility which is being updated")
+		return operations.NewConfigureSlotFacilityUnauthorized(), true
+	}
 
+	currentPrograms, ok := facility["programs"].([]interface{})
+	if !ok {
+		log.Infof("No programs exist for given facility %s", principal.FacilityCode)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	hasGivenProgram := false
+	for _, p := range currentPrograms {
+		prg, ok := p.(map[string]interface{})
+		if !ok {
+			log.Errorf("Error converting program to interface", e)
+			return model.NewGenericServerError(), true
+		}
+		if prg["programId"] == programId {
+			hasGivenProgram = true
+		}
+	}
+	if !hasGivenProgram {
+		log.Infof("Given program %s doesn't exist for facility %s", programId, principal.FacilityCode)
+		return operations.NewConfigureSlotFacilityBadRequest(), true
+	}
+	return nil, false
+}
+
+func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
 		return operations.NewGetFacilityProgramScheduleNotFound()
@@ -946,10 +1004,13 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 }
 
 func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-	// TODO: check if user and updated facility belongs to same facilityCode
+
+	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
+	if e {
+		return responder
+	}
 
 	objectId := "FacilityProgramSlot"
-
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
 	if err != nil {
 		operations.NewUpdateFacilityProgramScheduleBadRequest()
@@ -977,4 +1038,20 @@ func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgra
 		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
 
+}
+
+func getProgramsForPublic(params operations.GetProgramsForPublicParams) middleware.Responder {
+	entityType := "Program"
+	filter := make(map[string]interface{})
+	if params.Status != nil {
+		filter["status"] = map[string]interface{}{
+			"eq": params.Status,
+		}
+	}
+	response, err := kernelService.QueryRegistry(entityType, filter, 100, 0)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	return model.NewGenericJSONResponse(response[entityType])
 }

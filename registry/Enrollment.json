@@ -13,7 +13,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["nationalId", "dob"],
+      "required": ["nationalId"],
       "properties": {
         "beneficiaryPhone" : {
           "type": "string"
@@ -26,6 +26,9 @@
         },
         "nationalId": {
           "type": "string"
+        },
+        "yob": {
+          "type": "integer"
         },
         "dob": {
           "type": "string",
@@ -62,6 +65,12 @@
           "$id": "#/properties/address",
           "$ref": "Common.json#/definitions/Address",
           "title": "Address"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

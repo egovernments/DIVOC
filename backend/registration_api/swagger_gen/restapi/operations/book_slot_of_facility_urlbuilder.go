@@ -35,7 +35,7 @@ func (o *BookSlotOfFacilityURL) SetBasePath(bp string) {
 func (o *BookSlotOfFacilityURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/facility/slot/book"
+	var _path = "/appointment"
 
 	_basePath := o._basePath
 	if _basePath == "" {

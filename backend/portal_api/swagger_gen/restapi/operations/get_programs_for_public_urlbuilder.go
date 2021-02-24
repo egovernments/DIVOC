@@ -11,15 +11,19 @@ import (
 	golangswaggerpaths "path"
 )
 
-// GetUserFacilityURL generates an URL for the get user facility operation
-type GetUserFacilityURL struct {
+// GetProgramsForPublicURL generates an URL for the get programs for public operation
+type GetProgramsForPublicURL struct {
+	Status *string
+
 	_basePath string
+	// avoid unkeyed usage
+	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetUserFacilityURL) WithBasePath(bp string) *GetUserFacilityURL {
+func (o *GetProgramsForPublicURL) WithBasePath(bp string) *GetProgramsForPublicURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,27 +31,39 @@ func (o *GetUserFacilityURL) WithBasePath(bp string) *GetUserFacilityURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetUserFacilityURL) SetBasePath(bp string) {
+func (o *GetProgramsForPublicURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetUserFacilityURL) Build() (*url.URL, error) {
+func (o *GetProgramsForPublicURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/register"
+	var _path = "/public/programs"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/citizen"
+		_basePath = "/divoc/admin/api/v1"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
+
+	qs := make(url.Values)
+
+	var statusQ string
+	if o.Status != nil {
+		statusQ = *o.Status
+	}
+	if statusQ != "" {
+		qs.Set("status", statusQ)
+	}
+
+	_result.RawQuery = qs.Encode()
 
 	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetUserFacilityURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetProgramsForPublicURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +74,17 @@ func (o *GetUserFacilityURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetUserFacilityURL) String() string {
+func (o *GetProgramsForPublicURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetUserFacilityURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetProgramsForPublicURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetUserFacilityURL")
+		return nil, errors.New("scheme is required for a full url on GetProgramsForPublicURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetUserFacilityURL")
+		return nil, errors.New("host is required for a full url on GetProgramsForPublicURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +98,6 @@ func (o *GetUserFacilityURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetUserFacilityURL) StringFull(scheme, host string) string {
+func (o *GetProgramsForPublicURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

@@ -61,7 +61,7 @@ async function getVaccinationStatus() {
     const enrolledCount = recipientDetails[0].value + recipientDetails[1].value
     const isExceed = enrolledCount > programRate
     const remainingCertificate = programRate - enrolledCount
-    const isLimitToReach = remainingCertificate >= 0 && remainingCertificate <= 10;
+    const isLimitToReach = remainingCertificate >= 0 && remainingCertificate <= 10 && enrolledCount > 0;
     return new VaccinationDetails(
         enrolledCount,
         programRate,

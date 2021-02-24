@@ -5,6 +5,8 @@ package restapi
 import (
 	"crypto/tls"
 	"github.com/divoc/registration-api/pkg"
+	"github.com/divoc/registration-api/pkg/services"
+	"github.com/divoc/registration-api/swagger_gen/models"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -38,8 +40,10 @@ func configureAPI(api *operations.RegistrationAPIAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
+	api.BearerAuth = services.VerifyRecipientToken
+
 	if api.EnrollRecipientHandler == nil {
-		api.EnrollRecipientHandler = operations.EnrollRecipientHandlerFunc(func(params operations.EnrollRecipientParams) middleware.Responder {
+		api.EnrollRecipientHandler = operations.EnrollRecipientHandlerFunc(func(params operations.EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.EnrollRecipient has not yet been implemented")
 		})
 	}

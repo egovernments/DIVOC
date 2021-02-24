@@ -32,12 +32,19 @@ class ProgramDB {
         const allPrograms = await this.getPrograms()
         const eventDate = new Date(event.date);
         const givenVaccination = this.getPatientGivenMedicine(allPrograms, programId, event.medicineId)
-        let repeatUntil = 0;
-        if (givenVaccination["schedule"] && givenVaccination["schedule"]["repeatInterval"]) {
-            repeatUntil = givenVaccination["schedule"]["repeatInterval"]
+        let repeatUntil = 1;
+        if (givenVaccination?.doseIntervals?.length) {
+            repeatUntil = givenVaccination.doseIntervals.length + 1;
         }
-        const medicineEffectiveDate = givenVaccination["effectiveUntil"] ?? 0;
-        const effectiveUntilDate = this.getEffectiveUntil(eventDate, medicineEffectiveDate)
+
+        let medicineEffectiveDuration ;
+        if (repeatUntil == event.dose) {
+            medicineEffectiveDuration = givenVaccination.effectiveUntil ?? 0;
+        } else {
+            medicineEffectiveDuration = givenVaccination.doseIntervals[event.dose-1].min;
+        }
+        const effectiveUntilDate = this.getEffectiveUntil(eventDate, medicineEffectiveDuration);
+
         return {
             batch: event.batchId,
             date: eventDate,
@@ -59,10 +66,9 @@ class ProgramDB {
 
 
     getEffectiveUntil(event, effectiveUntil) {
-        const eventDate = new Date(event)
-        const newDateMonths = eventDate.setMonth(eventDate.getMonth() + effectiveUntil);
-        const newDate = new Date(newDateMonths);
-        return formatCertifyDate(newDate);
+        const eventDate = new Date(event);
+        eventDate.setDate(eventDate.getDate() + effectiveUntil);
+        return formatCertifyDate(eventDate);
     }
 
     getPatientGivenMedicine(allPrograms, programId, medicineId) {

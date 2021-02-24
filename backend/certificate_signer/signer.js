@@ -1,3 +1,13 @@
+const {CERTIFICATE_CONTROLLER_ID,
+  CERTIFICATE_DID,
+  CERTIFICATE_NAMESPACE,
+  CERTIFICATE_ISSUER,
+  CERTIFICATE_BASE_URL,
+  CERTIFICATE_FEEDBACK_BASE_URL,
+  CERTIFICATE_INFO_BASE_URL,
+  CERTIFICATE_PUBKEY_ID
+} = require ("./config/config");
+
 const jsigs = require('jsonld-signatures');
 const config = require('./config/config');
 const registry = require('./registry');
@@ -19,23 +29,22 @@ const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,
-  id: 'did:india',
+  id: CERTIFICATE_DID,
   type: 'RsaVerificationKey2018',
-  controller: 'https://example.com/i/india',
+  controller: CERTIFICATE_PUBKEY_ID,
   publicKeyPem
 };
 
+const documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
+documentLoaderMapping[CERTIFICATE_DID] = publicKey;
+documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
+documentLoaderMapping['https://www.w3.org/2018/credentials#'] = credentialsv1;
+documentLoaderMapping["https://www.w3.org/2018/credentials/v1"] = credentialsv1;
+documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
+
 const customLoader = url => {
   console.log("checking " + url);
-  const c = {
-    "did:india": publicKey,
-    "https://example.com/i/india": publicKey,
-    "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
-    'https://www.w3.org/2018/credentials#': credentialsv1,
-    "https://www.w3.org/2018/credentials/v1": credentialsv1,
-    "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext,
-  };
-  let context = c[url];
+  let context = documentLoaderMapping[url];
   if (context === undefined) {
     context = contexts[url];
   }
@@ -49,7 +58,7 @@ const customLoader = url => {
   if (url.startsWith("{")) {
     return JSON.parse(url);
   }
-  console.log("Fallback url lookup for document :" + url)
+  console.log("Fallback url lookup for document :" + url);
   return documentLoader()(url);
 };
 
@@ -58,14 +67,14 @@ async function signJSON(certificate) {
 
   const publicKey = {
     '@context': jsigs.SECURITY_CONTEXT_URL,
-    id: 'did:india',
+    id: CERTIFICATE_DID,
     type: 'RsaVerificationKey2018',
-    controller: 'https://cowin.gov.in/',
+    controller: CERTIFICATE_CONTROLLER_ID,
     publicKeyPem
   };
   const controller = {
     '@context': jsigs.SECURITY_CONTEXT_URL,
-    id: 'https://cowin.gov.in/',
+    id: CERTIFICATE_CONTROLLER_ID,
     publicKey: [publicKey],
     // this authorizes this key to be used for making assertions
     assertionMethod: [publicKey.id]
@@ -97,7 +106,7 @@ function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
-      "https://cowin.gov.in/credentials/vaccination/v1"
+      CERTIFICATE_NAMESPACE,
     ],
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
@@ -118,12 +127,12 @@ function transformW3(cert, certificateId) {
         "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
       }
     },
-    issuer: "https://cowin.gov.in/",
+    issuer: CERTIFICATE_ISSUER,
     issuanceDate: new Date().toISOString(),
     evidence: [{
-      "id": "https://cowin.gov.in/vaccine/" + certificateId,
-      "feedbackUrl": "https://cowin.gov.in/?" + certificateId,
-      "infoUrl": "https://cowin.gov.in/?" + certificateId,
+      "id": CERTIFICATE_BASE_URL + certificateId,
+      "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId,
+      "infoUrl": CERTIFICATE_INFO_BASE_URL + certificateId,
       "certificateId": certificateId,
       "type": ["Vaccination"],
       "batch": R.pathOr('', ['vaccination', 'batch'], cert),
@@ -135,12 +144,10 @@ function transformW3(cert, certificateId) {
       "dose": R.pathOr('', ['vaccination', 'dose'], cert),
       "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
       "verifier": {
-        // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
         "name": R.pathOr('', ['vaccinator', 'name'], cert),
-        // "sign-image": "..."
       },
       "facility": {
-        // "id": "https://nha.gov.in/evidence/facilities/" + cert.facility.id,
+        // "id": CERTIFICATE_BASE_URL + cert.facility.id,
         "name": R.pathOr('', ['facility', 'name'], cert),
         "address": {
           "streetAddress": R.pathOr('', ['facility', 'address', 'addressLine1'], cert),
@@ -151,7 +158,6 @@ function transformW3(cert, certificateId) {
           "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
           "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
-        // "seal-image": "..."
       }
     }],
     "nonTransferable": "true"

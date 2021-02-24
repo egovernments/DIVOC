@@ -74,6 +74,26 @@ func SetHash(key string, field string, value string) (bool, error) {
 	return redisClient.HSetNX(key, field, value).Result()
 }
 
+func SetHMSet(key string, fields map[string]interface{}) (string, error) {
+	return redisClient.HMSet(key, fields).Result()
+}
+
 func HashFieldExists(key string, field string) (bool, error) {
 	return redisClient.HExists(key, field).Result()
+}
+
+func GetHashValues(key string, ) (map[string]string, error) {
+	return redisClient.HGetAll(key).Result()
+}
+
+func IncrValue(key string) (int64, error) {
+	return redisClient.Incr(key).Result()
+}
+
+func RemoveHastField(key string, field string) (int64, error) {
+	return redisClient.HDel(key, field).Result()
+}
+
+func IncrHashField(key string, field string) (int64, error) {
+	return redisClient.HIncrBy(key, field, 1).Result()
 }

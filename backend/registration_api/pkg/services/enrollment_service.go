@@ -27,8 +27,9 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
 		facilityDetails := make(map[string]interface{})
 		facilityCode := enrollment["enrollmentScopeId"]
-		if facilityCode  != nil {
-			value, err := GetValue(facilityCode.(string))
+		if facilityCode != nil && len(facilityCode.(string)) > 0 {
+			redisKey := facilityCode.(string) + "-info"
+			value, err := GetValue(redisKey)
 			if err := json.Unmarshal([]byte(value), &facilityDetails); err != nil {
 				log.Errorf("Error in marshalling json %+v", err)
 			}
@@ -50,7 +51,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 					if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
 						log.Errorf("Error in Marshaling the facility details %+v", err)
 					} else {
-						err:=SetValue(facilityCode.(string), facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
+						err:=SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
 						if err != nil {
 							log.Errorf("Unable to set the value in Cache (%v)", err)
 						}

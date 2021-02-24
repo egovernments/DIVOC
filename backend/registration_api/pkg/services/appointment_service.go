@@ -4,25 +4,17 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/models"
 	log "github.com/sirupsen/logrus"
 	"strconv"
-	"time"
 )
 
-type FacilitySchedule struct {
-	FacilityCode string
-	ProgramId    string
-	Date         time.Time
-	Time         string
-	Slots        string
-}
-
 var (
-	appointmentScheduleChannel chan FacilitySchedule
+	appointmentScheduleChannel chan models.FacilitySchedule
 )
 
 func InitializeAppointmentScheduler() {
-	appointmentScheduleChannel = make(chan FacilitySchedule, config.Config.AppointmentScheduler.ChannelSize)
+	appointmentScheduleChannel = make(chan models.FacilitySchedule, config.Config.AppointmentScheduler.ChannelSize)
 	createAppointmentSchedulers()
 }
 
@@ -32,7 +24,7 @@ func createAppointmentSchedulers() {
 	}
 }
 
-func worker(workerID int, appointmentSchedulerChannel <-chan FacilitySchedule) {
+func worker(workerID int, appointmentSchedulerChannel <-chan models.FacilitySchedule) {
 	prefix := fmt.Sprintf("[WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Infof("%s : Started listening to service request channel\n", prefix)
@@ -41,13 +33,13 @@ func worker(workerID int, appointmentSchedulerChannel <-chan FacilitySchedule) {
 	}
 }
 
-func AddFacilityScheduleToChannel(serviceReq FacilitySchedule) {
+func AddFacilityScheduleToChannel(serviceReq models.FacilitySchedule) {
 	appointmentScheduleChannel <- serviceReq
 }
 
-func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
+func createFacilityWiseAppointmentSlots(schedule models.FacilitySchedule) {
 	log.Infof("Creating slot for facility %s at time : %s %s", schedule.FacilityCode, schedule.Date, schedule.Time)
-	key := fmt.Sprintf("%s_%s_%s_%s", schedule.FacilityCode, schedule.ProgramId, schedule.Date.Format("2006-01-02"), schedule.Time)
+	key := schedule.Key()
 	_, err := AddToSet(schedule.FacilityCode, key, float64(schedule.Date.Unix()))
 	if err == nil {
 		err = SetValueWithoutExpiry(key, schedule.Slots)
@@ -61,6 +53,7 @@ func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
 }
 
 func BookAppointmentSlot(slotId string) error {
+	//TODO: make the below transaction as atomic, use WATCH
 	log.Infof("Blocking appointment slot: %s", slotId)
 	remainingSlotsStr, err := GetValue(slotId)
 	if err != nil {
@@ -78,7 +71,7 @@ func BookAppointmentSlot(slotId string) error {
 	return err
 }
 
-func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
+func MarkEnrollmentAsBooked(enrollmentCode string, slotId string) bool {
 	success, err := SetHash(enrollmentCode, "slotId", slotId)
 	if err != nil {
 		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
@@ -86,4 +79,25 @@ func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
 		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
 	}
 	return success
+}
+
+func CancelBookedAppointment(slotId string) error {
+	_, err := IncrValue(slotId)
+	return err
+}
+
+func RevokeEnrollmentBookedStatus(enrollmentCode string) bool {
+	success, err := RemoveHastField(enrollmentCode, "slotId")
+	if err != nil {
+		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, err)
+	} else {
+		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode)
+	}
+	_, err = IncrHashField(enrollmentCode, "updatedCount")
+	if err != nil {
+		log.Errorf("Failed to increase %s updated count", enrollmentCode, err)
+	} else {
+		log.Infof("Successfully increased %s updated count", enrollmentCode)
+	}
+	return success == 1
 }

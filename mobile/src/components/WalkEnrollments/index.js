@@ -73,9 +73,6 @@ function WalkEnrollment(props) {
 
     const uiSchema = {
         classNames: "form-container",
-        phone: {
-            "ui:placeholder": countryCode
-        },
     };
 
     function setDistrictListInSchema(exisingFromData) {

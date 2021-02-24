@@ -37,13 +37,14 @@ func StartEnrollmentConsumer() {
 					err = services.CreateEnrollment(&enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
-						err = services.NotifyRecipient(enrollment)
+						cacheEnrollmentInfo(enrollment)
+						err := services.NotifyRecipient(enrollment)
 						if err != nil {
-							log.Error("Unable to send notification to the enrolled user",  err)
+							log.Error("Unable to send notification to the enrolled user", err)
 						}
 					} else {
 						// Push to error topic
-						log.Errorf("Error occured while trying to create the enrollment (%v)",  err)
+						log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
 					}
 					_, _ = consumer.CommitMessage(msg)
 				} else {
@@ -56,4 +57,15 @@ func StartEnrollmentConsumer() {
 			}
 		}
 	}()
+}
+
+func cacheEnrollmentInfo(enrollment models.Enrollment) {
+	data := map[string]interface{}{
+		"phone": enrollment.Phone,
+		"updatedCount": 0, //to restrict multiple updates
+	}
+	_, err := services.SetHMSet(enrollment.Code, data)
+	if err != nil {
+		log.Error("Unable to cache enrollment info", err)
+	}
 }

@@ -301,7 +301,6 @@ const StaffRow = ({index, staff, groups, updateStaff, saveStaff, deleteStaff, se
                         Mobile Number *
                     </label>
                     <input
-                        disabled={staff.type === OLD_USER}
                         className="form-control"
                         value={staff.mobileNumber}
                         type="text"
