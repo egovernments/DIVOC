@@ -200,7 +200,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
             <Row className="pt-2">
                 <div className="p-0 col-6">
                     <Col className="col-6">
-                        <label htmlFor="mobile">Mobile Number</label>
+                        <label htmlFor="mobile">Mobile</label>
                         { !verifyDetails && <div className="radio-group">
 
                             <div className="pb-2">
@@ -219,7 +219,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                 </div>
                 <div className="p-0 col-6">
                     <Col className="col-6">
-                        <label hidden={verifyDetails && !formData.email} htmlFor="email">Email ID</label>
+                        <label hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                         <div hidden={verifyDetails}>
                             <input className="form-control" id="email" name="email" type="text"
                                    placeholder="Enter Email ID"
@@ -228,6 +228,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                                    onFocus={(evt) => evt.target.value = formData.email}
                                    onChange={(e) => setValue({target: {name:"email", value:e.target.value}})}/>
                             <div className="pt-2">
+                                <label hidden={verifyDetails && !formData.email} htmlFor="confirmEmail">Verify Beneficiary Email ID</label>
                                 <input className="form-control" id="confirmEmail" name="email" type="text"
                                        placeholder="Confirm Email ID"
                                        value={formData.confirmEmail}
@@ -325,6 +326,51 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                     </Col>
                 </div>
             </Row>
+            <Row className="pt-2">
+                <div className="p-0 col-6">
+                    <Col className="col-6">
+                        <label htmlFor="name">Name * (As per ID card)</label>
+                        <input className="form-control" name="name" id="name" type="text"
+                               hidden={verifyDetails}
+                               placeholder="Enter Name"
+                               defaultValue={formData.name}
+                               onBlur={setValue}/>
+                        <div className="invalid-input">
+                            {errors.name}
+                        </div>
+                        {
+                            verifyDetails &&
+                            <b>{formData.name}</b>
+                        }
+                    </Col>
+                </div>
+                <div className="p-0 col-6">
+                    <Col className="col-6">
+                        <label htmlFor="name" className="pt-2">Age</label>
+                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
+                    </Col>
+                </div>
+            </Row>
+            <Row className="pt-2">
+                <div className="p-0 col-6">
+                    <Col className="col-6">
+                        <label htmlFor="gender">Gender *</label>
+                        <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
+                            <option disabled selected={!formData.gender} value>Select Gender</option>
+                            {
+                                GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
+                            }
+                        </select>
+                        {
+                            verifyDetails &&
+                            <><br/><b>{formData.gender}</b></>
+                        }
+                        <div className="invalid-input">
+                            {errors.gender}
+                        </div>
+                    </Col>
+                </div>
+            </Row>
         </div>
     )
 };
@@ -359,25 +405,8 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
     // minDate.setYear(minDate.getYear() - maxAge);
     return (
         <div className="pt-5">
-            <h5>Beneficiary Details</h5>
+            <h5>Residence Details</h5>
             <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="name">Name * (As per ID card)</label>
-                        <input className="form-control" name="name" id="name" type="text"
-                               hidden={verifyDetails}
-                               placeholder="Enter Name"
-                               defaultValue={formData.name}
-                               onBlur={setValue}/>
-                        <div className="invalid-input">
-                            {errors.name}
-                        </div>
-                        {
-                            verifyDetails &&
-                            <b>{formData.name}</b>
-                        }
-                    </Col>
-                </div>
                 <div className="p-0 col-6">
                     <Col className="col-6">
                         <label htmlFor="state">State *</label>
@@ -396,28 +425,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                             verifyDetails &&
                             <b>{formData.state}</b>
                         }
-                    </Col>
-                </div>
-            </Row>
-            <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="gender">Gender *</label>
-                        <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
-                            <option disabled selected={!formData.gender} value>Select Gender</option>
-                            {
-                                GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
-                            }
-                        </select>
-                        {
-                            verifyDetails &&
-                            <><br/><b>{formData.gender}</b></>
-                        }
-                        <div className="invalid-input">
-                            {errors.gender}
-                        </div>
-                        <label htmlFor="name" className="pt-2">Age</label>
-                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
                     </Col>
                 </div>
                 <div className="p-0 col-6">
