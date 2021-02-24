@@ -70,7 +70,7 @@ export function useWalkInEnrollment() {
     }
 
     const saveWalkInEnrollment = async function (paymentMode) {
-        state.paymentMode = paymentMode
+        state.paymentMode = paymentMode ?? "NA"
         return appIndexDb.saveWalkInEnrollments(state)
     }
 

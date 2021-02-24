@@ -112,6 +112,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     PRE_ENROLLMENT_DETAILS: "app.preenrollment.details",
     PRE_ENROLLMENT_ENTER_MANUALLY: "app.preenrollment.enterManually",
     PRE_ENROLLMENT_NO_PATIENTS: "app.preenrollment.noPatient",
+    PRE_ENROLLMENT_ENTER_OTP: "app.preenrollment.enterOTP",
 
     ENROLLMENT_TITLE: "app.enrollment.title",
     ENROLLMENT_NAME: "app.enrollment.name",
@@ -136,5 +137,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     BUTTON_DONE: "app.button.done",
     BUTTON_NEXT: "app.button.next",
     BUTTON_CONFIRM: "app.button.confirm",
-    BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination"
+    BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination",
+    BUTTON_OTP: "app.button.otp",
+    BUTTON_VERIFY: "app.button.verify"
 });
