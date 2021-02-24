@@ -43,18 +43,18 @@ class QueueDB {
                 const stashDate = new Date(stashQueue.date);
                 if (!is24hoursAgo(stashDate)) {
                     await this.saveQueue(stashQueue.queue);
-                    await this.savePatients(stashQueue.patients);
+                    await this.saveRecipient(stashQueue.patients);
                 }
                 await db.delete(STASH_DATA, userId);
             }
         }
     }
 
-    async savePatients(patients) {
-        if (patients && patients.length > 0) {
+    async saveRecipient(recipient) {
+        if (recipient && recipient.length > 0) {
             const db = this.getDB()
-            for (const patientItem of patients) {
-                await db.put(PATIENTS, patientItem);
+            for (const recipientItem of recipient) {
+                await db.put(PATIENTS, recipientItem);
             }
         }
     }
