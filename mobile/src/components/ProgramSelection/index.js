@@ -1,18 +1,13 @@
-import {Card} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import "./index.scss"
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {programDb} from "../../Services/ProgramDB";
-import Col from "react-bootstrap/Col";
 import ImgPlaceholder from "assets/img/no_image.svg"
 import ImgTick from "assets/img/tick.svg"
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../../Services/ApiServices";
 import {AuthSafeComponent} from "../../utils/keycloak";
-import {SyncFacade} from "../../SyncFacade";
-import {appIndexDb} from "../../AppDatabase";
-import {Messages} from "../../Base/Constants";
 import {BaseCard} from "../../Base/Base";
 import config from "../../config";
 

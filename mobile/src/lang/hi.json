@@ -22,20 +22,18 @@
   "app.limitReachMessage": "चेतावनी: आप दैनिक नामांकन सीमा तक पहुंच रहे हैं।",
   "app.name": "नाम",
   "app.recipientsEnrolled": "लाभार्थी नामांकित",
-  "app.exceedLimits": "Exceed Limits",
+  "app.exceedLimits": "सीमा से अधिक",
   "app.verifyRecipient.enterMobileAndVerificationCode": "अपना मोबाइल नंबर एवं ओ.टी.पी. लिखें",
   "app.verifyRecipient.confirmButton": "पुष्टि करें",
   "app.recipientQueue.message": "कोई लाभार्थी प्रतीक्षारत नहीं है",
   "app.recipientQueue.status": "अवस्था",
   "app.recipientQueue.number": "No",
-  "app.recipientQueue.title": "Recipient Queue",
+  "app.recipientQueue.title": "लाभार्थी कतार",
   "app.profile.lastLoggedIn": "पिछला लाॉग इन / प्रवेश",
   "app.profile.lastSync": "पिछला तालमेल",
   "app.profile.facility": "अस्पताल",
   "app.profile.confirmLogout.message": "कृपया पुष्टि करें",
-
-  "app.enrollment.title": "Enroll Recipient",
-
+  "app.enrollment.title": "लाभार्थी का नामांकन करें",
   "app.enrollment.name": "नाम",
   "app.enrollment.gender": "ङ्ग चुनें",
   "app.enrollment.nationalId": "राष्ट्रीयता",
@@ -44,12 +42,12 @@
   "app.enrollment.phone": "मोबाइल",
   "app.enrollment.identityType": "पहचान पत्र",
   "app.enrollment.identityValue": "पहचान पत्र क्रमांक",
-  "app.enrollment.addressLine1": "Address",
+  "app.enrollment.addressLine1": "पता",
   "app.enrollment.state": "प्रदेश",
   "app.enrollment.district": "जनपद",
   "app.enrollment.locality": "इलाका",
   "app.enrollment.pincode": "पिन कोड",
-
   "app.profile.confirmLogout.ok": "हाँ",
-  "app.profile.confirmLogout.cancel": "नहीं"
+  "app.profile.confirmLogout.cancel": "नहीं",
+  "app.preenrollment.title": "लाभार्थी सत्यापित करें"
 }

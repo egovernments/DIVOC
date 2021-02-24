@@ -1,6 +1,5 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
-import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
 
 const LAST_SYNC_KEY = "lastSyncedDate";

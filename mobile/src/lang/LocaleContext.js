@@ -108,6 +108,8 @@ export const LANGUAGE_KEYS = Object.freeze({
     PROFILE_CONFIRM_LOGOUT_OK: "app.profile.confirmLogout.ok",
     PROFILE_CONFIRM_LOGOUT_CANCEL: "app.profile.confirmLogout.cancel",
 
+    ENROLLMENT_TITLE: "app.enrollment.title",
+    PRE_ENROLLMENT_TITLE: "app.preenrollment.title",
     ENROLLMENT_NAME: "app.enrollment.name",
     ENROLLMENT_SELECT_GENDER: "app.enrollment.gender",
     ENROLLMENT_NATIONALITY: "app.enrollment.nationalId",

@@ -35,7 +35,6 @@
   "app.profile.confirmLogout.message": "Are you sure want to logout?",
   "app.profile.confirmLogout.ok": "Yes",
   "app.profile.confirmLogout.cancel": "No",
-
   "app.enrollment.title": "Enroll Recipient",
   "app.enrollment.name": "Name",
   "app.enrollment.gender": "Select Gender",
@@ -49,5 +48,6 @@
   "app.enrollment.state": "State",
   "app.enrollment.district": "District",
   "app.enrollment.locality": "Locality",
-  "app.enrollment.pincode": "Pincode"
+  "app.enrollment.pincode": "Pincode",
+  "app.preenrollment.title": "Verify Recipient"
 }

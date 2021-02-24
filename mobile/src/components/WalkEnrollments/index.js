@@ -11,7 +11,7 @@ import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 import config from "config.json"
 import {useSelector} from "react-redux";
-import {useLocale} from "../../lang/LocaleContext";
+import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -96,7 +96,7 @@ function WalkEnrollment(props) {
 
     return (
         <div className="new-enroll-container">
-            <BaseFormCard title={"Enroll Recipient"}>
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
                 <div className="pt-3 form-wrapper">
                     <Form
                         key={isFormTranslated}

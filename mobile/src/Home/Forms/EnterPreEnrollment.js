@@ -11,7 +11,7 @@ export const PHONE_NUMBER_MAX = 10
 
 export function PreEnrollmentCode(props) {
     return (
-        <BaseFormCard title={"Verify Recipient"}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_TITLE)}>
             <EnterPreEnrollmentContent/>
         </BaseFormCard>
     )
