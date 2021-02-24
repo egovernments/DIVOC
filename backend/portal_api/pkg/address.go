@@ -7,7 +7,7 @@ func GetAddressObject(data *Scanner) *models.Address {
 	addressLine2 := data.Text("addressLine2")
 	district := data.Text("district")
 	state := data.Text("state")
-	pincode := data.int64("pincode")
+	pincode := data.Text("pincode")
 	return &models.Address{
 		AddressLine1: &addressLine1,
 		AddressLine2: &addressLine2,

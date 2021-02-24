@@ -72,7 +72,7 @@ export class ApiServices {
                         addressLine2: patientDetails.address.addressLine2 ?? "N/A",
                         district: patientDetails.address.district ?? "N/A",
                         state: patientDetails.address.state ?? "N/A",
-                        pincode: patientDetails.address.pincode ?? 100000
+                        pincode: patientDetails.address.pincode ?? "N/A"
                     }
                 },
 
@@ -96,7 +96,7 @@ export class ApiServices {
                         addressLine2: facilityDetails.address.addressLine2 ?? "N/A",
                         district: facilityDetails.address.district ?? "N/A",
                         state: facilityDetails.address.state ?? "N/A",
-                        pincode: facilityDetails.address.pincode ?? 100000
+                        pincode: facilityDetails.address.pincode ?? "N/A"
                     }
                 }
             }

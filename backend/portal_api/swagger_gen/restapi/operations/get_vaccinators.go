@@ -31,7 +31,7 @@ func NewGetVaccinators(ctx *middleware.Context, handler GetVaccinatorsHandler) *
 	return &GetVaccinators{Context: ctx, Handler: handler}
 }
 
-/*GetVaccinators swagger:route GET /vaccinators getVaccinators
+/* GetVaccinators swagger:route GET /vaccinators getVaccinators
 
 Get vaccinators
 
@@ -47,7 +47,6 @@ func (o *GetVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetVaccinatorsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

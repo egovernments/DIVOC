@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -35,7 +36,7 @@ func NewUpdateFacilityProgramSchedule(ctx *middleware.Context, handler UpdateFac
 	return &UpdateFacilityProgramSchedule{Context: ctx, Handler: handler}
 }
 
-/*UpdateFacilityProgramSchedule swagger:route PUT /facility/{facilityId}/program/{programId}/schedule updateFacilityProgramSchedule
+/* UpdateFacilityProgramSchedule swagger:route PUT /facility/{facilityId}/program/{programId}/schedule updateFacilityProgramSchedule
 
 update schedule for program in facility
 
@@ -51,7 +52,6 @@ func (o *UpdateFacilityProgramSchedule) ServeHTTP(rw http.ResponseWriter, r *htt
 		r = rCtx
 	}
 	var Params = NewUpdateFacilityProgramScheduleParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,7 +71,6 @@ func (o *UpdateFacilityProgramSchedule) ServeHTTP(rw http.ResponseWriter, r *htt
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -107,7 +106,6 @@ func (o *UpdateFacilityProgramScheduleBody) Validate(formats strfmt.Registry) er
 }
 
 func (o *UpdateFacilityProgramScheduleBody) validateAppointmentSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.AppointmentSchedule) { // not required
 		return nil
 	}
@@ -132,7 +130,6 @@ func (o *UpdateFacilityProgramScheduleBody) validateAppointmentSchedule(formats 
 }
 
 func (o *UpdateFacilityProgramScheduleBody) validateWalkInSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.WalkInSchedule) { // not required
 		return nil
 	}
@@ -144,6 +141,60 @@ func (o *UpdateFacilityProgramScheduleBody) validateWalkInSchedule(formats strfm
 
 		if o.WalkInSchedule[i] != nil {
 			if err := o.WalkInSchedule[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "walkInSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this update facility program schedule body based on the context it is used
+func (o *UpdateFacilityProgramScheduleBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateAppointmentSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.contextValidateWalkInSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *UpdateFacilityProgramScheduleBody) contextValidateAppointmentSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.AppointmentSchedule); i++ {
+
+		if o.AppointmentSchedule[i] != nil {
+			if err := o.AppointmentSchedule[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "appointmentSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *UpdateFacilityProgramScheduleBody) contextValidateWalkInSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.WalkInSchedule); i++ {
+
+		if o.WalkInSchedule[i] != nil {
+			if err := o.WalkInSchedule[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("body" + "." + "walkInSchedule" + "." + strconv.Itoa(i))
 				}

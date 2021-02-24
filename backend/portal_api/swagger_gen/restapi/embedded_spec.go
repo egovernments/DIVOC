@@ -324,19 +324,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "facilityId": {
+              "type": "object",
+              "required": [
+                "message",
+                "facilities"
+              ],
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
                     "type": "string"
-                  },
-                  "pendingTasks": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
                   }
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "subject": {
+                  "type": "string"
                 }
               }
             }
@@ -1267,7 +1273,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "description": "State of address",
@@ -1283,7 +1289,7 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
@@ -2413,9 +2419,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/NotifyFacilitiesParamsBodyItems0"
+              "type": "object",
+              "required": [
+                "message",
+                "facilities"
+              ],
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "subject": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -3345,7 +3368,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "description": "State of address",
@@ -3361,7 +3384,7 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
@@ -3450,7 +3473,7 @@ func init() {
           "$id": "#/properties/address/properties/district"
         },
         "pincode": {
-          "type": "integer",
+          "type": "string",
           "title": "The pincode schema",
           "$id": "#/properties/address/properties/pincode"
         },
@@ -3469,7 +3492,7 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
@@ -3836,20 +3859,6 @@ func init() {
         },
         "startTime": {
           "type": "string"
-        }
-      }
-    },
-    "NotifyFacilitiesParamsBodyItems0": {
-      "type": "object",
-      "properties": {
-        "facilityId": {
-          "type": "string"
-        },
-        "pendingTasks": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
@@ -4326,7 +4335,7 @@ func init() {
               "$id": "#/properties/address/properties/district"
             },
             "pincode": {
-              "type": "integer",
+              "type": "string",
               "title": "The pincode schema",
               "$id": "#/properties/address/properties/pincode"
             },
@@ -4345,7 +4354,7 @@ func init() {
               "addressLine1": "no. 23, some lane, some road",
               "addressLine2": "some nagar",
               "district": "bangalore south",
-              "pincode": 560000,
+              "pincode": "560000",
               "state": "Karnataka"
             }
           ]

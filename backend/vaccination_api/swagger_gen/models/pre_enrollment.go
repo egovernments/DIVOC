@@ -216,7 +216,7 @@ type PreEnrollmentAddress struct {
 	District string `json:"district,omitempty"`
 
 	// pincode
-	Pincode int64 `json:"pincode,omitempty"`
+	Pincode string `json:"pincode,omitempty"`
 
 	// state
 	State string `json:"state,omitempty"`

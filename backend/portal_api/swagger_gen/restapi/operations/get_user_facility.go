@@ -31,7 +31,7 @@ func NewGetUserFacility(ctx *middleware.Context, handler GetUserFacilityHandler)
 	return &GetUserFacility{Context: ctx, Handler: handler}
 }
 
-/*GetUserFacility swagger:route GET /facility getUserFacility
+/* GetUserFacility swagger:route GET /facility getUserFacility
 
 get user facility details
 
@@ -47,7 +47,6 @@ func (o *GetUserFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetUserFacilityParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetUserFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

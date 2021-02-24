@@ -377,7 +377,7 @@ type CertificationRequestFacilityAddress struct {
 
 	// pincode
 	// Required: true
-	Pincode *int64 `json:"pincode"`
+	Pincode *string `json:"pincode"`
 
 	// state
 	// Required: true
@@ -683,7 +683,7 @@ type CertificationRequestRecipientAddress struct {
 
 	// pincode
 	// Required: true
-	Pincode *int64 `json:"pincode"`
+	Pincode *string `json:"pincode"`
 
 	// state
 	// Required: true
