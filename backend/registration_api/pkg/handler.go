@@ -315,21 +315,12 @@ func getEnrollmentInfoIfValid(enrollmentCode string, phone string) map[string]st
 	return nil
 }
 
-func deleteAppointment(params operations.DeleteAppointmentParams) middleware.Responder {
-	recipientToken := params.HTTPRequest.Header.Get("recipientToken")
+func deleteAppointment(params operations.DeleteAppointmentParams, principal *models3.JWTClaimBody) middleware.Responder {
 	if params.Body.EnrollmentCode == nil {
 		return operations.NewDeleteAppointmentBadRequest()
 	}
-	if recipientToken == "" {
-		log.Error("Recipient Token is empty")
-		return operations.NewDeleteAppointmentUnauthorized()
-	}
-	phone, err := services.VerifyRecipientToken(recipientToken)
-	if err != nil {
-		log.Error("Invalid Token")
-		return operations.NewDeleteAppointmentUnauthorized()
-	}
-	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, phone)
+
+	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, principal.Phone)
 	if enrollmentInfo != nil {
 		if checkIfAlreadyAppointed(enrollmentInfo) {
 			if msg := checkIfCancellationAllowed(enrollmentInfo); msg == "" {
@@ -361,10 +352,10 @@ func deleteAppointment(params operations.DeleteAppointmentParams) middleware.Res
 				return response
 			}
 		} else {
-			log.Errorf("Enrollment not booked %s, %s", *params.Body.EnrollmentCode, phone)
+			log.Errorf("Enrollment not booked %s, %s", *params.Body.EnrollmentCode, principal.Phone)
 		}
 	} else {
-		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, phone)
+		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
 	}
 	return operations.NewDeleteAppointmentBadRequest()
 }

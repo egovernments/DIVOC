@@ -47,10 +47,10 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
 		}),
-    DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams) middleware.Responder {
+		DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteAppointment has not yet been implemented")
 		}),
-		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams,  principal *models.JWTClaimBody) middleware.Responder {
+		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
 		GenerateOTPHandler: GenerateOTPHandlerFunc(func(params GenerateOTPParams) middleware.Responder {

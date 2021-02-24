@@ -81,6 +81,11 @@ func init() {
         }
       },
       "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Delete the appointment",
         "operationId": "deleteAppointment",
         "parameters": [
@@ -402,6 +407,11 @@ func init() {
         }
       },
       "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Delete the appointment",
         "operationId": "deleteAppointment",
         "parameters": [

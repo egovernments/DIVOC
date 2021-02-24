@@ -20,6 +20,8 @@ paths:
     delete:
       summary: Delete the appointment
       operationId: deleteAppointment
+      security:
+       - Bearer: [ ]
       parameters:
         - in: body
           name: body
