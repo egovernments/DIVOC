@@ -219,7 +219,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                 </div>
                 <div className="p-0 col-6">
                     <Col className="col-6">
-                        <label htmlFor="email">Email ID</label>
+                        <label hidden={verifyDetails && !formData.email} htmlFor="email">Email ID</label>
                         <div hidden={verifyDetails}>
                             <input className="form-control" id="email" name="email" type="text"
                                    placeholder="Enter Email ID"
