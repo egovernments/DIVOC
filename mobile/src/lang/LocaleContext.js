@@ -139,5 +139,11 @@ export const LANGUAGE_KEYS = Object.freeze({
     BUTTON_CONFIRM: "app.button.confirm",
     BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination",
     BUTTON_OTP: "app.button.otp",
-    BUTTON_VERIFY: "app.button.verify"
+    BUTTON_VERIFY: "app.button.verify",
+
+    VACCINATION_TITLE: "app.vaccination.title",
+    VACCINATION_VACCINATOR: "app.vaccination.vaccinator",
+    VACCINATION_VACCINE: "app.vaccination.vaccine",
+    VACCINATION_BATCH_ID: "app.vaccination.batchId",
+    VACCINATION_DOSE: "app.vaccination.dose",
 });
