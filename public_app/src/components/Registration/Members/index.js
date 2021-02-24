@@ -235,7 +235,7 @@ const MemberCard = (props) => {
                             <span className="mb-2"
                                   style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
                         {isAppointmentBooked ? <CustomDropdown items={[{
-                            name: "Delete Appointment", onClick: () => {
+                            name: "Cancel Appointment", onClick: () => {
                                 showDeleteConfirmation()
                             }
                         }]}/> : <span/>}
