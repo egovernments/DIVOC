@@ -13,7 +13,7 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 export function PreEnrollmentDetails(props) {
     return (
 
-        <BaseFormCard title={"Verify Vaccination Recipient"}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
             <PatientDetails/>
         </BaseFormCard>
     )
@@ -40,11 +40,11 @@ function PatientDetails(props) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state.enrollCode])
     if (!patientDetails) {
-        return <div className={"no-details"}>No Patient Details Found</div>
+        return <div className={"no-details"}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_NO_PATIENTS)}</div>
     }
     return (
         <div className={"pre-enrollment-details"}>
-            <h4>Confirm recipient details</h4>
+            <h4>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_DETAILS)}</h4>
             <PatientInfo patientDetails={patientDetails}/>
 
             <Col className="register-with-aadhaar">
@@ -52,7 +52,7 @@ function PatientDetails(props) {
                 <div>
                     <Button variant="outline-primary" className="action-btn mb-3" onClick={() => {
                         goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAAR_NUMBER, patientDetails)
-                    }}>ENTER MANUALLY</Button>
+                    }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_ENTER_MANUALLY)}</Button>
                 </div>
                 <div>
                     <Button variant="outline-primary" className="action-btn" onClick={() => {

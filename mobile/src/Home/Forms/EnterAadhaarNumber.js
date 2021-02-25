@@ -8,7 +8,7 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 export function VerifyAadhaarNumber(props) {
     return (
-        <BaseFormCard title={"Verify Vaccination Recipient"}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
             <EnterAadhaarNumber/>
         </BaseFormCard>
     )
@@ -35,14 +35,14 @@ function EnterAadhaarNumber(props) {
                 if (aadhaarNumber) {
                     goNext(FORM_AADHAAR_NUMBER, FORM_AADHAAR_OTP, {aadhaarNumber: aadhaarNumber})
                 }
-            }}>GENERATE OTP</Button>
+            }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_OTP)}</Button>
         </div>
     );
 }
 
 export function VerifyAadhaarOTP(props) {
     return (
-        <BaseFormCard title={"Verify Vaccination Recipient"}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
             <EnterAadhaarOTP/>
         </BaseFormCard>
     )
@@ -58,7 +58,7 @@ function EnterAadhaarOTP(props) {
 
     return (
         <div className="aadhaar-container">
-            <h5>Enter OTP</h5>
+            <h5>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_ENTER_OTP)}</h5>
             <Form.Control className="control"
                           placeholder="XXXX"
                           value={aadhaarOTP}
@@ -73,8 +73,7 @@ function EnterAadhaarOTP(props) {
                         console.log("Queue: " + e);
                     })
                 }
-            }}>VERIFY</Button>
+            }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_VERIFY)}</Button>
         </div>
     );
 }
-

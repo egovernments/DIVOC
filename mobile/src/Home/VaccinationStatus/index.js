@@ -67,7 +67,7 @@ async function getVaccinationStatus() {
         programRate,
         isExceed ? (enrolledCount - programRate) : 0,
         isExceed,
-        isExceed ? "Exceed Limits" : "Recipients Enrolled",
+        getMessageComponent(isExceed ? LANGUAGE_KEYS.EXCEED_LIMITS : LANGUAGE_KEYS.RECIPIENTS_ENROLLED),
         isLimitToReach
     );
 }
