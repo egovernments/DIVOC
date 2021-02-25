@@ -1,6 +1,7 @@
 import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 import {programDb} from "./Services/ProgramDB";
+import {queueDb} from "./Services/QueueDB";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -26,6 +27,8 @@ export class SyncFacade {
 
         const vaccinators = await ApiServices.fetchVaccinators();
         await appIndexDb.saveVaccinators(vaccinators);
+
+        await queueDb.popData()
     }
 
     static async push() {

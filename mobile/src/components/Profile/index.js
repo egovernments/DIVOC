@@ -9,6 +9,7 @@ import {Messages} from "../../Base/Constants";
 import {AuthSafeComponent} from "../../utils/keycloak";
 import Col from "react-bootstrap/Col";
 import config from "../../config";
+import {queueDb} from "../../Services/QueueDB";
 import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
 
 function AuthSafeUserProfile({keycloak}) {
@@ -63,6 +64,7 @@ function AuthSafeUserProfile({keycloak}) {
                                     SyncFacade
                                         .push()
                                         .catch((e) => console.log(e.message))
+                                        .then(() => queueDb.stashData())
                                         .then(() => appIndexDb.clearEverything())
                                         .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                                         .catch(e => {
