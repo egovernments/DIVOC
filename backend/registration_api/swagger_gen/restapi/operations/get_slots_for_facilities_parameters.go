@@ -22,8 +22,8 @@ func NewGetSlotsForFacilitiesParams() GetSlotsForFacilitiesParams {
 	var (
 		// initialize parameters with default values
 
-		pageNumberDefault = float64(0)
 		pageSizeDefault   = float64(0)
+		pageNumberDefault = int64(0)
 	)
 
 	return GetSlotsForFacilitiesParams{
@@ -50,12 +50,8 @@ type GetSlotsForFacilitiesParams struct {
 	  In: query
 	  Default: 0
 	*/
-	PageNumber *float64
-	/*
-	  In: query
-	  Default: 0
-	*/
 	PageSize *float64
+	PageNumber *int64
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -123,9 +119,9 @@ func (o *GetSlotsForFacilitiesParams) bindPageNumber(rawData []string, hasKey bo
 		return nil
 	}
 
-	value, err := swag.ConvertFloat64(raw)
+	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("pageNumber", "query", "float64", raw)
+		return errors.InvalidType("pageNumber", "query", "int64", raw)
 	}
 	o.PageNumber = &value
 
