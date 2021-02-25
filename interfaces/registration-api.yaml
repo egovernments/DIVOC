@@ -77,13 +77,18 @@ paths:
     get:
       summary: Get slots for facilites
       operationId: getSlotsForFacilities
-      security: [ ]
+      security:
+        - Bearer: [ ]
       parameters:
         - in: query
           name: facilityId
           type: string
         - in: query
           name: pageNumber
+          type: number
+          default: 0
+        - in: query
+          name: pageSize
           type: number
           default: 0
       responses:

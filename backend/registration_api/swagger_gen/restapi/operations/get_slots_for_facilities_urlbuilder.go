@@ -17,6 +17,7 @@ import (
 type GetSlotsForFacilitiesURL struct {
 	FacilityID *string
 	PageNumber *float64
+	PageSize   *float64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -66,6 +67,14 @@ func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
 	}
 	if pageNumberQ != "" {
 		qs.Set("pageNumber", pageNumberQ)
+	}
+
+	var pageSizeQ string
+	if o.PageSize != nil {
+		pageSizeQ = swag.FormatFloat64(*o.PageSize)
+	}
+	if pageSizeQ != "" {
+		qs.Set("pageSize", pageSizeQ)
 	}
 
 	_result.RawQuery = qs.Encode()

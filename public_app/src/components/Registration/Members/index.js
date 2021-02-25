@@ -13,6 +13,7 @@ import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
 import {CustomDropdown} from "../../CustomDropdown";
 import CloseImg from "../../../assets/img/icon-cross.svg";
+import {pathOr} from "ramda";
 
 export const Members = () => {
     const history = useHistory();
@@ -106,11 +107,11 @@ export const Members = () => {
                 setPrograms(ps)
             })
     }
-    
+
     function callCancelAppointment() {
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"recipientToken": token, "Content-Type": "application/json"},
+            headers: {"Authorization": token, "Content-Type": "application/json"},
             data: {enrollmentCode: members[selectedMemberIndex].code}
         };
 
@@ -123,11 +124,16 @@ export const Members = () => {
                 }, 3000);
 
             })
-            .catch(() => {
-                alert("Something went wrong. Please try again");
+            .catch((err) => {
+                if (pathOr("", ["response", "data", "message"], err) !== "") {
+                    alert(err.response.data.message);
+                } else {
+                    alert("Something went wrong. Please try again");
+                }
             })
             .finally(() => {
                 setShowModal(false)
+                setSelectedMemberIndex(-1)
             });
     }
 
@@ -169,7 +175,7 @@ export const Members = () => {
                         <span>+ Member</span>
                     </CustomButton>}
                 </div>
-                {selectedMemberIndex > -1 && members.length > 0 && <Modal show={showModal} onHide={() => {
+                {selectedMemberIndex > -1 && members.length > 0 && showModal && <Modal show={showModal} onHide={() => {
                     setShowModal(false)
                 }} centered backdrop="static" keyboard={false}>
                     <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
@@ -184,9 +190,13 @@ export const Members = () => {
                         <div className="d-flex flex-column justify-content-center align-items-center">
                             <b>{members[selectedMemberIndex].name}</b>
                             <b className="text-center mt-1">Enrollment number: {members[selectedMemberIndex].code}</b>
-                            <span className="mt-1">{`${members[selectedMemberIndex].facilityDetails.facilityName}, ${members[selectedMemberIndex].facilityDetails.district}, ${members[selectedMemberIndex].facilityDetails.state}, ${members[selectedMemberIndex].facilityDetails.pincode}`}</span>
-                            <span className="mt-1">{formatDate(members[selectedMemberIndex].appointmentDate || "")}, {members[selectedMemberIndex].appointmentSlot || ""}</span>
-                            <CustomButton className="blue-btn" onClick={() => {callCancelAppointment()}}>CONFIRM</CustomButton>
+                            <span
+                                className="mt-1">{`${members[selectedMemberIndex].facilityDetails.facilityName}, ${members[selectedMemberIndex].facilityDetails.district}, ${members[selectedMemberIndex].facilityDetails.state}, ${members[selectedMemberIndex].facilityDetails.pincode}`}</span>
+                            <span
+                                className="mt-1">{formatDate(members[selectedMemberIndex].appointmentDate || "")}, {members[selectedMemberIndex].appointmentSlot || ""}</span>
+                            <CustomButton className="blue-btn" onClick={() => {
+                                callCancelAppointment()
+                            }}>CONFIRM</CustomButton>
                         </div>
                     </div>
                 </Modal>}
@@ -225,7 +235,7 @@ const MemberCard = (props) => {
                             <span className="mb-2"
                                   style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
                         {isAppointmentBooked ? <CustomDropdown items={[{
-                            name: "Delete Appointment", onClick: () => {
+                            name: "Cancel Appointment", onClick: () => {
                                 showDeleteConfirmation()
                             }
                         }]}/> : <span/>}

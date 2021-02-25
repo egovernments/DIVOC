@@ -250,6 +250,14 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 	for _, facility := range facilities {
 		facilityIds = append(facilityIds, facility.Osid)
 	}
+	filter = map[string]interface{}{
+		"facilityId": map[string]interface{}{
+			"or": facilityIds,
+		},
+		"osCreatedAt": map[string]interface{}{
+			"lt": time.Now().Format("2006-01-02"),
+		},
+	}
 	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
 	responseData := map[string]interface{}{
 		"facilities": facilities,

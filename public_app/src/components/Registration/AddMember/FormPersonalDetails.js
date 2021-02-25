@@ -63,7 +63,7 @@ const STATES = Object.values(state_and_districts['states']).map(obj => obj.name)
 const GENDERS = [
     "Male",
     "Female",
-    "Others"
+    "Other"
 ];
 
 const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
