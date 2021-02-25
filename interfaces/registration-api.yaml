@@ -89,7 +89,7 @@ paths:
           default: 0
         - in: query
           name: pageSize
-          type: number
+          type: integer
           default: 0
       responses:
         '200':
