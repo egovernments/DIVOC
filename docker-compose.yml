@@ -9,6 +9,7 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     environment:
       - discovery.type=single-node
+      - ES_JAVA_OPTS="-Xms256m -Xmx512m"
     ports:
       - "9200:9200"
       - "9300:9300"
@@ -26,7 +27,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   registry:
-    image: dockerhub/registry-es
+    image: bindock/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
@@ -40,7 +41,7 @@ services:
       - es
       - db
   keycloak:
-    image: dockerhub/keycloak
+    image: bindock/keycloak
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -105,7 +106,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api
+    image: bindock/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -117,7 +118,7 @@ services:
       - kafka
       - keycloak
   portal_api:
-    image: dockerhub/portal_api
+    image: bindock/portal_api
     ports:
       - "8001:8001"
     environment:
@@ -131,31 +132,67 @@ services:
       - kafka
       - keycloak
   registration_api:
-    image: dockerhub/registration_api
+    image: bindock/registration_api
     ports:
       - "8002:8002"
     environment:
       REDIS_URL: redis://redis:6379
-      AUTH_PRIVATE_KEY:
-      AUTH_PUBLIC_KEY:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       # in min
       CACHE_TTL: 60
+      AUTH_PRIVATE_KEY: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA1mIX9SFluySnfIfT6Jz5LdORWO+O0j3L7cF+BLaAdX7JuiN1
+        0MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3rsb6ut/PweLn9sLmwsj9OGSAuH7DF
+        OHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgvd2+WnKYtdWfgo8kB82WkGolAT7++
+        efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpzTm87zshvOoEvkBUcBJdmKNjzLwBc
+        0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR557KyVGKL9NUvlbbp9jglcZERtpE6
+        pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6OQIDAQABAoIBAQDGeozZqvDngTj7
+        Bzm+m03rCnv/jdJ5fTMHTOOh82Ec5qRXC6tw/C6/PRAR8k72VGhdhwXxA5TWOFTM
+        zIqWW7AxoGtb7aGN9AwWiOQ5MnjYtD1fo6YD7kYJDEbVRc55CxsCo/fVz7XMkHd5
+        KA53YF/JwOr83rEpiGGm4VtH/6sd0JBLWZxIW1SEd7gPTOCNeRQku4xGXOARfNlC
+        l87FfqgZc4CeYh7c2OYwgjtShli2RMvcXKVQGI1BciTQQm2muLeoUU3P5Vn2NeGY
+        7WpbpjFQhN1nUIZq4cfN1QiNSTSIct0VXt6/qLZXLGOYLhkn9U/oDYOOYG1rY5xf
+        L0vumnrxAoGBAPJk0czb5gWbqd7AUEcfkVmRp3HZxHew6L+qmcfioiX+JTGHjW/f
+        OMgpipqXRJKmWZan+GT2MI5q36KIo7rcbwjXccA4DKw3JBukKHhS891iNqinwzX8
+        +ox2GH4bwYaHc35a9wIV4F8+IzcRRFiTgIW5bVs55ekgxqc7p2L3wb/dAoGBAOJq
+        w2HPddArOeI+S+YRYziKWoldJGwJFF9hILfsCWT2OCrVhiuBpRHvSJb3k1L6R0mn
+        gRGsss0HvpK6bUnWEAmNX9xEpll7g5kaWS1NSZMyvbOX6jTnoWE3jhdkXnQ1j8Uv
+        gxDB6zvtR60DTA9fCqPo09YeM4zcGLVySi+o/OwNAoGBAKUTNC4ns8ct88nXftRx
+        EzPElhxbCgnZWSjurjwKhBMLuZi5kAEYLDtkzxfo3LJix7BqRCe94eObtSGjnJ2t
+        cZC76KPXiAngo56PdWA8Xgfu0vqZBcDGwHrYEmYP0QQlSupKWN36uAsk7iaag8ku
+        6uAnH+p4y7Kwt5k8bwpfYHuhAoGAI3sTjxpRngOIGJomjrEe2VdlBK2h7YQmuyOf
+        WvMULcwf1SaM1fiFA6B5wZ6eaZxq23HyWfC0PEkAZkHsqmtvK/AJm5zubItcffuR
+        CfZYl0aWT7R4sT2zHmb0T1odKxzRoNbnNRMOZ9+xIb2oh6gfJLxxpdYpweMjxBta
+        4MkciWkCgYAOaBqc63WmPzFf0BDVlRPR4E5x2WjkNaNtMPNF0bj3rC7ZWVmXW6Ay
+        7tYqIxcu4KrP2MOFS0b2FL1KsBJlhUlvAfNEL5hn6IO73vl3OhhaJMNIBQ8NiJ/k
+        PbX9Cjh7u/BqNQmyROpFGHWbs4gjdQHeqY29CrmMaURZMo7U8g4b6w==
+        -----END RSA PRIVATE KEY-----
+      AUTH_PUBLIC_KEY: |
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
+        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
+        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
+        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
+        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
+        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
+        OQIDAQAB
+        -----END PUBLIC KEY-----
     depends_on:
       - kafka
       - keycloak
   analytics_feed:
-    image: dockerhub/analytics_feed
+    image: bindock/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
   certificate_processor:
-    image: dockerhub/certificate_processor
+    image: bindock/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -164,7 +201,7 @@ services:
     depends_on:
       - registry
   certificate_signer:
-    image: dockerhub/certificate_signer
+    image: bindock/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -173,7 +210,7 @@ services:
       - kafka
       - redis
   nginx:
-    image: dockerhub/nginx
+    image: bindock/nginx
     ports:
       - "80:80"
     depends_on:
@@ -181,7 +218,7 @@ services:
       - portal_api
       - registration_api
   notification-service:
-    image: dockerhub/notification-service
+    image: bindock/notification-service
     ports:
       - "8765:8765"
     environment:
@@ -192,7 +229,7 @@ services:
     depends_on:
       - kafka
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+    image: bindock/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"

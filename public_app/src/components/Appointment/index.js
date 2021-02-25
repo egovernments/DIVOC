@@ -3,13 +3,17 @@ import "./index.css";
 import {Button, Col, Modal, Row} from "react-bootstrap";
 import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
-import {formatDate, padDigit} from "../../utils/CustomDate";
+import PrivateSvg from "../../assets/img/icon-private.svg"
+import GovernmentSvg from "../../assets/img/icon-government.svg"
+import {formatDate} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {equals, reject} from "ramda";
 import {Loader} from "../Loader";
+import {getCookie} from "../../utils/cookies";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
@@ -22,6 +26,8 @@ export const Appointment = (props) => {
     const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(-1);
     const [showModal, setShowModal] = useState(false);
     const [selectedAllotment, setSelectedAllotment] = useState({});
+    const [facilitySlots, setFacilitySlots] = useState({});
+    const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
     useEffect(() => {
         setIsLoading(true);
@@ -33,29 +39,19 @@ export const Appointment = (props) => {
 
         axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
             .then(res => {
-                let data = res.data.map(d => {
-                    return {
-                        ...d,
-                        programs: d.programs.map(p => {
-                            if (p.programId === program_id) {
-                                return {
-                                    ...p, "schedule": {
-                                        "days": [
-                                            "Th",
-                                            "F",
-                                            "Sa"
-                                        ],
-                                        "endTime": "23:00",
-                                        "startTime": "11:00"
-                                    }
-                                }
-                            }
-                            return p;
-                        })
+                const {facilities, facilitiesSchedule} = res.data;
+                let data = facilities.map(d => {
+                    return d
+                });
+                let schedule = {};
+                facilitiesSchedule.map(d => {
+                    if (d.facilityId) {
+                        schedule[d.facilityId] = d
                     }
                 });
-                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText))
-                setFacilities(data)
+                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
+                setFacilities(data);
+                setFacilitiesSchedule(schedule);
                 setIsLoading(false);
             });
     }, [searchText, searchDate]);
@@ -66,6 +62,7 @@ export const Appointment = (props) => {
 
     function getAvailableAllotments() {
         let facility = facilities[selectedFacilityIndex];
+        const program = getProgramInfo(facility, program_id)
         return (
             <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
@@ -73,16 +70,17 @@ export const Appointment = (props) => {
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
-                <FacilityAllotment facility={facility} programId={program_id}
-                                   showModal={(facilityId, allotmentDate, allotmentTime, programName, facilityName, facilityAddress) => {
+                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility.osid]}
+                                   showModal={(allotmentDate, allotmentTime, slotKey) => {
                                        setShowModal(true)
                                        setSelectedAllotment({
-                                           facilityId,
+                                           facilityId: facility.osid,
+                                           facilityName: facility.facilityName,
+                                           facilityAddress: facility.address,
+                                           programName: program.name,
                                            allotmentDate,
                                            allotmentTime,
-                                           programName,
-                                           facilityName,
-                                           facilityAddress
+                                           slotKey
                                        })
                                    }}/>
             </div>
@@ -98,8 +96,61 @@ export const Appointment = (props) => {
         }
     }
 
-    function getMeridian(hour) {
-        return hour > 11 ? "PM" : "AM";
+    function getSlotsForFacility(facilityIndex, pageNumber = 0) {
+        setSelectedFacilityIndex(facilityIndex);
+        const facilityId = facilities[facilityIndex].facilityCode;
+        setIsLoading(true);
+        let params = {
+            facilityId,
+            pageNumber
+        };
+        params = reject(equals(''))(params);
+        const queryParams = new URLSearchParams(params);
+        axios.get("/divoc/api/citizen/facility/slots", {params: queryParams})
+            .then(res => {
+                const {keys, slots} = res.data;
+                const dayWiseSlotsInfo = {};
+                for (let i = 0; i < keys.length; i++) {
+                    const slotInfo = keys[i].split("_");
+                    const slotDate = slotInfo[2];
+                    const slotStartTime = slotInfo[3];
+                    const slotStopTime = slotInfo[4];
+                    if (!(slotDate in dayWiseSlotsInfo)) {
+                        dayWiseSlotsInfo[slotDate] = {}
+                    }
+                    dayWiseSlotsInfo[slotDate][slotStartTime] = {
+                        time: `${slotStartTime}-${slotStopTime}`,
+                        slots: slots[i],
+                        key: keys[i]
+                    }
+                }
+                setFacilitySlots(dayWiseSlotsInfo);
+                setIsLoading(false);
+            })
+            .catch(err => {
+                alert("something went wrong");
+                setIsLoading(false);
+            });
+    }
+
+    function bookSlot() {
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"recipientToken": token, "Content-Type": "application/json"},
+        };
+
+        axios.post("/divoc/api/citizen/facility/slot/book", {
+            enrollmentCode: enrollment_code,
+            facilitySlotId: selectedAllotment.slotKey
+        }, config)
+            .then(res => {
+                history.push("/" + enrollment_code + "/appointment/confirm")
+            })
+            .catch(() => {
+                alert("Something went wrong. Please try again");
+                setShowModal(false)
+                getSlotsForFacility(selectedFacilityIndex)
+            });
     }
 
     return (
@@ -108,7 +159,9 @@ export const Appointment = (props) => {
             <div className="card-container">
                 <div className="header-group">
                     <h3>Select Facility</h3>
-                    <span className="appointment-back-btn cursor-pointer" onClick={() => {history.push("/registration")}}>Back</span>
+                    <span className="appointment-back-btn cursor-pointer" onClick={() => {
+                        history.push("/registration")
+                    }}>Back</span>
                 </div>
                 <Row>
                     <Col lg={6}>
@@ -126,24 +179,23 @@ export const Appointment = (props) => {
                                 <>
                                     <div className={`facility-card ${index === selectedFacilityIndex ? "active" : ""}`}
                                          onClick={() => {
-                                             setSelectedFacilityIndex(index)
+                                             getSlotsForFacility(index)
                                          }}>
                                         <div className="d-flex justify-content-between">
                                             <b>{facility.facilityName}</b>
                                             {
-                                                getProgramIfAppointmentIsAvailable(facility, program_id) && <span
-                                                    style={{
-                                                        fontSize: "10px",
-                                                        color: "#2CD889"
-                                                    }}>Appointment Available</span>
-                                            }
-                                            {
-                                                !getProgramIfAppointmentIsAvailable(facility, program_id) &&
-                                                <span style={{fontSize: "10px", color: "#FF7C2B"}}>Walkin</span>
+                                                facility.category === "GOVT" ?
+                                                    <img src={GovernmentSvg} title={facility.category}/> :
+                                                    <img src={PrivateSvg} title={facility.category}/>
                                             }
                                         </div>
-                                        <div><span
-                                            className="facility-list-detail mr-2">Address:</span>{formatAddress(facility.address)}
+                                        <div>{formatAddress(facility.address)}
+                                            <div>
+                                                <span
+                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
+                                                <span
+                                                    className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
+                                            </div>
                                         </div>
 
                                     </div>
@@ -174,14 +226,9 @@ export const Appointment = (props) => {
                         <span>For {name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
                         <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
-                        <span
-                            className="mt-1">{padDigit(selectedAllotment.allotmentTime > 12 ? selectedAllotment.allotmentTime % 12 : selectedAllotment.allotmentTime)}:00 {getMeridian(selectedAllotment.allotmentTime)} - {padDigit((selectedAllotment.allotmentTime + 1) > 12 ? (selectedAllotment.allotmentTime + 1) % 12 : (selectedAllotment.allotmentTime + 1))}:00 {getMeridian(selectedAllotment.allotmentTime + 1)}</span>
+                        <span className="mt-1">{selectedAllotment.allotmentTime}</span>
                         <CustomButton className="blue-btn" onClick={() => {
-                            localStorage.setItem(enrollment_code, JSON.stringify({
-                                ...selectedAllotment,
-                                enrollment_code
-                            }))
-                            history.push("/" + enrollment_code + "/appointment/confirm")
+                            bookSlot()
                         }}>CONFIRM</CustomButton>
                     </div>
                 </div>
@@ -190,80 +237,101 @@ export const Appointment = (props) => {
     )
 };
 
-const Days = {
-    Su: 0,
-    M: 1,
-    Tu: 2,
-    W: 3,
-    Th: 4,
-    F: 5,
-    Sa: 6,
-};
-let MAX_DAYS = 3;
-
-function getProgramIfAppointmentIsAvailable(facility, programId) {
+function getProgramInfo(facility, programId) {
     const program = (facility.programs || []).find(program => program.programId === programId);
-    if (program && program.schedule && program.schedule.days.length > 0 && program.schedule.startTime && program.schedule.endTime) {
+    if (program) {
         return program
     } else {
         return undefined
     }
 }
 
-const FacilityAllotment = ({facility, programId, showModal}) => {
-    const program = getProgramIfAppointmentIsAvailable(facility, programId);
-    if (program) {
-        function getTimeSlots(allotmentDate) {
-            const startHour = parseInt(program.schedule.startTime.split(":")[0]);
-            const endHour = parseInt(program.schedule.endTime.split(":")[0]);
-            const lunchHour = 13;
-            let slots = [];
-            for (let i = startHour; i < endHour; i++) {
-
-                let time = padDigit(i > 12 ? i % 12 : i, 2);
-                let available = ((i + allotmentDate.getDay() + parseInt(facility.osid.substring(0,4).replace(/[a-z\-]/g,''))));
-                console.log("Time " + i + " " + available + " " + facility.osid.substr(0,4)) ;
-                if (i != lunchHour && available%3!==1) {
-                    slots.push(<Button
-                      variant="outline-primary"
-                      onClick={() => {
-                          showModal(facility.osid, allotmentDate, i, program.name, facility.facilityName, facility.address)
-                      }}
-                      className="mt-3">{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
-                } else if (i === lunchHour) {
-                    slots.push(<Button variant="outline-light" className="mt-3" >{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
-                }else {
-                    slots.push(<Button variant="outline-secondary" className="mt-3" >{time}:00 {i > 11 ? "PM" : "AM"}</Button>)
+const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
+    if (Object.keys(facilitySlots).length > 0) {
+        const dates = Object.keys(facilitySlots);
+        const timeStamps = new Set();
+        const timeStampWiseSlots = {};
+        for (const [key, value] of Object.entries(facilitySlots)) {
+            Object.values(value).forEach(v => {
+                timeStamps.add(v.time);
+                if (!(v.time in timeStampWiseSlots)) {
+                    timeStampWiseSlots[v.time] = {}
                 }
-            }
-            return slots;
+                timeStampWiseSlots[v.time][key] = v;
+            });
         }
-
-        let days = program.schedule.days;
-        days = days.map(d => Days[d]);
-        while (days.length < MAX_DAYS) {
-            days.push(...program.schedule.days.map(d => Days[d] + 7))
+        const dateWiseWalkinInfo = {};
+        const weekdays = {
+            0: "sun",
+            1: "mon",
+            2: "tue",
+            3: "wed",
+            4: "thu",
+            5: "fri",
+            6: "sat",
+        };
+        if (facilitySchedule && facilitySchedule.walkInSchedule.length > 0 && facilitySchedule.walkInSchedule[0].days.length > 0) {
+            dates.forEach(d => {
+                const toDate = new Date(d);
+                let schedule = facilitySchedule.walkInSchedule[0];
+                if (schedule.days.includes(weekdays[toDate.getDay()])) {
+                    dateWiseWalkinInfo[d] = `${schedule.startTime} - ${schedule.endTime}`
+                } else {
+                    dateWiseWalkinInfo[d] = "-"
+                }
+            })
         }
-        days = days.map(day => {
-            let d = new Date();
-            if (day > 6) {
-                d.setDate(d.getDate() + 7)
-            }
-            d.setDate(d.getDate() + ((7 - d.getDay()) % 7 + day) % 7);
-            return d;
-        }).sort((a, b) => a - b).slice(0, MAX_DAYS);
-
         return (
-            <div className="days-list-wrapper">
-                {days && days.map(d => (
-                    <div className="d-flex flex-column">
-                        <b>{formatDate(d)}</b>
+            <div className="overflow-auto">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td className="text-nowrap pl-3 pr-3 font-weight-bold"/>
                         {
-                            getTimeSlots(d)
-
+                            dates.map(date => <td
+                                className="text-nowrap pl-3 pr-3 font-weight-bold slot-booking-header">{date.length > 0 ? formatDate(date) : date}</td>)
                         }
-                    </div>
-                ))}
+                    </tr>
+                    {
+                        [...timeStamps].map(ts => (
+                            <tr>
+                                <td className="text-nowrap ">{ts}</td>
+                                {
+                                    dates.map(date => {
+                                        if (date in timeStampWiseSlots[ts]) {
+                                            let slots = timeStampWiseSlots[ts][date].slots;
+                                            return (
+                                                <td className="text-nowrap text-center">
+                                                    <Button
+                                                        variant="outline-primary"
+                                                        onClick={() => {
+                                                            if (slots != 0) {
+                                                                showModal(date, ts, timeStampWiseSlots[ts][date].key)
+                                                            }
+                                                        }}
+                                                        className={`slot-booking-btn mt-3 mb-3 ${slots == 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
+                                                </td>
+                                            )
+                                        } else {
+                                            return (<td className="text-nowrap"/>)
+                                        }
+                                    })
+                                }
+                            </tr>
+                        ))
+                    }
+                    {
+                        Object.keys(dateWiseWalkinInfo).length > 0 && <tr>
+                            <td className="text-nowrap text-center">Walkin</td>
+                            {
+                                dates.map(date => {
+                                    return <td className="text-nowrap text-center">{dateWiseWalkinInfo[date]}</td>
+                                })
+                            }
+                        </tr>
+                    }
+                    </tbody>
+                </table>
             </div>
         )
     } else {

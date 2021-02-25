@@ -64,6 +64,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.ConfigureSlotFacilityHandler = operations.ConfigureSlotFacilityHandlerFunc(createSlotForProgramFacilityHandler)
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
+	api.GetProgramsForPublicHandler = operations.GetProgramsForPublicHandlerFunc(getProgramsForPublic)
 }
 
 type GenericResponse struct {
@@ -245,7 +246,18 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	return model.NewGenericJSONResponse(facilities)
+	var facilityIds []string
+	for _, facility := range facilities {
+		facilityIds = append(facilityIds, facility.Osid)
+	}
+	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
+	responseData := map[string]interface{}{
+		"facilities": facilities,
+	}
+	if err2 == nil {
+		responseData["facilitiesSchedule"] = facilitySlotsResponse["FacilityProgramSlot"]
+	}
+	return model.NewGenericJSONResponse(responseData)
 }
 
 func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -871,26 +883,27 @@ func enrichResponseWithProgramDetails(response interface{}) []interface{}{
 
 	for _,objects := range responseArr {
 		obj := objects.(map[string]interface{})
-		programs := obj["programs"].([]interface{})
-		updatedPrograms := []interface{}{}
-		if programs != nil && len(programs) > 0 {
-			for _,obj := range programs {
-				program := obj.(map[string]interface{})
-				id := program["programId"].(string)
-				response, err := getProgramById(id, limit, offset)
-				if err != nil {
-					log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
-				} else {
-					responseArr := response["Program"].([]interface{})
-					if len(responseArr) != 0 {
-						program["name"] = responseArr[0].(map[string]interface{})["name"]
-						updatedPrograms = append(updatedPrograms, program)
+		if programs, ok := obj["programs"].([]interface{}); ok {
+			updatedPrograms := []interface{}{}
+			if programs != nil && len(programs) > 0 {
+				for _, obj := range programs {
+					program := obj.(map[string]interface{})
+					id := program["programId"].(string)
+					response, err := getProgramById(id, limit, offset)
+					if err != nil {
+						log.Errorf("Error in querying registry to get program for id %d %+v", id, err)
+					} else {
+						responseArr := response["Program"].([]interface{})
+						if len(responseArr) != 0 {
+							program["name"] = responseArr[0].(map[string]interface{})["name"]
+							updatedPrograms = append(updatedPrograms, program)
+						}
 					}
 				}
+				obj["programs"] = updatedPrograms
 			}
-			obj["programs"] = updatedPrograms
+			results = append(results, obj)
 		}
-		results = append(results, obj)
 	}
 	return results
 }
@@ -977,4 +990,20 @@ func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgra
 		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
 
+}
+
+func getProgramsForPublic(params operations.GetProgramsForPublicParams) middleware.Responder {
+	entityType := "Program"
+	filter := make(map[string]interface{})
+	if params.Status != nil {
+		filter["status"] = map[string]interface{}{
+			"eq": params.Status,
+		}
+	}
+	response, err := kernelService.QueryRegistry(entityType, filter, 100, 0)
+	if err != nil {
+		log.Errorf("Error in querying registry", err)
+		return model.NewGenericServerError()
+	}
+	return model.NewGenericJSONResponse(response[entityType])
 }

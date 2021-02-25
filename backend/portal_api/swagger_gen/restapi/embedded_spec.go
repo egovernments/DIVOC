@@ -992,6 +992,32 @@ func init() {
         }
       }
     },
+    "/public/programs": {
+      "get": {
+        "security": [],
+        "summary": "get program list for public",
+        "operationId": "getProgramsForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Status of the program (Active / Inactive)",
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
+              }
+            }
+          }
+        }
+      }
+    },
     "/register": {
       "post": {
         "summary": "Enroll Recipient",
@@ -3035,6 +3061,32 @@ func init() {
               "type": "array",
               "items": {
                 "$ref": "#/definitions/PublicFacility"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/public/programs": {
+      "get": {
+        "security": [],
+        "summary": "get program list for public",
+        "operationId": "getProgramsForPublic",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Status of the program (Active / Inactive)",
+            "name": "status",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Program"
               }
             }
           }

@@ -39,9 +39,8 @@ type Enrollment struct {
 	Code string `json:"code,omitempty"`
 
 	// dob
-	// Required: true
 	// Format: date
-	Dob *strfmt.Date `json:"dob"`
+	Dob strfmt.Date `json:"dob,omitempty"`
 
 	// email
 	Email string `json:"email,omitempty"`
@@ -65,6 +64,9 @@ type Enrollment struct {
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
+
+	// yob
+	Yob int64 `json:"yob,omitempty"`
 }
 
 // Validate validates this enrollment
@@ -130,8 +132,8 @@ func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
 
 func (m *Enrollment) validateDob(formats strfmt.Registry) error {
 
-	if err := validate.Required("dob", "body", m.Dob); err != nil {
-		return err
+	if swag.IsZero(m.Dob) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("dob", "body", "date", m.Dob.String(), formats); err != nil {

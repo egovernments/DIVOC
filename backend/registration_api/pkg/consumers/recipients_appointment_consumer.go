@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/strfmt"
@@ -26,7 +27,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 	}
 
 	go func() {
-		err := consumer.SubscribeTopics([]string{config.Config.Kafka.RecipientAppointmentTopic}, nil)
+		err := consumer.SubscribeTopics([]string{config.Config.Kafka.AppointmentAckTopic}, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -34,28 +35,28 @@ func StartRecipientsAppointmentBookingConsumer() {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				log.Info("Got the message to book an appointment")
-				var recipientAppointmentMessage RecipientAppointmentMessage
-				err = json.Unmarshal(msg.Value, &recipientAppointmentMessage)
+				var appointmentAckMessage models2.AppointmentAck
+				err = json.Unmarshal(msg.Value, &appointmentAckMessage)
 				if err == nil {
 					filter := map[string]interface{}{}
 					filter["code"] = map[string]interface{}{
-						"eq": recipientAppointmentMessage.EnrollmentCode,
+						"eq": appointmentAckMessage.EnrollmentCode,
 					}
 					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil {
 						appointmentTData := make(map[string]interface{})
 						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
 
-						appointmentTData["appointmentSlot"] = recipientAppointmentMessage.AppointmentTime
+						appointmentTData["appointmentSlot"] = appointmentAckMessage.AppointmentTime
 						appointmentTData["osid"] = enrollment["osid"]
-						appointmentTData["appointmentDate"] = recipientAppointmentMessage.AppointmentDate
-						appointmentTData["enrollmentScopeId"] = recipientAppointmentMessage.FacilityCode
+						appointmentTData["appointmentDate"] = appointmentAckMessage.AppointmentDate
+						appointmentTData["enrollmentScopeId"] = appointmentAckMessage.FacilityCode
 
 						log.Infof("Message on %s: %v \n", msg.TopicPartition, appointmentTData)
 
 						_, err := kernelService.UpdateRegistry("Enrollment", appointmentTData)
 						if err == nil {
-							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, recipientAppointmentMessage.AppointmentDate,
-								recipientAppointmentMessage.AppointmentTime))
+							err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, appointmentAckMessage.AppointmentDate,
+								appointmentAckMessage.AppointmentTime))
 							if err != nil {
 								log.Error("Unable to send notification to the enrolled user",  err)
 							}
@@ -86,10 +87,14 @@ func CreateEnrollmentFromInterface(enrollmentMap map[string]interface{}, appoint
 		log.Errorf("Invalid date format (%v) (%v)", appointmentDate, err)
 		return models.Enrollment{}
 	} else {
+		email, emailOk := enrollmentMap["email"].(string)
+		if !emailOk {
+			email = ""
+		}
 		return models.Enrollment{
 			Name:            enrollmentMap["name"].(string),
 			Phone:           enrollmentMap["phone"].(string),
-			Email:           enrollmentMap["email"].(string),
+			Email:           email,
 			AppointmentDate: strfmt.Date(appointmentDateFormat),
 			AppointmentSlot: appointmentTime,
 		}

@@ -17,7 +17,7 @@ services:
     ports:
       - "5432:5432"
   registry:
-    image: dockerhub/registry-es
+    image: bindock/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
