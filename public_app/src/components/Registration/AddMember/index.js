@@ -191,38 +191,40 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check eligibility</h3>
+          <h3>Check beneficiaries eligibility for the program</h3>
         </div>
-        <div className="pt-5">
-          <h5>Enter beneficiary's year of birth</h5>
-        </div>
-        <div className={"col-sm-4"}>
-          <label for="yearSelect">Year of birth *</label>
-          <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
-                  onChange={(t) => onYOBChange(t.target && t.target.value)}>
-            <option>Select</option>
-            {
-              years.map(x => <option selected={formData.yob === x} value={x}>{x}</option>)
-            }
-          </select>
-          <div className="invalid-input">
-            {errors.yob}
+        <div className="shadow-sm bg-white p-4">
+          <div className="p-2">
+            <h5>Enter beneficiary's year of birth</h5>
           </div>
-        </div>
-        <div className="pt-5">
-          <label>Does the beneficiary have any of the following comorbidities?</label>
-          <Row className={"col-6 ml-0"}>
-            {
-              conditions.map(x =>
-                <div className="col-md-6">
-                  <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
-                         value={x} id={x} onChange={(e) => {
-                    selectComorbidity(e.target);
-                  }}/>
-                  <label className="form-check-label" htmlFor={x}>{x}</label>
-                </div>)
-            }
-          </Row>
+          <div className={"col-sm-4"}>
+            <label for="yearSelect">Year of birth *</label>
+            <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
+                    onChange={(t) => onYOBChange(t.target && t.target.value)}>
+              <option>Select</option>
+              {
+                years.map(x => <option selected={formData.yob === x} value={x}>{x}</option>)
+              }
+            </select>
+            <div className="invalid-input">
+              {errors.yob}
+            </div>
+          </div>
+          <div className="pt-5">
+            <label>Does the beneficiary have any of the following comorbidities?</label>
+            <Row className={"col-6 ml-0"}>
+              {
+                conditions.map(x =>
+                  <div className="col-md-6">
+                    <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
+                           value={x} id={x} onChange={(e) => {
+                      selectComorbidity(e.target);
+                    }}/>
+                    <label className="form-check-label" htmlFor={x}>{x}</label>
+                  </div>)
+              }
+            </Row>
+          </div>
         </div>
         <div className="pt-3">
           <CustomButton isLink={true} type="submit" onClick={previous}>

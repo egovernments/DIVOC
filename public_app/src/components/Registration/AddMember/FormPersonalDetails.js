@@ -66,7 +66,7 @@ const GENDERS = [
     "Others"
 ];
 
-const RESPONSIVE_COL_CLASS = "col-lg-6 col-md col-sm-10";
+const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
 const RESPONSIVE_ROW_DIV_CLASS = "p-0 pt-2 col-lg-6 col-md-6 col-sm-12";
 
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
@@ -171,10 +171,12 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>{verifyDetails ? "Verify beneficiary details" : "Provide details to complete enrollment"}</h3>
-                <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to registry beneficiary"}</h3>
+                <div className="shadow-sm bg-white form-container">
+                    <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                    <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                    <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                </div>
                 <CustomButton isLink={true} type="submit" onClick={previous}>
                     <span>Back</span>
                 </CustomButton>
@@ -284,7 +286,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
     }
 
     return (
-        <div className="pt-5">
+        <div>
             <h5>ID details</h5>
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
