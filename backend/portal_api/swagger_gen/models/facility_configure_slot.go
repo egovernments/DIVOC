@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -50,7 +51,6 @@ func (m *FacilityConfigureSlot) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityConfigureSlot) validateAppointmentSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppointmentSchedule) { // not required
 		return nil
 	}
@@ -75,7 +75,6 @@ func (m *FacilityConfigureSlot) validateAppointmentSchedule(formats strfmt.Regis
 }
 
 func (m *FacilityConfigureSlot) validateWalkInSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.WalkInSchedule) { // not required
 		return nil
 	}
@@ -87,6 +86,60 @@ func (m *FacilityConfigureSlot) validateWalkInSchedule(formats strfmt.Registry) 
 
 		if m.WalkInSchedule[i] != nil {
 			if err := m.WalkInSchedule[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("walkInSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this facility configure slot based on the context it is used
+func (m *FacilityConfigureSlot) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAppointmentSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateWalkInSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityConfigureSlot) contextValidateAppointmentSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.AppointmentSchedule); i++ {
+
+		if m.AppointmentSchedule[i] != nil {
+			if err := m.AppointmentSchedule[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("appointmentSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (m *FacilityConfigureSlot) contextValidateWalkInSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.WalkInSchedule); i++ {
+
+		if m.WalkInSchedule[i] != nil {
+			if err := m.WalkInSchedule[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("walkInSchedule" + "." + strconv.Itoa(i))
 				}

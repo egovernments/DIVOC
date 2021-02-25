@@ -5,17 +5,13 @@ import axios from "axios";
 import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
-import SelectedLogo from "../../../assets/img/check.png"
+import SelectedLogo from "../../../assets/img/check.svg"
 import {Success} from "./Success";
 import {PROGRAM_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
-import check from "../../../assets/img/check.png";
 import Row from "react-bootstrap/Row";
-import Col from "react-bootstrap/Col";
-import Button from "react-bootstrap/Button";
-import {func} from "prop-types";
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_SELECT_COMORBIDITY = "selectComorbidity";
@@ -195,43 +191,45 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check eligibility</h3>
+          <h3>Check beneficiaries eligibility for the program</h3>
         </div>
-        <div className="pt-5">
-          <h5>Enter beneficiary's year of birth</h5>
-        </div>
-        <div className={"col-sm-4"}>
-          <label for="yearSelect">Year of birth *</label>
-          <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
-                  onChange={(t) => onYOBChange(t.target && t.target.value)}>
-            <option>Select</option>
-            {
-              years.map(x => <option selected={formData.yob === x} value={x}>{x}</option>)
-            }
-          </select>
-          <div className="invalid-input">
-            {errors.yob}
+        <div className="shadow-sm bg-white p-4">
+          <div className="p-2">
+            <h5>Enter beneficiary's year of birth</h5>
+          </div>
+          <div className={"col-sm-4"}>
+            <label for="yearSelect">Year of birth *</label>
+            <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
+                    onChange={(t) => onYOBChange(t.target && t.target.value)}>
+              <option>Select</option>
+              {
+                years.map(x => <option selected={formData.yob === x} value={x}>{x}</option>)
+              }
+            </select>
+            <div className="invalid-input">
+              {errors.yob}
+            </div>
+          </div>
+          <div className="pt-5">
+            <label>Does the beneficiary have any of the following comorbidities?</label>
+            <Row className={"col-6 ml-0"}>
+              {
+                conditions.map(x =>
+                  <div className="col-md-6">
+                    <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
+                           value={x} id={x} onChange={(e) => {
+                      selectComorbidity(e.target);
+                    }}/>
+                    <label className="form-check-label" htmlFor={x}>{x}</label>
+                  </div>)
+              }
+            </Row>
           </div>
         </div>
-        <div className="pt-5">
-          <label>Does the beneficiary have any of the following comorbidities?</label>
-          <Row className={"col-6 ml-0"}>
-            {
-              conditions.map(x =>
-                <div className="col-md-6">
-                  <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
-                         value={x} id={x} onChange={(e) => {
-                    selectComorbidity(e.target);
-                  }}></input>
-                  <label className="form-check-label" htmlFor={x}>{x}</label>
-                </div>)
-            }
-          </Row>
-        </div>
         <div className="pt-3">
-          <Button className="mr-3 btn-link" variant="link" type="submit" onClick={previous}>
+          <CustomButton isLink={true} type="submit" onClick={previous}>
             <span>Back</span>
-          </Button>
+          </CustomButton>
           <CustomButton className="blue-btn" type="submit" onClick={() => onNext()}>
             <span>Continue &#8594;</span>
           </CustomButton>
@@ -254,9 +252,6 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
           <h3>Please select vaccination program</h3>
-          <span className="back-btn cursor-pointer" onClick={() => {
-            history.goBack()
-          }}>Back</span>
         </div>
         <CardGroup className="mt-5">
           {
@@ -277,6 +272,9 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
             )
           }
         </CardGroup>
+        <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
+          <span>Back</span>
+        </CustomButton>
         <CustomButton className="blue-btn" type="submit" onClick={next}>
           <span>Continue &#8594;</span>
         </CustomButton>

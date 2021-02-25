@@ -65,6 +65,10 @@ const GENDERS = [
     "Female",
     "Other"
 ];
+
+const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
+const RESPONSIVE_ROW_DIV_CLASS = "p-0 pt-2 col-lg-6 col-md-6 col-sm-12";
+
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
 
@@ -144,7 +148,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             "addressLine2": "",
             "state": "",
             "district": "",
-            "pincode": 0
+            "pincode": ""
         };
         dataToSend["address"]["state"] = formData.state;
         dataToSend["address"]["district"] = formData.district;
@@ -167,13 +171,15 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>{verifyDetails ? "Verify beneficiary details" : "Provide details to complete enrollment"}</h3>
-                <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
-                <Button className="mr-3 btn-link" variant="link" type="submit" onClick={previous}>
+                <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to registry beneficiary"}</h3>
+                <div className="shadow-sm bg-white form-container">
+                    <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                    <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                    <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
+                </div>
+                <CustomButton isLink={true} type="submit" onClick={previous}>
                     <span>Back</span>
-                </Button>
+                </CustomButton>
                 { !verifyDetails &&
                 <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
                     <span>Continue &#8594;</span>
@@ -198,9 +204,9 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
         <div className="pt-5">
             <h5>Contact information for e-certificate</h5>
             <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="mobile">Mobile Number</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="mobile">Mobile</label>
                         { !verifyDetails && <div className="radio-group">
 
                             <div className="pb-2">
@@ -217,9 +223,9 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         }
                     </Col>
                 </div>
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label hidden={verifyDetails && !formData.email} htmlFor="email">Email ID</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                         <div hidden={verifyDetails}>
                             <input className="form-control" id="email" name="email" type="text"
                                    placeholder="Enter Email ID"
@@ -228,6 +234,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                                    onFocus={(evt) => evt.target.value = formData.email}
                                    onChange={(e) => setValue({target: {name:"email", value:e.target.value}})}/>
                             <div className="pt-2">
+                                <label hidden={verifyDetails && !formData.email} htmlFor="confirmEmail">Verify Beneficiary Email ID</label>
                                 <input className="form-control" id="confirmEmail" name="email" type="text"
                                        placeholder="Confirm Email ID"
                                        value={formData.confirmEmail}
@@ -279,12 +286,12 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
     }
 
     return (
-        <div className="pt-5">
+        <div>
             <h5>ID details</h5>
             <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="idType">ID Type *</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="idType">ID Type *</label>
                         <select className="form-control" id="idType"
                                 hidden={verifyDetails}
                                 placeholder="Select ID Type"
@@ -303,9 +310,9 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         }
                     </Col>
                 </div>
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="idNumber">ID Number *</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="idNumber">ID Number *</label>
                         <input className="form-control" id="idNumber"
                                hidden={verifyDetails}
                                type="text" placeholder="Enter ID Number"
@@ -322,6 +329,51 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                             verifyDetails &&
                             <b>{formData.nationalId.split(":")[2]}</b>
                         }
+                    </Col>
+                </div>
+            </Row>
+            <Row className="pt-2">
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="name">Name * (As per ID card)</label>
+                        <input className="form-control" name="name" id="name" type="text"
+                               hidden={verifyDetails}
+                               placeholder="Enter Name"
+                               defaultValue={formData.name}
+                               onBlur={setValue}/>
+                        <div className="invalid-input">
+                            {errors.name}
+                        </div>
+                        {
+                            verifyDetails &&
+                            <b>{formData.name}</b>
+                        }
+                    </Col>
+                </div>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="name">Age</label>
+                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
+                    </Col>
+                </div>
+            </Row>
+            <Row className="pt-2">
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="gender">Gender *</label>
+                        <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
+                            <option disabled selected={!formData.gender} value>Select Gender</option>
+                            {
+                                GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
+                            }
+                        </select>
+                        {
+                            verifyDetails &&
+                            <><br/><b>{formData.gender}</b></>
+                        }
+                        <div className="invalid-input">
+                            {errors.gender}
+                        </div>
                     </Col>
                 </div>
             </Row>
@@ -359,28 +411,11 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
     // minDate.setYear(minDate.getYear() - maxAge);
     return (
         <div className="pt-5">
-            <h5>Beneficiary Details</h5>
+            <h5>Residence Details</h5>
             <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="name">Name * (As per ID card)</label>
-                        <input className="form-control" name="name" id="name" type="text"
-                               hidden={verifyDetails}
-                               placeholder="Enter Name"
-                               defaultValue={formData.name}
-                               onBlur={setValue}/>
-                        <div className="invalid-input">
-                            {errors.name}
-                        </div>
-                        {
-                            verifyDetails &&
-                            <b>{formData.name}</b>
-                        }
-                    </Col>
-                </div>
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="state">State *</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="state">State *</label>
                         <select className="form-control" name="state" id="state"
                                 onChange={(e) => onStateSelected(e.target.value)}
                                 hidden={verifyDetails}>
@@ -398,31 +433,9 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         }
                     </Col>
                 </div>
-            </Row>
-            <Row className="pt-2">
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="gender">Gender *</label>
-                        <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
-                            <option disabled selected={!formData.gender} value>Select Gender</option>
-                            {
-                                GENDERS.map(id => <option selected={id === formData.gender} value={id}>{id}</option>)
-                            }
-                        </select>
-                        {
-                            verifyDetails &&
-                            <><br/><b>{formData.gender}</b></>
-                        }
-                        <div className="invalid-input">
-                            {errors.gender}
-                        </div>
-                        <label htmlFor="name" className="pt-2">Age</label>
-                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
-                    </Col>
-                </div>
-                <div className="p-0 col-6">
-                    <Col className="col-6">
-                        <label htmlFor="district">District *</label>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="district">District *</label>
                         <select className="form-control" id="district" name="district" onChange={setValue} hidden={verifyDetails}>
                             <option disabled selected={!formData.district} value>Select District</option>
                             {

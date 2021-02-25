@@ -5,6 +5,7 @@ import {ACTION_PATIENT_COMPLETED, useConfirmVaccine} from "../../ConfirmVaccinat
 import {SyncFacade} from "../../SyncFacade";
 import Select from 'react-select'
 import AutoComplete from "../AutoComplete";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 
 const selectorTheme = theme => ({
@@ -88,10 +89,11 @@ export const SelectVaccinator = (props) => {
     return (
         <div className="select-vaccinator-wrapper">
             <div className="table-wrapper">
-                <div className="select-title">SELECT VACCINATOR*</div>
+                <div className="select-title">{getMessageComponent(LANGUAGE_KEYS.VACCINATION_VACCINATOR)}*</div>
                 <Select
                     key={selectedVaccinatorId ?? "vaccinatorId"}
                     isSearchable={false}
+                    placeholder={""}
                     defaultValue={defaultVaccinatorOption()}
                     options={vaccinators.map((item, index) => {
                         return {
@@ -103,10 +105,11 @@ export const SelectVaccinator = (props) => {
                     onChange={(option) => {
                         setSelectedVaccinatorId(option.value)
                     }}/>
-                <div className="select-title">SELECT VACCINE*</div>
+                <div className="select-title">{getMessageComponent(LANGUAGE_KEYS.VACCINATION_VACCINE)}*</div>
                 <Select
                     key={selectedMedicineName ?? "medicineId"}
                     isSearchable={false}
+                    placeholder={""}
                     defaultValue={selectedMedicineName && {value: selectedMedicineName, label: selectedMedicineName}}
                     options={medicines.map((item, index) => {
                         return {
@@ -119,20 +122,21 @@ export const SelectVaccinator = (props) => {
                         setSelectedMedicineName(option.value)
                     }}/>
                 {selectedMedicineName && <div>
-                    <div className="select-title">SELECT DOSE*</div>
+                    <div className="select-title">{getMessageComponent(LANGUAGE_KEYS.VACCINATION_DOSE)}*</div>
                     <Select
                         key={selectedDose ?? "doseId"}
                         isSearchable={false}
+                        placeholder={""}
                         defaultValue={selectedDose && {value: selectedDose, label: selectedDose}}
                         options={fetchDoseOptions()}
                         theme={selectorTheme}
                         onChange={(option) => {
                             setSelectedDose(option.value)
                         }}/>
-                    </div>
+                </div>
                 }
                 <div className="d-flex flex-column">
-                    <div className="select-title">ENTER BATCH ID*</div>
+                    <div className="select-title">{getMessageComponent(LANGUAGE_KEYS.VACCINATION_BATCH_ID)}*</div>
                     <AutoComplete
                         noSuggestion={false}
                         key={tempSelectedBatchId ?? "batchId"}
@@ -145,7 +149,7 @@ export const SelectVaccinator = (props) => {
                 </div>
             </div>
             <Button variant="outline-primary" className="action-btn mt-4" disabled={!isInputValid()}
-                    onClick={(onActionBtnClick)}>{"CONFIRM"}</Button>
+                    onClick={(onActionBtnClick)}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_CONFIRM)}</Button>
         </div>
     );
 }

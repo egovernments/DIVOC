@@ -15,7 +15,8 @@ import (
 )
 
 // NewGetProgramsForPublicParams creates a new GetProgramsForPublicParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetProgramsForPublicParams() GetProgramsForPublicParams {
 
 	return GetProgramsForPublicParams{}
@@ -51,7 +52,6 @@ func (o *GetProgramsForPublicParams) BindRequest(r *http.Request, route *middlew
 	if err := o.bindStatus(qStatus, qhkStatus, route.Formats); err != nil {
 		res = append(res, err)
 	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -67,10 +67,10 @@ func (o *GetProgramsForPublicParams) bindStatus(rawData []string, hasKey bool, f
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
-
 	o.Status = &raw
 
 	return nil

@@ -9,6 +9,7 @@ import config from "config.json"
 import {programDb} from "../Services/ProgramDB";
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {getVaccinationDetails, saveVaccinationDetails} from "../utils/storage";
+import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 
 export function ConfirmFlow(props) {
     return (
@@ -32,7 +33,7 @@ export function ConfirmVaccination(props) {
 
     return (
         <div className="confirm-vaccination-container">
-            <BaseFormCard title={"Confirm Vaccination"}>
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VACCINATION_TITLE)}>
                 <div className="pt-3 form-wrapper">
                     {
                         getForm()

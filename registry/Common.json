@@ -41,7 +41,7 @@
         "addressLine2": "some nagar",
         "district": "bangalore south",
         "state": "Karnataka",
-        "pincode": 560000
+        "pincode": "560000"
       }],
       "required": [
         "addressLine1",
@@ -69,7 +69,7 @@
         },
         "pincode": {
           "$id": "#/properties/address/properties/pincode",
-          "type": "integer",
+          "type": "string",
           "title": "The pincode schema"
         },
         "state": {

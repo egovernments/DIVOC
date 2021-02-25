@@ -11,6 +11,7 @@ import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
 import config from "config.json"
 import {useSelector} from "react-redux";
+import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
 
 export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
@@ -46,14 +47,24 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 function WalkEnrollment(props) {
     const {state, goNext} = useWalkInEnrollment();
+    const {getText, selectLanguage} = useLocale()
     const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
     const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
     const [formData, setFormData] = useState(state);
+    const [isFormTranslated, setFormTranslated] = useState(false);
 
     useEffect(() => {
         setStateListInSchema();
-    }, []);
+        for (let index in enrollmentSchema.required) {
+            const property = enrollmentSchema.required[index]
+            const labelText = getText("app.enrollment." + property);
+            enrollmentSchema.properties[property].title = labelText
+        }
+        setEnrollmentSchema(enrollmentSchema)
+        setFormTranslated(true)
+
+    }, [selectLanguage]);
 
     const customFormats = {
         'phone-in': /\(?\d{3}\)?[\s-]?\d{3}[\s-]?\d{4}$/
@@ -75,15 +86,16 @@ function WalkEnrollment(props) {
     function setStateListInSchema() {
         let customeSchema = {...enrollmentSchema};
         customeSchema.properties.state.enum = stateAndDistricts['states'].map(obj => obj.name);
-        setFormData({...formData, state:customeSchema.properties.state.enum[0]});
+        setFormData({...formData, state: customeSchema.properties.state.enum[0]});
         setEnrollmentSchema(customeSchema)
     }
 
     return (
         <div className="new-enroll-container">
-            <BaseFormCard title={"Enroll Recipient"}>
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
                 <div className="pt-3 form-wrapper">
                     <Form
+                        key={isFormTranslated}
                         schema={enrollmentSchema}
                         customFormats={customFormats}
                         uiSchema={uiSchema}
@@ -97,7 +109,8 @@ function WalkEnrollment(props) {
                             goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, e.formData)
                         }}
                     >
-                        <Button type={"submit"} variant="outline-primary" className="action-btn">Done</Button>
+                        <Button type={"submit"} variant="outline-primary"
+                                className="action-btn">{getMessageComponent(LANGUAGE_KEYS.BUTTON_NEXT)}</Button>
                     </Form>
                 </div>
 
@@ -108,7 +121,8 @@ function WalkEnrollment(props) {
 
 const paymentMode = [
     {
-        name: "Government",
+        key: "government",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_GOVT),
         logo: function (selected) {
             return <ImgGovernment selected={selected}/>
         }
@@ -116,7 +130,8 @@ const paymentMode = [
     }
     ,
     {
-        name: "Voucher",
+        key: "voucher",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_VOUCHER),
         logo: function (selected) {
             return <ImgVoucher selected={selected}/>
         }
@@ -124,7 +139,8 @@ const paymentMode = [
     }
     ,
     {
-        name: "Direct",
+        key: "direct",
+        name: getMessageComponent(LANGUAGE_KEYS.PAYMENT_DIRECT),
         logo: function (selected) {
             return <ImgDirect selected={selected}/>
         }
@@ -138,18 +154,19 @@ function WalkEnrollmentPayment(props) {
     const [selectPaymentMode, setSelectPaymentMode] = useState()
     return (
         <div className="new-enroll-container">
-            <BaseFormCard title={"Enroll Recipient"}>
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
                 <div className="content">
-                    <h3>Please select mode of payment</h3>
+                    <h3>{getMessageComponent(LANGUAGE_KEYS.PAYMENT_TITLE)}</h3>
                     <Row className="payment-container">
                         {
                             paymentMode.map((item, index) => {
                                 return <PaymentItem
                                     title={item.name}
+                                    key={item.key}
                                     logo={item.logo}
-                                    selected={item.name === selectPaymentMode}
-                                    onClick={(value) => {
-                                        setSelectPaymentMode(value)
+                                    selected={selectPaymentMode && item.name === selectPaymentMode.name}
+                                    onClick={(value, key) => {
+                                        setSelectPaymentMode({name: value, key: key})
                                     }}/>
                             })
                         }
@@ -157,11 +174,11 @@ function WalkEnrollmentPayment(props) {
                     <Button variant="outline-primary"
                             className="action-btn"
                             onClick={() => {
-                                saveWalkInEnrollment(selectPaymentMode)
+                                saveWalkInEnrollment(selectPaymentMode.key)
                                     .then(() => {
                                         goNext(FORM_WALK_IN_ENROLL_PAYMENTS, "/", {})
                                     })
-                            }}>Send for vaccination</Button>
+                            }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</Button>
                 </div>
             </BaseFormCard>
         </div>
@@ -180,7 +197,7 @@ function PaymentItem(props) {
     return (
         <div onClick={() => {
             if (props.onClick) {
-                props.onClick(props.title)
+                props.onClick(props.title, props.key)
             }
         }}>
             <div className={`payment-item ${props.selected ? "active" : ""}`}>
