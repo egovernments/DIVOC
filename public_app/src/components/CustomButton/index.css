@@ -20,3 +20,10 @@
 .purple-btn {
     background: transparent linear-gradient(91deg, #8DA2FF 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
 }
+
+#custom-link-button {
+    color: #5C9EF8;
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 25px;
+}
