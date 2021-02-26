@@ -1,5 +1,5 @@
-export const isAllLetter = (inputTxt) =>{
-    const letters = /^[A-Za-z]+$/;
+export const isValidName = (inputTxt) =>{
+    const letters = /^[A-Za-z ]+$/;
     return inputTxt.match(letters);
 }
 
