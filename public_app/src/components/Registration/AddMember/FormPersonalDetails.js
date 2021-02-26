@@ -12,13 +12,13 @@ import {
     AADHAAR_ERROR_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
-    GENDER_ERROR_MSG, INVALID_NAME_ERR_MSG, MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
+    GENDER_ERROR_MSG, INVALID_NAME_ERR_MSG, MAXIMUM_LENGTH_OF_NAME_ERROR_MSG, MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
     STATE_ERROR_MSG
 } from "./error-constants";
-import {isAllLetter, isInValidAadhaarNumber} from "../../../utils/validations";
+import {isValidName, isInValidAadhaarNumber} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -104,8 +104,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.name = NAME_ERROR_MSG
         } else if (formData.name.length < 2){
             errors.name = MINIMUM_LENGTH_OF_NAME_ERROR_MSG
+        } else if (formData.name.length > 99) {
+            errors.name = MAXIMUM_LENGTH_OF_NAME_ERROR_MSG
         } else {
-            if(!isAllLetter(formData.name)) {
+            if(!isValidName(formData.name)) {
                 errors.name = INVALID_NAME_ERR_MSG
             }
         }
@@ -177,19 +179,21 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                     <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                     <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                 </div>
-                <CustomButton isLink={true} type="submit" onClick={previous}>
-                    <span>Back</span>
-                </CustomButton>
-                { !verifyDetails &&
-                <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
-                    <span>Continue &#8594;</span>
-                </CustomButton>
-                }
-                { verifyDetails &&
-                <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
-                    <span>Confirm</span>
-                </CustomButton>
-                }
+                <div className="pt-3">
+                    <CustomButton isLink={true} type="submit" onClick={previous}>
+                        <span>Back</span>
+                    </CustomButton>
+                    { !verifyDetails &&
+                    <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
+                        <span>Continue &#8594;</span>
+                    </CustomButton>
+                    }
+                    { verifyDetails &&
+                    <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
+                        <span>Confirm</span>
+                    </CustomButton>
+                    }
+                </div>
             </div>
         </Container>
 
@@ -206,7 +210,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="mobile">Mobile</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"} htmlFor="mobile">Mobile</label>
                         { !verifyDetails && <div className="radio-group">
 
                             <div className="pb-2">
@@ -219,13 +223,13 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         }
                         {
                             verifyDetails &&
-                            <><br/><b>{formData.contact}</b></>
+                            <><br/><p>{formData.contact}</p></>
                         }
                     </Col>
                 </div>
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"} hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                         <div hidden={verifyDetails}>
                             <input className="form-control" id="email" name="email" type="text"
                                    placeholder="Enter Email ID"
@@ -247,7 +251,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <><br/><b>{formData.email}</b></>
+                            <><br/><p>{formData.email}</p></>
                         }
                     </Col>
                 </div>
@@ -291,7 +295,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="idType">ID Type *</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="idType">ID Type </label>
                         <select className="form-control" id="idType"
                                 hidden={verifyDetails}
                                 placeholder="Select ID Type"
@@ -306,13 +310,13 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <b>{getSelectedIdType()}</b>
+                            <p>{getSelectedIdType()}</p>
                         }
                     </Col>
                 </div>
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="idNumber">ID Number *</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="idNumber">ID Number </label>
                         <input className="form-control" id="idNumber"
                                hidden={verifyDetails}
                                type="text" placeholder="Enter ID Number"
@@ -327,7 +331,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <b>{formData.nationalId.split(":")[2]}</b>
+                            <p>{formData.nationalId.split(":")[2]}</p>
                         }
                     </Col>
                 </div>
@@ -335,7 +339,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="name">Name * (As per ID card)</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="name">Name  (As per ID card)</label>
                         <input className="form-control" name="name" id="name" type="text"
                                hidden={verifyDetails}
                                placeholder="Enter Name"
@@ -346,21 +350,21 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <b>{formData.name}</b>
+                            <p>{formData.name}</p>
                         }
                     </Col>
                 </div>
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="name">Age</label>
-                        <div className={"pl-2" + verifyDetails?" font-weight-bold":""}> {new Date().getFullYear() - formData.yob} Years </div>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"} htmlFor="name">Age</label>
+                        <div> {new Date().getFullYear() - formData.yob} Years </div>
                     </Col>
                 </div>
             </Row>
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="gender">Gender *</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="gender">Gender </label>
                         <select className="form-control" id="gender" name="gender" onChange={setValue} hidden={verifyDetails}>
                             <option disabled selected={!formData.gender} value>Select Gender</option>
                             {
@@ -369,7 +373,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </select>
                         {
                             verifyDetails &&
-                            <><br/><b>{formData.gender}</b></>
+                            <><br/><p>{formData.gender}</p></>
                         }
                         <div className="invalid-input">
                             {errors.gender}
@@ -415,7 +419,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="state">State *</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="state">State </label>
                         <select className="form-control" name="state" id="state"
                                 onChange={(e) => onStateSelected(e.target.value)}
                                 hidden={verifyDetails}>
@@ -429,13 +433,13 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <b>{formData.state}</b>
+                            <p>{formData.state}</p>
                         }
                     </Col>
                 </div>
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
-                        <label className={verifyDetails ? "mb-0" : ""} htmlFor="district">District *</label>
+                        <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"} htmlFor="district">District </label>
                         <select className="form-control" id="district" name="district" onChange={setValue} hidden={verifyDetails}>
                             <option disabled selected={!formData.district} value>Select District</option>
                             {
@@ -447,7 +451,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <b>{formData.district}</b>
+                            <p>{formData.district}</p>
                         }
                     </Col>
                 </div>
