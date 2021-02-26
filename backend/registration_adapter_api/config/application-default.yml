@@ -1,0 +1,2 @@
+registration:
+  baseUrl: "http://localhost:1234/divoc/api/citizen"
