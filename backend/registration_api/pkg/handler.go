@@ -42,6 +42,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.GetSlotsForFacilitiesHandler = operations.GetSlotsForFacilitiesHandlerFunc(getFacilitySlots)
 	api.BookSlotOfFacilityHandler = operations.BookSlotOfFacilityHandlerFunc(bookSlot)
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
+	api.DeleteRecipientHandler = operations.DeleteRecipientHandlerFunc(deleteRecipient)
 }
 
 func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
@@ -357,6 +358,10 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
 	}
 	return operations.NewDeleteAppointmentBadRequest()
+}
+
+func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
+	return operations.NewDeleteRecipientOK()
 }
 
 func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {

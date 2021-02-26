@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -36,7 +35,7 @@ func NewBookSlotOfFacility(ctx *middleware.Context, handler BookSlotOfFacilityHa
 	return &BookSlotOfFacility{Context: ctx, Handler: handler}
 }
 
-/* BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
+/*BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
 
 Book a slot in facility
 
@@ -124,11 +123,6 @@ func (o *BookSlotOfFacilityBody) validateFacilitySlotID(formats strfmt.Registry)
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this book slot of facility body based on context it is used
-func (o *BookSlotOfFacilityBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

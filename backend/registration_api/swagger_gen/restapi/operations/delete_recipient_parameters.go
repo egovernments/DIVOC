@@ -13,18 +13,18 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 )
 
-// NewInitializeFacilitySlotsParams creates a new InitializeFacilitySlotsParams object
+// NewDeleteRecipientParams creates a new DeleteRecipientParams object
 // no default values defined in spec.
-func NewInitializeFacilitySlotsParams() InitializeFacilitySlotsParams {
+func NewDeleteRecipientParams() DeleteRecipientParams {
 
-	return InitializeFacilitySlotsParams{}
+	return DeleteRecipientParams{}
 }
 
-// InitializeFacilitySlotsParams contains all the bound params for the initialize facility slots operation
+// DeleteRecipientParams contains all the bound params for the delete recipient operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters initializeFacilitySlots
-type InitializeFacilitySlotsParams struct {
+// swagger:parameters deleteRecipient
+type DeleteRecipientParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -32,21 +32,21 @@ type InitializeFacilitySlotsParams struct {
 	/*
 	  In: body
 	*/
-	Body InitializeFacilitySlotsBody
+	Body DeleteRecipientBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewInitializeFacilitySlotsParams() beforehand.
-func (o *InitializeFacilitySlotsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewDeleteRecipientParams() beforehand.
+func (o *DeleteRecipientParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body InitializeFacilitySlotsBody
+		var body DeleteRecipientBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {

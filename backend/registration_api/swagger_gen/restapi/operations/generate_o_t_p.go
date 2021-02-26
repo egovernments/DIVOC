@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -32,7 +31,7 @@ func NewGenerateOTP(ctx *middleware.Context, handler GenerateOTPHandler) *Genera
 	return &GenerateOTP{Context: ctx, Handler: handler}
 }
 
-/* GenerateOTP swagger:route POST /generateOTP generateOTP
+/*GenerateOTP swagger:route POST /generateOTP generateOTP
 
 Generate OTP
 
@@ -48,12 +47,14 @@ func (o *GenerateOTP) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGenerateOTPParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -69,11 +70,6 @@ type GenerateOTPBody struct {
 
 // Validate validates this generate o t p body
 func (o *GenerateOTPBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this generate o t p body based on context it is used
-func (o *GenerateOTPBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

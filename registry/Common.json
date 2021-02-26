@@ -54,8 +54,7 @@
           "$id": "#/properties/address/properties/addressLine1",
           "type": "string",
           "title": "The address line 1",
-          "description": "Address line 1",
-          "default": ""
+          "description": "Address line 1"
         },
         "addressLine2": {
           "$id": "#/properties/address/properties/addressLine2",

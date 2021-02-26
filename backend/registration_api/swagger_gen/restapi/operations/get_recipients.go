@@ -31,7 +31,7 @@ func NewGetRecipients(ctx *middleware.Context, handler GetRecipientsHandler) *Ge
 	return &GetRecipients{Context: ctx, Handler: handler}
 }
 
-/* GetRecipients swagger:route GET /recipients getRecipients
+/*GetRecipients swagger:route GET /recipients getRecipients
 
 Get all the recipients
 

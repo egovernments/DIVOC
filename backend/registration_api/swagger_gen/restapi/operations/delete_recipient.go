@@ -17,40 +17,40 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
-// DeleteAppointmentHandlerFunc turns a function with the right signature into a delete appointment handler
-type DeleteAppointmentHandlerFunc func(DeleteAppointmentParams, *models.JWTClaimBody) middleware.Responder
+// DeleteRecipientHandlerFunc turns a function with the right signature into a delete recipient handler
+type DeleteRecipientHandlerFunc func(DeleteRecipientParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn DeleteAppointmentHandlerFunc) Handle(params DeleteAppointmentParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn DeleteRecipientHandlerFunc) Handle(params DeleteRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// DeleteAppointmentHandler interface for that can handle valid delete appointment params
-type DeleteAppointmentHandler interface {
-	Handle(DeleteAppointmentParams, *models.JWTClaimBody) middleware.Responder
+// DeleteRecipientHandler interface for that can handle valid delete recipient params
+type DeleteRecipientHandler interface {
+	Handle(DeleteRecipientParams, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewDeleteAppointment creates a new http.Handler for the delete appointment operation
-func NewDeleteAppointment(ctx *middleware.Context, handler DeleteAppointmentHandler) *DeleteAppointment {
-	return &DeleteAppointment{Context: ctx, Handler: handler}
+// NewDeleteRecipient creates a new http.Handler for the delete recipient operation
+func NewDeleteRecipient(ctx *middleware.Context, handler DeleteRecipientHandler) *DeleteRecipient {
+	return &DeleteRecipient{Context: ctx, Handler: handler}
 }
 
-/*DeleteAppointment swagger:route DELETE /appointment deleteAppointment
+/*DeleteRecipient swagger:route DELETE /recipients deleteRecipient
 
-Delete the appointment
+Delete the recipient
 
 */
-type DeleteAppointment struct {
+type DeleteRecipient struct {
 	Context *middleware.Context
-	Handler DeleteAppointmentHandler
+	Handler DeleteRecipientHandler
 }
 
-func (o *DeleteAppointment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *DeleteRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewDeleteAppointmentParams()
+	var Params = NewDeleteRecipientParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
@@ -76,22 +76,22 @@ func (o *DeleteAppointment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 }
 
-// DeleteAppointmentBadRequestBody delete appointment bad request body
+// DeleteRecipientBadRequestBody delete recipient bad request body
 //
-// swagger:model DeleteAppointmentBadRequestBody
-type DeleteAppointmentBadRequestBody struct {
+// swagger:model DeleteRecipientBadRequestBody
+type DeleteRecipientBadRequestBody struct {
 
 	// message
 	Message string `json:"message,omitempty"`
 }
 
-// Validate validates this delete appointment bad request body
-func (o *DeleteAppointmentBadRequestBody) Validate(formats strfmt.Registry) error {
+// Validate validates this delete recipient bad request body
+func (o *DeleteRecipientBadRequestBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
 // MarshalBinary interface implementation
-func (o *DeleteAppointmentBadRequestBody) MarshalBinary() ([]byte, error) {
+func (o *DeleteRecipientBadRequestBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -99,8 +99,8 @@ func (o *DeleteAppointmentBadRequestBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *DeleteAppointmentBadRequestBody) UnmarshalBinary(b []byte) error {
-	var res DeleteAppointmentBadRequestBody
+func (o *DeleteRecipientBadRequestBody) UnmarshalBinary(b []byte) error {
+	var res DeleteRecipientBadRequestBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
@@ -108,18 +108,18 @@ func (o *DeleteAppointmentBadRequestBody) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// DeleteAppointmentBody delete appointment body
+// DeleteRecipientBody delete recipient body
 //
-// swagger:model DeleteAppointmentBody
-type DeleteAppointmentBody struct {
+// swagger:model DeleteRecipientBody
+type DeleteRecipientBody struct {
 
 	// enrollment code
 	// Required: true
 	EnrollmentCode *string `json:"enrollmentCode"`
 }
 
-// Validate validates this delete appointment body
-func (o *DeleteAppointmentBody) Validate(formats strfmt.Registry) error {
+// Validate validates this delete recipient body
+func (o *DeleteRecipientBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateEnrollmentCode(formats); err != nil {
@@ -132,7 +132,7 @@ func (o *DeleteAppointmentBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (o *DeleteAppointmentBody) validateEnrollmentCode(formats strfmt.Registry) error {
+func (o *DeleteRecipientBody) validateEnrollmentCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("body"+"."+"enrollmentCode", "body", o.EnrollmentCode); err != nil {
 		return err
@@ -142,7 +142,7 @@ func (o *DeleteAppointmentBody) validateEnrollmentCode(formats strfmt.Registry) 
 }
 
 // MarshalBinary interface implementation
-func (o *DeleteAppointmentBody) MarshalBinary() ([]byte, error) {
+func (o *DeleteRecipientBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
 		return nil, nil
 	}
@@ -150,8 +150,8 @@ func (o *DeleteAppointmentBody) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (o *DeleteAppointmentBody) UnmarshalBinary(b []byte) error {
-	var res DeleteAppointmentBody
+func (o *DeleteRecipientBody) UnmarshalBinary(b []byte) error {
+	var res DeleteRecipientBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
