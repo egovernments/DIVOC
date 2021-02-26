@@ -17,7 +17,6 @@
     "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
     "react-intl": "^5.10.6",
-    "react-localization": "^1.0.15",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",

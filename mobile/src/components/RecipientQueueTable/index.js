@@ -10,6 +10,7 @@ import Col from "react-bootstrap/Col";
 import "./index.scss"
 import config from "config.json"
 import {formatDate} from "../../utils/date_utils";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 
 
 export const RecipientQueueTable = () => {
@@ -19,13 +20,13 @@ export const RecipientQueueTable = () => {
     })
     const history = useHistory();
     return (
-        <BaseFormCard title={"Recipient Queue"}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_TITLE)}>
             <Table responsive>
                 <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Name</th>
-                    <th>Status</th>
+                    <th>{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_NUMBER)}</th>
+                    <th>{getMessageComponent(LANGUAGE_KEYS.NAME)}</th>
+                    <th>{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_STATUS)}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -34,7 +35,7 @@ export const RecipientQueueTable = () => {
                         <tr key={index} onClick={() => {
                             history.push(config.urlPath + `/confirm/vaccination/${data.enrollCode}/${CONSTANT.SELECT_VACCINATOR}`)
                         }}>
-                            <td>{index+1}</td>
+                            <td>{index + 1}</td>
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>
@@ -50,7 +51,7 @@ export const RecipientQueueTable = () => {
                 </tbody>
             </Table>
             {queueData && queueData.length === 0 &&
-            <Col className={"center"}>No Patient in Queue</Col>}
+            <Col className={"center"}>{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_MESSAGE)}</Col>}
         </BaseFormCard>
     )
 };

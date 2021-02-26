@@ -3,14 +3,15 @@ package pkg
 import (
 	"bytes"
 	"fmt"
+	"strconv"
+	"strings"
+	"text/template"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"strings"
-	"text/template"
 )
 
 const FacilityRegistered = "facilityRegistered"
@@ -51,7 +52,7 @@ func createFacility(data *Scanner, authHeader string) error {
 	addressline2 := data.Text("addressLine2")
 	district := data.Text("district")
 	state := data.Text("state")
-	pincode := data.int64("pincode")
+	pincode := data.Text("pincode")
 	var admins []*models.FacilityAdmin
 	var index int64
 	facilityCode := data.Text("facilityCode")

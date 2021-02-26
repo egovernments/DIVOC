@@ -3,6 +3,11 @@
     height: 100%;
 }
 
+.form-container {
+    padding: 3rem;
+    height: 100%;
+}
+
 .select-program-container .container-fluid {
     height: 100%;
 }
@@ -14,7 +19,13 @@
 }
 @media (max-width: 961px) {
     .side-effect-container {
-        padding: 1rem 0;
+        padding: 1rem 0.5rem;
+    }
+    .form-container {
+        padding: 1rem 0.5rem;
+    }
+    .select-program-container {
+        padding: 1rem 0.5rem;
     }
 }
 
@@ -34,4 +45,11 @@
     right: -0.5rem;
     top: -0.5rem;
     background: white;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: url(../../../assets/img/icon-dropdown.svg) 96% / 04% no-repeat #EEE;
 }
