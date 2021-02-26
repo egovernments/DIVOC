@@ -7,20 +7,29 @@ import (
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
+	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
 	"text/template"
 	"time"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, currentRetryCount int) error {
-	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
-	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	// If the generated Code is not unique, try again
-	// code + programId should be unique
-	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-		return CreateEnrollment(enrollment, currentRetryCount+1)
+func CreateEnrollment(enrollment *models.Enrollment, position int) error {
+	maxEnrollmentCreationAllowed := config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
+
+	if position > maxEnrollmentCreationAllowed {
+		failedErrorMessage := "Maximum enrollment creation limit is reached"
+		log.Info(failedErrorMessage)
+		return errors.New(400, failedErrorMessage)
 	}
-	return err
+
+	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
+	exists, err2 := HashFieldExists(enrollment.Code, "phone")
+	if err2 == nil && !exists {
+		err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+		return err
+	} else {
+		return CreateEnrollment(enrollment, position+1)
+	}
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
@@ -51,7 +60,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 					if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
 						log.Errorf("Error in Marshaling the facility details %+v", err)
 					} else {
-						err:=SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
+						err := SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
 						if err != nil {
 							log.Errorf("Unable to set the value in Cache (%v)", err)
 						}
