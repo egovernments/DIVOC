@@ -814,6 +814,9 @@ func init() {
             }
           }
         },
+        "appointmentDate": {
+          "type": "string"
+        },
         "certified": {
           "type": "boolean"
         },
@@ -1973,6 +1976,9 @@ func init() {
               "type": "string"
             }
           }
+        },
+        "appointmentDate": {
+          "type": "string"
         },
         "certified": {
           "type": "boolean"
