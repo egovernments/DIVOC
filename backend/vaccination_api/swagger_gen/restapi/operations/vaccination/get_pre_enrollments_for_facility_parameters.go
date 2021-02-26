@@ -13,6 +13,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // NewGetPreEnrollmentsForFacilityParams creates a new GetPreEnrollmentsForFacilityParams object
@@ -35,6 +36,10 @@ type GetPreEnrollmentsForFacilityParams struct {
 	/*
 	  In: query
 	*/
+	Date *strfmt.Date
+	/*
+	  In: query
+	*/
 	Limit *float64
 	/*
 	  In: query
@@ -53,6 +58,11 @@ func (o *GetPreEnrollmentsForFacilityParams) BindRequest(r *http.Request, route 
 
 	qs := runtime.Values(r.URL.Query())
 
+	qDate, qhkDate, _ := qs.GetOK("date")
+	if err := o.bindDate(qDate, qhkDate, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	qLimit, qhkLimit, _ := qs.GetOK("limit")
 	if err := o.bindLimit(qLimit, qhkLimit, route.Formats); err != nil {
 		res = append(res, err)
@@ -64,6 +74,43 @@ func (o *GetPreEnrollmentsForFacilityParams) BindRequest(r *http.Request, route 
 	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// bindDate binds and validates parameter Date from query.
+func (o *GetPreEnrollmentsForFacilityParams) bindDate(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	// Format: date
+	value, err := formats.Parse("date", raw)
+	if err != nil {
+		return errors.InvalidType("date", "query", "strfmt.Date", raw)
+	}
+	o.Date = (value.(*strfmt.Date))
+
+	if err := o.validateDate(formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// validateDate carries on validations for parameter Date
+func (o *GetPreEnrollmentsForFacilityParams) validateDate(formats strfmt.Registry) error {
+
+	if err := validate.FormatOf("date", "query", "date", o.Date.String(), formats); err != nil {
+		return err
 	}
 	return nil
 }

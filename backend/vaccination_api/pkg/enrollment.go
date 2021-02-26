@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/kernel_library/services"

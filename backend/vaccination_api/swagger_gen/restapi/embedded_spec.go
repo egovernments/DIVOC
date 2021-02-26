@@ -344,6 +344,12 @@ func init() {
             "type": "number",
             "name": "offset",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "name": "date",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1286,6 +1292,12 @@ func init() {
           {
             "type": "number",
             "name": "offset",
+            "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "name": "date",
             "in": "query"
           }
         ],
