@@ -53,3 +53,16 @@ select {
     appearance: none;
     background: url(../../../assets/img/icon-dropdown.svg) 96% / 04% no-repeat #EEE;
 }
+
+label.custom-text-label {
+    color: #646D82;
+}
+
+label.custom-verify-text-label {
+    color: #646D82;
+    margin-bottom: 0;
+}
+
+label.required:after {
+    content: " *";
+}
