@@ -198,7 +198,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
             <h5>Enter beneficiary's year of birth</h5>
           </div>
           <div className={"col-sm-4"}>
-            <label for="yearSelect">Year of birth *</label>
+            <label className="custom-text-label required" for="yearSelect">Year of birth</label>
             <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
                     onChange={(t) => onYOBChange(t.target && t.target.value)}>
               <option>Select</option>
