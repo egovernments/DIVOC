@@ -23,8 +23,8 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) error {
 	}
 
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
-	exists, err2 := HashFieldExists(enrollment.Code, "phone")
-	if err2 == nil && !exists {
+	exists, err2 := KeyExists(enrollment.Code)
+	if err2 == nil && exists == 0 {
 		err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 		return err
 	} else {
