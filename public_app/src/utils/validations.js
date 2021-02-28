@@ -3,6 +3,11 @@ export const isValidName = (inputTxt) =>{
     return inputTxt.match(letters);
 }
 
+export const isValidPincode = (inputTxt) => {
+    const pincodeRegEx = /^[1-9][0-9]{5}$/;
+    return inputTxt.match(pincodeRegEx)
+}
+
 /*
 * For more info on the algorithm: http://en.wikipedia.org/wiki/Verhoeff_algorithm by Sergey Petushkov, 2014
 * Source code https://en.wikibooks.org/wiki/Algorithm_Implementation/Checksums/Verhoeff_Algorithm#JavaScript

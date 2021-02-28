@@ -39,7 +39,9 @@ const defaultData = {
   "email": "",
   "confirmEmail": "",
   "comorbidities": [],
-  "status":null
+  "status":null,
+  "locality": "",
+  "pincode": ""
 };
 
 export const AddMembersFlow = () => {

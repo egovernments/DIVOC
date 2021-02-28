@@ -16,9 +16,10 @@ import {
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
+    PINCODE_ERROR_MESSAGE,
     STATE_ERROR_MSG
 } from "./error-constants";
-import {isValidName, isInValidAadhaarNumber} from "../../../utils/validations";
+import {isValidName, isInValidAadhaarNumber, isValidPincode} from "../../../utils/validations";
 
 const ID_TYPES = [
     {
@@ -118,6 +119,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             errors.district = DISTRICT_ERROR_MSG
         }
 
+        if(formData.pincode && !isValidPincode(formData.pincode)) {
+            errors.pincode = PINCODE_ERROR_MESSAGE
+        }
+
         if(!formData.gender) {
             errors.gender = GENDER_ERROR_MSG
         }
@@ -144,6 +149,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         delete dataToSend["state"];
         delete dataToSend["district"];
         delete dataToSend["contact"];
+        delete dataToSend["pincode"];
+        delete dataToSend["locality"];
         dataToSend["yob"] = parseInt(dataToSend["yob"]);
         dataToSend["address"] = {
             "addressLine1": "",
@@ -152,8 +159,10 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
             "district": "",
             "pincode": ""
         };
+        dataToSend["address"]["addressLine2"] = formData.locality;
         dataToSend["address"]["state"] = formData.state;
         dataToSend["address"]["district"] = formData.district;
+        dataToSend["address"]["pincode"] = formData.pincode;
         dataToSend["phone"] = getUserNumberFromRecipientToken();
         dataToSend["beneficiaryPhone"] = formData.contact
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
@@ -452,6 +461,44 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                         {
                             verifyDetails &&
                             <p>{formData.district}</p>
+                        }
+                    </Col>
+                </div>
+            </Row>
+            <Row className="pt-2">
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label hidden={verifyDetails && !formData.locality}
+                               className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                               htmlFor="locality">Locality</label>
+                        <input className="form-control" name="locality" id="locality" type="text"
+                               hidden={verifyDetails}
+                               placeholder="Enter your locality"
+                               defaultValue={formData.locality}
+                               onBlur={setValue}/>
+                        {
+                            verifyDetails &&
+                            <p>{formData.locality}</p>
+                        }
+                    </Col>
+                </div>
+                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                    <Col className={RESPONSIVE_COL_CLASS}>
+                        <label hidden={verifyDetails && !formData.pincode}
+                               className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                               htmlFor="pinCode">Pin code</label>
+                        <input className="form-control" name="pincode" id="pinCode" type="text"
+                               hidden={verifyDetails}
+                               placeholder="Enter your pin code"
+                               defaultValue={formData.pincode}
+                               onBlur={setValue}
+                        />
+                        <div className="invalid-input">
+                            {errors.pincode}
+                        </div>
+                        {
+                            verifyDetails &&
+                            <p>{formData.pincode}</p>
                         }
                     </Col>
                 </div>
