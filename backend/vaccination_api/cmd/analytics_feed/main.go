@@ -9,7 +9,6 @@ import (
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
-	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
@@ -162,7 +161,7 @@ dt Date
 //	}
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
+	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifiedTopic)
 	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic)
 	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic)
 	wg.Wait()
@@ -305,8 +304,8 @@ func saveReportedSideEffects(connect *sql.DB, msg string) error {
 
 func saveCertificateEvent(connect *sql.DB, msg string) error {
 	saveCertificateEventV2(connect, msg)
-	var certifyMessage CertifyMessage
-	if err := json.Unmarshal([]byte(msg), &certifyMessage); err != nil {
+	var certifiedMessage models.CertifiedMessage
+	if err := json.Unmarshal([]byte(msg), &certifiedMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
 	}
@@ -337,31 +336,26 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		log.Infof("Error in preparing stmt %+v", err)
 	}
 	//todo collect n messages and batch write to analytics db.
-	age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
-	if age == 0 {
-		if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob); err == nil {
-			if (dobTime.Year() > 1900) {
-				age = time.Now().Year() - dobTime.Year()
-			}
-		}
-	}
+	credentialSubject := certifiedMessage.Certificate.CredentialSubject
+	evidence := certifiedMessage.Certificate.Evidence[0]
+	age, _ := strconv.Atoi(credentialSubject.Age)
 	if _, err := stmt.Exec(
-		"",
+		certifiedMessage.CertificateId,
 		age,
-		certifyMessage.Recipient.Gender,
-		certifyMessage.Facility.Address.District,
-		certifyMessage.Vaccination.Batch,
-		certifyMessage.Vaccination.Manufacturer,
+		credentialSubject.Gender,
+		credentialSubject.Address.District,
+		evidence.Batch,
+		evidence.Manufacturer,
 		time.Now(),
-		certifyMessage.Vaccination.Date,
-		certifyMessage.Vaccination.EffectiveStart,
-		certifyMessage.Vaccination.EffectiveUntil,
-		certifyMessage.Facility.Name,
+		evidence.Date,
+		evidence.EffectiveStart,
+		evidence.EffectiveUntil,
+		evidence.Facility.Name,
 		"IN",
-		certifyMessage.Facility.Address.State,
-		certifyMessage.Facility.Address.District,
-		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
-		certifyMessage.Vaccinator.Name,
+		evidence.Facility.Address.AddressRegion,
+		evidence.Facility.Address.District,
+		strconv.Itoa(int(evidence.Facility.Address.PostalCode)),
+		evidence.Verifier.Name,
 	); err != nil {
 		log.Fatal(err)
 	}
@@ -374,12 +368,15 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 }
 
 func saveCertificateEventV2(connect *sql.DB, msg string) {
-	var certifyMessage models2.CertificationRequestV2
-	if err := json.Unmarshal([]byte(msg), &certifyMessage); err == nil {
-		// push to click house - todo: batch it
-		var (
-			tx, _= connect.Begin()
-			stmt, err= tx.Prepare(`INSERT INTO certificatesv2 
+	var certifiedMessage models.CertifiedMessage
+	if err := json.Unmarshal([]byte(msg), &certifiedMessage); err == nil && certifiedMessage.Meta != nil {
+		metaBytes, _ := json.Marshal(certifiedMessage.Meta)
+		var meta models2.CertificationRequestV2Meta
+		if err := json.Unmarshal(metaBytes, &meta); err == nil {
+			// push to click house - todo: batch it
+			var (
+				tx, _     = connect.Begin()
+				stmt, err = tx.Prepare(`INSERT INTO certificatesv2 
 	(  certificateId,
   preEnrollmentCode,
   dt,
@@ -424,76 +421,72 @@ func saveCertificateEventV2(connect *sql.DB, msg string) {
   verificationDurationInSeconds,
   waitForVaccinationInMinutes) 
 	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-		)
+			)
 
-		if err != nil {
-			log.Infof("Error in preparing stmt %+v", err)
-		}
-		//todo collect n messages and batch write to analytics db.
-		age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
-		if age == 0 {
-			if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob.String()); err == nil {
-				if dobTime.Year() > 1900 {
-					age = time.Now().Year() - dobTime.Year()
-				}
+			if err != nil {
+				log.Infof("Error in preparing stmt %+v", err)
 			}
-		}
-		if _, err := stmt.Exec(
-			"",
-			certifyMessage.PreEnrollmentCode,
-			time.Now(),
+			//todo collect n messages and batch write to analytics db.
+			credentialSubject := certifiedMessage.Certificate.CredentialSubject
+			age, _ := strconv.Atoi(credentialSubject.Age)
+			evidence := certifiedMessage.Certificate.Evidence[0]
+			if _, err := stmt.Exec(
+				certifiedMessage.CertificateId,
+				certifiedMessage.PreEnrollmentCode,
+				time.Now(),
 
-			age,
-			certifyMessage.Recipient.Gender,
-			certifyMessage.Recipient.Address.District,
-			certifyMessage.Recipient.Address.State,
+				age,
+				credentialSubject.Gender,
+				credentialSubject.Address.District,
+				credentialSubject.Address.AddressRegion,
 
-			certifyMessage.Vaccination.Batch,
-			certifyMessage.Vaccination.Name,
-			certifyMessage.Vaccination.Manufacturer,
-			getDate(certifyMessage.Vaccination.Date),
-			certifyMessage.Vaccination.EffectiveStart,
-			certifyMessage.Vaccination.EffectiveUntil,
-			pkg.ToInt(certifyMessage.Vaccination.Dose),
-			pkg.ToInt(certifyMessage.Vaccination.TotalDoses),
+				evidence.Batch,
+				evidence.Vaccine,
+				evidence.Manufacturer,
+				getDate(evidence.Date.String()),
+				evidence.EffectiveStart,
+				evidence.EffectiveUntil,
+				pkg.ToInt(evidence.Dose),
+				pkg.ToInt(evidence.TotalDoses),
 
-			certifyMessage.Facility.Name,
-			"IN",
-			certifyMessage.Facility.Address.State,
-			certifyMessage.Facility.Address.District,
-			strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
-			certifyMessage.Vaccinator.Name,
+				evidence.Facility.Name,
+				"IN",
+				evidence.Facility.Address.AddressRegion,
+				evidence.Facility.Address.District,
+				strconv.Itoa(int(evidence.Facility.Address.PostalCode)),
+				evidence.Verifier.Name,
 
-			certifyMessage.Meta.VaccinationApp.Name,
-			certifyMessage.Meta.VaccinationApp.Version,
-			certifyMessage.Meta.VaccinationApp.Type,
-			certifyMessage.Meta.VaccinationApp.Device,
-			certifyMessage.Meta.VaccinationApp.DeviceOS,
-			certifyMessage.Meta.VaccinationApp.OSVersion,
-			certifyMessage.Meta.VaccinationApp.AppMode,
-			certifyMessage.Meta.VaccinationApp.ConnectionType,
+				meta.VaccinationApp.Name,
+				meta.VaccinationApp.Version,
+				meta.VaccinationApp.Type,
+				meta.VaccinationApp.Device,
+				meta.VaccinationApp.DeviceOS,
+				meta.VaccinationApp.OSVersion,
+				meta.VaccinationApp.AppMode,
+				meta.VaccinationApp.ConnectionType,
 
-			certifyMessage.Meta.FacilityType,
-			certifyMessage.Meta.PaymentType,
-			certifyMessage.Meta.RegistrationCategory,
-			certifyMessage.Meta.RegistrationDataMode,
-			certifyMessage.Meta.SessionDurationInMinutes,
-			getDate(certifyMessage.Meta.UploadTimestamp),
-			certifyMessage.Meta.VerificationAttempts,
-			certifyMessage.Meta.VerificationDurationInSeconds,
-			certifyMessage.Meta.WaitForVaccinationInMinutes,
-		); err != nil {
-			log.Fatal(err)
-		}
-		defer stmt.Close()
-		if err := tx.Commit(); err != nil {
-			log.Fatal(err)
+				meta.FacilityType,
+				meta.PaymentType,
+				meta.RegistrationCategory,
+				meta.RegistrationDataMode,
+				meta.SessionDurationInMinutes,
+				getDate(meta.UploadTimestamp.String()),
+				meta.VerificationAttempts,
+				meta.VerificationDurationInSeconds,
+				meta.WaitForVaccinationInMinutes,
+			); err != nil {
+				log.Fatal(err)
+			}
+			defer stmt.Close()
+			if err := tx.Commit(); err != nil {
+				log.Fatal(err)
+			}
 		}
 	}
 }
 
-func getDate(dateTime strfmt.DateTime) time.Time {
-	if dTime, err := time.Parse(time.RFC3339, dateTime.String()); err == nil {
+func getDate(dateTime string) time.Time {
+	if dTime, err := time.Parse(time.RFC3339, dateTime); err == nil {
 		return dTime
 	}
 	return time.Now()
