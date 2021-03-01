@@ -41,6 +41,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = sortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
@@ -105,6 +106,7 @@ func getCertificates(w http.ResponseWriter, request *http.Request) {
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = sortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificatesForThisMobile := []map[string]interface{}{}

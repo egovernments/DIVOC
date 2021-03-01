@@ -11,6 +11,7 @@ import (
 	kafkaService "github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 )
@@ -273,7 +274,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 
 }
 
-
 func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string, []byte, bool) {
 	log.Info("Got request ")
 	for name, values := range req.Header {
@@ -326,6 +326,7 @@ func getCertificate(preEnrollmentCode string, dob string, mobile string) *Vaccin
 func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = sortCertificatesByCreateAt(certificateArr)
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
@@ -342,3 +343,13 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 	return nil
 }
 
+func sortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
+	sort.Slice(certificateArr, func(i, j int) bool {
+		certificateA := certificateArr[i].(map[string]interface{})
+		certificateB := certificateArr[j].(map[string]interface{})
+		certificateACreateAt := certificateA["_osCreatedAt"].(string)
+		certificateBCreateAt := certificateB["_osCreatedAt"].(string)
+		return certificateACreateAt < certificateBCreateAt
+	})
+	return certificateArr
+}
