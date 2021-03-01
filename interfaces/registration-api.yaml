@@ -131,8 +131,11 @@ paths:
           schema:
             type: object
             required:
+              - enrollmentOsid
               - enrollmentCode
             properties:
+              enrollmentOsid:
+                type: string
               enrollmentCode:
                 type: string
       responses:

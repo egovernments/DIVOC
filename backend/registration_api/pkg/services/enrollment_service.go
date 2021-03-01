@@ -2,7 +2,7 @@ package services
 
 import (
 	"bytes"
-	"encoding/json"
+	json "encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/utils"
@@ -13,20 +13,24 @@ import (
 	"time"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, position int) error {
+func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
 	maxEnrollmentCreationAllowed := config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
 
 	if position > maxEnrollmentCreationAllowed {
 		failedErrorMessage := "Maximum enrollment creation limit is reached"
 		log.Info(failedErrorMessage)
-		return errors.New(400, failedErrorMessage)
+		return "", errors.New(400, failedErrorMessage)
 	}
 
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
-	exists, err2 := KeyExists(enrollment.Code)
-	if err2 == nil && exists == 0 {
-		err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-		return err
+	exists, err := KeyExists(enrollment.Code)
+	if err == nil && exists == 0 {
+		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+		if err != nil {
+			return "", err
+		}
+		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+		return result.(string), nil
 	} else {
 		return CreateEnrollment(enrollment, position+1)
 	}

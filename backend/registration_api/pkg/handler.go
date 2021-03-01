@@ -7,12 +7,14 @@ import (
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/models"
+	"github.com/divoc/registration-api/pkg/enrollment"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
 	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
@@ -320,19 +322,34 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 		return operations.NewDeleteAppointmentBadRequest()
 	}
 
-	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, principal.Phone)
+	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone)
+	if deleteError == nil {
+		return operations.NewDeleteRecipientOK()
+	} else {
+		errorMessage := deleteError.Error()
+		response := operations.NewDeleteAppointmentBadRequest()
+		response.Payload = &operations.DeleteAppointmentBadRequestBody{
+			Message: errorMessage,
+		}
+		log.Info(errorMessage)
+		return response
+	}
+}
+
+func deleteAppointmentInEnrollment(enrollmentCode string, phone string) error {
+	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, phone)
 	if enrollmentInfo != nil {
 		if checkIfAlreadyAppointed(enrollmentInfo) {
 			if msg := checkIfCancellationAllowed(enrollmentInfo); msg == "" {
 				lastBookedSlotId := enrollmentInfo["slotId"]
 				err := services.CancelBookedAppointment(lastBookedSlotId)
 				if err != nil {
-					return operations.NewDeleteAppointmentBadRequest()
+					return errors.New("Failed to cancel appointment")
 				} else {
-					isMarked := services.RevokeEnrollmentBookedStatus(*params.Body.EnrollmentCode)
+					isMarked := services.RevokeEnrollmentBookedStatus(enrollmentCode)
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
-							EnrollmentCode:  *params.Body.EnrollmentCode,
+							EnrollmentCode:  enrollmentCode,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",
@@ -340,27 +357,41 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 							CreatedAt:       time.Now(),
 							Status:          models2.CancelledStatus,
 						})
-						return operations.NewDeleteAppointmentOK()
+						return nil
 					}
 				}
 			} else {
 				log.Errorf("Cancellation of appointment not allowed %v", msg)
-				response := operations.NewDeleteAppointmentBadRequest()
-				response.Payload = &operations.DeleteAppointmentBadRequestBody{
-					Message: msg,
-				}
-				return response
+				return errors.New(msg)
 			}
 		} else {
-			log.Errorf("Enrollment not booked %s, %s", *params.Body.EnrollmentCode, principal.Phone)
+			return errors.New("Enrollment not booked " + enrollmentCode + "," + phone)
 		}
 	} else {
-		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
+		return errors.New("Invalid booking request  " + enrollmentCode + "," + phone)
 	}
-	return operations.NewDeleteAppointmentBadRequest()
+	return errors.New("Failed to cancel appointment")
 }
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
+	osid := *params.Body.EnrollmentOsid
+	code := *params.Body.EnrollmentCode
+	/*phone := principal.Phone
+	deleteErr := deleteAppointmentInEnrollment(code, phone)
+	if deleteErr != nil {
+		log.Error(deleteErr.Error())
+		return operations.NewDeleteRecipientBadRequest()
+	}*/
+	err := enrollment.DeleteRecipient(osid)
+
+	//registry, deleteErr := kernelService.DeleteRegistry("Enrollment", "d0a92028-4017-4845-8640-966c3f5b89e1")
+	if err != nil {
+		log.Error(err)
+		return operations.NewDeleteRecipientBadRequest()
+	} else {
+		err := services.DeleteValue(code)
+		log.Error(err)
+	}
 	return operations.NewDeleteRecipientOK()
 }
 

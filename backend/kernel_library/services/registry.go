@@ -85,7 +85,7 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 	return model.NewGenericStatusOk()
 }
 
-func CreateNewRegistry(requestMap interface{}, objectId string) error {
+func CreateNewRegistry(requestMap interface{}, objectId string) (RegistryResponse, error) {
 	requestJson := CreateEntityRegistryRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -104,13 +104,13 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 
 	if resp == nil || err != nil {
 		log.Error("Failed to request registry ", url, " ", err)
-		return err
+		return RegistryResponse{}, err
 	}
 	if resp.Response().StatusCode != 200 {
 		log.Error("Registry response is ", resp.Response().StatusCode, url)
 		println(resp.Response().Status)
 		log.Error("Next R Error" + string(resp.Response().Status))
-		return errors.New("Registry response is " + string(resp.Response().StatusCode))
+		return RegistryResponse{}, errors.New("Registry response is " + string(resp.Response().StatusCode))
 	}
 	respStr, _ := resp.ToString()
 	log.Infof("Response from registry %+v", respStr)
@@ -118,9 +118,9 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 	err = json.Unmarshal(resp.Bytes(), &registryResponse)
 	log.Info("Got response from registry ", registryResponse.Params.Status)
 	if registryResponse.Params.Status != "SUCCESSFUL" {
-		return errors.New(registryResponse.Params.Errmsg)
+		return registryResponse, errors.New(registryResponse.Params.Errmsg)
 	}
-	return nil
+	return registryResponse, nil
 }
 
 func registryUrl(operationId string) string {
@@ -233,4 +233,36 @@ func GetVaccinatorsForTheFacility(facilityCode string) (interface{}, error) {
 	} else {
 		return resp["Vaccinator"], nil
 	}
+}
+
+// It accepts the osid in the json and it will delete the row
+func DeleteRegistry(typeId string, osid string) (map[string]interface{}, error) {
+	queryRequest := RegistryRequest{
+		"open-saber.registry.delete",
+		"1.0",
+		map[string]interface{}{
+			typeId: map[string]interface{}{
+				"osid": osid,
+			},
+		},
+	}
+	log.Info("Registry query ", queryRequest)
+	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.DeleteOperationId, req.BodyJSON(queryRequest))
+	if err != nil {
+		return nil, errors.Errorf("Error while updating registry", err)
+	}
+	if response.Response().StatusCode != 200 {
+		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
+	}
+	responseObject := RegistryResponse{}
+	err = response.ToJSON(&responseObject)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to parse response from registry.")
+	}
+	log.Infof("Response %+v", responseObject)
+	if responseObject.Params.Status != "SUCCESSFUL" {
+		log.Infof("Response from registry %+v", responseObject)
+		return nil, errors.New("Failed while querying from registry")
+	}
+	return responseObject.Result, nil
 }

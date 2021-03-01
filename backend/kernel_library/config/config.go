@@ -18,6 +18,7 @@ var Config = struct {
 		SearchOperationId string `default:"search"`
 		UpdateOperationId string `default:"update"`
 		ReadOperationId   string `default:"read"`
+		DeleteOperationId string `default:"delete"`
 		ApiVersion        string `default:"1"`
 	}
 	Keycloak struct {
