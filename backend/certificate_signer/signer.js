@@ -174,8 +174,7 @@ async function signAndSave(certificate, retryCount = 0) {
     mobile: mobile,
     preEnrollmentCode: preEnrollmentCode,
     certificateId: certificateId,
-    certificate: JSON.stringify(signedCertificate),
-    meta: certificate["meta"]
+    certificate: JSON.stringify(signedCertificate)
   };
   let resp = await registry.saveCertificate(signedCertificateForDB);
   if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
@@ -192,11 +191,7 @@ async function signAndSave(certificate, retryCount = 0) {
     redis.storeKeyWithExpiry(`${preEnrollmentCode}-cert`, signedCertificateForDB.certificate)
   }
   resp.signedCertificate = {
-    name: name,
-    contact: contact,
-    mobile: mobile,
-    preEnrollmentCode: preEnrollmentCode,
-    certificateId: certificateId,
+    ...signedCertificateForDB,
     certificate: signedCertificate,
     meta: certificate["meta"]
   };
