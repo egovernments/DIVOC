@@ -1,10 +1,11 @@
 package services
 
 import (
-	"github.com/divoc/kernel_library/services"
-	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
+
+	"github.com/divoc/kernel_library/services"
+	log "github.com/sirupsen/logrus"
 )
 
 const FacilityProgramSlot = "FacilityProgramSlot"
@@ -54,11 +55,12 @@ func convertToProgramWiseDaySchedule(schedules []interface{}) ProgramDaySchedule
 				for _, dayScheduleObj := range appointmentSchedule["days"].([]interface{}) {
 					dayScheduleObj := dayScheduleObj.(map[string]interface{})
 					day := dayScheduleObj["day"].(string)
-					maxAppointments := strconv.Itoa(int(dayScheduleObj["maxAppointments"].(float64)))
 					schedule := map[string]string{
 						"startTime":       startTime,
 						"endTime":         endTime,
-						"maxAppointments": maxAppointments,
+					}
+					if dayScheduleObj["maxAppointments"] != nil {
+						schedule["maxAppointments"] = strconv.Itoa(int(dayScheduleObj["maxAppointments"].(float64)))
 					}
 					weekday := DaysMap[day]
 					if programWiseDaySchedule[programId] == nil {
