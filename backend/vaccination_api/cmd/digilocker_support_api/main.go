@@ -61,65 +61,7 @@ var (
 
 var ctx = context.Background()
 
-type Certificate struct {
-	Context           []string `json:"@context"`
-	Type              []string `json:"type"`
-	CredentialSubject struct {
-		Type        string `json:"type"`
-		ID          string `json:"id"`
-		RefId       string `json:"refId"`
-		Name        string `json:"name"`
-		Gender      string `json:"gender"`
-		Age         string `json:"age"`
-		Nationality string `json:"nationality"`
-		Address     struct {
-			StreetAddress  string `json:"streetAddress"`
-			StreetAddress2 string `json:"streetAddress2"`
-			District       string `json:"district"`
-			City           string `json:"city"`
-			AddressRegion  string `json:"addressRegion"`
-			AddressCountry string `json:"addressCountry"`
-		} `json:"address"`
-	} `json:"credentialSubject"`
-	Issuer       string `json:"issuer"`
-	IssuanceDate string `json:"issuanceDate"`
-	Evidence     []struct {
-		ID             string    `json:"id"`
-		FeedbackURL    string    `json:"feedbackUrl"`
-		InfoURL        string    `json:"infoUrl"`
-		Type           []string  `json:"type"`
-		Batch          string    `json:"batch"`
-		Vaccine        string    `json:"vaccine"`
-		Manufacturer   string    `json:"manufacturer"`
-		Date           time.Time `json:"date"`
-		EffectiveStart string    `json:"effectiveStart"`
-		EffectiveUntil string    `json:"effectiveUntil"`
-		Dose           int       `json:"dose"`
-		TotalDoses     int       `json:"totalDoses"`
-		Verifier       struct {
-			Name string `json:"name"`
-		} `json:"verifier"`
-		Facility struct {
-			Name    string `json:"name"`
-			Address struct {
-				StreetAddress  string `json:"streetAddress"`
-				StreetAddress2 string `json:"streetAddress2"`
-				District       string `json:"district"`
-				City           string `json:"city"`
-				AddressRegion  string `json:"addressRegion"`
-				AddressCountry string `json:"addressCountry"`
-			} `json:"address"`
-		} `json:"facility"`
-	} `json:"evidence"`
-	NonTransferable string `json:"nonTransferable"`
-	Proof           struct {
-		Type               string    `json:"type"`
-		Created            time.Time `json:"created"`
-		VerificationMethod string    `json:"verificationMethod"`
-		ProofPurpose       string    `json:"proofPurpose"`
-		Jws                string    `json:"jws"`
-	} `json:"proof"`
-}
+
 
 func getVaccineValidDays(start string, end string) string {
 	days := DEFAULT_DUE_DATE_N_DAYS
@@ -136,7 +78,7 @@ func getVaccineValidDays(start string, end string) string {
 	return fmt.Sprintf("after %d days", days)
 }
 
-func showLabelsAsPerTemplate(certificate Certificate) []string {
+func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 	if (!isFinal(certificate)) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
@@ -164,7 +106,7 @@ func showLabelsAsPerTemplate(certificate Certificate) []string {
 	}
 }
 
-func isFinal(certificate Certificate) bool {
+func isFinal(certificate models.Certificate) bool {
 	return certificate.Evidence[0].Dose == certificate.Evidence[0].TotalDoses
 }
 
@@ -175,7 +117,7 @@ func checkIdType(identity string, aadhaarPDF string, otherPDF string) string {
 	return otherPDF
 }
 
-func templateType(certificate Certificate) string {
+func templateType(certificate models.Certificate) string {
 	if isFinal(certificate) {
 		return checkIdType(certificate.CredentialSubject.ID, "config/final-with-aadhaar.pdf", "config/final-with-other.pdf")
 	}
@@ -183,7 +125,7 @@ func templateType(certificate Certificate) string {
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
-	var certificate Certificate
+	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
 		return nil, err
@@ -246,12 +188,12 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	return b.Bytes(), nil
 }
 
-func formatFacilityAddress(certificate Certificate) string {
+func formatFacilityAddress(certificate models.Certificate) string {
 	return concatenateReadableString(certificate.Evidence[0].Facility.Name,
 		certificate.Evidence[0].Facility.Address.District)
 }
 
-func formatRecipientAddress(certificate Certificate) string {
+func formatRecipientAddress(certificate models.Certificate) string {
 	return concatenateReadableString(certificate.CredentialSubject.Address.StreetAddress,
 		certificate.CredentialSubject.Address.District)
 }
@@ -454,6 +396,7 @@ func getSignedJson(preEnrollmentCode string) (string, error) {
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = sortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})

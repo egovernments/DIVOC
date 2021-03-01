@@ -115,7 +115,7 @@ function transformW3(cert, certificateId) {
         "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
         "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
         "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
-        "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
+        "postalCode": R.pathOr(0, ['recipient', 'address', 'pincode'], cert),
       }
     },
     issuer: "https://cowin.gov.in/",
@@ -149,7 +149,7 @@ function transformW3(cert, certificateId) {
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
           "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
-          "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
+          "postalCode": R.pathOr(0, ['facility', 'address', 'pincode'], cert)
         },
         // "seal-image": "..."
       }
@@ -174,10 +174,9 @@ async function signAndSave(certificate, retryCount = 0) {
     mobile: mobile,
     preEnrollmentCode: preEnrollmentCode,
     certificateId: certificateId,
-    certificate: JSON.stringify(signedCertificate),
-    meta: certificate["meta"]
+    certificate: JSON.stringify(signedCertificate)
   };
-  const resp = await registry.saveCertificate(signedCertificateForDB);
+  let resp = await registry.saveCertificate(signedCertificateForDB);
   if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
     if (retryCount <= config.CERTIFICATE_RETRY_COUNT) {
       console.error("Duplicate certificate id found, retrying attempt " + retryCount + " of " + config.CERTIFICATE_RETRY_COUNT);
@@ -191,6 +190,11 @@ async function signAndSave(certificate, retryCount = 0) {
     redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, certificateId)
     redis.storeKeyWithExpiry(`${preEnrollmentCode}-cert`, signedCertificateForDB.certificate)
   }
+  resp.signedCertificate = {
+    ...signedCertificateForDB,
+    certificate: signedCertificate,
+    meta: certificate["meta"]
+  };
   return resp;
 }
 
