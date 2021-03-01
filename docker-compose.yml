@@ -1,4 +1,4 @@
-version: "3"
+version: "2.4"
 
 services:
   redis:
@@ -38,8 +38,10 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - es
-      - db
+      es:
+        condition: service_healthy
+      db:
+        condition: service_started
   keycloak:
     image: dockerhub/keycloak
     environment:
@@ -62,7 +64,8 @@ services:
       - "8080:8080"
       - "9990:9990"
     depends_on:
-      - db
+      db:
+        condition: service_started
   flagr:
     image: checkr/flagr
     environment:
@@ -73,7 +76,8 @@ services:
     ports:
       - "18000:18000"
     depends_on:
-      - db
+      db:
+        condition: service_started
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:
@@ -84,7 +88,8 @@ services:
   kafka:
     image: confluentinc/cp-kafka:latest
     depends_on:
-      - zookeeper
+      zookeeper:
+        condition: service_started
     ports:
       - "9092:9092"
     environment:
@@ -115,8 +120,10 @@ services:
     ports:
       - "8000:8000"
     depends_on:
-      - kafka
-      - keycloak
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   portal_api:
     image: dockerhub/portal_api
     ports:
@@ -129,8 +136,10 @@ services:
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - kafka
-      - keycloak
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
   registration_api:
     image: dockerhub/registration_api
     ports:
@@ -182,15 +191,18 @@ services:
         OQIDAQAB
         -----END PUBLIC KEY-----
     depends_on:
-      - kafka
-      - keycloak
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy  
   analytics_feed:
     image: dockerhub/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
-      - clickhouse-server
+      clickhouse-server:
+        condition: service_started
   certificate_processor:
     image: dockerhub/certificate_processor
     environment:
@@ -199,7 +211,8 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: 65ade758-8371-49bc-98cd-ef24aaa4c6e1
     depends_on:
-      - registry
+      registry:
+        condition: service_started
   certificate_signer:
     image: dockerhub/certificate_signer
     environment:
@@ -215,16 +228,21 @@ services:
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
     depends_on:
-      - kafka
-      - redis
+      kafka:
+        condition: service_healthy
   nginx:
     image: dockerhub/nginx
     ports:
       - "80:80"
     depends_on:
-      - vaccination_api
-      - portal_api
-      - registration_api
+      vaccination_api:
+        condition: service_started
+      portal_api:
+        condition: service_started
+      registration_api:
+        condition: service_started
+      digilocker_support_api:
+        condition: service_started
   notification-service:
     image: dockerhub/notification-service
     ports:
@@ -235,7 +253,8 @@ services:
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
   digilocker_support_api:
     image: dockerhub/digilocker_support_api
     environment:
@@ -243,3 +262,8 @@ services:
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
+    depends_on:
+      kafka:
+        condition: service_healthy
+      keycloak:
+        condition: service_healthy
