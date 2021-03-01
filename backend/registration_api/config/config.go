@@ -24,6 +24,7 @@ var Config = struct {
 	EnrollmentCreation struct {
 		MaxRetryCount                  int `default:"10" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
+		MaxEnrollmentCreationAllowed   int `default:"4" yaml:"maxenrollmentcreationallowed"`
 	}
 	Redis struct {
 		Url      string `env:"REDIS_URL" yaml:"redisurl"`

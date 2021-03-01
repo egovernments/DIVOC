@@ -10,11 +10,13 @@ import (
 	"net/url"
 	golangswaggerpaths "path"
 
+	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
 
 // GetPreEnrollmentsForFacilityURL generates an URL for the get pre enrollments for facility operation
 type GetPreEnrollmentsForFacilityURL struct {
+	Date   *strfmt.Date
 	Limit  *float64
 	Offset *float64
 
@@ -51,6 +53,14 @@ func (o *GetPreEnrollmentsForFacilityURL) Build() (*url.URL, error) {
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
 	qs := make(url.Values)
+
+	var dateQ string
+	if o.Date != nil {
+		dateQ = o.Date.String()
+	}
+	if dateQ != "" {
+		qs.Set("date", dateQ)
+	}
 
 	var limitQ string
 	if o.Limit != nil {

@@ -149,8 +149,8 @@ export const Members = () => {
                 <div className="members-container">
                     <marquee style={{color: ""}}>{marqueeMsg}</marquee>
                     <div style={{display: "flex"}}>
-                        <h5>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
-                        </h5>
+                        <h3>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
+                        </h3>
                     </div>
                     {members.length === 0 &&
                     <div>

@@ -109,6 +109,10 @@ paths:
         - in: query
           name: offset
           type: number
+        - in: query
+          name: date
+          type: string
+          format: date
       responses:
         '200':
           description: OK
@@ -367,6 +371,10 @@ definitions:
         type: string
       email:
         type: string
+      appointmentDate:
+        type: string
+      certified:
+        type: boolean
       meta:
         type: object
       certified:

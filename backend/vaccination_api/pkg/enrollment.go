@@ -3,8 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 )
@@ -42,7 +44,8 @@ func findEnrollmentScopeAndCode(scopeId string, code string, limit int, offset i
 	return nil, errors.New("unable to get the enrollment " + code)
 }
 
-func findEnrollmentsForScope(facilityCode string, limit int, offset int) ([]*models.PreEnrollment, error) {
+func findEnrollmentsForScope(facilityCode string, params vaccination.GetPreEnrollmentsForFacilityParams) ([]*models.PreEnrollment, error) {
+	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
 	typeId := "Enrollment"
 	filter := map[string]interface{}{
 		"enrollmentScopeId": map[string]interface{}{
@@ -52,6 +55,12 @@ func findEnrollmentsForScope(facilityCode string, limit int, offset int) ([]*mod
 			"eq": false,
 		},
 	}
+	if params.Date != nil {
+		filter["appointmentDate"] = map[string]interface{}{
+			"eq": params.Date.String(),
+		}
+	}
+
 	if enrollmentsJson, err := services.QueryRegistry(typeId, filter, limit, offset); err == nil {
 		log.Info("Response ", enrollmentsJson)
 		enrollmentsJsonArray := enrollmentsJson["Enrollment"]

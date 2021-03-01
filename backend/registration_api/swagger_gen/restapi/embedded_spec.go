@@ -161,13 +161,13 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageSize",
             "in": "query"
@@ -513,13 +513,13 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageSize",
             "in": "query"
