@@ -7,7 +7,7 @@
 }
 
 .citizen-login input {
-  height: 70px;
+  height: 60px;
   background: #FFFFFF 0% 0% no-repeat padding-box;
   border: 1px solid #5C9EF8;
   border-radius: 4px;
@@ -36,7 +36,7 @@
 
 .login-otp label {
   position: absolute;
-  padding-top: 1.25rem;
+  padding-top: 1rem;
   padding-left: 1rem;
   font-size: 1.25rem;
   color: #4E67D1;

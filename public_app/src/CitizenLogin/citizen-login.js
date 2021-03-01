@@ -87,7 +87,7 @@ export function CitizenLoginComponent() {
                 Registration and Appointment Portal
             </label>
             <h5 style={{fontWeight: 600}} className="mb-5">
-                Get Started by entering your mobile number
+                Get started by entering your mobile number
             </h5>
         </>
         const inputs = <>
@@ -107,7 +107,7 @@ export function CitizenLoginComponent() {
                         </div>
                     </div>
                     <div className="form-group col-sm-3 login-otp" >
-                        <label htmlFor="otp" >OTP</label>
+                        <label htmlFor="otp"  hidden={state.showOnlyOTP} >OTP</label>
                         <input id="otp" maxLength={6}
                                ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
