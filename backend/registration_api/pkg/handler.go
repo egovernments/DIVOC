@@ -42,6 +42,11 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.GetSlotsForFacilitiesHandler = operations.GetSlotsForFacilitiesHandlerFunc(getFacilitySlots)
 	api.BookSlotOfFacilityHandler = operations.BookSlotOfFacilityHandlerFunc(bookSlot)
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
+	api.GetPingHandler = operations.GetPingHandlerFunc(pingHandler)
+}
+
+func pingHandler(params operations.GetPingParams) middleware.Responder {
+	return operations.NewGetPingOK()
 }
 
 func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
@@ -112,7 +117,8 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	}
 	value, err := services.GetValue(phone)
 	if err != nil {
-		return model.NewGenericServerError()
+		log.Errorf("No OTP in the store, might have expired. %+v", err)
+		return operations.NewVerifyOTPUnauthorized()
 	}
 	if value == "" {
 		return operations.NewVerifyOTPUnauthorized()
