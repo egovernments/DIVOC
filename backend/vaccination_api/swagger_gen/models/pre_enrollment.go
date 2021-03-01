@@ -23,6 +23,9 @@ type PreEnrollment struct {
 	// address
 	Address *PreEnrollmentAddress `json:"address,omitempty"`
 
+	// appointment date
+	AppointmentDate string `json:"appointmentDate,omitempty"`
+
 	// certified
 	Certified bool `json:"certified,omitempty"`
 
