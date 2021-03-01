@@ -244,7 +244,7 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 	if params.FacilityID == nil {
 		return operations.NewGenerateOTPBadRequest()
 	}
-	offset := (*params.PageNumber - 1) * (*params.PageSize)
+	offset := (*params.PageNumber) * (*params.PageSize)
 	now := fmt.Sprintf("%d", time.Now().Unix())
 	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, now, "inf", *params.PageSize, offset)
 	if err == nil && len(slotKeys) > 0 {
