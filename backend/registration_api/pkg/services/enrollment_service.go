@@ -35,8 +35,12 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) error {
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
 		facilityDetails := make(map[string]interface{})
-		// TODO: MULTI_PROGRAMS_SUPPORT
+		if enrollment["appointments"] == nil {
+			continue
+		}
 		appointments := enrollment["appointments"].([]interface{})
+
+		// No appointment means no need to show the facility details
 		for _, appointment := range appointments {
 			facilityCode := appointment.(map[string]interface{})["enrollmentScopeId"]
 			if facilityCode != nil && len(facilityCode.(string)) > 0 {

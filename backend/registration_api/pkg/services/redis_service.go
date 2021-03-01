@@ -106,3 +106,7 @@ func RemoveHastField(key string, field string) (int64, error) {
 func IncrHashField(key string, field string) (int64, error) {
 	return redisClient.HIncrBy(key, field, 1).Result()
 }
+
+func SetTTLForHash(key string, ttl time.Duration) (bool, error) {
+	return redisClient.Expire(key, ttl).Result()
+}

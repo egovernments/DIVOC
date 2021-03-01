@@ -20,7 +20,7 @@ func GenerateEnrollmentCode(phoneNumber string, code int) string {
 
 func GenerateOTP() string {
 	if config.Config.MockOtp {
-		return "1234"
+		return "123456"
 	} else {
 		n := config.Config.Auth.OTPLength
 		otp := int(math.Pow10(n-1)) + rand.Intn(int(math.Pow10(n)-math.Pow10(n-1)))

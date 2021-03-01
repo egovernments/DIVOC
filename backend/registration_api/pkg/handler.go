@@ -3,12 +3,9 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
-	"time"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
-	"github.com/divoc/registration-api/models"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
@@ -16,12 +13,16 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
+	"strconv"
+	"time"
 )
 
 const FacilityEntity = "Facility"
 const EnrollmentEntity = "Enrollment"
 const LastInitializedKey = "LAST_FACILITY_SLOTS_INITIALIZED"
 const YYYYMMDD = "2006-01-02"
+const AttemptsKey = "attempts"
+const OtpKey = "otp"
 
 var DaysMap = map[string]time.Weekday{
 	"Su": time.Sunday,
@@ -85,21 +86,25 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 		return operations.NewGenerateOTPBadRequest()
 	}
 	otp := utils.GenerateOTP()
-	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
-	err = services.SetValue(phone, string(cacheOtp), time.Minute * time.Duration(config.Config.Auth.TTLForOtp))
-	if config.Config.MockOtp {
-		return operations.NewGenerateOTPOK()
-	}
-	if err == nil {
-		// Send SMS
-		if _, err := utils.SendOTP("+91", phone, otp); err == nil {
-			return operations.NewGenerateOTPOK()
+
+	if _, err := services.SetHMSet(phone, map[string]interface{}{OtpKey: otp, AttemptsKey: 0}); err == nil {
+		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil{
+			if config.Config.MockOtp {
+				return operations.NewGenerateOTPOK()
+			}
+			// Send SMS
+			if _, err := utils.SendOTP("+91", phone, otp); err == nil {
+				return operations.NewGenerateOTPOK()
+			} else {
+				log.Errorf("Error while sending OTP %+v", err)
+				return operations.NewGenerateOTPInternalServerError()
+			}
 		} else {
-			log.Errorf("Error while sending OTP %+v", err)
+			log.Errorf("Error occurred while trying to set ttl for hash %+v", err)
 			return operations.NewGenerateOTPInternalServerError()
 		}
 	} else {
-		log.Errorf("Error while setting otp in redis %+v", err)
+		log.Errorf("Error occurred while trying to cache the otp details %+v", err)
 		return operations.NewGenerateOTPInternalServerError()
 	}
 }
@@ -110,29 +115,22 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	if receivedOTP == "" {
 		return operations.NewVerifyOTPBadRequest()
 	}
-	value, err := services.GetValue(phone)
+	otpDetails, err := services.GetHashValues(phone)
 	if err != nil {
 		return model.NewGenericServerError()
 	}
-	if value == "" {
-		return operations.NewVerifyOTPUnauthorized()
+
+	if attemptsTried, err := services.IncrHashField(phone, AttemptsKey); err == nil {
+		if attemptsTried > config.Config.Auth.MAXOtpVerifyAttempts {
+			if err = services.DeleteValue(phone); err != nil {
+				log.Errorf("Error in clearing the OTP in redis %+v", err)
+				return model.NewGenericServerError()
+			}
+			return operations.NewVerifyOTPTooManyRequests()
+		}
 	}
 
-	cacheOTP := models.CacheOTP{}
-	if err := json.Unmarshal([]byte(value), &cacheOTP); err != nil {
-		log.Errorf("Error in marshalling json %+v", err)
-		return model.NewGenericServerError()
-	}
-	if cacheOTP.VerifyAttemptCount > config.Config.Auth.MAXOtpVerifyAttempts {
-		return operations.NewVerifyOTPTooManyRequests()
-	}
-	if cacheOTP.Otp != receivedOTP {
-		cacheOTP.VerifyAttemptCount += 1
-		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
-			log.Errorf("Error in setting verify count %+v", err)
-		} else {
-			err = services.SetValue(phone, string(cacheOtp), time.Minute * time.Duration(config.Config.Auth.TTLForOtp))
-		}
+	if otpDetails[OtpKey] != receivedOTP {
 		return operations.NewVerifyOTPUnauthorized()
 	}
 
