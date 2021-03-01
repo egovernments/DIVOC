@@ -116,10 +116,6 @@ type DeleteRecipientBody struct {
 	// enrollment code
 	// Required: true
 	EnrollmentCode *string `json:"enrollmentCode"`
-
-	// enrollment osid
-	// Required: true
-	EnrollmentOsid *string `json:"enrollmentOsid"`
 }
 
 // Validate validates this delete recipient body
@@ -127,10 +123,6 @@ func (o *DeleteRecipientBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := o.validateEnrollmentCode(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := o.validateEnrollmentOsid(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -143,15 +135,6 @@ func (o *DeleteRecipientBody) Validate(formats strfmt.Registry) error {
 func (o *DeleteRecipientBody) validateEnrollmentCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("body"+"."+"enrollmentCode", "body", o.EnrollmentCode); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (o *DeleteRecipientBody) validateEnrollmentOsid(formats strfmt.Registry) error {
-
-	if err := validate.Required("body"+"."+"enrollmentOsid", "body", o.EnrollmentOsid); err != nil {
 		return err
 	}
 

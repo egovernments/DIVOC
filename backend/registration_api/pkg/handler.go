@@ -374,17 +374,17 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string) error {
 }
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
-	osid := *params.Body.EnrollmentOsid
 	code := *params.Body.EnrollmentCode
+
 	/*phone := principal.Phone
 	deleteErr := deleteAppointmentInEnrollment(code, phone)
 	if deleteErr != nil {
 		log.Error(deleteErr.Error())
 		return operations.NewDeleteRecipientBadRequest()
 	}*/
+	osid := enrollment.GetOsid(code)
 	err := enrollment.DeleteRecipient(osid)
 
-	//registry, deleteErr := kernelService.DeleteRegistry("Enrollment", "d0a92028-4017-4845-8640-966c3f5b89e1")
 	if err != nil {
 		log.Error(err)
 		return operations.NewDeleteRecipientBadRequest()

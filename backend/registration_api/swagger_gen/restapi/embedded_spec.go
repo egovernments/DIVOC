@@ -308,14 +308,10 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "enrollmentOsid",
                 "enrollmentCode"
               ],
               "properties": {
                 "enrollmentCode": {
-                  "type": "string"
-                },
-                "enrollmentOsid": {
                   "type": "string"
                 }
               }
@@ -696,14 +692,10 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "enrollmentOsid",
                 "enrollmentCode"
               ],
               "properties": {
                 "enrollmentCode": {
-                  "type": "string"
-                },
-                "enrollmentOsid": {
                   "type": "string"
                 }
               }
