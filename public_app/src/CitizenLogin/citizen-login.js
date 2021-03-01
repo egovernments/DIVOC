@@ -83,17 +83,17 @@ export function CitizenLoginComponent() {
     };
     {
         const infoText = <>
-            <h2>
+            <label style={{fontWeight: 500, fontSize: "40px"}} className="mb-5">
                 Registration and Appointment Portal
-            </h2>
-            <h4>
+            </label>
+            <h5 style={{fontWeight: 600}} className="mb-5">
                 Get Started by entering your mobile number
-            </h4>
+            </h5>
         </>
         const inputs = <>
             <form>
                 <div className="form-row">
-                    <div className="form-group col-md-3">
+                    <div className="form-group col-sm-3 mr-5">
                         <input placeholder="Mobile number"
                                ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
@@ -106,10 +106,11 @@ export function CitizenLoginComponent() {
                             {state.invalidMobileNumber}
                         </div>
                     </div>
-                    <div className="form-group col-md-3" >
-                        <input placeholder="OTP" maxLength={4}
+                    <div className="form-group col-sm-3 login-otp" >
+                        <label htmlFor="otp" >OTP</label>
+                        <input id="otp" maxLength={6}
                                ref={ref => ref && ref.focus()}
-                               className="login-otp form-control form-control-lg"
+                               className="form-control form-control-lg"
                                onChange={setOTP}
                                value={state.otp}
                                disabled={state.showOnlyOTP}
@@ -122,9 +123,14 @@ export function CitizenLoginComponent() {
             </form>
         </>
 
-        const getOTPButton = <button disabled={state.phoneNumber.length === 0} className={"custom-button purple-btn"} onClick={getOTPHandler}>Get OTP</button>;
-        const verifyButton = <button disabled={state.otp.length === 0} className={"custom-button purple-btn"} onClick={verifyHandler}>Verify</button>;
-        const backButton = <button className="btn btn-link transparent-button" onClick={backBtnHandler}>Back</button>;
+        const getOTPButton = <button disabled={state.phoneNumber.length === 0}
+                                     className={"custom-button purple-btn"}
+                                     onClick={getOTPHandler}><span>Get OTP &#8594;</span></button>;
+        const verifyButton = <button disabled={state.otp.length === 0}
+                                     className={"custom-button purple-btn"}
+                                     onClick={verifyHandler}><span>Verify &#8594;</span></button>;
+        const backButton = <button style={{paddingLeft: "0px"}} className="btn btn-link transparent-button"
+                                   onClick={backBtnHandler}>Back</button>;
 
         return <div className="citizen-login">
             {infoText}
