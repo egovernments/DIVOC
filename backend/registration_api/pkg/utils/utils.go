@@ -12,16 +12,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
-func GenerateEnrollmentCode(phoneNumber string) string {
-	log.Info("Generating the code for the length : ",
-		config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode, config.Config.EnrollmentCreation.MaxRetryCount)
-	digits := 0
-
-	n:= config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode
-	for ;n>=1;n-- {
-		digits  = digits * 10 + 9
-	}
-	return phoneNumber + "-" + strconv.Itoa(rand.Intn(digits))
+func GenerateEnrollmentCode(phoneNumber string, code int) string {
+	generatedCode := phoneNumber + "-" + strconv.Itoa(code)
+	log.Info("Generated Code: " + generatedCode)
+	return generatedCode
 }
 
 func GenerateOTP() string {
@@ -43,10 +37,10 @@ func SendOTP(prefix string, phone string, otp string) (*sns.PublishOutput, error
 	msgType := "Transactional"
 	dataType := "String"
 	svc.SetSMSAttributesRequest(&sns.SetSMSAttributesInput{
-		Attributes: map[string]*string{"DefaultSMSType": &msgType,},
+		Attributes: map[string]*string{"DefaultSMSType": &msgType},
 	})
 	params := &sns.PublishInput{
-		Message: aws.String("OTP for registration " + otp),
+		Message:     aws.String("OTP for registration " + otp),
 		PhoneNumber: aws.String(prefix + phone),
 		MessageAttributes: map[string]*sns.MessageAttributeValue{
 			"AWS.SNS.SMS.SMSType": &sns.MessageAttributeValue{
