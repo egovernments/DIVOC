@@ -375,6 +375,12 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string) error {
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
 	code := *params.Body.EnrollmentCode
+	phone := principal.Phone
+
+	enrollmentDetails, detailsErr := services.GetHashValues(code)
+	if detailsErr != nil || enrollmentDetails["phone"] != phone {
+		return operations.NewDeleteRecipientUnauthorized()
+	}
 
 	/*phone := principal.Phone
 	deleteErr := deleteAppointmentInEnrollment(code, phone)
