@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 	"time"
-
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -278,6 +277,8 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 				if isMarked {
 					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
 					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
+						Dose: *params.Body.Dose,
+						ProgramId: *params.Body.ProgramID,
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
@@ -334,6 +335,8 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
 							EnrollmentCode:  *params.Body.EnrollmentCode,
+							Dose: *params.Body.Dose,
+							ProgramId: *params.Body.ProgramID,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",

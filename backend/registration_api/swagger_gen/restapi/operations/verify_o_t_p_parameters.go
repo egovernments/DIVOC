@@ -6,19 +6,16 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"io"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/validate"
 )
 
 // NewVerifyOTPParams creates a new VerifyOTPParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewVerifyOTPParams() VerifyOTPParams {
 
 	return VerifyOTPParams{}
@@ -61,11 +58,6 @@ func (o *VerifyOTPParams) BindRequest(r *http.Request, route *middleware.Matched
 		} else {
 			// validate body object
 			if err := body.Validate(route.Formats); err != nil {
-				res = append(res, err)
-			}
-
-			ctx := validate.WithOperationRequest(context.Background())
-			if err := body.ContextValidate(ctx, route.Formats); err != nil {
 				res = append(res, err)
 			}
 

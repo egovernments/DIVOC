@@ -12,43 +12,43 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/divoc/portal-api/swagger_gen/models"
+	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
-// NewUpdateVaccinatorsParams creates a new UpdateVaccinatorsParams object
+// NewUpdateRecipientParams creates a new UpdateRecipientParams object
 // no default values defined in spec.
-func NewUpdateVaccinatorsParams() UpdateVaccinatorsParams {
+func NewUpdateRecipientParams() UpdateRecipientParams {
 
-	return UpdateVaccinatorsParams{}
+	return UpdateRecipientParams{}
 }
 
-// UpdateVaccinatorsParams contains all the bound params for the update vaccinators operation
+// UpdateRecipientParams contains all the bound params for the update recipient operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters updateVaccinators
-type UpdateVaccinatorsParams struct {
+// swagger:parameters updateRecipient
+type UpdateRecipientParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*Vaccinator Update Request
+	/*
 	  In: body
 	*/
-	Body models.VaccinatorUpdateRequest
+	Body *models.Enrollment
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewUpdateVaccinatorsParams() beforehand.
-func (o *UpdateVaccinatorsParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewUpdateRecipientParams() beforehand.
+func (o *UpdateRecipientParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.VaccinatorUpdateRequest
+		var body models.Enrollment
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -58,7 +58,7 @@ func (o *UpdateVaccinatorsParams) BindRequest(r *http.Request, route *middleware
 			}
 
 			if len(res) == 0 {
-				o.Body = body
+				o.Body = &body
 			}
 		}
 	}

@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/go-openapi/errors"
@@ -85,6 +84,7 @@ func (m *PreEnrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *PreEnrollment) validateAddress(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -102,6 +102,7 @@ func (m *PreEnrollment) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *PreEnrollment) validateDob(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
@@ -146,6 +147,7 @@ func (m *PreEnrollment) validateGenderEnum(path, location string, value string) 
 }
 
 func (m *PreEnrollment) validateGender(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -153,34 +155,6 @@ func (m *PreEnrollment) validateGender(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateGenderEnum("gender", "body", m.Gender); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this pre enrollment based on the context it is used
-func (m *PreEnrollment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateAddress(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *PreEnrollment) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
-
-	if m.Address != nil {
-		if err := m.Address.ContextValidate(ctx, formats); err != nil {
-			if ve, ok := err.(*errors.Validation); ok {
-				return ve.ValidateName("address")
-			}
-			return err
-		}
 	}
 
 	return nil
@@ -227,11 +201,6 @@ type PreEnrollmentAddress struct {
 
 // Validate validates this pre enrollment address
 func (m *PreEnrollmentAddress) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this pre enrollment address based on context it is used
-func (m *PreEnrollmentAddress) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

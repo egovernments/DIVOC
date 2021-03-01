@@ -31,7 +31,7 @@ func NewGetSlotsForFacilities(ctx *middleware.Context, handler GetSlotsForFacili
 	return &GetSlotsForFacilities{Context: ctx, Handler: handler}
 }
 
-/* GetSlotsForFacilities swagger:route GET /facility/slots getSlotsForFacilities
+/*GetSlotsForFacilities swagger:route GET /facility/slots getSlotsForFacilities
 
 Get slots for facilites
 

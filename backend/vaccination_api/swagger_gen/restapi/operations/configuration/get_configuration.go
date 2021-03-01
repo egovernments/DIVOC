@@ -31,7 +31,7 @@ func NewGetConfiguration(ctx *middleware.Context, handler GetConfigurationHandle
 	return &GetConfiguration{Context: ctx, Handler: handler}
 }
 
-/* GetConfiguration swagger:route GET /divoc/configuration configuration getConfiguration
+/*GetConfiguration swagger:route GET /divoc/configuration configuration getConfiguration
 
 Get Meta information about the application flow
 
@@ -47,6 +47,7 @@ func (o *GetConfiguration) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetConfigurationParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetConfiguration) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

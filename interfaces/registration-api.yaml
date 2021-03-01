@@ -29,8 +29,14 @@ paths:
             type: object
             required:
               - enrollmentCode
+              - programId
+              - dose
             properties:
               enrollmentCode:
+                type: string
+              programId:
+                type: string
+              dose:
                 type: string
       responses:
         '200':
@@ -59,10 +65,16 @@ paths:
             required:
               - facilitySlotId
               - enrollmentCode
+              - programId
+              - dose
             properties:
               facilitySlotId:
                 type: string
               enrollmentCode:
+                type: string
+              programId:
+                type: string
+              dose:
                 type: string
       responses:
         '200':

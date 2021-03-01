@@ -98,10 +98,10 @@ func (o *GetSlotsForFacilitiesParams) bindFacilityID(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.FacilityID = &raw
 
 	return nil
@@ -116,7 +116,6 @@ func (o *GetSlotsForFacilitiesParams) bindPageNumber(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil

@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
 )
@@ -26,11 +24,6 @@ type IdentityVerificationRequest struct {
 
 // Validate validates this identity verification request
 func (m *IdentityVerificationRequest) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this identity verification request based on context it is used
-func (m *IdentityVerificationRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
