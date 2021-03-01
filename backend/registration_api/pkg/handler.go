@@ -120,7 +120,7 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		return model.NewGenericServerError()
 	}
 
-	if 	attemptsTried, err := services.IncrHashField(phone, AttemptsKey); err == nil {
+	if attemptsTried, err := services.IncrHashField(phone, AttemptsKey); err == nil {
 		if attemptsTried > config.Config.Auth.MAXOtpVerifyAttempts {
 			if err = services.DeleteValue(phone); err != nil {
 				log.Errorf("Error in clearing the OTP in redis %+v", err)
