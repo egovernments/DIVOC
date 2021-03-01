@@ -3,6 +3,9 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -14,8 +17,6 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"time"
 )
 
 const FacilityEntity = "Facility"
@@ -86,7 +87,7 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	}
 	otp := utils.GenerateOTP()
 	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
-	err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
+	err = services.SetValue(phone, string(cacheOtp), time.Minute * time.Duration(config.Config.Auth.TTLForOtp))
 	if config.Config.MockOtp {
 		return operations.NewGenerateOTPOK()
 	}
@@ -131,7 +132,7 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
 			log.Errorf("Error in setting verify count %+v", err)
 		} else {
-			err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
+			err = services.SetValue(phone, string(cacheOtp), time.Minute * time.Duration(config.Config.Auth.TTLForOtp))
 		}
 		return operations.NewVerifyOTPUnauthorized()
 	}
@@ -167,7 +168,7 @@ func canInitializeSlots() bool {
 }
 
 func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
-
+	currentDate := time.Now()
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
@@ -191,8 +192,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 					if ok {
 						facilityCode := facility["facilityCode"].(string)
 						facilityOSID := facility["osid"].(string)
+						services.ClearOldSlots(facilityCode, currentDate.Unix())
 						log.Infof("Initializing facility %s slots", facilityCode)
-
 						facilityProgramArr, ok := facility["programs"].([]interface{})
 						facilityProgramWiseSchedule := services.GetFacilityAppointmentSchedule(facilityOSID)
 						if ok && len(facilityProgramArr) > 0 {
@@ -204,7 +205,6 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 									if ok && programStatus == "Active" {
 										programSchedule, ok := facilityProgramWiseSchedule[programId]
 										if ok {
-											currentDate := time.Now()
 											for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
@@ -217,7 +217,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 															FacilityCode: facilityCode,
 															ProgramId:    programId,
 															Date:         slotDate,
-															Time:         startTime + "_" + endTime,
+															StartTime:         startTime,
+															EndTime: 		endTime,
 															Slots:        maxAppointments,
 														}
 														log.Infof("Initializing facility slot %v", schedule)
@@ -240,12 +241,13 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	return operations.NewInitializeFacilitySlotsUnauthorized()
 }
 
-func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams, principal *models3.JWTClaimBody) middleware.Responder {
-	if paras.FacilityID == nil {
+func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *models3.JWTClaimBody) middleware.Responder {
+	if params.FacilityID == nil {
 		return operations.NewGenerateOTPBadRequest()
 	}
-	startPosition := int64(*paras.PageNumber) * int64(*paras.PageSize)
-	slotKeys, err := services.GetValuesFromSet(*paras.FacilityID, startPosition, startPosition+int64(*paras.PageSize)-1)
+	offset := (*params.PageNumber - 1) * (*params.PageSize)
+	now := fmt.Sprintf("%d", time.Now().Unix())
+	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, now, "inf", *params.PageSize, offset)
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {
@@ -280,7 +282,7 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
 						AppointmentDate: facilitySchedule.DateString(),
-						AppointmentTime: facilitySchedule.Time,
+						AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
 						CreatedAt:       time.Now(),
 						Status:          models2.AllottedStatus,
 					})

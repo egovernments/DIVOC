@@ -16,8 +16,8 @@ import (
 // GetSlotsForFacilitiesURL generates an URL for the get slots for facilities operation
 type GetSlotsForFacilitiesURL struct {
 	FacilityID *string
-	PageNumber *float64
-	PageSize   *float64
+	PageNumber *int64
+	PageSize   *int64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -63,7 +63,7 @@ func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
 
 	var pageNumberQ string
 	if o.PageNumber != nil {
-		pageNumberQ = swag.FormatFloat64(*o.PageNumber)
+		pageNumberQ = swag.FormatInt64(*o.PageNumber)
 	}
 	if pageNumberQ != "" {
 		qs.Set("pageNumber", pageNumberQ)
@@ -71,7 +71,7 @@ func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
 
 	var pageSizeQ string
 	if o.PageSize != nil {
-		pageSizeQ = swag.FormatFloat64(*o.PageSize)
+		pageSizeQ = swag.FormatInt64(*o.PageSize)
 	}
 	if pageSizeQ != "" {
 		qs.Set("pageSize", pageSizeQ)
