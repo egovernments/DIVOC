@@ -6,6 +6,7 @@ kafka:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
+  maxenrollmentcreationallowed: 4
 auth:
   maxotpverifyattempts: 3
   ttlforotpinminutes: 5

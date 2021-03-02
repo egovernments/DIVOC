@@ -10,9 +10,7 @@ docker:
 	$(MAKE) -C registry
 test:
 	echo "Starting services in e2e testing mode"
-	echo "version: \"2.4\"" > docker-compose.v2.yml && tail -n +2 docker-compose.yml >> docker-compose.v2.yml
-	docker-compose -f docker-compose.v2.yml -f docker-compose.e2e.yml up -d
-	rm docker-compose.v2.yml
+	docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up -d
 	docker logs -f e2e_test
 	bash ./e2e/e2e_test_spy.sh
 run:

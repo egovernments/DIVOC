@@ -3,10 +3,11 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	eventsModel "github.com/divoc/api/pkg/models"
 	"net/http"
 	"strings"
 	"time"
+
+	eventsModel "github.com/divoc/api/pkg/models"
 
 	"github.com/divoc/api/config"
 	"github.com/jinzhu/gorm"
@@ -262,8 +263,7 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 	if err != nil {
 		return NewGenericServerError()
 	}
-	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
-	if enrollments, err := findEnrollmentsForScope(scopeId, limit, offset); err == nil {
+	if enrollments, err := findEnrollmentsForScope(scopeId, params); err == nil {
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
 	return NewGenericServerError()

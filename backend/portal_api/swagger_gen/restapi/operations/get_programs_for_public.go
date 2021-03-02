@@ -29,7 +29,7 @@ func NewGetProgramsForPublic(ctx *middleware.Context, handler GetProgramsForPubl
 	return &GetProgramsForPublic{Context: ctx, Handler: handler}
 }
 
-/* GetProgramsForPublic swagger:route GET /public/programs getProgramsForPublic
+/*GetProgramsForPublic swagger:route GET /public/programs getProgramsForPublic
 
 get program list for public
 
@@ -45,12 +45,14 @@ func (o *GetProgramsForPublic) ServeHTTP(rw http.ResponseWriter, r *http.Request
 		r = rCtx
 	}
 	var Params = NewGetProgramsForPublicParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

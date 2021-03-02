@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -32,29 +31,6 @@ func (m VaccinatorUpdateRequest) Validate(formats strfmt.Registry) error {
 
 		if m[i] != nil {
 			if err := m[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName(strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-// ContextValidate validate this vaccinator update request based on the context it is used
-func (m VaccinatorUpdateRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	for i := 0; i < len(m); i++ {
-
-		if m[i] != nil {
-			if err := m[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName(strconv.Itoa(i))
 				}
@@ -143,15 +119,16 @@ func (m *VaccinatorUpdateRequestItems0) Validate(formats strfmt.Registry) error 
 }
 
 func (m *VaccinatorUpdateRequestItems0) validateMobileNumber(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.MobileNumber) { // not required
 		return nil
 	}
 
-	if err := validate.MinLength("mobileNumber", "body", m.MobileNumber, 10); err != nil {
+	if err := validate.MinLength("mobileNumber", "body", string(m.MobileNumber), 10); err != nil {
 		return err
 	}
 
-	if err := validate.MaxLength("mobileNumber", "body", m.MobileNumber, 10); err != nil {
+	if err := validate.MaxLength("mobileNumber", "body", string(m.MobileNumber), 10); err != nil {
 		return err
 	}
 
@@ -168,6 +145,7 @@ func (m *VaccinatorUpdateRequestItems0) validateOsid(formats strfmt.Registry) er
 }
 
 func (m *VaccinatorUpdateRequestItems0) validatePrograms(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Programs) { // not required
 		return nil
 	}
@@ -221,6 +199,7 @@ func (m *VaccinatorUpdateRequestItems0) validateStatusEnum(path, location string
 }
 
 func (m *VaccinatorUpdateRequestItems0) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -228,38 +207,6 @@ func (m *VaccinatorUpdateRequestItems0) validateStatus(formats strfmt.Registry) 
 	// value enum
 	if err := m.validateStatusEnum("status", "body", m.Status); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this vaccinator update request items0 based on the context it is used
-func (m *VaccinatorUpdateRequestItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidatePrograms(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *VaccinatorUpdateRequestItems0) contextValidatePrograms(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Programs); i++ {
-
-		if m.Programs[i] != nil {
-			if err := m.Programs[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -343,6 +290,7 @@ func (m *VaccinatorUpdateRequestItems0ProgramsItems0) validateStatusEnum(path, l
 }
 
 func (m *VaccinatorUpdateRequestItems0ProgramsItems0) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -352,11 +300,6 @@ func (m *VaccinatorUpdateRequestItems0ProgramsItems0) validateStatus(formats str
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this vaccinator update request items0 programs items0 based on context it is used
-func (m *VaccinatorUpdateRequestItems0ProgramsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

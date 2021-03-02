@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -36,7 +35,7 @@ func NewDeleteAppointment(ctx *middleware.Context, handler DeleteAppointmentHand
 	return &DeleteAppointment{Context: ctx, Handler: handler}
 }
 
-/* DeleteAppointment swagger:route DELETE /appointment deleteAppointment
+/*DeleteAppointment swagger:route DELETE /appointment deleteAppointment
 
 Delete the appointment
 
@@ -91,11 +90,6 @@ func (o *DeleteAppointmentBadRequestBody) Validate(formats strfmt.Registry) erro
 	return nil
 }
 
-// ContextValidate validates this delete appointment bad request body based on context it is used
-func (o *DeleteAppointmentBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	return nil
-}
-
 // MarshalBinary interface implementation
 func (o *DeleteAppointmentBadRequestBody) MarshalBinary() ([]byte, error) {
 	if o == nil {
@@ -119,22 +113,47 @@ func (o *DeleteAppointmentBadRequestBody) UnmarshalBinary(b []byte) error {
 // swagger:model DeleteAppointmentBody
 type DeleteAppointmentBody struct {
 
+	// dose
+	// Required: true
+	Dose *string `json:"dose"`
+
 	// enrollment code
 	// Required: true
 	EnrollmentCode *string `json:"enrollmentCode"`
+
+	// program Id
+	// Required: true
+	ProgramID *string `json:"programId"`
 }
 
 // Validate validates this delete appointment body
 func (o *DeleteAppointmentBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.validateDose(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.validateEnrollmentCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateProgramID(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *DeleteAppointmentBody) validateDose(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"dose", "body", o.Dose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -147,8 +166,12 @@ func (o *DeleteAppointmentBody) validateEnrollmentCode(formats strfmt.Registry) 
 	return nil
 }
 
-// ContextValidate validates this delete appointment body based on context it is used
-func (o *DeleteAppointmentBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (o *DeleteAppointmentBody) validateProgramID(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"programId", "body", o.ProgramID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

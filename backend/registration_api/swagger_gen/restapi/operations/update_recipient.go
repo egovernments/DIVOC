@@ -13,40 +13,40 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
-// GetRecipientsHandlerFunc turns a function with the right signature into a get recipients handler
-type GetRecipientsHandlerFunc func(GetRecipientsParams, *models.JWTClaimBody) middleware.Responder
+// UpdateRecipientHandlerFunc turns a function with the right signature into a update recipient handler
+type UpdateRecipientHandlerFunc func(UpdateRecipientParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn GetRecipientsHandlerFunc) Handle(params GetRecipientsParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn UpdateRecipientHandlerFunc) Handle(params UpdateRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// GetRecipientsHandler interface for that can handle valid get recipients params
-type GetRecipientsHandler interface {
-	Handle(GetRecipientsParams, *models.JWTClaimBody) middleware.Responder
+// UpdateRecipientHandler interface for that can handle valid update recipient params
+type UpdateRecipientHandler interface {
+	Handle(UpdateRecipientParams, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewGetRecipients creates a new http.Handler for the get recipients operation
-func NewGetRecipients(ctx *middleware.Context, handler GetRecipientsHandler) *GetRecipients {
-	return &GetRecipients{Context: ctx, Handler: handler}
+// NewUpdateRecipient creates a new http.Handler for the update recipient operation
+func NewUpdateRecipient(ctx *middleware.Context, handler UpdateRecipientHandler) *UpdateRecipient {
+	return &UpdateRecipient{Context: ctx, Handler: handler}
 }
 
-/*GetRecipients swagger:route GET /recipients getRecipients
+/*UpdateRecipient swagger:route PUT /recipients updateRecipient
 
-Get all the recipients
+Update uncertified enrolled recipient
 
 */
-type GetRecipients struct {
+type UpdateRecipient struct {
 	Context *middleware.Context
-	Handler GetRecipientsHandler
+	Handler UpdateRecipientHandler
 }
 
-func (o *GetRecipients) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *UpdateRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewGetRecipientsParams()
+	var Params = NewUpdateRecipientParams()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

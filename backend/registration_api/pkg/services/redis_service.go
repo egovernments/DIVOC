@@ -1,10 +1,11 @@
 package services
 
 import (
+	"time"
+
 	"github.com/divoc/registration-api/config"
 	"github.com/go-redis/redis"
 	log "github.com/sirupsen/logrus"
-	"time"
 )
 
 var redisClient *redis.Client
@@ -24,11 +25,9 @@ func InitRedis() {
 func DeleteValue(key string) error {
 	return redisClient.Del(key).Err()
 }
-func SetValue(key string, val interface{}, ttlInMin time.Duration) error {
+func SetValue(key string, val interface{}, ttl time.Duration) error {
 	log.Info("Set value for ", key)
-	duration := time.Minute * ttlInMin
-	err := redisClient.Set(key, val, duration).Err()
-	return err
+	return redisClient.Set(key, val, ttl).Err()
 }
 
 func GetValue(key string) (string, error) {
@@ -53,6 +52,10 @@ func AddToSet(key string, value string, score float64) (int64, error) {
 	}).Result()
 }
 
+func RemoveElementsByScoreInSet(key, minScore, maxScore string) error {
+	return redisClient.ZRemRangeByScore(key, minScore, maxScore).Err()
+}
+
 func SetValueWithoutExpiry(key string, val interface{}) error {
 	err := redisClient.SetNX(key, val, 0).Err()
 	return err
@@ -60,6 +63,12 @@ func SetValueWithoutExpiry(key string, val interface{}) error {
 
 func GetValuesFromSet(key string, startPosition int64, stopPosition int64) ([]string, error) {
 	return redisClient.ZRange(key, startPosition, stopPosition).Result()
+}
+
+func GetValuesByScoreFromSet(key, minScore, maxScore string, limit, offset int64) ([]string, error) {
+	return redisClient.ZRangeByScore(key, redis.ZRangeBy{
+		Min: minScore, Max: maxScore, Count: limit, Offset: offset,
+	}).Result()
 }
 
 func KeyExists(key string) (int64, error) {
@@ -96,4 +105,8 @@ func RemoveHastField(key string, field string) (int64, error) {
 
 func IncrHashField(key string, field string) (int64, error) {
 	return redisClient.HIncrBy(key, field, 1).Result()
+}
+
+func SetTTLForHash(key string, ttl time.Duration) (bool, error) {
+	return redisClient.Expire(key, ttl).Result()
 }

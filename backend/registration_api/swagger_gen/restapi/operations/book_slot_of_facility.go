@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -36,7 +35,7 @@ func NewBookSlotOfFacility(ctx *middleware.Context, handler BookSlotOfFacilityHa
 	return &BookSlotOfFacility{Context: ctx, Handler: handler}
 }
 
-/* BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
+/*BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
 
 Book a slot in facility
 
@@ -82,6 +81,10 @@ func (o *BookSlotOfFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 // swagger:model BookSlotOfFacilityBody
 type BookSlotOfFacilityBody struct {
 
+	// dose
+	// Required: true
+	Dose *string `json:"dose"`
+
 	// enrollment code
 	// Required: true
 	EnrollmentCode *string `json:"enrollmentCode"`
@@ -89,11 +92,19 @@ type BookSlotOfFacilityBody struct {
 	// facility slot Id
 	// Required: true
 	FacilitySlotID *string `json:"facilitySlotId"`
+
+	// program Id
+	// Required: true
+	ProgramID *string `json:"programId"`
 }
 
 // Validate validates this book slot of facility body
 func (o *BookSlotOfFacilityBody) Validate(formats strfmt.Registry) error {
 	var res []error
+
+	if err := o.validateDose(formats); err != nil {
+		res = append(res, err)
+	}
 
 	if err := o.validateEnrollmentCode(formats); err != nil {
 		res = append(res, err)
@@ -103,9 +114,22 @@ func (o *BookSlotOfFacilityBody) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := o.validateProgramID(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (o *BookSlotOfFacilityBody) validateDose(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"dose", "body", o.Dose); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -127,8 +151,12 @@ func (o *BookSlotOfFacilityBody) validateFacilitySlotID(formats strfmt.Registry)
 	return nil
 }
 
-// ContextValidate validates this book slot of facility body based on context it is used
-func (o *BookSlotOfFacilityBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (o *BookSlotOfFacilityBody) validateProgramID(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"programId", "body", o.ProgramID); err != nil {
+		return err
+	}
+
 	return nil
 }
 

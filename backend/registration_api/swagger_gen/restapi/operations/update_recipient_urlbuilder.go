@@ -9,25 +9,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
-
-	"github.com/go-openapi/swag"
 )
 
-// GetSlotsForFacilitiesURL generates an URL for the get slots for facilities operation
-type GetSlotsForFacilitiesURL struct {
-	FacilityID *string
-	PageNumber *int64
-	PageSize   *int64
-
+// UpdateRecipientURL generates an URL for the update recipient operation
+type UpdateRecipientURL struct {
 	_basePath string
-	// avoid unkeyed usage
-	_ struct{}
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetSlotsForFacilitiesURL) WithBasePath(bp string) *GetSlotsForFacilitiesURL {
+func (o *UpdateRecipientURL) WithBasePath(bp string) *UpdateRecipientURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -35,15 +27,15 @@ func (o *GetSlotsForFacilitiesURL) WithBasePath(bp string) *GetSlotsForFacilitie
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *GetSlotsForFacilitiesURL) SetBasePath(bp string) {
+func (o *UpdateRecipientURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
+func (o *UpdateRecipientURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/facility/slots"
+	var _path = "/recipients"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -51,39 +43,11 @@ func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 
-	qs := make(url.Values)
-
-	var facilityIDQ string
-	if o.FacilityID != nil {
-		facilityIDQ = *o.FacilityID
-	}
-	if facilityIDQ != "" {
-		qs.Set("facilityId", facilityIDQ)
-	}
-
-	var pageNumberQ string
-	if o.PageNumber != nil {
-		pageNumberQ = swag.FormatInt64(*o.PageNumber)
-	}
-	if pageNumberQ != "" {
-		qs.Set("pageNumber", pageNumberQ)
-	}
-
-	var pageSizeQ string
-	if o.PageSize != nil {
-		pageSizeQ = swag.FormatInt64(*o.PageSize)
-	}
-	if pageSizeQ != "" {
-		qs.Set("pageSize", pageSizeQ)
-	}
-
-	_result.RawQuery = qs.Encode()
-
 	return &_result, nil
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *GetSlotsForFacilitiesURL) Must(u *url.URL, err error) *url.URL {
+func (o *UpdateRecipientURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -94,17 +58,17 @@ func (o *GetSlotsForFacilitiesURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *GetSlotsForFacilitiesURL) String() string {
+func (o *UpdateRecipientURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *GetSlotsForFacilitiesURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *UpdateRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on GetSlotsForFacilitiesURL")
+		return nil, errors.New("scheme is required for a full url on UpdateRecipientURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on GetSlotsForFacilitiesURL")
+		return nil, errors.New("host is required for a full url on UpdateRecipientURL")
 	}
 
 	base, err := o.Build()
@@ -118,6 +82,6 @@ func (o *GetSlotsForFacilitiesURL) BuildFull(scheme, host string) (*url.URL, err
 }
 
 // StringFull returns the string representation of a complete url
-func (o *GetSlotsForFacilitiesURL) StringFull(scheme, host string) string {
+func (o *UpdateRecipientURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

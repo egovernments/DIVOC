@@ -31,7 +31,7 @@ func NewCreateMedicine(ctx *middleware.Context, handler CreateMedicineHandler) *
 	return &CreateMedicine{Context: ctx, Handler: handler}
 }
 
-/* CreateMedicine swagger:route POST /medicines createMedicine
+/*CreateMedicine swagger:route POST /medicines createMedicine
 
 Create Medicine
 
@@ -47,6 +47,7 @@ func (o *CreateMedicine) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewCreateMedicineParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *CreateMedicine) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
