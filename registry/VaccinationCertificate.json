@@ -52,6 +52,9 @@
         },
         "meta": {
           "type": "object"
+        },
+        "dose": {
+          "type": "number"
         }
       }
     }
