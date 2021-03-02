@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
@@ -32,7 +31,7 @@ func NewInitializeFacilitySlots(ctx *middleware.Context, handler InitializeFacil
 	return &InitializeFacilitySlots{Context: ctx, Handler: handler}
 }
 
-/* InitializeFacilitySlots swagger:route POST /facility/slots/init initializeFacilitySlots
+/*InitializeFacilitySlots swagger:route POST /facility/slots/init initializeFacilitySlots
 
 Initialize facility slots
 
@@ -48,12 +47,14 @@ func (o *InitializeFacilitySlots) ServeHTTP(rw http.ResponseWriter, r *http.Requ
 		r = rCtx
 	}
 	var Params = NewInitializeFacilitySlotsParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -69,11 +70,6 @@ type InitializeFacilitySlotsBody struct {
 
 // Validate validates this initialize facility slots body
 func (o *InitializeFacilitySlotsBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this initialize facility slots body based on context it is used
-func (o *InitializeFacilitySlotsBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

@@ -108,11 +108,16 @@ export const Members = () => {
             })
     }
 
-    function callCancelAppointment() {
+    function callCancelAppointment(member) {
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"Authorization": token, "Content-Type": "application/json"},
-            data: {enrollmentCode: members[selectedMemberIndex].code}
+            data: {
+                enrollmentCode: members[selectedMemberIndex].code,
+                // TODO: Hard coded logic, in future (program,dose) needed to delete an appointment
+                programId: member["appointments"][0]["programId"],
+                dose: member["appointments"][0]["programId"],
+            }
         };
 
         axios.delete("/divoc/api/citizen/appointment", config)
@@ -195,7 +200,7 @@ export const Members = () => {
                             <span
                                 className="mt-1">{formatDate(members[selectedMemberIndex].appointmentDate || "")}, {members[selectedMemberIndex].appointmentSlot || ""}</span>
                             <CustomButton className="blue-btn" onClick={() => {
-                                callCancelAppointment()
+                                callCancelAppointment(members[selectedMemberIndex])
                             }}>CONFIRM</CustomButton>
                         </div>
                     </div>

@@ -142,6 +142,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         delete dataToSend["state"];
         delete dataToSend["district"];
         delete dataToSend["contact"];
+        delete dataToSend["programId"]
         dataToSend["yob"] = parseInt(dataToSend["yob"]);
         dataToSend["address"] = {
             "addressLine1": "",
@@ -154,6 +155,11 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         dataToSend["address"]["district"] = formData.district;
         dataToSend["phone"] = getUserNumberFromRecipientToken();
         dataToSend["beneficiaryPhone"] = formData.contact
+        // While registering the user, By default user will be assigned to the selected program with dose 1
+        dataToSend["appointments"] = [{
+            "programId": formData.programId,
+            "dose": "1"
+        }]
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"Authorization": token, "Content-Type": "application/json"},

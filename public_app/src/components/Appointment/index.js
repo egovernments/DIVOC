@@ -160,7 +160,10 @@ export const Appointment = (props) => {
 
         axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
-            facilitySlotId: selectedAllotment.slotKey
+            facilitySlotId: selectedAllotment.slotKey,
+            programId: program_id,
+            // dose func is not yet configured
+            dose: "1"
         }, config)
             .then(res => {
                 history.push("/" + enrollment_code + "/appointment/confirm")

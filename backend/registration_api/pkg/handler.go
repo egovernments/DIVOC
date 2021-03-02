@@ -276,6 +276,8 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 				if isMarked {
 					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
 					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
+						Dose: *params.Body.Dose,
+						ProgramId: *params.Body.ProgramID,
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,

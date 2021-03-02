@@ -4,6 +4,8 @@ import "time"
 
 type AppointmentAck struct {
 	EnrollmentCode  string
+	ProgramId		string
+	Dose			string
 	SlotID          string
 	FacilityCode    string
 	AppointmentDate string

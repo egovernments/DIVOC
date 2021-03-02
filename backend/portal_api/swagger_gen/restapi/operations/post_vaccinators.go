@@ -31,7 +31,7 @@ func NewPostVaccinators(ctx *middleware.Context, handler PostVaccinatorsHandler)
 	return &PostVaccinators{Context: ctx, Handler: handler}
 }
 
-/* PostVaccinators swagger:route POST /vaccinators postVaccinators
+/*PostVaccinators swagger:route POST /vaccinators postVaccinators
 
 Upload facility csv for bulk ingestion
 
@@ -47,6 +47,7 @@ func (o *PostVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewPostVaccinatorsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *PostVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

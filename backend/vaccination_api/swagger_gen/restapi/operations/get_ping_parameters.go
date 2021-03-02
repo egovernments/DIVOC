@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetPingParams creates a new GetPingParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetPingParams() GetPingParams {
 
 	return GetPingParams{}

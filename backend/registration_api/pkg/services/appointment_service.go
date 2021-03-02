@@ -34,6 +34,7 @@ func worker(workerID int, appointmentSchedulerChannel <-chan models.FacilitySche
 }
 
 func AddFacilityScheduleToChannel(serviceReq models.FacilitySchedule) {
+	log.Info("Published the message to channel")
 	appointmentScheduleChannel <- serviceReq
 }
 

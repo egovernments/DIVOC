@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -68,6 +67,7 @@ func (m *CreateMedicineRequest) Validate(formats strfmt.Registry) error {
 }
 
 func (m *CreateMedicineRequest) validateDoseIntervals(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.DoseIntervals) { // not required
 		return nil
 	}
@@ -124,6 +124,7 @@ func (m *CreateMedicineRequest) validateStatusEnum(path, location string, value 
 }
 
 func (m *CreateMedicineRequest) validateStatus(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -169,6 +170,7 @@ func (m *CreateMedicineRequest) validateVaccinationModeEnum(path, location strin
 }
 
 func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -176,38 +178,6 @@ func (m *CreateMedicineRequest) validateVaccinationMode(formats strfmt.Registry)
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this create medicine request based on the context it is used
-func (m *CreateMedicineRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateDoseIntervals(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *CreateMedicineRequest) contextValidateDoseIntervals(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.DoseIntervals); i++ {
-
-		if m.DoseIntervals[i] != nil {
-			if err := m.DoseIntervals[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -248,11 +218,6 @@ type CreateMedicineRequestDoseIntervalsItems0 struct {
 
 // Validate validates this create medicine request dose intervals items0
 func (m *CreateMedicineRequestDoseIntervalsItems0) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this create medicine request dose intervals items0 based on context it is used
-func (m *CreateMedicineRequestDoseIntervalsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
