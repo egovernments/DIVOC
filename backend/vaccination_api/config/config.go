@@ -55,6 +55,7 @@ var Config = struct {
 	Kafka struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 	}
@@ -66,10 +67,10 @@ var Config = struct {
 		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
 	Redis struct {
-		Host 		string `env:"REDIS_HOST"`
-		Port 		string `default:"6379" env:"REDIS_PORT"`
-		Password 	string `default:"" env:"REDIS_PASSWORD"`
-		DB          int `default:"0" env:"REDIS_DB"`
+		Host     string `env:"REDIS_HOST"`
+		Port     string `default:"6379" env:"REDIS_PORT"`
+		Password string `default:"" env:"REDIS_PASSWORD"`
+		DB       int    `default:"0" env:"REDIS_DB"`
 	}
 	Certificate struct {
 		Upload struct {

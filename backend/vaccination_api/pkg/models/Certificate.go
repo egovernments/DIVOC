@@ -1,0 +1,64 @@
+package models
+
+import "time"
+
+type Certificate struct {
+	Context           []string `json:"@context"`
+	Type              []string `json:"type"`
+	CredentialSubject struct {
+		Type        string `json:"type"`
+		ID          string `json:"id"`
+		RefId       string `json:"refId"`
+		Name        string `json:"name"`
+		Gender      string `json:"gender"`
+		Age         string `json:"age"`
+		Nationality string `json:"nationality"`
+		Address     struct {
+			StreetAddress  string `json:"streetAddress"`
+			StreetAddress2 string `json:"streetAddress2"`
+			District       string `json:"district"`
+			City           string `json:"city"`
+			AddressRegion  string `json:"addressRegion"`
+			AddressCountry string `json:"addressCountry"`
+		} `json:"address"`
+	} `json:"credentialSubject"`
+	Issuer       string `json:"issuer"`
+	IssuanceDate string `json:"issuanceDate"`
+	Evidence     []struct {
+		ID             string    `json:"id"`
+		FeedbackURL    string    `json:"feedbackUrl"`
+		InfoURL        string    `json:"infoUrl"`
+		Type           []string  `json:"type"`
+		Batch          string    `json:"batch"`
+		Vaccine        string    `json:"vaccine"`
+		Manufacturer   string    `json:"manufacturer"`
+		Date           time.Time `json:"date"`
+		EffectiveStart string    `json:"effectiveStart"`
+		EffectiveUntil string    `json:"effectiveUntil"`
+		Dose           int       `json:"dose"`
+		TotalDoses     int       `json:"totalDoses"`
+		Verifier       struct {
+			Name string `json:"name"`
+		} `json:"verifier"`
+		Facility struct {
+			Name    string `json:"name"`
+			Address struct {
+				StreetAddress  string `json:"streetAddress"`
+				StreetAddress2 string `json:"streetAddress2"`
+				District       string `json:"district"`
+				City           string `json:"city"`
+				AddressRegion  string `json:"addressRegion"`
+				AddressCountry string `json:"addressCountry"`
+				PostalCode     int64 `json:"postalCode"`
+			} `json:"address"`
+		} `json:"facility"`
+	} `json:"evidence"`
+	NonTransferable string `json:"nonTransferable"`
+	Proof           struct {
+		Type               string    `json:"type"`
+		Created            time.Time `json:"created"`
+		VerificationMethod string    `json:"verificationMethod"`
+		ProofPurpose       string    `json:"proofPurpose"`
+		Jws                string    `json:"jws"`
+	} `json:"proof"`
+}
