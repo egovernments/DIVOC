@@ -124,7 +124,7 @@ func LogProducerEvents(producerClient *kafka.Producer) {
 			switch ev := e.(type) {
 			case *kafka.Message:
 				if ev.TopicPartition.Error != nil {
-					log.Infof("Delivery failed: %v\n%+v", ev.TopicPartition, ev.Value)
+					log.Infof("Delivery failed: %v\n%+v", ev.TopicPartition, string(ev.Value))
 				} else {
 					log.Infof("Delivered message to %v\n", ev.TopicPartition)
 				}
