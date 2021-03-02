@@ -6,7 +6,6 @@ import (
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
-	"github.com/divoc/registration-api/models"
 	"github.com/divoc/registration-api/pkg/enrollment"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
@@ -24,6 +23,8 @@ const FacilityEntity = "Facility"
 const EnrollmentEntity = "Enrollment"
 const LastInitializedKey = "LAST_FACILITY_SLOTS_INITIALIZED"
 const YYYYMMDD = "2006-01-02"
+const AttemptsKey = "attempts"
+const OtpKey = "otp"
 
 var DaysMap = map[string]time.Weekday{
 	"Su": time.Sunday,
@@ -88,21 +89,25 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 		return operations.NewGenerateOTPBadRequest()
 	}
 	otp := utils.GenerateOTP()
-	cacheOtp, err := json.Marshal(models.CacheOTP{Otp: otp, VerifyAttemptCount: 0})
-	err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
-	if config.Config.MockOtp {
-		return operations.NewGenerateOTPOK()
-	}
-	if err == nil {
-		// Send SMS
-		if _, err := utils.SendOTP("+91", phone, otp); err == nil {
-			return operations.NewGenerateOTPOK()
+
+	if _, err := services.SetHMSet(phone, map[string]interface{}{OtpKey: otp, AttemptsKey: 0}); err == nil {
+		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil{
+			if config.Config.MockOtp {
+				return operations.NewGenerateOTPOK()
+			}
+			// Send SMS
+			if _, err := utils.SendOTP("+91", phone, otp); err == nil {
+				return operations.NewGenerateOTPOK()
+			} else {
+				log.Errorf("Error while sending OTP %+v", err)
+				return operations.NewGenerateOTPInternalServerError()
+			}
 		} else {
-			log.Errorf("Error while sending OTP %+v", err)
+			log.Errorf("Error occurred while trying to set ttl for hash %+v", err)
 			return operations.NewGenerateOTPInternalServerError()
 		}
 	} else {
-		log.Errorf("Error while setting otp in redis %+v", err)
+		log.Errorf("Error occurred while trying to cache the otp details %+v", err)
 		return operations.NewGenerateOTPInternalServerError()
 	}
 }
@@ -113,29 +118,22 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	if receivedOTP == "" {
 		return operations.NewVerifyOTPBadRequest()
 	}
-	value, err := services.GetValue(phone)
+	otpDetails, err := services.GetHashValues(phone)
 	if err != nil {
 		return model.NewGenericServerError()
 	}
-	if value == "" {
-		return operations.NewVerifyOTPUnauthorized()
+
+	if attemptsTried, err := services.IncrHashField(phone, AttemptsKey); err == nil {
+		if attemptsTried > config.Config.Auth.MAXOtpVerifyAttempts {
+			if err = services.DeleteValue(phone); err != nil {
+				log.Errorf("Error in clearing the OTP in redis %+v", err)
+				return model.NewGenericServerError()
+			}
+			return operations.NewVerifyOTPTooManyRequests()
+		}
 	}
 
-	cacheOTP := models.CacheOTP{}
-	if err := json.Unmarshal([]byte(value), &cacheOTP); err != nil {
-		log.Errorf("Error in marshalling json %+v", err)
-		return model.NewGenericServerError()
-	}
-	if cacheOTP.VerifyAttemptCount > config.Config.Auth.MAXOtpVerifyAttempts {
-		return operations.NewVerifyOTPTooManyRequests()
-	}
-	if cacheOTP.Otp != receivedOTP {
-		cacheOTP.VerifyAttemptCount += 1
-		if cacheOtp, err := json.Marshal(cacheOTP); err != nil {
-			log.Errorf("Error in setting verify count %+v", err)
-		} else {
-			err = services.SetValue(phone, string(cacheOtp), time.Duration(config.Config.Auth.TTLForOtp))
-		}
+	if otpDetails[OtpKey] != receivedOTP {
 		return operations.NewVerifyOTPUnauthorized()
 	}
 
@@ -170,7 +168,7 @@ func canInitializeSlots() bool {
 }
 
 func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
-
+	currentDate := time.Now()
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
@@ -194,8 +192,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 					if ok {
 						facilityCode := facility["facilityCode"].(string)
 						facilityOSID := facility["osid"].(string)
+						services.ClearOldSlots(facilityCode, currentDate.Unix())
 						log.Infof("Initializing facility %s slots", facilityCode)
-
 						facilityProgramArr, ok := facility["programs"].([]interface{})
 						facilityProgramWiseSchedule := services.GetFacilityAppointmentSchedule(facilityOSID)
 						if ok && len(facilityProgramArr) > 0 {
@@ -207,7 +205,6 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 									if ok && programStatus == "Active" {
 										programSchedule, ok := facilityProgramWiseSchedule[programId]
 										if ok {
-											currentDate := time.Now()
 											for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
@@ -220,7 +217,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 															FacilityCode: facilityCode,
 															ProgramId:    programId,
 															Date:         slotDate,
-															Time:         startTime + "_" + endTime,
+															StartTime:         startTime,
+															EndTime: 		endTime,
 															Slots:        maxAppointments,
 														}
 														log.Infof("Initializing facility slot %v", schedule)
@@ -243,12 +241,13 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	return operations.NewInitializeFacilitySlotsUnauthorized()
 }
 
-func getFacilitySlots(paras operations.GetSlotsForFacilitiesParams, principal *models3.JWTClaimBody) middleware.Responder {
-	if paras.FacilityID == nil {
+func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *models3.JWTClaimBody) middleware.Responder {
+	if params.FacilityID == nil {
 		return operations.NewGenerateOTPBadRequest()
 	}
-	startPosition := int64(*paras.PageNumber) * int64(*paras.PageSize)
-	slotKeys, err := services.GetValuesFromSet(*paras.FacilityID, startPosition, startPosition+int64(*paras.PageSize)-1)
+	offset := (*params.PageNumber) * (*params.PageSize)
+	now := fmt.Sprintf("%d", time.Now().Unix())
+	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, now, "inf", *params.PageSize, offset)
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {
@@ -279,11 +278,13 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 				if isMarked {
 					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
 					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
+						Dose: *params.Body.Dose,
+						ProgramId: *params.Body.ProgramID,
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
 						AppointmentDate: facilitySchedule.DateString(),
-						AppointmentTime: facilitySchedule.Time,
+						AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
 						CreatedAt:       time.Now(),
 						Status:          models2.AllottedStatus,
 					})
@@ -322,7 +323,7 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 		return operations.NewDeleteAppointmentBadRequest()
 	}
 
-	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone)
+	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone,*params.Body.Dose,*params.Body.ProgramID)
 	if deleteError == nil {
 		return operations.NewDeleteRecipientOK()
 	} else {
@@ -336,7 +337,7 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 	}
 }
 
-func deleteAppointmentInEnrollment(enrollmentCode string, phone string) error {
+func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose string, programId string) error {
 	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, phone)
 	if enrollmentInfo != nil {
 		if checkIfAlreadyAppointed(enrollmentInfo) {
@@ -350,6 +351,8 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string) error {
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
 							EnrollmentCode:  enrollmentCode,
+							Dose: dose,
+							ProgramId: programId,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",

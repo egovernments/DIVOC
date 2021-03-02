@@ -226,7 +226,7 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 	filter := make(map[string]interface{})
 	if params.Pincode != nil {
 		filter[FacilityPincodekey] = map[string]interface{}{
-			"eq": *params.Pincode,
+			"startsWith": *params.Pincode,
 		}
 	}
 	limit, offset := getLimitAndOffset(params.Limit, params.Offset)

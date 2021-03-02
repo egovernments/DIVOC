@@ -52,13 +52,21 @@ func init() {
               "type": "object",
               "required": [
                 "facilitySlotId",
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
                   "type": "string"
                 },
                 "facilitySlotId": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -95,10 +103,18 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -145,13 +161,13 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageSize",
             "in": "query"
@@ -436,13 +452,21 @@ func init() {
               "type": "object",
               "required": [
                 "facilitySlotId",
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
                   "type": "string"
                 },
                 "facilitySlotId": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -479,10 +503,18 @@ func init() {
             "schema": {
               "type": "object",
               "required": [
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -529,13 +561,13 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageSize",
             "in": "query"
@@ -778,6 +810,31 @@ func init() {
     }
   },
   "definitions": {
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
     "address": {
       "description": "Indian address format",
       "type": "object",
@@ -839,19 +896,14 @@ func init() {
         "address": {
           "$ref": "#/definitions/address"
         },
-        "appointmentDate": {
-          "type": "string",
-          "format": "date"
-        },
-        "appointmentSlot": {
-          "type": "string"
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
         },
         "beneficiaryPhone": {
           "type": "string"
-        },
-        "certified": {
-          "type": "boolean",
-          "default": false
         },
         "code": {
           "type": "string"
@@ -869,9 +921,6 @@ func init() {
         "email": {
           "type": "string"
         },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
         "gender": {
           "type": "string",
           "enum": [
@@ -887,9 +936,6 @@ func init() {
           "type": "string"
         },
         "phone": {
-          "type": "string"
-        },
-        "programId": {
           "type": "string"
         },
         "yob": {

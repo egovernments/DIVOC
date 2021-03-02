@@ -7,6 +7,7 @@ package models
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -22,18 +23,11 @@ type Enrollment struct {
 	// address
 	Address *Address `json:"address,omitempty"`
 
-	// appointment date
-	// Format: date
-	AppointmentDate strfmt.Date `json:"appointmentDate,omitempty"`
-
-	// appointment slot
-	AppointmentSlot string `json:"appointmentSlot,omitempty"`
+	// appointments
+	Appointments []*EnrollmentAppointmentsItems0 `json:"appointments"`
 
 	// beneficiary phone
 	BeneficiaryPhone string `json:"beneficiaryPhone,omitempty"`
-
-	// certified
-	Certified *bool `json:"certified,omitempty"`
 
 	// code
 	Code string `json:"code,omitempty"`
@@ -48,9 +42,6 @@ type Enrollment struct {
 	// email
 	Email string `json:"email,omitempty"`
 
-	// enrollment scope Id
-	EnrollmentScopeID string `json:"enrollmentScopeId,omitempty"`
-
 	// gender
 	// Enum: [Male Female Other]
 	Gender string `json:"gender,omitempty"`
@@ -64,9 +55,6 @@ type Enrollment struct {
 
 	// phone
 	Phone string `json:"phone,omitempty"`
-
-	// program Id
-	ProgramID string `json:"programId,omitempty"`
 
 	// yob
 	Yob int64 `json:"yob,omitempty"`
@@ -122,12 +110,24 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 
 func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
 
-	if swag.IsZero(m.AppointmentDate) { // not required
+	if swag.IsZero(m.Appointments) { // not required
 		return nil
 	}
 
-	if err := validate.FormatOf("appointmentDate", "body", "date", m.AppointmentDate.String(), formats); err != nil {
-		return err
+	for i := 0; i < len(m.Appointments); i++ {
+		if swag.IsZero(m.Appointments[i]) { // not required
+			continue
+		}
+
+		if m.Appointments[i] != nil {
+			if err := m.Appointments[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("appointments" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -212,6 +212,76 @@ func (m *Enrollment) MarshalBinary() ([]byte, error) {
 // UnmarshalBinary interface implementation
 func (m *Enrollment) UnmarshalBinary(b []byte) error {
 	var res Enrollment
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// EnrollmentAppointmentsItems0 enrollment appointments items0
+//
+// swagger:model EnrollmentAppointmentsItems0
+type EnrollmentAppointmentsItems0 struct {
+
+	// appointment date
+	// Format: date
+	AppointmentDate strfmt.Date `json:"appointmentDate,omitempty"`
+
+	// appointment slot
+	AppointmentSlot string `json:"appointmentSlot,omitempty"`
+
+	// certified
+	Certified *bool `json:"certified,omitempty"`
+
+	// dose
+	Dose string `json:"dose,omitempty"`
+
+	// enrollment scope Id
+	EnrollmentScopeID string `json:"enrollmentScopeId,omitempty"`
+
+	// program Id
+	ProgramID string `json:"programId,omitempty"`
+}
+
+// Validate validates this enrollment appointments items0
+func (m *EnrollmentAppointmentsItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateAppointmentDate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.AppointmentDate) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("appointmentDate", "body", "date", m.AppointmentDate.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *EnrollmentAppointmentsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *EnrollmentAppointmentsItems0) UnmarshalBinary(b []byte) error {
+	var res EnrollmentAppointmentsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

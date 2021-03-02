@@ -31,7 +31,7 @@ func NewEnrollRecipient(ctx *middleware.Context, handler EnrollRecipientHandler)
 	return &EnrollRecipient{Context: ctx, Handler: handler}
 }
 
-/* EnrollRecipient swagger:route POST /register enrollRecipient
+/*EnrollRecipient swagger:route POST /register enrollRecipient
 
 Enroll Recipient
 
@@ -47,6 +47,7 @@ func (o *EnrollRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewEnrollRecipientParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *EnrollRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

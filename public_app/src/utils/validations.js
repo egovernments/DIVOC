@@ -1,6 +1,11 @@
-export const isAllLetter = (inputTxt) =>{
-    const letters = /^[A-Za-z]+$/;
+export const isValidName = (inputTxt) =>{
+    const letters = /^[A-Za-z ]+$/;
     return inputTxt.match(letters);
+}
+
+export const isValidPincode = (inputTxt) => {
+    const pincodeRegEx = /^[1-9][0-9]{5}$/;
+    return inputTxt.match(pincodeRegEx)
 }
 
 /*

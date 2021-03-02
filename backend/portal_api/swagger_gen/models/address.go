@@ -6,8 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
-
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -17,7 +15,6 @@ import (
 // Address Address
 //
 // Indian address format
-// Example: [{"addressLine1":"no. 23, some lane, some road","addressLine2":"some nagar","district":"bangalore south","pincode":"560000","state":"Karnataka"}]
 //
 // swagger:model Address
 type Address struct {
@@ -41,7 +38,6 @@ type Address struct {
 	// The state schema
 	//
 	// State of address
-	// Example: ["Karnataka"]
 	// Required: true
 	State *string `json:"state"`
 }
@@ -118,11 +114,6 @@ func (m *Address) validateState(formats strfmt.Registry) error {
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this address based on context it is used
-func (m *Address) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

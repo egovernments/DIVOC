@@ -113,16 +113,32 @@ func (o *DeleteAppointmentBadRequestBody) UnmarshalBinary(b []byte) error {
 // swagger:model DeleteAppointmentBody
 type DeleteAppointmentBody struct {
 
+	// dose
+	// Required: true
+	Dose *string `json:"dose"`
+
 	// enrollment code
 	// Required: true
 	EnrollmentCode *string `json:"enrollmentCode"`
+
+	// program Id
+	// Required: true
+	ProgramID *string `json:"programId"`
 }
 
 // Validate validates this delete appointment body
 func (o *DeleteAppointmentBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := o.validateDose(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := o.validateEnrollmentCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateProgramID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -132,9 +148,27 @@ func (o *DeleteAppointmentBody) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
+func (o *DeleteAppointmentBody) validateDose(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"dose", "body", o.Dose); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (o *DeleteAppointmentBody) validateEnrollmentCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("body"+"."+"enrollmentCode", "body", o.EnrollmentCode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *DeleteAppointmentBody) validateProgramID(formats strfmt.Registry) error {
+
+	if err := validate.Required("body"+"."+"programId", "body", o.ProgramID); err != nil {
 		return err
 	}
 

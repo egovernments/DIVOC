@@ -3497,6 +3497,31 @@ func init() {
         }
       ]
     },
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -4359,19 +4384,14 @@ func init() {
             }
           ]
         },
-        "appointmentDate": {
-          "type": "string",
-          "format": "date"
-        },
-        "appointmentSlot": {
-          "type": "string"
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
         },
         "beneficiaryPhone": {
           "type": "string"
-        },
-        "certified": {
-          "type": "boolean",
-          "default": false
         },
         "code": {
           "type": "string"
@@ -4389,9 +4409,6 @@ func init() {
         "email": {
           "type": "string"
         },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
         "gender": {
           "type": "string",
           "enum": [
@@ -4407,9 +4424,6 @@ func init() {
           "type": "string"
         },
         "phone": {
-          "type": "string"
-        },
-        "programId": {
           "type": "string"
         },
         "yob": {

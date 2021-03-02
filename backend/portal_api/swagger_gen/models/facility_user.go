@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
@@ -66,6 +65,7 @@ func (m *FacilityUser) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Groups) { // not required
 		return nil
 	}
@@ -90,6 +90,7 @@ func (m *FacilityUser) validateGroups(formats strfmt.Registry) error {
 }
 
 func (m *FacilityUser) validateVaccinationRateLimits(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.VaccinationRateLimits) { // not required
 		return nil
 	}
@@ -101,60 +102,6 @@ func (m *FacilityUser) validateVaccinationRateLimits(formats strfmt.Registry) er
 
 		if m.VaccinationRateLimits[i] != nil {
 			if err := m.VaccinationRateLimits[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("vaccinationRateLimits" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ContextValidate validate this facility user based on the context it is used
-func (m *FacilityUser) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateGroups(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.contextValidateVaccinationRateLimits(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *FacilityUser) contextValidateGroups(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Groups); i++ {
-
-		if m.Groups[i] != nil {
-			if err := m.Groups[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("groups" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (m *FacilityUser) contextValidateVaccinationRateLimits(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.VaccinationRateLimits); i++ {
-
-		if m.VaccinationRateLimits[i] != nil {
-			if err := m.VaccinationRateLimits[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("vaccinationRateLimits" + "." + strconv.Itoa(i))
 				}
