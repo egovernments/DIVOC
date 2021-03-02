@@ -202,7 +202,7 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 									if ok && programStatus == "Active" {
 										programSchedule, ok := facilityProgramWiseSchedule[programId]
 										if ok {
-											for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
+											for i := 1; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
 												for _, programSchedule := range programSchedulesForDay {
