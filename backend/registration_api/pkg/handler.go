@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -14,7 +13,6 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 	"time"
 )
 
@@ -334,6 +332,8 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
 							EnrollmentCode:  *params.Body.EnrollmentCode,
+							Dose: *params.Body.Dose,
+							ProgramId: *params.Body.ProgramID,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",

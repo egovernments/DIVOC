@@ -114,9 +114,9 @@ export const Members = () => {
             headers: {"Authorization": token, "Content-Type": "application/json"},
             data: {
                 enrollmentCode: members[selectedMemberIndex].code,
-                // TODO: Hard coded logic, in future (program,dose) needed to delete an appointment
+                // TODO: MULTI_PROGRAMS_SUPPORT Hard coded logic, in future (program,dose) needed to delete an appointment
                 programId: member["appointments"][0]["programId"],
-                dose: member["appointments"][0]["programId"],
+                dose: member["appointments"][0]["dose"],
             }
         };
 
@@ -196,9 +196,9 @@ export const Members = () => {
                             <b>{members[selectedMemberIndex].name}</b>
                             <b className="text-center mt-1">Enrollment number: {members[selectedMemberIndex].code}</b>
                             <span
-                                className="mt-1">{`${members[selectedMemberIndex].facilityDetails.facilityName}, ${members[selectedMemberIndex].facilityDetails.district}, ${members[selectedMemberIndex].facilityDetails.state}, ${members[selectedMemberIndex].facilityDetails.pincode}`}</span>
+                                className="mt-1">{`${members[selectedMemberIndex]["appointments"][0].facilityDetails.facilityName}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.district}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.state}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.pincode}`}</span>
                             <span
-                                className="mt-1">{formatDate(members[selectedMemberIndex].appointmentDate || "")}, {members[selectedMemberIndex].appointmentSlot || ""}</span>
+                                className="mt-1">{formatDate(members[selectedMemberIndex]["appointments"][0].appointmentDate || "")}, {members[selectedMemberIndex]["appointments"][0].appointmentSlot || ""}</span>
                             <CustomButton className="blue-btn" onClick={() => {
                                 callCancelAppointment(members[selectedMemberIndex])
                             }}>CONFIRM</CustomButton>
@@ -214,7 +214,10 @@ const MemberCard = (props) => {
     const history = useHistory();
     const member = props.member;
     const program = props.programs.filter(p => p.id === member.programId)[0];
-    const isAppointmentBooked = !!member.enrollmentScopeId;
+
+    // Need to think about the logic to support multiple appointment
+    const isAppointmentBooked = !!member["appointments"][0].enrollmentScopeId;
+
 
     function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
         return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -263,17 +266,17 @@ const MemberCard = (props) => {
                                 <Col lg={isAppointmentBooked ? 12 : 6}
                                      className={`${!isAppointmentBooked && "invisible"}`}>
                                     <span style={{color: "#646D82"}}> Appointment: </span>
-                                    <span>{isAppointmentBooked && `${member.facilityDetails.facilityName}, ${member.facilityDetails.district}, ${member.facilityDetails.state}, ${member.facilityDetails.pincode}`}</span>
+                                    <span>{isAppointmentBooked && `${member["appointments"][0].facilityDetails.facilityName}, ${member["appointments"][0].facilityDetails.district}, ${member["appointments"][0].facilityDetails.state}, ${member["appointments"][0].facilityDetails.pincode}`}</span>
                                     <br/>
                                     <span className="invisible"> Appointment: </span>
                                     <span
-                                        className="">{formatDate(member.appointmentDate || "")}, {member.appointmentSlot || ""}</span>
+                                        className="">{formatDate(member["appointments"][0].appointmentDate || "")}, {member["appointments"][0].appointmentSlot || ""}</span>
                                 </Col>
                                 <Col lg={6} className="d-flex justify-content-end">
                                     <CustomButton className={`blue-btn m-0 ${isAppointmentBooked && "d-none"}`}
                                                   onClick={() => {
                                                       history.push({
-                                                          pathname: `/${member.code}/${member.programId}/appointment`,
+                                                          pathname: `/${member.code}/${member["appointments"][0].programId}/appointment`,
                                                           state: {name: member.name}
                                                       })
                                                   }}>{isAppointmentBooked ? "Edit" : "Book"}
