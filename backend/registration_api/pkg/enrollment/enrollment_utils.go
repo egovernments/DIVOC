@@ -1,6 +1,7 @@
 package enrollment
 
 import (
+	"errors"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/pkg/services"
 )
@@ -27,4 +28,17 @@ func GetOsid(enrollmentCode string) string {
 		//TODO: Get from query
 		return ""
 	}
+}
+
+func DeleteAppointment(enrollmentCode string, lastBookedSlotId string) error {
+	err := services.CancelBookedAppointment(lastBookedSlotId)
+	if err != nil {
+		return errors.New("Failed to cancel appointment")
+	} else {
+		isMarked := services.RevokeEnrollmentBookedStatus(enrollmentCode)
+		if isMarked {
+			return nil
+		}
+	}
+	return errors.New("Failed to cancel appointment")
 }

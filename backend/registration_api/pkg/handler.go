@@ -91,7 +91,7 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	otp := utils.GenerateOTP()
 
 	if _, err := services.SetHMSet(phone, map[string]interface{}{OtpKey: otp, AttemptsKey: 0}); err == nil {
-		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil{
+		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil {
 			if config.Config.MockOtp {
 				return operations.NewGenerateOTPOK()
 			}
@@ -217,8 +217,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 															FacilityCode: facilityCode,
 															ProgramId:    programId,
 															Date:         slotDate,
-															StartTime:         startTime,
-															EndTime: 		endTime,
+															StartTime:    startTime,
+															EndTime:      endTime,
 															Slots:        maxAppointments,
 														}
 														log.Infof("Initializing facility slot %v", schedule)
@@ -278,8 +278,8 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 				if isMarked {
 					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
 					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
-						Dose: *params.Body.Dose,
-						ProgramId: *params.Body.ProgramID,
+						Dose:            *params.Body.Dose,
+						ProgramId:       *params.Body.ProgramID,
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
@@ -323,7 +323,7 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 		return operations.NewDeleteAppointmentBadRequest()
 	}
 
-	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone,*params.Body.Dose,*params.Body.ProgramID)
+	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone, *params.Body.Dose, *params.Body.ProgramID)
 	if deleteError == nil {
 		return operations.NewDeleteRecipientOK()
 	} else {
@@ -351,8 +351,8 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
 							EnrollmentCode:  enrollmentCode,
-							Dose: dose,
-							ProgramId: programId,
+							Dose:            dose,
+							ProgramId:       programId,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",
@@ -385,12 +385,17 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 		return operations.NewDeleteRecipientUnauthorized()
 	}
 
-	/*phone := principal.Phone
-	deleteErr := deleteAppointmentInEnrollment(code, phone)
-	if deleteErr != nil {
-		log.Error(deleteErr.Error())
-		return operations.NewDeleteRecipientBadRequest()
-	}*/
+	enrollmentInfo := getEnrollmentInfoIfValid(code, phone)
+	if enrollmentInfo != nil {
+		if checkIfAlreadyAppointed(enrollmentInfo) {
+			deleteErr := enrollment.DeleteAppointment(code, enrollmentInfo["slotId"])
+			if deleteErr != nil {
+				log.Error(deleteErr.Error())
+				return operations.NewDeleteRecipientBadRequest()
+			}
+		}
+	}
+
 	osid := enrollment.GetOsid(code)
 	err := enrollment.DeleteRecipient(osid)
 
