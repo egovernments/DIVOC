@@ -115,7 +115,7 @@ function transformW3(cert, certificateId) {
         "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
         "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
         "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
-        "postalCode": R.pathOr(0, ['recipient', 'address', 'pincode'], cert),
+        "postalCode": R.pathOr("", ['recipient', 'address', 'pincode'], cert),
       }
     },
     issuer: "https://cowin.gov.in/",
@@ -149,7 +149,7 @@ function transformW3(cert, certificateId) {
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
           "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
-          "postalCode": R.pathOr(0, ['facility', 'address', 'pincode'], cert)
+          "postalCode": R.pathOr("", ['facility', 'address', 'pincode'], cert)
         },
         // "seal-image": "..."
       }
@@ -174,7 +174,8 @@ async function signAndSave(certificate, retryCount = 0) {
     mobile: mobile,
     preEnrollmentCode: preEnrollmentCode,
     certificateId: certificateId,
-    certificate: JSON.stringify(signedCertificate)
+    certificate: JSON.stringify(signedCertificate),
+    dose: currentDose
   };
   let resp = await registry.saveCertificate(signedCertificateForDB);
   if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
