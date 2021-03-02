@@ -43,35 +43,38 @@ func StartRecipientsAppointmentBookingConsumer() {
 						"eq": appointmentAckMessage.EnrollmentCode,
 					}
 					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil {
-						appointmentTData := make(map[string]interface{})
 						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
-
-						appointmentTData["appointmentSlot"] = appointmentAckMessage.AppointmentTime
-						appointmentTData["osid"] = enrollment["osid"]
-						appointmentTData["appointmentDate"] = appointmentAckMessage.AppointmentDate
-						appointmentTData["enrollmentScopeId"] = appointmentAckMessage.FacilityCode
-
-						log.Infof("Message on %s: %v \n", msg.TopicPartition, appointmentTData)
-
-						_, err := kernelService.UpdateRegistry("Enrollment", appointmentTData)
-						if err == nil {
-							if appointmentAckMessage.Status == models2.AllottedStatus {
-								err := services.NotifyAppointmentBooked(CreateEnrollmentFromInterface(enrollment, appointmentAckMessage.AppointmentDate,
-									appointmentAckMessage.AppointmentTime))
-								if err != nil {
-									log.Error("Unable to send notification to the enrolled user", err)
+						existingAppointments := enrollment["appointments"].([]interface{})
+						appointmentToUpdate := findTheAppointmentToUpdate(existingAppointments, appointmentAckMessage)
+						if appointmentToUpdate == nil {
+							log.Errorf("User didn't enroll for the given program (%v) and dose (%v)", appointmentAckMessage.ProgramId, appointmentAckMessage.Dose)
+						} else  {
+							parsedDate, err := time.Parse("2006-01-02", appointmentAckMessage.AppointmentDate)
+							if err == nil {
+								appointmentToUpdate["appointmentDate"] = strfmt.Date(parsedDate)
+								appointmentToUpdate["appointmentSlot"] = appointmentAckMessage.AppointmentTime
+								appointmentToUpdate["enrollmentScopeId"] = appointmentAckMessage.FacilityCode
+								appointmentToUpdate["certified"] = false
+								_, err = kernelService.UpdateRegistry("appointments", appointmentToUpdate)
+								if err == nil {
+									err := services.NotifyAppointmentBooked(CreateEnrollmentForNotificationTemplate(enrollment, appointmentAckMessage))
+									if err != nil {
+										log.Error("Unable to send notification to the enrolled user", err)
+									}
+								} else {
+									log.Error("Booking appointment is failed ", err)
 								}
+							} else {
+								// Push to error topic
+								log.Error("Date parsing failed ", err)
 							}
-						} else {
-							// Push to error topic
-							log.Error("Booking appointment is failed ", err)
 						}
 						_, _ = consumer.CommitMessage(msg)
 					} else {
-						log.Errorf("Unable to fetch the osid for Enrollment", err)
+						log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode, err)
 					}
 				} else {
-					log.Info("Unable to serialize the request body", err)
+					log.Info("Unable to serialize the ack message body", err)
 				}
 
 			} else {
@@ -82,23 +85,38 @@ func StartRecipientsAppointmentBookingConsumer() {
 	}()
 }
 
-func CreateEnrollmentFromInterface(enrollmentMap map[string]interface{}, appointmentDate string, appointmentTime string) models.Enrollment {
+func findTheAppointmentToUpdate(existingAppointments []interface{}, message models2.AppointmentAck) map[string]interface{} {
+	for _, appointment := range existingAppointments {
+		appointmentMap := appointment.(map[string]interface{})
+		if appointmentMap["programId"] == message.ProgramId && appointmentMap["dose"] == message.Dose {
+			log.Info("Found an appointment to update")
+			return appointmentMap
+		}
+	}
+	return nil
+}
 
-	appointmentDateFormat, err := time.Parse("2006-01-02", appointmentDate)
+func CreateEnrollmentForNotificationTemplate(enrollmentMap map[string]interface{}, message models2.AppointmentAck) models.Enrollment {
+	appointmentDateFormat, err := time.Parse("2006-01-02", message.AppointmentDate)
 	if err != nil {
-		log.Errorf("Invalid date format (%v) (%v)", appointmentDate, err)
+		log.Errorf("Invalid date format (%v) (%v)", message.AppointmentDate, err)
 		return models.Enrollment{}
 	} else {
 		email, emailOk := enrollmentMap["email"].(string)
 		if !emailOk {
 			email = ""
 		}
+		appointments := make([]*models.EnrollmentAppointmentsItems0, 1)
+		// In template there will be only one appointment in an appointments array
 		return models.Enrollment{
 			Name:            enrollmentMap["name"].(string),
 			Phone:           enrollmentMap["phone"].(string),
 			Email:           email,
-			AppointmentDate: strfmt.Date(appointmentDateFormat),
-			AppointmentSlot: appointmentTime,
+			Appointments: append(appointments, &models.EnrollmentAppointmentsItems0{
+				AppointmentDate: strfmt.Date(appointmentDateFormat),
+				AppointmentSlot: message.AppointmentTime,
+				Dose:            message.Dose,
+			}),
 		}
 	}
 }

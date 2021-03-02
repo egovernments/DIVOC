@@ -1,10 +1,11 @@
 package services
 
 import (
-	"github.com/divoc/kernel_library/services"
-	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
+
+	"github.com/divoc/kernel_library/services"
+	log "github.com/sirupsen/logrus"
 )
 
 const FacilityProgramSlot = "FacilityProgramSlot"
@@ -50,23 +51,26 @@ func convertToProgramWiseDaySchedule(schedules []interface{}) ProgramDaySchedule
 			appointmentSchedule := appointmentScheduleObj.(map[string]interface{})
 			startTime := appointmentSchedule["startTime"].(string)
 			endTime := appointmentSchedule["endTime"].(string)
-			for _, dayScheduleObj := range appointmentSchedule["days"].([]interface{}) {
-				dayScheduleObj := dayScheduleObj.(map[string]interface{})
-				day := dayScheduleObj["day"].(string)
-				maxAppointments := strconv.Itoa(int(dayScheduleObj["maxAppointments"].(float64)))
-				schedule := map[string]string{
-					"startTime":       startTime,
-					"endTime":         endTime,
-					"maxAppointments": maxAppointments,
+			if appointmentSchedule["days"] != nil {
+				for _, dayScheduleObj := range appointmentSchedule["days"].([]interface{}) {
+					dayScheduleObj := dayScheduleObj.(map[string]interface{})
+					day := dayScheduleObj["day"].(string)
+					schedule := map[string]string{
+						"startTime":       startTime,
+						"endTime":         endTime,
+					}
+					if dayScheduleObj["maxAppointments"] != nil {
+						schedule["maxAppointments"] = strconv.Itoa(int(dayScheduleObj["maxAppointments"].(float64)))
+					}
+					weekday := DaysMap[day]
+					if programWiseDaySchedule[programId] == nil {
+						programWiseDaySchedule[programId] = make(daySchedule)
+					}
+					if programWiseDaySchedule[programId][weekday] == nil {
+						programWiseDaySchedule[programId][weekday] = []map[string]string{}
+					}
+					programWiseDaySchedule[programId][weekday] = append(programWiseDaySchedule[programId][weekday], schedule)
 				}
-				weekday := DaysMap[day]
-				if programWiseDaySchedule[programId] == nil {
-					programWiseDaySchedule[programId] = make(daySchedule)
-				}
-				if programWiseDaySchedule[programId][weekday] == nil {
-					programWiseDaySchedule[programId][weekday] = []map[string]string{}
-				}
-				programWiseDaySchedule[programId][weekday] = append(programWiseDaySchedule[programId][weekday], schedule)
 			}
 		}
 	}

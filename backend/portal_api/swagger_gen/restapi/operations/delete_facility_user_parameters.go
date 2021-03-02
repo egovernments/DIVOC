@@ -14,8 +14,7 @@ import (
 )
 
 // NewDeleteFacilityUserParams creates a new DeleteFacilityUserParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewDeleteFacilityUserParams() DeleteFacilityUserParams {
 
 	return DeleteFacilityUserParams{}
@@ -50,6 +49,7 @@ func (o *DeleteFacilityUserParams) BindRequest(r *http.Request, route *middlewar
 	if err := o.bindUserID(rUserID, rhkUserID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -65,6 +65,7 @@ func (o *DeleteFacilityUserParams) bindUserID(rawData []string, hasKey bool, for
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.UserID = raw
 
 	return nil

@@ -16,8 +16,7 @@ import (
 )
 
 // NewGetFacilitiesParams creates a new GetFacilitiesParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetFacilitiesParams() GetFacilitiesParams {
 
 	return GetFacilitiesParams{}
@@ -125,6 +124,7 @@ func (o *GetFacilitiesParams) BindRequest(r *http.Request, route *middleware.Mat
 	if err := o.bindType(qType, qhkType, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -140,10 +140,10 @@ func (o *GetFacilitiesParams) bindDistrict(rawData []string, hasKey bool, format
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.District = &raw
 
 	return nil
@@ -158,7 +158,6 @@ func (o *GetFacilitiesParams) bindLimit(rawData []string, hasKey bool, formats s
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
@@ -181,7 +180,6 @@ func (o *GetFacilitiesParams) bindOffset(rawData []string, hasKey bool, formats 
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
@@ -204,10 +202,10 @@ func (o *GetFacilitiesParams) bindProgramID(rawData []string, hasKey bool, forma
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.ProgramID = &raw
 
 	return nil
@@ -222,10 +220,10 @@ func (o *GetFacilitiesParams) bindProgramStatus(rawData []string, hasKey bool, f
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.ProgramStatus = &raw
 
 	return nil
@@ -240,10 +238,10 @@ func (o *GetFacilitiesParams) bindRateUpdatedFrom(rawData []string, hasKey bool,
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.RateUpdatedFrom = &raw
 
 	return nil
@@ -258,10 +256,10 @@ func (o *GetFacilitiesParams) bindRateUpdatedTo(rawData []string, hasKey bool, f
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.RateUpdatedTo = &raw
 
 	return nil
@@ -276,10 +274,10 @@ func (o *GetFacilitiesParams) bindState(rawData []string, hasKey bool, formats s
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.State = &raw
 
 	return nil
@@ -294,10 +292,10 @@ func (o *GetFacilitiesParams) bindType(rawData []string, hasKey bool, formats st
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.Type = &raw
 
 	return nil

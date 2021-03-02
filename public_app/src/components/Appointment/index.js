@@ -40,24 +40,20 @@ export const Appointment = (props) => {
         if (searchText === "" || searchText.length > 3) {
             setIsLoading(true);
             let params = {
-                // pincode: searchText
+                pincode: searchText
             };
             params = reject(equals(''))(params);
             const queryParams = new URLSearchParams(params);
             axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
                 .then(res => {
                     const {facilities, facilitiesSchedule} = res.data;
-                    let data = facilities.map(d => {
-                        return d
-                    });
                     let schedule = {};
                     facilitiesSchedule.map(d => {
                         if (d.facilityId) {
                             schedule[d.facilityId] = d
                         }
                     });
-                    data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
-                    setFacilities(data);
+                    setFacilities(facilities.filter(d => d.osid in schedule));
                     setFacilitiesSchedule(schedule);
                     setIsLoading(false);
                 });
@@ -77,11 +73,11 @@ export const Appointment = (props) => {
         return (
             <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
-                    <h5>Available Time Slots for {facility.facilityName}</h5>
+                    <h5>Available Time Slots for {facility?.facilityName}</h5>
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
-                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility.osid]}
+                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility?.osid]}
                                    showModal={(allotmentDate, allotmentTime, slotKey) => {
                                        if (facility) {
                                            setShowModal(true)
@@ -160,7 +156,10 @@ export const Appointment = (props) => {
 
         axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
-            facilitySlotId: selectedAllotment.slotKey
+            facilitySlotId: selectedAllotment.slotKey,
+            programId: program_id,
+            // dose func is not yet configured
+            dose: "1"
         }, config)
             .then(res => {
                 history.push("/" + enrollment_code + "/appointment/confirm")
