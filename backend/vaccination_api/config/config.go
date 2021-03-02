@@ -58,6 +58,7 @@ var Config = struct {
 		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
@@ -67,8 +68,7 @@ var Config = struct {
 		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
 	Redis struct {
-		Host     string `env:"REDIS_HOST"`
-		Port     string `default:"6379" env:"REDIS_PORT"`
+		Url      string `env:"REDIS_URL" default:"redis://0.0.0.0:6379"`
 		Password string `default:"" env:"REDIS_PASSWORD"`
 		DB       int    `default:"0" env:"REDIS_DB"`
 	}

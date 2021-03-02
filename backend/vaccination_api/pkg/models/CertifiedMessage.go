@@ -8,6 +8,6 @@ type CertifiedMessage struct {
 	Mobile            string   `json:"mobile"`
 	PreEnrollmentCode string   `json:"preEnrollmentCode"`
 	CertificateId     string   `json:"certificateId"`
-	Certificate       Certificate `json:"certificate"`
+	Certificate       *Certificate `json:"certificate"`
 	Meta              models.CertificationRequestV2Meta `json:"meta"`
 }

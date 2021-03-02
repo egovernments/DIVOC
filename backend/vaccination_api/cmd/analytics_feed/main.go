@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
-	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
@@ -161,10 +160,10 @@ dt Date
 	//	}
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
-	go startCertificateEventConsumer(err, connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic)
-	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic)
-	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic)
+	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic, "latest")
+	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
 	wg.Wait()
 }
 
@@ -191,11 +190,11 @@ func initClickhouse() *sql.DB {
 
 type MessageCallback func(*sql.DB, string) error
 
-func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string) {
+func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string, resetOption string) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "analytics_feed",
-		"auto.offset.reset":  "earliest",
+		"auto.offset.reset":  resetOption,
 		"enable.auto.commit": "false",
 	})
 
@@ -378,6 +377,10 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
 	}
+	if certifiedMessage.Certificate == nil {
+		log.Infof("Ignoring invalid message %+v", msg)
+		return nil
+	}
 	if certifiedMessage.Meta.VaccinationApp == nil {
 		certifiedMessage.Meta.VaccinationApp = &models2.CertificationRequestV2MetaVaccinationApp{}
 	}
@@ -451,17 +454,17 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		evidence.Batch,
 		evidence.Vaccine,
 		evidence.Manufacturer,
-		getDate(evidence.Date.String()),
+		evidence.Date,
 		evidence.EffectiveStart,
 		evidence.EffectiveUntil,
-		pkg.ToInt(evidence.Dose),
-		pkg.ToInt(evidence.TotalDoses),
+		evidence.Dose,
+		evidence.TotalDoses,
 
 		evidence.Facility.Name,
 		"IN",
 		evidence.Facility.Address.AddressRegion,
 		evidence.Facility.Address.District,
-		strconv.Itoa(int(evidence.Facility.Address.PostalCode)),
+		certifiedMessage.Certificate.GetFacilityPostalCode(),
 		evidence.Verifier.Name,
 
 		certifiedMessage.Meta.VaccinationApp.Name,

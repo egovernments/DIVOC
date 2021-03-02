@@ -1,6 +1,9 @@
 package models
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -43,13 +46,13 @@ type Certificate struct {
 		Facility struct {
 			Name    string `json:"name"`
 			Address struct {
-				StreetAddress  string `json:"streetAddress"`
-				StreetAddress2 string `json:"streetAddress2"`
-				District       string `json:"district"`
-				City           string `json:"city"`
-				AddressRegion  string `json:"addressRegion"`
-				AddressCountry string `json:"addressCountry"`
-				PostalCode     int64 `json:"postalCode"`
+				StreetAddress  string      `json:"streetAddress"`
+				StreetAddress2 string      `json:"streetAddress2"`
+				District       string      `json:"district"`
+				City           string      `json:"city"`
+				AddressRegion  string      `json:"addressRegion"`
+				AddressCountry string      `json:"addressCountry"`
+				PostalCode     interface{} `json:"postalCode"`
 			} `json:"address"`
 		} `json:"facility"`
 	} `json:"evidence"`
@@ -61,4 +64,11 @@ type Certificate struct {
 		ProofPurpose       string    `json:"proofPurpose"`
 		Jws                string    `json:"jws"`
 	} `json:"proof"`
+}
+
+func (certificate *Certificate) GetFacilityPostalCode() string {
+	if postalCode, ok := certificate.Evidence[0].Facility.Address.PostalCode.(float64); ok {
+		return strconv.Itoa(int(postalCode))
+	}
+	return certificate.Evidence[0].Facility.Address.PostalCode.(string)
 }

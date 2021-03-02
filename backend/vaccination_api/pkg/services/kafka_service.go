@@ -28,22 +28,23 @@ func InitializeKafka() {
 	if err != nil {
 		panic(err)
 	}
-	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  servers,
-		"group.id":           "certify_ack",
-		"auto.offset.reset":  "earliest",
-		"enable.auto.commit": "false",
-	})
-	if err != nil {
-		panic(err)
-	}
+
 	log.Infof("Connected to kafka on %s", servers)
 
-	//defer func() {
-	//	log.Info("Closing the producer!")
-	//	producer.Close()
-	//}()
+	StartCertifyProducer(producer)
 
+	StartEventProducer(producer)
+
+	StartReportedSideEffectsProducer(producer)
+
+	if config.Config.Kafka.EnableCertificateAck {
+		startAcknowledgementConsumer(servers)
+	}
+
+	LogProducerEvents(producer)
+}
+
+func StartCertifyProducer(producer *kafka.Producer) {
 	go func() {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
@@ -60,9 +61,9 @@ func InitializeKafka() {
 			}
 		}
 	}()
+}
 
-	StartEventProducer(producer)
-
+func StartReportedSideEffectsProducer(producer *kafka.Producer) {
 	go func() {
 		topic := config.Config.Kafka.ReportedSideEffectsTopic
 		for {
@@ -75,8 +76,20 @@ func InitializeKafka() {
 			}
 		}
 	}()
+}
 
+func startAcknowledgementConsumer(servers string) {
 	go func() {
+		consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+			"bootstrap.servers":  servers,
+			"group.id":           "certify_ack",
+			"auto.offset.reset":  "earliest",
+			"enable.auto.commit": "false",
+		})
+		if err != nil {
+			panic(err)
+		}
+
 		consumer.SubscribeTopics([]string{"certify_ack"}, nil)
 
 		for {
@@ -113,8 +126,6 @@ func InitializeKafka() {
 			}
 		}
 	}()
-
-	LogProducerEvents(producer)
 }
 
 func LogProducerEvents(producerClient *kafka.Producer) {

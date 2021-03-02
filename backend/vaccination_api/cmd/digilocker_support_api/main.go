@@ -374,18 +374,18 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-var rdb *redis.Client
+var redisClient *redis.Client
 
 func initRedis(){
-	rdb = redis.NewClient(&redis.Options{
-	Addr:     config.Config.Redis.Host + ":" + config.Config.Redis.Port,
-	Password: config.Config.Redis.Password,
-	DB:       config.Config.Redis.DB,
-	})
+	options, err := redis.ParseURL(config.Config.Redis.Url)
+	if err != nil {
+		panic(err)
+	}
+	redisClient = redis.NewClient(options)
 }
 
 func getSignedJson(preEnrollmentCode string) (string, error) {
-	if cachedCertificate, err := rdb.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
 		log.Infof("Error while looking up cache %+v", err)
 	} else {
 		if cachedCertificate != "" {
@@ -469,7 +469,7 @@ func main() {
 	config.Initialize()
 	initializeKafka()
 	initRedis()
-	log.Infof("rdb %+v", rdb)
+	log.Infof("redisClient %+v", redisClient)
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.Handle("/metrics", promhttp.Handler())
