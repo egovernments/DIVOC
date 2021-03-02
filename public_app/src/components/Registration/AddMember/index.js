@@ -28,6 +28,7 @@ const steps = [
 ];
 
 const defaultData = {
+  "choice":"yes",
   "programId": "",
   "nationalId": "",
   "name": "",
@@ -131,6 +132,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   const conditions = ["Heart Problem", "Diabetes", "Asthma", "Cystic fibrosis", "Hypertension or BP", "Liver disease", "Pulmonary fibrosis", "Neurologic conditions"];
   const years = [];
   const curYear = new Date().getFullYear();
+  const [showCommorbidity, setShowCommorbidity] = useState("yes");
 
   const [minAge, setMinAge] = useState(50);
 
@@ -188,6 +190,13 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     setValue({target: {name: "comorbidities", value: updatedList}})
   }
 
+  function showComorbiditiesHandler(event) {
+    setShowCommorbidity(event.target.value)
+    setValue({target: {name: "choice", value: event.target.value}})
+    if (event.target.value === "no") {
+      setValue({target: {name: "comorbidities", value: []}})
+    }
+  }
 
   return (
     <Container fluid>
@@ -213,19 +222,32 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
             </div>
           </div>
           <div className="pt-5">
-            <label>Does the beneficiary have any of the following comorbidities?</label>
-            <Row className={"col-6 ml-0"}>
-              {
-                conditions.map(x =>
-                  <div className="col-md-6">
-                    <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
-                           value={x} id={x} onChange={(e) => {
-                      selectComorbidity(e.target);
-                    }}/>
-                    <label className="form-check-label" htmlFor={x}>{x}</label>
-                  </div>)
-              }
-            </Row>
+              <p style={{fontSize:"1.1rem"}}>Does the beneficiary have any of the following comorbidities?</p>
+              <div className="pl-2 form-check form-check-inline">
+                <input className="form-check-input" type="radio" onChange={showComorbiditiesHandler}
+                       id="yes" name="choice" value="yes" defaultChecked checked={formData.choice === "yes"}/>
+                <label className="form-check-label" htmlFor="yes">Yes</label>
+              </div>
+              <div className="pl-2 form-check form-check-inline">
+                <input className="form-check-input" type="radio"  onChange={showComorbiditiesHandler}
+                       id="no" name="choice" value="no" checked={formData.choice === "no"}/>
+                <label className="form-check-label" htmlFor="no">No</label>
+              </div>
+            <div hidden={formData.choice === "no"} className="pt-3">
+              <p>If Yes, Please select comorbidity</p>
+              <Row className={"col-6 ml-0"}>
+                {
+                  conditions.map(x =>
+                    <div className="col-md-6">
+                      <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
+                             value={x} id={x} onChange={(e) => {
+                        selectComorbidity(e.target);
+                      }}/>
+                      <label className="form-check-label" htmlFor={x}>{x}</label>
+                    </div>)
+                }
+              </Row>
+            </div>
           </div>
         </div>
         <div className="pt-3">
