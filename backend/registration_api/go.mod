@@ -15,6 +15,7 @@ require (
 	github.com/go-openapi/swag v0.19.11
 	github.com/go-openapi/validate v0.19.12
 	github.com/go-redis/redis v6.15.9+incompatible
+	github.com/go-redis/redis/v8 v8.6.0
 	github.com/golang/protobuf v1.4.3 // indirect
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/google/uuid v1.1.2 // indirect

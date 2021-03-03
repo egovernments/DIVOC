@@ -42,7 +42,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 					filter["code"] = map[string]interface{}{
 						"eq": appointmentAckMessage.EnrollmentCode,
 					}
-					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil {
+					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil && len(responseFromRegistry["Enrollment"].([]interface{})) > 0{
 						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
 						existingAppointments := enrollment["appointments"].([]interface{})
 						appointmentToUpdate := findTheAppointmentToUpdate(existingAppointments, appointmentAckMessage)

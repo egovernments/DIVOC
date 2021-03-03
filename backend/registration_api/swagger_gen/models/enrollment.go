@@ -68,7 +68,7 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateAppointmentDate(formats); err != nil {
+	if err := m.validateAppointments(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -108,7 +108,7 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Enrollment) validateAppointmentDate(formats strfmt.Registry) error {
+func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
 
 	if swag.IsZero(m.Appointments) { // not required
 		return nil

@@ -377,36 +377,30 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 }
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
-	code := *params.Body.EnrollmentCode
-	phone := principal.Phone
-
-	enrollmentDetails, detailsErr := services.GetHashValues(code)
-	if detailsErr != nil || enrollmentDetails["phone"] != phone {
-		return operations.NewDeleteRecipientUnauthorized()
-	}
-
-	enrollmentInfo := getEnrollmentInfoIfValid(code, phone)
-	if enrollmentInfo != nil {
-		if checkIfAlreadyAppointed(enrollmentInfo) {
-			deleteErr := enrollment.DeleteAppointment(code, enrollmentInfo["slotId"])
-			if deleteErr != nil {
-				log.Error(deleteErr.Error())
+	enrollmentCode := *params.Body.EnrollmentCode
+	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, principal.Phone)
+	if enrollmentInfo != nil && !checkIfAlreadyAppointed(enrollmentInfo) {
+		if osid, ok := enrollmentInfo["osid"]; ok {
+			err := enrollment.DeleteRecipient(osid)
+			if err != nil {
+				log.Error(err)
 				return operations.NewDeleteRecipientBadRequest()
+			} else {
+				err := services.DeleteValue(enrollmentCode)
+				log.Error(err)
 			}
+			return operations.NewDeleteRecipientOK()
 		}
-	}
-
-	osid := enrollment.GetOsid(code)
-	err := enrollment.DeleteRecipient(osid)
-
-	if err != nil {
-		log.Error(err)
-		return operations.NewDeleteRecipientBadRequest()
 	} else {
-		err := services.DeleteValue(code)
-		log.Error(err)
+		errorMessage := "Deleting a recipient is not allowed if appointment is scheduled."
+		response := operations.NewDeleteAppointmentBadRequest()
+		response.Payload = &operations.DeleteAppointmentBadRequestBody{
+			Message: errorMessage,
+		}
+		log.Info(errorMessage)
+		return response
 	}
-	return operations.NewDeleteRecipientOK()
+	return operations.NewDeleteRecipientBadRequest()
 }
 
 func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {
