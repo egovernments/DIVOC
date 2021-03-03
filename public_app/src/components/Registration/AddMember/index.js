@@ -128,20 +128,22 @@ export const AddMembersFlow = () => {
 
 const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   const history = useHistory();
+  const MINIMUM_SUPPORT_YEAR = 1920;
   const [errors, setErrors] = useState({});
-  const conditions = ["Heart Problem", "Diabetes", "Asthma", "Cystic fibrosis", "Hypertension or BP", "Liver disease", "Pulmonary fibrosis", "Neurologic conditions"];
+  const [conditions, setConditions] = useState([])
   const years = [];
   const curYear = new Date().getFullYear();
   const [showCommorbidity, setShowCommorbidity] = useState("yes");
 
   const [minAge, setMinAge] = useState(50);
+  const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
 
   useEffect(() => {
     const data = {
+      "flagKey": "programs",
       "entityContext": {
-
-      },
-      "flagKey": "country_specific_features"
+        "programId": formData.programId
+      }
     };
     axios
       .post("/config/api/v1/evaluation", data)
@@ -152,22 +154,42 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
         console.log(err)
       })
       .then((result) => {
-        setMinAge(result["variantAttachment"].registrationMinAge)
+        if(result["variantAttachment"]) {
+          setConditions(result["variantAttachment"].commorbidities || [])
+          setMinAge(result["variantAttachment"].minAge)
+          setMaxAge(result["variantAttachment"].maxAge)
+        } else {
+          console.error("program eligibility criteria is not configure");
+        }
       })
   }, []);
 
-  for (let i = 1920; i < curYear; i++) {
+  for (let i = MINIMUM_SUPPORT_YEAR; i < curYear; i++) {
     years.push("" + i)
   }
   const {previous, next} = navigation;
 
   function onNext() {
-    if (formData.yob && formData.yob > 1900 &&
-      ((curYear - formData.yob) >= minAge || formData.comorbidities.length>0)) {
+    function isValidAge() {
+      return (curYear - formData.yob) >= minAge && (curYear - formData.yob) <= maxAge;
+    }
+
+    if(formData.choice === "yes" && formData.comorbidities.length === 0) {
+      setErrors({...errors, "choice":"* Please select at least one comorbidity"});
+    }
+    else if (formData.yob && formData.yob > 1900 && formData.choice === "yes" &&
+      (isValidAge() || formData.comorbidities.length>0)) {
       next()
-    } else if (formData.yob) {
+    } else if(formData.yob && formData.yob > 1900 && formData.choice === "no" && isValidAge()) {
+      next()
+    }
+    else if (formData.yob && (curYear - formData.yob) < minAge) {
       setErrors({...errors, "yob":"Without any below mentioned conditions, minimum age for eligibility is " + minAge});
-    }else {
+    }
+    else if (formData.yob && (curYear - formData.yob) > maxAge) {
+      setErrors({...errors, "yob":"Without any below mentioned conditions, maximum age for eligibility is " + maxAge});
+    }
+    else {
       // errors.yob = "Please select year of birth";
       setErrors({...errors, "yob":"Please select year of birth"});
     }
@@ -246,6 +268,9 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
                       <label className="form-check-label" htmlFor={x}>{x}</label>
                     </div>)
                 }
+                <div className="invalid-input">
+                  {errors.choice}
+                </div>
               </Row>
             </div>
           </div>
@@ -269,6 +294,8 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
 
   function onProgramSelect(osid) {
     setValue({target: {name: "programId", value: osid}})
+    // Reinitialize the selected comorbidities if the user changed the program
+    setValue({target: {name: "comorbidities", value: []}})
   }
 
   return (

@@ -63,7 +63,9 @@ export const Members = () => {
                 console.log(err)
             })
             .then((result) => {
-                setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
+                if (result["variantAttachment"]) {
+                    setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
+                }
             })
     }, []);
 
