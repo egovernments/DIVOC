@@ -22,7 +22,7 @@ export const Members = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [members, setMembers] = useState([]);
     const [programs, setPrograms] = useState([]);
-    const [marqueeMsg, setMarqueeMsg] = useState("Registrations are open only for citizens 50 years and above.");
+    // const [marqueeMsg, setMarqueeMsg] = useState("Registrations are open only for citizens 50 years and above.");
     const [showModal, setShowModal] = useState(false);
     const [selectedMemberIndex, setSelectedMemberIndex] = useState(-1);
     const [memberAction, setMemberAction] = useState(CANCEL_APPOINTMENT);
@@ -66,9 +66,9 @@ export const Members = () => {
                 console.log(err)
             })
             .then((result) => {
-                if (result["variantAttachment"]) {
-                    setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
-                }
+                // if (result["variantAttachment"]) {
+                //     setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
+                // }
             })
     }, []);
 
@@ -184,7 +184,7 @@ export const Members = () => {
             {isLoading && <Loader/>}
             <Container fluid>
                 <div className="members-container">
-                    <marquee style={{color: ""}}>{marqueeMsg}</marquee>
+                    {/*<marquee style={{color: ""}}>{marqueeMsg}</marquee>*/}
                     <div style={{display: "flex"}}>
                         <h3>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
                         </h3>
