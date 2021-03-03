@@ -8,12 +8,12 @@ import axios from "axios";
 import Card from "react-bootstrap/Card";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
-import Button from "react-bootstrap/Button";
 import {formatDate, padDigit} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
 import {CustomDropdown} from "../../CustomDropdown";
 import CloseImg from "../../../assets/img/icon-cross.svg";
 import {pathOr} from "ramda";
+import appConfig from "../../../config.json";
 
 export const Members = () => {
     const history = useHistory();
@@ -174,7 +174,7 @@ export const Members = () => {
 
                         }
                     </Row>
-                    {members.length < 4 && <CustomButton className="mt-4" isLink={true} type="submit" onClick={() => {
+                    {members.length < appConfig.registerMemberLimit && <CustomButton className="mt-4" isLink={true} type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
                         <span>+ Member</span>
