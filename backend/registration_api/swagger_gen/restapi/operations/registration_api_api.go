@@ -44,6 +44,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetPing has not yet been implemented")
+		}),
 		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
 		}),
@@ -116,6 +119,8 @@ type RegistrationAPIAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// GetPingHandler sets the operation handler for the get ping operation
+	GetPingHandler GetPingHandler
 	// BookSlotOfFacilityHandler sets the operation handler for the book slot of facility operation
 	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
 	// DeleteAppointmentHandler sets the operation handler for the delete appointment operation
@@ -212,6 +217,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
+	if o.GetPingHandler == nil {
+		unregistered = append(unregistered, "GetPingHandler")
+	}
 	if o.BookSlotOfFacilityHandler == nil {
 		unregistered = append(unregistered, "BookSlotOfFacilityHandler")
 	}
@@ -335,6 +343,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
