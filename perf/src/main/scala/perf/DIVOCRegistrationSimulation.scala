@@ -74,9 +74,9 @@ class DIVOCRegistrationSimulation extends Simulation {
     .exec(s=> {
       s.set("phone", Random.between(1e10, 1e11).toLong.toString)
     })
-    .exec(ping)
-//    .exec(getOTP)
-//    .exec(confirmOTP)
+//    .exec(ping)
+    .exec(getOTP)
+    .exec(confirmOTP)
     .exec(s=>{
       if (s.status == KO) {
         noError = false
@@ -89,29 +89,29 @@ class DIVOCRegistrationSimulation extends Simulation {
       }
       s
     })
-//    .exec(getRecipientList)
-//    .repeat(4) {
-//      pace(10 seconds)
-//        .exec({s=>
-//          s.set("id", (s.attributes.getOrElse("id", "1").toString).toLong + 1)
-//          .set("r", Random.nextInt().toString)
-//        }
-//        )
-//        .exec(getRecipientList)
-//        .exec(createMember)
-//        .exec(s => {
-//          if (s.status == KO) {
-//            noError = false
-//            println(s)
-//            val failures = stat.incrementAndGet()
-//            if (failures==100) {
-//              java.lang.System.exit(0)
-//              s.eventLoop.shutdownGracefully(1000, 1000, TimeUnit.MILLISECONDS)
-//            }
-//          }
-//          s
-//        })
-//    }
+    .exec(getRecipientList)
+    .repeat(4) {
+      pace(10 seconds)
+        .exec({s=>
+          s.set("id", (s.attributes.getOrElse("id", "1").toString).toLong + 1)
+          .set("r", Random.nextInt().toString)
+        }
+        )
+        .exec(getRecipientList)
+        .exec(createMember)
+        .exec(s => {
+          if (s.status == KO) {
+            noError = false
+            println(s)
+            val failures = stat.incrementAndGet()
+            if (failures==100) {
+              java.lang.System.exit(0)
+              s.eventLoop.shutdownGracefully(1000, 1000, TimeUnit.MILLISECONDS)
+            }
+          }
+          s
+        })
+    }
 
 
 //  setUp(scn.inject(atOnceUsers(1)))
