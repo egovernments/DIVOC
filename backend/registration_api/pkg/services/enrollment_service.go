@@ -3,14 +3,14 @@ package services
 import (
 	"bytes"
 	json "encoding/json"
+	"text/template"
+	"time"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
-	"text/template"
-	"time"
 )
 
 func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
@@ -24,16 +24,18 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
 	exists, err := KeyExists(enrollment.Code)
-	if err == nil && exists == 0 {
+	if err != nil {
+		return "", err
+	}
+	if exists == 0 {
 		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 		if err != nil {
 			return "", err
 		}
 		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
 		return result.(string), nil
-	} else {
-		return CreateEnrollment(enrollment, position+1)
 	}
+	return CreateEnrollment(enrollment, position+1)
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {

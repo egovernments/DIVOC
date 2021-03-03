@@ -5,11 +5,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/divoc/registration-api/config"
 	log "github.com/sirupsen/logrus"
 )
 
 const DateFormat = "2006-01-02"
 const TimeFormat = "15:04"
+const OffsetFormat = "-07:00"
 
 type FacilitySchedule struct {
 	FacilityCode string
@@ -29,7 +31,10 @@ func (schedule FacilitySchedule) DateString() string {
 }
 
 func (fs FacilitySchedule) getStartTime() time.Time {
-	startTime, err := time.ParseInLocation(DateFormat+TimeFormat, fs.Date.Format(DateFormat)+fs.StartTime, time.Local)
+	startTime, err := time.Parse(
+		DateFormat+TimeFormat+OffsetFormat, 
+		fs.Date.Format(DateFormat)+fs.StartTime+config.Config.TimeZoneOffset,
+	)
 	if  err != nil {
 		log.Errorf("Error parsing startTime %s", fs.StartTime)
 	}
@@ -41,7 +46,11 @@ func (fs FacilitySchedule) GetStartTimeEpoch() int64 {
 }
 
 func (fs FacilitySchedule) GetTTL() time.Duration {
-	return fs.getStartTime().Sub(time.Now())	
+	ttl := fs.getStartTime().Sub(time.Now())
+	if ttl < 0 {
+		return time.Second
+	}
+	return ttl
 }
 
 func ToFacilitySchedule(key string) FacilitySchedule {
