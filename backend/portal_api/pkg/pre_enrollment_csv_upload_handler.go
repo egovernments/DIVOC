@@ -61,10 +61,10 @@ func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetry
 		ProgramId:         preEnrollmentCsv.ProgramId,
 		Address:           GetAddressObject(data),
 	}
-	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	_, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	log.Info("Received error response from the create new registry", err)
 	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount + 1)
+		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount+1)
 	}
 	return err, enrollment
 }

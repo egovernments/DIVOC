@@ -6,12 +6,14 @@ import (
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/enrollment"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
 	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"strconv"
 	"time"
@@ -43,6 +45,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.GetSlotsForFacilitiesHandler = operations.GetSlotsForFacilitiesHandlerFunc(getFacilitySlots)
 	api.BookSlotOfFacilityHandler = operations.BookSlotOfFacilityHandlerFunc(bookSlot)
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
+	api.DeleteRecipientHandler = operations.DeleteRecipientHandlerFunc(deleteRecipient)
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingHandler)
 }
 
@@ -93,7 +96,7 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	otp := utils.GenerateOTP()
 
 	if _, err := services.SetHMSet(phone, map[string]interface{}{OtpKey: otp, AttemptsKey: 0}); err == nil {
-		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil{
+		if _, err := services.SetTTLForHash(phone, time.Minute*time.Duration(config.Config.Auth.TTLForOtp)); err == nil {
 			if config.Config.MockOtp {
 				return operations.NewGenerateOTPOK()
 			}
@@ -220,8 +223,8 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 															FacilityCode: facilityCode,
 															ProgramId:    programId,
 															Date:         slotDate,
-															StartTime:         startTime,
-															EndTime: 		endTime,
+															StartTime:    startTime,
+															EndTime:      endTime,
 															Slots:        maxAppointments,
 														}
 														log.Infof("Initializing facility slot %v", schedule)
@@ -281,8 +284,8 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 				if isMarked {
 					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
 					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
-						Dose: *params.Body.Dose,
-						ProgramId: *params.Body.ProgramID,
+						Dose:            *params.Body.Dose,
+						ProgramId:       *params.Body.ProgramID,
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
@@ -326,21 +329,36 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 		return operations.NewDeleteAppointmentBadRequest()
 	}
 
-	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, principal.Phone)
+	deleteError := deleteAppointmentInEnrollment(*params.Body.EnrollmentCode, principal.Phone, *params.Body.Dose, *params.Body.ProgramID)
+	if deleteError == nil {
+		return operations.NewDeleteRecipientOK()
+	} else {
+		errorMessage := deleteError.Error()
+		response := operations.NewDeleteAppointmentBadRequest()
+		response.Payload = &operations.DeleteAppointmentBadRequestBody{
+			Message: errorMessage,
+		}
+		log.Info(errorMessage)
+		return response
+	}
+}
+
+func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose string, programId string) error {
+	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, phone)
 	if enrollmentInfo != nil {
 		if checkIfAlreadyAppointed(enrollmentInfo) {
 			if msg := checkIfCancellationAllowed(enrollmentInfo); msg == "" {
 				lastBookedSlotId := enrollmentInfo["slotId"]
 				err := services.CancelBookedAppointment(lastBookedSlotId)
 				if err != nil {
-					return operations.NewDeleteAppointmentBadRequest()
+					return errors.New("Failed to cancel appointment")
 				} else {
-					isMarked := services.RevokeEnrollmentBookedStatus(*params.Body.EnrollmentCode)
+					isMarked := services.RevokeEnrollmentBookedStatus(enrollmentCode)
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
-							EnrollmentCode:  *params.Body.EnrollmentCode,
-							Dose: *params.Body.Dose,
-							ProgramId: *params.Body.ProgramID,
+							EnrollmentCode:  enrollmentCode,
+							Dose:            dose,
+							ProgramId:       programId,
 							SlotID:          "",
 							FacilityCode:    "",
 							AppointmentDate: "0001-01-01",
@@ -348,24 +366,47 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 							CreatedAt:       time.Now(),
 							Status:          models2.CancelledStatus,
 						})
-						return operations.NewDeleteAppointmentOK()
+						return nil
 					}
 				}
 			} else {
 				log.Errorf("Cancellation of appointment not allowed %v", msg)
-				response := operations.NewDeleteAppointmentBadRequest()
-				response.Payload = &operations.DeleteAppointmentBadRequestBody{
-					Message: msg,
-				}
-				return response
+				return errors.New(msg)
 			}
 		} else {
-			log.Errorf("Enrollment not booked %s, %s", *params.Body.EnrollmentCode, principal.Phone)
+			return errors.New("Enrollment not booked " + enrollmentCode + "," + phone)
 		}
 	} else {
-		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
+		return errors.New("Invalid booking request  " + enrollmentCode + "," + phone)
 	}
-	return operations.NewDeleteAppointmentBadRequest()
+	return errors.New("Failed to cancel appointment")
+}
+
+func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
+	enrollmentCode := *params.Body.EnrollmentCode
+	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, principal.Phone)
+	if enrollmentInfo != nil && !checkIfAlreadyAppointed(enrollmentInfo) {
+		if osid, ok := enrollmentInfo["osid"]; ok {
+			err := enrollment.DeleteRecipient(osid)
+			if err != nil {
+				log.Error(err)
+				return operations.NewDeleteRecipientBadRequest()
+			} else {
+				err := services.DeleteValue(enrollmentCode)
+				log.Error(err)
+			}
+			return operations.NewDeleteRecipientOK()
+		}
+	} else {
+		errorMessage := "Deleting a recipient is not allowed if appointment is scheduled."
+		response := operations.NewDeleteAppointmentBadRequest()
+		response.Payload = &operations.DeleteAppointmentBadRequestBody{
+			Message: errorMessage,
+		}
+		log.Info(errorMessage)
+		return response
+	}
+	return operations.NewDeleteRecipientBadRequest()
 }
 
 func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {

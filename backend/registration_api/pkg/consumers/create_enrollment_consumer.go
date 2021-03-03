@@ -34,10 +34,10 @@ func StartEnrollmentConsumer() {
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					err = services.CreateEnrollment(&enrollment, 1)
+					osid, err := services.CreateEnrollment(&enrollment, 1)
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
-						cacheEnrollmentInfo(enrollment)
+						cacheEnrollmentInfo(enrollment, osid)
 						err := services.NotifyRecipient(enrollment)
 						if err != nil {
 							log.Error("Unable to send notification to the enrolled user", err)
@@ -59,10 +59,11 @@ func StartEnrollmentConsumer() {
 	}()
 }
 
-func cacheEnrollmentInfo(enrollment models.Enrollment) {
+func cacheEnrollmentInfo(enrollment models.Enrollment, osid string) {
 	data := map[string]interface{}{
-		"phone": enrollment.Phone,
+		"phone":        enrollment.Phone,
 		"updatedCount": 0, //to restrict multiple updates
+		"osid":         osid,
 	}
 	_, err := services.SetHMSet(enrollment.Code, data)
 	if err != nil {

@@ -320,6 +320,54 @@ func init() {
             "description": "Invalid token"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient",
+        "operationId": "deleteRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/verifyOTP": {
@@ -684,6 +732,54 @@ func init() {
             "description": "Invalid token"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient",
+        "operationId": "deleteRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/verifyOTP": {
@@ -778,7 +874,6 @@ func init() {
           "description": "Address line 1",
           "type": "string",
           "title": "The address line 1",
-          "default": "",
           "$id": "#/properties/address/properties/addressLine1"
         },
         "addressLine2": {

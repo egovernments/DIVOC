@@ -53,6 +53,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteAppointment has not yet been implemented")
 		}),
+		DeleteRecipientHandler: DeleteRecipientHandlerFunc(func(params DeleteRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteRecipient has not yet been implemented")
+		}),
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
@@ -125,6 +128,8 @@ type RegistrationAPIAPI struct {
 	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
 	// DeleteAppointmentHandler sets the operation handler for the delete appointment operation
 	DeleteAppointmentHandler DeleteAppointmentHandler
+	// DeleteRecipientHandler sets the operation handler for the delete recipient operation
+	DeleteRecipientHandler DeleteRecipientHandler
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
@@ -225,6 +230,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.DeleteAppointmentHandler == nil {
 		unregistered = append(unregistered, "DeleteAppointmentHandler")
+	}
+	if o.DeleteRecipientHandler == nil {
+		unregistered = append(unregistered, "DeleteRecipientHandler")
 	}
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
@@ -355,6 +363,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/appointment"] = NewDeleteAppointment(o.context, o.DeleteAppointmentHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/recipients"] = NewDeleteRecipient(o.context, o.DeleteRecipientHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -54,7 +54,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		WebsiteURL:         data.Text("websiteURL"),
 		Programs:           []*models.FacilityProgramsItems0{},
 	}
-	err = services.CreateNewRegistry(facility, "Facility")
+	_, err = services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
 		errmsg := err.Error()
 		if strings.Contains(errmsg, "Detail:") {
