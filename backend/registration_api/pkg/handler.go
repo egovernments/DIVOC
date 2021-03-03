@@ -46,6 +46,11 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.BookSlotOfFacilityHandler = operations.BookSlotOfFacilityHandlerFunc(bookSlot)
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
 	api.DeleteRecipientHandler = operations.DeleteRecipientHandlerFunc(deleteRecipient)
+	api.GetPingHandler = operations.GetPingHandlerFunc(pingHandler)
+}
+
+func pingHandler(params operations.GetPingParams) middleware.Responder {
+	return operations.NewGetPingOK()
 }
 
 func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
@@ -120,7 +125,8 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	}
 	otpDetails, err := services.GetHashValues(phone)
 	if err != nil {
-		return model.NewGenericServerError()
+		log.Errorf("No OTP in the store, might have expired. %+v", err)
+		return operations.NewVerifyOTPUnauthorized()
 	}
 
 	if attemptsTried, err := services.IncrHashField(phone, AttemptsKey); err == nil {
@@ -205,7 +211,7 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 									if ok && programStatus == "Active" {
 										programSchedule, ok := facilityProgramWiseSchedule[programId]
 										if ok {
-											for i := 0; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
+											for i := 1; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
 												for _, programSchedule := range programSchedulesForDay {

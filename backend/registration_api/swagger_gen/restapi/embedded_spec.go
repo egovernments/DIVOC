@@ -254,6 +254,18 @@ func init() {
         }
       }
     },
+    "/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/recipients": {
       "get": {
         "security": [
@@ -650,6 +662,18 @@ func init() {
           },
           "500": {
             "description": "Internal Error"
+          }
+        }
+      }
+    },
+    "/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
