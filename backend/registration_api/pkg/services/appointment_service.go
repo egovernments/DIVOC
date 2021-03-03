@@ -67,7 +67,7 @@ func BookAppointmentSlot(slotId string) error {
 	remainingSlotsStr, err := GetValue(slotId)
 	if err != nil {
 		log.Errorf("Failed getting slots info: %s %v", slotId, err)
-		return nil
+		return err
 	}
 	remainingSlots, err := strconv.Atoi(remainingSlotsStr)
 	if remainingSlots <= 0 {
