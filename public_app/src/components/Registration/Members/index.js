@@ -8,13 +8,15 @@ import axios from "axios";
 import Card from "react-bootstrap/Card";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
-import {formatDate, padDigit} from "../../../utils/CustomDate";
+import {formatDate} from "../../../utils/CustomDate";
 import {Loader} from "../../Loader";
 import {CustomDropdown} from "../../CustomDropdown";
 import CloseImg from "../../../assets/img/icon-cross.svg";
 import {pathOr} from "ramda";
 import appConfig from "../../../config.json";
 
+const DELETE_MEMBER = "DELETE_MEMBER";
+const CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
 export const Members = () => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
@@ -23,6 +25,7 @@ export const Members = () => {
     const [marqueeMsg, setMarqueeMsg] = useState("Registrations are open only for citizens 50 years and above.");
     const [showModal, setShowModal] = useState(false);
     const [selectedMemberIndex, setSelectedMemberIndex] = useState(-1);
+    const [memberAction, setMemberAction] = useState(CANCEL_APPOINTMENT);
 
     function fetchRecipients() {
         setIsLoading(true);
@@ -53,7 +56,7 @@ export const Members = () => {
         const data = {
             "entityContext": {},
             "flagKey": "country_specific_features"
-        }
+        };
         axios
             .post("/config/api/v1/evaluation", data)
             .then((res) => {
@@ -108,12 +111,13 @@ export const Members = () => {
             })
     }
 
-    function callCancelAppointment(member) {
+    function callCancelAppointment() {
+        const member = members[selectedMemberIndex];
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"Authorization": token, "Content-Type": "application/json"},
             data: {
-                enrollmentCode: members[selectedMemberIndex].code,
+                enrollmentCode: member.code,
                 // TODO: MULTI_PROGRAMS_SUPPORT Hard coded logic, in future (program,dose) needed to delete an appointment
                 programId: member["appointments"][0]["programId"],
                 dose: member["appointments"][0]["dose"],
@@ -137,7 +141,38 @@ export const Members = () => {
                 }
             })
             .finally(() => {
-                setShowModal(false)
+                setShowModal(false);
+                setSelectedMemberIndex(-1)
+            });
+    }
+
+    function callDeleteRecipient() {
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
+            data: {
+                enrollmentCode: members[selectedMemberIndex].code
+            }
+        };
+
+        axios.delete("/divoc/api/citizen/recipients", config)
+            .then(res => {
+                setIsLoading(true);
+                setTimeout(() => {
+                    fetchRecipients();
+                    fetchPrograms()
+                }, 3000);
+
+            })
+            .catch((err) => {
+                if (pathOr("", ["response", "data", "message"], err) !== "") {
+                    alert(err.response.data.message);
+                } else {
+                    alert("Something went wrong. Please try again");
+                }
+            })
+            .finally(() => {
+                setShowModal(false);
                 setSelectedMemberIndex(-1)
             });
     }
@@ -165,16 +200,30 @@ export const Members = () => {
                         {
                             members.length > 0 &&
                             members.map((member, index) => {
-                                return <MemberCard member={member} programs={programs} onDelete={() => {
-                                    setShowModal(true)
-                                    setSelectedMemberIndex(index)
-                                }
-                                }/>
+                                return <MemberCard
+                                    member={member}
+                                    programs={programs}
+                                    onCancelAppointment={
+                                        () => {
+                                            setShowModal(true);
+                                            setSelectedMemberIndex(index);
+                                            setMemberAction(CANCEL_APPOINTMENT)
+                                        }
+                                    }
+                                    onDeleteMember={
+                                        () => {
+                                            setShowModal(true);
+                                            setSelectedMemberIndex(index);
+                                            setMemberAction(DELETE_MEMBER)
+                                        }
+                                    }
+                                />
                             })
 
                         }
                     </Row>
-                    {members.length < appConfig.registerMemberLimit && <CustomButton className="mt-4" isLink={true} type="submit" onClick={() => {
+                    {members.length < appConfig.registerMemberLimit &&
+                    <CustomButton className="mt-4" isLink={true} type="submit" onClick={() => {
                         history.push("/addMember")
                     }}>
                         <span>+ Member</span>
@@ -186,7 +235,7 @@ export const Members = () => {
                     <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                         <div className="d-flex justify-content-between align-items-center">
                             <div/>
-                            <h5>Confirm Cancelling Appointment </h5>
+                            <h5>{memberAction === CANCEL_APPOINTMENT ? "Confirm Cancelling Appointment" : "Confirm Removing Member"}</h5>
                             <img src={CloseImg} className="cursor-pointer" alt={""}
                                  onClick={() => {
                                      setShowModal(false)
@@ -195,12 +244,16 @@ export const Members = () => {
                         <div className="d-flex flex-column justify-content-center align-items-center">
                             <b>{members[selectedMemberIndex].name}</b>
                             <b className="text-center mt-1">Enrollment number: {members[selectedMemberIndex].code}</b>
-                            <span
-                                className="mt-1">{`${members[selectedMemberIndex]["appointments"][0].facilityDetails.facilityName}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.district}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.state}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.pincode}`}</span>
-                            <span
-                                className="mt-1">{formatDate(members[selectedMemberIndex]["appointments"][0].appointmentDate || "")}, {members[selectedMemberIndex]["appointments"][0].appointmentSlot || ""}</span>
+                            {memberAction === CANCEL_APPOINTMENT &&
+                            <>
+                                <span
+                                    className="mt-1">{`${members[selectedMemberIndex]["appointments"][0].facilityDetails.facilityName}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.district}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.state}, ${members[selectedMemberIndex]["appointments"][0].facilityDetails.pincode}`}</span>
+                                <span
+                                    className="mt-1">{formatDate(members[selectedMemberIndex]["appointments"][0].appointmentDate || "")}, {members[selectedMemberIndex]["appointments"][0].appointmentSlot || ""}</span>
+                            </>
+                            }
                             <CustomButton className="blue-btn" onClick={() => {
-                                callCancelAppointment(members[selectedMemberIndex])
+                                memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : callDeleteRecipient()
                             }}>CONFIRM</CustomButton>
                         </div>
                     </div>
@@ -217,22 +270,30 @@ const MemberCard = (props) => {
 
     // Need to think about the logic to support multiple appointment
     const isAppointmentBooked = !!member["appointments"][0].enrollmentScopeId;
+    
 
-
-    function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
-        return [district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
-    }
-
-    function getTime(fromTime) {
-        if (fromTime > 11) {
-            return padDigit(fromTime > 12 ? fromTime % 12 : fromTime) + ":00 PM"
-        } else {
-            return fromTime + ":00 AM"
+    function getDropdownItems() {
+        let items = [
+            {
+                name: "Remove Member",
+                onClick: () => {
+                    props.onDeleteMember()
+                },
+                disabled: isAppointmentBooked,
+                tooltip: "You cannot remove a member with an appointment booked."
+            }
+        ];
+        if (isAppointmentBooked) {
+            items.push({
+                name: "Cancel Appointment",
+                onClick: () => {
+                    props.onCancelAppointment()
+                },
+                disabled: false,
+                tooltip: ""
+            })
         }
-    }
-
-    function showDeleteConfirmation() {
-        props.onDelete()
+        return items;
     }
 
     return (
@@ -242,11 +303,7 @@ const MemberCard = (props) => {
                     <div className="d-flex justify-content-between">
                             <span className="mb-2"
                                   style={{fontWeight: 600, fontSize: "18px", color: "#646D82"}}>{member.name}</span>
-                        {isAppointmentBooked ? <CustomDropdown items={[{
-                            name: "Cancel Appointment", onClick: () => {
-                                showDeleteConfirmation()
-                            }
-                        }]}/> : <span/>}
+                        <CustomDropdown items={getDropdownItems()}/>
                     </div>
                     <div className="mb-2">
                         {program ? program.name : ''}
