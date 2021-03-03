@@ -234,35 +234,3 @@ func GetVaccinatorsForTheFacility(facilityCode string) (interface{}, error) {
 		return resp["Vaccinator"], nil
 	}
 }
-
-// It accepts the osid in the json and it will delete the row
-func DeleteRegistry(typeId string, osid string) (map[string]interface{}, error) {
-	queryRequest := RegistryRequest{
-		"open-saber.registry.delete",
-		"1.0",
-		map[string]interface{}{
-			typeId: map[string]interface{}{
-				"osid": osid,
-			},
-		},
-	}
-	log.Info("Registry query ", queryRequest)
-	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.DeleteOperationId, req.BodyJSON(queryRequest))
-	if err != nil {
-		return nil, errors.Errorf("Error while updating registry", err)
-	}
-	if response.Response().StatusCode != 200 {
-		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
-	}
-	responseObject := RegistryResponse{}
-	err = response.ToJSON(&responseObject)
-	if err != nil {
-		return nil, errors.Wrap(err, "Unable to parse response from registry.")
-	}
-	log.Infof("Response %+v", responseObject)
-	if responseObject.Params.Status != "SUCCESSFUL" {
-		log.Infof("Response from registry %+v", responseObject)
-		return nil, errors.New("Failed while querying from registry")
-	}
-	return responseObject.Result, nil
-}
