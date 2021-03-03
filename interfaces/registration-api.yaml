@@ -132,6 +132,35 @@ paths:
           description: Unauthorized
 
   /recipients:
+    delete:
+      summary: Delete the recipient
+      operationId: deleteRecipient
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - enrollmentCode
+            properties:
+              enrollmentCode:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '401':
+          description: Unauthorized
     post:
       summary: Enroll Recipient
       operationId: enrollRecipient
@@ -221,3 +250,13 @@ paths:
           description: Internal error
         '429':
           description: Verify otp attempts exceeded, generate new OTP
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK

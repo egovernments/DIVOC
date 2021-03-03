@@ -47,7 +47,7 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 		Email:               email,
 	}
 	//services.MakeRegistryCreateRequest(vaccinator, "Vaccinator")
-	errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")
+	_, errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")
 	if errorVaccinator != nil {
 		errmsg := errorVaccinator.Error()
 		if strings.Contains(errmsg, "Detail:") {

@@ -11,22 +11,20 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-
-	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
-// NewUpdateRecipientParams creates a new UpdateRecipientParams object
+// NewDeleteRecipientParams creates a new DeleteRecipientParams object
 // no default values defined in spec.
-func NewUpdateRecipientParams() UpdateRecipientParams {
+func NewDeleteRecipientParams() DeleteRecipientParams {
 
-	return UpdateRecipientParams{}
+	return DeleteRecipientParams{}
 }
 
-// UpdateRecipientParams contains all the bound params for the update recipient operation
+// DeleteRecipientParams contains all the bound params for the delete recipient operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters updateRecipient
-type UpdateRecipientParams struct {
+// swagger:parameters deleteRecipient
+type DeleteRecipientParams struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -34,21 +32,21 @@ type UpdateRecipientParams struct {
 	/*
 	  In: body
 	*/
-	Body *models.Enrollment
+	Body DeleteRecipientBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewUpdateRecipientParams() beforehand.
-func (o *UpdateRecipientParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewDeleteRecipientParams() beforehand.
+func (o *DeleteRecipientParams) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body models.Enrollment
+		var body DeleteRecipientBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
@@ -58,7 +56,7 @@ func (o *UpdateRecipientParams) BindRequest(r *http.Request, route *middleware.M
 			}
 
 			if len(res) == 0 {
-				o.Body = &body
+				o.Body = body
 			}
 		}
 	}

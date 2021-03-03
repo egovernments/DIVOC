@@ -306,7 +306,7 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                                 <td className="text-nowrap ">{ts}</td>
                                 {
                                     dates.map(date => {
-                                        if (date in timeStampWiseSlots[ts]) {
+                                        if (timeStampWiseSlots[ts][date]?.slots) {
                                             let slots = timeStampWiseSlots[ts][date].slots;
                                             return (
                                                 <td className="text-nowrap text-center">

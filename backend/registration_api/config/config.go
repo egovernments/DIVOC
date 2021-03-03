@@ -35,9 +35,10 @@ var Config = struct {
 		ChannelWorkers int `default:"10"`
 		ScheduleDays   int `default:"30"`
 	}
-	MockOtp                      bool `default:"true" env:"MOCK_OTP"`
-	MinCancellationHours         int  `default:"24"`
-	MaxAppointmentUpdatesAllowed int  `default:"3"`
+	MockOtp                      	bool 	`default:"true" env:"MOCK_OTP"`
+	MinCancellationHours         	int  	`default:"24"`
+	MaxAppointmentUpdatesAllowed 	int  	`default:"3"`
+	TimeZoneOffset					string	`default:"+05:30"`
 }{}
 
 func Initialize() {

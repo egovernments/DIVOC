@@ -2,16 +2,19 @@ import {useForm, useStep} from "react-hooks-helper";
 import React, {useEffect, useState} from "react";
 import {FormPersonalDetails} from "./FormPersonalDetails";
 import axios from "axios";
-import {Card, CardColumns, CardGroup, Container} from "react-bootstrap";
+import {Card, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import SelectedLogo from "../../../assets/img/check.svg"
 import {Success} from "./Success";
-import {PROGRAM_API} from "../../../constants";
+import {CITIZEN_TOKEN_COOKIE_NAME, PROGRAM_API, RECIPIENTS_API} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
 import Row from "react-bootstrap/Row";
+import {getCookie} from "../../../utils/cookies";
+import appConfig from "../../../config.json";
+
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
 export const FORM_SELECT_COMORBIDITY = "selectComorbidity";
@@ -59,52 +62,51 @@ export const AddMembersFlow = () => {
     fetchPrograms()
   }, []);
 
-  useEffect(() => {
-    if (!getUserNumberFromRecipientToken()) {
-      history.push("/citizen")
-    }
-  }, []);
 
-  function fetchPrograms() {
-    const mockData = [
-      {
-        "description": "Covid 19 program",
-        "endDate": "2021-02-24",
-        "medicineIds": ["1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a"],
-        "name": "Covid-19 program",
-        "osCreatedAt": "2021-02-16T06:51:58.271Z",
-        "osUpdatedAt": "2021-02-17T07:56:29.012Z",
-        "osid": "1-b58ec6ec-c971-455c-ade5-7dce34ea0b09",
-        "startDate": "2021-02-01",
-        "status": "Active",
-        "logoURL": "https://www.un.org/sites/un2.un.org/files/covid19_response_icon.svg",
-      },
-      {
-        "description": "This is the Phase 3 of the vaccination drive happening in the country. Eligible beneficiaries will have to register themselves on the citizen portal. Based on the enrolment code and the ID proof, beneficiaries will be vaccinated and issued a digital certificate that can be downloaded from the citizen portal.",
-        "endDate": "2021-06-30",
-        "medicineIds": ["1-b6ebbbe4-b09e-45c8-b7a3-38828092da1a", "1-2a62ae65-1ea5-4a23-946b-062fe5f512f6", "1-9ac9eaf1-82bf-4135-b6ee-a948ae972fd4"],
-        "name": "Polio Vaccination",
-        "osCreatedAt": "2021-02-16T09:57:37.474Z",
-        "osUpdatedAt": "2021-02-17T09:37:23.195Z",
-        "osid": "1-7875daad-7ceb-4368-9a4b-7997e3b5b008",
-        "startDate": "2021-02-01",
-        "status": "Active"
-      }
-    ];
-    axios.get(PROGRAM_API)
-      .then(res => {
-        if (res.status === 200) {
-          setPrograms(res.data);
-          setValue({target: {name: "programId", value: res.data[0].osid}})
+    useEffect(() => {
+        if (!getUserNumberFromRecipientToken()) {
+            history.push("/citizen")
         }
-      })
-      .catch(e => {
-        console.log(e);
-        // mock data setup
-        setPrograms(mockData)
-        setValue({target: {name: "programId", value: mockData[0].osid}})
-      })
-  }
+
+        checkIfMemberLimitCrossed()
+            .then((isLimitCrossed) => {
+                console.log(isLimitCrossed);
+                if (isLimitCrossed) {
+                    history.push("/registration")
+                }
+            })
+    }, []);
+
+
+    async function checkIfMemberLimitCrossed() {
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
+        };
+        return axios
+            .get(RECIPIENTS_API, config)
+            .then((res) => {
+                return res && res.data && res.data.length >= appConfig.registerMemberLimit;
+            })
+            .catch(e => {
+                console.log(e);
+                return false;
+            })
+    }
+
+    function fetchPrograms() {
+        axios.get(PROGRAM_API)
+            .then(res => {
+                if (res.status === 200) {
+                    setPrograms(res.data);
+                    setValue({target: {name: "programId", value: res.data[0].osid}})
+                }
+            })
+            .catch(e => {
+                console.log(e);
+                history.push("/registration")
+            })
+    }
 
   let props = {formData, setValue, navigation, programs};
 
@@ -127,7 +129,6 @@ export const AddMembersFlow = () => {
 };
 
 const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
-  const history = useHistory();
   const MINIMUM_SUPPORT_YEAR = 1920;
   const [errors, setErrors] = useState({});
   const [conditions, setConditions] = useState([])

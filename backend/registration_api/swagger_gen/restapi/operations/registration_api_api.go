@@ -44,11 +44,17 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
+		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetPing has not yet been implemented")
+		}),
 		BookSlotOfFacilityHandler: BookSlotOfFacilityHandlerFunc(func(params BookSlotOfFacilityParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation BookSlotOfFacility has not yet been implemented")
 		}),
 		DeleteAppointmentHandler: DeleteAppointmentHandlerFunc(func(params DeleteAppointmentParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteAppointment has not yet been implemented")
+		}),
+		DeleteRecipientHandler: DeleteRecipientHandlerFunc(func(params DeleteRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteRecipient has not yet been implemented")
 		}),
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
@@ -116,10 +122,14 @@ type RegistrationAPIAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
+	// GetPingHandler sets the operation handler for the get ping operation
+	GetPingHandler GetPingHandler
 	// BookSlotOfFacilityHandler sets the operation handler for the book slot of facility operation
 	BookSlotOfFacilityHandler BookSlotOfFacilityHandler
 	// DeleteAppointmentHandler sets the operation handler for the delete appointment operation
 	DeleteAppointmentHandler DeleteAppointmentHandler
+	// DeleteRecipientHandler sets the operation handler for the delete recipient operation
+	DeleteRecipientHandler DeleteRecipientHandler
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
@@ -212,11 +222,17 @@ func (o *RegistrationAPIAPI) Validate() error {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
 
+	if o.GetPingHandler == nil {
+		unregistered = append(unregistered, "GetPingHandler")
+	}
 	if o.BookSlotOfFacilityHandler == nil {
 		unregistered = append(unregistered, "BookSlotOfFacilityHandler")
 	}
 	if o.DeleteAppointmentHandler == nil {
 		unregistered = append(unregistered, "DeleteAppointmentHandler")
+	}
+	if o.DeleteRecipientHandler == nil {
+		unregistered = append(unregistered, "DeleteRecipientHandler")
 	}
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
@@ -335,6 +351,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers = make(map[string]map[string]http.Handler)
 	}
 
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -343,6 +363,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/appointment"] = NewDeleteAppointment(o.context, o.DeleteAppointmentHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/recipients"] = NewDeleteRecipient(o.context, o.DeleteRecipientHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -30,3 +30,5 @@ yarn.lock
 keycloak/themes
 *.pyo
 *.pyc
+perf/results
+perf/.bsp

@@ -85,7 +85,7 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 	return model.NewGenericStatusOk()
 }
 
-func CreateNewRegistry(requestMap interface{}, objectId string) error {
+func CreateNewRegistry(requestMap interface{}, objectId string) (RegistryResponse, error) {
 	requestJson := CreateEntityRegistryRequest{
 		ID:  "open-saber.registry.create",
 		Ver: config.Config.Registry.ApiVersion,
@@ -104,13 +104,13 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 
 	if resp == nil || err != nil {
 		log.Error("Failed to request registry ", url, " ", err)
-		return err
+		return RegistryResponse{}, err
 	}
 	if resp.Response().StatusCode != 200 {
 		log.Error("Registry response is ", resp.Response().StatusCode, url)
 		println(resp.Response().Status)
 		log.Error("Next R Error" + string(resp.Response().Status))
-		return errors.New("Registry response is " + string(resp.Response().StatusCode))
+		return RegistryResponse{}, errors.New("Registry response is " + string(resp.Response().StatusCode))
 	}
 	respStr, _ := resp.ToString()
 	log.Infof("Response from registry %+v", respStr)
@@ -118,9 +118,9 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 	err = json.Unmarshal(resp.Bytes(), &registryResponse)
 	log.Info("Got response from registry ", registryResponse.Params.Status)
 	if registryResponse.Params.Status != "SUCCESSFUL" {
-		return errors.New(registryResponse.Params.Errmsg)
+		return registryResponse, errors.New(registryResponse.Params.Errmsg)
 	}
-	return nil
+	return registryResponse, nil
 }
 
 func registryUrl(operationId string) string {

@@ -11,15 +11,15 @@ import (
 	golangswaggerpaths "path"
 )
 
-// UpdateRecipientURL generates an URL for the update recipient operation
-type UpdateRecipientURL struct {
+// GetPingURL generates an URL for the get ping operation
+type GetPingURL struct {
 	_basePath string
 }
 
 // WithBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *UpdateRecipientURL) WithBasePath(bp string) *UpdateRecipientURL {
+func (o *GetPingURL) WithBasePath(bp string) *GetPingURL {
 	o.SetBasePath(bp)
 	return o
 }
@@ -27,15 +27,15 @@ func (o *UpdateRecipientURL) WithBasePath(bp string) *UpdateRecipientURL {
 // SetBasePath sets the base path for this url builder, only required when it's different from the
 // base path specified in the swagger spec.
 // When the value of the base path is an empty string
-func (o *UpdateRecipientURL) SetBasePath(bp string) {
+func (o *GetPingURL) SetBasePath(bp string) {
 	o._basePath = bp
 }
 
 // Build a url path and query string
-func (o *UpdateRecipientURL) Build() (*url.URL, error) {
+func (o *GetPingURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/recipients"
+	var _path = "/ping"
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -47,7 +47,7 @@ func (o *UpdateRecipientURL) Build() (*url.URL, error) {
 }
 
 // Must is a helper function to panic when the url builder returns an error
-func (o *UpdateRecipientURL) Must(u *url.URL, err error) *url.URL {
+func (o *GetPingURL) Must(u *url.URL, err error) *url.URL {
 	if err != nil {
 		panic(err)
 	}
@@ -58,17 +58,17 @@ func (o *UpdateRecipientURL) Must(u *url.URL, err error) *url.URL {
 }
 
 // String returns the string representation of the path with query string
-func (o *UpdateRecipientURL) String() string {
+func (o *GetPingURL) String() string {
 	return o.Must(o.Build()).String()
 }
 
 // BuildFull builds a full url with scheme, host, path and query string
-func (o *UpdateRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
+func (o *GetPingURL) BuildFull(scheme, host string) (*url.URL, error) {
 	if scheme == "" {
-		return nil, errors.New("scheme is required for a full url on UpdateRecipientURL")
+		return nil, errors.New("scheme is required for a full url on GetPingURL")
 	}
 	if host == "" {
-		return nil, errors.New("host is required for a full url on UpdateRecipientURL")
+		return nil, errors.New("host is required for a full url on GetPingURL")
 	}
 
 	base, err := o.Build()
@@ -82,6 +82,6 @@ func (o *UpdateRecipientURL) BuildFull(scheme, host string) (*url.URL, error) {
 }
 
 // StringFull returns the string representation of a complete url
-func (o *UpdateRecipientURL) StringFull(scheme, host string) string {
+func (o *GetPingURL) StringFull(scheme, host string) string {
 	return o.Must(o.BuildFull(scheme, host)).String()
 }

@@ -2,34 +2,40 @@ package services
 
 import (
 	"bytes"
-	"encoding/json"
+	json "encoding/json"
+	"text/template"
+	"time"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
-	"text/template"
-	"time"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, position int) error {
+func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
 	maxEnrollmentCreationAllowed := config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
 
 	if position > maxEnrollmentCreationAllowed {
 		failedErrorMessage := "Maximum enrollment creation limit is reached"
 		log.Info(failedErrorMessage)
-		return errors.New(400, failedErrorMessage)
+		return "", errors.New(400, failedErrorMessage)
 	}
 
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
 	exists, err := KeyExists(enrollment.Code)
-	if err == nil && exists == 0 {
-		err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-		return err
-	} else {
-		return CreateEnrollment(enrollment, position+1)
+	if err != nil {
+		return "", err
 	}
+	if exists == 0 {
+		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+		if err != nil {
+			return "", err
+		}
+		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+		return result.(string), nil
+	}
+	return CreateEnrollment(enrollment, position+1)
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
