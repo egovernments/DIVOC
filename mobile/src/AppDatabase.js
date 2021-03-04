@@ -5,7 +5,7 @@ import {programDb} from "./Services/ProgramDB";
 import {monthNames} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 13;
+const DATABASE_VERSION = 12;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
