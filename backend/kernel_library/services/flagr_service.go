@@ -42,7 +42,7 @@ func fetchNotificationTemplates() {
 	if err != nil {
 		log.Errorf("Unable to parse response from registry.", err)
 	}
-	log.Infof("Response %+v", responseObject)
+	log.Debugf("Response %+v", responseObject)
 	if response.Response().StatusCode == 200 {
 		// convert map to json
 		jsonString, _ := json.Marshal(responseObject["variantAttachment"])

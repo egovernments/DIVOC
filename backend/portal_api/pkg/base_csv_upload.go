@@ -6,6 +6,7 @@ import (
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"strings"
+	"time"
 )
 
 type CSVMetadata struct {
@@ -86,6 +87,9 @@ func ProcessCSV(baseCsv BaseCSV, data *Scanner) *models.Error {
 
 	var totalRowErrors int64 = 0
 	var totalRecords int64 = 0
+	// start time
+	startTime := time.Now()
+	log.Infof("CSV file ingestion started at %v", startTime)
 	for data.Scan() {
 		rowErrors := baseCsv.ValidateRow()
 		log.Error(rowErrors)
@@ -103,6 +107,11 @@ func ProcessCSV(baseCsv BaseCSV, data *Scanner) *models.Error {
 		}
 		totalRecords += 1
 	}
+	// end time
+	endTime := time.Now()
+	log.Infof("CSV file ingestion ended at %v", endTime)
+	var d = time.Duration(endTime.UnixNano() - startTime.UnixNano())
+	log.Infof("Total Time taken %v", d.Seconds())
 
 	csvUploadHistory.TotalRecords = totalRecords
 	csvUploadHistory.TotalErrorRows = totalRowErrors

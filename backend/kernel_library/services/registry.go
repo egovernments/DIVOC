@@ -73,7 +73,7 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 		return model.NewGenericServerError()
 	}
 	respStr, _ := resp.ToString()
-	log.Infof("Response from registry %+v", respStr)
+	log.Debugf("Response from registry %+v", respStr)
 	var registryResponse = RegistryResponse{}
 	err = json.Unmarshal(resp.Bytes(), &registryResponse)
 	if err != nil {
@@ -115,7 +115,7 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 		return errors.New("Registry response is " + string(resp.Response().StatusCode))
 	}
 	respStr, _ := resp.ToString()
-	log.Infof("Response from registry %+v", respStr)
+	log.Debugf("Response from registry %+v", respStr)
 	var registryResponse = RegistryResponse{}
 	err = json.Unmarshal(resp.Bytes(), &registryResponse)
 	log.Info("Got response from registry ", registryResponse.Params.Status)
@@ -158,7 +158,7 @@ func analyseResponse(response *req.Resp, err error) (map[string]interface{}, err
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to parse response from registry.")
 	}
-	log.Infof("Response %+v", responseObject)
+	log.Debugf("Response %+v", responseObject)
 	if responseObject.Params.Status != "SUCCESSFUL" {
 		log.Infof("Response from registry %+v", responseObject)
 		return nil, errors.New("Failed while querying from registry")
@@ -216,7 +216,7 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to parse response from registry.")
 	}
-	log.Infof("Response %+v", responseObject)
+	log.Debugf("Response %+v", responseObject)
 	if responseObject.Params.Status != "SUCCESSFUL" {
 		log.Infof("Response from registry %+v", responseObject)
 		return nil, errors.New("Failed while querying from registry")
