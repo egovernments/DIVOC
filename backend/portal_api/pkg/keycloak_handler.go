@@ -79,7 +79,7 @@ func (k *KeycloakUserAttributes) UnmarshalJson(data []byte) error {
 func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users"
-	log.Infof("creating user %s : %s, %+v", url, authHeader, user)
+	log.Debugf("creating user %s : %s, %+v", url, authHeader, user)
 	return req.Post(url, req.BodyJSON(user),
 		req.Header{"Authorization": authHeader},
 	)
