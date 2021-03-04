@@ -210,7 +210,7 @@ export const Appointment = (props) => {
                                         <div>{formatAddress(facility.address)}
                                             <div>
                                                 <span
-                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
+                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walkin"}</span>
                                                 <span
                                                     className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
                                             </div>

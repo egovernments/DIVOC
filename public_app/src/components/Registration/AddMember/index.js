@@ -31,6 +31,7 @@ const steps = [
 ];
 
 const defaultData = {
+  "choice":"yes",
   "programId": "",
   "nationalId": "",
   "name": "",
@@ -128,19 +129,22 @@ export const AddMembersFlow = () => {
 };
 
 const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
+  const MINIMUM_SUPPORT_YEAR = 1920;
   const [errors, setErrors] = useState({});
-  const conditions = ["Heart Problem", "Diabetes", "Asthma", "Cystic fibrosis", "Hypertension or BP", "Liver disease", "Pulmonary fibrosis", "Neurologic conditions"];
+  const [conditions, setConditions] = useState([])
   const years = [];
   const curYear = new Date().getFullYear();
+  const [showCommorbidity, setShowCommorbidity] = useState("yes");
 
   const [minAge, setMinAge] = useState(50);
+  const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
 
   useEffect(() => {
     const data = {
+      "flagKey": "programs",
       "entityContext": {
-
-      },
-      "flagKey": "country_specific_features"
+        "programId": formData.programId
+      }
     };
     axios
       .post("/config/api/v1/evaluation", data)
@@ -151,22 +155,42 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
         console.log(err)
       })
       .then((result) => {
-        setMinAge(result["variantAttachment"].registrationMinAge)
+        if(result["variantAttachment"]) {
+          setConditions(result["variantAttachment"].commorbidities || [])
+          setMinAge(result["variantAttachment"].minAge)
+          setMaxAge(result["variantAttachment"].maxAge)
+        } else {
+          console.error("program eligibility criteria is not configure");
+        }
       })
   }, []);
 
-  for (let i = 1920; i < curYear; i++) {
+  for (let i = MINIMUM_SUPPORT_YEAR; i < curYear; i++) {
     years.push("" + i)
   }
   const {previous, next} = navigation;
 
   function onNext() {
-    if (formData.yob && formData.yob > 1900 &&
-      ((curYear - formData.yob) >= minAge || formData.comorbidities.length>0)) {
+    function isValidAge() {
+      return (curYear - formData.yob) >= minAge && (curYear - formData.yob) <= maxAge;
+    }
+
+    if(formData.choice === "yes" && formData.comorbidities.length === 0) {
+      setErrors({...errors, "choice":"* Please select at least one comorbidity"});
+    }
+    else if (formData.yob && formData.yob > 1900 && formData.choice === "yes" &&
+      (isValidAge() || formData.comorbidities.length>0)) {
       next()
-    } else if (formData.yob) {
+    } else if(formData.yob && formData.yob > 1900 && formData.choice === "no" && isValidAge()) {
+      next()
+    }
+    else if (formData.yob && (curYear - formData.yob) < minAge) {
       setErrors({...errors, "yob":"Without any below mentioned conditions, minimum age for eligibility is " + minAge});
-    }else {
+    }
+    else if (formData.yob && (curYear - formData.yob) > maxAge) {
+      setErrors({...errors, "yob":"Without any below mentioned conditions, maximum age for eligibility is " + maxAge});
+    }
+    else {
       // errors.yob = "Please select year of birth";
       setErrors({...errors, "yob":"Please select year of birth"});
     }
@@ -189,12 +213,19 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     setValue({target: {name: "comorbidities", value: updatedList}})
   }
 
+  function showComorbiditiesHandler(event) {
+    setShowCommorbidity(event.target.value)
+    setValue({target: {name: "choice", value: event.target.value}})
+    if (event.target.value === "no") {
+      setValue({target: {name: "comorbidities", value: []}})
+    }
+  }
 
   return (
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check beneficiaries eligibility for the program</h3>
+          <h3>Check beneficiary's eligibility for the program</h3>
         </div>
         <div className="shadow-sm bg-white p-4">
           <div className="p-2">
@@ -214,19 +245,35 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
             </div>
           </div>
           <div className="pt-5">
-            <label>Does the beneficiary have any of the following comorbidities?</label>
-            <Row className={"col-6 ml-0"}>
-              {
-                conditions.map(x =>
-                  <div className="col-md-6">
-                    <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
-                           value={x} id={x} onChange={(e) => {
-                      selectComorbidity(e.target);
-                    }}/>
-                    <label className="form-check-label" htmlFor={x}>{x}</label>
-                  </div>)
-              }
-            </Row>
+              <p style={{fontSize:"1.1rem"}}>Does the beneficiary have any of the following comorbidities?</p>
+              <div className="pl-2 form-check form-check-inline">
+                <input className="form-check-input" type="radio" onChange={showComorbiditiesHandler}
+                       id="yes" name="choice" value="yes" defaultChecked checked={formData.choice === "yes"}/>
+                <label className="form-check-label" htmlFor="yes">Yes</label>
+              </div>
+              <div className="pl-2 form-check form-check-inline">
+                <input className="form-check-input" type="radio"  onChange={showComorbiditiesHandler}
+                       id="no" name="choice" value="no" checked={formData.choice === "no"}/>
+                <label className="form-check-label" htmlFor="no">No</label>
+              </div>
+            <div hidden={formData.choice === "no"} className="pt-3">
+              <p>If Yes, Please select comorbidity</p>
+              <Row className={"col-6 ml-0"}>
+                {
+                  conditions.map(x =>
+                    <div className="col-md-6">
+                      <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
+                             value={x} id={x} onChange={(e) => {
+                        selectComorbidity(e.target);
+                      }}/>
+                      <label className="form-check-label" htmlFor={x}>{x}</label>
+                    </div>)
+                }
+                <div className="invalid-input">
+                  {errors.choice}
+                </div>
+              </Row>
+            </div>
           </div>
         </div>
         <div className="pt-3">
@@ -248,6 +295,8 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
 
   function onProgramSelect(osid) {
     setValue({target: {name: "programId", value: osid}})
+    // Reinitialize the selected comorbidities if the user changed the program
+    setValue({target: {name: "comorbidities", value: []}})
   }
 
   return (

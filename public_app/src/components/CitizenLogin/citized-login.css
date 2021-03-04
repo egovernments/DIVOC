@@ -51,3 +51,11 @@
 .login-otp {
   box-sizing: border-box;
 }
+
+.login-otp input:disabled {
+  border-color: #FFFFFF;
+}
+
+.citizen-login input:disabled {
+  border-color: #FFFFFF;
+}

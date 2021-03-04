@@ -18,7 +18,7 @@ import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE} from "./constants";
 import {SubmitSymptomsForm} from "./components/SubmitSymptomsForm";
 import {Members} from "./components/Registration/Members";
 import {AddMembersFlow} from "./components/Registration/AddMember";
-import {CitizenLoginComponent} from "./CitizenLogin/citizen-login";
+import {CitizenLoginComponent} from "./components/CitizenLogin/citizen-login";
 import {PageNotFound} from "./components/PageNotFound";
 import React from "react";
 import {Appointment} from "./components/Appointment";

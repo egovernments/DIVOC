@@ -1,8 +1,8 @@
 import {useState} from "react";
 import './citized-login.css'
 import axios from "axios";
-import {setCookie} from "../utils/cookies";
-import {CITIZEN_TOKEN_COOKIE_NAME} from "../constants";
+import {setCookie} from "../../utils/cookies";
+import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export function CitizenLoginComponent() {
     const [state, setState] = useState({
