@@ -1,4 +1,5 @@
 import {appIndexDb} from "../AppDatabase";
+import {is24hoursAgo} from "../SyncFacade";
 
 const PATIENTS = "patients";
 const QUEUE = "queue";
@@ -19,14 +20,16 @@ class QueueDB {
         const db = this.getDB();
         if (userDetails && userDetails.mobile_number) {
             const queue = await db.getAll(QUEUE);
-            const patients = await db.getAll(PATIENTS);
-
-            const stashUserData = {
-                userId: userDetails.mobile_number,
-                queue: queue,
-                patients: patients
+            if (queue && queue.length > 0) {
+                const patients = await db.getAll(PATIENTS);
+                const stashUserData = {
+                    userId: userDetails.mobile_number,
+                    date: new Date().toISOString(),
+                    queue: queue,
+                    patients: patients
+                }
+                await db.put(STASH_DATA, stashUserData);
             }
-            await db.put(STASH_DATA, stashUserData);
         }
     }
 
@@ -37,21 +40,30 @@ class QueueDB {
             const userId = userDetails["mobile_number"]
             const stashQueue = await db.get(STASH_DATA, userId);
             if (stashQueue) {
-                const queue = stashQueue.queue
-                if (queue && queue.length > 0) {
-                    for (const queueItem of queue) {
-                        await db.put(QUEUE, queueItem);
-                    }
+                const stashDate = new Date(stashQueue.date);
+                if (!is24hoursAgo(stashDate)) {
+                    await this.saveQueue(stashQueue.queue);
+                    await this.savePatients(stashQueue.patients);
                 }
-
-                const patients = stashQueue.patients
-                if (patients && patients.length > 0) {
-                    for (const patientItem of patients) {
-                        await db.put(PATIENTS, patientItem);
-                    }
-                }
-
                 await db.delete(STASH_DATA, userId);
+            }
+        }
+    }
+
+    async savePatients(patients) {
+        if (patients && patients.length > 0) {
+            const db = this.getDB()
+            for (const patientItem of patients) {
+                await db.put(PATIENTS, patientItem);
+            }
+        }
+    }
+
+    async saveQueue(queue) {
+        if (queue && queue.length > 0) {
+            const db = this.getDB()
+            for (const queueItem of queue) {
+                await db.put(QUEUE, queueItem);
             }
         }
     }
