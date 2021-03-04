@@ -49,18 +49,19 @@ const defaultData = {
 };
 
 export const AddMembersFlow = () => {
-  const history = useHistory();
-  const userMobileNumber = getUserNumberFromRecipientToken();
-  defaultData["contact"] = userMobileNumber;
+    const history = useHistory();
+    const userMobileNumber = getUserNumberFromRecipientToken();
+    defaultData["contact"] = userMobileNumber;
 
-  const [formData, setValue] = useForm(defaultData);
-  const {step, navigation} = useStep({initialStep: 0, steps});
-  const {id} = step;
-  const [programs, setPrograms] = useState([]);
+    const [formData, setValue] = useForm(defaultData);
+    const {step, navigation} = useStep({initialStep: 0, steps});
+    const {id} = step;
+    const [programs, setPrograms] = useState([]);
+    const [isValidationLoading, setValidationLoading] = useState(true);
 
-  useEffect(() => {
-    fetchPrograms()
-  }, []);
+    useEffect(() => {
+        fetchPrograms()
+    }, []);
 
 
     useEffect(() => {
@@ -74,6 +75,7 @@ export const AddMembersFlow = () => {
                 if (isLimitCrossed) {
                     history.push("/registration")
                 }
+                setValidationLoading(isLimitCrossed)
             })
     }, []);
 
@@ -106,6 +108,10 @@ export const AddMembersFlow = () => {
                 console.log(e);
                 history.push("/registration")
             })
+    }
+
+    if (isValidationLoading) {
+        return <div>Loading...</div>
     }
 
   let props = {formData, setValue, navigation, programs};
@@ -327,9 +333,9 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
         <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
           <span>Back</span>
         </CustomButton>
-        <CustomButton className="blue-btn" type="submit" onClick={next}>
+          {programs.length>0 && <CustomButton className="blue-btn" type="submit" onClick={next}>
           <span>Continue &#8594;</span>
-        </CustomButton>
+        </CustomButton>}
       </div>
     </Container>
   )
