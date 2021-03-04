@@ -60,7 +60,8 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 	url := registryUrl(config.Config.Registry.AddOperationId)
 	log.Info("Using registry url ", url)
 	log.Infof("Request >> %+v", requestJson)
-	resp, err := req.Post(url, req.BodyJSON(requestJson))
+	r := req.New()
+	resp, err := r.Post(url, req.BodyJSON(requestJson))
 
 	if resp == nil || err != nil {
 		log.Error("Failed to request registry ", url, " ", err)
@@ -100,7 +101,8 @@ func CreateNewRegistry(requestMap interface{}, objectId string) error {
 	url := registryUrl(config.Config.Registry.AddOperationId)
 	log.Info("Using registry url ", url)
 	log.Infof("Request >> %+v", requestJson)
-	resp, err := req.Post(url, req.BodyJSON(requestJson))
+	r := req.New()
+	resp, err := r.Post(url, req.BodyJSON(requestJson))
 
 	if resp == nil || err != nil {
 		log.Error("Failed to request registry ", url, " ", err)
@@ -201,7 +203,8 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 		},
 	}
 	log.Info("Registry query ", queryRequest)
-	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.UpdateOperationId, req.BodyJSON(queryRequest))
+	r := req.New()
+	response, err := r.Post(config.Config.Registry.Url+"/"+config.Config.Registry.UpdateOperationId, req.BodyJSON(queryRequest))
 	if err != nil {
 		return nil, errors.Errorf("Error while updating registry", err)
 	}
