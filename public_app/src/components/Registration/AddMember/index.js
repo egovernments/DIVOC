@@ -225,7 +225,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check beneficiaries eligibility for the program</h3>
+          <h3>Check beneficiary's eligibility for the program</h3>
         </div>
         <div className="shadow-sm bg-white p-4">
           <div className="p-2">
