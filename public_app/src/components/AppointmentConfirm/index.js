@@ -18,8 +18,8 @@ export const AppointmentConfirm = (props) => {
         <CustomConfirmPage onDone={() => {history.push("/registration")}}>
             <h2 className="">Successfully booked appointment for {appointment.programName || "Covid 19 program"}</h2>
             <h2 className="mt-5 mb-5">Enrolment number: {enrollment_code}</h2>
-            <span style={{fontSize: "18px", marginBottom: "1rem"}}>Booking details will be sent to registered mobile number and email.</span>
-            <span style={{fontSize: "18px", marginBottom: "1rem"}}>Please carry ID proof used for registration when you go to facility for vaccination.</span>
+            <span style={{fontSize: "18px", marginBottom: "1rem"}}>Appointment details will be sent to the registered mobile number and/or email.</span>
+            <span style={{fontSize: "18px", marginBottom: "1rem"}}>On the day of vaccination, please carry your original ``ID Type`` for manual verification</span>
         </CustomConfirmPage>
     )
 };

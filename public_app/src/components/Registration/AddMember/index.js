@@ -33,6 +33,7 @@ const steps = [
 const defaultData = {
   "choice":"yes",
   "programId": "",
+  "programName": "",
   "nationalId": "",
   "name": "",
   "yob": "",
@@ -100,6 +101,7 @@ export const AddMembersFlow = () => {
                 if (res.status === 200) {
                     setPrograms(res.data);
                     setValue({target: {name: "programId", value: res.data[0].osid}})
+                    setValue({target: {name: "programName", value: res.data[0].name}})
                 }
             })
             .catch(e => {
@@ -225,7 +227,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check beneficiary's eligibility for the program</h3>
+          <h3>Check beneficiary's eligibility for {formData.programName}</h3>
         </div>
         <div className="shadow-sm bg-white p-4">
           <div className="p-2">
@@ -293,8 +295,9 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
   const history = useHistory();
   const {next} = navigation;
 
-  function onProgramSelect(osid) {
+  function onProgramSelect(osid, name) {
     setValue({target: {name: "programId", value: osid}})
+    setValue({target: {name: "programName", value: name}})
     // Reinitialize the selected comorbidities if the user changed the program
     setValue({target: {name: "comorbidities", value: []}})
   }
@@ -309,7 +312,7 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
           {
             programs.map(p =>
               <div className="p-2">
-                <a key={p.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(p.osid)}>
+                <a key={p.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(p.osid, p.name)}>
                   <Card border={p.osid === formData.programId ? "success" : "light"} style={{width: '15rem'}}
                         className="text-center h-100">
                     {p.osid === formData.programId && <img src={SelectedLogo} className="selected-program-img"/>}

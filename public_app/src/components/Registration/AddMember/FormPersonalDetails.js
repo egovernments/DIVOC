@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {Col, Container, Row} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
-import Button from "react-bootstrap/Button";
 import state_and_districts from '../../../DummyData/state_and_districts.json';
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 import axios from "axios";
@@ -12,52 +11,19 @@ import {
     AADHAAR_ERROR_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
-    GENDER_ERROR_MSG, INVALID_NAME_ERR_MSG, MAXIMUM_LENGTH_OF_NAME_ERROR_MSG, MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
+    GENDER_ERROR_MSG,
+    INVALID_NAME_ERR_MSG,
+    MAXIMUM_LENGTH_OF_NAME_ERROR_MSG,
+    MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
     NAME_ERROR_MSG,
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
     PINCODE_ERROR_MESSAGE,
     STATE_ERROR_MSG
 } from "./error-constants";
-import {isValidName, isInValidAadhaarNumber, isValidPincode} from "../../../utils/validations";
+import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../../utils/validations";
+import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} from "../../../utils/national-id";
 
-const ID_TYPES = [
-    {
-        "id": "aadhaar",
-        "name": "Aadhaar",
-        "value": "in.gov.uidai.aadhaar"
-    },
-    {
-        "id": "driverLicense",
-        "name": "Driver License",
-        "value": "in.gov.driverlicense"
-    },
-    {
-        "id": "panCard",
-        "name": "Pan Card",
-        "value": "in.gov.pancard"
-    },
-    {
-        "id": "passport",
-        "name": "Passport",
-        "value": "in.gov.passport"
-    },
-    {
-        "id": "healthInsurance",
-        "name": "Health Insurance Smart Card",
-        "value": "in.gov.healthInsurance"
-    },
-    {
-        "id": "mnrega",
-        "name": "MNREGA Job Card",
-        "value": "in.gov.mnrega"
-    },
-    {
-        "id": "id",
-        "name": "Official Identity Card issued to MPs/MLAs",
-        "value": "in.gov.id"
-    }
-];
 // TODO: get state and distict from flagr
 const STATES = Object.values(state_and_districts['states']).map(obj => obj.name);
 
@@ -73,22 +39,13 @@ const RESPONSIVE_ROW_DIV_CLASS = "p-0 pt-2 col-lg-6 col-md-6 col-sm-12";
 export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
 
-
-    const MANDATORY_FIELDS = [
-        "name",
-        "dob",
-        "state",
-        "district",
-        "gender"
-    ];
-
     const { previous, next } = navigation;
     const [errors, setErrors] = useState({});
 
     function validateUserDetails() {
         const errors = {}
-        const nationalIDType = formData.nationalId.split(":")[1]
-        const nationIDNumber = formData.nationalId.split(":")[2]
+        const nationalIDType = getNationalIdType(formData.nationalId)
+        const nationIDNumber = getNationalIdNumber(formData.nationalId)
 
         if(!nationalIDType) {
             errors.nationalIDType = NATIONAL_ID_TYPE_ERROR_MSG
@@ -188,7 +145,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to registry beneficiary"}</h3>
+                <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to register beneficiary"}</h3>
                 <div className="shadow-sm bg-white form-container">
                     <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                     <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
@@ -221,7 +178,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
 
     return (
         <div className="pt-5">
-            <h5>Contact information for e-certificate</h5>
+            <h5>Contact information for vaccination certificate</h5>
             <Row className="pt-2">
                 <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
@@ -276,12 +233,9 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
 };
 
 const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
-    function constuctNationalId(idtype, idNumber) {
-        return ["did", idtype, idNumber].join(":")
-    }
 
     function getSelectedIdType() {
-        const preSelectedIdValue = formData.nationalId ? formData.nationalId.split(":")[1]: undefined;
+        const preSelectedIdValue = formData.nationalId ? getNationalIdType(formData.nationalId): undefined;
         return preSelectedIdValue ? ID_TYPES.filter(a => a.value === preSelectedIdValue)[0].name: ""
     }
 
@@ -290,15 +244,18 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
             const idValue = event.target.value;
             let existingIdNumber = "";
             if (formData.nationalId) {
-                existingIdNumber = formData.nationalId.split(":")[2] ? formData.nationalId.split(":")[2]: ""
+                const nationalIdNumber = getNationalIdNumber(formData.nationalId);
+                existingIdNumber = nationalIdNumber ? nationalIdNumber: ""
             }
             let nationalId = constuctNationalId(idValue, existingIdNumber)
             setValue({target: {name:"nationalId", value:nationalId}})
         } else if (type === "idNumber") {
             const idNumber = event.target.value;
             let existingIdType = "";
-            if (formData.nationalId)
-                existingIdType = formData.nationalId.split(":")[1] ? formData.nationalId.split(":")[1]: "";
+            if (formData.nationalId) {
+                const nationalIdType = getNationalIdType(formData.nationalId);
+                existingIdType = nationalIdType ? nationalIdType: "";
+            }
             let nationalId = constuctNationalId(existingIdType, idNumber);
             setValue({target: {name:"nationalId", value:nationalId}})
         }
@@ -335,7 +292,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         <input className="form-control" id="idNumber"
                                hidden={verifyDetails}
                                type="text" placeholder="Enter ID Number"
-                               defaultValue={formData.nationalId.split(":")[2]}
+                               defaultValue={getNationalIdNumber(formData.nationalId)}
                                onBlur={(e) => onIdChange(e, "idNumber")}/>
                         <div className="invalid-input">
                             {errors.nationalID}
@@ -346,7 +303,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <p>{formData.nationalId.split(":")[2]}</p>
+                            <p>{getNationalIdNumber(formData.nationalId)}</p>
                         }
                     </Col>
                 </div>
