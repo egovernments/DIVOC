@@ -99,11 +99,8 @@ export const Members = () => {
         ];
         axios.get(PROGRAM_API)
             .then(res => {
-                if (res.status === 200) {
-                    const programs = res.data.map(obj => ({name: obj.name, id: obj.osid}));
-                    setPrograms(programs);
-                }
-                setPrograms([])
+                const programs = res.data.map(obj => ({name: obj.name, id: obj.osid}));
+                setPrograms(programs);
             })
             .catch(e => {
                 console.log("throwened error", e);
@@ -268,7 +265,7 @@ export const Members = () => {
 const MemberCard = (props) => {
     const history = useHistory();
     const member = props.member;
-    const program = props.programs.filter(p => p.id === member.programId)[0];
+    const program = props.programs.find(p => p.osid === member.programId);
 
     // Need to think about the logic to support multiple appointment
     const isAppointmentBooked = !!member["appointments"][0].enrollmentScopeId;
@@ -336,7 +333,7 @@ const MemberCard = (props) => {
                                                   onClick={() => {
                                                       history.push({
                                                           pathname: `/${member.code}/${member["appointments"][0].programId}/appointment`,
-                                                          state: {name: member.name}
+                                                          state: {name: member.name, nationalId: member.nationalId, program: program}
                                                       })
                                                   }}>{isAppointmentBooked ? "Edit" : "Book"}
                                         <br/>Appointment</CustomButton>

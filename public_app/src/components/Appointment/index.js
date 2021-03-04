@@ -162,7 +162,10 @@ export const Appointment = (props) => {
             dose: "1"
         }, config)
             .then(res => {
-                history.push("/" + enrollment_code + "/appointment/confirm")
+                history.push({
+                    pathname:"/" + enrollment_code + "/appointment/confirm",
+                    state:{nationalId: state.nationalId, program: state.program}
+                })
             })
             .catch(() => {
                 alert("Something went wrong. Please try again");

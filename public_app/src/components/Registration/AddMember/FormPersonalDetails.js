@@ -223,7 +223,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         </div>
                         {
                             verifyDetails &&
-                            <><br/><p>{formData.email}</p></>
+                            <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                         }
                     </Col>
                 </div>
