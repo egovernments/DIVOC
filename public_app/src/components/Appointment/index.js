@@ -98,7 +98,7 @@ export const Appointment = (props) => {
     function getFacilityDetails() {
         if (showModal && "facilityId" in selectedAllotment) {
             const facility = facilities.find(facility => facility.osid === selectedAllotment.facilityId);
-            return <>{`At ${facility.facilityName},`}<br/> {`${formatAddress(facility.address)}`}</>;
+            return <>{`at ${facility.facilityName},`}<br/> {`${formatAddress(facility.address)}`}</>;
         } else {
             return "";
         }
@@ -162,7 +162,10 @@ export const Appointment = (props) => {
             dose: "1"
         }, config)
             .then(res => {
-                history.push("/" + enrollment_code + "/appointment/confirm")
+                history.push({
+                    pathname:"/" + enrollment_code + "/appointment/confirm",
+                    state:{nationalId: state.nationalId, program: state.program}
+                })
             })
             .catch(() => {
                 alert("Something went wrong. Please try again");
@@ -189,7 +192,7 @@ export const Appointment = (props) => {
 
                 </Row>
                 <br/>
-                <h4>Facilities availability for next few days</h4>
+                <h4>Facilities' availability for next few days</h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
@@ -242,8 +245,8 @@ export const Appointment = (props) => {
                     <div className="d-flex flex-column justify-content-center align-items-center">
                         <span>For {state && state.name}</span>
                         <span className="text-center mt-1">{getFacilityDetails()}</span>
-                        <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
-                        <span className="mt-1">{selectedAllotment.allotmentTime}</span>
+                        <span className="mt-1">on {formatDate(selectedAllotment.allotmentDate)}</span>
+                        <span className="mt-1">at {selectedAllotment.allotmentTime}</span>
                         <CustomButton className="blue-btn" onClick={() => {
                             bookSlot()
                         }}>CONFIRM</CustomButton>

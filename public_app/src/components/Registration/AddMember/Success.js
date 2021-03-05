@@ -2,6 +2,7 @@ import React from "react";
 import {useHistory} from "react-router-dom";
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 import {CustomConfirmPage} from "../../CustomConfirmPage";
+import {getNameOfTheId, getNationalIdType} from "../../../utils/national-id";
 
 export const Success = ({ formData, programs}) => {
     const history = useHistory();
@@ -19,7 +20,7 @@ export const Success = ({ formData, programs}) => {
                     {maskPersonalDetails(formData.contact)}</p>
             </div>
             <div className="pt-3">
-                <p>On day of vaccination, please carry same ID proof used for registration</p>
+                <p>On day of vaccination, please carry your original {getNameOfTheId(getNationalIdType(formData.nationalId))}</p>
             </div>
         </CustomConfirmPage>
     )
