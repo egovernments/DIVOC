@@ -3,6 +3,7 @@ package db
 import (
 	"errors"
 	"fmt"
+
 	"github.com/divoc/portal-api/config"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres" //required for gorm to work
@@ -19,12 +20,6 @@ type CSVUploads struct {
 
 	// file header
 	FileHeaders string
-
-	// Enum: [Success,Processing,Failed]
-	Status string
-
-	// total error rows
-	TotalErrorRows int64
 
 	// total records
 	TotalRecords int64
@@ -46,6 +41,8 @@ type CSVUploadErrors struct {
 	Errors string `json:"errors"`
 
 	RowData string
+	
+	InProgress bool
 }
 
 func Init() {
@@ -78,32 +75,15 @@ func CreateCSVUpload(data *CSVUploads) error {
 	return nil
 }
 
-// GetFacilityUploadsForUser - Get all Facility file uploads for giver user
-func GetFacilityUploadsForUser(userID string) ([]*CSVUploads, error) {
-	var facilityUploads []*CSVUploads
-	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, "Facility"); result.Error != nil {
-		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
-		return nil, errors.New("error occurred while retrieving CSVUploads")
+// GetUploadsForUser - Get all uploads for given User and Type
+func GetUploadsForUser(userID, uploadType string) ([]*CSVUploads, error) {
+	var uploads []*CSVUploads
+	if result := db.Order("created_at desc").Find(&uploads, "user_id = ? AND upload_type = ?", userID, uploadType); result.Error != nil {
+		errMsg := fmt.Sprintf("Error occurred while retrieving %s CSVUploads for user %s", uploadType, userID)
+		log.Errorf(errMsg)
+		return nil, errors.New(errMsg)
 	}
-	return facilityUploads, nil
-}
-
-func GetEnrollmentUploadsForUser(userID string) ([]*CSVUploads, error) {
-	var facilityUploads []*CSVUploads
-	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, "PreEnrollment"); result.Error != nil {
-		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
-		return nil, errors.New("error occurred while retrieving CSVUploads")
-	}
-	return facilityUploads, nil
-}
-
-func GetCSVUploadsForUser(userID string, uploadType string) ([]*CSVUploads, error) {
-	var facilityUploads []*CSVUploads
-	if result := db.Order("created_at desc").Find(&facilityUploads, "user_id = ? AND upload_type = ?", userID, uploadType); result.Error != nil {
-		log.Error("Error occurred while retrieving CSVUploads for user ", userID)
-		return nil, errors.New("error occurred while retrieving CSVUploads")
-	}
-	return facilityUploads, nil
+	return uploads, nil
 }
 
 func UpdateCSVUpload(data *CSVUploads) error {
@@ -131,6 +111,33 @@ func GetCSVUploadsForID(id int64) (*CSVUploads, error) {
 	}
 	return facilityUpload, nil
 
+}
+
+func DeleteCSVUploadError(id uint) error {
+	if r := db.Unscoped().Delete(&CSVUploadErrors{}, id); r.Error != nil {
+		errMsg := fmt.Sprintf("Error while deleting CSVUpload Error id = %d, error: %s", id, r.Error.Error())
+		log.Error(errMsg)
+		return errors.New(errMsg)
+	}
+	log.Info("Deleted CSVUploadError for ID = ", id)
+	return nil
+}
+
+func UpdateCSVUploadError(id uint, errorMsg string, inProgess bool) error {
+	csvUploadErrors := &CSVUploadErrors{}
+	if r := db.First(&csvUploadErrors, id); r.Error != nil {
+		errMsg := fmt.Sprintf("Error occurred while fetching CSVUploadError ID=%d", id)
+		log.Error(errMsg)
+		return errors.New(errMsg)
+	}
+	csvUploadErrors.InProgress = inProgess
+	csvUploadErrors.Errors = errorMsg
+
+	r := db.Save(csvUploadErrors)
+	if r.Error != nil {
+		log.Error("Error while saving CSVUploadError ID=", id)
+	} 
+	return r.Error
 }
 
 func GetCSVUploadErrorsForUploadID(uploadId int64) ([]*CSVUploadErrors, error) {

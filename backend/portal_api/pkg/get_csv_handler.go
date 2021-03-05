@@ -2,10 +2,11 @@ package pkg
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jinzhu/gorm"
-	"strings"
 )
 
 type GetCSVUpload struct {
@@ -15,7 +16,7 @@ type GetCSVUpload struct {
 }
 
 func (getCSVUpload GetCSVUpload) GetCSVUploadsForUser() ([]*db.CSVUploads, error) {
-	return db.GetCSVUploadsForUser(getCSVUpload.UserId, getCSVUpload.UploadType)
+	return db.GetUploadsForUser(getCSVUpload.UserId, getCSVUpload.UploadType)
 }
 
 func (getCSVUpload GetCSVUpload) GetCSVUploadErrors(uploadID int64) middleware.Responder {
