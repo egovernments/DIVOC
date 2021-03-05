@@ -257,6 +257,9 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                                 <input className="form-control" id="confirmEmail" name="email" type="text"
                                        placeholder="Confirm Email ID"
                                        value={formData.confirmEmail}
+                                       onPaste={(e) => {e.preventDefault()}}
+                                       onDrag={(e) => {e.preventDefault()}}
+                                       onDrop={(e) => {e.preventDefault()}}
                                        onChange={(e) => setValue({target: {name:"confirmEmail", value:e.target.value}})}
                                 />
                             </div>
