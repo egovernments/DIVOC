@@ -265,7 +265,7 @@ export const Members = () => {
 const MemberCard = (props) => {
     const history = useHistory();
     const member = props.member;
-    const program = props.programs.find(p => p.osid === member.programId);
+    const program = props.programs.find(p => p.id === member["appointments"][0].programId);
 
     // Need to think about the logic to support multiple appointment
     const isAppointmentBooked = !!member["appointments"][0].enrollmentScopeId;
