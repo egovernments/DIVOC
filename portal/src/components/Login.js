@@ -36,6 +36,7 @@ const Login = () => {
             } else {
                 alert("Unauthorized access. Contact ADMIN");
                 keycloak.logout({redirectUri: window.location.origin + config.urlPath});
+                return
             }
             history.push(redirectUrl)
         }
