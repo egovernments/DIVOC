@@ -17,6 +17,7 @@ import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
+import {AppointmentDetails} from "./AppointmentDetails";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState();
@@ -113,6 +114,7 @@ export function VaccineProgram() {
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY)} content={<VaccinationStatus/>}/>
+        <AppointmentDetails/>
     </div>;
 }
 
