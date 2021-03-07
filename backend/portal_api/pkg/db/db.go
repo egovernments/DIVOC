@@ -32,6 +32,11 @@ type CSVUploads struct {
 	UploadType string
 }
 
+type CSVUploadInfo struct {
+	CSVUploads
+	TotalErrorRows	uint
+}
+
 type CSVUploadErrors struct {
 	gorm.Model
 
@@ -76,10 +81,16 @@ func CreateCSVUpload(data *CSVUploads) error {
 }
 
 // GetUploadsForUser - Get all uploads for given User and Type
-func GetUploadsForUser(userID, uploadType string) ([]*CSVUploads, error) {
-	var uploads []*CSVUploads
-	if result := db.Order("created_at desc").Find(&uploads, "user_id = ? AND upload_type = ?", userID, uploadType); result.Error != nil {
-		errMsg := fmt.Sprintf("Error occurred while retrieving %s CSVUploads for user %s", uploadType, userID)
+func GetUploadsForUser(userID, uploadType string) ([]*CSVUploadInfo, error) {
+	var uploads []*CSVUploadInfo
+	if err := db.Raw(`
+					SELECT csv_uploads.*, count(csv_upload_errors.id) as total_error_rows
+					FROM csv_uploads LEFT JOIN csv_upload_errors 
+						ON csv_upload_errors.csv_upload_id = csv_uploads.id 
+						AND csv_upload_errors.in_progress != true
+					WHERE user_id = ? AND upload_type = ? GROUP BY csv_uploads.id`, userID, uploadType,
+				).Scan(&uploads).Error; err != nil {
+		errMsg := fmt.Sprintf("Error occurred while retrieving %s CSVUploads for user %s. Error: %s", uploadType, userID, err.Error())
 		log.Errorf(errMsg)
 		return nil, errors.New(errMsg)
 	}

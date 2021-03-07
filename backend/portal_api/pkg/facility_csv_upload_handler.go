@@ -110,6 +110,6 @@ func buildVaccinator(data *Scanner) *models.FacilityAdmin {
 	}
 }
 
-func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) *db.CSVUploadErrors {
-	return facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }

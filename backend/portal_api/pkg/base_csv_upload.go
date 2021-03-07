@@ -22,7 +22,7 @@ type BaseCSV interface {
 	CreateCsvUploadHistory() *db.CSVUploads
 	ValidateRow() []string
 	ProcessRow(uploadID uint) error
-	SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) *db.CSVUploadErrors
+	SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgess bool) *db.CSVUploadErrors
 }
 
 func (baseCsv CSVMetadata) ValidateHeaders() *models.Error {
@@ -65,10 +65,11 @@ func (baseCsv CSVMetadata) CreateCsvUploadHistory(uploadType string) *db.CSVUplo
 	return &uploadEntry
 }
 
-func (baseCsv CSVMetadata) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) *db.CSVUploadErrors {
+func (baseCsv CSVMetadata) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgess bool) *db.CSVUploadErrors {
 	csvUploadErrors := db.CSVUploadErrors{}
 	csvUploadErrors.Errors = strings.Join(rowErrors, ",")
 	csvUploadErrors.CSVUploadID = csvUploadHistoryId
+	csvUploadErrors.InProgress = inProgess
 	var row []string
 	for _, item := range baseCsv.Data.Row {
 		row = append(row, "\""+item+"\"")
@@ -91,7 +92,7 @@ func ProcessCSV(baseCsv BaseCSV, data *Scanner) {
 
 	saveErrors := func (errors []string) {
 		log.Error("Error while processing row : ", errors)
-		baseCsv.SaveCsvErrors(errors, csvUploadHistory.ID)
+		baseCsv.SaveCsvErrors(errors, csvUploadHistory.ID, false)
 	}
 
 	for data.Scan() {

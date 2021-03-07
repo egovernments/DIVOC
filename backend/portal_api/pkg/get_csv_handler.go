@@ -15,7 +15,7 @@ type GetCSVUpload struct {
 	UploadType string
 }
 
-func (getCSVUpload GetCSVUpload) GetCSVUploadsForUser() ([]*db.CSVUploads, error) {
+func (getCSVUpload GetCSVUpload) GetCSVUploadsForUser() ([]*db.CSVUploadInfo, error) {
 	return db.GetUploadsForUser(getCSVUpload.UserId, getCSVUpload.UploadType)
 }
 

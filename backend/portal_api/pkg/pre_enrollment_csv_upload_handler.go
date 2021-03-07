@@ -75,7 +75,7 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 		Comorbidities: []string{},
 	}
 
-	csvUploadErr := preEnrollmentCsv.SaveCsvErrors(nil, uploadID)
+	csvUploadErr := preEnrollmentCsv.SaveCsvErrors(nil, uploadID, true)
 	
 	enrollmentMsg, err := json.Marshal(struct{
 		RowID uint	`json:"rowID"`
@@ -91,6 +91,6 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 	return nil
 }
 
-func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) *db.CSVUploadErrors {
-	return preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }

@@ -63,6 +63,6 @@ func (vaccinatorCSV VaccinatorCSV) ProcessRow(uploadID uint) error {
 	return nil
 }
 
-func (vaccinatorCSV VaccinatorCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) *db.CSVUploadErrors {
-	return vaccinatorCSV.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (vaccinatorCSV VaccinatorCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return vaccinatorCSV.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }
