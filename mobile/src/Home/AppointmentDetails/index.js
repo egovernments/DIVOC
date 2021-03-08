@@ -6,33 +6,51 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {formatDate, getMeridiemTime, weekdays} from "../../utils/date_utils";
 import {Title} from "../Home";
 
-function getTimeInSeconds(str1) {
-    str1 =  str1.split(':');
-    return str1[0] * 3600 + str1[1] * 60;
-}
-
-function isOnGoing(startTime, endTime) {
-    const startTimeInSeconds = parseInt(getTimeInSeconds(startTime));
-    const endTimeInSeconds = parseInt(getTimeInSeconds(endTime));
-
-    const today = new Date()
-    const todayInSeconds = getTimeInSeconds(today.getHours() + ":" + today.getMinutes())
-
-    return todayInSeconds >= startTimeInSeconds && todayInSeconds <= endTimeInSeconds
-}
-
 export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, completed, open, ...props) => {
     const [appointmentScheduleData, setAppointmentScheduleData] = useState({});
     const [enrollments, setEnrollments] = useState(undefined)
     const [morningScheduleOnGoing, setMorningScheduleOnGoing] = useState(false)
     const [afterNoonScheduleOnGoing, setAfterNoonScheduleOnGoing] = useState(false)
 
+    function getTimeInSeconds(time) {
+        time =  time.split(':');
+        return time[0] * 3600 + time[1] * 60;
+    }
+
+    function isOnGoing(startTime, endTime) {
+        const startTimeInSeconds = parseInt(getTimeInSeconds(startTime));
+        const endTimeInSeconds = parseInt(getTimeInSeconds(endTime));
+
+        const today = new Date()
+        const todayInSeconds = getTimeInSeconds(today.getHours() + ":" + today.getMinutes())
+
+        return todayInSeconds >= startTimeInSeconds && todayInSeconds <= endTimeInSeconds
+    }
+
     useEffect(() => {
+        let interval;
         appIndexDb.getFacilitySchedule()
-            .then((scheduleResponse) => setAppointmentScheduleData(scheduleResponse));
+            .then((scheduleResponse) => {
+                setAppointmentScheduleData(scheduleResponse)
+                // Calculate ongoing logic for every minute
+                const timeout = 1000 * 60;
+                interval = setInterval(() => {
+                    console.log("I am calculating ongoing status");
+                    const appointmentSchedules = scheduleResponse["appointmentSchedule"]
+                    setMorningScheduleOnGoing(
+                        isOnGoing(appointmentSchedules[0].startTime, appointmentSchedules[0].endTime)
+                    )
+                    setAfterNoonScheduleOnGoing(
+                        isOnGoing(appointmentSchedules[1].startTime, appointmentSchedules[1].endTime)
+                    )
+                }, timeout)
+            });
         appIndexDb.getAllEnrollments()
             .then((enrollments) => setEnrollments(enrollments))
+        // Clear the interval when component unmounts
+        return () => clearInterval(interval)
     }, [])
+
     completed = 10
 
     const dimGrayColor = {color:"#696969"};
@@ -55,8 +73,7 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         </div>
     }
 
-    const scheduleLabel = (title, schedule) => {
-        const onGoing = isOnGoing(schedule.startTime, schedule.endTime)
+    const scheduleLabel = (title, schedule, onGoing) => {
         const dayOfToday = weekdays[new Date().getDay()]
         const scheduleDetails = schedule["days"].find((scheduleForThatDay) => scheduleForThatDay.day === dayOfToday)
         const total = scheduleDetails.maxAppointments
@@ -72,11 +89,11 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
             {statusBanner(booked, completed, total - booked)}
         </div>
     }
-    const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
 
-    if (appointmentSchedule && enrollments) {
-        const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0])
-        const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1])
+    if (appointmentScheduleData["appointmentSchedule"] && enrollments) {
+        const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
+        const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0], morningScheduleOnGoing)
+        const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1], afterNoonScheduleOnGoing)
         const content = <>
             {morningScheduleElement}
             {afterNoonScheduleElement}
