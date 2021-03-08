@@ -2,15 +2,14 @@ package services
 
 import (
 	"bytes"
-	json "encoding/json"
-	"text/template"
-	"time"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
+	"text/template"
 )
 
 func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
@@ -40,7 +39,6 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
-		facilityDetails := make(map[string]interface{})
 		if enrollment["appointments"] == nil {
 			continue
 		}
@@ -48,43 +46,11 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 
 		// No appointment means no need to show the facility details
 		for _, appointment := range appointments {
-			facilityCode := appointment.(map[string]interface{})["enrollmentScopeId"]
-			if facilityCode != nil && len(facilityCode.(string)) > 0 {
-				redisKey := facilityCode.(string) + "-info"
-				value, err := GetValue(redisKey)
-				if err := json.Unmarshal([]byte(value), &facilityDetails); err != nil {
-					log.Errorf("Error in marshalling json %+v", err)
-				}
-				if err != nil || len(facilityDetails) == 0 {
-					log.Errorf("Unable to get the value in Cache (%v)", err)
-					filter := map[string]interface{}{}
-					filter["facilityCode"] = map[string]interface{}{
-						"eq": facilityCode,
-					}
-					if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
-						facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
-						facilityDetails["facilityName"] = facility["facilityName"]
-						facilityAddress := facility["address"].(map[string]interface{})
-						facilityDetails["state"] = facilityAddress["state"]
-						facilityDetails["pincode"] = facilityAddress["pincode"]
-						facilityDetails["district"] = facilityAddress["district"]
-						appointment.(map[string]interface{})["facilityDetails"] = facilityDetails
-						if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
-							log.Errorf("Error in Marshaling the facility details %+v", err)
-						} else {
-							err:=SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
-							if err != nil {
-								log.Errorf("Unable to set the value in Cache (%v)", err)
-							}
-						}
-					} else {
-						log.Errorf("Error occurred while fetching the details of facility (%v)", err)
-					}
-				} else {
-					appointment.(map[string]interface{})["facilityDetails"] = facilityDetails
-				}
+			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string);
+			ok && facilityCode != "" && len(facilityCode) > 0 {
+				minifiedFacilityDetails := GetMinifiedFacilityDetails(facilityCode)
+				appointment.(map[string]interface{})["facilityDetails"] = minifiedFacilityDetails
 			}
-
 		}
 	}
 }
@@ -115,23 +81,23 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 	return nil
 }
 
-func NotifyAppointmentBooked(enrollment models.Enrollment) error {
-	AppointmentBooked := "appointmentBooked"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[AppointmentBooked].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[AppointmentBooked].Subject
+func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotification) error {
+	appointmentBooked := "appointmentBooked"
+	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
-	recipient := "sms:" + enrollment.Phone
-	log.Infof("Sending SMS %s %s", recipient, enrollment)
+	recipient := "sms:" + appointmentNotification.RecipientPhone
+	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
 	buf := bytes.Buffer{}
-	err := appointmentBookedTemplate.Execute(&buf, enrollment)
+	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
-		if len(enrollment.Phone) > 0 {
-			PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
+		if len(appointmentNotification.RecipientPhone) > 0 {
+			PublishNotificationMessage("tel:"+appointmentNotification.RecipientPhone, subject, buf.String())
 		}
-		if len(enrollment.Email) > 0 {
-			PublishNotificationMessage("mailto:"+enrollment.Email, subject, buf.String())
+		if len(appointmentNotification.RecipientEmail) > 0 {
+			PublishNotificationMessage("mailto:"+appointmentNotification.RecipientEmail, subject, buf.String())
 		}
 	} else {
 		log.Errorf("Error occurred while parsing the message (%v)", err)
@@ -139,3 +105,29 @@ func NotifyAppointmentBooked(enrollment models.Enrollment) error {
 	}
 	return nil
 }
+
+func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotification) error {
+	appointmentCancelled := "appointmentCancelled"
+	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Subject
+
+	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
+
+	recipient := "sms:" + appointmentNotification.RecipientPhone
+	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	buf := bytes.Buffer{}
+	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
+	if err == nil {
+		if len(appointmentNotification.RecipientPhone) > 0 {
+			PublishNotificationMessage("tel:"+appointmentNotification.RecipientPhone, subject, buf.String())
+		}
+		if len(appointmentNotification.RecipientEmail) > 0 {
+			PublishNotificationMessage("mailto:"+appointmentNotification.RecipientEmail, subject, buf.String())
+		}
+	} else {
+		log.Errorf("Error occurred while parsing the message (%v)", err)
+		return err
+	}
+	return nil
+}
+

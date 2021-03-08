@@ -6,6 +6,7 @@ import (
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
+	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
@@ -43,30 +44,52 @@ func StartRecipientsAppointmentBookingConsumer() {
 						"eq": appointmentAckMessage.EnrollmentCode,
 					}
 					if responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0); err==nil && len(responseFromRegistry["Enrollment"].([]interface{})) > 0{
-						enrollment := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
-						existingAppointments := enrollment["appointments"].([]interface{})
-						appointmentToUpdate := findTheAppointmentToUpdate(existingAppointments, appointmentAckMessage)
-						if appointmentToUpdate == nil {
-							log.Errorf("User didn't enroll for the given program (%v) and dose (%v)", appointmentAckMessage.ProgramId, appointmentAckMessage.Dose)
-						} else  {
-							parsedDate, err := time.Parse("2006-01-02", appointmentAckMessage.AppointmentDate)
-							if err == nil {
-								appointmentToUpdate["appointmentDate"] = strfmt.Date(parsedDate)
-								appointmentToUpdate["appointmentSlot"] = appointmentAckMessage.AppointmentTime
-								appointmentToUpdate["enrollmentScopeId"] = appointmentAckMessage.FacilityCode
-								appointmentToUpdate["certified"] = false
-								_, err = kernelService.UpdateRegistry("appointments", appointmentToUpdate)
-								if err == nil {
-									err := services.NotifyAppointmentBooked(CreateEnrollmentForNotificationTemplate(enrollment, appointmentAckMessage))
-									if err != nil {
-										log.Error("Unable to send notification to the enrolled user", err)
-									}
+						enrollmentResp := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
+						if bytes, err := json.Marshal(enrollmentResp); err == nil {
+							var enrollment models.Enrollment
+							if err = json.Unmarshal(bytes, &enrollment); err == nil {
+								existingAppointments := enrollment.Appointments
+								appointmentToUpdate := findTheAppointmentToUpdate(existingAppointments, appointmentAckMessage)
+								if appointmentToUpdate == nil {
+									log.Errorf("User didn't enroll for the given program (%v) and dose (%v)", appointmentAckMessage.ProgramId, appointmentAckMessage.Dose)
 								} else {
-									log.Error("Booking appointment is failed ", err)
+									parsedDate, err := time.Parse("2006-01-02", appointmentAckMessage.AppointmentDate)
+									if err == nil {
+										notificationTemplate := toAppointmentNotificationTemplate(enrollment, appointmentToUpdate)
+										if appointmentAckMessage.Status == models2.AllottedStatus {
+											appointmentToUpdate.AppointmentDate = strfmt.Date(parsedDate)
+											appointmentToUpdate.AppointmentSlot = appointmentAckMessage.AppointmentTime
+											appointmentToUpdate.EnrollmentScopeID = appointmentAckMessage.FacilityCode
+										} else if appointmentAckMessage.Status == models2.CancelledStatus {
+											appointmentToUpdate.AppointmentDate = strfmt.Date(parsedDate)
+											appointmentToUpdate.AppointmentSlot = ""
+											appointmentToUpdate.EnrollmentScopeID = ""
+										}
+										certified := false
+										appointmentToUpdate.Certified = &certified
+										_, err = kernelService.UpdateRegistry("appointments", utils.ToMap(appointmentToUpdate))
+										if err == nil {
+											if appointmentAckMessage.Status == models2.AllottedStatus {
+												notificationTemplate := toAppointmentNotificationTemplate(enrollment, appointmentToUpdate)
+												err := services.NotifyAppointmentBooked(notificationTemplate)
+												if err != nil {
+													log.Error("Unable to send notification to the enrolled user", err)
+												}
+											}
+											if appointmentAckMessage.Status == models2.CancelledStatus {
+												err := services.NotifyAppointmentCancelled(notificationTemplate)
+												if err != nil {
+													log.Error("Unable to send notification to the enrolled user", err)
+												}
+											}
+										} else {
+											log.Error("Booking appointment is failed ", err)
+										}
+									} else {
+										// Push to error topic
+										log.Error("Date parsing failed ", err)
+									}
 								}
-							} else {
-								// Push to error topic
-								log.Error("Date parsing failed ", err)
 							}
 						}
 						_, _ = consumer.CommitMessage(msg)
@@ -85,45 +108,23 @@ func StartRecipientsAppointmentBookingConsumer() {
 	}()
 }
 
-func findTheAppointmentToUpdate(existingAppointments []interface{}, message models2.AppointmentAck) map[string]interface{} {
+func findTheAppointmentToUpdate(existingAppointments []*models.EnrollmentAppointmentsItems0, message models2.AppointmentAck) *models.EnrollmentAppointmentsItems0 {
 	for _, appointment := range existingAppointments {
-		appointmentMap := appointment.(map[string]interface{})
-		if appointmentMap["programId"] == message.ProgramId && appointmentMap["dose"] == message.Dose {
+		if appointment.ProgramID == message.ProgramId && appointment.Dose == message.Dose {
 			log.Info("Found an appointment to update")
-			return appointmentMap
+			return appointment
 		}
 	}
 	return nil
 }
 
-func CreateEnrollmentForNotificationTemplate(enrollmentMap map[string]interface{}, message models2.AppointmentAck) models.Enrollment {
-	appointmentDateFormat, err := time.Parse("2006-01-02", message.AppointmentDate)
-	if err != nil {
-		log.Errorf("Invalid date format (%v) (%v)", message.AppointmentDate, err)
-		return models.Enrollment{}
-	} else {
-		email, emailOk := enrollmentMap["email"].(string)
-		if !emailOk {
-			email = ""
-		}
-		appointments := make([]*models.EnrollmentAppointmentsItems0, 1)
-		// In template there will be only one appointment in an appointments array
-		return models.Enrollment{
-			Name:            enrollmentMap["name"].(string),
-			Phone:           enrollmentMap["phone"].(string),
-			Email:           email,
-			Appointments: append(appointments, &models.EnrollmentAppointmentsItems0{
-				AppointmentDate: strfmt.Date(appointmentDateFormat),
-				AppointmentSlot: message.AppointmentTime,
-				Dose:            message.Dose,
-			}),
-		}
+func toAppointmentNotificationTemplate(enrollment models.Enrollment, appointment *models.EnrollmentAppointmentsItems0) models2.AppointmentNotification {
+	facilityDetails := services.GetMinifiedFacilityDetails(appointment.EnrollmentScopeID)
+	return models2.AppointmentNotification{
+		RecipientName:    enrollment.Name,
+		RecipientPhone:   enrollment.Phone,
+		RecipientEmail:   enrollment.Email,
+		FacilityName:     facilityDetails.FacilityName,
+		FacilitySlotTime: appointment.AppointmentDate.String() + appointment.AppointmentSlot,
 	}
-}
-
-type RecipientAppointmentMessage struct {
-	EnrollmentCode  string
-	FacilityCode    string
-	AppointmentDate string
-	AppointmentTime string
 }

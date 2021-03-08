@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"github.com/divoc/registration-api/config"
 	log "github.com/sirupsen/logrus"
 	"math"
@@ -52,4 +53,14 @@ func SendOTP(prefix string, phone string, otp string) (*sns.PublishOutput, error
 	resp, err := svc.Publish(params)
 	log.Infof("Message sent %s %+v", phone, resp)
 	return resp, err
+}
+
+func ToMap(obj interface{}) map[string]interface{}{
+	if bytes, err := json.Marshal(obj); err == nil {
+		var resp map[string]interface{}
+		if err := json.Unmarshal(bytes, &resp); err == nil {
+			return resp
+		}
+	}
+	return nil
 }
