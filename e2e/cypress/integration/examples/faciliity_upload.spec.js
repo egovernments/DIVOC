@@ -1,19 +1,27 @@
+const BASE_URL = "http://localhost:8001/divoc/admin/api/v1";
+const FACILITIES = BASE_URL + "/facilities"
+
 describe("Facility Tests", () => {
-    it('should get all facilities', function () {
-        cy.divocRequest('GET', 'http://localhost:8001/divoc/admin/api/v1/facilities')
+
+    beforeEach(() => {
+        cy.intercept({
+            url: BASE_URL,
+        }).as("waitForApiToComplete");
+    })
+
+    it("Test GET facilities by Upload Facilities CSV ", () => {
+
+        const fileName = 'facilities.csv';
+
+        cy.divocFormRequest('POST', FACILITIES, fileName, (response) => {
+            expect(response.status).to.eq(200)
+        })
+
+        cy.wait("@waitForApiToComplete")
+
+        cy.divocRequest('GET', FACILITIES)
             .its('body')
             .should('be.an', 'array')
             .and('have.length', 10)
-    });
-
-    it("Facilities File Upload", () => {
-        //Declarations
-        const fileName = 'facilities.csv';
-        const method = 'POST';
-        const url = 'http://localhost:8001/divoc/admin/api/v1/facilities';
-
-        cy.divocFormRequest(method, url, fileName, (response) => {
-            expect(response.status).to.eq(200)
-        });
     })
 })
