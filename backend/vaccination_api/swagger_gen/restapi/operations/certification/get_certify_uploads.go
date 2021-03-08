@@ -31,7 +31,7 @@ func NewGetCertifyUploads(ctx *middleware.Context, handler GetCertifyUploadsHand
 	return &GetCertifyUploads{Context: ctx, Handler: handler}
 }
 
-/*GetCertifyUploads swagger:route GET /certify/uploads certification getCertifyUploads
+/* GetCertifyUploads swagger:route GET /certify/uploads certification getCertifyUploads
 
 Get all file uploads for certification for given facility admin
 
@@ -47,7 +47,6 @@ func (o *GetCertifyUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetCertifyUploadsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetCertifyUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

@@ -17,7 +17,8 @@ import (
 )
 
 // NewGetPreEnrollmentsForFacilityParams creates a new GetPreEnrollmentsForFacilityParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetPreEnrollmentsForFacilityParams() GetPreEnrollmentsForFacilityParams {
 
 	return GetPreEnrollmentsForFacilityParams{}
@@ -71,7 +72,6 @@ func (o *GetPreEnrollmentsForFacilityParams) BindRequest(r *http.Request, route 
 	if err := o.bindOffset(qOffset, qhkOffset, route.Formats); err != nil {
 		res = append(res, err)
 	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -123,6 +123,7 @@ func (o *GetPreEnrollmentsForFacilityParams) bindLimit(rawData []string, hasKey 
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
@@ -145,6 +146,7 @@ func (o *GetPreEnrollmentsForFacilityParams) bindOffset(rawData []string, hasKey
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
