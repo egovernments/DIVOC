@@ -32,6 +32,9 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	if err != nil {
 		return err
 	}
+	if serialNum == 0 {
+		return errors.New("serialNum key can not have zero value")
+	}
 
 	var admins []*models.FacilityAdmin
 	admins = append(admins, buildVaccinator(data))
