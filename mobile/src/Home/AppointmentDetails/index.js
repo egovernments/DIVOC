@@ -1,7 +1,18 @@
 import "../Home.scss"
 import "./index.scss"
+import React, {useEffect, useState} from "react";
+import {appIndexDb} from "../../AppDatabase";
+import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
+import {formatDate} from "../../utils/date_utils";
+import {Title} from "../Home";
 
 export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, completed, open, ...props) => {
+    const [appointmentScheduleData, setAppointmentScheduleData] = useState({});
+
+    useEffect(() => {
+        appIndexDb.getFacilitySchedule()
+            .then((scheduleResponse) => setAppointmentScheduleData(scheduleResponse));
+    }, [])
     morningSchedule = "09.00 AM TO 01:00 PM"
     afterNoonSchedule = "02.00 PM TO 05.00 PM"
     open = 1
@@ -27,21 +38,28 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
             </div>
         </div>
     }
-    const scheduleLabel = (title, value, onGoing) => {
+    const scheduleLabel = (title, schedule, onGoing) => {
         return <div>
             <div className="title d-flex mb-2">
-                {title}: {value}
+                {title}: {schedule.startTime} - {schedule.endTime}
                 {onGoing && onGoingLabel}
             </div>
             {statusBanner(booked, completed, open)}
         </div>
     }
-    const morningScheduleElement = scheduleLabel("MORNING", morningSchedule, false)
-    const afterNoonScheduleElement = scheduleLabel("AFTERNOON", afterNoonSchedule, true)
+    const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
+    const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0], false)
+    const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1], true)
 
-    return <>
-        {morningScheduleElement}
-        {afterNoonScheduleElement}
-    </>
+    if (appointmentSchedule) {
+        const content = <>
+            {morningScheduleElement}
+            {afterNoonScheduleElement}
+        </>;
+        return <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})}
+                      content={content}/>
+    } else {
+        return <></>
+    }
 }
 

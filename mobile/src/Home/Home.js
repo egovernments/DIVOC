@@ -61,7 +61,7 @@ function ProgramHeader() {
     </div>;
 }
 
-function Title({text, content}) {
+export function Title({text, content}) {
     return <div className={"title-container"}>
         <div className={"title"}>{text}</div>
         {content}
@@ -125,7 +125,7 @@ export function VaccineProgram() {
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationProgress/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY)} content={<AppointmentDetails/>}/>
+        <AppointmentDetails />
     </div>;
 }
 
