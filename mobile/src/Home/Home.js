@@ -7,7 +7,7 @@ import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
 import enrollRecipient from "./enroll_recipient.png"
 import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
-import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
+import {getMessageComponent, getMessageComponentWithValues, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
@@ -18,6 +18,7 @@ import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
 import {AppointmentDetails} from "./AppointmentDetails";
+import {formatDate} from "../utils/date_utils";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState();
@@ -113,8 +114,8 @@ export function VaccineProgram() {
         <ProgramHeader/>
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY)} content={<VaccinationStatus/>}/>
-        <AppointmentDetails/>
+        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationStatus/>}/>
+        <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY)} content={<AppointmentDetails/>}/>
     </div>;
 }
 

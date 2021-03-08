@@ -39,10 +39,9 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
     const morningScheduleElement = scheduleLabel("MORNING", morningSchedule, false)
     const afterNoonScheduleElement = scheduleLabel("AFTERNOON", afterNoonSchedule, true)
 
-    return <div className="title-container">
-        <div className="title">Appointments Today</div>
+    return <>
         {morningScheduleElement}
         {afterNoonScheduleElement}
-    </div>
+    </>
 }
 
