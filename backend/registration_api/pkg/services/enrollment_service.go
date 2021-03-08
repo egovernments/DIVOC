@@ -131,3 +131,24 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 	return nil
 }
 
+func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string) error {
+	EnrollmentRegistered := "enrollmentDeleted"
+	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+
+	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
+	enrollment["enrollmentCode"] = enrollmentCode
+	phone := enrollment["phone"]
+	buf := bytes.Buffer{}
+	err := enrollmentTemplate.Execute(&buf, enrollment)
+	if err == nil {
+		if len(phone) > 0 {
+			PublishNotificationMessage("tel:"+phone, subject, buf.String())
+		}
+	} else {
+		log.Errorf("Error occurred while parsing the message (%v)", err)
+		return err
+	}
+	return nil
+}
+
