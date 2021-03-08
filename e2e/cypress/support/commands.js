@@ -23,3 +23,19 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+// Performs an XMLHttpRequest instead of a cy.request (able to send data as
+// FormData - multipart/form-data)
+Cypress.Commands.add('form_request', (method, url, token, formData, done) => {
+    fetch(url, {
+        method: method,
+        headers: {
+            "Authorization": `Bearer ${token}`,
+        },
+        body: formData,
+    }).then(r => {
+        done(r)
+    }).catch((e) => {
+        done(e)
+    })
+})
