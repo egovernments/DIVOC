@@ -3,21 +3,37 @@ import "./index.scss"
 import React, {useEffect, useState} from "react";
 import {appIndexDb} from "../../AppDatabase";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
-import {formatDate} from "../../utils/date_utils";
+import {formatDate, getMeridiemTime, weekdays} from "../../utils/date_utils";
 import {Title} from "../Home";
+
+function getTimeInSeconds(str1) {
+    str1 =  str1.split(':');
+    return str1[0] * 3600 + str1[1] * 60;
+}
+
+function isOnGoing(startTime, endTime) {
+    const startTimeInSeconds = parseInt(getTimeInSeconds(startTime));
+    const endTimeInSeconds = parseInt(getTimeInSeconds(endTime));
+
+    const today = new Date()
+    const todayInSeconds = getTimeInSeconds(today.getHours() + ":" + today.getMinutes())
+
+    return todayInSeconds >= startTimeInSeconds && todayInSeconds <= endTimeInSeconds
+}
 
 export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, completed, open, ...props) => {
     const [appointmentScheduleData, setAppointmentScheduleData] = useState({});
+    const [enrollments, setEnrollments] = useState(undefined)
+    const [morningScheduleOnGoing, setMorningScheduleOnGoing] = useState(false)
+    const [afterNoonScheduleOnGoing, setAfterNoonScheduleOnGoing] = useState(false)
 
     useEffect(() => {
         appIndexDb.getFacilitySchedule()
             .then((scheduleResponse) => setAppointmentScheduleData(scheduleResponse));
+        appIndexDb.getAllEnrollments()
+            .then((enrollments) => setEnrollments(enrollments))
     }, [])
-    morningSchedule = "09.00 AM TO 01:00 PM"
-    afterNoonSchedule = "02.00 PM TO 05.00 PM"
-    open = 1
     completed = 10
-    booked = 1
 
     const dimGrayColor = {color:"#696969"};
     const onGoingLabel = <div className="appointment-card pl-3 pr-3 ml-2" style={dimGrayColor}>Ongoing</div>
@@ -38,25 +54,34 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
             </div>
         </div>
     }
-    const scheduleLabel = (title, schedule, onGoing) => {
+
+    const scheduleLabel = (title, schedule) => {
+        const onGoing = isOnGoing(schedule.startTime, schedule.endTime)
+        const dayOfToday = weekdays[new Date().getDay()]
+        const scheduleDetails = schedule["days"].find((scheduleForThatDay) => scheduleForThatDay.day === dayOfToday)
+        const total = scheduleDetails.maxAppointments
+        const appointments = [].concat.apply([], enrollments.map((enrollment => enrollment.appointments)))
+        const booked = appointments.filter((appointment) => appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime)
+            .length
+
         return <div>
             <div className="title d-flex mb-2">
-                {title}: {schedule.startTime} - {schedule.endTime}
+                {title}: {getMeridiemTime(schedule.startTime)} - {getMeridiemTime(schedule.endTime)}
                 {onGoing && onGoingLabel}
             </div>
-            {statusBanner(booked, completed, open)}
+            {statusBanner(booked, completed, total - booked)}
         </div>
     }
     const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
-    const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0], false)
-    const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1], true)
 
-    if (appointmentSchedule) {
+    if (appointmentSchedule && enrollments) {
+        const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0])
+        const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1])
         const content = <>
             {morningScheduleElement}
             {afterNoonScheduleElement}
         </>;
-        return <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})}
+        return <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY,"", {date: formatDate(new Date().toISOString())})}
                       content={content}/>
     } else {
         return <></>

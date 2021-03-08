@@ -5,14 +5,12 @@ import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
 import enrollRecipient from "./enroll_recipient.png"
-import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
-import {getMessageComponent, getMessageComponentWithValues, LANGUAGE_KEYS} from "../lang/LocaleContext";
+import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
-import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
