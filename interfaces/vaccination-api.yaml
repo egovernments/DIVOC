@@ -373,8 +373,6 @@ definitions:
         type: string
       appointmentDate:
         type: string
-      certified:
-        type: boolean
       meta:
         type: object
       certified:
