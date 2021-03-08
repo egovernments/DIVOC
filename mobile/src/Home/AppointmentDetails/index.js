@@ -14,16 +14,16 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
     const statusBanner = (booked, completed, open) => {
         return <div className="d-flex appointment-card justify-content-around">
             <div className="text-center title">
-                    <div>{booked}</div>
-                    <div className="mb-3">Booked</div>
+                    <h5>{booked}</h5>
+                    <h5 className="mb-3">Booked</h5>
             </div>
             <div className="text-center title">
-                    <div>{completed}</div>
-                    <div className="mb3">Completed</div>
+                    <h5>{completed}</h5>
+                    <h5 className="mb3">Completed</h5>
             </div>
             <div className="text-center title" style={dimGrayColor}>
-                    <div>{open}</div>
-                    <div className="mb-3">Open</div>
+                    <h5>{open}</h5>
+                    <h5 className="mb-3">Open</h5>
             </div>
         </div>
     }

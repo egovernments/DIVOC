@@ -2,6 +2,7 @@ import {appIndexDb} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 import {programDb} from "./Services/ProgramDB";
 import {queueDb} from "./Services/QueueDB";
+import {getSelectedProgram, getSelectedProgramId} from "./components/ProgramSelection";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -27,6 +28,12 @@ export class SyncFacade {
 
         const vaccinators = await ApiServices.fetchVaccinators();
         await appIndexDb.saveVaccinators(vaccinators);
+
+        const selectedProgram = getSelectedProgramId();
+        const userDetails = await appIndexDb.getUserDetails()
+        const facilityId = userDetails["facilityDetails"]["osid"]
+        const facilitySchedule = await ApiServices.fetchFacilitySchedule(facilityId,selectedProgram)
+        await appIndexDb.saveFacilitySchedule(facilitySchedule)
 
         await queueDb.popData()
     }

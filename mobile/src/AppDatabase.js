@@ -14,6 +14,7 @@ const EVENTS = "events";
 const VACCINATORS = "vaccinators";
 const STATUS = "status";
 const USER_DETAILS = "user_details";
+const FACILITY_SCHEDULE = "facility_schedule";
 
 const PROGRAM_ID = "programId";
 
@@ -55,6 +56,10 @@ export class AppDatabase {
 
                 if (!objectNames.contains(STASH_DATA)) {
                     database.createObjectStore(STASH_DATA, {keyPath: "userId"});
+                }
+
+                if (!objectNames.contains(FACILITY_SCHEDULE)) {
+                    database.createObjectStore(FACILITY_SCHEDULE);
                 }
                 console.log("DB upgraded from " + oldVersion + " to " + newVersion)
             }
@@ -240,6 +245,14 @@ export class AppDatabase {
 
     async getAllEvents() {
         return await this.db.getAll(EVENTS) || [];
+    }
+
+    async getFacilitySchedule() {
+        return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+    }
+
+    async saveFacilitySchedule(facilitySchedule) {
+        return this.db.put(FACILITY_SCHEDULE, facilitySchedule, FACILITY_SCHEDULE)
     }
 }
 

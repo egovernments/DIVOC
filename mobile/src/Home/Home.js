@@ -83,19 +83,29 @@ function EnrollmentTypes() {
                             onClick={() => {
                                 goToNewEnroll()
                             }}/>
-            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} icon={recipientQueue}
-                            onClick={goToQueue}/>
         </div>
     </>;
 }
 
-function EnrolmentItems({icon, title, onClick}) {
+function VaccinationProgress() {
+    const {goToQueue} = useHome();
+    return <>
+        <div className="enroll-container">
+            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                            onClick={goToQueue} value={10}/>
+            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)} value={15}/>
+        </div>
+    </>;
+}
+
+function EnrolmentItems({icon, title, onClick, value}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>
                 <Col>
                     <img className={"icon"} src={icon} alt={""}/>
-                    <h6>{title}</h6>
+                    <h4>{value}</h4>
+                    <h4>{title}</h4>
                 </Col>
             </BaseCard>
         </div>
@@ -114,7 +124,7 @@ export function VaccineProgram() {
         <ProgramHeader/>
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
         <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationStatus/>}/>
+        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationProgress/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY)} content={<AppointmentDetails/>}/>
     </div>;
 }
