@@ -95,7 +95,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/PreEnrollment'
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
   '/preEnrollments':
     get:
       tags:
@@ -119,7 +119,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/PreEnrollment'
+              $ref: '../registry/Enrollment.json#/definitions/Enrollment'
   /certify:
     post:
       tags:
@@ -350,48 +350,6 @@ definitions:
         type: string
       refreshToken:
         type: string
-  PreEnrollment:
-    type: object
-    properties:
-      code:
-        type: string
-      enrollmentScopeId:
-        type: string
-      phone:
-        type: string
-      nationalId:
-        type: string
-      dob:
-        type: string
-        format: date
-      gender:
-        type: string
-        enum: ["Male", "Female", "Other"]
-      name:
-        type: string
-      email:
-        type: string
-      appointmentDate:
-        type: string
-      meta:
-        type: object
-      certified:
-        type: boolean
-      programId:
-        type: string
-      address:
-        type: object
-        properties:
-          addressLine1:
-            type: string
-          addressLine2:
-            type: string
-          district:
-            type: string
-          state:
-            type: string
-          pincode:
-            type: string
   CertificationRequest:
     type: object
     properties:

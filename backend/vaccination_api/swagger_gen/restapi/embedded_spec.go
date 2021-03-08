@@ -358,7 +358,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PreEnrollment"
+                "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
               }
             }
           }
@@ -395,7 +395,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/PreEnrollment"
+              "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
             }
           }
         }
@@ -787,73 +787,6 @@ func init() {
           "type": "string"
         },
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollment": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "object",
-          "properties": {
-            "addressLine1": {
-              "type": "string"
-            },
-            "addressLine2": {
-              "type": "string"
-            },
-            "district": {
-              "type": "string"
-            },
-            "pincode": {
-              "type": "string"
-            },
-            "state": {
-              "type": "string"
-            }
-          }
-        },
-        "appointmentDate": {
-          "type": "string"
-        },
-        "certified": {
-          "type": "boolean"
-        },
-        "code": {
-          "type": "string"
-        },
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "email": {
-          "type": "string"
-        },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "string",
-          "enum": [
-            "Male",
-            "Female",
-            "Other"
-          ]
-        },
-        "meta": {
-          "type": "object"
-        },
-        "name": {
-          "type": "string"
-        },
-        "nationalId": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "programId": {
           "type": "string"
         }
       }
@@ -1310,7 +1243,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PreEnrollment"
+                "$ref": "#/definitions/enrollment"
               }
             }
           }
@@ -1347,7 +1280,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/PreEnrollment"
+              "$ref": "#/definitions/enrollment"
             }
           }
         }
@@ -1891,6 +1824,31 @@ func init() {
         }
       }
     },
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date"
+        },
+        "appointmentSlot": {
+          "type": "string"
+        },
+        "certified": {
+          "type": "boolean",
+          "default": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -1950,93 +1908,6 @@ func init() {
           "type": "string"
         },
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollment": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "object",
-          "properties": {
-            "addressLine1": {
-              "type": "string"
-            },
-            "addressLine2": {
-              "type": "string"
-            },
-            "district": {
-              "type": "string"
-            },
-            "pincode": {
-              "type": "string"
-            },
-            "state": {
-              "type": "string"
-            }
-          }
-        },
-        "appointmentDate": {
-          "type": "string"
-        },
-        "certified": {
-          "type": "boolean"
-        },
-        "code": {
-          "type": "string"
-        },
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "email": {
-          "type": "string"
-        },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "string",
-          "enum": [
-            "Male",
-            "Female",
-            "Other"
-          ]
-        },
-        "meta": {
-          "type": "object"
-        },
-        "name": {
-          "type": "string"
-        },
-        "nationalId": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "programId": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollmentAddress": {
-      "type": "object",
-      "properties": {
-        "addressLine1": {
-          "type": "string"
-        },
-        "addressLine2": {
-          "type": "string"
-        },
-        "district": {
-          "type": "string"
-        },
-        "pincode": {
-          "type": "string"
-        },
-        "state": {
           "type": "string"
         }
       }
@@ -2154,6 +2025,114 @@ func init() {
           "type": "string",
           "format": "date",
           "$id": "#/properties/statusUpdatedAt"
+        }
+      }
+    },
+    "address": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "description": "Address line 1",
+          "type": "string",
+          "title": "The address line 1",
+          "$id": "#/properties/address/properties/addressLine1"
+        },
+        "addressLine2": {
+          "type": "string",
+          "title": "The address2 schema",
+          "$id": "#/properties/address/properties/addressLine2"
+        },
+        "district": {
+          "type": "string",
+          "title": "The district schema",
+          "$id": "#/properties/address/properties/district"
+        },
+        "pincode": {
+          "type": "string",
+          "title": "The pincode schema",
+          "$id": "#/properties/address/properties/pincode"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "$id": "#/properties/address/properties/state",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": "560000",
+          "state": "Karnataka"
+        }
+      ]
+    },
+    "enrollment": {
+      "type": "object",
+      "required": [
+        "nationalId"
+      ],
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
+        },
+        "beneficiaryPhone": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "yob": {
+          "type": "integer"
         }
       }
     },
