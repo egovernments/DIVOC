@@ -16,7 +16,7 @@ database:
   host: localhost
   port: 5432
   user: postgres
-  dbname: postgres
+  dbname: registry
   password: postgres
 certificate:
   upload:
