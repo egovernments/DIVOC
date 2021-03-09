@@ -107,7 +107,7 @@ services:
       - kafka
       - keycloak
   registration_api:
-    image: dockerhub/registration_api1.20.2-generic
+    image: dockerhub/registration_api:1.20.2-generic
     ports:
       - "8002:8002"
     environment:
