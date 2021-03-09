@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 
@@ -21,7 +22,7 @@ import (
 type Enrollment struct {
 
 	// address
-	Address *EnrollmentAddress `json:"address,omitempty"`
+	Address *Address `json:"address,omitempty"`
 
 	// appointments
 	Appointments []*EnrollmentAppointmentsItems0 `json:"appointments"`
@@ -91,7 +92,6 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -109,7 +109,6 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Appointments) { // not required
 		return nil
 	}
@@ -134,7 +133,6 @@ func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateDob(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
@@ -179,7 +177,6 @@ func (m *Enrollment) validateGenderEnum(path, location string, value string) err
 }
 
 func (m *Enrollment) validateGender(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -196,6 +193,56 @@ func (m *Enrollment) validateNationalID(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalId", "body", m.NationalID); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this enrollment based on the context it is used
+func (m *Enrollment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateAppointments(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Enrollment) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Enrollment) contextValidateAppointments(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Appointments); i++ {
+
+		if m.Appointments[i] != nil {
+			if err := m.Appointments[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("appointments" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -219,117 +266,6 @@ func (m *Enrollment) UnmarshalBinary(b []byte) error {
 	return nil
 }
 
-// EnrollmentAddress Address
-//
-// Indian address format
-//
-// swagger:model EnrollmentAddress
-type EnrollmentAddress struct {
-
-	// The address line 1
-	//
-	// Address line 1
-	// Required: true
-	AddressLine1 *string `json:"addressLine1"`
-
-	// The address2 schema
-	AddressLine2 string `json:"addressLine2,omitempty"`
-
-	// The district schema
-	// Required: true
-	District *string `json:"district"`
-
-	// The pincode schema
-	// Required: true
-	Pincode *string `json:"pincode"`
-
-	// The state schema
-	//
-	// State of address
-	// Required: true
-	State *string `json:"state"`
-}
-
-// Validate validates this enrollment address
-func (m *EnrollmentAddress) Validate(formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.validateAddressLine1(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateDistrict(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePincode(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validateState(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *EnrollmentAddress) validateAddressLine1(formats strfmt.Registry) error {
-
-	if err := validate.Required("address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *EnrollmentAddress) validateDistrict(formats strfmt.Registry) error {
-
-	if err := validate.Required("address"+"."+"district", "body", m.District); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *EnrollmentAddress) validatePincode(formats strfmt.Registry) error {
-
-	if err := validate.Required("address"+"."+"pincode", "body", m.Pincode); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *EnrollmentAddress) validateState(formats strfmt.Registry) error {
-
-	if err := validate.Required("address"+"."+"state", "body", m.State); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// MarshalBinary interface implementation
-func (m *EnrollmentAddress) MarshalBinary() ([]byte, error) {
-	if m == nil {
-		return nil, nil
-	}
-	return swag.WriteJSON(m)
-}
-
-// UnmarshalBinary interface implementation
-func (m *EnrollmentAddress) UnmarshalBinary(b []byte) error {
-	var res EnrollmentAddress
-	if err := swag.ReadJSON(b, &res); err != nil {
-		return err
-	}
-	*m = res
-	return nil
-}
-
 // EnrollmentAppointmentsItems0 enrollment appointments items0
 //
 // swagger:model EnrollmentAppointmentsItems0
@@ -337,22 +273,19 @@ type EnrollmentAppointmentsItems0 struct {
 
 	// appointment date
 	// Format: date
-	AppointmentDate strfmt.Date `json:"appointmentDate"`
+	AppointmentDate strfmt.Date `json:"appointmentDate,omitempty"`
 
 	// appointment slot
-	AppointmentSlot string `json:"appointmentSlot"`
+	AppointmentSlot string `json:"appointmentSlot,omitempty"`
 
 	// certified
-	Certified *bool `json:"certified"`
+	Certified *bool `json:"certified,omitempty"`
 
 	// dose
 	Dose string `json:"dose,omitempty"`
 
 	// enrollment scope Id
-	EnrollmentScopeID string `json:"enrollmentScopeId"`
-
-	// osid
-	Osid string `json:"osid,omitempty"`
+	EnrollmentScopeID string `json:"enrollmentScopeId,omitempty"`
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
@@ -373,7 +306,6 @@ func (m *EnrollmentAppointmentsItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppointmentDate) { // not required
 		return nil
 	}
@@ -382,6 +314,11 @@ func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Re
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this enrollment appointments items0 based on context it is used
+func (m *EnrollmentAppointmentsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

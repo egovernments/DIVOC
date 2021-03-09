@@ -25,7 +25,7 @@ type GetPreEnrollmentOK struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.PreEnrollment `json:"body,omitempty"`
+	Payload *models.Enrollment `json:"body,omitempty"`
 }
 
 // NewGetPreEnrollmentOK creates GetPreEnrollmentOK with default headers values
@@ -35,13 +35,13 @@ func NewGetPreEnrollmentOK() *GetPreEnrollmentOK {
 }
 
 // WithPayload adds the payload to the get pre enrollment o k response
-func (o *GetPreEnrollmentOK) WithPayload(payload *models.PreEnrollment) *GetPreEnrollmentOK {
+func (o *GetPreEnrollmentOK) WithPayload(payload *models.Enrollment) *GetPreEnrollmentOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get pre enrollment o k response
-func (o *GetPreEnrollmentOK) SetPayload(payload *models.PreEnrollment) {
+func (o *GetPreEnrollmentOK) SetPayload(payload *models.Enrollment) {
 	o.Payload = payload
 }
 
