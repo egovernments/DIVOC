@@ -1,5 +1,5 @@
 const {facilities} = require("./test_data");
-const BASE_URL = "http://portal_api:8001/divoc/admin/api/v1";
+const BASE_URL = "http://localhost:8001/divoc/admin/api/v1";
 const FACILITIES = BASE_URL + "/facilities"
 
 

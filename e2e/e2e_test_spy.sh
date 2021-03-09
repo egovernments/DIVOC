@@ -1,8 +1,5 @@
 #!/bin/bash
 
-cd e2e || exit
-npx cypress run --headless
-
 while true
 do status=$(docker inspect e2e_test --format='{{.State.Status}}')
     if [ $status == "exited" ]

@@ -43,9 +43,9 @@ Cypress.Commands.add('divocRequest', (method, url, body) => {
 })
 
 
-const KEYCLOAK_URL = "http://keycloak:8080/auth"
+const KEYCLOAK_URL = "http://localhost:8080/auth"
 const TOKEN_URL = KEYCLOAK_URL + "/realms/divoc/protocol/openid-connect/token"
-const ADMIN_API_CLIENT_SECRET = "a1832880-059a-40d0-86b1-e318ced82613"
+const ADMIN_API_CLIENT_SECRET = "8eb72e25-baff-4ec5-b636-d4c1b55257b5"
 
 const authBody = {
     "grant_type": "client_credentials",
