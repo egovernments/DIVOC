@@ -270,6 +270,11 @@ const MemberCard = (props) => {
     // Need to think about the logic to support multiple appointment
     const isAppointmentBooked = !!member["appointments"][0].enrollmentScopeId;
     
+    function getRemainingHours(member) {
+        const currentDate = new Date();
+        const appointmentDate = new Date(member.appointments[0].appointmentDate + " " + member.appointments[0].appointmentSlot.split("-")[0])
+        return (appointmentDate - currentDate) / 1000 / 60 / 60
+    }
 
     function getDropdownItems() {
         let items = [
@@ -283,15 +288,14 @@ const MemberCard = (props) => {
             }
         ];
         if (isAppointmentBooked) {
-            const currentDate = new Date();
-            const appointmentDate = new Date(member["appointments"][0].appointmentDate)
-            const isAppointmentCancellationAllowed = !((appointmentDate.getDate() - currentDate.getDate()) > 0);
+
+            const isAppointmentCancellationAllowed = getRemainingHours(member) > 24;
             items.push({
                 name: "Cancel Appointment",
                 onClick: () => {
                     props.onCancelAppointment()
                 },
-                disabled: isAppointmentCancellationAllowed,
+                disabled: !isAppointmentCancellationAllowed,
                 tooltip: "Cancellation within 24 hours of appointment is not allowed"
             })
         }
@@ -300,7 +304,7 @@ const MemberCard = (props) => {
 
     return (
         <div className="col-xl-6 pt-3">
-            <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8"}}>
+            <Card style={{boxShadow: "0px 6px 20px #C1CFD933", border: "1px solid #F8F8F8", height: "100%"}}>
                 <Card.Body style={{fontSize: "14px"}}>
                     <div className="d-flex justify-content-between">
                             <span className="mb-2"
