@@ -2,6 +2,9 @@ package pkg
 
 import (
 	"errors"
+	"strconv"
+	"strings"
+
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
@@ -23,7 +26,7 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 	return facilityCsv.CSVMetadata.ValidateRow(requiredHeaders)
 }
 
-func (facilityCsv FacilityCSV) CreateCsvUpload() error {
+func (facilityCsv FacilityCSV) ProcessRow(uploadID uint) error {
 	data := facilityCsv.Data
 	//facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon,adminName,adminMobile
@@ -103,6 +106,6 @@ func buildVaccinator(data *Scanner) *models.FacilityAdmin {
 	}
 }
 
-func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }
