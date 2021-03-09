@@ -11,7 +11,7 @@ def fetch_auth_token():
     body = {
         "grant_type" : "client_credentials",
         "client_id" : "admin-api",
-        "client_secret" : "a1832880-059a-40d0-86b1-e318ced82613"
+        "client_secret" : "8eb72e25-baff-4ec5-b636-d4c1b55257b5"
     }
     resp = r.post(TOKEN_URL, data=body, headers=headers)
     assert resp.status_code == 200, "Failed to fetch Auth Token. Response code : {code}".format(code = resp.status_code)

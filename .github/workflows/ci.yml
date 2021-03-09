@@ -16,7 +16,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Build
         run: make
-
-      - uses: actions/setup-node@v2
-      - name: Test API
-        run: make test | npm install cypress | npx cypress run --headless
+      - name: Test
+        run: make test
