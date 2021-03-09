@@ -3,6 +3,9 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -15,8 +18,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"time"
 )
 
 const FacilityEntity = "Facility"
@@ -175,6 +176,10 @@ func canInitializeSlots() bool {
 
 func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
 	currentDate := time.Now()
+	programDates, err := services.GetActiveProgramDates()
+	if err != nil {
+		return model.NewGenericServerError()
+	}
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
@@ -213,6 +218,9 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 										if ok {
 											for i := 1; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
+												if !programDates[programId].Has(slotDate) {
+													continue
+												}
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
 												for _, programSchedule := range programSchedulesForDay {
 													if isFacilityAvailableForSlot {
@@ -392,8 +400,11 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 				log.Error(err)
 				return operations.NewDeleteRecipientBadRequest()
 			} else {
-				err := services.DeleteValue(enrollmentCode)
-				log.Error(err)
+				if err := services.DeleteValue(enrollmentCode); err == nil {
+					services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)	
+				} else {
+					log.Error(err)
+				}
 			}
 			return operations.NewDeleteRecipientOK()
 		}
@@ -417,7 +428,7 @@ func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {
 		return fmt.Sprintf("Cancellation is not allowed")
 	}
 	if remainingHoursForSchedule <= float64(config.Config.MinCancellationHours) {
-		return fmt.Sprintf("Cancellation before %d hours is not allowed", config.Config.MinCancellationHours)
+		return fmt.Sprintf("Cancellation within %d hours of appointment is not allowed", config.Config.MinCancellationHours)
 	}
 	updatedCount, _ := strconv.Atoi(enrollmentInfo["updatedCount"])
 	if updatedCount >= config.Config.MaxAppointmentUpdatesAllowed {

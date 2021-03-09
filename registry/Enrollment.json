@@ -49,22 +49,28 @@
           "items": {
             "type": "object",
             "properties": {
+              "osid": {
+                "type": "string"
+              },
               "programId": {
                 "type": "string"
               },
               "appointmentSlot": {
-                "type": "string"
+                "type": "string",
+                "x-omitempty": false
               },
               "appointmentDate": {
                 "type": "string",
-                "format": "date"
+                "format": "date",
+                "x-omitempty": false
               },
               "certified": {
                 "type": "boolean",
-                "default": false
+                "x-omitempty": false
               },
               "enrollmentScopeId": {
-                "type": "string"
+                "type": "string",
+                "x-omitempty": false
               },
               "dose": {
                 "type": "string"

@@ -111,8 +111,8 @@ function EnrolmentItems({icon, title, onClick, value}) {
             <BaseCard>
                 <Col>
                     <img className={"icon"} src={icon} alt={""}/>
-                    <h4>{value}</h4>
-                    <h4>{title}</h4>
+                    <h5>{value}</h5>
+                    <h5>{title}</h5>
                 </Col>
             </BaseCard>
         </div>

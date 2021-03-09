@@ -3,7 +3,6 @@ package pkg
 import (
 	"bytes"
 	"fmt"
-	"strconv"
 	"strings"
 	"text/template"
 
@@ -44,10 +43,7 @@ func createFacility(data *Scanner, authHeader string) error {
 	//todo: pass it to queue and then process.
 	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
+
 	addressline1 := data.Text("addressLine1")
 	addressline2 := data.Text("addressLine2")
 	district := data.Text("district")
@@ -68,7 +64,6 @@ func createFacility(data *Scanner, authHeader string) error {
 		})
 	}
 	facility := models.Facility{
-		SerialNum:          serialNum,
 		FacilityCode:       facilityCode,
 		FacilityName:       data.Text("facilityName"),
 		Contact:            data.Text("contact"),

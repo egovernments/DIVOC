@@ -169,8 +169,7 @@ export class AppDatabase {
         if (walkEnrollment) {
             walkEnrollment.code = Date.now().toString()
             const programId = getSelectedProgramId()
-            const currentProgram = await programDb.getProgramByName(programId)
-            walkEnrollment.programId = currentProgram.id
+            walkEnrollment.programId = programId
             await this.saveEnrollments([walkEnrollment])
             const queue = {
                 enrollCode: walkEnrollment.code,

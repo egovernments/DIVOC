@@ -79,7 +79,8 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         const dayOfToday = weekdays[new Date().getDay()]
         const scheduleDetails = schedule["days"].find((scheduleForThatDay) => scheduleForThatDay.day === dayOfToday)
         const total = scheduleDetails.maxAppointments
-        const appointments = [].concat.apply([], enrollments.map((enrollment => enrollment.appointments)))
+        const appointmentsArrays = enrollments.filter(enrollment => enrollment.appointments).map((enrollment => enrollment.appointments));
+        const appointments = [].concat.apply([], appointmentsArrays)
         const booked = appointments.filter((appointment) => appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime)
             .length
 

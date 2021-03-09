@@ -1442,10 +1442,6 @@ func init() {
             }
           }
         },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
-        },
         "stamp": {
           "type": "string"
         },
@@ -3503,19 +3499,26 @@ func init() {
       "properties": {
         "appointmentDate": {
           "type": "string",
-          "format": "date"
+          "format": "date",
+          "x-omitempty": false
         },
         "appointmentSlot": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "certified": {
           "type": "boolean",
-          "default": false
+          "default": false,
+          "x-omitempty": false
         },
         "dose": {
           "type": "string"
         },
         "enrollmentScopeId": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "osid": {
           "type": "string"
         },
         "programId": {
@@ -3597,10 +3600,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/FacilityProgramsItems0"
           }
-        },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
         },
         "stamp": {
           "type": "string"

@@ -68,8 +68,12 @@ const UploadHistory = ({
     }
 
     function getSuccessRecords(item) {
-        if (!isNaN(item["TotalRecords"]) && !isNaN(item["TotalErrorRows"])) {
-            return item["TotalRecords"] - item["TotalErrorRows"]
+        let totalErrRows = 0;
+        if (!isNaN(item["TotalErrorRows"])) {
+            totalErrRows =  item["TotalErrorRows"]
+        }
+        if (!isNaN(item["TotalRecords"])) {
+            return item["TotalRecords"] - totalErrRows
         }
         return 0
     }

@@ -948,9 +948,6 @@ definitions:
                     type: string
   Facility:
     properties:
-      serialNum:
-        type: integer
-        title: Serial Number
       facilityCode:
         type: string
         title: Facility Code
