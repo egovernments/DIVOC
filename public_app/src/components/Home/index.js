@@ -1,12 +1,12 @@
-import React, {useEffect} from "react";
-import {Link, useHistory} from "react-router-dom";
+import React, {useEffect, useState} from "react";
+import {Link, Redirect, useHistory} from "react-router-dom";
 import CertificateSmallImg from '../../assets/img/certificate-small.svg'
 import CenterSmallImg from '../../assets/img/center-small.svg'
 import CertificateImg from '../../assets/img/download-certificate-home.svg'
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import SideEffectsBannerImg from '../../assets/img/side-effects-banner-img.png'
 import DashboardBannerImg from '../../assets/img/dashboard-banner.png'
-import LearnMoreBannerImg from '../../assets/img/leanr_more.png'
+import GetVaccinatedImg from '../../assets/img/img-getvaccinated.png'
 import Covid19PgmImg from '../../assets/img/covid19program.svg'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import {LatestUpdateCard} from "../LatestUpdateCard";
@@ -19,7 +19,7 @@ import {useKeycloak} from "@react-keycloak/web";
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
     <Col lg={3}>
         <div className="d-flex flex-column justify-content-center align-items-center pb-3 pl-4 pr-4 pt-0 mt-3"
-             style={{width: "100%", height: "50vh", backgroundColor: backgroundColor, borderRadius: "20px"}}>
+             style={{width: "100%", height: "65vh", backgroundColor: backgroundColor, borderRadius: "20px"}}>
             <div className="d-inline-flex justify-content-center" style={{height: "30%"}}>
                 {
                     img
@@ -40,19 +40,45 @@ const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassN
 export const Home = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
+    const [mobileNumber, setMobileNumber] = useState('');
+
     useEffect(() => {
         if(keycloak.authenticated) {
             keycloak.logout()
         }
     }, []);
+
+    function buttonLoginOnClick() {
+        history.push({
+            pathname: '/citizen',
+            state: {mobileNumber}
+        })
+    }
+
     return (
         <div className="home-section">
             <div className="section ">
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
-                        <h3>Welcome to the</h3>
-                        <span
-                            className="title">Digital Infrastructure for Vaccination & Open Certification Portal</span>
+                        <Row className="d-flex justify-content-center mb-3">
+                            <Col style={{paddingRight:"20vh", paddingLeft:"10vh"}}>
+                                <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
+                                <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
+                                <input placeholder="Enter mobile number"
+                                       className="form-control form-control-lg"
+                                       onChange={(e) => {setMobileNumber(e.target.value)}}
+                                       value={mobileNumber}
+                                       maxLength={10}
+                                />
+                                <div className="info-input">
+                                    <p>An OTP will be sent to you for verification</p>
+                                </div>
+                                <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>Log In</CustomButton>
+                            </Col>
+                            <Col>
+                                <img src={GetVaccinatedImg} alt={""} style={{height:"70vh"}}/>
+                            </Col>
+                        </Row>
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={"Download your Vaccination Certificate"}
@@ -85,60 +111,7 @@ export const Home = () => {
                                       buttonClassName={"yellow-btn"}
                                       backgroundColor={"#FFFBF0"}
                             />
-
-                            <HomeCard img={<img src={LearnMoreBannerImg} alt={""} width={"60%"}/>}
-                                      title={"Learn"}
-                                      subtitle={"The C-19 vaccination drive launched in India in 2021 aims to control, reduce and eradicate the prevalence of Covid in India. These videos will help you understand the program and learn about side-effect post vaccination."}
-                                      buttonText={"Learn"}
-                                      buttonOnClick={() => {
-                                          history.push("/learn")
-                                      }}
-                                      buttonClassName={"purple-btn"}
-                                      backgroundColor={"#F8FAFF"}
-                            />
                         </Row>
-                    </div>
-                </div>
-            </div>
-            <div className="half-section  d-lg-flex p-3 p-lg-0">
-                <div className="divoc-video-wrapper d-flex justify-content-center align-items-center">
-                    <iframe width="90%" height="100%" src="https://www.youtube.com/embed/vl_EP9fpzh0" frameBorder="0"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen></iframe>
-                </div>
-                <div className="divoc-info-wrapper">
-                    <img src={Covid19PgmImg} alt={""}/>
-                    <h3 className="text-center mt-3 text-lg-left">Information about C- 19 Vaccination</h3>
-                    <span className="text-center  text-lg-left">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
-                    <CustomButton className={"purple-btn"} onClick={() => {
-                    }}>Know More</CustomButton>
-                </div>
-            </div>
-            <div className="dashboard-section p-3 p-lg-0">
-                <div className="h-100 pt-lg-5 d-flex flex-column align-items-center justify-content-center">
-                    <h3>Public Dashboard</h3>
-                    <span className="pt-3 dashboard-subtitle">Some introductory text about the dashboard - Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum</span>
-                    <div className="h-100 pt-lg-5">
-                        <div className="row h-100 row-cols-lg-3 row-cols-1">
-                            <div
-                                className="col d-flex flex-column justify-content-center align-items-center  p-3 pt-5 p-lg-3 order-lg-1">
-                                <img alt={""} src={CertificateSmallImg} width={40}/>
-                                <h4 className="pt-3">Certificates Issued</h4>
-                                <h1 className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</h1>
-                                <Link to={"/dashboard"} className="outline-button ">View Numbers ></Link>
-                            </div>
-                            <div className="col order-lg-2 order-3">
-                                <img alt={""} src={DashboardBannerImg} width={"100%"} height={"100%"}/>
-                            </div>
-                            <div
-                                className="col d-flex flex-column justify-content-center align-items-center p-3 pt-5 p-lg-3 order-lg-3 order-2">
-                                <img alt={""} src={CenterSmallImg} width={40}/>
-                                <h4 className="pt-3">Certificates Issued</h4>
-                                <b className="pt-3 pb-3" style={{fontSize: "50px"}}>7,72,055</b>
-                                <Link to={"/dashboard"} className="outline-button yellow-outline">View Centre details
-                                    ></Link>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
