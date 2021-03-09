@@ -31,7 +31,7 @@ func NewGetCertifyUploadErrors(ctx *middleware.Context, handler GetCertifyUpload
 	return &GetCertifyUploadErrors{Context: ctx, Handler: handler}
 }
 
-/* GetCertifyUploadErrors swagger:route GET /certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
+/*GetCertifyUploadErrors swagger:route GET /certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
 
 Get all the error rows associated with given uploadId
 
@@ -47,6 +47,7 @@ func (o *GetCertifyUploadErrors) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 		r = rCtx
 	}
 	var Params = NewGetCertifyUploadErrorsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetCertifyUploadErrors) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

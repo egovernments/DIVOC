@@ -91,7 +91,7 @@ func findEnrollmentsForScope(facilityCode string, params vaccination.GetPreEnrol
 			return filterEnrollemntAppointments(listOfEnrollments, func(ea *models.EnrollmentAppointmentsItems0) bool {
 				facilityCodeMatch := ea.EnrollmentScopeID == facilityCode
 				appointmentDateMatch := params.Date == nil || ea.AppointmentDate.String() == params.Date.String()
-				certifiedMatch := ea.Certified == nil || !*ea.Certified
+				certifiedMatch := !ea.Certified
 				return facilityCodeMatch && appointmentDateMatch && certifiedMatch
 			}), nil
 		}
