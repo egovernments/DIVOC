@@ -400,8 +400,11 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 				log.Error(err)
 				return operations.NewDeleteRecipientBadRequest()
 			} else {
-				err := services.DeleteValue(enrollmentCode)
-				log.Error(err)
+				if err := services.DeleteValue(enrollmentCode); err == nil {
+					services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)	
+				} else {
+					log.Error(err)
+				}
 			}
 			return operations.NewDeleteRecipientOK()
 		}

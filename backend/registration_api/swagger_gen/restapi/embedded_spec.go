@@ -839,19 +839,26 @@ func init() {
       "properties": {
         "appointmentDate": {
           "type": "string",
-          "format": "date"
+          "format": "date",
+          "x-omitempty": false
         },
         "appointmentSlot": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "certified": {
           "type": "boolean",
-          "default": false
+          "default": false,
+          "x-omitempty": false
         },
         "dose": {
           "type": "string"
         },
         "enrollmentScopeId": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "osid": {
           "type": "string"
         },
         "programId": {

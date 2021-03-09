@@ -87,7 +87,6 @@ func (o *GetPreEnrollmentsForFacilityParams) bindDate(rawData []string, hasKey b
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
