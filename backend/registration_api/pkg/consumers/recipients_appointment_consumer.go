@@ -65,8 +65,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 											appointmentToUpdate.AppointmentSlot = ""
 											appointmentToUpdate.EnrollmentScopeID = ""
 										}
-										certified := false
-										appointmentToUpdate.Certified = &certified
+										appointmentToUpdate.Certified = false
 										_, err = kernelService.UpdateRegistry("appointments", utils.ToMap(appointmentToUpdate))
 										if err == nil {
 											if appointmentAckMessage.Status == models2.AllottedStatus {

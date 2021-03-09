@@ -283,13 +283,16 @@ const MemberCard = (props) => {
             }
         ];
         if (isAppointmentBooked) {
+            const currentDate = new Date();
+            const appointmentDate = new Date(member["appointments"][0].appointmentDate)
+            const isAppointmentCancellationAllowed = !((appointmentDate.getDate() - currentDate.getDate()) > 0);
             items.push({
                 name: "Cancel Appointment",
                 onClick: () => {
                     props.onCancelAppointment()
                 },
-                disabled: false,
-                tooltip: ""
+                disabled: isAppointmentCancellationAllowed,
+                tooltip: "Cancellation within 24 hours of appointment is not allowed"
             })
         }
         return items;

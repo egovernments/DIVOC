@@ -848,7 +848,7 @@ func init() {
         },
         "certified": {
           "type": "boolean",
-          "default": false,
+          "x-omitempty": false,
           "x-omitempty": false
         },
         "dose": {
