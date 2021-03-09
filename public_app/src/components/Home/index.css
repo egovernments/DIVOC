@@ -143,6 +143,12 @@
     text-align: center;
 }
 
+.info-input {
+    width:100%;
+    margin-top:.25rem;
+    font-size:80%;
+}
+
 @media (max-width: 961px) {
     .home-section .section {
         height: 100%;
