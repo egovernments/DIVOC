@@ -1,5 +1,5 @@
 const {facilities} = require("./test_data");
-const BASE_URL = "http://localhost:8001/divoc/admin/api/v1";
+const BASE_URL = "http://portal_api:8001/divoc/admin/api/v1";
 const FACILITIES = BASE_URL + "/facilities"
 
 
@@ -48,9 +48,10 @@ function convertJsonIntoCSV(jsonArray) {
 
 
 function createFacilitatesCSV(fileName) {
-    facilities.forEach((item) => {
-        item.serialNum = new Date().getTime()
-        item.facilityCode = "FC-" + new Date().getTime()
+    facilities.forEach((item, index) => {
+        const uniqueNumber = new Date().getTime() + "" + index
+        item.serialNum = uniqueNumber
+        item.facilityCode = "FC-" + uniqueNumber
     })
 
     const csv = convertJsonIntoCSV(facilities)
