@@ -37,12 +37,14 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
                 interval = setInterval(() => {
                     console.log("I am calculating ongoing status");
                     const appointmentSchedules = scheduleResponse["appointmentSchedule"]
-                    setMorningScheduleOnGoing(
-                        isOnGoing(appointmentSchedules[0].startTime, appointmentSchedules[0].endTime)
-                    )
-                    setAfterNoonScheduleOnGoing(
-                        isOnGoing(appointmentSchedules[1].startTime, appointmentSchedules[1].endTime)
-                    )
+                    if(appointmentSchedules) {
+                        setMorningScheduleOnGoing(
+                            isOnGoing(appointmentSchedules[0].startTime, appointmentSchedules[0].endTime)
+                        )
+                        setAfterNoonScheduleOnGoing(
+                            isOnGoing(appointmentSchedules[1].startTime, appointmentSchedules[1].endTime)
+                        )
+                    }
                 }, timeout)
             });
         appIndexDb.getAllEnrollments()

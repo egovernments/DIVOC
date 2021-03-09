@@ -93,7 +93,7 @@ function VaccinationProgress() {
     const {goToQueue} = useHome();
     if(beneficiaryStatus.length > 0) {
         return <>
-            <div className="enroll-container">
+            <div className="enroll-container mt-2">
                 <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
                                 onClick={goToQueue} value={beneficiaryStatus[0].value}/>
                 <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}

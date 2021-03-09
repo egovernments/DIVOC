@@ -620,7 +620,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
@@ -2715,7 +2716,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
@@ -3459,7 +3461,6 @@ func init() {
           "description": "Address line 1",
           "type": "string",
           "title": "The address line 1",
-          "default": "",
           "$id": "#/properties/address/properties/addressLine1"
         },
         "addressLine2": {
@@ -4346,7 +4347,6 @@ func init() {
               "description": "Address line 1",
               "type": "string",
               "title": "The address line 1",
-              "default": "",
               "$id": "#/properties/address/properties/addressLine1"
             },
             "addressLine2": {

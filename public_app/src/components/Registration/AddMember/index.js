@@ -265,7 +265,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
                 <label className="form-check-label" htmlFor="no">No</label>
               </div>
             <div hidden={formData.choice === "no"} className="pt-3">
-              <p>If Yes, Please select comorbidity</p>
+              <p>If yes, please select (all) applicable comorbidities</p>
               <Row className={"col-6 ml-0"}>
                 {
                   conditions.map(x =>
