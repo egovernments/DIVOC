@@ -16,7 +16,6 @@
       "type": "object",
       "title": "The Facility Schema",
       "required": [
-        "serialNum",
         "facilityCode",
         "facilityName",
         "address",
@@ -226,8 +225,8 @@
 
     "privateFields": [],
     "signedFields": [],
-    "indexFields": ["(serialNum, facilityCode)","facilityName"],
-    "uniqueIndexFields": ["serialNum", "facilityCode"],
+    "indexFields": ["facilityCode","facilityName"],
+    "uniqueIndexFields": ["facilityCode"],
     "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
   }
 }

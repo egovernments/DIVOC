@@ -1,15 +1,16 @@
 package pkg
 
 import (
+	"encoding/json"
 	"errors"
-	kernelService "github.com/divoc/kernel_library/services"
+	"strings"
+	"time"
+
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
-	"github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
-	"github.com/divoc/portal-api/pkg/utils"
-	log "github.com/sirupsen/logrus"
-	"strings"
+	"github.com/divoc/portal-api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 )
 
 type PreEnrollmentCSV struct {
@@ -26,8 +27,8 @@ func (preEnrollmentCsv PreEnrollmentCSV) ValidateRow() []string {
 	return preEnrollmentCsv.CSVMetadata.ValidateRow(requiredHeaders)
 }
 
-func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
-	err, enrollment := createPreEnrollmentRegistry(preEnrollmentCsv, 1)
+func (preEnrollmentCsv PreEnrollmentCSV) ProcessRow(uploadID uint) error {
+	err := sendForEnrollment(preEnrollmentCsv, uploadID)
 	if err != nil {
 		errmsg := err.Error()
 		if strings.Contains(errmsg, "Detail:") {
@@ -39,36 +40,57 @@ func (preEnrollmentCsv PreEnrollmentCSV) CreateCsvUpload() error {
 		}
 		return errors.New(errmsg)
 	}
-	errNotify := services.NotifyRecipient(enrollment)
-	return errNotify
+	return nil
 }
 
-func createPreEnrollmentRegistry(preEnrollmentCsv PreEnrollmentCSV, currentRetryCount int) (error, models.Enrollment) {
-	log.Info("Current number of tries for createPreEnrollmentRegistry ", currentRetryCount)
+func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
+
+	ptrOf := func (s string) *string  { return &s}
 	data := preEnrollmentCsv.Data
-	//Name, Mobile, National Identifier, DOB, facilityId
-	//EnrollmentScopeId instead of facility so that we can have flexibility of getting preenrollment at geo attribute like city etc.
+	dob, err := time.Parse(strfmt.RFC3339FullDate, data.Text("dob"))
+	if err != nil {
+		return err
+	}
+
 	enrollment := models.Enrollment{
 		Phone:             data.Text("phone"),
-		EnrollmentScopeId: data.Text("enrollmentScopeId"),
-		NationalId:        data.Text("nationalId"),
-		Dob:               data.Text("dob"),
+		NationalID:        ptrOf(data.Text("nationalId")),
+		Dob:               strfmt.Date(dob),
 		Gender:            data.Text("gender"),
 		Name:              data.Text("name"),
 		Email:             data.Text("email"),
-		Code:              utils.GenerateEnrollmentCode(data.Text("phone")),
-		Certified:         false,
-		ProgramId:         preEnrollmentCsv.ProgramId,
-		Address:           GetAddressObject(data),
+		Address:           &models.EnrollmentAddress{
+			AddressLine1: ptrOf(data.Text("addressLine1")),
+			AddressLine2: data.Text("addressLine2"),
+			District: ptrOf(data.Text("district")),
+			State: ptrOf(data.Text("state")),
+			Pincode: ptrOf(data.Text("pincode")),
+		},
+		Appointments: []*models.EnrollmentAppointmentsItems0{
+			{
+				ProgramID: preEnrollmentCsv.ProgramId,
+			},
+		},
+		Yob: int64(dob.Year()),
+		Comorbidities: []string{},
 	}
-	_, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	log.Info("Received error response from the create new registry", err)
-	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-		return createPreEnrollmentRegistry(preEnrollmentCsv, currentRetryCount+1)
+
+	csvUploadErr := preEnrollmentCsv.SaveCsvErrors(nil, uploadID, true)
+	
+	enrollmentMsg, err := json.Marshal(struct{
+		RowID uint	`json:"rowID"`
+		models.Enrollment
+	}{
+		RowID: csvUploadErr.ID,
+		Enrollment: enrollment,
+	})
+	if err != nil {
+		return err
 	}
-	return err, enrollment
+	services.PublishEnrollmentMessage(enrollmentMsg)
+	return nil
 }
 
-func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (preEnrollmentCsv PreEnrollmentCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return preEnrollmentCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }

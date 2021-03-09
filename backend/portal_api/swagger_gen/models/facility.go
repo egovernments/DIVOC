@@ -59,9 +59,6 @@ type Facility struct {
 	// programs
 	Programs []*FacilityProgramsItems0 `json:"programs"`
 
-	// Serial Number
-	SerialNum int64 `json:"serialNum,omitempty"`
-
 	// stamp
 	Stamp string `json:"stamp,omitempty"`
 
