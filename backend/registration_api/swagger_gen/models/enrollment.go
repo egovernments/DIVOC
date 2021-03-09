@@ -232,7 +232,7 @@ type EnrollmentAppointmentsItems0 struct {
 	AppointmentSlot string `json:"appointmentSlot"`
 
 	// certified
-	Certified *bool `json:"certified"`
+	Certified bool `json:"certified"`
 
 	// dose
 	Dose string `json:"dose,omitempty"`

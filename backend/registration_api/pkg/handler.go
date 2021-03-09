@@ -420,7 +420,7 @@ func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {
 		return fmt.Sprintf("Cancellation is not allowed")
 	}
 	if remainingHoursForSchedule <= float64(config.Config.MinCancellationHours) {
-		return fmt.Sprintf("Cancellation before %d hours is not allowed", config.Config.MinCancellationHours)
+		return fmt.Sprintf("Cancellation within %d hours of appointment is not allowed", config.Config.MinCancellationHours)
 	}
 	updatedCount, _ := strconv.Atoi(enrollmentInfo["updatedCount"])
 	if updatedCount >= config.Config.MaxAppointmentUpdatesAllowed {
