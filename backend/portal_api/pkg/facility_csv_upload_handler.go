@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 
 	"github.com/divoc/kernel_library/services"
@@ -10,7 +9,6 @@ import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 type FacilityCSV struct {

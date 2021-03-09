@@ -337,19 +337,22 @@ type EnrollmentAppointmentsItems0 struct {
 
 	// appointment date
 	// Format: date
-	AppointmentDate strfmt.Date `json:"appointmentDate,omitempty"`
+	AppointmentDate strfmt.Date `json:"appointmentDate"`
 
 	// appointment slot
-	AppointmentSlot string `json:"appointmentSlot,omitempty"`
+	AppointmentSlot string `json:"appointmentSlot"`
 
 	// certified
-	Certified *bool `json:"certified,omitempty"`
+	Certified *bool `json:"certified"`
 
 	// dose
 	Dose string `json:"dose,omitempty"`
 
 	// enrollment scope Id
-	EnrollmentScopeID string `json:"enrollmentScopeId,omitempty"`
+	EnrollmentScopeID string `json:"enrollmentScopeId"`
+
+	// osid
+	Osid string `json:"osid,omitempty"`
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
