@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+
 	"github.com/divoc/portal-api/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -25,6 +26,7 @@ func InitializeKafka() {
 
 	log.Infof("Connected to kafka on %s", servers)
 	StartCertifiedConsumer()
+	StartEnrollmentACKConsumer()
 	go func() {
 		topic := config.Config.Kafka.NotifyTopic
 		for {

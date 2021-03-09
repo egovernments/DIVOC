@@ -20,7 +20,7 @@ analytics:
   datasource: tcp://localhost:9000?debug=true
 facility:
   upload:
-    columns: "serialNum,facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,adminName,adminMobile"
+    columns: "facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,adminName,adminMobile"
     required: "facilityCode,facilityName,contact,addressLine1,addressLine1,district,state,pincode,adminName,adminMobile"
 preenrollment:
   upload:

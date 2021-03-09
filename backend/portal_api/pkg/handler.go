@@ -398,13 +398,8 @@ func postEnrollmentsHandler(params operations.PostEnrollmentsParams, principal *
 		return operations.NewPostEnrollmentsBadRequest().WithPayload(headerErrors)
 	}
 
-	processError := ProcessCSV(preEnrollmentCSV, &data)
+	ProcessCSV(preEnrollmentCSV, &data)
 	defer params.File.Close()
-
-	if processError != nil {
-		return operations.NewPostEnrollmentsBadRequest().WithPayload(processError)
-	}
-
 	return operations.NewPostEnrollmentsOK()
 }
 
@@ -429,13 +424,8 @@ func postFacilitiesHandler(params operations.PostFacilitiesParams, principal *mo
 		return operations.NewPostFacilitiesBadRequest().WithPayload(headerErrors)
 	}
 
-	processError := ProcessCSV(facilityCSV, &data)
+	ProcessCSV(facilityCSV, &data)
 	defer params.File.Close()
-
-	if processError != nil {
-		return operations.NewPostFacilitiesBadRequest().WithPayload(processError)
-	}
-
 	return operations.NewPostFacilitiesOK()
 }
 
@@ -460,13 +450,8 @@ func postVaccinatorsHandler(params operations.PostVaccinatorsParams, principal *
 		return operations.NewPostVaccinatorsBadRequest().WithPayload(headerErrors)
 	}
 
-	processError := ProcessCSV(vaccinatorCSV, &data)
+	ProcessCSV(vaccinatorCSV, &data)
 	defer params.File.Close()
-
-	if processError != nil {
-		return operations.NewPostVaccinatorsBadRequest().WithPayload(processError)
-	}
-
 	return operations.NewPostVaccinatorsOK()
 }
 
@@ -662,7 +647,7 @@ func updateFacilityUserHandler(params operations.UpdateFacilityUserParams, princ
 
 func getFacilityUploadHandler(params operations.GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 	preferredUsername := principal.PreferredUsername
-	facilityUploads, err := db.GetFacilityUploadsForUser(preferredUsername)
+	facilityUploads, err := db.GetUploadsForUser(preferredUsername, "Facility")
 	if err == nil {
 		return NewGenericJSONResponse(facilityUploads)
 	}

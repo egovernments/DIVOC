@@ -1441,10 +1441,6 @@ func init() {
             }
           }
         },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
-        },
         "stamp": {
           "type": "string"
         },
@@ -3459,7 +3455,6 @@ func init() {
           "description": "Address line 1",
           "type": "string",
           "title": "The address line 1",
-          "default": "",
           "$id": "#/properties/address/properties/addressLine1"
         },
         "addressLine2": {
@@ -3596,10 +3591,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/FacilityProgramsItems0"
           }
-        },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
         },
         "stamp": {
           "type": "string"
@@ -4346,7 +4337,6 @@ func init() {
               "description": "Address line 1",
               "type": "string",
               "title": "The address line 1",
-              "default": "",
               "$id": "#/properties/address/properties/addressLine1"
             },
             "addressLine2": {

@@ -3,6 +3,9 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/divoc/kernel_library/model"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -15,8 +18,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"time"
 )
 
 const FacilityEntity = "Facility"
@@ -175,6 +176,10 @@ func canInitializeSlots() bool {
 
 func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
 	currentDate := time.Now()
+	programDates, err := services.GetActiveProgramDates()
+	if err != nil {
+		return model.NewGenericServerError()
+	}
 	if canInitializeSlots() {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
@@ -213,6 +218,9 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 										if ok {
 											for i := 1; i < config.Config.AppointmentScheduler.ScheduleDays; i++ {
 												slotDate := currentDate.AddDate(0, 0, i)
+												if !programDates[programId].Has(slotDate) {
+													continue
+												}
 												programSchedulesForDay, isFacilityAvailableForSlot := programSchedule[slotDate.Weekday()]
 												for _, programSchedule := range programSchedulesForDay {
 													if isFacilityAvailableForSlot {

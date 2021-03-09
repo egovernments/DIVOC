@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/models"
 	log "github.com/sirupsen/logrus"
@@ -11,6 +12,7 @@ import (
 var enrollmentMessages = make(chan []byte)
 var appointmentAckMessages = make(chan []byte)
 var notifications = make(chan []byte)
+var enrollmentACKMessages = make(chan []byte)
 
 func InitializeKafka() {
 	servers := config.Config.Kafka.BootstrapServers
@@ -58,10 +60,38 @@ func InitializeKafka() {
 			}
 		}
 	}()
+
+	go func() {
+		topic := config.Config.Kafka.EnrollmentACKTopic
+		for {
+			msg := <- enrollmentACKMessages
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
 }
 
 func PublishEnrollmentMessage(enrollment []byte) {
 	enrollmentMessages <- enrollment
+}
+
+func PublishEnrollmentACK(rowID uint, e error) {
+	var errMsg string
+	if e != nil {
+		errMsg = e.Error()
+	}
+	msg, _ := json.Marshal(struct{
+		RowID uint	`json:"rowID,omitempty"`
+		ErrMsg string `json:"errMsg,omitempty"`
+	}{
+		RowID: rowID,
+		ErrMsg: errMsg,
+	})
+	enrollmentACKMessages <- msg
 }
 
 func PublishAppointmentAcknowledgement(appointmentAck models.AppointmentAck) {
