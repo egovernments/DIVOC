@@ -59,6 +59,42 @@ var (
 	})
 )
 
+var statesEnabled = map[string]bool{
+	"odisha": true,
+	"nagaland": true,
+	"bihar": true,
+	"karnataka": true,
+	"uttar pradesh": true,
+	"chhattisgarh": true,
+	"maharashtra": true,
+	"madhya pradesh": true,
+	"himachal pradesh": true,
+	"uttarakhand": true,
+	"jammu and kashmir": true,
+	"goa": true,
+	"gujarat": true,
+	"rajasthan": true,
+	"delhi": true,
+	"telangana": true,
+	"andhra pradesh": true,
+	"jharkhand": true,
+	"punjab": true,
+	"tripura": true,
+	"haryana": true,
+	"sikkim": true,
+	"mizoram": true,
+	"chandigarh": true,
+	"meghalaya": true,
+	"arunachal pradesh": true,
+	"dadra and nagar haveli": true,
+	"manipur": true,
+	"daman and diu": true,
+	"ladakh": true,
+	"andaman and nicobar islands": true,
+	"lakshadweep": true,
+	"himachal": true,
+}
+
 var ctx = context.Background()
 
 
@@ -118,10 +154,25 @@ func checkIdType(identity string, aadhaarPDF string, otherPDF string) string {
 }
 
 func templateType(certificate models.Certificate) string {
+	variant := getCertificateVariant(certificate)
+	var basePath string
 	if isFinal(certificate) {
-		return checkIdType(certificate.CredentialSubject.ID, "config/final-with-aadhaar.pdf", "config/final-with-other.pdf")
+		basePath = checkIdType(certificate.CredentialSubject.ID, "config/final-with-aadhaar", "config/final-with-other")
+	} else {
+		basePath = checkIdType(certificate.CredentialSubject.ID, "config/provisional-with-aadhaar", "config/provisional-with-other")
 	}
-	return checkIdType(certificate.CredentialSubject.ID, "config/provisional-with-aadhaar.pdf", "config/provisional-with-other.pdf")
+
+	return  fmt.Sprintf("%s%s.pdf", basePath, variant)
+}
+
+func getCertificateVariant(certificate models.Certificate) string {
+	if len(certificate.Evidence) > 0 {
+		stateName := strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
+		if _, found := statesEnabled[stateName]; found {
+			return ""
+		}
+	}
+	return "-plain"
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
