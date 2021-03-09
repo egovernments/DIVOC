@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetCertificateParams creates a new GetCertificateParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetCertificateParams() GetCertificateParams {
 
 	return GetCertificateParams{}
