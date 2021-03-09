@@ -4,7 +4,7 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
-Cypress.Commands.add('divocFormRequest', (method, url, fileName) => {
+Cypress.Commands.add('divocFormRequest', (method, url, fileName, formData) => {
     return cy.fixture(fileName, 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
         .then((blob) => {
@@ -13,10 +13,8 @@ Cypress.Commands.add('divocFormRequest', (method, url, fileName) => {
                     return {accessToken: accessToken, blob: blob}
                 })
         }).then((result) => {
-            // Build up the form
-            const formData = new FormData();
-            formData.set('file', result.blob, fileName); //adding a file to the form
             // Perform the request
+            formData.set('file', result.blob, fileName); //adding a file to the form
             return fetch(url, {
                 method: method,
                 headers: {

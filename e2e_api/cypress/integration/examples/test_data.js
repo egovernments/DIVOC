@@ -44,3 +44,48 @@ export const facilities = [
         "adminMobile": 1111111112
     }
 ]
+
+export const enrollments = [
+    {
+        "phone": "1234567890",
+        "enrollmentScopeId": "",
+        "nationalId": "2425",
+        "dob": "1992-03-01",
+        "gender": "Male",
+        "name": "John",
+        "email": "john@email.com",
+        "addressLine1": "A",
+        "addressLine2": "B",
+        "district": "C",
+        "state": "D",
+        "pincode": "500001",
+    }
+]
+
+export function convertJsonIntoCSV(jsonArray) {
+    const items = jsonArray
+    const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
+    const header = Object.keys(items[0])
+    const csv = [
+        header.join(','), // header row first
+        ...items.map(row => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+    ].join('\r\n')
+
+    return csv;
+}
+
+export function createFacilitatesCSV(fileName) {
+
+    facilities.forEach((item, index) => {
+        const uniqueNumber = new Date().getTime() + "" + index
+        item.serialNum = uniqueNumber
+        item.facilityCode = "FC-" + uniqueNumber
+    })
+    return createCSV(facilities, fileName);
+}
+
+export function createCSV(jsonArray, fileName) {
+    const csv = convertJsonIntoCSV(jsonArray)
+    cy.writeFile(`cypress/fixtures/${fileName}`, csv)
+    return csv;
+}
