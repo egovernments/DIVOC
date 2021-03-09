@@ -7,7 +7,6 @@ import (
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"strconv"
 	"strings"
 )
 
@@ -26,22 +25,14 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 
 func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 	data := facilityCsv.Data
-	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
+	//facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon,adminName,adminMobile
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
-	if serialNum == 0 {
-		return errors.New("serialNum key can not have zero value")
-	}
 
 	var admins []*models.FacilityAdmin
 	admins = append(admins, buildVaccinator(data))
 
 	facilityCode := data.Text("facilityCode")
 	facility := models.Facility{
-		SerialNum:          serialNum,
 		FacilityCode:       facilityCode,
 		FacilityName:       data.Text("facilityName"),
 		Contact:            data.Text("contact"),
@@ -57,7 +48,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		WebsiteURL:         data.Text("websiteURL"),
 		Programs:           []*models.FacilityProgramsItems0{},
 	}
-	_, err = services.CreateNewRegistry(facility, "Facility")
+	_, err := services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
 		errmsg := err.Error()
 		if strings.Contains(errmsg, "Detail:") {
