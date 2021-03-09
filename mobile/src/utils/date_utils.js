@@ -26,6 +26,9 @@ export function formatDate(givenDate) {
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
 
+    if (parseInt(day) <= 9) {
+        day = '0' + day
+    }
     return `${day}-${monthName}-${year}`;
 }
 

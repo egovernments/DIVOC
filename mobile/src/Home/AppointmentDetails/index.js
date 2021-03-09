@@ -33,7 +33,7 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
             .then((scheduleResponse) => {
                 setAppointmentScheduleData(scheduleResponse)
                 // Calculate ongoing logic for every minute
-                const timeout = 1000 * 60;
+                const timeout = 1000;
                 interval = setInterval(() => {
                     console.log("I am calculating ongoing status");
                     const appointmentSchedules = scheduleResponse["appointmentSchedule"]
@@ -94,10 +94,10 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
         const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0], morningScheduleOnGoing)
         const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1], afterNoonScheduleOnGoing)
-        const content = <>
+        const content = <div style={{marginTop: "-4%"}}>
             {morningScheduleElement}
             {afterNoonScheduleElement}
-        </>;
+        </div>;
         return <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY,"", {date: formatDate(new Date().toISOString())})}
                       content={content}/>
     } else {

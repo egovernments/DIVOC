@@ -74,15 +74,14 @@
 
   .enroll-container {
     display: grid;
-    grid-template-columns: repeat(3,1fr)/repeat(3,1fr);
+    grid-template-columns: 1fr 1fr;
+    gap: 5%;
     height: 50%;
 
     .verify-card {
       height: 100%;
-      margin: 4%;
       grid-row: 1/3;
       text-align: center;
-
       .icon {
         padding: 5%;
       }

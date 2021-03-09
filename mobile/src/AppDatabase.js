@@ -158,6 +158,10 @@ export class AppDatabase {
         return this.db.get(USER_DETAILS, USER_DETAILS);
     }
 
+    async getAllEnrollments() {
+        return await this.db.getAll(PATIENTS)
+    }
+
     async saveEnrollments(enrollments) {
         const enrollmentsList = enrollments || [];
         const patients = enrollmentsList.map((item, index) => this.db.put(PATIENTS, item));

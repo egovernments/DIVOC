@@ -86,14 +86,23 @@ function EnrollmentTypes() {
 }
 
 function VaccinationProgress() {
+    const [beneficiaryStatus, setRecipientDetails] = useState([])
+    useEffect(() => {
+        appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary))
+    },[])
     const {goToQueue} = useHome();
-    return <>
-        <div className="enroll-container">
-            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
-                            onClick={goToQueue} value={10}/>
-            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)} value={15}/>
-        </div>
-    </>;
+    if(beneficiaryStatus.length > 0) {
+        return <>
+            <div className="enroll-container">
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                                onClick={goToQueue} value={beneficiaryStatus[0].value}/>
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
+                                value={beneficiaryStatus[1].value}/>
+            </div>
+        </>;
+    } else {
+        return <></>
+    }
 }
 
 function EnrolmentItems({icon, title, onClick, value}) {
@@ -121,7 +130,7 @@ export function VaccineProgram() {
     return <div className={"home-container"}>
         <ProgramHeader/>
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
+        <Title text={""} content={<EnrollmentTypes/>}/>
         <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationProgress/>}/>
         <AppointmentDetails />
     </div>;
