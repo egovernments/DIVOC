@@ -7,7 +7,10 @@ import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import SideEffectsBannerImg from '../../assets/img/side-effects-banner-img.png'
 import DashboardBannerImg from '../../assets/img/dashboard-banner.png'
 import GetVaccinatedImg from '../../assets/img/img-getvaccinated.png'
-import Covid19PgmImg from '../../assets/img/covid19program.svg'
+import enterMobileImg from '../../assets/img/icon-entermobile.svg'
+import enrollmentNumberImg from '../../assets/img/icon-enrolmentnumber.svg'
+import verifyIdImg from '../../assets/img/icon-verifyid.svg'
+import appointmentImg from '../../assets/img/icon-appointment.svg'
 import {ButtonBack, ButtonNext, CarouselProvider, Slide, Slider} from "pure-react-carousel";
 import {LatestUpdateCard} from "../LatestUpdateCard";
 import "./index.css";
@@ -15,6 +18,8 @@ import 'pure-react-carousel/dist/react-carousel.es.css';
 import {Col, Row} from "react-bootstrap";
 import {CustomButton} from "../CustomButton";
 import {useKeycloak} from "@react-keycloak/web";
+import axios from "axios";
+import {PROGRAM_API} from "../../constants";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
     <Col lg={3}>
@@ -35,18 +40,49 @@ const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassN
         </div>
 
     </Col>
+);
+
+const InfoCard = ({img, title, subtitle}) => (
+    <Col lg={3} md={6} sm={12} className="pt-3">
+        <Row className="justify-content-center">
+            <Col className="col-2 pt-2 pb-2" style={{backgroundColor:"#ffffff", maxHeight:"7vh" }}>
+                <div>
+                 { img }
+                </div>
+            </Col>
+            <Col>
+                <p className="mb-1" style={{fontWeight: "bold"}}>{title}</p>
+                <p className="info-input">{subtitle}</p>
+            </Col>
+        </Row>
+    </Col>
 )
 
 export const Home = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
     const [mobileNumber, setMobileNumber] = useState('');
+    const [programs, setPrograms] = useState([]);
 
     useEffect(() => {
         if(keycloak.authenticated) {
             keycloak.logout()
         }
+        fetchPrograms()
     }, []);
+
+  function fetchPrograms() {
+    axios.get(PROGRAM_API)
+      .then(res => {
+        if (res.status === 200) {
+          setPrograms(res.data);
+        }
+      })
+      .catch(e => {
+        console.log(e);
+        setPrograms([])
+      })
+  }
 
     function buttonLoginOnClick() {
         history.push({
@@ -61,7 +97,7 @@ export const Home = () => {
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
-                            <Col style={{paddingRight:"20vh", paddingLeft:"10vh"}}>
+                            <Col style={{paddingRight:"10vh", paddingLeft:"10vh"}}>
                                 <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
                                 <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
                                 <input placeholder="Enter mobile number"
@@ -76,9 +112,39 @@ export const Home = () => {
                                 <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>Log In</CustomButton>
                             </Col>
                             <Col>
-                                <img src={GetVaccinatedImg} alt={""} style={{height:"70vh"}}/>
+                                <img src={GetVaccinatedImg} alt={""} style={{height:"60vh"}}/>
                             </Col>
                         </Row>
+                    </div>
+                </div>
+            </div>
+            <div className="section ">
+                <div className="info-section d-flex flex-column" style={{height: "100%"}}>
+                    <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
+                        <Row className="d-flex justify-content-center mb-3">
+                            <InfoCard img={<img src={enterMobileImg} alt={""}/>}
+                                      title={"Enter Mobile"}
+                                      subtitle={"Verify your mobile number"}
+                            />
+                            <InfoCard img={<img src={verifyIdImg} alt={""}/>}
+                                      title={"Verify ID Details"}
+                                      subtitle={"Add Beneficiaries"}
+                            />
+                            <InfoCard img={<img src={enrollmentNumberImg} alt={""}/>}
+                                      title={"Get enrollment number"}
+                                      subtitle={"Carry this enrollment number to the facility center"}
+                            />
+                            <InfoCard img={<img src={appointmentImg} alt={""}/>}
+                                      title={"Book Appointment or Walkin"}
+                                      subtitle={"Search for the nearest facility center"}
+                            />
+                        </Row>
+                    </div>
+                </div>
+            </div>
+            <div className="section ">
+                <div className="d-flex flex-column" style={{height: "100%"}}>
+                    <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={"Download your Vaccination Certificate"}
@@ -111,6 +177,29 @@ export const Home = () => {
                                       buttonClassName={"yellow-btn"}
                                       backgroundColor={"#FFFBF0"}
                             />
+                        </Row>
+                    </div>
+                </div>
+            </div>
+            <div hidden={!programs || programs.length === 0} className="section ">
+                <div className="d-flex flex-column" style={{height: "100%"}}>
+                    <div className="ml-3 pb-4 pb-lg-5 d-flex flex-column justify-content-center align-items-center">
+                        <h3 style={{fontWeight:"bold"}}>Ongoing Vaccination Programs</h3>
+                    </div>
+                </div>
+            </div>
+            <div className="section ">
+                <div className="d-flex flex-column" style={{height: "100%"}}>
+                    <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
+                        <Row className="justify-content-center">
+                        {
+                            programs.map(p =>
+                                <Col lg={5} className="p-4 mb-4 mr-4" style={{backgroundColor:"#F9FAFA", borderRadius: "10px"}}>
+                                    <h4 className="pb-2" style={{fontWeight:"bold"}}>{p.name}</h4>
+                                    <p className="info-input">{p.description}</p>
+                                </Col>
+                            )
+                        }
                         </Row>
                     </div>
                 </div>
