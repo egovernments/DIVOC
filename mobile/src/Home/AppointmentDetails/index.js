@@ -73,21 +73,22 @@ export const AppointmentDetails = (props) => {
     }, [])
 
     const dimGrayColor = {color:"#696969"};
-    const onGoingLabel = <div className="appointment-card pl-3 pr-3 ml-2" style={dimGrayColor}>Ongoing</div>
+    const onGoingLabel = <div className="appointment-card pl-3 pr-3 ml-2" style={dimGrayColor}>
+        {getMessageComponent(LANGUAGE_KEYS.STATUS_ONGOING)}</div>
 
     const statusBanner = (booked, completed, open) => {
         return <div className="d-flex appointment-card justify-content-around">
             <div className="text-center title">
                     <h5>{booked}</h5>
-                    <h5 className="mb-3">Booked</h5>
+                    <h5 className="mb-3">{getMessageComponent(LANGUAGE_KEYS.STATUS_BOOKED)}</h5>
             </div>
             <div className="text-center title">
                     <h5>{completed}</h5>
-                    <h5 className="mb3">Completed</h5>
+                    <h5 className="mb3">{getMessageComponent(LANGUAGE_KEYS.STATUS_COMPLETED)}</h5>
             </div>
             <div className="text-center title" style={dimGrayColor}>
                     <h5>{open}</h5>
-                    <h5 className="mb-3">Open</h5>
+                    <h5 className="mb-3">{getMessageComponent(LANGUAGE_KEYS.STATUS_OPEN)}</h5>
             </div>
         </div>
     }
@@ -111,8 +112,10 @@ export const AppointmentDetails = (props) => {
 
     if (appointmentScheduleData["appointmentSchedule"] && enrollments) {
         const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
-        const morningScheduleElement = scheduleLabel("MORNING", appointmentSchedule[0], morningScheduleOnGoing)
-        const afterNoonScheduleElement = scheduleLabel("AFTERNOON", appointmentSchedule[1], afterNoonScheduleOnGoing)
+        const morningScheduleElement = scheduleLabel(
+            getMessageComponent(LANGUAGE_KEYS.MORNING_SCHEDULE), appointmentSchedule[0], morningScheduleOnGoing)
+        const afterNoonScheduleElement = scheduleLabel(
+            getMessageComponent(LANGUAGE_KEYS.AFTERNOON_SCHEDULE), appointmentSchedule[1], afterNoonScheduleOnGoing)
         const content = <div style={{marginTop: "-4%"}}>
             {morningScheduleElement}
             {afterNoonScheduleElement}
