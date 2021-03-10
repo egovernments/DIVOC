@@ -62,6 +62,18 @@ export const enrollments = [
     }
 ]
 
+export const vaccinators = [
+    {
+        "code": "V-12",
+        "name": "John",
+        "nationalIdentifier": "2424",
+        "mobileNumber": "1234567890",
+        "email": "a@a.com",
+        "status": "Active",
+        "facilityIds": "F-12",
+    }
+]
+
 export function convertJsonIntoCSV(jsonArray) {
     const items = jsonArray
     const replacer = (key, value) => value === null ? '' : value // specify how you want to handle null values here
