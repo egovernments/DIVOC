@@ -60,8 +60,8 @@ export function useLocale() {
     }
 }
 
-export function getMessageComponent(id, defaultMessage) {
-    return <FormattedMessage id={id} defaultMessage={defaultMessage || ""}/>
+export function getMessageComponent(id, defaultMessage, values) {
+    return <FormattedMessage id={id} values={values || {}} defaultMessage={defaultMessage || ""}/>
 }
 
 export function getNumberComponent(number) {
@@ -77,8 +77,15 @@ export const LANGUAGE_KEYS = Object.freeze({
     LOGOUT: "app.logout",
     PROFILE: "app.profile",
     ACTIONS: "app.actionTitle",
+    STATUS_OPEN: "app.statusOpen",
+    STATUS_COMPLETED: "app.statusCompleted",
+    STATUS_BOOKED: "app.statusBooked",
     RECIPIENT_NUMBERS: "app.recipientDetailsTitle",
     ENROLLMENT_TODAY: "app.enrollmentToday",
+    APPOINTMENT_TODAY: "app.appointmentToday",
+    MORNING_SCHEDULE: "app.morningSchedule",
+    AFTERNOON_SCHEDULE: "app.afternoonSchedule",
+    STATUS_ONGOING: "app.statusOngoing",
     SELECT_LANGUAGE: "app.selectLanguage",
     SELECT_PROGRAM: "app.selectProgram",
     VERIFY_RECIPIENT: "app.verifyRecipient",

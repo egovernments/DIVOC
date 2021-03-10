@@ -24,7 +24,8 @@ export function ProgramSelection() {
     }, [])
 
     const onProgramSelected = (program) => {
-        saveSelectedProgram(program)
+        saveSelectedProgram(program.name)
+        saveSelectedProgramId(program.id)
     }
 
     return (
@@ -39,7 +40,7 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
     const [selectedProgram, setSelectedProgram] = useState(getSelectedProgram())
 
     const onProgramSelected = (program) => {
-        setSelectedProgram(program)
+        setSelectedProgram(program.name)
         if (onProgramSelectedCallback) {
             onProgramSelectedCallback(program)
         }
@@ -51,7 +52,7 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
                     key={item.id}
                     program={item}
                     selected={item.name === selectedProgram}
-                    onClick={() => onProgramSelected(item.name)}/>
+                    onClick={() => onProgramSelected(item)}/>
             })}
         </div>
     )
@@ -88,6 +89,7 @@ export function SelectProgram({onDone}) {
                 setPrograms(result);
                 if (result?.length === 1) {
                     saveSelectedProgram(result[0].name);
+                    saveSelectedProgramId(result[0].id);
                     onDone(result[0].name);
                 }
             })
@@ -156,6 +158,14 @@ function NoProgramFound({keycloak}) {
 
 export function getSelectedProgram() {
     return localStorage.getItem("program")
+}
+
+export function getSelectedProgramId() {
+    return localStorage.getItem("programId")
+}
+
+export function saveSelectedProgramId(programId) {
+    localStorage.setItem("programId", programId)
 }
 
 export function saveSelectedProgram(programName) {

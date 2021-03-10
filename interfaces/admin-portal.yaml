@@ -500,7 +500,7 @@ paths:
       summary: Get slots for given program and facility
       operationId: getFacilityProgramSchedule
       security:
-        - hasRole: ["facility-admin"]
+        - hasRole: ["facility-admin", "facility-staff"]
       parameters:
         - name: facilityId
           in: path
