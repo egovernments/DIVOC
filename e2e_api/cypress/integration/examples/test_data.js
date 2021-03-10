@@ -1,3 +1,6 @@
+export const PORTAL_URL = "http://portal_api:8001"
+export const KEYCLOAK_URL = "http://keycloak:8001"
+
 export const facilities = [
     {
         "serialNum": 100,

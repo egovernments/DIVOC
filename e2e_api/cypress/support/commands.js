@@ -4,6 +4,7 @@
 // https://on.cypress.io/custom-commands
 // ***********************************************
 
+const {KEYCLOAK_URL} = require("../integration/examples/test_data");
 Cypress.Commands.add('divocFormRequest', (method, url, fileName, formData) => {
     return cy.fixture(fileName, 'binary')
         .then(Cypress.Blob.binaryStringToBlob)
@@ -41,8 +42,7 @@ Cypress.Commands.add('divocRequest', (method, url, body) => {
 })
 
 
-const KEYCLOAK_URL = "http://localhost:8080/auth"
-const TOKEN_URL = KEYCLOAK_URL + "/realms/divoc/protocol/openid-connect/token"
+const TOKEN_URL = KEYCLOAK_URL + "/auth/realms/divoc/protocol/openid-connect/token"
 const ADMIN_API_CLIENT_SECRET = "8eb72e25-baff-4ec5-b636-d4c1b55257b5"
 
 const authBody = {

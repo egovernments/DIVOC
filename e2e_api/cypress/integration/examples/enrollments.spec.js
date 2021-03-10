@@ -1,7 +1,7 @@
-import {createCSV, enrollments} from "./test_data";
+import {createCSV, enrollments, PORTAL_URL} from "./test_data";
 
 const {facilities} = require("./test_data");
-const BASE_URL = "http://localhost:8001/divoc/admin/api/v1";
+const BASE_URL = PORTAL_URL + "/divoc/admin/api/v1";
 const ENROLLMENTS = BASE_URL + "/enrollments"
 const FACILITIES = BASE_URL + "/facilities"
 
@@ -37,8 +37,8 @@ describe("Enrollments Tests", () => {
             expect(response.status).to.eq(200)
         });
 
-       cy.wait("@waitForApiToComplete");
-       cy.wait(1000)
+        cy.wait("@waitForApiToComplete");
+        cy.wait(1000)
 
         cy.divocRequest('GET', ENROLLMENTS)
             .its('body')

@@ -1,7 +1,7 @@
-import {createCSV, vaccinators} from "./test_data";
+import {createCSV, PORTAL_URL, vaccinators} from "./test_data";
 
 const {facilities} = require("./test_data");
-const BASE_URL = "http://localhost:8001/divoc/admin/api/v1";
+const BASE_URL = PORTAL_URL + "/divoc/admin/api/v1";
 const VACCINATORS = BASE_URL + "/vaccinators"
 const FACILITIES = BASE_URL + "/facilities"
 
