@@ -6,11 +6,12 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {formatDate, getMeridiemTime, weekdays} from "../../utils/date_utils";
 import {Title} from "../Home";
 
-export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, completed, open, ...props) => {
+export const AppointmentDetails = (props) => {
     const [appointmentScheduleData, setAppointmentScheduleData] = useState({});
     const [enrollments, setEnrollments] = useState(undefined)
     const [morningScheduleOnGoing, setMorningScheduleOnGoing] = useState(false)
     const [afterNoonScheduleOnGoing, setAfterNoonScheduleOnGoing] = useState(false)
+    const [beneficiaryCompletedStatus, setBeneficiaryCompletedStatus] = useState({})
 
     function getTimeInSeconds(time) {
         time =  time.split(':');
@@ -32,11 +33,29 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         appIndexDb.getFacilitySchedule()
             .then((scheduleResponse) => {
                 setAppointmentScheduleData(scheduleResponse)
-                // Calculate ongoing logic for every minute
+                const appointmentSchedules = scheduleResponse["appointmentSchedule"]
+                if(appointmentSchedules) {
+                    const morningSlot = appointmentSchedules[0].startTime + "-" + appointmentSchedules[0].endTime;
+                    const afterNoonSlot = appointmentSchedules[1].startTime + "-" + appointmentSchedules[1].endTime;
+                    appIndexDb.getCompletedCountForAppointmentBookedBeneficiaries(morningSlot)
+                        .then(count => setBeneficiaryCompletedStatus((prevState => {
+                            return {
+                                ...prevState,
+                                [morningSlot]: count
+                            }
+                        })))
+                    appIndexDb.getCompletedCountForAppointmentBookedBeneficiaries(afterNoonSlot)
+                        .then(count => setBeneficiaryCompletedStatus((prevState => {
+                            return {
+                                ...prevState,
+                                [afterNoonSlot]: count
+                            }
+                        })))
+                }
+                // Calculate ongoing logic for every seconds
                 const timeout = 1000;
                 interval = setInterval(() => {
                     console.log("I am calculating ongoing status");
-                    const appointmentSchedules = scheduleResponse["appointmentSchedule"]
                     if(appointmentSchedules) {
                         setMorningScheduleOnGoing(
                             isOnGoing(appointmentSchedules[0].startTime, appointmentSchedules[0].endTime)
@@ -52,8 +71,6 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         // Clear the interval when component unmounts
         return () => clearInterval(interval)
     }, [])
-
-    completed = 10
 
     const dimGrayColor = {color:"#696969"};
     const onGoingLabel = <div className="appointment-card pl-3 pr-3 ml-2" style={dimGrayColor}>Ongoing</div>
@@ -83,13 +100,12 @@ export const AppointmentDetails = (morningSchedule, afterNoonSchedule, booked, c
         const appointments = [].concat.apply([], appointmentsArrays)
         const booked = appointments.filter((appointment) => appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime)
             .length
-
         return <div>
             <div className="title d-flex mb-2">
                 {title}: {getMeridiemTime(schedule.startTime)} - {getMeridiemTime(schedule.endTime)}
                 {onGoing && onGoingLabel}
             </div>
-            {statusBanner(booked, completed, total - booked)}
+            {statusBanner(booked, beneficiaryCompletedStatus[schedule.startTime + "-" + schedule.endTime], total - booked)}
         </div>
     }
 

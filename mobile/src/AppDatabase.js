@@ -121,6 +121,16 @@ export class AppDatabase {
         ];
     }
 
+    async getCompletedCountForAppointmentBookedBeneficiaries(appointmentSlot) {
+        if (this.db) {
+            const result = await this.db.getAll(QUEUE);
+            return result.filter((beneficiary) => beneficiary.appointments
+                && beneficiary.status === QUEUE_STATUS.COMPLETED
+                && beneficiary.appointments.some(appointment => appointment.appointmentSlot === appointmentSlot)).length
+        } else {
+            return 0
+        }
+    }
 
     async getQueue(status) {
         if (status) {
