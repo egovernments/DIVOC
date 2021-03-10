@@ -9,6 +9,7 @@ const FACILITIES = BASE_URL + "/facilities"
 describe("Facility Tests", () => {
 
     beforeEach(() => {
+        cy.wait(5000)
         cy.intercept({
             url: BASE_URL,
         }).as("waitForApiToComplete");
@@ -26,7 +27,7 @@ describe("Facility Tests", () => {
         })
 
         cy.wait("@waitForApiToComplete")
-        cy.wait(2000)
+        cy.wait(1000)
 
         cy.divocRequest('GET', FACILITIES)
             .its('body')

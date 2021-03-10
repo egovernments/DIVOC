@@ -9,6 +9,7 @@ describe("Enrollments Tests", () => {
 
     const NewFacilityCode = "E" + new Date().getTime()
     beforeEach(() => {
+        cy.wait(5000)
         cy.intercept({
             url: BASE_URL,
         }).as("waitForApiToComplete");
@@ -38,7 +39,7 @@ describe("Enrollments Tests", () => {
         });
 
         cy.wait("@waitForApiToComplete");
-        cy.wait(2000)
+        cy.wait(1000)
 
         cy.divocRequest('GET', ENROLLMENTS)
             .its('body')
