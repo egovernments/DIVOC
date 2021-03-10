@@ -5,7 +5,7 @@ import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
 import PrivateSvg from "../../assets/img/icon-private.svg"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
-import {formatDate} from "../../utils/CustomDate";
+import {formatDate, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
@@ -71,7 +71,7 @@ export const Appointment = (props) => {
     function getAvailableAllotments() {
         let facility = facilities[selectedFacilityIndex];
         return (
-            <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
+            facility && <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
                     <h5>Available Time Slots for {facility?.facilityName}</h5>
                     <img src={CloseImg} className="cursor-pointer" alt={""}
@@ -98,7 +98,7 @@ export const Appointment = (props) => {
     function getFacilityDetails() {
         if (showModal && "facilityId" in selectedAllotment) {
             const facility = facilities.find(facility => facility.osid === selectedAllotment.facilityId);
-            return <>{`at ${facility.facilityName},`}<br/> {`${formatAddress(facility.address)}`}</>;
+            return <>{`At ${facility.facilityName},`}<br/> {`${formatAddress(facility.address)}`}</>;
         } else {
             return "";
         }
@@ -236,21 +236,32 @@ export const Appointment = (props) => {
             }} centered backdrop="static"
                    keyboard={false}>
                 <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex">
                         <div/>
                         <h5>Confirm Appointment Details </h5>
-                        <img src={CloseImg} className="cursor-pointer" alt={""}
-                             onClick={() => setShowModal(false)}/>
                     </div>
-                    <div className="d-flex flex-column justify-content-center align-items-center">
+                    <div className="d-flex flex-column">
                         <span>For {state && state.name}</span>
-                        <span className="text-center mt-1">{getFacilityDetails()}</span>
-                        <span className="mt-1">on {formatDate(selectedAllotment.allotmentDate)}</span>
-                        <span className="mt-1">at {selectedAllotment.allotmentTime}</span>
-                        <CustomButton className="blue-btn" onClick={() => {
+                        <span className="mt-2">{getFacilityDetails()}</span>
+                        <span className="mt-2">{formatDateLong(selectedAllotment.allotmentDate)}</span>
+                        <span className="mt-1">{formatTimeInterval12hr(selectedAllotment.allotmentTime)}</span>
+                    </div>
+                    <Row>
+                       <Col style={{"margin": "15px"}}>
+                            <Button variant="outline-light" onClick={() => {
+                                setShowModal(false)
+                            }}>
+                                <span className="cancel-btn-appnt">
+                                    CANCEL
+                                </span>
+                            </Button>
+                       </Col> 
+                       <Col>
+                       <CustomButton className="blue-btn" onClick={() => {
                             bookSlot()
                         }}>CONFIRM</CustomButton>
-                    </div>
+                       </Col>
+                    </Row>
                 </div>
             </Modal>
         </div>

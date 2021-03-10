@@ -100,3 +100,9 @@
     background: #65E8AC;
 }
 
+.cancel-btn-appnt {
+    font-size: 18px;
+    color: cornflowerblue;
+    font-weight: bold;
+    padding: 5px;
+}
