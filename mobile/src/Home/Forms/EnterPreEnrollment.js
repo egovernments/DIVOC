@@ -30,7 +30,7 @@ function EnterPreEnrollmentContent(props) {
     }
 
     const handleEnrollCodeOnChange = (e) => {
-        if (e.target.value.length <= 5) {
+        if (e.target.value.length <= 13) {
             setEnrollCode(e.target.value)
         }
     }

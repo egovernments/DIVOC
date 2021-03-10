@@ -26,5 +26,27 @@ export function formatDate(givenDate) {
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
 
+    if (parseInt(day) <= 9) {
+        day = '0' + day
+    }
     return `${day}-${monthName}-${year}`;
 }
+
+export const getMeridiemTime = (time) => {
+    const timeInNumber = parseInt(time.split(":")[0])
+    if(timeInNumber >= 0 && timeInNumber <=11) {
+        return time + " AM"
+    } else {
+        return time + " PM"
+    }
+}
+
+export const weekdays = {
+    0: "sun",
+    1: "mon",
+    2: "tue",
+    3: "wed",
+    4: "thu",
+    5: "fri",
+    6: "sat",
+};

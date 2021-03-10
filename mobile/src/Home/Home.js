@@ -5,18 +5,18 @@ import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
 import enrollRecipient from "./enroll_recipient.png"
-import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
 import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
 import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
-import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
+import {AppointmentDetails} from "./AppointmentDetails";
+import {formatDate} from "../utils/date_utils";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState();
@@ -59,7 +59,7 @@ function ProgramHeader() {
     </div>;
 }
 
-function Title({text, content}) {
+export function Title({text, content}) {
     return <div className={"title-container"}>
         <div className={"title"}>{text}</div>
         {content}
@@ -81,19 +81,38 @@ function EnrollmentTypes() {
                             onClick={() => {
                                 goToNewEnroll()
                             }}/>
-            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} icon={recipientQueue}
-                            onClick={goToQueue}/>
         </div>
     </>;
 }
 
-function EnrolmentItems({icon, title, onClick}) {
+function VaccinationProgress() {
+    const [beneficiaryStatus, setRecipientDetails] = useState([])
+    useEffect(() => {
+        appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary))
+    },[])
+    const {goToQueue} = useHome();
+    if(beneficiaryStatus.length > 0) {
+        return <>
+            <div className="enroll-container mt-2">
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                                onClick={goToQueue} value={beneficiaryStatus[0].value}/>
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
+                                value={beneficiaryStatus[1].value}/>
+            </div>
+        </>;
+    } else {
+        return <></>
+    }
+}
+
+function EnrolmentItems({icon, title, onClick, value}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>
                 <Col>
                     <img className={"icon"} src={icon} alt={""}/>
-                    <h6>{title}</h6>
+                    <h5>{value}</h5>
+                    <h5>{title}</h5>
                 </Col>
             </BaseCard>
         </div>
@@ -111,8 +130,9 @@ export function VaccineProgram() {
     return <div className={"home-container"}>
         <ProgramHeader/>
         {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY)} content={<VaccinationStatus/>}/>
+        <Title text={""} content={<EnrollmentTypes/>}/>
+        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationProgress/>}/>
+        <AppointmentDetails />
     </div>;
 }
 

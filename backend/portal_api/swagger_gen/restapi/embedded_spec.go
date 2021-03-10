@@ -620,7 +620,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
@@ -2711,7 +2712,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
