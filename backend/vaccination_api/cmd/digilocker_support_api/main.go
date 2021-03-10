@@ -28,6 +28,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -36,6 +37,7 @@ const ApiRole = "api"
 const ArogyaSetuRole = "arogyasetu"
 const CertificateEntity = "VaccinationCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
+const Dose = "dose"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
 const BeneficiaryId = "beneficiaryId"
@@ -48,6 +50,7 @@ const EventTagFailed = "-failed"
 const EventTagError = "-error"
 const EventTagExternal = "external"
 const EventTagInternal = "internal"
+const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
@@ -378,6 +381,63 @@ func handleFetchPDFPostRequest(w http.ResponseWriter, r *http.Request) {
 	getCertificatePDFHandler(w, r, EventTagInternal)
 }
 
+func headCertificateWithDoseHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err!=nil {
+		w.WriteHeader(400);
+	} else {
+		exists, err := isCertificatePresent(preEnrollmentCode, dose)
+		if err != nil {
+			w.WriteHeader(500);
+			return
+		}
+		if exists {
+			w.WriteHeader(200);
+		} else {
+			w.WriteHeader(404);
+		}
+	}
+}
+
+func isCertificatePresent(preEnrollmentCode string, dose int64) (bool, error) {
+	if certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode); err != nil {
+		log.Errorf("Error in querying from registry %+v", err)
+		return false, errors.New("Internal error (registry)")
+	} else  {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		return isCertificatePresentInCertificatesForGivenDose(certificateArr, dose), nil
+	}
+}
+
+func isCertificatePresentInCertificatesForGivenDose(certificateArr []interface{}, dose int64) bool {
+	for _, cert := range certificateArr {
+		if certificateMap, ok  := cert.(map[string]interface{}); ok {
+			if doseValue, found := certificateMap["dose"]; found {
+				if doseValueFloat, ok := doseValue.(float64); ok {
+					if int64(doseValueFloat) == dose {
+						return true
+					}
+				}
+			} else { //get from certificate json.
+				if certificateJson, found := certificateMap["certificate"]; found {
+					var certificate models.Certificate
+					if certificateString, ok := certificateJson.(string); ok {
+						if err := json.Unmarshal([]byte(certificateString), &certificate); err == nil {
+							if int64(certificate.Evidence[0].Dose) == dose {
+								return true
+							}
+						} else {
+							log.Errorf("Error in reading certificate json %+v", err)
+						}
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
 func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
@@ -385,7 +445,7 @@ func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Infof("Error %+v", err)
 		w.WriteHeader(500)
-		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Internal error")
+		publishEvent(preEnrollmentCode, EventTagInternalHead+EventTagFailed, "Internal error")
 		return
 	}
 	if signedJson != "" {
@@ -530,6 +590,7 @@ func main() {
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
+	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")
 
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
