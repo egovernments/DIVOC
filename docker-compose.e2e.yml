@@ -1,8 +1,6 @@
 version: "2.4"
 
 services:
-  portal_api:
-    entrypoint: /bin/true
   registration_api:
     entrypoint: /bin/true
   analytics_feed:
@@ -29,8 +27,19 @@ services:
     build:
       context: ./e2e
     container_name: e2e_test
-    depends_on: 
+    depends_on:
       vaccination_api:
+        condition: service_started
+      keycloak:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  e2e_api_test:
+    build:
+      context: ./e2e_api
+    container_name: e2e_api_test
+    depends_on:
+      portal_api:
         condition: service_started
       keycloak:
         condition: service_healthy
