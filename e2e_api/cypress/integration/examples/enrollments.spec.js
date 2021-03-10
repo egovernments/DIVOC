@@ -38,7 +38,7 @@ describe("Enrollments Tests", () => {
         });
 
         cy.wait("@waitForApiToComplete");
-        cy.wait(1000)
+        cy.wait(2000)
 
         cy.divocRequest('GET', ENROLLMENTS)
             .its('body')

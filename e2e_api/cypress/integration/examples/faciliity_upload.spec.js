@@ -26,6 +26,7 @@ describe("Facility Tests", () => {
         })
 
         cy.wait("@waitForApiToComplete")
+        cy.wait(2000)
 
         cy.divocRequest('GET', FACILITIES)
             .its('body')
