@@ -315,7 +315,7 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                         }
                     </tr>
                     {
-                        [...timeStamps].map(ts => (
+                        [...timeStamps].sort().map(ts => (
                             <tr>
                                 <td className="text-nowrap ">{ts}</td>
                                 {
