@@ -25,8 +25,6 @@ describe("Vaccinator Tests", () => {
 
     it("Test GET vaccinator by uploading vaccinator CSV ", () => {
 
-        cy.wait(1000)
-
         const fileName = 'vaccinator.csv';
         const newVaccinator = vaccinators[0]
         newVaccinator.code = "C" + new Date().getTime();

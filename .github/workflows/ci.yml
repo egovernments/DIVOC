@@ -18,3 +18,18 @@ jobs:
         run: make
       - name: Test
         run: make test
+
+  cypress-run:
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./e2e_api
+    container: cypress/included:4.11.0
+    steps:
+      - name: Checkout 🛎
+        uses: actions/checkout@v2
+      - name: Install dependencies 📦
+        uses: bahmutov/npm-install@v1
+      - name: Run tests 🧪
+        run: cypress run
