@@ -2,11 +2,13 @@ package utils
 
 import (
 	"encoding/json"
-	"github.com/divoc/registration-api/config"
-	log "github.com/sirupsen/logrus"
 	"math"
 	"math/rand"
 	"strconv"
+	"time"
+
+	"github.com/divoc/registration-api/config"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -63,4 +65,8 @@ func ToMap(obj interface{}) map[string]interface{}{
 		}
 	}
 	return nil
+}
+
+func GetTomorrowStart() time.Time {
+	return time.Now().Truncate(24 * time.Hour).AddDate(0, 0, 1)
 }

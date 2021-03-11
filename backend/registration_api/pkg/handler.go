@@ -260,8 +260,8 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 		return operations.NewGenerateOTPBadRequest()
 	}
 	offset := (*params.PageNumber) * (*params.PageSize)
-	now := fmt.Sprintf("%d", time.Now().Unix())
-	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, now, "inf", *params.PageSize, offset)
+	tomorrowStart := fmt.Sprintf("%d", utils.GetTomorrowStart().Unix())
+	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, tomorrowStart, "inf", *params.PageSize, offset)
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {
