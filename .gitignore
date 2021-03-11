@@ -28,3 +28,4 @@ backend/vaccination_api/divoc-server
 backend/vaccination_api/caching-dash-server
 yarn.lock
 perf/results
+backend/vaccination_api/*.csv
