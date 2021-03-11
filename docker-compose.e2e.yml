@@ -38,7 +38,11 @@ services:
     build:
       context: ./e2e_api
     container_name: e2e_api_test
+    #volumes:
+     # - $PWD:/cypress
     depends_on:
+      e2e_test:
+        condition: service_started
       portal_api:
         condition: service_started
       keycloak:
