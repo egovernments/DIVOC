@@ -42,6 +42,11 @@ type Enrollment struct {
 	// email
 	Email string `json:"email,omitempty"`
 
+	// enrollment type
+	// Required: true
+	// Enum: [SELF_ENRL PRE_ENRL WALK_IN]
+	EnrollmentType *string `json:"enrollmentType"`
+
 	// gender
 	// Enum: [Male Female Other]
 	Gender string `json:"gender,omitempty"`
@@ -76,6 +81,10 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateEnrollmentType(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateGender(formats); err != nil {
 		res = append(res, err)
 	}
@@ -91,7 +100,6 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -109,7 +117,6 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Appointments) { // not required
 		return nil
 	}
@@ -134,12 +141,57 @@ func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateDob(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
 
 	if err := validate.FormatOf("dob", "body", "date", m.Dob.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var enrollmentTypeEnrollmentTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["SELF_ENRL","PRE_ENRL","WALK_IN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		enrollmentTypeEnrollmentTypePropEnum = append(enrollmentTypeEnrollmentTypePropEnum, v)
+	}
+}
+
+const (
+
+	// EnrollmentEnrollmentTypeSELFENRL captures enum value "SELF_ENRL"
+	EnrollmentEnrollmentTypeSELFENRL string = "SELF_ENRL"
+
+	// EnrollmentEnrollmentTypePREENRL captures enum value "PRE_ENRL"
+	EnrollmentEnrollmentTypePREENRL string = "PRE_ENRL"
+
+	// EnrollmentEnrollmentTypeWALKIN captures enum value "WALK_IN"
+	EnrollmentEnrollmentTypeWALKIN string = "WALK_IN"
+)
+
+// prop value enum
+func (m *Enrollment) validateEnrollmentTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, enrollmentTypeEnrollmentTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Enrollment) validateEnrollmentType(formats strfmt.Registry) error {
+
+	if err := validate.Required("enrollmentType", "body", m.EnrollmentType); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := m.validateEnrollmentTypeEnum("enrollmentType", "body", *m.EnrollmentType); err != nil {
 		return err
 	}
 
@@ -179,7 +231,6 @@ func (m *Enrollment) validateGenderEnum(path, location string, value string) err
 }
 
 func (m *Enrollment) validateGender(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -262,7 +313,6 @@ func (m *EnrollmentAppointmentsItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppointmentDate) { // not required
 		return nil
 	}
