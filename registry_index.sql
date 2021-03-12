@@ -1,6 +1,6 @@
 CREATE UNIQUE INDEX "public_V_Facility_facilityCode_sqlgIdx" ON "public"."V_Facility" ("facilityCode");
 CREATE UNIQUE INDEX "public_V_Enrollment_scope_code_sqlgIdx" ON "public"."V_Enrollment" ("enrollmentScopeId", "code");
-CREATE UNIQUE INDEX "public_V_Enrollment_enrlType_sqlgIdx" ON "public"."V_Enrollment" ("enrollmentType")
+CREATE INDEX "public_V_Enrollment_enrlType_sqlgIdx" ON "public"."V_Enrollment" ("enrollmentType");
 CREATE UNIQUE INDEX "public_V_Medicine_name_sqlgIdx" ON "public"."V_Medicine" ("name");
 CREATE UNIQUE INDEX "public_V_Program_name_sqlgIdx" ON "public"."V_Program" ("name");
 CREATE INDEX "public_V_VaccinationCertificate_preEnrollmentCode_sqlgIdx" ON "public"."V_VaccinationCertificate" ("preEnrollmentCode");

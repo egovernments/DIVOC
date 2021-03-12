@@ -52,6 +52,10 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 	if err != nil {
 		return err
 	}
+	dose := data.Text("doseNumber")
+	if dose == "" {
+		dose = "1"
+	}
 	enrollment := models.Enrollment{
 		Phone:             data.Text("phone"),
 		EnrollmentType: 	string(custommodels.PreEnrolled),
@@ -70,6 +74,7 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 		Appointments: []*models.EnrollmentAppointmentsItems0{
 			{
 				ProgramID: preEnrollmentCsv.ProgramId,
+				Dose: dose,
 			},
 		},
 		Yob: int64(dob.Year()),

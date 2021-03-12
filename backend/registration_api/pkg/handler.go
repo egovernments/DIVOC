@@ -16,6 +16,7 @@ import (
 	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -298,7 +299,7 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
-						AppointmentDate: facilitySchedule.DateString(),
+						AppointmentDate: strfmt.Date(facilitySchedule.Date),
 						AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
 						CreatedAt:       time.Now(),
 						Status:          models2.AllottedStatus,
@@ -370,7 +371,7 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 							ProgramId:       programId,
 							SlotID:          "",
 							FacilityCode:    "",
-							AppointmentDate: "0001-01-01",
+							AppointmentDate: strfmt.Date{},
 							AppointmentTime: "",
 							CreatedAt:       time.Now(),
 							Status:          models2.CancelledStatus,
