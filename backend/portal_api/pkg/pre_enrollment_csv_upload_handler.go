@@ -54,7 +54,7 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 	}
 	enrollment := models.Enrollment{
 		Phone:             data.Text("phone"),
-		EnrollmentType: 	ptrOf(string(custommodels.PreEnrolled)),
+		EnrollmentType: 	string(custommodels.PreEnrolled),
 		NationalID:        ptrOf(data.Text("nationalId")),
 		Dob:               strfmt.Date(dob),
 		Gender:            data.Text("gender"),

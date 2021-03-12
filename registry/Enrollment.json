@@ -2,8 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
   "properties": {
-    "Facility": {
-      "$ref": "#/definitions/Enrollment"
+    "Enrollment": {
+      "allOf": [
+        {"$ref": "#/definitions/Enrollment"},
+        {"required": ["code", "enrollmentType"]}
+      ]
     }
   },
   "required": [
@@ -13,7 +16,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["nationalId", "enrollmentType"],
+      "required": ["nationalId"],
       "properties": {
         "enrollmentType": {
           "type": "string",

@@ -82,6 +82,7 @@ func getRecipients(params operations.GetRecipientsParams, principal *models3.JWT
 
 func enrollRecipient(params operations.EnrollRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
 	params.Body.Phone = principal.Phone
+	params.Body.EnrollmentType = "SELF_ENRL"
 	if recipientData, err := json.Marshal(params.Body); err == nil {
 		log.Info("Received Recipient data to enroll", string(recipientData), params.Body)
 		services.PublishEnrollmentMessage(recipientData)

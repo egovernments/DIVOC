@@ -31,7 +31,7 @@ func NewGetFacilityProgramSchedule(ctx *middleware.Context, handler GetFacilityP
 	return &GetFacilityProgramSchedule{Context: ctx, Handler: handler}
 }
 
-/*GetFacilityProgramSchedule swagger:route GET /facility/{facilityId}/program/{programId}/schedule getFacilityProgramSchedule
+/* GetFacilityProgramSchedule swagger:route GET /facility/{facilityId}/program/{programId}/schedule getFacilityProgramSchedule
 
 Get slots for given program and facility
 
@@ -47,7 +47,6 @@ func (o *GetFacilityProgramSchedule) ServeHTTP(rw http.ResponseWriter, r *http.R
 		r = rCtx
 	}
 	var Params = NewGetFacilityProgramScheduleParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetFacilityProgramSchedule) ServeHTTP(rw http.ResponseWriter, r *http.R
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

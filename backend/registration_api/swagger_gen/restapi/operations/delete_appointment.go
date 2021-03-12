@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -35,7 +36,7 @@ func NewDeleteAppointment(ctx *middleware.Context, handler DeleteAppointmentHand
 	return &DeleteAppointment{Context: ctx, Handler: handler}
 }
 
-/*DeleteAppointment swagger:route DELETE /appointment deleteAppointment
+/* DeleteAppointment swagger:route DELETE /appointment deleteAppointment
 
 Delete the appointment
 
@@ -51,7 +52,6 @@ func (o *DeleteAppointment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewDeleteAppointmentParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,7 +71,6 @@ func (o *DeleteAppointment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -87,6 +86,11 @@ type DeleteAppointmentBadRequestBody struct {
 
 // Validate validates this delete appointment bad request body
 func (o *DeleteAppointmentBadRequestBody) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this delete appointment bad request body based on context it is used
+func (o *DeleteAppointmentBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -172,6 +176,11 @@ func (o *DeleteAppointmentBody) validateProgramID(formats strfmt.Registry) error
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this delete appointment body based on context it is used
+func (o *DeleteAppointmentBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
