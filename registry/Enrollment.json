@@ -13,8 +13,12 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["nationalId"],
+      "required": ["nationalId", "enrollmentType"],
       "properties": {
+        "enrollmentType": {
+          "type": "string",
+          "enum": ["SELF_ENRL", "PRE_ENRL", "WALK_IN"]
+        },
         "beneficiaryPhone" : {
           "type": "string"
         },

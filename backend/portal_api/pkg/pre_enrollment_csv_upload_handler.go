@@ -8,6 +8,7 @@ import (
 
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
+	custommodels "github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/go-openapi/strfmt"
@@ -51,9 +52,9 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 	if err != nil {
 		return err
 	}
-
 	enrollment := models.Enrollment{
 		Phone:             data.Text("phone"),
+		EnrollmentType: 	ptrOf(string(custommodels.PreEnrolled)),
 		NationalID:        ptrOf(data.Text("nationalId")),
 		Dob:               strfmt.Date(dob),
 		Gender:            data.Text("gender"),
