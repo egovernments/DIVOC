@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
@@ -37,6 +38,31 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 	return CreateEnrollment(enrollment, position+1)
 }
 
+func CreateWalkInEnrollment(enrollment *struct {
+	RowID             uint   `json:"rowID"`
+	Code              string `json:"code"`
+	EnrollmentScopeId string `json:"enrollmentScopeId"`
+	models.Enrollment
+}) (string, error) {
+	enrollment.Enrollment.Code = enrollment.Code
+	//f:=enrollment.Enrollment
+	//m := f.(map[string]interface{})
+
+	marshal, err := json.Marshal(&enrollment.Enrollment)
+	f := map[string]interface{}{
+		"enrollmentScopeId": enrollment.EnrollmentScopeId,
+		"certified":         true,
+	}
+	err = json.Unmarshal(marshal, &f)
+
+	registryResponse, err := kernelService.CreateNewRegistry(f, "Enrollment")
+	if err != nil {
+		return "", err
+	}
+	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+	return result.(string), nil
+}
+
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
 		if enrollment["appointments"] == nil {
@@ -46,8 +72,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 
 		// No appointment means no need to show the facility details
 		for _, appointment := range appointments {
-			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string);
-			ok && facilityCode != "" && len(facilityCode) > 0 {
+			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string); ok && facilityCode != "" && len(facilityCode) > 0 {
 				minifiedFacilityDetails := GetMinifiedFacilityDetails(facilityCode)
 				appointment.(map[string]interface{})["facilityDetails"] = minifiedFacilityDetails
 			}
@@ -151,4 +176,3 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 	}
 	return nil
 }
-

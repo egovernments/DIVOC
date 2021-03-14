@@ -17,6 +17,9 @@ import (
 // swagger:model CertificationRequest
 type CertificationRequest struct {
 
+	// enrollment type
+	EnrollmentType string `json:"enrollmentType,omitempty"`
+
 	// facility
 	// Required: true
 	Facility *CertificationRequestFacility `json:"facility"`

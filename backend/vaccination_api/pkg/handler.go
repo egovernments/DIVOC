@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+	"github.com/go-openapi/strfmt"
 	"net/http"
 	"strings"
 	"time"
@@ -233,7 +234,7 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *mo
 	return identity.NewPostIdentityVerifyPartialContent()
 }
 
-func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 	limit := config.Config.SearchRegistry.DefaultLimit
 	offset := config.Config.SearchRegistry.DefaultOffset
 	if limitValue != nil {
@@ -278,15 +279,55 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Age and DOB both are missing. Atleast one should be present"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
-				Code: &errorCode,
+				Code:    &errorCode,
 				Message: &errorMsg,
 			})
 		}
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
+
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			if request.EnrollmentType == "walkin" {
+				dob, _ := time.Parse(strfmt.RFC3339FullDate, request.Recipient.Dob.String())
+
+				enrollment := models.Enrollment{
+					Phone:      "request.Text",
+					NationalID: request.Recipient.Nationality,
+					Dob:        *request.Recipient.Dob,
+					Gender:     *request.Recipient.Gender,
+					Name:       *request.Recipient.Name,
+					Email:      "test@email.com",
+					Address: &models.Address{
+						AddressLine1: request.Recipient.Address.AddressLine1,
+						AddressLine2: request.Recipient.Address.AddressLine2,
+						District:     request.Recipient.Address.District,
+						State:        request.Recipient.Address.State,
+						Pincode:      request.Recipient.Address.Pincode,
+					},
+					Appointments: []*models.EnrollmentAppointmentsItems0{
+						{
+							ProgramID: "TestProgramId",
+						},
+					},
+					Yob:           int64(dob.Year()),
+					Comorbidities: []string{},
+				}
+
+				enrollmentMsg, _ := json.Marshal(struct {
+					Code              string `json:"code"`
+					EnrollmentScopeId string `json:"enrollmentScopeId"`
+					models.Enrollment
+				}{
+					Code:              *request.PreEnrollmentCode,
+					EnrollmentScopeId: "TestFacility100",
+					Enrollment:        enrollment,
+				})
+
+				kafkaService.PublishWalkEnrollment(enrollmentMsg, nil, nil)
+			} else {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
 		}
 	}
 	return certification.NewCertifyOK()

@@ -561,6 +561,9 @@ func init() {
         "facility"
       ],
       "properties": {
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -773,7 +776,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -1446,6 +1450,9 @@ func init() {
         "facility"
       ],
       "properties": {
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -1900,7 +1907,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -2155,14 +2163,12 @@ func init() {
           "description": "response",
           "type": "string",
           "title": "response",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/response"
         },
         "symptom": {
           "description": "symptom",
           "type": "string",
           "title": "symptom",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/symptom"
         }
       },

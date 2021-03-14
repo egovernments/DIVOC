@@ -340,7 +340,7 @@ definitions:
     properties:
       mobile:
         type: string
-        format: ''
+        format: "string"
       token2fa:
         type: string
   LoginResponse:
@@ -354,6 +354,8 @@ definitions:
     type: object
     properties:
       preEnrollmentCode:
+        type: string
+      enrollmentType:
         type: string
       recipient:
         type: object

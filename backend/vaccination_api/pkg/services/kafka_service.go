@@ -13,6 +13,7 @@ import (
 var producer *kafka.Producer
 
 var messages = make(chan Message)
+var enrollmentMessages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
@@ -48,6 +49,23 @@ func InitializeKafka() {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
 			msg := <-messages
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          []byte(msg.payload),
+				Headers: []kafka.Header{
+					{Key: "uploadId", Value: msg.UploadId},
+					{Key: "rowId", Value: msg.rowId},
+				},
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
+	go func() {
+		topic := config.Config.Kafka.EnrollmentTopic
+		for {
+			msg := <-enrollmentMessages
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          []byte(msg.payload),
@@ -151,6 +169,14 @@ func StartEventProducer(producerClient *kafka.Producer) {
 
 func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
 	messages <- Message{
+		UploadId: uploadId,
+		rowId:    rowId,
+		payload:  string(message),
+	}
+}
+
+func PublishWalkEnrollment(message []byte, uploadId []byte, rowId []byte) {
+	enrollmentMessages <- Message{
 		UploadId: uploadId,
 		rowId:    rowId,
 		payload:  string(message),
