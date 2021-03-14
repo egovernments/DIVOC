@@ -143,6 +143,16 @@
     text-align: center;
 }
 
+.info-input {
+    width:100%;
+    margin-top:.25rem;
+    font-size:80%;
+}
+
+.info-section {
+    background-color: #F9FAFA;
+}
+
 @media (max-width: 961px) {
     .home-section .section {
         height: 100%;
@@ -150,6 +160,7 @@
     .home-section .section .title{
         font-size: 16px;
         padding: 0 1rem;
+        margin: 1rem;
     }
     .welcome-wrapper {
         height: 100%;
