@@ -5,7 +5,7 @@ import {programDb} from "./Services/ProgramDB";
 import {monthNames} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 12;
+const DATABASE_VERSION = 13;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
@@ -15,6 +15,46 @@ const VACCINATORS = "vaccinators";
 const STATUS = "status";
 const USER_DETAILS = "user_details";
 const FACILITY_SCHEDULE = "facility_schedule";
+const COMORBIDITIES = "comorbidities";
+
+const dbConfigs = [
+    {
+        table: PATIENTS,
+        optionalParameters: {keyPath: "code"}
+    },
+    {
+        table: QUEUE,
+        optionalParameters: {keyPath: "code"},
+    },
+    {
+        table: VACCINATORS,
+        optionalParameters: {keyPath: "osid"},
+    },
+    {
+        table: EVENTS,
+        optionalParameters: {keyPath: "id", autoIncrement: true},
+    },
+    {
+        table: USER_DETAILS,
+        optionalParameters: {},
+    },
+    {
+        table: PROGRAMS,
+        optionalParameters: {keyPath: "name"},
+    },
+    {
+        table: STASH_DATA,
+        optionalParameters: {keyPath: "userId"},
+    },
+    {
+        table: FACILITY_SCHEDULE,
+        optionalParameters: {},
+    },
+    {
+        table: COMORBIDITIES,
+        optionalParameters: {keyPath: "programId"}
+    }
+]
 
 const PROGRAM_ID = "programId";
 
@@ -30,37 +70,11 @@ export class AppDatabase {
             upgrade(database, oldVersion, newVersion) {
                 const objectNames = database.objectStoreNames;
 
-                if (!objectNames.contains(PATIENTS)) {
-                    database.createObjectStore(PATIENTS, {keyPath: "code"});
-                }
-
-                if (!objectNames.contains(QUEUE)) {
-                    database.createObjectStore(QUEUE, {keyPath: "code"});
-                }
-
-                if (!objectNames.contains(VACCINATORS)) {
-                    database.createObjectStore(VACCINATORS, {keyPath: "osid"});
-                }
-
-                if (!objectNames.contains(EVENTS)) {
-                    database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
-                }
-
-                if (!objectNames.contains(USER_DETAILS)) {
-                    database.createObjectStore(USER_DETAILS);
-                }
-
-                if (!objectNames.contains(PROGRAMS)) {
-                    database.createObjectStore(PROGRAMS, {keyPath: "name"});
-                }
-
-                if (!objectNames.contains(STASH_DATA)) {
-                    database.createObjectStore(STASH_DATA, {keyPath: "userId"});
-                }
-
-                if (!objectNames.contains(FACILITY_SCHEDULE)) {
-                    database.createObjectStore(FACILITY_SCHEDULE);
-                }
+                dbConfigs.forEach(config => {
+                    if (!objectNames.contains(config.table)) {
+                        database.createObjectStore(config.table, config.optionalParameters);
+                    }
+                });
                 console.log("DB upgraded from " + oldVersion + " to " + newVersion)
             }
         });
@@ -187,6 +201,8 @@ export class AppDatabase {
                 previousForm: "Payment Mode",
                 name: walkEnrollment.name,
                 dob: walkEnrollment.dob,
+                yob: walkEnrollment.yob,
+                age: new Date().getFullYear() - walkEnrollment.yob,
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
                 code: walkEnrollment.code,

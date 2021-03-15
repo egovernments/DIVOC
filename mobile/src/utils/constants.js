@@ -3,5 +3,6 @@ export const CONSTANT = {
     FACILITY_STAFF_ROLE: "facility-staff",
     PORTAL_CLIENT: "facility-admin-portal",
     ACTIVE: "Active",
-    IN_ACTIVE: "Inactive"
+    IN_ACTIVE: "Inactive",
+    VariantAttachment: "variantAttachment"
 };

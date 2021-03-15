@@ -17,6 +17,7 @@
     "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
     "react-intl": "^5.10.6",
+    "react-otp-input": "^2.3.0",
     "react-redux": "^7.2.2",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
@@ -62,9 +63,9 @@
     ]
   },
   "devDependencies": {
+    "chai": "^4.2.0",
     "mockdate": "^3.0.2",
-    "sass": "^1.29.0",
-    "chai": "^4.2.0"
+    "sass": "^1.29.0"
   },
   "proxy": "https://divoc.xiv.in"
 }
