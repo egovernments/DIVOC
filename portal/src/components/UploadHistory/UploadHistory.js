@@ -63,7 +63,7 @@ const UploadHistory = ({
                 })
             })
             .then((result) => {
-                result.sort((a, b) => b.uploadedDate - a.uploadedDate)
+                result.sort((a, b) => b.uploadedDate - a.uploadedDate);
                 setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
