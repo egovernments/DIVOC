@@ -300,6 +300,9 @@ func getFacilitiesHandler(params operations.GetFacilitiesParams, principal *mode
 }
 
 func createMedicineHandler(params operations.CreateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
+	if !utils.ValidateMedicineIntervals(params.Body) {
+		return operations.NewCreateMedicineBadRequest()
+	}
 	log.Infof("Create medicine %+v", params.Body)
 	objectId := "Medicine"
 	requestBody, err := json.Marshal(params.Body)
@@ -355,6 +358,9 @@ func updateProgramsHandler(params operations.UpdateProgramParams, principal *mod
 }
 
 func updateMedicineHandler(params operations.UpdateMedicineParams, principal *models.JWTClaimBody) middleware.Responder {
+	if !utils.ValidateMedicineIntervals(&params.Body.Medicine) {
+		return operations.NewUpdateMedicineBadRequest()
+	}
 	log.Infof("Update Medicine %+v", params.Body)
 	objectId := "Medicine"
 	requestBody, err := json.Marshal(params.Body)

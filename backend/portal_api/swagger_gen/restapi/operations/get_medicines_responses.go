@@ -25,7 +25,7 @@ type GetMedicinesOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.CreateMedicineRequest `json:"body,omitempty"`
+	Payload []*models.Medicine `json:"body,omitempty"`
 }
 
 // NewGetMedicinesOK creates GetMedicinesOK with default headers values
@@ -35,13 +35,13 @@ func NewGetMedicinesOK() *GetMedicinesOK {
 }
 
 // WithPayload adds the payload to the get medicines o k response
-func (o *GetMedicinesOK) WithPayload(payload []*models.CreateMedicineRequest) *GetMedicinesOK {
+func (o *GetMedicinesOK) WithPayload(payload []*models.Medicine) *GetMedicinesOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get medicines o k response
-func (o *GetMedicinesOK) SetPayload(payload []*models.CreateMedicineRequest) {
+func (o *GetMedicinesOK) SetPayload(payload []*models.Medicine) {
 	o.Payload = payload
 }
 
@@ -52,7 +52,7 @@ func (o *GetMedicinesOK) WriteResponse(rw http.ResponseWriter, producer runtime.
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*models.CreateMedicineRequest, 0, 50)
+		payload = make([]*models.Medicine, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
