@@ -26,7 +26,7 @@ services:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  registry:
+  registry-es:
     image: dockerhub/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
@@ -35,6 +35,19 @@ services:
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
+    ports:
+      - "8082:8081"
+    depends_on:
+      es:
+        condition: service_healthy
+      db:
+        condition: service_started
+  registry:
+    image: dockerhub/registry-es
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
+      - connectionInfo_username=postgres
+      - connectionInfo_password=postgres
     ports:
       - "8081:8081"
     depends_on:
@@ -114,6 +127,7 @@ services:
     image: dockerhub/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
@@ -130,9 +144,10 @@ services:
       - "8001:8001"
     environment:
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: 65ade758-8371-49bc-98cd-ef24aaa4c6e1
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
@@ -147,6 +162,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -208,8 +224,9 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: 65ade758-8371-49bc-98cd-ef24aaa4c6e1
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
     depends_on:
       registry:
         condition: service_started
@@ -218,6 +235,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
       CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
       CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
@@ -260,6 +278,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
     depends_on:
