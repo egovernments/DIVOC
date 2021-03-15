@@ -39,7 +39,7 @@ export const RecipientQueueTable = () => {
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>
-                                    <span style={{fontSize: "12px"}}>{`${data.gender}, ${formatDate(data.dob)}`}</span>
+                                    <span style={{fontSize: "12px"}}>{`${data.gender}, ${new Date().getFullYear() - data.yob} Years`}</span>
                                 </div>
                             </td>
                             <td>
