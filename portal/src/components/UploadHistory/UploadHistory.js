@@ -62,6 +62,7 @@ const UploadHistory = ({
                 })
             })
             .then((result) => {
+                result.reverse();
                 setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
