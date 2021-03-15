@@ -57,11 +57,13 @@ const UploadHistory = ({
                         date: uploadLocalDate,
                         time: uploadLocalTime,
                         success: getSuccessRecords(item),
-                        errors: item["TotalErrorRows"]
+                        errors: item["TotalErrorRows"],
+                        uploadedDate: uploadedDate
                     }
                 })
             })
             .then((result) => {
+                result.sort((a, b) => b.uploadedDate - a.uploadedDate);
                 setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
