@@ -1,0 +1,22 @@
+.custom-button {
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 3rem;
+    margin-top: 1rem
+}
+.green-btn {
+    background: transparent linear-gradient(90deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;
+}
+
+.blue-btn {
+    background: transparent linear-gradient(90deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+}
+
+.yellow-btn {
+    background: transparent linear-gradient(91deg, #FDBD22 0%, #DE9D00 100%) 0% 0% no-repeat padding-box;
+}
+
+.purple-btn {
+    background: transparent linear-gradient(91deg, #8DA2FF 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+}

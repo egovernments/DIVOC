@@ -1,0 +1,23 @@
+{
+  "background_color": "gray",
+  "description": "Verifies vaccination certificates by scanning",
+  "display": "fullscreen",
+  "icons": [
+    {
+          "src": "favicon.ico",
+          "sizes": "16x16",
+          "type": "image/x-icon"
+    },
+    {
+      "src": "verify.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "name": "Verify vaccination certificate (DiVoc)",
+  "short_name": "DiVoc",
+  "start_url": "/verify-certificate/",
+  "display": "standalone",
+  "theme_color": "#005050",
+  "background_color": "#afafaf"
+}
