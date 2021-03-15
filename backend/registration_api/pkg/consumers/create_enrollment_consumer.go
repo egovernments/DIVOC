@@ -30,23 +30,24 @@ func StartEnrollmentConsumer() {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				log.Info("Got the message to create new enrollment")
-				var enrollment struct {
-					RowID             uint   `json:"rowID"`
-					Code              string `json:"code"`
-					EnrollmentScopeId string `json:"enrollmentScopeId"`
-					models.Enrollment
-				}
+				var enrollment = services.EnrollmentPayload{}
 				err = json.Unmarshal(msg.Value, &enrollment)
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 					var osid = ""
-					if enrollment.Code != "" {
-						osid, err = services.CreateWalkInEnrollment(&enrollment)
+					if enrollment.EnrollmentType == "walkin" {
+						osid, err = services.CreateWalkInEnrollment(enrollment)
 					} else {
 						osid, err = services.CreateEnrollment(&enrollment.Enrollment, 1)
 					}
-					services.PublishEnrollmentACK(enrollment.RowID, err)
+
+					services.PublishEnrollmentACK(
+						enrollment.RowID,
+						enrollment.VaccinationDetails,
+						enrollment.EnrollmentType,
+						err,
+					)
 
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {

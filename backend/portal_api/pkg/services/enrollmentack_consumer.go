@@ -29,14 +29,19 @@ func StartEnrollmentACKConsumer() {
 		for {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
-				var message struct{
-					RowID *uint `json:"rowID"`
-					Err	*string	`json:"errMsg"`
+				var message struct {
+					RowID              *uint   `json:"rowID"`
+					Err                *string `json:"errMsg"`
+					EnrollmentType     string  `json:"enrollmentType"`
+					VaccinationDetails []byte  `json:"vaccinationDetails"`
 				}
 				json.Unmarshal(msg.Value, &message)
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 
-				if message.RowID != nil {
+				if message.EnrollmentType == "walkin" {
+					println("ACK Walkin " + string(message.VaccinationDetails))
+					//TODO: Push certify acknowledgment from here
+				} else if message.RowID != nil {
 					if message.Err != nil {
 						db.UpdateCSVUploadError(*message.RowID, *message.Err, false)
 					} else {

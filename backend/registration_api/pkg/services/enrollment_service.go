@@ -38,25 +38,16 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 	return CreateEnrollment(enrollment, position+1)
 }
 
-func CreateWalkInEnrollment(enrollment *struct {
-	RowID             uint   `json:"rowID"`
-	Code              string `json:"code"`
-	EnrollmentScopeId string `json:"enrollmentScopeId"`
-	models.Enrollment
-}) (string, error) {
-	enrollment.Enrollment.Code = enrollment.Code
-	//f:=enrollment.Enrollment
-	//m := f.(map[string]interface{})
-
-	marshal, err := json.Marshal(&enrollment.Enrollment)
-	f := map[string]interface{}{
-		"enrollmentScopeId": enrollment.EnrollmentScopeId,
+func CreateWalkInEnrollment(enrollmentPayload EnrollmentPayload) (string, error) {
+	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
+	enrollment := map[string]interface{}{
+		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
 		"certified":         true,
-		"programId":         enrollment.Appointments[0].ProgramID,
+		"programId":         enrollmentPayload.Appointments[0].ProgramID,
 	}
-	err = json.Unmarshal(marshal, &f)
+	err = json.Unmarshal(marshal, &enrollment)
 
-	registryResponse, err := kernelService.CreateNewRegistry(f, "Enrollment")
+	registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 	if err != nil {
 		return "", err
 	}
@@ -176,4 +167,12 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 		return err
 	}
 	return nil
+}
+
+type EnrollmentPayload struct {
+	RowID              uint   `json:"rowID"`
+	EnrollmentType     string `json:"enrollmentType"`
+	EnrollmentScopeId  string `json:"enrollmentScopeId"`
+	VaccinationDetails []byte `json:"vaccinationDetails"`
+	models.Enrollment
 }

@@ -115,7 +115,7 @@ func getUserAssociatedFacility(authHeader string) (string, error) {
 	return claimBody.FacilityCode, nil
 }
 
-func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string) []byte {
+func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string, vaccinationDetails []byte) []byte {
 	dob, _ := time.Parse(strfmt.RFC3339FullDate, request.Recipient.Dob.String())
 	contacts := request.Recipient.Contact
 	mobile := ""
@@ -131,6 +131,7 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 	}
 
 	enrollment := models.Enrollment{
+		Code:       *request.PreEnrollmentCode,
 		Phone:      mobile,
 		NationalID: request.Recipient.Nationality,
 		Dob:        *request.Recipient.Dob,
@@ -154,13 +155,16 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 	}
 
 	enrollmentMsg, _ := json.Marshal(struct {
-		Code              string `json:"code"`
-		EnrollmentScopeId string `json:"enrollmentScopeId"`
+		Code               string `json:"code"`
+		EnrollmentType     string `json:"enrollmentType"`
+		EnrollmentScopeId  string `json:"enrollmentScopeId"`
+		VaccinationDetails []byte `json:"vaccinationDetails"`
 		models.Enrollment
 	}{
-		Code:              *request.PreEnrollmentCode,
-		EnrollmentScopeId: facilityCode,
-		Enrollment:        enrollment,
+		EnrollmentScopeId:  facilityCode,
+		Enrollment:         enrollment,
+		VaccinationDetails: vaccinationDetails,
+		EnrollmentType:     "walkin",
 	})
 	return enrollmentMsg
 }
