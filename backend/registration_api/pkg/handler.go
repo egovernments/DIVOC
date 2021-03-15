@@ -16,6 +16,7 @@ import (
 	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
@@ -82,6 +83,7 @@ func getRecipients(params operations.GetRecipientsParams, principal *models3.JWT
 
 func enrollRecipient(params operations.EnrollRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
 	params.Body.Phone = principal.Phone
+	params.Body.EnrollmentType = "SELF_ENRL"
 	if recipientData, err := json.Marshal(params.Body); err == nil {
 		log.Info("Received Recipient data to enroll", string(recipientData), params.Body)
 		services.PublishEnrollmentMessage(recipientData)
@@ -260,8 +262,8 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 		return operations.NewGenerateOTPBadRequest()
 	}
 	offset := (*params.PageNumber) * (*params.PageSize)
-	now := fmt.Sprintf("%d", time.Now().Unix())
-	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, now, "inf", *params.PageSize, offset)
+	tomorrowStart := fmt.Sprintf("%d", utils.GetTomorrowStart().Unix())
+	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, tomorrowStart, "inf", *params.PageSize, offset)
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {
@@ -297,7 +299,7 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 						EnrollmentCode:  *params.Body.EnrollmentCode,
 						SlotID:          *params.Body.FacilitySlotID,
 						FacilityCode:    facilitySchedule.FacilityCode,
-						AppointmentDate: facilitySchedule.DateString(),
+						AppointmentDate: strfmt.Date(facilitySchedule.Date),
 						AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
 						CreatedAt:       time.Now(),
 						Status:          models2.AllottedStatus,
@@ -369,7 +371,7 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 							ProgramId:       programId,
 							SlotID:          "",
 							FacilityCode:    "",
-							AppointmentDate: "0001-01-01",
+							AppointmentDate: strfmt.Date{},
 							AppointmentTime: "",
 							CreatedAt:       time.Now(),
 							Status:          models2.CancelledStatus,

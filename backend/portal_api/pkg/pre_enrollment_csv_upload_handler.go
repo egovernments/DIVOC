@@ -8,6 +8,7 @@ import (
 
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
+	custommodels "github.com/divoc/portal-api/pkg/models"
 	"github.com/divoc/portal-api/pkg/services"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	"github.com/go-openapi/strfmt"
@@ -51,9 +52,13 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 	if err != nil {
 		return err
 	}
-
+	dose := data.Text("doseNumber")
+	if dose == "" {
+		dose = "1"
+	}
 	enrollment := models.Enrollment{
 		Phone:             data.Text("phone"),
+		EnrollmentType: 	string(custommodels.PreEnrolled),
 		NationalID:        ptrOf(data.Text("nationalId")),
 		Dob:               strfmt.Date(dob),
 		Gender:            data.Text("gender"),
@@ -69,6 +74,7 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 		Appointments: []*models.EnrollmentAppointmentsItems0{
 			{
 				ProgramID: preEnrollmentCsv.ProgramId,
+				Dose: dose,
 			},
 		},
 		Yob: int64(dob.Year()),

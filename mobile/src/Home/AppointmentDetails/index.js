@@ -110,7 +110,16 @@ export const AppointmentDetails = (props) => {
         </div>
     }
 
-    if (appointmentScheduleData["appointmentSchedule"] && enrollments) {
+    function isAppointmentConfiguredForToday(appointmentSchedule) {
+        if(appointmentSchedule) {
+            const dayOfToday = weekdays[new Date().getDay()]
+            return appointmentSchedule.some(schedule => schedule.days.some(day => day["day"] === dayOfToday))
+        } else {
+            return false;
+        }
+    }
+
+    if (isAppointmentConfiguredForToday(appointmentScheduleData["appointmentSchedule"]) && enrollments) {
         const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
         const morningScheduleElement = scheduleLabel(
             getMessageComponent(LANGUAGE_KEYS.MORNING_SCHEDULE), appointmentSchedule[0], morningScheduleOnGoing)

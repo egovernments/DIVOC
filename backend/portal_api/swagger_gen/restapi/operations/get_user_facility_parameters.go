@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetUserFacilityParams creates a new GetUserFacilityParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetUserFacilityParams() GetUserFacilityParams {
 
 	return GetUserFacilityParams{}

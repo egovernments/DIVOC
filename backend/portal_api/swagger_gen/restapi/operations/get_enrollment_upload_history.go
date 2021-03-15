@@ -31,7 +31,7 @@ func NewGetEnrollmentUploadHistory(ctx *middleware.Context, handler GetEnrollmen
 	return &GetEnrollmentUploadHistory{Context: ctx, Handler: handler}
 }
 
-/*GetEnrollmentUploadHistory swagger:route GET /enrollments/uploads getEnrollmentUploadHistory
+/* GetEnrollmentUploadHistory swagger:route GET /enrollments/uploads getEnrollmentUploadHistory
 
 Get Enrollments uploads
 
@@ -47,7 +47,6 @@ func (o *GetEnrollmentUploadHistory) ServeHTTP(rw http.ResponseWriter, r *http.R
 		r = rCtx
 	}
 	var Params = NewGetEnrollmentUploadHistoryParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetEnrollmentUploadHistory) ServeHTTP(rw http.ResponseWriter, r *http.R
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
