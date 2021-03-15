@@ -848,7 +848,6 @@ func init() {
         },
         "certified": {
           "type": "boolean",
-          "x-omitempty": false,
           "x-omitempty": false
         },
         "dose": {
@@ -951,6 +950,14 @@ func init() {
         },
         "email": {
           "type": "string"
+        },
+        "enrollmentType": {
+          "type": "string",
+          "enum": [
+            "SELF_ENRL",
+            "PRE_ENRL",
+            "WALK_IN"
+          ]
         },
         "gender": {
           "type": "string",

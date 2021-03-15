@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetEnrollmentsParams creates a new GetEnrollmentsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetEnrollmentsParams() GetEnrollmentsParams {
 
 	return GetEnrollmentsParams{}

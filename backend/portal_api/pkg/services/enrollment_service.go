@@ -2,11 +2,12 @@ package services
 
 import (
 	"bytes"
+	"text/template"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/pkg/models"
+	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"text/template"
 )
 
 const EnrollmentEntity = "Enrollment"

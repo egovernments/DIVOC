@@ -6,6 +6,7 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -35,7 +36,7 @@ func NewBookSlotOfFacility(ctx *middleware.Context, handler BookSlotOfFacilityHa
 	return &BookSlotOfFacility{Context: ctx, Handler: handler}
 }
 
-/*BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
+/* BookSlotOfFacility swagger:route POST /appointment bookSlotOfFacility
 
 Book a slot in facility
 
@@ -51,7 +52,6 @@ func (o *BookSlotOfFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewBookSlotOfFacilityParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,7 +71,6 @@ func (o *BookSlotOfFacility) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -157,6 +156,11 @@ func (o *BookSlotOfFacilityBody) validateProgramID(formats strfmt.Registry) erro
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this book slot of facility body based on context it is used
+func (o *BookSlotOfFacilityBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

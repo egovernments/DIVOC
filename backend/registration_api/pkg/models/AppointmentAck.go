@@ -1,6 +1,10 @@
 package models
 
-import "time"
+import (
+	"time"
+
+	"github.com/go-openapi/strfmt"
+)
 
 type AppointmentAck struct {
 	EnrollmentCode  string
@@ -8,7 +12,7 @@ type AppointmentAck struct {
 	Dose			string
 	SlotID          string
 	FacilityCode    string
-	AppointmentDate string
+	AppointmentDate strfmt.Date
 	AppointmentTime string
 	CreatedAt       time.Time
 	Status          string

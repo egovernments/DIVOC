@@ -31,7 +31,7 @@ func NewPostEnrollments(ctx *middleware.Context, handler PostEnrollmentsHandler)
 	return &PostEnrollments{Context: ctx, Handler: handler}
 }
 
-/*PostEnrollments swagger:route POST /enrollments postEnrollments
+/* PostEnrollments swagger:route POST /enrollments postEnrollments
 
 Upload facility csv for bulk ingestion of pre enrollment
 
@@ -47,7 +47,6 @@ func (o *PostEnrollments) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewPostEnrollmentsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *PostEnrollments) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
