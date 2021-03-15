@@ -357,6 +357,12 @@ definitions:
         type: string
       enrollmentType:
         type: string
+      programId:
+        type: string
+      comorbidities:
+        type: array
+        items:
+          type: string
       recipient:
         type: object
         properties:

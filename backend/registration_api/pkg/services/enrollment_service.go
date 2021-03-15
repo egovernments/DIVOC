@@ -52,6 +52,7 @@ func CreateWalkInEnrollment(enrollment *struct {
 	f := map[string]interface{}{
 		"enrollmentScopeId": enrollment.EnrollmentScopeId,
 		"certified":         true,
+		"programId":         enrollment.Appointments[0].ProgramID,
 	}
 	err = json.Unmarshal(marshal, &f)
 

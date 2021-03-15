@@ -17,6 +17,9 @@ import (
 // swagger:model CertificationRequest
 type CertificationRequest struct {
 
+	// comorbidities
+	Comorbidities []string `json:"comorbidities"`
+
 	// enrollment type
 	EnrollmentType string `json:"enrollmentType,omitempty"`
 
@@ -30,6 +33,9 @@ type CertificationRequest struct {
 	// pre enrollment code
 	// Required: true
 	PreEnrollmentCode *string `json:"preEnrollmentCode"`
+
+	// program Id
+	ProgramID string `json:"programId,omitempty"`
 
 	// recipient
 	// Required: true

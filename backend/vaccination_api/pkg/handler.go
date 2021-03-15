@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/go-openapi/strfmt"
 	"net/http"
 	"strings"
 	"time"
@@ -289,41 +288,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == "walkin" {
-				dob, _ := time.Parse(strfmt.RFC3339FullDate, request.Recipient.Dob.String())
-
-				enrollment := models.Enrollment{
-					Phone:      "request.Text",
-					NationalID: request.Recipient.Nationality,
-					Dob:        *request.Recipient.Dob,
-					Gender:     *request.Recipient.Gender,
-					Name:       *request.Recipient.Name,
-					Email:      "test@email.com",
-					Address: &models.Address{
-						AddressLine1: request.Recipient.Address.AddressLine1,
-						AddressLine2: request.Recipient.Address.AddressLine2,
-						District:     request.Recipient.Address.District,
-						State:        request.Recipient.Address.State,
-						Pincode:      request.Recipient.Address.Pincode,
-					},
-					Appointments: []*models.EnrollmentAppointmentsItems0{
-						{
-							ProgramID: "TestProgramId",
-						},
-					},
-					Yob:           int64(dob.Year()),
-					Comorbidities: []string{},
-				}
-
-				enrollmentMsg, _ := json.Marshal(struct {
-					Code              string `json:"code"`
-					EnrollmentScopeId string `json:"enrollmentScopeId"`
-					models.Enrollment
-				}{
-					Code:              *request.PreEnrollmentCode,
-					EnrollmentScopeId: "TestFacility100",
-					Enrollment:        enrollment,
-				})
-
+				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
 				kafkaService.PublishWalkEnrollment(enrollmentMsg, nil, nil)
 			} else {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)

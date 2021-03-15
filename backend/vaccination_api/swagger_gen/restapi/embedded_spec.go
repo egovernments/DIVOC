@@ -561,6 +561,12 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "enrollmentType": {
           "type": "string"
         },
@@ -606,6 +612,9 @@ func init() {
           "type": "object"
         },
         "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
           "type": "string"
         },
         "recipient": {
@@ -1450,6 +1459,12 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "enrollmentType": {
           "type": "string"
         },
@@ -1495,6 +1510,9 @@ func init() {
           "type": "object"
         },
         "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
           "type": "string"
         },
         "recipient": {
