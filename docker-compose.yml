@@ -127,7 +127,7 @@ services:
     image: dockerhub/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
@@ -144,7 +144,7 @@ services:
       - "8001:8001"
     environment:
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
@@ -162,7 +162,7 @@ services:
     environment:
       REDIS_URL: redis://redis:6379
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -224,7 +224,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
     depends_on:
@@ -235,7 +235,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
       CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
       CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
@@ -278,7 +278,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
-      REGISTRY_URL_FOR_ES: "http://registry-es:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
     depends_on:
