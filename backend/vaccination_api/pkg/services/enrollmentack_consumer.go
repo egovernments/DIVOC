@@ -2,9 +2,7 @@ package services
 
 import (
 	"encoding/json"
-
-	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/pkg/db"
+	"github.com/divoc/api/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -30,20 +28,16 @@ func StartEnrollmentACKConsumer() {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				var message struct {
-					RowID *uint   `json:"rowID"`
-					Err   *string `json:"errMsg"`
+					Err                *string `json:"errMsg"`
+					EnrollmentType     string  `json:"enrollmentType"`
+					VaccinationDetails []byte  `json:"vaccinationDetails"`
 				}
 				json.Unmarshal(msg.Value, &message)
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 
-				if message.RowID != nil {
-					if message.Err != nil {
-						db.UpdateCSVUploadError(*message.RowID, *message.Err, false)
-					} else {
-						db.DeleteCSVUploadError(*message.RowID)
-					}
+				if message.EnrollmentType == "walkin" {
+					PublishCertifyMessage(message.VaccinationDetails, nil, nil)
 				}
-
 				consumer.CommitMessage(msg)
 			} else {
 				// The client will automatically try to recover from all errors.

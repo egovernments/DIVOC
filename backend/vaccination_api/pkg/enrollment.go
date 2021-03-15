@@ -155,7 +155,6 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 	}
 
 	enrollmentMsg, _ := json.Marshal(struct {
-		Code               string `json:"code"`
 		EnrollmentType     string `json:"enrollmentType"`
 		EnrollmentScopeId  string `json:"enrollmentScopeId"`
 		VaccinationDetails []byte `json:"vaccinationDetails"`

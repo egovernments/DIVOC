@@ -38,12 +38,8 @@ func InitializeKafka() {
 	if err != nil {
 		panic(err)
 	}
+	StartEnrollmentACKConsumer()
 	log.Infof("Connected to kafka on %s", servers)
-
-	//defer func() {
-	//	log.Info("Closing the producer!")
-	//	producer.Close()
-	//}()
 
 	go func() {
 		topic := config.Config.Kafka.CertifyTopic
@@ -175,10 +171,10 @@ func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
 	}
 }
 
-func PublishWalkEnrollment(message []byte, uploadId []byte, rowId []byte) {
+func PublishWalkEnrollment(message []byte) {
 	enrollmentMessages <- Message{
-		UploadId: uploadId,
-		rowId:    rowId,
+		UploadId: nil,
+		rowId:    nil,
 		payload:  string(message),
 	}
 }

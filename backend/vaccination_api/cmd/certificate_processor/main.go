@@ -8,8 +8,6 @@ import (
 	"github.com/divoc/api/pkg"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"math/rand"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -123,81 +121,5 @@ func processCertificateMessage(msg string) error {
 			}
 		}
 	}
-
-	/*
-	certifyMessageString := msg
-	certificate := VaccinationCertificateRequest{
-		ID:  "open-saber.registry.create",
-		Ver: config.Config.Registry.ApiVersion,
-		Ets: "",
-		Params: struct {
-			Did   string `json:"did"`
-			Key   string `json:"key"`
-			Msgid string `json:"msgid"`
-		}{},
-		Request: struct {
-			VaccinationCertificate struct {
-				CertificateID string   `json:"certificateId"`
-				Identity      string   `json:"identity"`
-				Contact       []string `json:"contact"`
-				Name          string   `json:"name"`
-				//Mobile          string                 `json:"mobile"`
-				Certificate string `json:"certificate"`
-			} `json:"VaccinationCertificate"`
-		}{
-			VaccinationCertificate: struct {
-				CertificateID string   `json:"certificateId"`
-				Identity      string   `json:"identity"`
-				Contact       []string `json:"contact"`
-				Name          string   `json:"name"`
-				//Mobile          string                 `json:"mobile"`
-				Certificate string `json:"certificate"`
-			}{
-				CertificateID: generateUniqueCertificateId(certifyMessage),
-				Identity:      certifyMessage.Recipient.Identity,
-				Contact:       certifyMessage.Recipient.Contact,
-				Name:          certifyMessage.Recipient.Name,
-				//Mobile: 	   certifyMessage.Recipient.Contact
-				Certificate: certifyMessageString,
-			},
-		},
-	}
-
-	if certString, err := json.Marshal(certificate); err == nil {
-		log.Infof("Creating certificate %+v", string(certString))
-	}
-
-	if response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.AddOperationId, req.BodyJSON(certificate)); err != nil {
-		log.Errorf("Error storing vacciantion certificate %+v", err)
-		return errors.New("error storing vacciantion certificate")
-	} else {
-		log.Infof("Create vaccination certificate response %+v", response.String())
-		var registryResponse services.RegistryResponse
-		if err := response.ToJSON(&registryResponse); err != nil {
-			log.Errorf("Error in decoding json from registry after creating vaccination certificate")
-			return errors.New("error in decoding json from registry after creating vaccination certificate")
-		} else {
-			if registryResponse.Params.Status != "SUCCESSFUL" {
-				log.Errorf("Error while storing the certificate %+v for %+v", registryResponse, certifyMessage.Recipient.Identity)
-				errors.New("error while storing the certificate")
-			} else {
-				log.Infof("Created vaccination certificate")
-				for _, contact := range certificate.Request.VaccinationCertificate.Contact {
-					if strings.HasPrefix(contact, mobilePhonePrefix) {
-						if err := pkg.CreateRecipientUserId(strings.TrimPrefix(contact, mobilePhonePrefix)); err != nil {
-							log.Errorf("Error in setting up login for the recipient %s", contact)
-							//kafka.pushMessage({"type":"createContact", "contact":contact}) //todo: can relay message via queue to create contact itself
-						}
-					}
-				}
-			}
-		}
-	}
-
-	*/
 	return nil
-}
-
-func generateUniqueCertificateId(message CertifyMessage) string {
-	return strconv.Itoa(rand.Intn(10000000)) //todo: create random id based on set of rules
 }

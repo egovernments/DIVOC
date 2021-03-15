@@ -746,32 +746,6 @@ func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal
 	return operations.NewCreateVaccinatorOK()
 }
 
-func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
-	for _, updateRequest := range params.Body {
-		requestBody, err := json.Marshal(updateRequest)
-		if err != nil {
-			log.Error(err)
-			return operations.NewUpdateVaccinatorsBadRequest()
-		}
-		requestMap := make(map[string]interface{})
-		err = json.Unmarshal(requestBody, &requestMap)
-		if requestMap["facilityIds"] == nil {
-			delete(requestMap, "facilityIds")
-		}
-		if requestMap["programs"] == nil {
-			delete(requestMap, "programs")
-		}
-		resp, err := kernelService.UpdateRegistry("Vaccinator", requestMap)
-		if err != nil {
-			log.Error(err)
-			return operations.NewUpdateVaccinatorsBadRequest()
-		} else {
-			log.Print(resp)
-		}
-	}
-	return operations.NewUpdateVaccinatorsOK()
-}
-
 func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 	for _, updateRequest := range params.Body {
 		if *updateRequest.Osid == "" {

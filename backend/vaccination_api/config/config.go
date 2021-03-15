@@ -58,6 +58,7 @@ var Config = struct {
 		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
