@@ -59,6 +59,7 @@ const dbConfigs = [
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
+export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", WALK_IN: "WALK_IN"});
 
 export class AppDatabase {
 
@@ -183,9 +184,12 @@ export class AppDatabase {
         return await this.db.getAll(PATIENTS)
     }
 
-    async saveEnrollments(enrollments) {
+    async saveEnrollments(enrollments, enrollmentType) {
         const enrollmentsList = enrollments || [];
-        const patients = enrollmentsList.map((item, index) => this.db.put(PATIENTS, item));
+        const patients = enrollmentsList.map((item, index) => {
+            item.enrollmentType = enrollmentType;
+            return this.db.put(PATIENTS, item)
+        });
         return Promise.all(patients)
     }
 
@@ -194,9 +198,10 @@ export class AppDatabase {
             walkEnrollment.code = Date.now().toString()
             const programId = getSelectedProgramId()
             walkEnrollment.programId = programId
-            await this.saveEnrollments([walkEnrollment])
+            await this.saveEnrollments([walkEnrollment],ENROLLMENT_TYPES.WALK_IN)
             const queue = {
                 enrollCode: walkEnrollment.code,
+                enrollmentType: ENROLLMENT_TYPES.WALK_IN,
                 mobileNumber: walkEnrollment.phone,
                 previousForm: "Payment Mode",
                 name: walkEnrollment.name,
