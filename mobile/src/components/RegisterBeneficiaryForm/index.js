@@ -33,20 +33,20 @@ const GENDERS = [
     "Female",
     "Other"
 ];
-export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinue}) => {
+export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinue, buttonText}) => {
     const [formData, setFormData] = useState({...state});
 
     return (
         <div className="new-enroll-container">
             <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)} onBack={verifyDetails ? () => {
                 onBack(formData)} : undefined}>
-                <BeneficiaryForm verifyDetails={verifyDetails} state={state} onContinue={onContinue}/>
+                <BeneficiaryForm verifyDetails={verifyDetails} state={state} onContinue={onContinue} buttonText={buttonText}/>
             </BaseFormCard>
         </div>
     )
 }
 
-export function BeneficiaryForm({verifyDetails, state, onContinue}) {
+export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) {
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({...state});
 
@@ -125,7 +125,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue}) {
                                 errors={errors}/>
             <ContactInfo formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <CustomButton className="primary-btn w-100 mt-5 mb-5"
-                          onClick={onContinueClick}>{verifyDetails ? "CONFIRM" : "CONTINUE"}</CustomButton>
+                          onClick={onContinueClick}>{buttonText}</CustomButton>
         </div>
     )
 }
@@ -414,7 +414,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                 }
             </div>
-            <div className="comorbidities-section">
+            <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
                 <label htmlFor="confirmEmail">Comorbidities</label>
                 <p>
                     {formData.comorbidities.join(", ")}

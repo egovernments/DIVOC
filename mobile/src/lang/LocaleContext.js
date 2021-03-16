@@ -145,6 +145,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     BUTTON_DONE: "app.button.done",
     BUTTON_NEXT: "app.button.next",
     BUTTON_CONFIRM: "app.button.confirm",
+    BUTTON_CONTINUE: "app.button.continue",
     BUTTON_SEND_FOR_VACCINATION: "app.button.sendvaccination",
     BUTTON_OTP: "app.button.otp",
     BUTTON_VERIFY: "app.button.verify",

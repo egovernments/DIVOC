@@ -53,13 +53,13 @@ function WalkInEnrollmentRouteCheck({pageName}) {
                 const onFormContinue = (formData) => {
                     goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_VERIFY_FORM, formData)
                 };
-                return <RegisterBeneficiaryForm state={state} onContinue={onFormContinue} />;
+                return <RegisterBeneficiaryForm state={state} onContinue={onFormContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)} />;
             case FORM_WALK_IN_VERIFY_FORM:
                 const onContinue = (formData) => {
                         goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, formData)
                 };
                 const onBack = (formData) => {goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_FORM, formData)};
-                return <RegisterBeneficiaryForm verifyDetails={true} state={state} onBack={onBack} onContinue={onContinue}/>;
+                return <RegisterBeneficiaryForm verifyDetails={true} state={state} onBack={onBack} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONFIRM)}/>;
             case FORM_WALK_IN_ENROLL_PAYMENTS : {
                 if (state.name) {
                     return <WalkEnrollmentPayment/>

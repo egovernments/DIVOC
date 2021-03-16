@@ -64,6 +64,7 @@
   "app.button.done": "DONE",
   "app.button.next": "NEXT",
   "app.button.confirm": "CONFIRM",
+  "app.button.continue": "CONTINUE",
   "app.button.otp": "GENERATE OTP",
   "app.button.sendvaccination": "SEND FOR VACCINATION",
   "app.payment.title": "Please select mode of payment",

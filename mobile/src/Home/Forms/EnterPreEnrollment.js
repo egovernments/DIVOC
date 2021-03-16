@@ -11,7 +11,7 @@ export const PHONE_NUMBER_MAX = 10
 
 export function PreEnrollmentCode(props) {
     return (
-        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_TITLE)}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
             <EnterPreEnrollmentContent/>
         </BaseFormCard>
     )
@@ -37,28 +37,27 @@ function EnterPreEnrollmentContent(props) {
     return (
         <div className="enroll-code-container">
             <h4 className="title text-center">{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_ENTER_ENROLMENT_NUMBER)}</h4>
-            <div className={"input-container"}>
-                <div className="divOuter">
-                    <div className="divInner">
-
-                        <Form.Group>
-                            <Form.Control type="text" tabIndex="1" value={enrollCode}
-                                          onChange={handleEnrollCodeOnChange}/>
-                            {/*<input id="otp" type="text" className="otp" tabIndex="2" maxLength="5"*/}
-                            {/*       value={enrollCode}*/}
-                            {/*       onChange={handleEnrollCodeOnChange}*/}
-                            {/*       placeholder=""/>*/}
-                        </Form.Group>
-
-                    </div>
-                </div>
+            <div>
+                <Form.Group>
+                    <Form.Control type="text" tabIndex="1" value={enrollCode}
+                                  onChange={handleEnrollCodeOnChange}/>
+                    {/*<input id="otp" type="text" className="otp" tabIndex="2" maxLength="5"*/}
+                    {/*       value={enrollCode}*/}
+                    {/*       onChange={handleEnrollCodeOnChange}*/}
+                    {/*       placeholder=""/>*/}
+                </Form.Group>
             </div>
-            <Button variant="outline-primary" className="action-btn" onClick={() => {
-                goNext(FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, {
-                    mobileNumber: phoneNumber,
-                    enrollCode: enrollCode
-                })
-            }}>{getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT_CONFIRM_BUTTON)}</Button>
+            <Button variant="outline-primary" className="primary-btn w-100 mt-5 mb-5" onClick={() => {
+                if (enrollCode)
+                    goNext(FORM_PRE_ENROLL_CODE, FORM_PRE_ENROLL_DETAILS, {
+                        mobileNumber: phoneNumber,
+                        enrollCode: enrollCode
+                    })
+                else {
+                    alert("Please enter enrollment number");
+                    return false
+                }
+            }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_CONTINUE)}</Button>
         </div>
     );
 }

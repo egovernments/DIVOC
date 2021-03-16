@@ -139,7 +139,7 @@ export function usePreEnrollment() {
         dispatch({type: current, payload: payload});
         if (next) {
             if (next === '/') {
-                history.replace(config.urlPath + "/", null)
+                history.replace(config.urlPath + "/queue", null)
             } else {
                 history.push(config.urlPath + '/preEnroll/' + next)
             }

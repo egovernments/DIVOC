@@ -36,7 +36,7 @@ export function PatientInfo(props) {
 
     return (
         <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
-            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue}/>;
+            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}/>;
         </BaseFormCard>
     )
 }
@@ -68,8 +68,8 @@ function WarningInfo(props) {
             }
             </div>
             <div className="mt-5">
-                <p style={{ color:"#777777"}}>Current Appointment Slot</p>
-                <p>{currentSlot}</p>
+                <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
+                <p>{currentSlot || "N/A"}</p>
             </div>
             {   recipientDetails.length > 0 &&
                 <div className="enroll-container mt-4" style={{height:"30%"}}>
@@ -186,6 +186,7 @@ function PatientDetails(props) {
                             showCurrentSlot={true}
                             state={getFormData(patientDetails)}
                             onContinue={onFormContinue}
+                            buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}
                         />;
                     </div>
             }
