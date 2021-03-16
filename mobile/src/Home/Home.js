@@ -7,8 +7,7 @@ import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
 import enrollRecipient from "./enroll_recipient.png"
 import verifyRecipient from "./verify_recpient.png"
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
-import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
-import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
+import {FORM_WALK_IN_ELIGIBILITY_CRITERIA, WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
 import NoNetworkImg from "assets/img/no_network.svg"
@@ -90,9 +89,9 @@ function VaccinationProgress() {
     const [beneficiaryStatus, setRecipientDetails] = useState([])
     useEffect(() => {
         appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary))
-    },[])
+    }, [])
     const {goToQueue} = useHome();
-    if(beneficiaryStatus.length > 0) {
+    if (beneficiaryStatus.length > 0) {
         return <>
             <div className="enroll-container mt-2">
                 <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
@@ -135,8 +134,10 @@ export function VaccineProgram() {
         <ProgramHeader/>
         <SyncData isNotSynced={isNotSynced} eventsCount={eventsCount}/>
         <Title text={""} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY,"", {date: formatDate(new Date().toISOString())})} content={<VaccinationProgress/>}/>
-        <AppointmentDetails />
+        <Title
+            text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY, "", {date: formatDate(new Date().toISOString())})}
+            content={<VaccinationProgress/>}/>
+        <AppointmentDetails/>
     </div>;
 }
 
@@ -156,7 +157,7 @@ function SyncData(props) {
                 <img className="network mr-2" src={NoNetworkImg} alt={"no_network"} width="25px"/>
                 <div className="p-3 ml-4">
                     <label style={{fontWeight: 600}}>Last synced {lastSyncedDate}.</label>
-                    <label>Turn on the cellular data/wifi to sync or you may loose data of {props.eventsCount} Beneficiaries.</label>
+                    <label>Information of {props.eventsCount} beneficiaries is not yet synced.</label>
                 </div>
             </div>
         </BaseCard>
@@ -214,7 +215,7 @@ export function useHome() {
         history.push(`${config.urlPath}/queue`)
     };
     const goToNewEnroll = function () {
-        history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM)
+        history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ELIGIBILITY_CRITERIA)
     };
 
     return {

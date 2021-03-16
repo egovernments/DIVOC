@@ -3,7 +3,18 @@ import {Redirect} from "react-router";
 import {BaseFormCard} from "../BaseFormCard";
 import "./index.scss"
 import {Button} from "react-bootstrap";
-import {useWalkInEnrollment, WALK_IN_ROUTE, WalkInEnrollmentProvider} from "./context";
+import {
+    FORM_WALK_IN_ELIGIBILITY_CRITERIA, FORM_WALK_IN_ENROLL_CONFIRMATION,
+    FORM_WALK_IN_ENROLL_FORM,
+    FORM_WALK_IN_ENROLL_PAYMENTS,
+    FORM_WALK_IN_VERIFY_FORM,
+    FORM_WALK_IN_VERIFY_MOBILE,
+    FORM_WALK_IN_VERIFY_OTP,
+    initialWalkInEnrollmentState,
+    useWalkInEnrollment,
+    WALK_IN_ROUTE,
+    WalkInEnrollmentProvider
+} from "./context";
 import Row from "react-bootstrap/Row";
 import PropTypes from 'prop-types';
 import schema from '../../jsonSchema/walk_in_form.json';
@@ -12,9 +23,13 @@ import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageCompon
 import config from "config.json"
 import {useSelector} from "react-redux";
 import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
+import {SelectComorbidity} from "../SelectComorbidity";
+import {VerifyMobile} from "../VerifyMobile";
+import {VerifyOTP} from "../VerifyOTP";
+import {RegisterBeneficiaryForm} from "../RegisterBeneficiaryForm";
+import {WalkInConfirmation} from "../WalkInConfirmation";
+import {CustomButton} from "../CustomButton";
 
-export const FORM_WALK_IN_ENROLL_FORM = "form";
-export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
 
 export function WalkEnrollmentFlow(props) {
     return (
@@ -25,18 +40,31 @@ export function WalkEnrollmentFlow(props) {
 }
 
 function WalkInEnrollmentRouteCheck({pageName}) {
-    const {state} = useWalkInEnrollment();
-    switch (pageName) {
-        case FORM_WALK_IN_ENROLL_FORM :
-            return <WalkEnrollment/>;
-        case FORM_WALK_IN_ENROLL_PAYMENTS : {
-            if (state.name) {
-                return <WalkEnrollmentPayment/>
+    const {state, goNext} = useWalkInEnrollment();
+    if (pageName === state.nextForm) {
+        switch (pageName) {
+            case FORM_WALK_IN_ELIGIBILITY_CRITERIA :
+                return <SelectComorbidity/>;
+            case FORM_WALK_IN_VERIFY_MOBILE:
+                return <VerifyMobile/>;
+            case FORM_WALK_IN_VERIFY_OTP:
+                return <VerifyOTP/>;
+            case FORM_WALK_IN_ENROLL_FORM:
+                return <RegisterBeneficiaryForm/>;
+            case FORM_WALK_IN_VERIFY_FORM:
+                return <RegisterBeneficiaryForm verifyDetails={true}/>;
+            case FORM_WALK_IN_ENROLL_PAYMENTS : {
+                if (state.name) {
+                    return <WalkEnrollmentPayment/>
+                }
+                break;
             }
-            break;
+            case FORM_WALK_IN_ENROLL_CONFIRMATION:
+                return <WalkInConfirmation/>
+            default:
         }
-        default:
     }
+    goNext(state.currentForm, FORM_WALK_IN_ELIGIBILITY_CRITERIA, initialWalkInEnrollmentState)
     return <Redirect
         to={{
             pathname: config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM
@@ -45,11 +73,11 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 }
 
 
-function WalkEnrollment(props) {
+function WalkEnrollmentForm(props) {
     const {state, goNext} = useWalkInEnrollment();
+    const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const {getText, selectLanguage} = useLocale()
     const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
-    const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
     const [formData, setFormData] = useState(state);
     const [isFormTranslated, setFormTranslated] = useState(false);
@@ -153,7 +181,7 @@ function WalkEnrollmentPayment(props) {
     const {goNext, saveWalkInEnrollment} = useWalkInEnrollment()
     const [selectPaymentMode, setSelectPaymentMode] = useState()
     return (
-        <div className="new-enroll-container">
+        <div className="new-enroll-container text-center">
             <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
                 <div className="content">
                     <h3>{getMessageComponent(LANGUAGE_KEYS.PAYMENT_TITLE)}</h3>
@@ -171,14 +199,11 @@ function WalkEnrollmentPayment(props) {
                             })
                         }
                     </Row>
-                    <Button variant="outline-primary"
-                            className="action-btn"
-                            onClick={() => {
-                                saveWalkInEnrollment(selectPaymentMode.key)
-                                    .then(() => {
-                                        goNext(FORM_WALK_IN_ENROLL_PAYMENTS, "/", {})
-                                    })
-                            }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</Button>
+                    <CustomButton className="primary-btn w-100 mt-5 mb-5"
+                                  onClick={() => {
+                                      saveWalkInEnrollment(selectPaymentMode.key)
+                                      goNext(FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_ENROLL_CONFIRMATION, {})
+                                  }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</CustomButton>
                 </div>
             </BaseFormCard>
         </div>

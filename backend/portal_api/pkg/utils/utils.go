@@ -3,10 +3,12 @@ package utils
 import (
 	"encoding/json"
 	"errors"
-	"github.com/divoc/portal-api/config"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"strconv"
+
+	"github.com/divoc/portal-api/config"
+	"github.com/divoc/portal-api/swagger_gen/models"
+	log "github.com/sirupsen/logrus"
 )
 
 func IsEqual(arr1 []string, arr2 []string) bool {
@@ -88,4 +90,16 @@ func GenerateEnrollmentCode(phoneNumber string) string {
 		digits  = digits * 10 + 9
 	}
 	return strconv.Itoa(rand.Intn(digits))
+}
+
+func ValidateMedicineIntervals(m *models.Medicine) bool {
+	for _, interval := range m.DoseIntervals {
+		if interval.Max == nil || interval.Min == nil {
+			continue
+		}
+		if *interval.Max < *interval.Min {
+			return false
+		}
+	}
+	return true
 }

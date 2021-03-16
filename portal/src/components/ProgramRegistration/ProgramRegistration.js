@@ -11,13 +11,20 @@ import {CustomDateWidget} from '../CustomDateWidget/index';
 import {CustomTextWidget} from '../CustomTextWidget/index';
 import {CustomTextAreaWidget} from '../CustomTextAreaWidget/index';
 import {CustomDropdownWidget} from "../CustomDropdownWidget/index";
-import {formatDate} from "../../utils/dateutil";
+import {formatDate, formatYYYYMMDDDate} from "../../utils/dateutil";
 import * as R from "ramda";
 import {TextInCenter} from "../TextInCenter";
 
+const initialState = {
+    medicineIds: [],
+    dateRange: {
+        startDate:  formatYYYYMMDDDate(new Date()),
+        endDate:  formatYYYYMMDDDate(new Date())
+    }
+}
 function VaccineRegistration() {
     const {keycloak} = useKeycloak();
-    const [formData, setFormData] = useState(null);
+    const [formData, setFormData] = useState(initialState);
     const [programList, setProgramList] = useState([]);
     const [programSchema, setProgramSchema] = useState(schema);
     const [showForm, setShowForm] = useState(false);
@@ -185,7 +192,7 @@ function VaccineRegistration() {
                     listData={activePrograms}
                     onRegisterBtnClick={() => {
                         setShowForm(true);
-                        setFormData({medicineIds: []});
+                        setFormData(initialState);
                     }}
                     title={activePrograms.length > 0 ? "Active Vaccine Programs" : ""}
                     buttonTitle="Register New Vaccine Program"

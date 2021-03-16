@@ -64,7 +64,7 @@ export class ApiServices {
                         "tel:" + patientDetails.phone,
                         "mailto:" + patientDetails.email
                     ],
-                    dob: patientDetails.dob,
+                    age: "" + (new Date().getFullYear() - patientDetails.yob),
                     gender: patientDetails.gender,
                     identity: item.identity ? item.identity : "",
                     name: patientDetails.name,
@@ -158,6 +158,10 @@ export class ApiServices {
         const data = {
             "flagKey": "country_specific_features"
         };
+        return this.fetchFlagrConfigs(data);
+    }
+
+    static fetchFlagrConfigs(data) {
         const requestOptions = {
             method: 'POST',
             headers: {

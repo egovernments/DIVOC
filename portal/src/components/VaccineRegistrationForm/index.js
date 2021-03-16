@@ -5,6 +5,9 @@ import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
 import { Col, Form } from "react-bootstrap";
 
+const IS_REQUIRED = " is required";
+const GT_ZERO = " cannot be negative";
+
 function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
 
     const [formData, setFormData] = useState(transformToFormData(vaccine));
@@ -38,16 +41,26 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
         const errors = {};
         ["name", "provider", "price"].forEach(f => {
             if(!data[f]) {
-                errors[f] = " is required";
+                errors[f] = IS_REQUIRED;
             }
         });
+        if (data["price"] && data["price"] < 0) {
+            errors["price"] = GT_ZERO;
+        }
         data.doseIntervals.forEach((interval, index) => {
             if(!interval.min.count) {
-                errors["doseIntervals_"+index+"_min"] = " is required";
-            } else if(interval.max.count && convertIntervalToDays(interval.max) < convertIntervalToDays(interval.min)) {
+                errors["doseIntervals_"+index+"_min"] = IS_REQUIRED;
+            } else if(interval.min.count < 0) {
+                errors["doseIntervals_"+index+"_min"] = GT_ZERO;
+            }else if(interval.max.count && interval.max.count < 0) {
+                errors["doseIntervals_"+index+"_max"] = GT_ZERO;
+            } else if (convertIntervalToDays(interval.max) < convertIntervalToDays(interval.min)) {
                 errors["doseIntervals_"+index+"_max"] = " should be > Minimum Interval";
             }
         });
+        if (data["effectiveUntil"]["count"] && data["effectiveUntil"]["count"] < 0) {
+            errors["effectiveUntil"] = GT_ZERO;
+        }
         setValidationErrors(errors);
         return Object.keys(errors).length === 0;
     }
@@ -212,6 +225,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
             <TimeInterval 
                 defaultValue={{"count": vaccine?.effectiveUntil, "unit": "Days"}} 
                 name="effectiveUntil" allowLifeTime
+                errormsg={validationErrors && validationErrors["effectiveUntil"]}
                 onChange={handleChange} title={schema.properties.effectiveUntil.title}/>
 
             </Col>
