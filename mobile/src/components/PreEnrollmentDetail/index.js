@@ -66,6 +66,9 @@ function WarningInfo(props) {
                     )}
                 </p>
             }
+            {props.patientDetailsError &&
+                <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current</p>
+            }
             </div>
             <div className="mt-5">
                 <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
@@ -83,12 +86,12 @@ function WarningInfo(props) {
             }
             <Col className="register-with-aadhaar">
                 <div>
-                    <Button variant="outline-primary" className="primary-btn w-100 mt-5 mb-5" onClick={() => {
+                    <Button hidden={props.patientDetailsError} variant="outline-primary" className="primary-btn w-100 mt-5 mb-5" onClick={() => {
                         props.onContinue()
                     }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_CONTINUE)}</Button>
                 </div>
                 <div>
-                    <Button variant="outline-primary" className="action-btn" onClick={() => {
+                    <Button variant="outline-primary" className="action-btn w-100 mt-3" onClick={() => {
                         history.push(config.urlPath + '/')
                     }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
                 </div>
@@ -125,6 +128,14 @@ function PatientDetails(props) {
     }, [state.enrollCode]);
 
     if (!patientDetails) {
+        return (
+            <WarningInfo
+                patientDetailsError={true}
+                patientDetails={patientDetails}
+                currentAppointmentSlot={currentAppointmentSlot}
+                onContinue={onContinue}
+            />
+        )
         return <div className={"no-details"}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_NO_PATIENTS)}</div>
     }
 
