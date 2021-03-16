@@ -50,9 +50,16 @@ function WalkInEnrollmentRouteCheck({pageName}) {
             case FORM_WALK_IN_VERIFY_OTP:
                 return <VerifyOTP/>;
             case FORM_WALK_IN_ENROLL_FORM:
-                return <RegisterBeneficiaryForm/>;
+                const onFormContinue = (formData) => {
+                    goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_VERIFY_FORM, formData)
+                };
+                return <RegisterBeneficiaryForm state={state} onContinue={onFormContinue} />;
             case FORM_WALK_IN_VERIFY_FORM:
-                return <RegisterBeneficiaryForm verifyDetails={true}/>;
+                const onContinue = (formData) => {
+                        goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, formData)
+                };
+                const onBack = (formData) => {goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_FORM, formData)};
+                return <RegisterBeneficiaryForm verifyDetails={true} state={state} onBack={onBack} onContinue={onContinue}/>;
             case FORM_WALK_IN_ENROLL_PAYMENTS : {
                 if (state.name) {
                     return <WalkEnrollmentPayment/>
@@ -176,38 +183,48 @@ const paymentMode = [
     }
 ]
 
-function WalkEnrollmentPayment(props) {
+export function WalkEnrollmentPayment(props) {
 
     const {goNext, saveWalkInEnrollment} = useWalkInEnrollment()
-    const [selectPaymentMode, setSelectPaymentMode] = useState()
+
+    const onContinue = (selectPaymentMode) => {
+        saveWalkInEnrollment(selectPaymentMode.key)
+        goNext(FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_ENROLL_CONFIRMATION, {})
+    }
     return (
         <div className="new-enroll-container text-center">
             <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)}>
-                <div className="content">
-                    <h3>{getMessageComponent(LANGUAGE_KEYS.PAYMENT_TITLE)}</h3>
-                    <Row className="payment-container">
-                        {
-                            paymentMode.map((item, index) => {
-                                return <PaymentItem
-                                    title={item.name}
-                                    key={item.key}
-                                    logo={item.logo}
-                                    selected={selectPaymentMode && item.name === selectPaymentMode.name}
-                                    onClick={(value, key) => {
-                                        setSelectPaymentMode({name: value, key: key})
-                                    }}/>
-                            })
-                        }
-                    </Row>
-                    <CustomButton className="primary-btn w-100 mt-5 mb-5"
-                                  onClick={() => {
-                                      saveWalkInEnrollment(selectPaymentMode.key)
-                                      goNext(FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_ENROLL_CONFIRMATION, {})
-                                  }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</CustomButton>
-                </div>
+                <PaymentComponent onContinue={onContinue} />
             </BaseFormCard>
         </div>
     );
+}
+
+export function PaymentComponent({onContinue}) {
+    const [selectPaymentMode, setSelectPaymentMode] = useState()
+
+    return (
+        <div className="content">
+            <h3>{getMessageComponent(LANGUAGE_KEYS.PAYMENT_TITLE)}</h3>
+            <Row className="payment-container">
+                {
+                    paymentMode.map((item, index) => {
+                        return <PaymentItem
+                            title={item.name}
+                            key={item.key}
+                            logo={item.logo}
+                            selected={selectPaymentMode && item.name === selectPaymentMode.name}
+                            onClick={(value, key) => {
+                                setSelectPaymentMode({name: value, key: key})
+                            }}/>
+                    })
+                }
+            </Row>
+            <CustomButton className="primary-btn w-100 mt-5 mb-5"
+                          onClick={() => onContinue(selectPaymentMode)}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_SEND_FOR_VACCINATION)}</CustomButton>
+        </div>
+    )
+
 }
 
 

@@ -1,4 +1,4 @@
-export function maskPersonalDetails(personalDetail, maskAll=false){
+export function maskPersonalDetails(personalDetail="", maskAll=false){
     if (maskAll) {
         return personalDetail.replace(/^(.*)$/,(_, b) => b.replace(/./g, '*'))
     }

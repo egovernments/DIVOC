@@ -104,7 +104,7 @@ function VaccinationProgress() {
     }
 }
 
-function EnrolmentItems({icon, title, onClick, value}) {
+export function EnrolmentItems({icon, title, onClick, value}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>

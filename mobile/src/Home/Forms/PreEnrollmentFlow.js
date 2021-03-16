@@ -2,10 +2,15 @@ import {PreEnrollmentCode} from "./EnterPreEnrollment";
 import {VerifyAadhaarNumber, VerifyAadhaarOTP} from "./EnterAadhaarNumber";
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {Redirect, useHistory} from "react-router";
-import {appIndexDb} from "../../AppDatabase";
-import {PreEnrollmentDetails} from "../../components/PreEnrollmentDetail";
+import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
+import {PatientInfo, PreEnrollmentDetails} from "../../components/PreEnrollmentDetail";
 import "./PreEnrollmentFlow.scss";
 import config from "config.json"
+import {
+    FORM_WALK_IN_ENROLL_PAYMENTS,
+    FORM_WALK_IN_VERIFY_FORM
+} from "../../components/WalkEnrollments/context";
+import {BeneficiaryVerifyPayment} from "./BeneficiaryVerifyPayment";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode";
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails";
@@ -23,16 +28,12 @@ export function PreEnrollmentFlow(props) {
 }
 
 function PreEnrollmentRouteCheck({pageName}) {
-    const {state} = usePreEnrollment();
+    const {state, goNext} = usePreEnrollment();
     switch (pageName) {
         case FORM_PRE_ENROLL_CODE :
             return <PreEnrollmentCode/>;
-        case FORM_PRE_ENROLL_DETAILS : {
-            if (state.mobileNumber) {
-                return <PreEnrollmentDetails/>
-            }
-            break;
-        }
+        case FORM_PRE_ENROLL_DETAILS :
+            return <PreEnrollmentDetails/>
         case FORM_AADHAAR_NUMBER : {
             if (state.name) {
                 return <VerifyAadhaarNumber/>
@@ -44,6 +45,11 @@ function PreEnrollmentRouteCheck({pageName}) {
                 return <VerifyAadhaarOTP/>
             }
             break;
+        case FORM_WALK_IN_VERIFY_FORM:
+            return <PatientInfo/>;
+        case FORM_WALK_IN_ENROLL_PAYMENTS : {
+            return <BeneficiaryVerifyPayment/>
+        }
         default:
     }
     return <Redirect
@@ -74,11 +80,9 @@ function preEnrollmentReducer(state, action) {
             return newState
         }
         case FORM_PRE_ENROLL_DETAILS: {
-            const newState = {...state};
-            newState.name = action.payload.name;
-            newState.dob = action.payload.dob;
-            newState.gender = action.payload.gender;
-            newState.programId = action.payload.programId;
+            const newState = {...state, ...action.payload};
+            newState.state = action.payload.address.state;
+            newState.district = action.payload.address.district;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
 
@@ -93,6 +97,27 @@ function preEnrollmentReducer(state, action) {
             const newState = {...state};
             newState.aadhaarOtp = action.payload.aadhaarOtp;
             newState.previousForm = action.payload.currentForm ?? null;
+            return newState
+        }
+        case FORM_WALK_IN_ENROLL_PAYMENTS: {
+            return {
+                ...state,
+                ...action.payload
+            };
+        }
+        case FORM_WALK_IN_VERIFY_FORM: {
+            const newState = {
+                ...state,
+                ...action.payload
+            };
+            newState.address = {
+                addressLine1: "",
+                addressLine2: "",
+                district: action.payload.district,
+                state: action.payload.state,
+                pincode: action.payload.pincode
+            };
+            newState.enrollCode = action.payload.code;
             return newState
         }
         default:
@@ -121,17 +146,32 @@ export function usePreEnrollment() {
         }
     };
 
-    const addToQueue = function () {
+    const addToQueue = function (paymentMode) {
         const [state] = context;
-        return appIndexDb.addToQueue(state)
+        state.paymentMode = paymentMode ?? "NA";
+        const queue = {
+            enrollCode: state.code,
+            mobileNumber: state.phone,
+            previousForm: "Payment Mode",
+            name: state.name,
+            dob: state.dob,
+            yob: state.yob,
+            age: new Date().getFullYear() - state.yob,
+            gender: state.gender,
+            status: QUEUE_STATUS.IN_QUEUE,
+            code: state.code,
+            programId: localStorage.getItem("programId"),
+            identity: state.nationalId
+        }
+        return appIndexDb.addToQueue(queue)
     };
 
     const goBack = function () {
         history.goBack()
     };
 
-    const getUserDetails = function (enrollCode, mobileNumber) {
-        return appIndexDb.getPatientDetails(enrollCode, mobileNumber)
+    const getUserDetails = function (enrollCode) {
+        return appIndexDb.getPatientDetails(enrollCode)
     };
 
     return {

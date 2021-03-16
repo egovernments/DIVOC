@@ -1,5 +1,4 @@
 import {
-    FORM_AADHAAR_NUMBER,
     FORM_PRE_ENROLL_DETAILS,
     usePreEnrollment
 } from "../../Home/Forms/PreEnrollmentFlow";
@@ -9,6 +8,13 @@ import "./index.scss"
 import * as PropTypes from "prop-types";
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
+import {appIndexDb} from "../../AppDatabase";
+import {EnrolmentItems, VaccinationProgress} from "../../Home/Home";
+import {formatAppointmentSlot} from "../../utils/date_utils";
+import {useHistory} from "react-router";
+import config from "../../config";
+import {FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_VERIFY_FORM} from "../WalkEnrollments/context";
+import {BeneficiaryForm} from "../RegisterBeneficiaryForm";
 
 export function PreEnrollmentDetails(props) {
     return (
@@ -22,44 +28,168 @@ export function PreEnrollmentDetails(props) {
 PatientInfo.propTypes = {patientDetails: PropTypes.func};
 
 export function PatientInfo(props) {
-    return <div className={"patient-info"}>
-        <h5>{props.patientDetails.name}</h5>
-        <h5>{props.patientDetails.gender}</h5>
-        <h5>{props.patientDetails.dob}</h5>
-    </div>;
+    const {state, goNext} = usePreEnrollment()
+
+    const onContinue = (formData) => {
+        goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, formData)
+    };
+
+    return (
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
+            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue}/>;
+        </BaseFormCard>
+    )
 }
 
-function PatientDetails(props) {
-    const {state, goNext, getUserDetails} = usePreEnrollment()
-    const [patientDetails, setPatientDetails] = useState()
-    useEffect(() => {
-        getUserDetails(state.enrollCode, state.mobileNumber)
-            .then((patient) => {
-                setPatientDetails(patient)
-            })
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [state.enrollCode])
-    if (!patientDetails) {
-        return <div className={"no-details"}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_NO_PATIENTS)}</div>
-    }
-    return (
-        <div className={"pre-enrollment-details"}>
-            <h4>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_DETAILS)}</h4>
-            <PatientInfo patientDetails={patientDetails}/>
+function WarningInfo(props) {
+    const [recipientDetails, setRecipientDetails] = useState([]);
+    const [currentSlot, setCurrentSlot] = useState("");
+    const history = useHistory();
 
+    useEffect(() => {
+        appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary));
+        if (props.currentAppointmentSlot && props.currentAppointmentSlot.startTime)
+            setCurrentSlot(formatAppointmentSlot(new Date(), props.currentAppointmentSlot.startTime, props.currentAppointmentSlot.endTime))
+    }, []);
+    return (
+        <div className={"home-container"}>
+            <div>
+            {props.otherFacilityError &&
+                <p className="invalid-input" style={{fontSize:"100%"}}>{props.patientDetails.name}'s scheduled appointment: <br/>Not at this facility</p>
+            }
+            {props.otherSlotError &&
+                <p className="invalid-input" style={{fontSize:"100%"}}>{props.patientDetails.name}'s scheduled appointment: <br/>
+                    Time: {formatAppointmentSlot(
+                        props.patientDetails["appointments"][0].appointmentDate,
+                        props.patientDetails["appointments"][0].appointmentSlot.split("-")[0],
+                        props.patientDetails["appointments"][0].appointmentSlot.split("-")[1],
+                    )}
+                </p>
+            }
+            </div>
+            <div className="mt-5">
+                <p style={{ color:"#777777"}}>Current Appointment Slot</p>
+                <p>{currentSlot}</p>
+            </div>
+            {   recipientDetails.length > 0 &&
+                <div className="enroll-container mt-4" style={{height:"30%"}}>
+                    <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                                     value={recipientDetails[0].value}
+                    />
+                    <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
+                                    value={recipientDetails[1].value}
+                    />
+                </div>
+            }
             <Col className="register-with-aadhaar">
-                <h4>{getMessageComponent(LANGUAGE_KEYS.REGISTER_IDENTITY_NUMBER)}</h4>
                 <div>
-                    <Button variant="outline-primary" className="action-btn mb-3" onClick={() => {
-                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAAR_NUMBER, patientDetails)
-                    }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_ENTER_MANUALLY)}</Button>
+                    <Button variant="outline-primary" className="primary-btn w-100 mt-5 mb-5" onClick={() => {
+                        props.onContinue()
+                    }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_CONTINUE)}</Button>
                 </div>
                 <div>
                     <Button variant="outline-primary" className="action-btn" onClick={() => {
-                        goNext(FORM_PRE_ENROLL_DETAILS, FORM_AADHAAR_NUMBER, patientDetails)
-                    }}>{getMessageComponent(LANGUAGE_KEYS.SCAN_IDENTITY_NUMBER)}</Button>
+                        history.push(config.urlPath + '/')
+                    }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
                 </div>
             </Col>
+        </div>
+    )
+}
+function PatientDetails(props) {
+    const {state, goNext, getUserDetails} = usePreEnrollment()
+    const [patientDetails, setPatientDetails] = useState()
+    const [invalidAppointment, setInvalidAppointment] = useState(false);
+    const [userDetails, setUserDetails] = useState()
+    const [otherFacilityError, setOtherFacilityError] = useState(false);
+    const [otherSlotError, setOtherSlotError] = useState(false);
+    const [currentAppointmentSlot, setCurrentAppointmentSlot] = useState({});
+    const [showPatientInfo, setShowPatientInfo] = useState(false);
+
+    useEffect(() => {
+        getUserDetails(state.enrollCode)
+            .then((patient) => {
+                appIndexDb.getUserDetails()
+                    .then((userDetails) => {
+                        appIndexDb.getCurrentAppointmentSlot().then(schedule => {
+                            setCurrentAppointmentSlot(schedule);
+                            setInvalidAppointment(!validateAppointment(patient, userDetails, schedule));
+                            setPatientDetails(patient);
+                            setUserDetails(userDetails);
+                        })
+                    })
+                    .catch((e) => {
+                        console.log("error getting facility user details ", e)
+                    })
+            });
+    }, [state.enrollCode]);
+
+    if (!patientDetails) {
+        return <div className={"no-details"}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_NO_PATIENTS)}</div>
+    }
+
+    function validateAppointment(patient, userDetails, currSch) {
+        if (showPatientInfo) {
+            return true
+        }
+        if (!patient) {
+            return false
+        }
+
+        // check if appointment belong to same facility
+        if (userDetails.facilityDetails.facilityCode !== patient["appointments"][0].enrollmentScopeId) {
+            setOtherFacilityError(true);
+            return false
+        }
+
+        // check if appointment belong to current slot
+        if (!(patient["appointments"][0].appointmentDate === new Date().toISOString().slice(0, 10) &&
+            patient["appointments"][0].appointmentSlot === currSch.startTime+"-"+currSch.endTime)) {
+            setOtherSlotError(true);
+            return false
+        }
+
+        return true;
+    }
+
+    function getFormData(patientDetails) {
+        return {...patientDetails, state:patientDetails.address.state, district:patientDetails.address.district}
+    }
+
+    function onContinue() {
+        setShowPatientInfo(true);
+        setInvalidAppointment(false);
+        goNext(FORM_PRE_ENROLL_DETAILS, FORM_WALK_IN_VERIFY_FORM, patientDetails)
+    }
+    function onFormContinue() {
+        goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, patientDetails)
+    }
+    return (
+        <div className={"pre-enrollment-details"}>
+            {
+                invalidAppointment &&
+                        <div>
+                            <WarningInfo
+                                otherFacilityError={otherFacilityError}
+                                otherSlotError={otherSlotError}
+                                patientDetails={patientDetails}
+                                currentAppointmentSlot={currentAppointmentSlot}
+                                onContinue={onContinue}
+                            />
+                        </div>
+            }
+            {
+                !invalidAppointment &&
+                    <div>
+                        <BeneficiaryForm
+                            verifyDetails={true}
+                            showCurrentSlot={true}
+                            state={getFormData(patientDetails)}
+                            onContinue={onFormContinue}
+                        />;
+                    </div>
+            }
+
         </div>
     );
 }

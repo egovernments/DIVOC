@@ -36,16 +36,13 @@ function EnterPreEnrollmentContent(props) {
     }
     return (
         <div className="enroll-code-container">
-            <h4 className="title text-center">{getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT_ENTER_MOBILE_AND_VERIFICATION_CODE)}</h4>
+            <h4 className="title text-center">{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_ENTER_ENROLMENT_NUMBER)}</h4>
             <div className={"input-container"}>
                 <div className="divOuter">
                     <div className="divInner">
 
                         <Form.Group>
-                            <Form.Control type="text" placeholder={countryCode + "-XXXXXXXXX"} tabIndex="1"
-                                          value={phoneNumber}
-                                          onChange={handlePhoneNumberOnChange}/>
-                            <Form.Control type="text" placeholder="XXXXX" tabIndex="1" value={enrollCode}
+                            <Form.Control type="text" tabIndex="1" value={enrollCode}
                                           onChange={handleEnrollCodeOnChange}/>
                             {/*<input id="otp" type="text" className="otp" tabIndex="2" maxLength="5"*/}
                             {/*       value={enrollCode}*/}

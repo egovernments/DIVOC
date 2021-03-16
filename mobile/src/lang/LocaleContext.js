@@ -101,7 +101,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     EXCEED_LIMITS: "app.exceedLimits",
     NAME: "app.name",
 
-    VERIFY_RECIPIENT_ENTER_MOBILE_AND_VERIFICATION_CODE: "app.verifyRecipient.enterMobileAndVerificationCode",
+    RECIPIENT_ENTER_ENROLMENT_NUMBER: "app.verifyRecipient.enterMobileAndVerificationCode",
     VERIFY_RECIPIENT_CONFIRM_BUTTON: "app.verifyRecipient.confirmButton",
     RECIPIENT_QUEUE_MESSAGE: "app.recipientQueue.message",
     RECIPIENT_QUEUE_STATUS: "app.recipientQueue.status",
@@ -118,6 +118,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     PRE_ENROLLMENT_TITLE: "app.preenrollment.title",
     PRE_ENROLLMENT_DETAILS: "app.preenrollment.details",
     PRE_ENROLLMENT_ENTER_MANUALLY: "app.preenrollment.enterManually",
+    PRE_ENROLLMENT_CONTINUE: "app.preenrollment.continue",
     PRE_ENROLLMENT_NO_PATIENTS: "app.preenrollment.noPatient",
     PRE_ENROLLMENT_ENTER_OTP: "app.preenrollment.enterOTP",
 
