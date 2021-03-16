@@ -31,7 +31,7 @@ func NewGetPreEnrollment(ctx *middleware.Context, handler GetPreEnrollmentHandle
 	return &GetPreEnrollment{Context: ctx, Handler: handler}
 }
 
-/* GetPreEnrollment swagger:route GET /preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
+/*GetPreEnrollment swagger:route GET /preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
 
 Get pre enrollment information
 
@@ -49,6 +49,7 @@ func (o *GetPreEnrollment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetPreEnrollmentParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -68,6 +69,7 @@ func (o *GetPreEnrollment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

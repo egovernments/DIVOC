@@ -36,7 +36,7 @@ func StartEnrollmentConsumer() {
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 					var osid = ""
-					if enrollment.EnrollmentType == "walkin" {
+					if enrollment.Enrollment.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 						osid, err = services.CreateWalkInEnrollment(enrollment)
 					} else {
 						osid, err = services.CreateEnrollment(&enrollment.Enrollment, 1)
@@ -45,7 +45,7 @@ func StartEnrollmentConsumer() {
 					services.PublishEnrollmentACK(
 						enrollment.RowID,
 						enrollment.VaccinationDetails,
-						enrollment.EnrollmentType,
+						enrollment.Enrollment.EnrollmentType,
 						err,
 					)
 

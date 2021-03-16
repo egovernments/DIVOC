@@ -171,7 +171,6 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 
 type EnrollmentPayload struct {
 	RowID              uint   `json:"rowID"`
-	EnrollmentType     string `json:"enrollmentType"`
 	EnrollmentScopeId  string `json:"enrollmentScopeId"`
 	VaccinationDetails []byte `json:"vaccinationDetails"`
 	models.Enrollment

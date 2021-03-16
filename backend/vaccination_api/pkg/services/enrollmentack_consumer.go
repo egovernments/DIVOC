@@ -3,6 +3,7 @@ package services
 import (
 	"encoding/json"
 	"github.com/divoc/api/config"
+	models2 "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -35,7 +36,7 @@ func StartEnrollmentACKConsumer() {
 				json.Unmarshal(msg.Value, &message)
 				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 
-				if message.EnrollmentType == "walkin" {
+				if message.EnrollmentType == models2.EnrollmentEnrollmentTypeWALKIN {
 					PublishCertifyMessage(message.VaccinationDetails, nil, nil)
 				}
 				consumer.CommitMessage(msg)

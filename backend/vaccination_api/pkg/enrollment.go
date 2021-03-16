@@ -131,13 +131,14 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 	}
 
 	enrollment := models.Enrollment{
-		Code:       *request.PreEnrollmentCode,
-		Phone:      mobile,
-		NationalID: request.Recipient.Nationality,
-		Dob:        *request.Recipient.Dob,
-		Gender:     *request.Recipient.Gender,
-		Name:       *request.Recipient.Name,
-		Email:      email,
+		Code:           *request.PreEnrollmentCode,
+		Phone:          mobile,
+		EnrollmentType: models.EnrollmentEnrollmentTypeWALKIN,
+		NationalID:     request.Recipient.Nationality,
+		Dob:            *request.Recipient.Dob,
+		Gender:         *request.Recipient.Gender,
+		Name:           *request.Recipient.Name,
+		Email:          email,
 		Address: &models.Address{
 			AddressLine1: request.Recipient.Address.AddressLine1,
 			AddressLine2: request.Recipient.Address.AddressLine2,
@@ -155,7 +156,6 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 	}
 
 	enrollmentMsg, _ := json.Marshal(struct {
-		EnrollmentType     string `json:"enrollmentType"`
 		EnrollmentScopeId  string `json:"enrollmentScopeId"`
 		VaccinationDetails []byte `json:"vaccinationDetails"`
 		models.Enrollment
@@ -163,7 +163,6 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 		EnrollmentScopeId:  facilityCode,
 		Enrollment:         enrollment,
 		VaccinationDetails: vaccinationDetails,
-		EnrollmentType:     "walkin",
 	})
 	return enrollmentMsg
 }

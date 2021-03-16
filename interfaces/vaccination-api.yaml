@@ -127,7 +127,7 @@ paths:
       summary: Certify the one or more vaccination
       description: >-
         Certification happens asynchronously, this requires vaccinator
-        athorization and vaccinator should be trained for the vaccination that
+        authorization and vaccinator should be trained for the vaccination that
         is being certified.
       operationId: certify
       parameters:
@@ -409,6 +409,8 @@ definitions:
           - identity
           - contact
           - address
+          - enrollmentType
+          - programId
       vaccination:
         type: object
         properties:

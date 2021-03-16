@@ -287,7 +287,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		}
 
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			if request.EnrollmentType == "walkin" {
+			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode, jsonRequestString)
 				kafkaService.PublishWalkEnrollment(enrollmentMsg)
 			} else {

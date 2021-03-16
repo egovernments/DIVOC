@@ -140,7 +140,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -625,7 +625,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -1038,7 +1040,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -1523,7 +1525,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -1710,7 +1714,9 @@ func init() {
         "nationality",
         "identity",
         "contact",
-        "address"
+        "address",
+        "enrollmentType",
+        "programId"
       ],
       "properties": {
         "address": {
