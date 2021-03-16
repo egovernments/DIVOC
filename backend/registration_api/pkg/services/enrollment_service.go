@@ -13,8 +13,14 @@ import (
 	"text/template"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
-	maxEnrollmentCreationAllowed := config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
+
+	maxEnrollmentCreationAllowed := 0
+	if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxWalkEnrollmentCreationAllowed
+	} else {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
+	}
 
 	if position > maxEnrollmentCreationAllowed {
 		failedErrorMessage := "Maximum enrollment creation limit is reached"
@@ -22,12 +28,17 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 		return "", errors.New(400, failedErrorMessage)
 	}
 
+	enrollment := enrollmentPayload.Enrollment
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
 	exists, err := KeyExists(enrollment.Code)
 	if err != nil {
 		return "", err
 	}
 	if exists == 0 {
+		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+			enrollmentPayload.Enrollment = enrollment
+			return CreateWalkInEnrollment(enrollmentPayload)
+		}
 		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 		if err != nil {
 			return "", err
@@ -35,10 +46,10 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
 		return result.(string), nil
 	}
-	return CreateEnrollment(enrollment, position+1)
+	return CreateEnrollment(enrollmentPayload, position+1)
 }
 
-func CreateWalkInEnrollment(enrollmentPayload EnrollmentPayload) (string, error) {
+func CreateWalkInEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
 	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
 	enrollment := map[string]interface{}{
 		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
@@ -72,7 +83,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	}
 }
 
-func NotifyRecipient(enrollment models.Enrollment) error {
+func NotifyRecipient(enrollment *models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
 	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
 	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
@@ -173,5 +184,5 @@ type EnrollmentPayload struct {
 	RowID              uint   `json:"rowID"`
 	EnrollmentScopeId  string `json:"enrollmentScopeId"`
 	VaccinationDetails []byte `json:"vaccinationDetails"`
-	models.Enrollment
+	*models.Enrollment
 }

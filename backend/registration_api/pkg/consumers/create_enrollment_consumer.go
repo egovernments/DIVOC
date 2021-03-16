@@ -35,12 +35,7 @@ func StartEnrollmentConsumer() {
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					var osid = ""
-					if enrollment.Enrollment.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
-						osid, err = services.CreateWalkInEnrollment(enrollment)
-					} else {
-						osid, err = services.CreateEnrollment(&enrollment.Enrollment, 1)
-					}
+					osid, err := services.CreateEnrollment(&enrollment, 1)
 
 					services.PublishEnrollmentACK(
 						enrollment.RowID,
@@ -73,7 +68,7 @@ func StartEnrollmentConsumer() {
 	}()
 }
 
-func cacheEnrollmentInfo(enrollment models.Enrollment, osid string) {
+func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
 		"phone":        enrollment.Phone,
 		"updatedCount": 0, //to restrict multiple updates

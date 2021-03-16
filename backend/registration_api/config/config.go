@@ -17,15 +17,16 @@ var Config = struct {
 		BootstrapServers          string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapservers"`
 		NotifyTopic               string `default:"notify" yaml:"notifyTopic"`
 		EnrollmentTopic           string `default:"enrollment" yaml:"enrollmenttopic"`
-		EnrollmentACKTopic           string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
+		EnrollmentACKTopic        string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 		AppointmentAckTopic       string `default:"appointment_ack" yaml:"appointmentacktopic"`
 		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
 	}
 
 	EnrollmentCreation struct {
-		MaxRetryCount                  int `default:"10" yaml:"maxretrycount"`
-		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
-		MaxEnrollmentCreationAllowed   int `default:"4" yaml:"maxenrollmentcreationallowed"`
+		MaxRetryCount                    int `default:"10" yaml:"maxretrycount"`
+		LengthOfSuffixedEnrollmentCode   int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
+		MaxEnrollmentCreationAllowed     int `default:"4" yaml:"maxenrollmentcreationallowed"`
+		MaxWalkEnrollmentCreationAllowed int `default:"4" yaml:"maxwalkinenrollmentcreationallowed"`
 	}
 	Redis struct {
 		Url      string `env:"REDIS_URL" yaml:"redisurl"`
@@ -36,10 +37,10 @@ var Config = struct {
 		ChannelWorkers int `default:"10"`
 		ScheduleDays   int `default:"30"`
 	}
-	MockOtp                      	bool 	`default:"true" env:"MOCK_OTP"`
-	MinCancellationHours         	int  	`default:"24"`
-	MaxAppointmentUpdatesAllowed 	int  	`default:"3"`
-	TimeZoneOffset					string	`default:"+05:30"`
+	MockOtp                      bool   `default:"true" env:"MOCK_OTP"`
+	MinCancellationHours         int    `default:"24"`
+	MaxAppointmentUpdatesAllowed int    `default:"3"`
+	TimeZoneOffset               string `default:"+05:30"`
 }{}
 
 func Initialize() {
