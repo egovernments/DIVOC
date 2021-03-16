@@ -21,6 +21,15 @@ function Header() {
         removeCookie(CITIZEN_TOKEN_COOKIE_NAME);
         window.location.href = "/citizen"
     }
+
+    function onLogoutClicked() {
+        if (reciepientUser) {
+            logoutRecipient()
+        }
+        if (keycloak.authenticated) {
+            keycloak.logout({redirectUri: window.location.origin})
+        }
+    }
     return(
         <Navbar fixed="top" bg="white">
             <Navbar.Brand href={"/"}>
@@ -38,8 +47,7 @@ function Header() {
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
                     {/*</NavDropdown>*/}
-                    {keycloak.authenticated && <Nav.Link onClick={() => {keycloak.logout({redirectUri: window.location.origin});}}>LOGOUT</Nav.Link>}
-                    {reciepientUser && <Nav.Link onClick={() => logoutRecipient()}>LOGOUT</Nav.Link>}
+                    {(keycloak.authenticated || reciepientUser) && <Nav.Link onClick={onLogoutClicked}>LOGOUT</Nav.Link>}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

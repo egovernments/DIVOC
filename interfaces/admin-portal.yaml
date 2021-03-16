@@ -363,7 +363,7 @@ paths:
             type: array
             items:
               type: object
-              $ref: '#/definitions/CreateMedicineRequest'
+              $ref: '#/definitions/Medicine'
     post:
       summary: Create Medicine
       operationId: createMedicine
@@ -373,7 +373,7 @@ paths:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/CreateMedicineRequest'
+            $ref: '#/definitions/Medicine'
           description: Create Medicine
       responses:
         '200':
@@ -830,43 +830,12 @@ definitions:
             type: string
   UpdateMedicineRequest:
     allOf:
-      - $ref: "#/definitions/CreateMedicineRequest"
+      - $ref: "#/definitions/Medicine"
       - properties:
           osid:
             type: string
-  CreateMedicineRequest:
-    type: object
-    properties:
-      name:
-        type: string
-      provider:
-        type: string
-      vaccinationMode:
-        type: string
-        enum: ["muscular injection", "oral", "nasal"]
-      doseIntervals:
-        type: array
-        items:
-          type: object
-          properties:
-            osid:
-              type: string
-            min:
-              type: integer
-            max:
-              type: integer
-      effectiveUntil:
-        type: integer
-        description: Effective until n days after the last dose
-      status:
-        type: string
-        enum:
-          - Active
-          - Inactive
-          - Blocked
-      price:
-        type: number
-        description: Indicative price if fixed or max price available.
+  Medicine:
+    $ref: '../registry/Medicine.json#/definitions/Medicine'
   PublicFacility:
     properties:
       osid:

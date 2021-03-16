@@ -6,14 +6,18 @@ import "./index.scss"
 import * as PropTypes from "prop-types";
 import {useHistory} from "react-router";
 
-export const BaseFormCard = ({title, children}) => {
+export const BaseFormCard = ({title, children, onBack}) => {
     const history = useHistory();
     return (
         <div className="base-queue-card">
             <BaseCard>
                 <Card.Header className="d-flex justify-content-between">
                     <img src={BackBtnImg} alt={""} onClick={() => {
-                        history.goBack()
+                        if (!!onBack) {
+                            onBack()
+                        } else {
+                            history.goBack();
+                        }
                     }}/>
                     <span>{title}</span>
                     <span/>

@@ -31,7 +31,7 @@ func NewGetVaccinatorsUploadHistory(ctx *middleware.Context, handler GetVaccinat
 	return &GetVaccinatorsUploadHistory{Context: ctx, Handler: handler}
 }
 
-/*GetVaccinatorsUploadHistory swagger:route GET /vaccinators/uploads getVaccinatorsUploadHistory
+/* GetVaccinatorsUploadHistory swagger:route GET /vaccinators/uploads getVaccinatorsUploadHistory
 
 Get Vaccinators uploads
 
@@ -47,7 +47,6 @@ func (o *GetVaccinatorsUploadHistory) ServeHTTP(rw http.ResponseWriter, r *http.
 		r = rCtx
 	}
 	var Params = NewGetVaccinatorsUploadHistoryParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *GetVaccinatorsUploadHistory) ServeHTTP(rw http.ResponseWriter, r *http.
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

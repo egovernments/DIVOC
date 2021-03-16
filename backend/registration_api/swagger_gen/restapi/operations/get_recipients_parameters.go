@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetRecipientsParams creates a new GetRecipientsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetRecipientsParams() GetRecipientsParams {
 
 	return GetRecipientsParams{}

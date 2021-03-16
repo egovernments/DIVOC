@@ -1,0 +1,9 @@
+.confirm-walkin-container {
+    padding: 5rem 2rem;
+    height: 100%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+}

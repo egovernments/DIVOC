@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 
@@ -42,6 +43,10 @@ type Enrollment struct {
 	// email
 	Email string `json:"email,omitempty"`
 
+	// enrollment type
+	// Enum: [SELF_ENRL PRE_ENRL WALK_IN]
+	EnrollmentType string `json:"enrollmentType,omitempty"`
+
 	// gender
 	// Enum: [Male Female Other]
 	Gender string `json:"gender,omitempty"`
@@ -76,6 +81,10 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
+	if err := m.validateEnrollmentType(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateGender(formats); err != nil {
 		res = append(res, err)
 	}
@@ -91,7 +100,6 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -109,7 +117,6 @@ func (m *Enrollment) validateAddress(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Appointments) { // not required
 		return nil
 	}
@@ -134,12 +141,56 @@ func (m *Enrollment) validateAppointments(formats strfmt.Registry) error {
 }
 
 func (m *Enrollment) validateDob(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
 
 	if err := validate.FormatOf("dob", "body", "date", m.Dob.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+var enrollmentTypeEnrollmentTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["SELF_ENRL","PRE_ENRL","WALK_IN"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		enrollmentTypeEnrollmentTypePropEnum = append(enrollmentTypeEnrollmentTypePropEnum, v)
+	}
+}
+
+const (
+
+	// EnrollmentEnrollmentTypeSELFENRL captures enum value "SELF_ENRL"
+	EnrollmentEnrollmentTypeSELFENRL string = "SELF_ENRL"
+
+	// EnrollmentEnrollmentTypePREENRL captures enum value "PRE_ENRL"
+	EnrollmentEnrollmentTypePREENRL string = "PRE_ENRL"
+
+	// EnrollmentEnrollmentTypeWALKIN captures enum value "WALK_IN"
+	EnrollmentEnrollmentTypeWALKIN string = "WALK_IN"
+)
+
+// prop value enum
+func (m *Enrollment) validateEnrollmentTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, enrollmentTypeEnrollmentTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (m *Enrollment) validateEnrollmentType(formats strfmt.Registry) error {
+	if swag.IsZero(m.EnrollmentType) { // not required
+		return nil
+	}
+
+	// value enum
+	if err := m.validateEnrollmentTypeEnum("enrollmentType", "body", m.EnrollmentType); err != nil {
 		return err
 	}
 
@@ -179,7 +230,6 @@ func (m *Enrollment) validateGenderEnum(path, location string, value string) err
 }
 
 func (m *Enrollment) validateGender(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -196,6 +246,56 @@ func (m *Enrollment) validateNationalID(formats strfmt.Registry) error {
 
 	if err := validate.Required("nationalId", "body", m.NationalID); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this enrollment based on the context it is used
+func (m *Enrollment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateAppointments(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Enrollment) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *Enrollment) contextValidateAppointments(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Appointments); i++ {
+
+		if m.Appointments[i] != nil {
+			if err := m.Appointments[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("appointments" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -312,6 +412,11 @@ func (m *EnrollmentAddress) validateState(formats strfmt.Registry) error {
 	return nil
 }
 
+// ContextValidate validates this enrollment address based on context it is used
+func (m *EnrollmentAddress) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *EnrollmentAddress) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -373,7 +478,6 @@ func (m *EnrollmentAppointmentsItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppointmentDate) { // not required
 		return nil
 	}
@@ -382,6 +486,11 @@ func (m *EnrollmentAppointmentsItems0) validateAppointmentDate(formats strfmt.Re
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this enrollment appointments items0 based on context it is used
+func (m *EnrollmentAppointmentsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

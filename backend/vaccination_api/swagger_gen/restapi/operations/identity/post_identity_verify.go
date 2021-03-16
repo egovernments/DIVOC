@@ -31,7 +31,7 @@ func NewPostIdentityVerify(ctx *middleware.Context, handler PostIdentityVerifyHa
 	return &PostIdentityVerify{Context: ctx, Handler: handler}
 }
 
-/*PostIdentityVerify swagger:route POST /identity/verify identity postIdentityVerify
+/* PostIdentityVerify swagger:route POST /identity/verify identity postIdentityVerify
 
 Validate identity if the person
 
@@ -47,7 +47,6 @@ func (o *PostIdentityVerify) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewPostIdentityVerifyParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -67,7 +66,6 @@ func (o *PostIdentityVerify) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
