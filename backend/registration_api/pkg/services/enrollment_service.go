@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
@@ -12,8 +13,14 @@ import (
 	"text/template"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, position int) (string, error) {
-	maxEnrollmentCreationAllowed := config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
+
+	maxEnrollmentCreationAllowed := 0
+	if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxWalkEnrollmentCreationAllowed
+	} else {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
+	}
 
 	if position > maxEnrollmentCreationAllowed {
 		failedErrorMessage := "Maximum enrollment creation limit is reached"
@@ -21,12 +28,17 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 		return "", errors.New(400, failedErrorMessage)
 	}
 
+	enrollment := enrollmentPayload.Enrollment
 	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
 	exists, err := KeyExists(enrollment.Code)
 	if err != nil {
 		return "", err
 	}
 	if exists == 0 {
+		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+			enrollmentPayload.Enrollment = enrollment
+			return CreateWalkInEnrollment(enrollmentPayload)
+		}
 		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 		if err != nil {
 			return "", err
@@ -34,7 +46,24 @@ func CreateEnrollment(enrollment *models.Enrollment, position int) (string, erro
 		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
 		return result.(string), nil
 	}
-	return CreateEnrollment(enrollment, position+1)
+	return CreateEnrollment(enrollmentPayload, position+1)
+}
+
+func CreateWalkInEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
+	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
+	enrollment := map[string]interface{}{
+		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
+		"certified":         true,
+		"programId":         enrollmentPayload.Appointments[0].ProgramID,
+	}
+	err = json.Unmarshal(marshal, &enrollment)
+
+	registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	if err != nil {
+		return "", err
+	}
+	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+	return result.(string), nil
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
@@ -46,8 +75,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 
 		// No appointment means no need to show the facility details
 		for _, appointment := range appointments {
-			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string);
-			ok && facilityCode != "" && len(facilityCode) > 0 {
+			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string); ok && facilityCode != "" && len(facilityCode) > 0 {
 				minifiedFacilityDetails := GetMinifiedFacilityDetails(facilityCode)
 				appointment.(map[string]interface{})["facilityDetails"] = minifiedFacilityDetails
 			}
@@ -55,7 +83,7 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	}
 }
 
-func NotifyRecipient(enrollment models.Enrollment) error {
+func NotifyRecipient(enrollment *models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
 	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
 	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
@@ -152,3 +180,9 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 	return nil
 }
 
+type EnrollmentPayload struct {
+	RowID              uint   `json:"rowID"`
+	EnrollmentScopeId  string `json:"enrollmentScopeId"`
+	VaccinationDetails []byte `json:"vaccinationDetails"`
+	*models.Enrollment
+}

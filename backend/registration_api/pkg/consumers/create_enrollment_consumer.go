@@ -30,16 +30,20 @@ func StartEnrollmentConsumer() {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				log.Info("Got the message to create new enrollment")
-				var enrollment struct{
-					RowID uint `json:"rowID"`
-					models.Enrollment
-				}
+				var enrollment = services.EnrollmentPayload{}
 				err = json.Unmarshal(msg.Value, &enrollment)
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					osid, err := services.CreateEnrollment(&enrollment.Enrollment, 1)
-					services.PublishEnrollmentACK(enrollment.RowID, err)
+					osid, err := services.CreateEnrollment(&enrollment, 1)
+
+					services.PublishEnrollmentACK(
+						enrollment.RowID,
+						enrollment.VaccinationDetails,
+						enrollment.Enrollment.EnrollmentType,
+						err,
+					)
+
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
 						cacheEnrollmentInfo(enrollment.Enrollment, osid)
@@ -64,7 +68,7 @@ func StartEnrollmentConsumer() {
 	}()
 }
 
-func cacheEnrollmentInfo(enrollment models.Enrollment, osid string) {
+func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
 		"phone":        enrollment.Phone,
 		"updatedCount": 0, //to restrict multiple updates

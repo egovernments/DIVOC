@@ -233,7 +233,7 @@ func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *mo
 	return identity.NewPostIdentityVerifyPartialContent()
 }
 
-func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int){
+func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 	limit := config.Config.SearchRegistry.DefaultLimit
 	offset := config.Config.SearchRegistry.DefaultOffset
 	if limitValue != nil {
@@ -278,15 +278,21 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Age and DOB both are missing. Atleast one should be present"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
-				Code: &errorCode,
+				Code:    &errorCode,
 				Message: &errorMsg,
 			})
 		}
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
+
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode, jsonRequestString)
+				kafkaService.PublishWalkEnrollment(enrollmentMsg)
+			} else {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
 		}
 	}
 	return certification.NewCertifyOK()
