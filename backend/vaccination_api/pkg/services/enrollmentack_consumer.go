@@ -13,7 +13,7 @@ func StartEnrollmentACKConsumer() {
 	servers := config.Config.Kafka.BootstrapServers
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  servers,
-		"group.id":           "enrollment_ack",
+		"group.id":           "enrollment_ack_certify",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
 	})
