@@ -7,30 +7,52 @@ services:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     environment:
       - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ports:
       - "9200:9200"
       - "9300:9300"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
   db:
     image: postgres
     environment:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  registry:
-    image: dockerhub/registry-es:1.20.2-generic
+  registry-es:
+    image: dockerhub/registry-es:1.21.0-generic
     environment:
-      - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
+      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
     ports:
+      - "8082:8081"
+    depends_on:
+      es:
+        condition: service_healthy
+      db:
+        condition: service_started
+  registry:
+    image: dockerhub/registry-es:1.21.0-generic
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
+      - connectionInfo_username=postgres
+      - connectionInfo_password=postgres
+    ports:
       - "8081:8081"
     depends_on:
-      - db
+      es:
+        condition: service_healthy
+      db:
+        condition: service_started
   keycloak:
-    image: dockerhub/keycloak:1.20.2-generic
+    image: dockerhub/keycloak:1.21.0-generic
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -55,7 +77,7 @@ services:
   flagr:
     image: checkr/flagr
     environment:
-      FLAGR_DB_DBDRIVER: registry
+      FLAGR_DB_DBDRIVER: postgres
       FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/registry?sslmode=disable
       HOST: 0.0.0.0
       FLAGR_WEB_PREFIX: /config
@@ -95,7 +117,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api:1.20.2-generic
+    image: dockerhub/vaccination_api:1.21.0-generic
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -107,10 +129,11 @@ services:
       - kafka
       - keycloak
   registration_api:
-    image: dockerhub/registration_api:1.20.2-generic
+    image: dockerhub/registration_api:1.21.0-generic
     ports:
       - "8002:8002"
     environment:
+      REDIS_URL: redis://redis:6379
       AUTH_PRIVATE_KEY:
       AUTH_PUBLIC_KEY:
       REGISTRY_URL: "http://registry:8081"
@@ -121,7 +144,7 @@ services:
       - kafka
       - keycloak
   portal_api:
-    image: dockerhub/portal_api:1.20.2-generic
+    image: dockerhub/portal_api:1.21.0-generic
     ports:
       - "8001:8001"
     environment:
@@ -135,14 +158,14 @@ services:
       - kafka
       - keycloak
   analytics_feed:
-    image: dockerhub/analytics_feed:1.20.2-generic
+    image: dockerhub/analytics_feed:1.21.0-generic
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
   certificate_processor:
-    image: dockerhub/certificate_processor:1.20.2-generic
+    image: dockerhub/certificate_processor:1.21.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -151,7 +174,7 @@ services:
     depends_on:
       - registry
   certificate_signer:
-    image: dockerhub/certificate_signer:1.20.2-generic
+    image: dockerhub/certificate_signer:1.21.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -160,7 +183,7 @@ services:
       - kafka
       - redis
   nginx:
-    image: dockerhub/nginx:1.20.2-generic
+    image: dockerhub/nginx:1.21.0-generic
     ports:
       - "81:80"
     depends_on:
@@ -168,7 +191,7 @@ services:
       - portal_api
       - registration_api
   notification-service:
-    image: dockerhub/notification-service:1.20.2-generic
+    image: dockerhub/notification-service:1.21.0-generic
     ports:
       - "8765:8765"
     environment:
@@ -179,7 +202,7 @@ services:
     depends_on:
       - kafka
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api:1.20.2-generic
+    image: dockerhub/digilocker_support_api:1.21.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
