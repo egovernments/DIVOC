@@ -30,6 +30,10 @@ export const CertificateDetailsPaths = {
         path: ["evidence", "0", "certificateId"],
         format: (data) => (data)
     },
+    "Beneficiary ID": {
+        path: ["credentialSubject", "refId"],
+        format: (data) => (data)
+    },
     "Date of Issue": {
         path: ["evidence", "0", "effectiveStart"],
         format: (data) => (formatDate(data))
