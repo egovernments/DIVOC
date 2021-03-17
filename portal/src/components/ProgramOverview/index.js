@@ -72,7 +72,7 @@ export default function ProgramOverview() {
                         <div className="medicine-row">
                             <div className="d-flex justify-content-between">
                                 <b className="">{selectedMedicine['name']}</b>
-                                <span className="">Validity {selectedMedicine.effectiveUntil} month</span>
+                                <span className="">Validity {selectedMedicine.effectiveUntil} Days</span>
                             </div>
                             <div className="d-flex justify-content-between">
                                 <span className="">{selectedMedicine['provider']}</span>
