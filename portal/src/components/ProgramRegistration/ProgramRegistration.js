@@ -43,22 +43,33 @@ function VaccineRegistration() {
         },
     };
 
-    const uiSchema = {
-        classNames: styles["form"],
-        title: {
-            classNames: styles["form-title"],
-        },
-        status: {
-            classNames: styles["form-radio-buttons"],
-            "ui:widget": "radio",
-            "ui:options": {
-                "inline": true,
-            }
-        },
-        description: {
-            "ui:widget": "textarea",
-            "ui:options": {
-                rows: 5
+    const uiSchema = () => {
+        const today = new Date();
+        const startDate = new Date(formData.dateRange.startDate);
+        return {
+            classNames: styles["form"],
+            title: {
+                classNames: styles["form-title"],
+            },
+            status: {
+                classNames: styles["form-radio-buttons"],
+                "ui:widget": "radio",
+                "ui:options": {
+                    "inline": true,
+                }
+            },
+            description: {
+                "ui:widget": "textarea",
+                "ui:options": {
+                    rows: 5
+                }
+            },
+            dateRange: {
+                endDate: {
+                    "ui:options": {
+                        minDate: startDate < today ? today : startDate
+                    }
+                }
             }
         }
     };
@@ -168,7 +179,7 @@ function VaccineRegistration() {
 
                 <Form
                     schema={programSchema}
-                    uiSchema={uiSchema}
+                    uiSchema={uiSchema()}
                     widgets={widgets}
                     formData={formData}
                     onSubmit={(e) => {
