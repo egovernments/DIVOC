@@ -75,17 +75,10 @@ export class SyncFacade {
     }
 
 
-    static async isSyncedIn24Hours() {
+    static async isNotSynced() {
         await appIndexDb.initDb();
         const events = await appIndexDb.getAllEvents();
-        if (events) {
-            if (events.length && events.length > 0) {
-                const lastSyncedDate = localStorage.getItem(LAST_SYNC_KEY);
-                const date = new Date(lastSyncedDate)
-                return is24hoursAgo(date)
-            }
-        }
-        return false;
+        return (events && events.length > 0)
     }
 
     static lastSyncedOn() {

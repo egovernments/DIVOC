@@ -11,6 +11,7 @@ import {FORM_WALK_IN_ELIGIBILITY_CRITERIA, WALK_IN_ROUTE} from "../components/Wa
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
 import NoNetworkImg from "assets/img/no_network.svg"
+import NetworkImg from "assets/img/network_online.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
@@ -118,17 +119,20 @@ function EnrolmentItems({icon, title, onClick, value}) {
     );
 }
 
-
 export function VaccineProgram() {
     const [isNotSynced, setNotSynced] = useState(false)
+    const [eventsCount, setEventsCount] = useState(false)
     useEffect(() => {
-        SyncFacade.isSyncedIn24Hours()
+        appIndexDb.getAllEvents()
+            .then((events) => setEventsCount(events.length))
+            .catch(e => console.log(e.message))
+        SyncFacade.isNotSynced()
             .then((result) => setNotSynced(result))
             .catch(e => console.log(e.message))
     }, [])
     return <div className={"home-container"}>
         <ProgramHeader/>
-        {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
+        <SyncData isNotSynced={isNotSynced} eventsCount={eventsCount}/>
         <Title text={""} content={<EnrollmentTypes/>}/>
         <Title
             text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY, "", {date: formatDate(new Date().toISOString())})}
@@ -137,30 +141,30 @@ export function VaccineProgram() {
     </div>;
 }
 
-function SyncData({onSyncDone}) {
-    const [loading, setLoading] = useState(false)
-    const lastSyncedDate = SyncFacade.lastSyncedOn();
+function SyncData(props) {
+    let baseCard;
+    if (!props.isNotSynced) {
+        baseCard = <BaseCard>
+            <div className="d-flex pl-3 ml-4">
+                <img className="network" src={NetworkImg} alt={"no_network"} width="25px"/>
+                <div className="p-3" style={{fontWeight: 600}}>Sync upto date</div>
+            </div>
+        </BaseCard>
+    } else {
+        const lastSyncedDate = SyncFacade.lastSyncedOn();
+        baseCard = <BaseCard>
+            <div className="d-flex pl-3">
+                <img className="network mr-2" src={NoNetworkImg} alt={"no_network"} width="25px"/>
+                <div className="p-3 ml-4">
+                    <label style={{fontWeight: 600}}>Last synced {lastSyncedDate}.</label>
+                    <label>Information of {props.eventsCount} beneficiaries is not yet synced.</label>
+                </div>
+            </div>
+        </BaseCard>
+    }
     return (
         <div className="mt-3">
-            <BaseCard>
-                <div className="d-flex pl-3">
-                    <img src={NoNetworkImg} alt={"no_network"} width="25px"/>
-                    <div className="p-3">Last synced {lastSyncedDate}</div>
-                    <div className="p-3" style={{color: "#5C9EF8"}} onClick={() => {
-                        if (!loading) {
-                            setLoading(true)
-                            SyncFacade.push()
-                                .then((result) => {
-                                    setLoading(false)
-                                    if (onSyncDone != null) {
-                                        onSyncDone()
-                                    }
-                                })
-                                .catch((e) => setLoading(false))
-                        }
-                    }}>{loading ? "Syncing..." : <u>Sync now</u>}</div>
-                </div>
-            </BaseCard>
+            {baseCard}
         </div>
     );
 }
