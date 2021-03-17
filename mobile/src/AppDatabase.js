@@ -2,7 +2,7 @@ import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgramId} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
-import {monthNames} from "./utils/date_utils";
+import {monthNames, weekdays} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 13;
@@ -89,14 +89,12 @@ export class AppDatabase {
         return this.db.put(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode, mobileNumber) {
+    async getPatientDetails(enrollCode) {
         const patient = await this.db.get(PATIENTS, enrollCode);
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
             const selectedProgramId = getSelectedProgramId();
-            if (patient.phone === mobileNumber
-                && patient[PROGRAM_ID] === selectedProgramId) {
-                patient.dob = this.formatDate(patient.dob)
+            if (patient["appointments"][0][PROGRAM_ID] === selectedProgramId) {
                 return patient
             } else {
                 return null;
@@ -280,6 +278,27 @@ export class AppDatabase {
 
     async getFacilitySchedule() {
         return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+    }
+
+    async getCurrentAppointmentSlot() {
+        let currentSlot = {};
+        const today = new Date();
+        const currentDay = weekdays[today.getDay()];
+        const currentTime = today.getTime();
+        await appIndexDb.getFacilitySchedule()
+            .then((scheduleResponse) => {
+                const appointmentSchedules = scheduleResponse["appointmentSchedule"];
+                if (appointmentSchedules) {
+                    appointmentSchedules.forEach(as => {
+                        let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.startTime.split(":")[0], as.startTime.split(":")[1]).getTime();
+                        let endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.endTime.split(":")[0], as.endTime.split(":")[1]).getTime();
+                        if (as.days.map(d => d.day).includes(currentDay) && currentTime >= startTime && currentTime <= endTime) {
+                            currentSlot = as
+                        }
+                    })
+                }
+            });
+        return currentSlot
     }
 
     async saveFacilitySchedule(facilitySchedule) {

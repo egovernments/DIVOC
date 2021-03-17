@@ -37,8 +37,13 @@ export const getMeridiemTime = (time) => {
     if(timeInNumber >= 0 && timeInNumber <=11) {
         return time + " AM"
     } else {
-        return time + " PM"
+        let t = timeInNumber-12 + ":" + time.split(":")[1]
+        return t + " PM"
     }
+}
+
+export const formatAppointmentSlot = (date, startTime, endTime) => {
+    return formatDate(date)+", "+getMeridiemTime(startTime)+" to "+ getMeridiemTime(endTime)
 }
 
 export const weekdays = {
