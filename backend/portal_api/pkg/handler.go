@@ -320,6 +320,9 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal *mo
 
 func createProgramHandler(params operations.CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Create Program %+v", params.Body)
+	if !utils.ValidateProgramDates(params.Body) {
+		return operations.NewCreateProgramBadRequest()
+	}
 	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
@@ -336,6 +339,9 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 
 func updateProgramsHandler(params operations.UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Update Program %+v", params.Body)
+	if !utils.ValidateProgramDates(&params.Body.ProgramRequest) {
+		return operations.NewUpdateProgramBadRequest()
+	}
 	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
