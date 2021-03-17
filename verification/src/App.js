@@ -1,11 +1,15 @@
 import './App.css';
 import {VerifyCertificate} from "./components/VerifyCertificate";
+import {Provider} from "react-redux";
+import {store} from "./redux/store";
 
 function App() {
   return (
-    <div className="App">
-        <VerifyCertificate />
-    </div>
+      <Provider store={store}>
+        <div className="App">
+            <VerifyCertificate />
+        </div>
+      </Provider>
   );
 }
 

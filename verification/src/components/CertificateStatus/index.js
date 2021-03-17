@@ -24,12 +24,14 @@ const credentialsv1 = require('../../utils/credentials.json');
 const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
+    console.log("checking " + url);
     const c = {
         "did:india": config.certificatePublicKey,
+        "https://example.com/i/india": config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        "https://www.who.int/2020/credentials/vaccination/v1": vaccinationContext
+        "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext,
     };
     let context = c[url];
     if (context === undefined) {
@@ -45,6 +47,7 @@ const customLoader = url => {
     if (url.startsWith("{")) {
         return JSON.parse(url);
     }
+    console.log("Fallback url lookup for document :" + url)
     return documentLoader()(url);
 };
 
@@ -74,12 +77,12 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
                     id: 'did:india',
                     type: 'RsaVerificationKey2018',
-                    controller: 'https://example.com/i/india',
+                    controller: 'https://cowin.gov.in/',
                     publicKeyPem: config.certificatePublicKey
                 };
                 const controller = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: 'https://example.com/i/india',
+                    id: 'https://cowin.gov.in/',
                     publicKey: [publicKey],
                     // this authorizes this key to be used for making assertions
                     assertionMethod: [publicKey.id]
@@ -90,8 +93,10 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 const result = await jsigs.verify(signedJSON, {
                     suite: new RsaSignature2018({key}),
                     purpose: new AssertionProofPurpose({controller}),
-                    documentLoader: customLoader
+                    documentLoader: customLoader,
+                    compactProof: false
                 });
+                alert(JSON.stringify(result));
                 if (result.verified) {
                     console.log('Signature verified.');
                     setValid(true);

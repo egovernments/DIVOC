@@ -1,7 +1,5 @@
 import {createStore} from "redux";
 import rootReducer from "./reducers";
-import throttle from 'lodash.throttle';
-import {postEvents} from "./reducers/events";
 
 const loadState = () => {
     try {
@@ -30,9 +28,5 @@ export const store = createStore(
     rootReducer,
     window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
 );
-store.subscribe(throttle(() => {
-    // saveState(store.getState());
-    postEvents(store.getState().events, store.dispatch)
-}, 1000));
 
 
