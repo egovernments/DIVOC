@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/go-openapi/strfmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -116,7 +117,6 @@ func getUserAssociatedFacility(authHeader string) (string, error) {
 }
 
 func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string, vaccinationDetails []byte) []byte {
-	dob, _ := time.Parse(strfmt.RFC3339FullDate, request.Recipient.Dob.String())
 	contacts := request.Recipient.Contact
 	mobile := ""
 	email := ""
@@ -130,12 +130,21 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 		}
 	}
 
+	year, _, _ := time.Now().Date()
+	age, _ := strconv.Atoi(request.Recipient.Age)
+	yob := year - age
+
+	var dob strfmt.Date
+	if request.Recipient.Dob != nil {
+		dob = *request.Recipient.Dob
+	}
+
 	enrollment := models.Enrollment{
 		Code:           *request.PreEnrollmentCode,
 		Phone:          mobile,
 		EnrollmentType: models.EnrollmentEnrollmentTypeWALKIN,
 		NationalID:     request.Recipient.Nationality,
-		Dob:            *request.Recipient.Dob,
+		Dob:            dob,
 		Gender:         *request.Recipient.Gender,
 		Name:           *request.Recipient.Name,
 		Email:          email,
@@ -151,7 +160,7 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 				ProgramID: request.ProgramID,
 			},
 		},
-		Yob:           int64(dob.Year()),
+		Yob:           int64(yob),
 		Comorbidities: request.Comorbidities,
 	}
 
