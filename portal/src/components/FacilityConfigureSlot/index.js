@@ -10,7 +10,7 @@ import {useAxios} from "../../utils/useAxios";
 import {API_URL} from "../../utils/constants";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
-const MORNING_SCHEDULE = "morningSchedule";
+const APPOINTMENT_SCHEDULE = "appointmentSchedule";
 const WALKIN_SCHEDULE = "walkInSchedule";
 const MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY = 2;
 
@@ -35,9 +35,7 @@ export default function FacilityConfigureSlot ({location}) {
             .replace(":facilityId", facilityId)
             .replace(":programId", programId)
         ).then(res => {
-            if (res.status === 200) {
-                schedule = res.data;
-            }
+            schedule = res.data;
             setFacilityProgramSchedules(schedule);
             setSelectedDaysFromSchedule(schedule);
             setAppointmentSchedule(schedule);
@@ -102,7 +100,7 @@ export default function FacilityConfigureSlot ({location}) {
         let appointmentSchedules = [];
 
         schedule.appointmentSchedule.forEach((as, index) => {
-            appointmentSchedules.push({...as, scheduleType: MORNING_SCHEDULE, edited: false, index})
+            appointmentSchedules.push({...as, scheduleType: APPOINTMENT_SCHEDULE, edited: false, index})
         });
         for (let i = 0; appointmentSchedules.length < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY &&
                 i < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY - appointmentSchedules.length + 1; i++) {
@@ -110,7 +108,7 @@ export default function FacilityConfigureSlot ({location}) {
                 startTime: "",
                 endTime: "",
                 days: [],
-                scheduleType: MORNING_SCHEDULE,
+                scheduleType: APPOINTMENT_SCHEDULE,
                 edited: false,
                 index: appointmentSchedules.length + i
             })
@@ -159,7 +157,7 @@ export default function FacilityConfigureSlot ({location}) {
             if(schedule.startTime && schedule.endTime && parseInt(schedule.startTime) > parseInt(schedule.endTime)) {
                 err = {...err, [schedule.scheduleType+"endTime"]: "* From time should be less than To time"};
             }
-            if ([MORNING_SCHEDULE].includes(schedule.scheduleType) &&
+            if ([APPOINTMENT_SCHEDULE].includes(schedule.scheduleType) &&
                 (!schedule.days || schedule.days.length === 0 ||
                 schedule.days.map(d => d.maxAppointments === 0).reduce((a, b) => a && b))) {
                 err = {...err, [schedule.scheduleType+"maxAppointment"]: "Please add maximum number"}
@@ -170,17 +168,19 @@ export default function FacilityConfigureSlot ({location}) {
             }
             // if all 3 errors (startTime, endTime and maxApp/walkInDays) are there
             // then dont add any errors
+            // TODO: Find why
             if (Object.keys(err).length === 3) {
                 return {}
             }
             return err
         }
 
-        let morSch = validateSchedule(appointmentSchedules[0])
-        let aftSch = validateSchedule(appointmentSchedules[1])
         let wlkSch = validateSchedule(walkInSchedules[0])
-
-        let overallErrors = {...morSch, ...aftSch, ...wlkSch};
+        let overallErrors = {...wlkSch};
+        for (let i = 0; i < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY; i++) {
+            const err = validateSchedule(appointmentSchedules[i]);
+            overallErrors = {...wlkSch, ...err}
+        }
         setErrors(overallErrors);
         return Object.keys(overallErrors).length > 0
     }
@@ -188,7 +188,7 @@ export default function FacilityConfigureSlot ({location}) {
     function handleOnSave() {
         let data = {};
 
-        let isMorningSchedulesChanged = appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+        let isAppointmentSchedulesChanged = appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
         let isWalkInSchedulesChanged = walkInSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
 
         if (validateSchedules()) {
@@ -197,56 +197,28 @@ export default function FacilityConfigureSlot ({location}) {
 
         if (facilityProgramSchedules.osid) {
             // update
-            if (appointmentSchedules[0].startTime || appointmentSchedules[0].startTime) {
-                let appSch = [];
-                if (appointmentSchedules[0].startTime) {
-                    appSch = [...appSch, ...appointmentSchedules];
-                }
-                if (appointmentSchedules[0].startTime) {
-                    appSch = [...appSch, ...appointmentSchedules]
-                }
-                data["appointmentSchedule"] = appSch
-            }
-            if (isWalkInSchedulesChanged) {
-                data["walkInSchedule"] = [...walkInSchedules]
-            }
-
-            if (data["appointmentSchedule"] || data["walkInSchedule"]) {
+            data["appointmentSchedule"] = [...appointmentSchedules]
+            data["walkInSchedule"] = [...walkInSchedules]
+            if (isAppointmentSchedulesChanged || isWalkInSchedulesChanged) {
                 let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
                 axiosInstance.current.put(apiUrl, data)
-                    .then(res => {
-                        if (res.status === 200) {
-                            onSuccessfulSave();
-                            getFacilityProgramSchedules()
-                        }
-                        else
-                            alert("Something went wrong while saving!");
+                    .then(_ => {
+                        onSuccessfulSave();
+                        getFacilityProgramSchedules()
                     });
             } else {
                 alert("Nothing has changed!")
             }
         } else {
             // post
-            if (isMorningSchedulesChanged) {
-                let appSch = [];
-                if (isMorningSchedulesChanged) {
-                    appSch = appointmentSchedules;
-                }
-                data["appointmentSchedule"] = appSch
-            }
-            if (isWalkInSchedulesChanged) {
-                data["walkInSchedule"] = [...walkInSchedules]
-            }
-            if (data["appointmentSchedule"] || data["walkInSchedule"]) {
+            data["appointmentSchedule"] = appointmentSchedules
+            data["walkInSchedule"] = [...walkInSchedules]
+            if (isAppointmentSchedulesChanged || isWalkInSchedulesChanged) {
                 let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
                 axiosInstance.current.post(apiUrl, data)
-                    .then(res => {
-                        if (res.status === 200) {
-                            onSuccessfulSave();
-                            getFacilityProgramSchedules()
-                        }
-                        else
-                            alert("Something went wrong while saving!");
+                    .then(_ => {
+                        onSuccessfulSave();
+                        getFacilityProgramSchedules()
                     });
             } else {
                 alert("Nothing has changed!")
@@ -289,16 +261,16 @@ export default function FacilityConfigureSlot ({location}) {
                         <Col style={{ fontWeight: "bold", color: "#646D82"}}>
                                 Maximum number of appointments allowed
                             <div style={{fontWeight:"normal"}} className="invalid-input">
-                                {errors[MORNING_SCHEDULE+"maxAppointment"]}
+                                {errors[APPOINTMENT_SCHEDULE+"maxAppointment"]}
                             </div>
                         </Col>
                     </Row>
                     <div>
                         {
                             appointmentSchedules.length > 0 &&
-                                appointmentSchedules.map((ms, i) =>
+                                appointmentSchedules.map((schedule, i) =>
                                     <AppointmentScheduleRow key={"ms_"+i}
-                                                            schedule={ms} onChange={onScheduleChange}
+                                                            schedule={schedule} onChange={onScheduleChange}
                                                             errors={errors} selectedDays={selectedDays}/>)
                         }
                     </div>
@@ -348,7 +320,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
 
     function onMaxAppointmentsChange(evt, day) {
         let value = Number(evt.target.value);
-        if (schedule.scheduleType === MORNING_SCHEDULE) {
+        if (schedule.scheduleType === APPOINTMENT_SCHEDULE) {
             // assuming only one row
             let newSchedule = {...schedule, edited: true};
             if (schedule.days.map(d => d.day).includes(day)) {
