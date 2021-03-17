@@ -149,37 +149,35 @@ export default function FacilityConfigureSlot ({location}) {
         function validateSchedule(schedule) {
             let err = {};
             if (!schedule.startTime || schedule.startTime === ""){
-                err = {...err, [schedule.scheduleType+"startTime"]: "* Add From time"};
+                err = {...err, [schedule.scheduleType + schedule.index+"startTime"]: "* Add From time"};
             }
             if (!schedule.endTime || schedule.endTime === "") {
-                err = {...err, [schedule.scheduleType+"endTime"]: "* Add To time"};
+                err = {...err, [schedule.scheduleType + schedule.index+"endTime"]: "* Add To time"};
             }
             if(schedule.startTime && schedule.endTime && parseInt(schedule.startTime) > parseInt(schedule.endTime)) {
-                err = {...err, [schedule.scheduleType+"endTime"]: "* From time should be less than To time"};
+                err = {...err, [schedule.scheduleType + schedule.index+"endTime"]: "* From time should be less than To time"};
             }
-            if ([APPOINTMENT_SCHEDULE].includes(schedule.scheduleType) &&
+            if (APPOINTMENT_SCHEDULE === schedule.scheduleType &&
                 (!schedule.days || schedule.days.length === 0 ||
-                schedule.days.map(d => d.maxAppointments === 0).reduce((a, b) => a && b))) {
-                err = {...err, [schedule.scheduleType+"maxAppointment"]: "Please add maximum number"}
+                schedule.days.filter(d => d.maxAppointments)
+                    .map(d => d.maxAppointments)
+                    .reduce((a, b) => a && b))) {
+                err = {...err, [schedule.scheduleType + schedule.index+"maxAppointment"]: "* Please add maximum number"}
             }
             if (schedule.scheduleType === WALKIN_SCHEDULE &&
                 (!schedule.days || schedule.days.length === 0)) {
-                err = {...err, [schedule.scheduleType+"walkInDays"]: "Please select walk-in days"}
+                err = {...err, [schedule.scheduleType + schedule.index+"walkInDays"]: "Please select walk-in days"}
             }
             // if all 3 errors (startTime, endTime and maxApp/walkInDays) are there
             // then dont add any errors
-            // TODO: Find why
-            if (Object.keys(err).length === 3) {
-                return {}
-            }
             return err
         }
 
         let wlkSch = validateSchedule(walkInSchedules[0])
         let overallErrors = {...wlkSch};
-        for (let i = 0; i < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY; i++) {
+        for (let i = 0; i < appointmentSchedules.length; i++) {
             const err = validateSchedule(appointmentSchedules[i]);
-            overallErrors = {...wlkSch, ...err}
+            overallErrors = {...overallErrors, ...err}
         }
         setErrors(overallErrors);
         return Object.keys(overallErrors).length > 0
@@ -260,9 +258,6 @@ export default function FacilityConfigureSlot ({location}) {
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}}>
                                 Maximum number of appointments allowed
-                            <div style={{fontWeight:"normal"}} className="invalid-input">
-                                {errors[APPOINTMENT_SCHEDULE+"maxAppointment"]}
-                            </div>
                         </Col>
                     </Row>
                     <div>
@@ -353,7 +348,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                             onChange={(evt) => onValueChange(evt, "startTime")}
                             required/>
                         <div className="invalid-input">
-                            {errors[schedule.scheduleType+"startTime"]}
+                            {errors[schedule.scheduleType + schedule.index+"startTime"]}
                         </div>
                     </Col>
                     <Col className="mt-0">
@@ -368,7 +363,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                             onChange={(evt) => onValueChange(evt, "endTime")}
                             required/>
                         <div className="invalid-input">
-                            {errors[schedule.scheduleType+"endTime"]}
+                            {errors[schedule.scheduleType + schedule.index+"endTime"]}
                         </div>
                     </Col>
                 </Row>
@@ -385,6 +380,9 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                             name="maxAppointments"
                             onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
                             required/>
+                        <div style={{fontWeight:"normal"}} className="invalid-input">
+                            {errors[APPOINTMENT_SCHEDULE+ schedule.index + "maxAppointment"]}
+                        </div>
                     </Col>
             )}
         </Row>
@@ -420,7 +418,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                             onBlur={(evt) => onValueChange(evt, "startTime")}
                             required/>
                         <div className="invalid-input">
-                            {errors[schedule.scheduleType+"startTime"]}
+                            {errors[schedule.scheduleType + schedule.index+"startTime"]}
                         </div>
                     </Col>
                     <Col className="mt-0">
@@ -435,7 +433,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                             onBlur={(evt) => onValueChange(evt, "endTime")}
                             required/>
                         <div className="invalid-input">
-                            {errors[schedule.scheduleType+"endTime"]}
+                            {errors[schedule.scheduleType + schedule.index+"endTime"]}
                         </div>
                     </Col>
                 </Row>
