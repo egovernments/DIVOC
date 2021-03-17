@@ -157,13 +157,18 @@ export default function FacilityConfigureSlot ({location}) {
             if(schedule.startTime && schedule.endTime && parseInt(schedule.startTime) > parseInt(schedule.endTime)) {
                 err = {...err, [schedule.scheduleType + schedule.index+"endTime"]: "* From time should be less than To time"};
             }
-            if (APPOINTMENT_SCHEDULE === schedule.scheduleType &&
-                (!schedule.days || schedule.days.length === 0 ||
-                schedule.days.filter(d => d.maxAppointments)
-                    .map(d => d.maxAppointments)
-                    .reduce((a, b) => a && b))) {
-                err = {...err, [schedule.scheduleType + schedule.index+"maxAppointment"]: "* Please add maximum number"}
-            }
+            // if(schedule.startTime && schedule.endTime) {
+                if (APPOINTMENT_SCHEDULE === schedule.scheduleType &&
+                    (!schedule.days || schedule.days.length === 0 ||
+                        schedule.days.filter(d => d.maxAppointments).length !== schedule.days.length)) {
+                    schedule.days.forEach(d => {
+                        if(!d.maxAppointments || d.maxAppointments < 0) {
+                            err = {...err, [schedule.scheduleType + schedule.index+d.day]: "* Please add maximum number"}
+                        }
+                    })
+                }
+            // }
+
             if (schedule.scheduleType === WALKIN_SCHEDULE &&
                 (!schedule.days || schedule.days.length === 0)) {
                 err = {...err, [schedule.scheduleType + schedule.index+"walkInDays"]: "Please select walk-in days"}
@@ -381,7 +386,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                             onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
                             required/>
                         <div style={{fontWeight:"normal"}} className="invalid-input">
-                            {errors[APPOINTMENT_SCHEDULE+ schedule.index + "maxAppointment"]}
+                            {errors[APPOINTMENT_SCHEDULE+ schedule.index + d]}
                         </div>
                     </Col>
             )}
