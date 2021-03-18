@@ -8,6 +8,12 @@ import {useHistory} from "react-router-dom";
 import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
 import {API_URL} from "../../utils/constants";
+import {
+    INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
+    INVALID_SLOT_TIME,
+    INVALID_TIME,
+    SCHEDULE_WITH_NO_DAYS_SELECTED
+} from "./error-constants";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const APPOINTMENT_SCHEDULE = "appointmentSchedule";
@@ -138,6 +144,16 @@ export default function FacilityConfigureSlot ({location}) {
     function onSelectDay(d) {
         const updatedSelection =  selectedDays.includes(d) ? selectedDays.filter(s => s !== d) : selectedDays.concat(d);
         setSelectedDays(updatedSelection);
+        const schedules = appointmentSchedules
+        schedules.forEach(schedule => {
+            const index = schedule.days.findIndex(dayDetails => dayDetails.day === d)
+            if(index !== -1) {
+                schedule.days.splice(index, 1)
+            } else {
+                schedule.days.push({day: d})
+            }
+        })
+        setAppointmentSchedules(schedules)
     }
 
     function onSuccessfulSave() {
@@ -145,36 +161,55 @@ export default function FacilityConfigureSlot ({location}) {
     }
 
     function validateSchedules() {
-
         function validateSchedule(schedule) {
+            const timeToNumber = (time) => {
+                const hrMin = time.split(':');
+                return parseInt(hrMin[0] + hrMin[1])
+            }
             let err = {};
             if (!schedule.startTime || schedule.startTime === ""){
-                err = {...err, [schedule.scheduleType + schedule.index+"startTime"]: "* Add From time"};
+                err = {...err, [schedule.scheduleType + schedule.index + "startTime"]: INVALID_TIME};
             }
             if (!schedule.endTime || schedule.endTime === "") {
-                err = {...err, [schedule.scheduleType + schedule.index+"endTime"]: "* Add To time"};
+                err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_TIME};
             }
-            if(schedule.startTime && schedule.endTime && parseInt(schedule.startTime) > parseInt(schedule.endTime)) {
-                err = {...err, [schedule.scheduleType + schedule.index+"endTime"]: "* From time should be less than To time"};
+
+            if(APPOINTMENT_SCHEDULE === schedule.scheduleType && schedule.startTime && schedule.endTime) {
+                if (schedule.index === 0) {
+                    if(schedule.startTime && schedule.endTime &&
+                        timeToNumber(schedule.startTime) > timeToNumber(schedule.endTime)) {
+                        err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_FIRST_SLOT_TIME};
+                    }
+                } else {
+                    for (let i = 0; i < schedule.index; i++) {
+                        if(schedule.startTime && appointmentSchedules[i].startTime &&
+                            timeToNumber(schedule.startTime) > timeToNumber(appointmentSchedules[i].startTime)) {
+                            err = {...err,
+                                [schedule.scheduleType + schedule.index + "endTime"]: INVALID_SLOT_TIME};
+                        }
+                    }
+                }
             }
-            // if(schedule.startTime && schedule.endTime) {
-                if (APPOINTMENT_SCHEDULE === schedule.scheduleType &&
-                    (!schedule.days || schedule.days.length === 0 ||
-                        schedule.days.filter(d => d.maxAppointments).length !== schedule.days.length)) {
+            if (APPOINTMENT_SCHEDULE === schedule.scheduleType) {
+                if (!schedule.days || schedule.days.length === 0) {
+                    err = {
+                        ...err,
+                        [schedule.scheduleType + schedule.index + "endTime"]: SCHEDULE_WITH_NO_DAYS_SELECTED
+                    }
+                } else if (schedule.days.filter(d => d.maxAppointments).length !== schedule.days.length) {
                     schedule.days.forEach(d => {
-                        if(!d.maxAppointments || d.maxAppointments < 0) {
-                            err = {...err, [schedule.scheduleType + schedule.index+d.day]: "* Please add maximum number"}
+                        if (!d.maxAppointments || d.maxAppointments < 0) {
+                            err = {
+                                ...err,
+                                [schedule.scheduleType + schedule.index + d.day]:INVALID_SLOT_COUNT}
                         }
                     })
                 }
-            // }
-
+            }
             if (schedule.scheduleType === WALKIN_SCHEDULE &&
                 (!schedule.days || schedule.days.length === 0)) {
                 err = {...err, [schedule.scheduleType + schedule.index+"walkInDays"]: "Please select walk-in days"}
             }
-            // if all 3 errors (startTime, endTime and maxApp/walkInDays) are there
-            // then dont add any errors
             return err
         }
 
@@ -229,6 +264,29 @@ export default function FacilityConfigureSlot ({location}) {
         }
     }
 
+    const addScheduleHandler = () => {
+        const newSchedule = {
+            startTime: "",
+                endTime: "",
+            days: [],
+            scheduleType: APPOINTMENT_SCHEDULE,
+            edited: false,
+            index: appointmentSchedules.length
+        }
+        setAppointmentSchedules((prevState => {
+            if (prevState) {
+                return [...prevState, newSchedule]
+            } else {
+                return []
+            }
+        }))
+    }
+    const deleteHandler = (indexToRemove) => {
+        setAppointmentSchedules((prevState => {
+            return [...prevState.filter(schedule => schedule.index !== indexToRemove)]
+        }))
+    }
+
     return (
         <div className="container-fluid mt-4">
             <Row className="pb-0">
@@ -271,8 +329,11 @@ export default function FacilityConfigureSlot ({location}) {
                                 appointmentSchedules.map((schedule, i) =>
                                     <AppointmentScheduleRow key={"ms_"+i}
                                                             schedule={schedule} onChange={onScheduleChange}
-                                                            errors={errors} selectedDays={selectedDays}/>)
+                                                            errors={errors} selectedDays={selectedDays}
+                                                            deleteHandler={deleteHandler}
+                                    />)
                         }
+                        <button onClick={addScheduleHandler}>ADD</button>
                     </div>
                 </div>
                 <div className="mt-4">
@@ -308,18 +369,26 @@ export default function FacilityConfigureSlot ({location}) {
     )
 }
 
-function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
+function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, deleteHandler}) {
     function onValueChange(evt, field) {
         onChange({...schedule, [field]: evt.target.value, edited: true});
     }
 
     function getMaxAppointments(day) {
-        return schedule.days.filter(d => d.day === day).length > 0 ?
-            schedule.days.filter(d => d.day === day)[0].maxAppointments : ''
+        const scheduleDayDetails = schedule.days.find(d => d.day === day);
+        if(scheduleDayDetails) {
+            if(scheduleDayDetails.maxAppointments) {
+                return scheduleDayDetails.maxAppointments.toString()
+            } else {
+                return ""
+            }
+        } else {
+            return ""
+        }
     }
 
     function onMaxAppointmentsChange(evt, day) {
-        let value = Number(evt.target.value);
+        let value = parseInt(evt.target.value);
         if (schedule.scheduleType === APPOINTMENT_SCHEDULE) {
             // assuming only one row
             let newSchedule = {...schedule, edited: true};
@@ -367,6 +436,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                             name="endTime"
                             onChange={(evt) => onValueChange(evt, "endTime")}
                             required/>
+                        <button onClick={() => deleteHandler(schedule.index)}>DELETE</button>
                         <div className="invalid-input">
                             {errors[schedule.scheduleType + schedule.index+"endTime"]}
                         </div>
@@ -379,11 +449,11 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors}) {
                         <input
                             style={{marginTop: "19px"}}
                             className="form-control"
-                            defaultValue={getMaxAppointments(d)}
+                            value={getMaxAppointments(d)}
                             disabled={!selectedDays.includes(d)}
                             type="number"
                             name="maxAppointments"
-                            onBlur={(evt) => onMaxAppointmentsChange(evt, d)}
+                            onChange={(evt) => onMaxAppointmentsChange(evt, d)}
                             required/>
                         <div style={{fontWeight:"normal"}} className="invalid-input">
                             {errors[APPOINTMENT_SCHEDULE+ schedule.index + d]}
