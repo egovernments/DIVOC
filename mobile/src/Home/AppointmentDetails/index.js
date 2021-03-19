@@ -9,8 +9,6 @@ import {Title} from "../Home";
 export const AppointmentDetails = (props) => {
     const [appointmentScheduleData, setAppointmentScheduleData] = useState({});
     const [enrollments, setEnrollments] = useState(undefined)
-    const [morningScheduleOnGoing, setMorningScheduleOnGoing] = useState(false)
-    const [afterNoonScheduleOnGoing, setAfterNoonScheduleOnGoing] = useState(false)
     const [beneficiaryCompletedStatus, setBeneficiaryCompletedStatus] = useState({})
 
     function getTimeInSeconds(time) {
@@ -29,7 +27,6 @@ export const AppointmentDetails = (props) => {
     }
 
     useEffect(() => {
-        let interval;
         appIndexDb.getFacilitySchedule()
             .then((scheduleResponse) => {
                 setAppointmentScheduleData(scheduleResponse)
@@ -52,24 +49,9 @@ export const AppointmentDetails = (props) => {
                             }
                         })))
                 }
-                // Calculate ongoing logic for every seconds
-                const timeout = 1000;
-                interval = setInterval(() => {
-                    console.log("I am calculating ongoing status");
-                    if(appointmentSchedules) {
-                        setMorningScheduleOnGoing(
-                            isOnGoing(appointmentSchedules[0].startTime, appointmentSchedules[0].endTime)
-                        )
-                        setAfterNoonScheduleOnGoing(
-                            isOnGoing(appointmentSchedules[1].startTime, appointmentSchedules[1].endTime)
-                        )
-                    }
-                }, timeout)
             });
         appIndexDb.getAllEnrollments()
             .then((enrollments) => setEnrollments(enrollments))
-        // Clear the interval when component unmounts
-        return () => clearInterval(interval)
     }, [])
 
     const dimGrayColor = {color:"#696969"};
@@ -93,7 +75,7 @@ export const AppointmentDetails = (props) => {
         </div>
     }
 
-    const scheduleLabel = (title, schedule, onGoing) => {
+    const scheduleLabel = (schedule) => {
         const dayOfToday = weekdays[new Date().getDay()]
         const scheduleDetails = schedule["days"].find((scheduleForThatDay) => scheduleForThatDay.day === dayOfToday)
         const total = scheduleDetails.maxAppointments
@@ -101,10 +83,11 @@ export const AppointmentDetails = (props) => {
         const appointments = [].concat.apply([], appointmentsArrays)
         const booked = appointments.filter((appointment) => appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime)
             .length
+        // TODO: add ref key
         return <div>
             <div className="title d-flex mb-2">
-                {title}: {getMeridiemTime(schedule.startTime)} - {getMeridiemTime(schedule.endTime)}
-                {onGoing && onGoingLabel}
+                {getMeridiemTime(schedule.startTime)} - {getMeridiemTime(schedule.endTime)}
+                {isOnGoing(schedule.startTime, schedule.endTime) && onGoingLabel}
             </div>
             {statusBanner(booked, beneficiaryCompletedStatus[schedule.startTime + "-" + schedule.endTime], total - booked)}
         </div>
@@ -121,13 +104,8 @@ export const AppointmentDetails = (props) => {
 
     if (isAppointmentConfiguredForToday(appointmentScheduleData["appointmentSchedule"]) && enrollments) {
         const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
-        const morningScheduleElement = scheduleLabel(
-            getMessageComponent(LANGUAGE_KEYS.MORNING_SCHEDULE), appointmentSchedule[0], morningScheduleOnGoing)
-        const afterNoonScheduleElement = scheduleLabel(
-            getMessageComponent(LANGUAGE_KEYS.AFTERNOON_SCHEDULE), appointmentSchedule[1], afterNoonScheduleOnGoing)
         const content = <div style={{marginTop: "-4%"}}>
-            {morningScheduleElement}
-            {afterNoonScheduleElement}
+            {appointmentSchedule.map(schedule => scheduleLabel(schedule))}
         </div>;
         return <Title text={getMessageComponent(LANGUAGE_KEYS.APPOINTMENT_TODAY,"", {date: formatDate(new Date().toISOString())})}
                       content={content}/>
