@@ -18,7 +18,6 @@ import {
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const APPOINTMENT_SCHEDULE = "appointmentSchedule";
 const WALKIN_SCHEDULE = "walkInSchedule";
-const MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY = 2;
 
 export default function FacilityConfigureSlot ({location}) {
     const [facilityId, programId, programName] = [location.facilityOsid, location.programId, location.programName];
@@ -44,13 +43,13 @@ export default function FacilityConfigureSlot ({location}) {
             schedule = res.data;
             setFacilityProgramSchedules(schedule);
             setSelectedDaysFromSchedule(schedule);
-            setAppointmentSchedule(schedule);
+            setAppointmentSchedulesFromResponse(schedule);
             setWalkInScheduleFromSchedule(schedule);
         }).catch(err => {
             console.log("API request errored with ", err);
             setFacilityProgramSchedules(schedule);
             setSelectedDaysFromSchedule(schedule);
-            setAppointmentSchedule(schedule);
+            setAppointmentSchedulesFromResponse(schedule);
             setWalkInScheduleFromSchedule(schedule);
         })
     }
@@ -69,7 +68,7 @@ export default function FacilityConfigureSlot ({location}) {
                 {
                     startTime: "",
                     endTime: "",
-                    days: [],
+                    days: [selectedDays.map(day => ({day}))],
                     scheduleType: WALKIN_SCHEDULE,
                     edited: false
                 }
@@ -102,22 +101,22 @@ export default function FacilityConfigureSlot ({location}) {
         setSelectedDays([...selectedDays].concat(daysInAppointmentSchedule))
     }
 
-    function setAppointmentSchedule(schedule) {
+    function setAppointmentSchedulesFromResponse(appointmentSchedulesResponse) {
         let appointmentSchedules = [];
 
-        schedule.appointmentSchedule.forEach((as, index) => {
-            appointmentSchedules.push({...as, scheduleType: APPOINTMENT_SCHEDULE, edited: false, index})
-        });
-        for (let i = 0; appointmentSchedules.length < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY &&
-                i < MAXIMUM_NUMBER_OF_SCHEDULES_PER_DAY - appointmentSchedules.length + 1; i++) {
+        if(appointmentSchedulesResponse.length === 0) {
             appointmentSchedules.push({
                 startTime: "",
                 endTime: "",
-                days: [],
+                days: selectedDays.map(day => ({day})),
                 scheduleType: APPOINTMENT_SCHEDULE,
                 edited: false,
-                index: appointmentSchedules.length + i
+                index: 0
             })
+        } else {
+            appointmentSchedulesResponse.appointmentSchedule.forEach((as, index) => {
+                appointmentSchedules.push({...as, scheduleType: APPOINTMENT_SCHEDULE, edited: false, index})
+            });
         }
         setAppointmentSchedules(appointmentSchedules);
     }
@@ -126,7 +125,7 @@ export default function FacilityConfigureSlot ({location}) {
         setAppointmentSchedules((prevState) => {
             const index = prevState.findIndex(s => s.index === schedule.index)
             prevState[index] = schedule
-            return prevState
+            return [...prevState]
         });
     }
 
@@ -138,22 +137,40 @@ export default function FacilityConfigureSlot ({location}) {
                 return s;
             }
         });
-        setWalkInSchedules(newWalkInSchedules);
+        setWalkInSchedules([...newWalkInSchedules]);
     }
 
     function onSelectDay(d) {
         const updatedSelection =  selectedDays.includes(d) ? selectedDays.filter(s => s !== d) : selectedDays.concat(d);
         setSelectedDays(updatedSelection);
-        const schedules = appointmentSchedules
-        schedules.forEach(schedule => {
-            const index = schedule.days.findIndex(dayDetails => dayDetails.day === d)
-            if(index !== -1) {
-                schedule.days.splice(index, 1)
-            } else {
-                schedule.days.push({day: d})
-            }
-        })
-        setAppointmentSchedules(schedules)
+
+        function updateAppointmentSchedules() {
+            const schedules = [...appointmentSchedules]
+            schedules.forEach(schedule => {
+                const index = schedule.days.findIndex(dayDetails => dayDetails.day === d)
+                if (index !== -1) {
+                    schedule.days.splice(index, 1)
+                } else {
+                    schedule.days.push({day: d})
+                }
+            })
+            setAppointmentSchedules(schedules)
+        }
+        function updateWalkInSchedules() {
+            const schedules = [...walkInSchedules]
+            schedules.forEach(schedule => {
+                const index = schedule.days.findIndex(day => day === d)
+                if (index !== -1) {
+                    schedule.days.splice(index, 1)
+                } else {
+                    schedule.days.push(d)
+                }
+            })
+            setWalkInSchedules(schedules)
+        }
+
+        updateAppointmentSchedules();
+        updateWalkInSchedules();
     }
 
     function onSuccessfulSave() {
@@ -198,7 +215,7 @@ export default function FacilityConfigureSlot ({location}) {
                     }
                 } else if (schedule.days.filter(d => d.maxAppointments).length !== schedule.days.length) {
                     schedule.days.forEach(d => {
-                        if (!d.maxAppointments || d.maxAppointments < 0) {
+                        if (d.maxAppointments === undefined || d.maxAppointments < 0) {
                             err = {
                                 ...err,
                                 [schedule.scheduleType + schedule.index + d.day]:INVALID_SLOT_COUNT}
@@ -377,7 +394,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     function getMaxAppointments(day) {
         const scheduleDayDetails = schedule.days.find(d => d.day === day);
         if(scheduleDayDetails) {
-            if(scheduleDayDetails.maxAppointments) {
+            if(scheduleDayDetails.maxAppointments !== undefined) {
                 return scheduleDayDetails.maxAppointments.toString()
             } else {
                 return ""
