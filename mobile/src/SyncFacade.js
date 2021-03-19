@@ -1,4 +1,4 @@
-import {appIndexDb} from "./AppDatabase";
+import {appIndexDb, ENROLLMENT_TYPES} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
 import {programDb} from "./Services/ProgramDB";
 import {comorbiditiesDb} from "./Services/ComorbiditiesDB";
@@ -23,7 +23,7 @@ export class SyncFacade {
     static async pull() {
         await appIndexDb.initDb();
         const preEnrollments = await ApiServices.fetchPreEnrollments();
-        await appIndexDb.saveEnrollments(preEnrollments);
+        await appIndexDb.saveEnrollments(preEnrollments, ENROLLMENT_TYPES.PRE_ENROLLMENT);
 
         const programs = await ApiServices.fetchPrograms();
         await programDb.savePrograms(programs);

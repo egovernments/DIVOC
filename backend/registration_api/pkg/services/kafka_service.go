@@ -64,7 +64,7 @@ func InitializeKafka() {
 	go func() {
 		topic := config.Config.Kafka.EnrollmentACKTopic
 		for {
-			msg := <- enrollmentACKMessages
+			msg := <-enrollmentACKMessages
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
@@ -79,17 +79,21 @@ func PublishEnrollmentMessage(enrollment []byte) {
 	enrollmentMessages <- enrollment
 }
 
-func PublishEnrollmentACK(rowID uint, e error) {
+func PublishEnrollmentACK(rowID uint, vaccinationDetails []byte, enrollmentType string, e error) {
 	var errMsg string
 	if e != nil {
 		errMsg = e.Error()
 	}
-	msg, _ := json.Marshal(struct{
-		RowID uint	`json:"rowID,omitempty"`
-		ErrMsg string `json:"errMsg,omitempty"`
+	msg, _ := json.Marshal(struct {
+		RowID              uint   `json:"rowID,omitempty"`
+		ErrMsg             string `json:"errMsg,omitempty"`
+		EnrollmentType     string `json:"enrollmentType"`
+		VaccinationDetails []byte `json:"vaccinationDetails"`
 	}{
-		RowID: rowID,
-		ErrMsg: errMsg,
+		RowID:              rowID,
+		VaccinationDetails: vaccinationDetails,
+		EnrollmentType:     enrollmentType,
+		ErrMsg:             errMsg,
 	})
 	enrollmentACKMessages <- msg
 }

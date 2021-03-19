@@ -55,8 +55,10 @@ var Config = struct {
 	Kafka struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
@@ -67,7 +69,7 @@ var Config = struct {
 	}
 	Certificate struct {
 		Upload struct {
-			Columns string `yaml:"columns"`
+			Columns        string `yaml:"columns"`
 			RequiredFields string `yaml:"required_fields"`
 		}
 	}

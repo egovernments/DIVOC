@@ -320,6 +320,9 @@ func createMedicineHandler(params operations.CreateMedicineParams, principal *mo
 
 func createProgramHandler(params operations.CreateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Create Program %+v", params.Body)
+	if !utils.ValidateProgramDates(params.Body) {
+		return operations.NewCreateProgramBadRequest()
+	}
 	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
@@ -336,6 +339,9 @@ func createProgramHandler(params operations.CreateProgramParams, principal *mode
 
 func updateProgramsHandler(params operations.UpdateProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 	log.Infof("Update Program %+v", params.Body)
+	if !utils.ValidateProgramDates(&params.Body.ProgramRequest) {
+		return operations.NewUpdateProgramBadRequest()
+	}
 	objectId := "Program"
 	requestBody, err := json.Marshal(params.Body)
 	if err != nil {
@@ -750,32 +756,6 @@ func createVaccinatorHandler(params operations.CreateVaccinatorParams, principal
 		return operations.NewCreateVaccinatorBadRequest()
 	}
 	return operations.NewCreateVaccinatorOK()
-}
-
-func updateVaccinatorsHandler(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
-	for _, updateRequest := range params.Body {
-		requestBody, err := json.Marshal(updateRequest)
-		if err != nil {
-			log.Error(err)
-			return operations.NewUpdateVaccinatorsBadRequest()
-		}
-		requestMap := make(map[string]interface{})
-		err = json.Unmarshal(requestBody, &requestMap)
-		if requestMap["facilityIds"] == nil {
-			delete(requestMap, "facilityIds")
-		}
-		if requestMap["programs"] == nil {
-			delete(requestMap, "programs")
-		}
-		resp, err := kernelService.UpdateRegistry("Vaccinator", requestMap)
-		if err != nil {
-			log.Error(err)
-			return operations.NewUpdateVaccinatorsBadRequest()
-		} else {
-			log.Print(resp)
-		}
-	}
-	return operations.NewUpdateVaccinatorsOK()
 }
 
 func updateVaccinatorsHandlerV2(params operations.UpdateVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {

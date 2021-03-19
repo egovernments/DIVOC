@@ -59,6 +59,9 @@ export class ApiServices {
             const patientDetails = item.patient;
             return {
                 preEnrollmentCode: item.enrollCode,
+                enrollmentType: patientDetails.enrollmentType,
+                programId: patientDetails.programId,
+                comorbidities: patientDetails.comorbidities ?? [],
                 recipient: {
                     contact: [
                         "tel:" + patientDetails.phone,

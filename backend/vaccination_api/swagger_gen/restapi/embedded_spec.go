@@ -140,7 +140,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -561,6 +561,15 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -605,6 +614,9 @@ func init() {
         "preEnrollmentCode": {
           "type": "string"
         },
+        "programId": {
+          "type": "string"
+        },
         "recipient": {
           "type": "object",
           "required": [
@@ -613,7 +625,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -773,7 +787,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -1025,7 +1040,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -1446,6 +1461,15 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -1490,6 +1514,9 @@ func init() {
         "preEnrollmentCode": {
           "type": "string"
         },
+        "programId": {
+          "type": "string"
+        },
         "recipient": {
           "type": "object",
           "required": [
@@ -1498,7 +1525,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -1685,7 +1714,9 @@ func init() {
         "nationality",
         "identity",
         "contact",
-        "address"
+        "address",
+        "enrollmentType",
+        "programId"
       ],
       "properties": {
         "address": {
@@ -1900,7 +1931,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -2163,14 +2195,12 @@ func init() {
           "description": "response",
           "type": "string",
           "title": "response",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/response"
         },
         "symptom": {
           "description": "symptom",
           "type": "string",
           "title": "symptom",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/symptom"
         }
       },

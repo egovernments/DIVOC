@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/rand"
 	"strconv"
+	"time"
 
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/models"
@@ -102,4 +103,10 @@ func ValidateMedicineIntervals(m *models.Medicine) bool {
 		}
 	}
 	return true
+}
+
+func ValidateProgramDates(p *models.ProgramRequest) bool {
+	start := time.Time(p.StartDate)
+	end := time.Time(p.EndDate)
+	return start.Before(end) || start.Equal(end)
 }

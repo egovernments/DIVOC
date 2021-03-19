@@ -3,6 +3,10 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
+	"github.com/go-openapi/strfmt"
+	"strconv"
+	"strings"
+	"time"
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
@@ -11,9 +15,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func filterEnrollemntAppointments(enrollments []*models.Enrollment, criteria func(ea *models.EnrollmentAppointmentsItems0) bool ) []*models.Enrollment {
+func filterEnrollemntAppointments(enrollments []*models.Enrollment, criteria func(ea *models.EnrollmentAppointmentsItems0) bool) []*models.Enrollment {
 	var relEnrollments []*models.Enrollment
-	for _, enrmt:= range enrollments {
+	for _, enrmt := range enrollments {
 		var relAppointments []*models.EnrollmentAppointmentsItems0
 		for _, apnt := range enrmt.Appointments {
 			if criteria(apnt) {
@@ -50,9 +54,9 @@ func findEnrollmentScopeAndCode(scopeID string, code string, limit int, offset i
 			log.Infof("Number of enrollments %v", len(listOfEnrollments))
 			if len(listOfEnrollments) >= 1 {
 				log.Infof("Enrollment %+v", listOfEnrollments[0])
-				return filterEnrollemntAppointments(listOfEnrollments,func(ea *models.EnrollmentAppointmentsItems0) bool {
-						return ea.EnrollmentScopeID == scopeID
-					})[0], nil
+				return filterEnrollemntAppointments(listOfEnrollments, func(ea *models.EnrollmentAppointmentsItems0) bool {
+					return ea.EnrollmentScopeID == scopeID
+				})[0], nil
 			}
 			log.Infof("No enrollment found for the scope %s code %s", scopeID, code)
 			return nil, errors.New("no enrollment found")
@@ -110,4 +114,64 @@ func getUserAssociatedFacility(authHeader string) (string, error) {
 		return "", errors.New("unauthorized")
 	}
 	return claimBody.FacilityCode, nil
+}
+
+func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string, vaccinationDetails []byte) []byte {
+	contacts := request.Recipient.Contact
+	mobile := ""
+	email := ""
+	for _, contact := range contacts {
+		if strings.Contains(contact, "tel:") {
+			mobile = strings.ReplaceAll(contact, "tel:", "")
+		}
+
+		if strings.Contains(contact, "mailto:") {
+			email = strings.ReplaceAll(contact, "mailto:", "")
+		}
+	}
+
+	year, _, _ := time.Now().Date()
+	age, _ := strconv.Atoi(request.Recipient.Age)
+	yob := year - age
+
+	var dob strfmt.Date
+	if request.Recipient.Dob != nil {
+		dob = *request.Recipient.Dob
+	}
+
+	enrollment := models.Enrollment{
+		Code:           *request.PreEnrollmentCode,
+		Phone:          mobile,
+		EnrollmentType: models.EnrollmentEnrollmentTypeWALKIN,
+		NationalID:     request.Recipient.Nationality,
+		Dob:            dob,
+		Gender:         *request.Recipient.Gender,
+		Name:           *request.Recipient.Name,
+		Email:          email,
+		Address: &models.Address{
+			AddressLine1: request.Recipient.Address.AddressLine1,
+			AddressLine2: request.Recipient.Address.AddressLine2,
+			District:     request.Recipient.Address.District,
+			State:        request.Recipient.Address.State,
+			Pincode:      request.Recipient.Address.Pincode,
+		},
+		Appointments: []*models.EnrollmentAppointmentsItems0{
+			{
+				ProgramID: request.ProgramID,
+			},
+		},
+		Yob:           int64(yob),
+		Comorbidities: request.Comorbidities,
+	}
+
+	enrollmentMsg, _ := json.Marshal(struct {
+		EnrollmentScopeId  string `json:"enrollmentScopeId"`
+		VaccinationDetails []byte `json:"vaccinationDetails"`
+		models.Enrollment
+	}{
+		EnrollmentScopeId:  facilityCode,
+		Enrollment:         enrollment,
+		VaccinationDetails: vaccinationDetails,
+	})
+	return enrollmentMsg
 }

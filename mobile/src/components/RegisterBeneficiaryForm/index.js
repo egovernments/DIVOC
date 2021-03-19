@@ -25,14 +25,28 @@ import {
     STATE_ERROR_MSG
 } from "./error-constants";
 import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../utils/validations";
+import {appIndexDb} from "../../AppDatabase";
+import {formatAppointmentSlot} from "../../utils/date_utils";
 
 const GENDERS = [
     "Male",
     "Female",
     "Other"
 ];
-export const RegisterBeneficiaryForm = ({verifyDetails}) => {
-    const {state, goNext, saveWalkInEnrollment} = useWalkInEnrollment();
+export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinue, buttonText}) => {
+    const [formData, setFormData] = useState({...state});
+
+    return (
+        <div className="new-enroll-container">
+            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)} onBack={verifyDetails ? () => {
+                onBack(formData)} : undefined}>
+                <BeneficiaryForm verifyDetails={verifyDetails} state={state} onContinue={onContinue} buttonText={buttonText}/>
+            </BaseFormCard>
+        </div>
+    )
+}
+
+export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) {
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({...state});
 
@@ -92,33 +106,26 @@ export const RegisterBeneficiaryForm = ({verifyDetails}) => {
         // TODO: add validations before going to confirm screen
     }
 
-    function onContinue() {
+    function onContinueClick() {
         if (verifyDetails) {
-            goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_PAYMENTS, formData)
-
+            onContinue(formData)
         } else {
             if (validateUserDetails()) {
                 alert("Please fill all the required field")
             } else {
-                goNext(FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_VERIFY_FORM, formData)
+                onContinue(formData)
             }
         }
     }
 
     return (
-        <div className="new-enroll-container">
-            <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TITLE)} onBack={verifyDetails ? () => {
-                verifyDetails && goNext(FORM_WALK_IN_VERIFY_FORM, FORM_WALK_IN_ENROLL_FORM, formData)
-            } : undefined}>
-                <div className="text-left verify-mobile-container">
-                    <IdDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
-                    <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
-                                        errors={errors}/>
-                    <ContactInfo formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
-                    <CustomButton className="primary-btn w-100 mt-5 mb-5"
-                                  onClick={onContinue}>{verifyDetails ? "CONFIRM" : "CONTINUE"}</CustomButton>
-                </div>
-            </BaseFormCard>
+        <div className="text-left verify-mobile-container">
+            <IdDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
+            <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
+                                errors={errors}/>
+            <ContactInfo formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
+            <CustomButton className="primary-btn w-100 mt-5 mb-5"
+                          onClick={onContinueClick}>{buttonText}</CustomButton>
         </div>
     )
 }
@@ -407,7 +414,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                 }
             </div>
-            <div className="comorbidities-section">
+            <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
                 <label htmlFor="confirmEmail">Comorbidities</label>
                 <p>
                     {formData.comorbidities.join(", ")}

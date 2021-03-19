@@ -655,6 +655,9 @@
         "realm-management": [
           "manage-users"
         ],
+        "admin-api": [
+          "api"
+        ],
         "account": [
           "manage-account",
           "view-profile"

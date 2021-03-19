@@ -2,7 +2,7 @@ import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgramId} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
-import {monthNames} from "./utils/date_utils";
+import {monthNames, weekdays} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 13;
@@ -59,6 +59,7 @@ const dbConfigs = [
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
+export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", WALK_IN: "WALK_IN"});
 
 export class AppDatabase {
 
@@ -88,14 +89,12 @@ export class AppDatabase {
         return this.db.put(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode, mobileNumber) {
+    async getPatientDetails(enrollCode) {
         const patient = await this.db.get(PATIENTS, enrollCode);
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
             const selectedProgramId = getSelectedProgramId();
-            if (patient.phone === mobileNumber
-                && patient[PROGRAM_ID] === selectedProgramId) {
-                patient.dob = this.formatDate(patient.dob)
+            if (patient["appointments"][0][PROGRAM_ID] === selectedProgramId) {
                 return patient
             } else {
                 return null;
@@ -183,9 +182,12 @@ export class AppDatabase {
         return await this.db.getAll(PATIENTS)
     }
 
-    async saveEnrollments(enrollments) {
+    async saveEnrollments(enrollments, enrollmentType) {
         const enrollmentsList = enrollments || [];
-        const patients = enrollmentsList.map((item, index) => this.db.put(PATIENTS, item));
+        const patients = enrollmentsList.map((item, index) => {
+            item.enrollmentType = enrollmentType;
+            return this.db.put(PATIENTS, item)
+        });
         return Promise.all(patients)
     }
 
@@ -194,9 +196,10 @@ export class AppDatabase {
             walkEnrollment.code = Date.now().toString()
             const programId = getSelectedProgramId()
             walkEnrollment.programId = programId
-            await this.saveEnrollments([walkEnrollment])
+            await this.saveEnrollments([walkEnrollment],ENROLLMENT_TYPES.WALK_IN)
             const queue = {
                 enrollCode: walkEnrollment.code,
+                enrollmentType: ENROLLMENT_TYPES.WALK_IN,
                 mobileNumber: walkEnrollment.phone,
                 previousForm: "Payment Mode",
                 name: walkEnrollment.name,
@@ -275,6 +278,27 @@ export class AppDatabase {
 
     async getFacilitySchedule() {
         return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+    }
+
+    async getCurrentAppointmentSlot() {
+        let currentSlot = {};
+        const today = new Date();
+        const currentDay = weekdays[today.getDay()];
+        const currentTime = today.getTime();
+        await appIndexDb.getFacilitySchedule()
+            .then((scheduleResponse) => {
+                const appointmentSchedules = scheduleResponse["appointmentSchedule"];
+                if (appointmentSchedules) {
+                    appointmentSchedules.forEach(as => {
+                        let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.startTime.split(":")[0], as.startTime.split(":")[1]).getTime();
+                        let endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.endTime.split(":")[0], as.endTime.split(":")[1]).getTime();
+                        if (as.days.map(d => d.day).includes(currentDay) && currentTime >= startTime && currentTime <= endTime) {
+                            currentSlot = as
+                        }
+                    })
+                }
+            });
+        return currentSlot
     }
 
     async saveFacilitySchedule(facilitySchedule) {
