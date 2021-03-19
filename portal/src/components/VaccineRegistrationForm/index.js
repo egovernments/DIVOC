@@ -4,11 +4,13 @@ import regStyles from "../VaccineRegistration/VaccineRegistration.module.css"
 import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
 import { Col, Form } from "react-bootstrap";
+import {useSelector} from "react-redux";
 
 function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
 
     const [formData, setFormData] = useState(transformToFormData(vaccine));
     const [validationErrors, setValidationErrors] = useState();
+    const currency = useSelector(state => state.flagr.appConfig.currency);
 
     function transformToFormData(vaccine) {
         const data = {...vaccine};
@@ -148,7 +150,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
             </Form.Group>
             <Form.Group>
                 <Form.Label>
-                    {schema.properties.price.title}*
+                    {schema.properties.price.title} ({currency})*
                     {validationErrors?.price && <p className={styles["error-message"]}>{validationErrors.price}</p>}
                 </Form.Label>
                 <Form.Control type="number" defaultValue={formData.price} name="price" onChange={handleChange}/>
