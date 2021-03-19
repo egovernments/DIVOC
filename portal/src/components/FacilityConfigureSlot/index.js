@@ -7,13 +7,15 @@ import {CheckboxItem} from "../FacilityFilterTab";
 import {useHistory} from "react-router-dom";
 import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
-import {API_URL} from "../../utils/constants";
+import {API_URL, CONSTANTS} from "../../utils/constants";
 import {
     INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
     INVALID_SLOT_TIME,
     INVALID_TIME,
     SCHEDULE_WITH_NO_DAYS_SELECTED
 } from "./error-constants";
+import DeleteIcon from "../../assets/img/icon-delete.svg";
+import AddIcon from "../../assets/img/add-admin.svg";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const APPOINTMENT_SCHEDULE = "appointmentSchedule";
@@ -316,7 +318,7 @@ export default function FacilityConfigureSlot ({location}) {
             </Row>
             <div className="config-slot">
                 <Row>
-                    <Col className="col-3"><p style={{fontSize: "large", fontWeight: 900}}>Vaccination Days</p></Col>
+                    <Col className="col-4"><p style={{fontSize: "large", fontWeight: 900}}>Vaccination Days</p></Col>
                     {DAYS.map(d =>
                         <Col key={d}>
                             <Button className={(selectedDays && selectedDays.includes(d) ? "selected-slot-day" : "ignored-slot-day")}
@@ -331,7 +333,7 @@ export default function FacilityConfigureSlot ({location}) {
                 <hr className="mt-0"/>
                 <div>
                     <Row>
-                        <Col className="col-3">
+                        <Col className="col-4">
                             <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
                                 Appointment Scheduler
                             </p>
@@ -340,7 +342,7 @@ export default function FacilityConfigureSlot ({location}) {
                                 Maximum number of appointments allowed
                         </Col>
                     </Row>
-                    <div>
+                    <div className="pt-3">
                         {
                             appointmentSchedules.length > 0 &&
                                 appointmentSchedules.map((schedule, i) =>
@@ -350,12 +352,12 @@ export default function FacilityConfigureSlot ({location}) {
                                                             deleteHandler={deleteHandler}
                                     />)
                         }
-                        <button onClick={addScheduleHandler}>ADD</button>
+                        <img className="addIcon" alt={""} src={AddIcon} width={30} onClick={addScheduleHandler}/>
                     </div>
                 </div>
                 <div className="mt-4">
                     <Row>
-                        <Col className="col-3">
+                        <Col className="col-4">
                             <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Walk-in Scheduler</p>
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}} >
@@ -424,13 +426,10 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     }
 
     return (
-        <Row>
-            <Col className="col-3 timings-div">
+        <Row className="mb-2">
+            <Col className="col-4 timings-div" style={schedule.index === 0 ? {marginRight: "0%"}: {}}>
                 <Row>
-                    <Col className="mt-0">
-                        <label className="mb-0" htmlFor="startTime">
-                            From
-                        </label>
+                    <Col>
                         <input
                             className="form-control"
                             defaultValue={schedule.startTime}
@@ -442,10 +441,10 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                             {errors[schedule.scheduleType + schedule.index+"startTime"]}
                         </div>
                     </Col>
-                    <Col className="mt-0">
-                        <label className="mb-0" htmlFor="endTime">
-                            To
-                        </label>
+                    <Col className="p-1 flex-grow-0">
+                        to
+                    </Col>
+                    <Col>
                         <input
                             className="form-control"
                             defaultValue={schedule.endTime}
@@ -453,18 +452,20 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                             name="endTime"
                             onChange={(evt) => onValueChange(evt, "endTime")}
                             required/>
-                        <button onClick={() => deleteHandler(schedule.index)}>DELETE</button>
                         <div className="invalid-input">
                             {errors[schedule.scheduleType + schedule.index+"endTime"]}
                         </div>
                     </Col>
+                    {schedule.index !== 0 && <Col className="m-0 p-1 flex-grow-0">
+                        <img alt={""} style={{cursor:"pointer"}} src={DeleteIcon} width={30}
+                             onClick={() => deleteHandler(schedule.index)}/>
+                    </Col>}
                 </Row>
             </Col>
             {
                 DAYS.map(d =>
                     <Col key={d}>
                         <input
-                            style={{marginTop: "19px"}}
                             className="form-control"
                             value={getMaxAppointments(d)}
                             disabled={!selectedDays.includes(d)}
@@ -496,12 +497,9 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
 
     return (
         <Row>
-            <Col className="col-3 timings-div">
+            <Col className="col-4 timings-div" style={{width: "93%"}}>
                 <Row>
-                    <Col className="mt-0">
-                        <label className="mt-0" htmlFor="startTime">
-                            From
-                        </label>
+                    <Col>
                         <input
                             className="form-control"
                             defaultValue={schedule.startTime}
@@ -513,10 +511,10 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                             {errors[schedule.scheduleType + schedule.index+"startTime"]}
                         </div>
                     </Col>
-                    <Col className="mt-0">
-                        <label className="mt-0" htmlFor="endTime">
-                            To
-                        </label>
+                    <Col className="p-1 flex-grow-0">
+                        to
+                    </Col>
+                    <Col>
                         <input
                             className="form-control"
                             defaultValue={schedule.endTime}
@@ -532,7 +530,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
             </Col>
             {
                 DAYS.map(d =>
-                    <Col style={{marginTop: "31px"}}  key={d}>
+                    <Col key={d} style={{marginTop:"1%"}}>
                         <CheckboxItem
                             checkedColor={"#5C9EF8"}
                             text={d}
