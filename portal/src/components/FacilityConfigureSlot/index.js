@@ -7,7 +7,7 @@ import {CheckboxItem} from "../FacilityFilterTab";
 import {useHistory} from "react-router-dom";
 import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
-import {API_URL, CONSTANTS} from "../../utils/constants";
+import {API_URL} from "../../utils/constants";
 import {
     INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
     INVALID_SLOT_TIME,
@@ -70,7 +70,7 @@ export default function FacilityConfigureSlot ({location}) {
                 {
                     startTime: "",
                     endTime: "",
-                    days: [selectedDays.map(day => ({day}))],
+                    days: selectedDays.map(day => day),
                     scheduleType: WALKIN_SCHEDULE,
                     edited: false
                 }
@@ -201,10 +201,10 @@ export default function FacilityConfigureSlot ({location}) {
                     }
                 } else {
                     for (let i = 0; i < schedule.index; i++) {
-                        if(schedule.startTime && appointmentSchedules[i].startTime &&
-                            timeToNumber(schedule.startTime) > timeToNumber(appointmentSchedules[i].startTime)) {
+                        if(schedule.startTime && appointmentSchedules[i].endTime &&
+                            timeToNumber(schedule.startTime) < timeToNumber(appointmentSchedules[i].endTime)) {
                             err = {...err,
-                                [schedule.scheduleType + schedule.index + "endTime"]: INVALID_SLOT_TIME};
+                                [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME};
                         }
                     }
                 }
@@ -215,7 +215,7 @@ export default function FacilityConfigureSlot ({location}) {
                         ...err,
                         [schedule.scheduleType + schedule.index + "endTime"]: SCHEDULE_WITH_NO_DAYS_SELECTED
                     }
-                } else if (schedule.days.filter(d => d.maxAppointments).length !== schedule.days.length) {
+                } else {
                     schedule.days.forEach(d => {
                         if (d.maxAppointments === undefined || d.maxAppointments < 0) {
                             err = {
@@ -287,7 +287,7 @@ export default function FacilityConfigureSlot ({location}) {
         const newSchedule = {
             startTime: "",
                 endTime: "",
-            days: [],
+            days: selectedDays.map(day => ({day})),
             scheduleType: APPOINTMENT_SCHEDULE,
             edited: false,
             index: appointmentSchedules.length
@@ -409,17 +409,15 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     function onMaxAppointmentsChange(evt, day) {
         let value = parseInt(evt.target.value);
         if (schedule.scheduleType === APPOINTMENT_SCHEDULE) {
-            // assuming only one row
             let newSchedule = {...schedule, edited: true};
-            if (schedule.days.map(d => d.day).includes(day)) {
-                newSchedule.days = schedule.days.map(d => {
+            if (newSchedule.days.map(d => d.day).includes(day)) {
+                newSchedule.days.forEach(d => {
                     if (d.day === day) {
                         d.maxAppointments = value
                     }
-                    return d
                 });
             } else {
-                newSchedule.days = schedule.days.concat({ "day": day, maxAppointments: value})
+                newSchedule.days.concat({ "day": day, maxAppointments: value})
             }
             onChange(newSchedule);
         }
@@ -427,12 +425,12 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
 
     return (
         <Row className="mb-2">
-            <Col className="col-4 timings-div" style={schedule.index === 0 ? {marginRight: "0%"}: {}}>
-                <Row>
+            <Col className="col-4 timings-div" >
+                <Row style={schedule.index === 0 ? {marginRight: "0%", width: "92.5%"}: {}}>
                     <Col>
                         <input
                             className="form-control"
-                            defaultValue={schedule.startTime}
+                            value={schedule.startTime}
                             type="time"
                             name="startTime"
                             onChange={(evt) => onValueChange(evt, "startTime")}
@@ -447,7 +445,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                     <Col>
                         <input
                             className="form-control"
-                            defaultValue={schedule.endTime}
+                            value={schedule.endTime}
                             type="time"
                             name="endTime"
                             onChange={(evt) => onValueChange(evt, "endTime")}
@@ -497,8 +495,8 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
 
     return (
         <Row>
-            <Col className="col-4 timings-div" style={{width: "93%"}}>
-                <Row>
+            <Col className="col-4 timings-div">
+                <Row style={{width: "92.5%"}}>
                     <Col>
                         <input
                             className="form-control"
