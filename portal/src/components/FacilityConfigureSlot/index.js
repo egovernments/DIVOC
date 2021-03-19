@@ -12,7 +12,7 @@ import {
     INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
     INVALID_SLOT_TIME,
     INVALID_TIME,
-    SCHEDULE_WITH_NO_DAYS_SELECTED
+    SCHEDULE_WITH_NO_DAYS_SELECTED, WALKIN_SCHEDULE_ERROR_MSG
 } from "./error-constants";
 import DeleteIcon from "../../assets/img/icon-delete.svg";
 import AddIcon from "../../assets/img/add-admin.svg";
@@ -44,6 +44,7 @@ export default function FacilityConfigureSlot ({location}) {
         ).then(res => {
             schedule = res.data;
             setFacilityProgramSchedules(schedule);
+            // TODO: Add utils to sort the schedule by startTime
             setSelectedDaysFromSchedule(schedule);
             setAppointmentSchedulesFromResponse(schedule);
             setWalkInScheduleFromSchedule(schedule);
@@ -180,35 +181,43 @@ export default function FacilityConfigureSlot ({location}) {
     }
 
     function validateSchedules() {
-        function validateSchedule(schedule) {
+        function validateStartTime(schedule, err) {
+            if (!schedule.startTime || schedule.startTime === "") {
+                err = {...err, [schedule.scheduleType + schedule.index + "startTime"]: INVALID_TIME};
+            }
+            return err;
+        }
+
+        function validateEndTime(schedule, err) {
+            if (!schedule.endTime || schedule.endTime === "") {
+                err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_TIME};
+            }
+            return err;
+        }
+
+        function validateTimeRange(schedule, err) {
             const timeToNumber = (time) => {
                 const hrMin = time.split(':');
                 return parseInt(hrMin[0] + hrMin[1])
             }
-            let err = {};
-            if (!schedule.startTime || schedule.startTime === ""){
-                err = {...err, [schedule.scheduleType + schedule.index + "startTime"]: INVALID_TIME};
-            }
-            if (!schedule.endTime || schedule.endTime === "") {
-                err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_TIME};
-            }
-
-            if(APPOINTMENT_SCHEDULE === schedule.scheduleType && schedule.startTime && schedule.endTime) {
-                if (schedule.index === 0) {
-                    if(schedule.startTime && schedule.endTime &&
-                        timeToNumber(schedule.startTime) > timeToNumber(schedule.endTime)) {
-                        err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_FIRST_SLOT_TIME};
-                    }
-                } else {
-                    for (let i = 0; i < schedule.index; i++) {
-                        if(schedule.startTime && appointmentSchedules[i].endTime &&
-                            timeToNumber(schedule.startTime) < timeToNumber(appointmentSchedules[i].endTime)) {
-                            err = {...err,
-                                [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME};
-                        }
+            if (APPOINTMENT_SCHEDULE === schedule.scheduleType && schedule.startTime && schedule.endTime) {
+                if (timeToNumber(schedule.startTime) > timeToNumber(schedule.endTime)) {
+                    err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_FIRST_SLOT_TIME};
+                }
+                if (schedule.index - 1 >= 0) {
+                    if (appointmentSchedules[schedule.index - 1].endTime &&
+                        timeToNumber(schedule.startTime) < timeToNumber(appointmentSchedules[schedule.index - 1].endTime)) {
+                        err = {
+                            ...err,
+                            [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME
+                        };
                     }
                 }
             }
+            return err;
+        }
+
+        function validateSlotFrequencyCount(schedule, err) {
             if (APPOINTMENT_SCHEDULE === schedule.scheduleType) {
                 if (!schedule.days || schedule.days.length === 0) {
                     err = {
@@ -220,15 +229,30 @@ export default function FacilityConfigureSlot ({location}) {
                         if (d.maxAppointments === undefined || d.maxAppointments < 0) {
                             err = {
                                 ...err,
-                                [schedule.scheduleType + schedule.index + d.day]:INVALID_SLOT_COUNT}
+                                [schedule.scheduleType + schedule.index + d.day]: INVALID_SLOT_COUNT
+                            }
                         }
                     })
                 }
             }
+            return err;
+        }
+
+        function validateWalkinSchedule(schedule, err) {
             if (schedule.scheduleType === WALKIN_SCHEDULE &&
                 (!schedule.days || schedule.days.length === 0)) {
-                err = {...err, [schedule.scheduleType + schedule.index+"walkInDays"]: "Please select walk-in days"}
+                err = {...err, [schedule.scheduleType + schedule.index + "walkInDays"]: WALKIN_SCHEDULE_ERROR_MSG}
             }
+            return err;
+        }
+
+        function validateSchedule(schedule) {
+            let err = {};
+            err = validateStartTime(schedule, err);
+            err = validateEndTime(schedule, err);
+            err = validateTimeRange(schedule, err);
+            err = validateSlotFrequencyCount(schedule, err);
+            err = validateWalkinSchedule(schedule, err);
             return err
         }
 
