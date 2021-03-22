@@ -70,3 +70,14 @@ func ToMap(obj interface{}) map[string]interface{}{
 func GetTomorrowStart() time.Time {
 	return time.Now().Truncate(24 * time.Hour).AddDate(0, 0, 1)
 }
+
+//Filter returns new slice with elements that fit the criteria
+func Filter(entries []string, criteria func(s string) bool) []string {
+	var res []string
+	for _, e := range entries {
+		if criteria(e) {
+			res = append(res, e)
+		}
+	}
+	return res
+}

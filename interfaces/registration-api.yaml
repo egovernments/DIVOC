@@ -93,6 +93,9 @@ paths:
         - Bearer: [ ]
       parameters:
         - in: query
+          name: programId
+          type: string
+        - in: query
           name: facilityId
           type: string
         - in: query

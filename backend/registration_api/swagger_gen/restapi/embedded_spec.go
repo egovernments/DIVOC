@@ -157,6 +157,11 @@ func init() {
         "parameters": [
           {
             "type": "string",
+            "name": "programId",
+            "in": "query"
+          },
+          {
+            "type": "string",
             "name": "facilityId",
             "in": "query"
           },
@@ -567,6 +572,11 @@ func init() {
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
+          {
+            "type": "string",
+            "name": "programId",
+            "in": "query"
+          },
           {
             "type": "string",
             "name": "facilityId",

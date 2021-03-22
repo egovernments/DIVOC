@@ -16,7 +16,7 @@ import {getCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export const Appointment = (props) => {
-    const {enrollment_code, program_id} = props.match.params;
+    const {enrollment_code, program_id: programId} = props.match.params;
     const {state} = props.location;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
@@ -110,6 +110,7 @@ export const Appointment = (props) => {
         setIsLoading(true);
         let params = {
             facilityId,
+            programId,
             pageNumber,
             pageSize
         };
@@ -157,7 +158,7 @@ export const Appointment = (props) => {
         axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
             facilitySlotId: selectedAllotment.slotKey,
-            programId: program_id,
+            programId: programId,
             // dose func is not yet configured
             dose: "1"
         }, config)

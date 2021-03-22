@@ -30,7 +30,7 @@ export const AppointmentDetails = (props) => {
         appIndexDb.getFacilitySchedule()
             .then((scheduleResponse) => {
                 setAppointmentScheduleData(scheduleResponse)
-                const appointmentSchedules = scheduleResponse["appointmentSchedule"]
+                const appointmentSchedules = scheduleResponse?.appointmentSchedule
                 if(appointmentSchedules) {
                     const morningSlot = appointmentSchedules[0].startTime + "-" + appointmentSchedules[0].endTime;
                     const afterNoonSlot = appointmentSchedules[1].startTime + "-" + appointmentSchedules[1].endTime;
@@ -75,15 +75,18 @@ export const AppointmentDetails = (props) => {
         </div>
     }
 
+
     const scheduleLabel = (schedule) => {
+        const today = new Date().toISOString().slice(0, 10);
         const dayOfToday = weekdays[new Date().getDay()]
         const scheduleDetails = schedule["days"].find((scheduleForThatDay) => scheduleForThatDay.day === dayOfToday)
         const total = scheduleDetails.maxAppointments
         const appointmentsArrays = enrollments.filter(enrollment => enrollment.appointments).map((enrollment => enrollment.appointments));
         const appointments = [].concat.apply([], appointmentsArrays)
-        const booked = appointments.filter((appointment) => appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime)
-            .length
-        // TODO: add ref key
+        const booked = appointments.filter((appointment) => 
+            (appointment.appointmentSlot === schedule.startTime + "-" + schedule.endTime) && 
+            (appointment.appointmentDate === today)
+        ).length
         return <div>
             <div className="title d-flex mb-2">
                 {getMeridiemTime(schedule.startTime)} - {getMeridiemTime(schedule.endTime)}
@@ -102,7 +105,7 @@ export const AppointmentDetails = (props) => {
         }
     }
 
-    if (isAppointmentConfiguredForToday(appointmentScheduleData["appointmentSchedule"]) && enrollments) {
+    if (isAppointmentConfiguredForToday(appointmentScheduleData?.appointmentSchedule) && enrollments) {
         const appointmentSchedule = appointmentScheduleData["appointmentSchedule"];
         const content = <div style={{marginTop: "-4%"}}>
             {appointmentSchedule.map(schedule => scheduleLabel(schedule))}
