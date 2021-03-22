@@ -3,8 +3,9 @@ package config
 import "github.com/jinzhu/configor"
 
 var EsRegistries []string
+
 func init() {
-	EsRegistries = []string{"Facility"}
+	EsRegistries = []string{"Facility", "Enrollment"}
 	print("kernel config initialization")
 	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 

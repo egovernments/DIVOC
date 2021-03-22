@@ -35,7 +35,7 @@ export function formatDate(givenDate) {
 export const getMeridiemTime = (time) => {
     const timeInNumber = parseInt(time.split(":")[0])
     if(timeInNumber >= 0 && timeInNumber <=11) {
-        return (timeInNumber <= 9 ? '0' + time : time) + " AM"
+        return time + " AM"
     } else {
         let t = timeInNumber-12 + ":" + time.split(":")[1]
         return ((timeInNumber - 12) <= 9 ? '0' + t : t) + " PM"

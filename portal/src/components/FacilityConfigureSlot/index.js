@@ -107,7 +107,7 @@ export default function FacilityConfigureSlot ({location}) {
     function setAppointmentSchedulesFromResponse(appointmentSchedulesResponse) {
         let appointmentSchedules = [];
 
-        if(appointmentSchedulesResponse.length === 0) {
+        if(appointmentSchedulesResponse.appointmentSchedule.length === 0) {
             appointmentSchedules.push({
                 startTime: "",
                 endTime: "",
@@ -450,7 +450,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     return (
         <Row className="mb-2">
             <Col className="col-4 timings-div" >
-                <Row style={schedule.index === 0 ? {marginRight: "0%", width: "41em"}: {}}>
+                <Row style={schedule.index === 0 ? {marginRight: "0%", width: "92.5%"}: {}}>
                     <Col>
                         <input
                             className="form-control"
