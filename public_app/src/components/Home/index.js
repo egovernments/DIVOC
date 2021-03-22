@@ -62,6 +62,7 @@ export const Home = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
     const [mobileNumber, setMobileNumber] = useState('');
+    const [mobileNumberErr, setMobileNumberErr] = useState('');
     const [programs, setPrograms] = useState([]);
 
     useEffect(() => {
@@ -85,10 +86,14 @@ export const Home = () => {
   }
 
     function buttonLoginOnClick() {
-        history.push({
-            pathname: '/citizen',
-            state: {mobileNumber}
-        })
+        if (mobileNumber.length < 10 || isNaN(mobileNumber)) {
+            setMobileNumberErr("* Invalid mobile number")
+        } else {
+            history.push({
+                pathname: '/citizen',
+                state: {mobileNumber}
+            })
+        }
     }
 
     return (
@@ -106,8 +111,11 @@ export const Home = () => {
                                        value={mobileNumber}
                                        maxLength={10}
                                 />
-                                <div className="info-input">
+                                <div hidden={mobileNumberErr} className="info-input">
                                     <p>An OTP will be sent to you for verification</p>
+                                </div>
+                                <div className="invalid-input">
+                                    <p>{mobileNumberErr}</p>
                                 </div>
                                 <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>Log In</CustomButton>
                             </Col>
