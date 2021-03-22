@@ -1,5 +1,5 @@
 export const INVALID_TIME = "Enter time";
-export const INVALID_FIRST_SLOT_TIME = "From time should be less than To time";
+export const INVALID_FIRST_SLOT_TIME = "From time should be less than to time";
 export const INVALID_SLOT_TIME = "Overlap time";
 export const INVALID_SLOT_COUNT = "Enter 0 or more";
 export const SCHEDULE_WITH_NO_DAYS_SELECTED = "Select at least one day for this schedule";
