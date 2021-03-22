@@ -156,8 +156,8 @@ export const SelectComorbidity = ({}) => {
                                 {errors.yob}
                             </div>
                         </div>
-                        <div className="d-flex flex-column align-items-start"
-                             hidden={!conditions || conditions.length === 0}>
+                        <div hidden={!conditions || conditions.length === 0}>
+                        <div className="d-flex flex-column align-items-start">
                             <label className="custom-text-label required text-left mt-2" htmlFor="yearSelect">Does the
                                 beneficiary have any of the following comorbidities?</label>
                             <div className="d-flex">
@@ -193,6 +193,7 @@ export const SelectComorbidity = ({}) => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                     <div className="pb-3">

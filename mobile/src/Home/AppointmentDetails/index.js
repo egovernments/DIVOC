@@ -32,22 +32,16 @@ export const AppointmentDetails = (props) => {
                 setAppointmentScheduleData(scheduleResponse)
                 const appointmentSchedules = scheduleResponse?.appointmentSchedule
                 if(appointmentSchedules) {
-                    const morningSlot = appointmentSchedules[0].startTime + "-" + appointmentSchedules[0].endTime;
-                    const afterNoonSlot = appointmentSchedules[1].startTime + "-" + appointmentSchedules[1].endTime;
-                    appIndexDb.getCompletedCountForAppointmentBookedBeneficiaries(morningSlot)
-                        .then(count => setBeneficiaryCompletedStatus((prevState => {
-                            return {
-                                ...prevState,
-                                [morningSlot]: count
-                            }
-                        })))
-                    appIndexDb.getCompletedCountForAppointmentBookedBeneficiaries(afterNoonSlot)
-                        .then(count => setBeneficiaryCompletedStatus((prevState => {
-                            return {
-                                ...prevState,
-                                [afterNoonSlot]: count
-                            }
-                        })))
+                    appointmentSchedules.forEach(schedule => {
+                        const slot = schedule.startTime + "-" + schedule.endTime;
+                        appIndexDb.getCompletedCountForAppointmentBookedBeneficiaries(slot)
+                            .then(count => setBeneficiaryCompletedStatus((prevState => {
+                                return {
+                                    ...prevState,
+                                    [slot]: count
+                                }
+                            })))
+                    })
                 }
             });
         appIndexDb.getAllEnrollments()
