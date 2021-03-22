@@ -30,3 +30,8 @@
     background: #ecf2f5 0% 0% no-repeat padding-box;
     border-color: #ecf2f5;
 }
+
+.addIcon {
+    cursor: pointer;
+    margin-left: 1%
+}

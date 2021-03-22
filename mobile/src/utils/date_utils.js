@@ -38,7 +38,7 @@ export const getMeridiemTime = (time) => {
         return time + " AM"
     } else {
         let t = timeInNumber-12 + ":" + time.split(":")[1]
-        return t + " PM"
+        return ((timeInNumber - 12) <= 9 ? '0' + t : t) + " PM"
     }
 }
 
