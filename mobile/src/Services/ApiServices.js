@@ -24,12 +24,14 @@ export class ApiServices {
             .then(response => response.json())
     }
 
-    static async fetchPreEnrollments() {
+    static async fetchPreEnrollments(date=new Date()) {
+        const qParams = new URLSearchParams();
+        qParams.set("date", date.toISOString().slice(0, 10));
         const requestOptions = {
             method: 'GET',
             headers: {'accept': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem("token")}
         };
-        return fetch(PRE_ENROLLMENT, requestOptions)
+        return fetch(PRE_ENROLLMENT + `?${qParams.toString()}`, requestOptions)
             .then(response => response.json())
     }
 
