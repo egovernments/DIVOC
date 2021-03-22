@@ -450,7 +450,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     return (
         <Row className="mb-2">
             <Col className="col-4 timings-div" >
-                <Row style={schedule.index === 0 ? {marginRight: "0%", width: "92.5%"}: {}}>
+                <Row style={schedule.index === 0 ? {marginRight: "0%", width: "41em"}: {}}>
                     <Col>
                         <input
                             className="form-control"
