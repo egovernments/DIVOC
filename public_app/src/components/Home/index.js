@@ -45,7 +45,7 @@ const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassN
 const InfoCard = ({img, title, subtitle}) => (
     <Col lg={3} md={6} sm={12} className="pt-3">
         <Row className="justify-content-center">
-            <Col className="col-2 pt-2 pb-2" style={{backgroundColor:"#ffffff", maxHeight:"7vh" }}>
+            <Col className="col-2 pt-2 pb-2" style={{backgroundColor:"#ffffff", maxHeight:"45px", maxWidth:"55px" }}>
                 <div>
                  { img }
                 </div>
@@ -62,6 +62,7 @@ export const Home = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
     const [mobileNumber, setMobileNumber] = useState('');
+    const [mobileNumberErr, setMobileNumberErr] = useState('');
     const [programs, setPrograms] = useState([]);
 
     useEffect(() => {
@@ -85,10 +86,14 @@ export const Home = () => {
   }
 
     function buttonLoginOnClick() {
-        history.push({
-            pathname: '/citizen',
-            state: {mobileNumber}
-        })
+        if (mobileNumber.length < 10 || isNaN(mobileNumber)) {
+            setMobileNumberErr("* Invalid mobile number")
+        } else {
+            history.push({
+                pathname: '/citizen',
+                state: {mobileNumber}
+            })
+        }
     }
 
     return (
@@ -97,7 +102,7 @@ export const Home = () => {
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
-                            <Col style={{paddingRight:"10vh", paddingLeft:"10vh"}}>
+                            <Col style={{paddingRight:"10vmin", paddingLeft:"10vmin"}}>
                                 <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
                                 <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
                                 <input placeholder="Enter mobile number"
@@ -106,13 +111,16 @@ export const Home = () => {
                                        value={mobileNumber}
                                        maxLength={10}
                                 />
-                                <div className="info-input">
+                                <div hidden={mobileNumberErr} className="info-input">
                                     <p>An OTP will be sent to you for verification</p>
+                                </div>
+                                <div className="invalid-input">
+                                    <p>{mobileNumberErr}</p>
                                 </div>
                                 <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>Log In</CustomButton>
                             </Col>
                             <Col>
-                                <img src={GetVaccinatedImg} alt={""} style={{height:"60vh"}}/>
+                                <img className="vaccinate-img" src={GetVaccinatedImg} alt={""} />
                             </Col>
                         </Row>
                     </div>
@@ -121,7 +129,7 @@ export const Home = () => {
             <div className="section ">
                 <div className="info-section d-flex flex-column" style={{height: "100%"}}>
                     <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
-                        <Row className="d-flex justify-content-center mb-3">
+                        <Row className="d-flex justify-content-center">
                             <InfoCard img={<img src={enterMobileImg} alt={""}/>}
                                       title={"Enter Mobile"}
                                       subtitle={"Verify your mobile number"}

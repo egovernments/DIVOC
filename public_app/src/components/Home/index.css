@@ -1,4 +1,6 @@
 .home-section {
+    max-width: 1300px;
+    margin: auto !important;
 }
 
 .home-section .section .title{
@@ -239,4 +241,12 @@
         padding: 0.5rem 1rem;
         font-size: 12px;
     }
+}
+
+.vaccinate-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1rem;
+    width: 60vmin;
 }
