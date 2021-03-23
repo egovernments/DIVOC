@@ -19,7 +19,9 @@ import {
     NATIONAL_ID_ERROR_MSG,
     NATIONAL_ID_TYPE_ERROR_MSG,
     PINCODE_ERROR_MESSAGE,
-    STATE_ERROR_MSG
+    STATE_ERROR_MSG,
+    DUPLICATE_NAME_YOB,
+    DUPLICATE_NATIONAL_ID_ERR_MSG
 } from "./error-constants";
 import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../../utils/validations";
 import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} from "../../../utils/national-id";
@@ -36,7 +38,7 @@ const GENDERS = [
 const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
 const RESPONSIVE_ROW_DIV_CLASS = "p-0 pt-2 col-lg-6 col-md-6 col-sm-12";
 
-export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails}) => {
+export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails, members}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
 
     const { previous, next } = navigation;
@@ -58,6 +60,11 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
                 errors.aadhaar = AADHAAR_ERROR_MESSAGE
             }
         }
+
+        if (members.filter(m => m.nationalId == formData.nationalId).length > 0) {
+            errors.nationalID = DUPLICATE_NATIONAL_ID_ERR_MSG
+        }
+
         if(!formData.name) {
             errors.name = NAME_ERROR_MSG
         } else if (formData.name.length < 2){
@@ -67,6 +74,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         } else {
             if(!isValidName(formData.name)) {
                 errors.name = INVALID_NAME_ERR_MSG
+            } else if (members.filter(m => (m.name == formData.name) && (m.yob == formData.yob)).length > 0) {
+                errors.name = DUPLICATE_NAME_YOB;
             }
         }
         if(!formData.state) {
