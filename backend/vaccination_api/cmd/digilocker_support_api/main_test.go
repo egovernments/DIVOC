@@ -145,11 +145,11 @@ func Test_isCertificatePresent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := isCertificatePresentInCertificatesForGivenDose(tt.args.certs, tt.args.dose)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("isCertificatePresent() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := isCertificatePresentInCertificatesForGivenDose(tt.args.certs, tt.args.dose)
+			//if (err != nil) != tt.wantErr {
+			//	t.Errorf("isCertificatePresent() error = %v, wantErr %v", err, tt.wantErr)
+			//	return
+			//}
 			if got != tt.want {
 				t.Errorf("isCertificatePresent() got = %v, want %v", got, tt.want)
 			}

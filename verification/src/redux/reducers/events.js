@@ -8,6 +8,7 @@ export const EVENT_TYPES = {
     CERTIFICATE_DOWNLOAD: "certificate-download",
     VALID_VERIFICATION: "valid-verification",
     INVALID_VERIFICATION: "invalid-verification",
+    REVOKED_CERTIFICATE: "revoked-certificate",
 };
 const initialState = {
     data: [],

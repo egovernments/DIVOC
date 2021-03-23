@@ -98,17 +98,20 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 });
                 alert(JSON.stringify(result));
                 if (result.verified) {
-                    console.log('Signature verified.');
-                    setValid(true);
-                    setData(signedJSON);
-                    dispatch(addEventAction({
-                        type: EVENT_TYPES.VALID_VERIFICATION,
-                        extra: signedJSON.credentialSubject
-                    }));
-                } else {
-                    dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
-                    setValid(false);
+                    const revokedResponse = await checkIfRevokedCertificate(signedJSON)
+                    if (revokedResponse.response.status === 404) {
+                        console.log('Signature verified.');
+                        setValid(true);
+                        setData(signedJSON);
+                        dispatch(addEventAction({
+                            type: EVENT_TYPES.VALID_VERIFICATION,
+                            extra: signedJSON.credentialSubject
+                        }));
+                        return;
+                    }
                 }
+                dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
+                setValid(false);
             } catch (e) {
                 console.log('Invalid data', e);
                 setValid(false);
@@ -121,6 +124,18 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         verifyData()
 
     }, []);
+
+    async function checkIfRevokedCertificate(data) {
+        return axios
+            .post("/divoc/api/v1/certificate/revoked", data)
+            .then((res) => {
+                dispatch(addEventAction({type: EVENT_TYPES.REVOKED_CERTIFICATE, extra: certificateData}));
+                return res
+            }).catch((e) => {
+                console.log(e);
+                return e
+            });
+    }
     return (
         <div className="certificate-status-wrapper">
             <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
