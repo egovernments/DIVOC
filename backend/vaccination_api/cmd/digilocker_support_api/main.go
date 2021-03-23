@@ -10,6 +10,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
@@ -507,7 +508,7 @@ func getSignedJson(preEnrollmentCode string) (string, error) {
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		certificateArr = sortCertificatesByCreateAt(certificateArr)
+		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})

@@ -58,7 +58,8 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           throw Error("Required parameters not available")
         }
         const isSigned = await redis.checkIfKeyExists(`${preEnrollmentCode}-${currentDose}`);
-        if (!isSigned) {
+        const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], jsonMessage);
+        if (!isSigned || isUpdateRequest) {
           redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {

@@ -76,6 +76,7 @@ var Config = struct {
 		Upload struct {
 			Columns string `yaml:"columns"`
 		}
+		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"1"`
 	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`
