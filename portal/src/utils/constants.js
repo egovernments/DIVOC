@@ -42,3 +42,12 @@ export class SampleCSV {
     static PRE_ENROLLMENT = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/enrollments.csv"
     static BULK_CERTIFY = "https://raw.githubusercontent.com/egovernments/DIVOC/main/interfaces/certificates.csv"
 }
+
+export const TAB_INDICES = {
+    facilityAdmin: {
+        uploadVaccinationDetails: 0,
+        roleSetup: 1,
+        vaccinatorDetails: 2,
+        programOverview: 3
+    }
+}
