@@ -7,9 +7,9 @@ const FLAGR_ACTION_TYPES = {
 const initialState = {
     appConfig: {
         "applicationLogo": "",
-        "currency": "INR",
-        "countryCode": "+91",
-        "countryName": "India",
+        "currency": "BIRR",
+        "countryCode": "+251",
+        "countryName": "Ethiopia",
         "stateAndDistricts": state_and_districts
     }
 };
