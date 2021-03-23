@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	eventsModel "github.com/divoc/api/pkg/models"
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"strings"
 	"time"
@@ -28,6 +29,7 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
+	kernelService "github.com/divoc/kernel_library/services"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -55,6 +57,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
+	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 }
 
 type GenericResponse struct {
@@ -390,4 +393,39 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 		})
 	}
 	return NewGenericServerError()
+}
+
+func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams) middleware.Responder {
+	typeId := "RevokedCertificate"
+	if body, ok := params.Body.(map[string]interface{}); ok {
+		if credentialSubject, ok := body["credentialSubject"].(map[string]interface{}); ok {
+			preEnrollmentCode := credentialSubject["refId"]
+			if evidence, ok := body["evidence"].([]interface{}); ok {
+				if certificateInfo, ok := evidence[0].(map[string]interface{}); ok {
+					certificateId := certificateInfo["certificateId"]
+					dose := certificateInfo["dose"]
+					filter := map[string]interface{}{
+						"certificateId": map[string]interface{}{
+							"eq": certificateId,
+						},
+						"dose": map[string]interface{}{
+							"eq": dose,
+						},
+						"preEnrollmentCode": map[string]interface{}{
+							"eq": preEnrollmentCode,
+						},
+					}
+					if resp, err := kernelService.QueryRegistry(typeId,filter); err == nil {
+						if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+							if len(revokedCertificates) > 0 {
+								return certificate_revoked.NewCertificateRevokedOK()
+							}
+							return certificate_revoked.NewCertificateRevokedNotFound()
+						}
+					}
+				}
+			}
+		}
+	}
+	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
