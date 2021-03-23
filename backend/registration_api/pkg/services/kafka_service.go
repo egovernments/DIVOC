@@ -79,7 +79,7 @@ func PublishEnrollmentMessage(enrollment []byte) {
 	enrollmentMessages <- enrollment
 }
 
-func PublishEnrollmentACK(rowID uint, vaccinationDetails []byte, enrollmentType string, e error) {
+func PublishEnrollmentACK(enrollmentPayload EnrollmentPayload, e error) {
 	var errMsg string
 	if e != nil {
 		errMsg = e.Error()
@@ -90,9 +90,9 @@ func PublishEnrollmentACK(rowID uint, vaccinationDetails []byte, enrollmentType 
 		EnrollmentType     string `json:"enrollmentType"`
 		VaccinationDetails []byte `json:"vaccinationDetails"`
 	}{
-		RowID:              rowID,
-		VaccinationDetails: vaccinationDetails,
-		EnrollmentType:     enrollmentType,
+		RowID:              enrollmentPayload.RowID,
+		VaccinationDetails: enrollmentPayload.VaccinationDetails,
+		EnrollmentType:     enrollmentPayload.EnrollmentType,
 		ErrMsg:             errMsg,
 	})
 	enrollmentACKMessages <- msg
