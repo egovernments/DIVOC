@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../../utils/cookies";
@@ -12,6 +12,12 @@ export function CitizenLoginComponent(props) {
         invalidOTP: "",
         invalidMobileNumber: ""
     });
+
+    useEffect(() => {
+        if (props.location.state && props.location.state.mobileNumber) {
+            getOTPHandler()
+        }
+    }, [])
 
     const setMobileNumber = (event) => {
         setState((prevState)=>{

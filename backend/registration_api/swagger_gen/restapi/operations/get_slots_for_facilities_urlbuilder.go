@@ -18,6 +18,7 @@ type GetSlotsForFacilitiesURL struct {
 	FacilityID *string
 	PageNumber *int64
 	PageSize   *int64
+	ProgramID  *string
 
 	_basePath string
 	// avoid unkeyed usage
@@ -75,6 +76,14 @@ func (o *GetSlotsForFacilitiesURL) Build() (*url.URL, error) {
 	}
 	if pageSizeQ != "" {
 		qs.Set("pageSize", pageSizeQ)
+	}
+
+	var programIDQ string
+	if o.ProgramID != nil {
+		programIDQ = *o.ProgramID
+	}
+	if programIDQ != "" {
+		qs.Set("programId", programIDQ)
 	}
 
 	_result.RawQuery = qs.Encode()

@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/divoc/kernel_library/model"
@@ -264,6 +265,11 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 	offset := (*params.PageNumber) * (*params.PageSize)
 	tomorrowStart := fmt.Sprintf("%d", utils.GetTomorrowStart().Unix())
 	slotKeys, err := services.GetValuesByScoreFromSet(*params.FacilityID, tomorrowStart, "inf", *params.PageSize, offset)
+	if params.ProgramID != nil {
+		slotKeys = utils.Filter(slotKeys, func(s string) bool {
+			return strings.Contains(s, *params.ProgramID)
+		})
+	}
 	if err == nil && len(slotKeys) > 0 {
 		slotsAvailable, err := services.GetValues(slotKeys...)
 		if err == nil {

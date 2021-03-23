@@ -126,7 +126,6 @@ func CreateNewRegistry(requestMap interface{}, objectId string) (RegistryRespons
 }
 
 func registryUrl(operationId string, entityId string) string {
-	log.Info("Inside url creator....")
 	for _, id := range config.EsRegistries {
 		if id == entityId {
 			return config.Config.Registry.UrlForES + "/" + operationId

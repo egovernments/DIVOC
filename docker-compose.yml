@@ -45,7 +45,7 @@ services:
   registry:
     image: dockerhub/registry-es
     environment:
-      - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
+      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
     ports:
