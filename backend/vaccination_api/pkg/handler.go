@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	eventsModel "github.com/divoc/api/pkg/models"
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"sort"
 	"strings"
@@ -57,6 +58,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
+	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -470,6 +472,51 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 		})
 	}
 	return NewGenericServerError()
+}
+
+func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams) middleware.Responder {
+	typeId := "RevokedCertificate"
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		log.Printf("JSON marshalling error %v", err)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+
+	var certificate eventsModel.Certificate
+	err = json.Unmarshal(requestBody, &certificate)
+	if err != nil {
+		log.Printf("Error while converting requestBody to Certificate object %v", err)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+	if len(certificate.Evidence) == 0 {
+		log.Printf("Error while getting Evidence array in requestBody %v", certificate)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+
+	preEnrollmentCode := certificate.CredentialSubject.RefId
+	certificateId := certificate.Evidence[0].CertificateId
+	dose := certificate.Evidence[0].Dose
+
+	filter := map[string]interface{}{
+		"certificateId": map[string]interface{}{
+			"eq": certificateId,
+		},
+		"dose": map[string]interface{}{
+			"eq": dose,
+		},
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if resp, err := services.QueryRegistry(typeId,filter); err == nil {
+		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+			if len(revokedCertificates) > 0 {
+				return certificate_revoked.NewCertificateRevokedOK()
+			}
+			return certificate_revoked.NewCertificateRevokedNotFound()
+		}
+	}
+	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
 
 

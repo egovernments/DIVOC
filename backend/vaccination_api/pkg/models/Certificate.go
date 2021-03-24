@@ -38,6 +38,7 @@ type Certificate struct {
 		Date           time.Time `json:"date"`
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
+		CertificateId  string    `json:"certificateId"`
 		Dose           int       `json:"dose"`
 		TotalDoses     int       `json:"totalDoses"`
 		Verifier       struct {

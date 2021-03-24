@@ -114,6 +114,37 @@ func init() {
         }
       }
     },
+    "/v1/certificate/revoked": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certificateRevoked"
+        ],
+        "summary": "Check if given certificate is revoked",
+        "operationId": "certificateRevoked",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found in revocation list"
+          }
+        }
+      }
+    },
     "/v1/certificate": {
       "put": {
         "description": "Update existing certificate if all checks are passed",
@@ -1279,6 +1310,37 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/certificate/revoked": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certificateRevoked"
+        ],
+        "summary": "Check if given certificate is revoked",
+        "operationId": "certificateRevoked",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found in revocation list"
           }
         }
       }

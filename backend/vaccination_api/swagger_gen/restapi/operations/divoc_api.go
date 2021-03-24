@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/swag"
 
 	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
@@ -63,6 +64,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.BulkCertify has not yet been implemented")
+		}),
+		CertificateRevokedCertificateRevokedHandler: certificate_revoked.CertificateRevokedHandlerFunc(func(params certificate_revoked.CertificateRevokedParams) middleware.Responder {
+			return middleware.NotImplemented("operation certificate_revoked.CertificateRevoked has not yet been implemented")
 		}),
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
@@ -167,6 +171,8 @@ type DivocAPI struct {
 	IdentityPostV1IdentityVerifyHandler identity.PostV1IdentityVerifyHandler
 	// CertificationBulkCertifyHandler sets the operation handler for the bulk certify operation
 	CertificationBulkCertifyHandler certification.BulkCertifyHandler
+	// CertificateRevokedCertificateRevokedHandler sets the operation handler for the certificate revoked operation
+	CertificateRevokedCertificateRevokedHandler certificate_revoked.CertificateRevokedHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
 	// CertificationCertifyV2Handler sets the operation handler for the certify v2 operation
@@ -291,6 +297,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationBulkCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.BulkCertifyHandler")
+	}
+	if o.CertificateRevokedCertificateRevokedHandler == nil {
+		unregistered = append(unregistered, "certificate_revoked.CertificateRevokedHandler")
 	}
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
@@ -453,6 +462,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/v1/bulkCertify"] = certification.NewBulkCertify(o.context, o.CertificationBulkCertifyHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v1/certificate/revoked"] = certificate_revoked.NewCertificateRevoked(o.context, o.CertificateRevokedCertificateRevokedHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

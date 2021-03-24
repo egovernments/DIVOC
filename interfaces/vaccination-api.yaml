@@ -122,6 +122,26 @@ paths:
       responses:
         '200':
           description: OK
+  /v1/certificate/revoked:
+    post:
+      tags:
+        - certificateRevoked
+      summary: Check if given certificate is revoked
+      operationId: certificateRevoked
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: certificate not found in revocation list
+        '400':
+          description: Invalid input
   /v1/bulkCertify:
     post:
       tags:
