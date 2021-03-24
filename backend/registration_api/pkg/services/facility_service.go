@@ -75,7 +75,7 @@ func GetActiveProgramDates() (map[string]TimeInterval, error) {
 		},
 	}
 
-	programsResp, err := services.QueryRegistry(Program, filter, -1, 0)
+	programsResp, err := services.QueryRegistry(Program, filter, 100, 0)
 	if err != nil {
 		log.Errorf("Error fetching Programs [%s]", err.Error())
 		return nil, err
