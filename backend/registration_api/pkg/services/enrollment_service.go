@@ -3,6 +3,10 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"text/template"
+
+	errors2 "github.com/pkg/errors"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
@@ -10,7 +14,6 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
-	"text/template"
 )
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
@@ -178,6 +181,52 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 		return err
 	}
 	return nil
+}
+
+func ValidateEnrollment(enrollmentPayload EnrollmentPayload) error {
+	enrollmentArr, err := FetchEnrollments(enrollmentPayload.Phone)
+	if err != nil {
+		return err
+	}
+	var enrollments []models.Enrollment
+	if err := json.Unmarshal(enrollmentArr, &enrollments); err != nil {
+		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+		return err
+	}
+	if duplicates := FilterEnrollments(enrollments, func(e models.Enrollment) bool {
+		return (e.Name == enrollmentPayload.Name && e.Yob == enrollmentPayload.Yob) || (*e.NationalID == *enrollmentPayload.NationalID)
+	}); len(duplicates) > 0 {
+		return errors2.New("Enrollment with same details [Name-YOB or national ID] already exists")
+	}
+	return nil
+}
+
+func FilterEnrollments(enrollments []models.Enrollment, criteria func(e models.Enrollment) bool) []models.Enrollment {
+	var res []models.Enrollment
+	for _, e := range enrollments {
+		if criteria(e) {
+			res = append(res, e)
+		}
+	}
+	return res
+}
+
+func FetchEnrollments(mobile string) ([]byte, error){
+	filter := map[string]interface{}{}
+	filter["phone"] = map[string]interface{}{
+		"eq": mobile,
+	}
+	responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0)
+	if err != nil {
+		log.Error("Error occurred while querying Enrollment registry ", err)
+		return nil, err
+	}
+	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]);
+	if err != nil {
+		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
+		return nil, err
+	}
+	return enrollmentArr, nil
 }
 
 type EnrollmentPayload struct {

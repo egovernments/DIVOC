@@ -57,7 +57,7 @@ func MakeRegistryCreateRequest(requestMap interface{}, objectId string) middlewa
 		}{},
 		Request: map[string]interface{}{objectId: requestMap},
 	}
-	url := registryUrl(config.Config.Registry.AddOperationId, objectId)
+	url := registryUrl(config.Config.Registry.AddOperationId)
 	log.Info("Using registry url ", url)
 	log.Infof("Request >> %+v", requestJson)
 	r := req.New()
@@ -98,7 +98,7 @@ func CreateNewRegistry(requestMap interface{}, objectId string) (RegistryRespons
 		}{},
 		Request: map[string]interface{}{objectId: requestMap},
 	}
-	url := registryUrl(config.Config.Registry.AddOperationId, objectId)
+	url := registryUrl(config.Config.Registry.AddOperationId)
 	log.Info("Using registry url ", url)
 	log.Infof("Request >> %+v", requestJson)
 	r := req.New()
@@ -125,12 +125,7 @@ func CreateNewRegistry(requestMap interface{}, objectId string) (RegistryRespons
 	return registryResponse, nil
 }
 
-func registryUrl(operationId string, entityId string) string {
-	for _, id := range config.EsRegistries {
-		if id == entityId {
-			return config.Config.Registry.UrlForES + "/" + operationId
-		}
-	}
+func registryUrl(operationId string) string {
 	url := config.Config.Registry.Url + "/" + operationId
 	return url
 }
@@ -147,7 +142,7 @@ func ReadRegistry(typeId string, osid string) (map[string]interface{}, error) {
 		},
 	}
 	log.Info("Registry read ", readRequest)
-	response, err := req.Post(registryUrl(config.Config.Registry.ReadOperationId, typeId), req.BodyJSON(readRequest))
+	response, err := req.Post(registryUrl(config.Config.Registry.ReadOperationId), req.BodyJSON(readRequest))
 	return analyseResponse(response, err)
 }
 
@@ -184,7 +179,7 @@ func QueryRegistry(typeId string, filter map[string]interface{}, limit int, offs
 		},
 	}
 	log.Info("Registry query ", queryRequest)
-	response, err := req.Post(registryUrl(config.Config.Registry.SearchOperationId, typeId), req.BodyJSON(queryRequest))
+	response, err := req.Post(registryUrl(config.Config.Registry.SearchOperationId), req.BodyJSON(queryRequest))
 	return analyseResponse(response, err)
 }
 
@@ -209,7 +204,7 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 	}
 	log.Info("Registry query ", queryRequest)
 	r := req.New()
-	response, err := r.Post(registryUrl(config.Config.Registry.UpdateOperationId, typeId), req.BodyJSON(queryRequest))
+	response, err := r.Post(registryUrl(config.Config.Registry.UpdateOperationId), req.BodyJSON(queryRequest))
 	if err != nil {
 		return nil, errors.Errorf("Error while updating registry", err)
 	}

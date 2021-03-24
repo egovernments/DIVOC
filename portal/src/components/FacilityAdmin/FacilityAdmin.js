@@ -10,8 +10,8 @@ import Vaccinators from "../facility/Vaccinators/Vaccinators";
 import ProgramOverview from "../ProgramOverview";
 
 
-export default function FacilityAdmin() {
-
+export default function FacilityAdmin(props) {
+    const tabIndex = props.location?.state?.tabIndex;
     useEffect(() => {
     }, []);
 
@@ -30,6 +30,8 @@ export default function FacilityAdmin() {
             {title: "Role Setup", component: <RoleSetup/>},
             {title: "Vaccinator Details", component: <Vaccinators/>},
             {title: "Program Overview", component: <ProgramOverview/>},
-        ]}/>
+        ]}
+        tabIndex={tabIndex}
+        />
     );
 }

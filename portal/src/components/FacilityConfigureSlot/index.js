@@ -7,7 +7,7 @@ import {CheckboxItem} from "../FacilityFilterTab";
 import {useHistory} from "react-router-dom";
 import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
-import {API_URL} from "../../utils/constants";
+import {API_URL, TAB_INDICES} from "../../utils/constants";
 import {
     INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
     INVALID_SLOT_TIME,
@@ -23,7 +23,7 @@ const WALKIN_SCHEDULE = "walkInSchedule";
 
 export default function FacilityConfigureSlot ({location}) {
     const [facilityId, programId, programName] = [location.facilityOsid, location.programId, location.programName];
-
+    const [scheduleDeleted, setScheduleDeleted] = useState(false);
     const history = useHistory();
     const [selectedDays, setSelectedDays] = useState([]);
     const [facilityProgramSchedules, setFacilityProgramSchedules] = useState({});
@@ -269,7 +269,8 @@ export default function FacilityConfigureSlot ({location}) {
     function handleOnSave() {
         let data = {};
 
-        let isAppointmentSchedulesChanged = appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+        let isAppointmentSchedulesChanged = scheduleDeleted ||
+            appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
         let isWalkInSchedulesChanged = walkInSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
 
         if (validateSchedules()) {
@@ -325,9 +326,12 @@ export default function FacilityConfigureSlot ({location}) {
         }))
     }
     const deleteHandler = (indexToRemove) => {
-        setAppointmentSchedules((prevState => {
-            return [...prevState.filter(schedule => schedule.index !== indexToRemove)]
-        }))
+        setScheduleDeleted(true);
+        const newAppointments = appointmentSchedules.filter(schedule => schedule.index !== indexToRemove);
+        newAppointments.forEach((schedule, i) => {
+            schedule.index = i;
+        })
+        setAppointmentSchedules([...newAppointments])
     }
 
     return (
@@ -335,7 +339,13 @@ export default function FacilityConfigureSlot ({location}) {
             <Row className="pb-0">
                 <Col><h3>{programName ? "Program: "+programName+" / ": ""} Config Slot</h3></Col>
                 <Col style={{"textAlign": "right"}}>
-                    <Button className='add-vaccinator-button mr-4' variant="outlined" color="primary" onClick={() => history.push(config.urlPath +'/facility_admin')}>
+                    <Button className='add-vaccinator-button mr-4' variant="outlined" color="primary"
+                            onClick={() => history.push(
+                                {
+                                    pathname: config.urlPath +'/facility_admin',
+                                    state: {tabIndex: TAB_INDICES.facilityAdmin.programOverview}
+                                },
+                                )}>
                         BACK
                     </Button>
                 </Col>
