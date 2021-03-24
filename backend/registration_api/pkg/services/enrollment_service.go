@@ -5,68 +5,85 @@ import (
 	"encoding/json"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
+	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
+	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
 	"text/template"
-	"time"
 )
 
-func CreateEnrollment(enrollment *models.Enrollment, currentRetryCount int) error {
-	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone)
-	err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	// If the generated Code is not unique, try again
-	// code + programId should be unique
-	if err != nil && currentRetryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-		return CreateEnrollment(enrollment, currentRetryCount+1)
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
+
+	maxEnrollmentCreationAllowed := 0
+	if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxWalkEnrollmentCreationAllowed
+	} else {
+		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
 	}
-	return err
+
+	if position > maxEnrollmentCreationAllowed {
+		failedErrorMessage := "Maximum enrollment creation limit is reached"
+		log.Info(failedErrorMessage)
+		return "", errors.New(400, failedErrorMessage)
+	}
+
+	enrollment := enrollmentPayload.Enrollment
+	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
+	exists, err := KeyExists(enrollment.Code)
+	if err != nil {
+		return "", err
+	}
+	if exists == 0 {
+		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+			enrollmentPayload.Enrollment = enrollment
+			return CreateWalkInEnrollment(enrollmentPayload)
+		}
+		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+		if err != nil {
+			return "", err
+		}
+		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+		return result.(string), nil
+	}
+	return CreateEnrollment(enrollmentPayload, position+1)
+}
+
+func CreateWalkInEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
+	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
+	enrollment := map[string]interface{}{
+		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
+		"certified":         true,
+		"programId":         enrollmentPayload.Appointments[0].ProgramID,
+	}
+	err = json.Unmarshal(marshal, &enrollment)
+
+	registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	if err != nil {
+		return "", err
+	}
+	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+	return result.(string), nil
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 	for _, enrollment := range enrollments {
-		facilityDetails := make(map[string]interface{})
-		facilityCode := enrollment["enrollmentScopeId"]
-		if facilityCode  != nil {
-			redisKey := facilityCode.(string) + "-info"
-			value, err := GetValue(redisKey)
-			if err := json.Unmarshal([]byte(value), &facilityDetails); err != nil {
-				log.Errorf("Error in marshalling json %+v", err)
-			}
-			if err != nil || len(facilityDetails) == 0 {
-				log.Errorf("Unable to get the value in Cache (%v)", err)
-				filter := map[string]interface{}{}
-				filter["facilityCode"] = map[string]interface{}{
-					"eq": facilityCode,
-				}
-				if responseFromRegistry, err := kernelService.QueryRegistry("Facility", filter, 100, 0); err == nil {
-					facility := responseFromRegistry["Facility"].([]interface{})[0].(map[string]interface{})
-					facilityDetails["facilityName"] = facility["facilityName"]
-					facilityAddress := facility["address"].(map[string]interface{})
-					facilityDetails["state"] = facilityAddress["state"]
-					facilityDetails["pincode"] = facilityAddress["pincode"]
-					facilityDetails["district"] = facilityAddress["district"]
-					enrollment["facilityDetails"] = facilityDetails
+		if enrollment["appointments"] == nil {
+			continue
+		}
+		appointments := enrollment["appointments"].([]interface{})
 
-					if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
-						log.Errorf("Error in Marshaling the facility details %+v", err)
-					} else {
-						err:=SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
-						if err != nil {
-							log.Errorf("Unable to set the value in Cache (%v)", err)
-						}
-					}
-				} else {
-					log.Errorf("Error occurred while fetching the details of facility (%v)", err)
-				}
-			} else {
-				enrollment["facilityDetails"] = facilityDetails
+		// No appointment means no need to show the facility details
+		for _, appointment := range appointments {
+			if facilityCode, ok := appointment.(map[string]interface{})["enrollmentScopeId"].(string); ok && facilityCode != "" && len(facilityCode) > 0 {
+				minifiedFacilityDetails := GetMinifiedFacilityDetails(facilityCode)
+				appointment.(map[string]interface{})["facilityDetails"] = minifiedFacilityDetails
 			}
 		}
 	}
 }
 
-func NotifyRecipient(enrollment models.Enrollment) error {
+func NotifyRecipient(enrollment *models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
 	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
 	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
@@ -92,27 +109,80 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 	return nil
 }
 
-func NotifyAppointmentBooked(enrollment models.Enrollment) error {
-	AppointmentBooked := "appointmentBooked"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[AppointmentBooked].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[AppointmentBooked].Subject
+func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotification) error {
+	appointmentBooked := "appointmentBooked"
+	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
-	recipient := "sms:" + enrollment.Phone
-	log.Infof("Sending SMS %s %s", recipient, enrollment)
+	recipient := "sms:" + appointmentNotification.RecipientPhone
+	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
 	buf := bytes.Buffer{}
-	err := appointmentBookedTemplate.Execute(&buf, enrollment)
+	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
-		if len(enrollment.Phone) > 0 {
-			PublishNotificationMessage("tel:"+enrollment.Phone, subject, buf.String())
+		if len(appointmentNotification.RecipientPhone) > 0 {
+			PublishNotificationMessage("tel:"+appointmentNotification.RecipientPhone, subject, buf.String())
 		}
-		if len(enrollment.Email) > 0 {
-			PublishNotificationMessage("mailto:"+enrollment.Email, subject, buf.String())
+		if len(appointmentNotification.RecipientEmail) > 0 {
+			PublishNotificationMessage("mailto:"+appointmentNotification.RecipientEmail, subject, buf.String())
 		}
 	} else {
 		log.Errorf("Error occurred while parsing the message (%v)", err)
 		return err
 	}
 	return nil
+}
+
+func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotification) error {
+	appointmentCancelled := "appointmentCancelled"
+	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Subject
+
+	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
+
+	recipient := "sms:" + appointmentNotification.RecipientPhone
+	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	buf := bytes.Buffer{}
+	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
+	if err == nil {
+		if len(appointmentNotification.RecipientPhone) > 0 {
+			PublishNotificationMessage("tel:"+appointmentNotification.RecipientPhone, subject, buf.String())
+		}
+		if len(appointmentNotification.RecipientEmail) > 0 {
+			PublishNotificationMessage("mailto:"+appointmentNotification.RecipientEmail, subject, buf.String())
+		}
+	} else {
+		log.Errorf("Error occurred while parsing the message (%v)", err)
+		return err
+	}
+	return nil
+}
+
+func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string) error {
+	EnrollmentRegistered := "enrollmentDeleted"
+	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+
+	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
+	enrollment["enrollmentCode"] = enrollmentCode
+	phone := enrollment["phone"]
+	buf := bytes.Buffer{}
+	err := enrollmentTemplate.Execute(&buf, enrollment)
+	if err == nil {
+		if len(phone) > 0 {
+			PublishNotificationMessage("tel:"+phone, subject, buf.String())
+		}
+	} else {
+		log.Errorf("Error occurred while parsing the message (%v)", err)
+		return err
+	}
+	return nil
+}
+
+type EnrollmentPayload struct {
+	RowID              uint   `json:"rowID"`
+	EnrollmentScopeId  string `json:"enrollmentScopeId"`
+	VaccinationDetails []byte `json:"vaccinationDetails"`
+	*models.Enrollment
 }

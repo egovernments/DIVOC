@@ -1,0 +1,330 @@
+swagger: "2.0"
+info:
+  title: Registration adapter API
+  description: Registration adapter API
+  version: 1.0.0
+schemes:
+  - https
+basePath: /api/v1
+consumes:
+  - application/json
+produces:
+  - application/json
+
+paths:
+  /auth/generateOTP:
+    post:
+      summary: Generate OTP
+      operationId: generateOTP
+      security: [ ]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - mobile
+            properties:
+              mobile:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              txn:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '429':
+          description: Too many requests
+  /auth/confirm:
+    post:
+      summary: Confirm OTP
+      operationId: confirmOTP
+      security: [ ]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - mobile
+              - txn
+              - otp
+            properties:
+              mobile:
+                type: string
+              txn:
+                type: string
+              otp:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+        '429':
+          description: Too many requests
+  /registration/beneficiaries/new:
+    post:
+      summary: Create a new benficiary
+      operationId: createNewBeneficiary
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - name
+              - birth_year
+              - gender
+              - comorbidities
+              - photo_id_type
+              - photo_id_number
+              - state_id
+              - district_id
+              - pincode
+              - consent
+            properties:
+              name:
+                type: string
+              birth_year:
+                type: string
+              gender:
+                type: string
+              comorbidities:
+                type: array
+                items:
+                  type: string
+              photo_id_type:
+                type: string
+              photo_id_number:
+                type: string
+              state_id:
+                type: string
+              district_id:
+                type: string
+              pincode:
+                type: string
+              consent:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              beneficiary_reference_id:
+                type: string
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+  /registration/beneficiaries:
+    get:
+      summary: Get benficiary details
+      operationId: getBeneficiaries
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                appointment:
+                  type: object
+                  properties:
+                    appointment_number:
+                      type: string
+                    center_id:
+                      type: string
+                    date:
+                      type: string
+                    dose_number:
+                      type: string
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+  /registration/beneficiaries/{id}:
+    delete:
+      summary: delete a beneficiary by id
+      operationId: deleteBeneficiaryById
+      parameters:
+        - in: path
+          name: id
+          type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '410':
+          description: Already deleted
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+        '409':
+          description: Appointment is already booked
+          schema:
+            type: object
+  /appointment/schedule:
+    post:
+      summary: book an appointment
+      operationId: bookAppointment
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - center_id
+              - date
+              - slot_id
+              - beneficiaries
+            properties:
+              center_id:
+                type: string
+              date:
+                type: string
+              slot_id:
+                type: string
+              beneficiaries:
+                type: array
+                items:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+        '409':
+          description: Someone else booked by the time we tried to book
+          schema:
+            type: object
+  /appointment/cancel:
+    post:
+      summary: cancel an appointment
+      operationId: cancelAppointment
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - center_id
+              - date
+              - slot_id
+              - beneficiaries
+            properties:
+              center_id:
+                type: string
+              date:
+                type: string
+              slot_id:
+                type: string
+              beneficiaries:
+                type: array
+                items:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object
+        '409':
+          description: Cannot cancel
+          schema:
+            type: object
+  /appointment/timeslots/findByCenter:
+    get:
+      summary: getTimeSlots
+      operationId: getTimeSlots
+      parameters:
+        - in: query
+          name: center_id
+          type: string
+          description: Center id
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              center_id:
+                type: string
+              timeslots:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    date:
+                      type: string
+                    slot_id:
+                      type: string
+                    slot_name:
+                      type: string
+                    timings:
+                      type: string
+                    available_capacity:
+                      type: string
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+        '401':
+          description: Unauthorized
+          schema:
+            type: object

@@ -1,22 +1,65 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
-import {getSelectedProgram} from "./components/ProgramSelection";
+import {getSelectedProgramId} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
-import {monthNames} from "./utils/date_utils";
+import {monthNames, weekdays} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 11;
+const DATABASE_VERSION = 13;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
+const STASH_DATA = "stash_data";
 const EVENTS = "events";
 const VACCINATORS = "vaccinators";
 const STATUS = "status";
 const USER_DETAILS = "user_details";
+const FACILITY_SCHEDULE = "facility_schedule";
+const COMORBIDITIES = "comorbidities";
+
+const dbConfigs = [
+    {
+        table: PATIENTS,
+        optionalParameters: {keyPath: "code"}
+    },
+    {
+        table: QUEUE,
+        optionalParameters: {keyPath: "code"},
+    },
+    {
+        table: VACCINATORS,
+        optionalParameters: {keyPath: "osid"},
+    },
+    {
+        table: EVENTS,
+        optionalParameters: {keyPath: "id", autoIncrement: true},
+    },
+    {
+        table: USER_DETAILS,
+        optionalParameters: {},
+    },
+    {
+        table: PROGRAMS,
+        optionalParameters: {keyPath: "name"},
+    },
+    {
+        table: STASH_DATA,
+        optionalParameters: {keyPath: "userId"},
+    },
+    {
+        table: FACILITY_SCHEDULE,
+        optionalParameters: {},
+    },
+    {
+        table: COMORBIDITIES,
+        optionalParameters: {keyPath: "programId"}
+    }
+]
 
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
+export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", WALK_IN: "WALK_IN"});
 
 export class AppDatabase {
 
@@ -28,29 +71,11 @@ export class AppDatabase {
             upgrade(database, oldVersion, newVersion) {
                 const objectNames = database.objectStoreNames;
 
-                if (!objectNames.contains(PATIENTS)) {
-                    database.createObjectStore(PATIENTS, {keyPath: "code"});
-                }
-
-                if (!objectNames.contains(QUEUE)) {
-                    database.createObjectStore(QUEUE, {keyPath: "code"});
-                }
-
-                if (!objectNames.contains(VACCINATORS)) {
-                    database.createObjectStore(VACCINATORS, {keyPath: "osid"});
-                }
-
-                if (!objectNames.contains(EVENTS)) {
-                    database.createObjectStore(EVENTS, {keyPath: "id", autoIncrement: true});
-                }
-
-                if (!objectNames.contains(USER_DETAILS)) {
-                    database.createObjectStore(USER_DETAILS);
-                }
-
-                if (!objectNames.contains(PROGRAMS)) {
-                    database.createObjectStore(PROGRAMS, {keyPath: "name"});
-                }
+                dbConfigs.forEach(config => {
+                    if (!objectNames.contains(config.table)) {
+                        database.createObjectStore(config.table, config.optionalParameters);
+                    }
+                });
                 console.log("DB upgraded from " + oldVersion + " to " + newVersion)
             }
         });
@@ -64,15 +89,12 @@ export class AppDatabase {
         return this.db.put(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode, mobileNumber) {
+    async getPatientDetails(enrollCode) {
         const patient = await this.db.get(PATIENTS, enrollCode);
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
-            const selectedProgram = getSelectedProgram();
-            const program = await programDb.getProgramByName(selectedProgram);
-            if (patient.phone === mobileNumber
-                && patient[PROGRAM_ID] === program.id) {
-                patient.dob = this.formatDate(patient.dob)
+            const selectedProgramId = getSelectedProgramId();
+            if (patient["appointments"][0][PROGRAM_ID] === selectedProgramId) {
                 return patient
             } else {
                 return null;
@@ -93,12 +115,11 @@ export class AppDatabase {
     async recipientDetails() {
         let waiting = 0;
         let issue = 0;
-        const programName = getSelectedProgram()
+        const programId = getSelectedProgramId()
         if (this.db) {
             const result = await this.db.getAll(QUEUE);
-            const currentProgram = await programDb.getProgramByName(programName)
             result.forEach((item) => {
-                if (item[PROGRAM_ID] === currentProgram.id)
+                if (item[PROGRAM_ID] === programId)
                     if (item[STATUS] === QUEUE_STATUS.IN_QUEUE) {
                         waiting++;
                     } else if (item[STATUS] === QUEUE_STATUS.COMPLETED) {
@@ -113,14 +134,23 @@ export class AppDatabase {
         ];
     }
 
+    async getCompletedCountForAppointmentBookedBeneficiaries(appointmentSlot) {
+        if (this.db) {
+            const result = await this.db.getAll(QUEUE);
+            return result.filter((beneficiary) => beneficiary.appointments
+                && beneficiary.status === QUEUE_STATUS.COMPLETED
+                && beneficiary.appointments.some(appointment => appointment.appointmentSlot === appointmentSlot)).length
+        } else {
+            return 0
+        }
+    }
 
     async getQueue(status) {
         if (status) {
-            const programName = getSelectedProgram()
-            const program = await programDb.getProgramByName(programName)
+            const programId = getSelectedProgramId()
             const result = await this.db.getAll(QUEUE);
             const filter = result.filter((item) => {
-                    return item[STATUS] === status && item[PROGRAM_ID] === program.id
+                    return item[STATUS] === status && item[PROGRAM_ID] === programId
                 }
             );
             return Promise.resolve(filter)
@@ -148,25 +178,34 @@ export class AppDatabase {
         return this.db.get(USER_DETAILS, USER_DETAILS);
     }
 
-    async saveEnrollments(enrollments) {
+    async getAllEnrollments() {
+        return await this.db.getAll(PATIENTS)
+    }
+
+    async saveEnrollments(enrollments, enrollmentType) {
         const enrollmentsList = enrollments || [];
-        const patients = enrollmentsList.map((item, index) => this.db.put(PATIENTS, item));
+        const patients = enrollmentsList.map((item, index) => {
+            item.enrollmentType = enrollmentType;
+            return this.db.put(PATIENTS, item)
+        });
         return Promise.all(patients)
     }
 
     async saveWalkInEnrollments(walkEnrollment) {
         if (walkEnrollment) {
             walkEnrollment.code = Date.now().toString()
-            const programName = getSelectedProgram()
-            const currentProgram = await programDb.getProgramByName(programName)
-            walkEnrollment.programId = currentProgram.id
-            await this.saveEnrollments([walkEnrollment])
+            const programId = getSelectedProgramId()
+            walkEnrollment.programId = programId
+            await this.saveEnrollments([walkEnrollment],ENROLLMENT_TYPES.WALK_IN)
             const queue = {
                 enrollCode: walkEnrollment.code,
+                enrollmentType: ENROLLMENT_TYPES.WALK_IN,
                 mobileNumber: walkEnrollment.phone,
                 previousForm: "Payment Mode",
                 name: walkEnrollment.name,
                 dob: walkEnrollment.dob,
+                yob: walkEnrollment.yob,
+                age: new Date().getFullYear() - walkEnrollment.yob,
                 gender: walkEnrollment.gender,
                 status: QUEUE_STATUS.IN_QUEUE,
                 code: walkEnrollment.code,
@@ -189,21 +228,25 @@ export class AppDatabase {
         const events = await this.db.getAll(EVENTS) || [];
         const certifyObjects = events.map((item, index) => this.getCertifyObject(item));
         const result = await Promise.all(certifyObjects);
-        return result;
+        const filterObjects = result.filter((item) => item.hasOwnProperty("patient"));
+        return filterObjects;
     }
 
     async getCertifyObject(event) {
         const patient = await this.db.get(PATIENTS, event.enrollCode);
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
-        const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
-        return {
-            vaccinatorName: vaccinator.name,
-            patient: patient,
-            enrollCode: event.enrollCode,
-            identity: queue.identity || "",
-            vaccination: vaccination
+        if (patient && vaccinator && queue) {
+            const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
+            return {
+                vaccinatorName: vaccinator.name,
+                patient: patient,
+                enrollCode: event.enrollCode,
+                identity: queue.identity || "",
+                vaccination: vaccination
+            }
         }
+        return {}
     }
 
     async cleanEvents() {
@@ -232,8 +275,35 @@ export class AppDatabase {
     async getAllEvents() {
         return await this.db.getAll(EVENTS) || [];
     }
+
+    async getFacilitySchedule() {
+        return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+    }
+
+    async getCurrentAppointmentSlot() {
+        let currentSlot = {};
+        const today = new Date();
+        const currentDay = weekdays[today.getDay()];
+        const currentTime = today.getTime();
+        await appIndexDb.getFacilitySchedule()
+            .then((scheduleResponse) => {
+                const appointmentSchedules = scheduleResponse["appointmentSchedule"];
+                if (appointmentSchedules) {
+                    appointmentSchedules.forEach(as => {
+                        let startTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.startTime.split(":")[0], as.startTime.split(":")[1]).getTime();
+                        let endTime = new Date(today.getFullYear(), today.getMonth(), today.getDate(), as.endTime.split(":")[0], as.endTime.split(":")[1]).getTime();
+                        if (as.days.map(d => d.day).includes(currentDay) && currentTime >= startTime && currentTime <= endTime) {
+                            currentSlot = as
+                        }
+                    })
+                }
+            });
+        return currentSlot
+    }
+
+    async saveFacilitySchedule(facilitySchedule) {
+        return this.db.put(FACILITY_SCHEDULE, facilitySchedule, FACILITY_SCHEDULE)
+    }
 }
 
 export const appIndexDb = new AppDatabase();
-
-

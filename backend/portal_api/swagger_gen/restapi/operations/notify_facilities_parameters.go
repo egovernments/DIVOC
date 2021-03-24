@@ -6,15 +6,18 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/validate"
 )
 
 // NewNotifyFacilitiesParams creates a new NotifyFacilitiesParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewNotifyFacilitiesParams() NotifyFacilitiesParams {
 
 	return NotifyFacilitiesParams{}
@@ -32,7 +35,7 @@ type NotifyFacilitiesParams struct {
 	/*
 	  In: body
 	*/
-	Body []*NotifyFacilitiesParamsBodyItems0
+	Body NotifyFacilitiesBody
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -46,20 +49,20 @@ func (o *NotifyFacilitiesParams) BindRequest(r *http.Request, route *middleware.
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body []*NotifyFacilitiesParamsBodyItems0
+		var body NotifyFacilitiesBody
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			res = append(res, errors.NewParseError("body", "body", "", err))
 		} else {
-			// validate array of body objects
-			for i := range body {
-				if body[i] == nil {
-					continue
-				}
-				if err := body[i].Validate(route.Formats); err != nil {
-					res = append(res, err)
-					break
-				}
+			// validate body object
+			if err := body.Validate(route.Formats); err != nil {
+				res = append(res, err)
 			}
+
+			ctx := validate.WithOperationRequest(context.Background())
+			if err := body.ContextValidate(ctx, route.Formats); err != nil {
+				res = append(res, err)
+			}
+
 			if len(res) == 0 {
 				o.Body = body
 			}

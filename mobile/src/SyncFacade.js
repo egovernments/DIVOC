@@ -1,7 +1,10 @@
-import {appIndexDb} from "./AppDatabase";
+import {appIndexDb, ENROLLMENT_TYPES} from "./AppDatabase";
 import {ApiServices} from "./Services/ApiServices";
-import {getSelectedProgram, saveSelectedProgram} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
+import {comorbiditiesDb} from "./Services/ComorbiditiesDB";
+import {queueDb} from "./Services/QueueDB";
+import {getSelectedProgram, getSelectedProgramId} from "./components/ProgramSelection";
+import {CONSTANT} from "./utils/constants";
 
 const LAST_SYNC_KEY = "lastSyncedDate";
 
@@ -20,13 +23,40 @@ export class SyncFacade {
     static async pull() {
         await appIndexDb.initDb();
         const preEnrollments = await ApiServices.fetchPreEnrollments();
-        await appIndexDb.saveEnrollments(preEnrollments);
+        await appIndexDb.saveEnrollments(preEnrollments, ENROLLMENT_TYPES.PRE_ENROLLMENT);
 
         const programs = await ApiServices.fetchPrograms();
-        await programDb.savePrograms(programs)
+        await programDb.savePrograms(programs);
+        for (const program of programs) {
+            const data = {
+                "flagKey": "programs",
+                "entityContext": {
+                    "programId": program.id
+                }
+            };
+            await ApiServices.fetchFlagrConfigs(data)
+                .catch((err) => {
+                    console.log(err)
+                })
+                .then((result) => {
+                    if (CONSTANT.VariantAttachment in result) {
+                        comorbiditiesDb.saveComorbidities( program.id, result[CONSTANT.VariantAttachment])
+                    } else {
+                        console.error("program comorbidities is not configure");
+                    }
+                })
+        }
 
         const vaccinators = await ApiServices.fetchVaccinators();
         await appIndexDb.saveVaccinators(vaccinators);
+
+        const selectedProgram = getSelectedProgramId();
+        const userDetails = await appIndexDb.getUserDetails()
+        const facilityId = userDetails["facilityDetails"]["osid"]
+        const facilitySchedule = await ApiServices.fetchFacilitySchedule(facilityId,selectedProgram)
+        await appIndexDb.saveFacilitySchedule(facilitySchedule)
+
+        await queueDb.popData()
     }
 
     static async push() {
@@ -45,17 +75,10 @@ export class SyncFacade {
     }
 
 
-    static async isSyncedIn24Hours() {
+    static async isNotSynced() {
         await appIndexDb.initDb();
         const events = await appIndexDb.getAllEvents();
-        if (events) {
-            if (events.length && events.length > 0) {
-                const lastSyncedDate = localStorage.getItem(LAST_SYNC_KEY);
-                const date = new Date(lastSyncedDate)
-                return is24hoursAgo(date)
-            }
-        }
-        return false;
+        return (events && events.length > 0)
     }
 
     static lastSyncedOn() {

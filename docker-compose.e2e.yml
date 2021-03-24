@@ -1,38 +1,30 @@
 version: "2.4"
 
 services:
+  portal_api:
+    entrypoint: /bin/true
+  registration_api:
+    entrypoint: /bin/true
+  analytics_feed:
+    entrypoint: /bin/true
+  nginx:
+    entrypoint: /bin/true
+  notification-service:
+    entrypoint: /bin/true
+  digilocker_support_api:
+    entrypoint: /bin/true
+  flagr:
+    entrypoint: /bin/true
+  clickhouse-server:
+    entrypoint: /bin/true
   keycloak:
     environment:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json
     volumes:
       - ./keycloak:/config
-  portal_api:
-    environment:
-      ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
   certificate_processor:
       environment:
         ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
-  registry:
-    depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
-  vaccination_api:
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-  certificate_signer:
-    depends_on:
-        kafka:
-          condition: service_healthy
   e2e_test:
     build:
       context: ./e2e

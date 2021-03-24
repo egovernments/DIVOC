@@ -11,12 +11,26 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
     ports:
       - "5432:5432"
   registry:
+    image: bindock/registry-es
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
+      - connectionInfo_username=postgres
+      - connectionInfo_password=postgres
+    #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
+    volumes:
+      - .:/home/opensaber/config/public/_schemas
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db
+      - es
+  registry-es:
     image: bindock/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
@@ -28,7 +42,7 @@ services:
     volumes:
       - .:/home/opensaber/config/public/_schemas
     ports:
-      - "8081:8081"
+      - "8082:8081"
     depends_on:
-      - db
       - es
+      - db

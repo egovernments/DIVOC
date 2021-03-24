@@ -25,7 +25,7 @@ type GetPreEnrollmentsForFacilityOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.PreEnrollment `json:"body,omitempty"`
+	Payload []*models.Enrollment `json:"body,omitempty"`
 }
 
 // NewGetPreEnrollmentsForFacilityOK creates GetPreEnrollmentsForFacilityOK with default headers values
@@ -35,13 +35,13 @@ func NewGetPreEnrollmentsForFacilityOK() *GetPreEnrollmentsForFacilityOK {
 }
 
 // WithPayload adds the payload to the get pre enrollments for facility o k response
-func (o *GetPreEnrollmentsForFacilityOK) WithPayload(payload []*models.PreEnrollment) *GetPreEnrollmentsForFacilityOK {
+func (o *GetPreEnrollmentsForFacilityOK) WithPayload(payload []*models.Enrollment) *GetPreEnrollmentsForFacilityOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get pre enrollments for facility o k response
-func (o *GetPreEnrollmentsForFacilityOK) SetPayload(payload []*models.PreEnrollment) {
+func (o *GetPreEnrollmentsForFacilityOK) SetPayload(payload []*models.Enrollment) {
 	o.Payload = payload
 }
 
@@ -52,7 +52,7 @@ func (o *GetPreEnrollmentsForFacilityOK) WriteResponse(rw http.ResponseWriter, p
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*models.PreEnrollment, 0, 50)
+		payload = make([]*models.Enrollment, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {

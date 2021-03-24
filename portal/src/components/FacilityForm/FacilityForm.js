@@ -100,7 +100,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
         const updatedFacility = {...facility, ...data}
         updatedFacility.address.addressLine1 = data.addressLine1;
         updatedFacility.address.addressLine2 = data.addressLine2;
-        updatedFacility.address.pincode = parseInt(data.pincode);
+        updatedFacility.address.pincode = data.pincode;
 
         if(updatedFacility.admins && updatedFacility.admins.length > 0) {
             updatedFacility.admins[0].name = data.adminName;
@@ -178,7 +178,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                     <div>
                         <label>
                             <div><b>Pincode: </b></div>
-                            <input type="number" name="pincode" defaultValue={facility.address?.pincode} disabled={!editFacility} onChange={handleChange}/>
+                            <input type="text" name="pincode" defaultValue={facility.address?.pincode} disabled={!editFacility} onChange={handleChange}/>
                         </label>
                     </div>
                     <div>
@@ -239,7 +239,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 </Container>
 
                     <h4>Ongoing Vaccination Programs</h4>
-                    <Container  style={{"columnCount": 2}}>
+                    <Container  style={{"columnCount": activePrograms?.length === 1 ? 1 : 2}}>
                     { activePrograms?.map(p => 
                         <Container key={p.programId} className="programDiv">
                             <label>

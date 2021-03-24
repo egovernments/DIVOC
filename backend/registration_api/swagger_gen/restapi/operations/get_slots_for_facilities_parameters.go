@@ -22,11 +22,14 @@ func NewGetSlotsForFacilitiesParams() GetSlotsForFacilitiesParams {
 	var (
 		// initialize parameters with default values
 
-		pageNumberDefault = float64(0)
+		pageNumberDefault = int64(0)
+		pageSizeDefault   = int64(0)
 	)
 
 	return GetSlotsForFacilitiesParams{
 		PageNumber: &pageNumberDefault,
+
+		PageSize: &pageSizeDefault,
 	}
 }
 
@@ -47,7 +50,12 @@ type GetSlotsForFacilitiesParams struct {
 	  In: query
 	  Default: 0
 	*/
-	PageNumber *float64
+	PageNumber *int64
+	/*
+	  In: query
+	  Default: 0
+	*/
+	PageSize *int64
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -71,6 +79,10 @@ func (o *GetSlotsForFacilitiesParams) BindRequest(r *http.Request, route *middle
 		res = append(res, err)
 	}
 
+	qPageSize, qhkPageSize, _ := qs.GetOK("pageSize")
+	if err := o.bindPageSize(qPageSize, qhkPageSize, route.Formats); err != nil {
+		res = append(res, err)
+	}
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -86,10 +98,10 @@ func (o *GetSlotsForFacilitiesParams) bindFacilityID(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
-
 	o.FacilityID = &raw
 
 	return nil
@@ -104,16 +116,41 @@ func (o *GetSlotsForFacilitiesParams) bindPageNumber(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil
 	}
 
-	value, err := swag.ConvertFloat64(raw)
+	value, err := swag.ConvertInt64(raw)
 	if err != nil {
-		return errors.InvalidType("pageNumber", "query", "float64", raw)
+		return errors.InvalidType("pageNumber", "query", "int64", raw)
 	}
 	o.PageNumber = &value
+
+	return nil
+}
+
+// bindPageSize binds and validates parameter PageSize from query.
+func (o *GetSlotsForFacilitiesParams) bindPageSize(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+
+	if raw == "" { // empty values pass all other validations
+		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
+		return nil
+	}
+
+	value, err := swag.ConvertInt64(raw)
+	if err != nil {
+		return errors.InvalidType("pageSize", "query", "int64", raw)
+	}
+	o.PageSize = &value
 
 	return nil
 }

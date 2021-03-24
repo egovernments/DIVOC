@@ -2,14 +2,15 @@ package pkg
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/divoc/api/config"
-	eventsModel "github.com/divoc/api/pkg/models"
-	"github.com/divoc/api/pkg/services"
 	"strconv"
 	"strings"
 	"time"
-	"errors"
+
+	"github.com/divoc/api/config"
+	eventsModel "github.com/divoc/api/pkg/models"
+	"github.com/divoc/api/pkg/services"
 
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/swagger_gen/models"
@@ -171,7 +172,7 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		RecipientAddressLine2:     data.Text("recipientAddressLine2"),
 		RecipientDistrict:         data.Text("recipientDistrict"),
 		RecipientState:            data.Text("recipientState"),
-		RecipientPincode:          data.int64("recipientPincode"),
+		RecipientPincode:          data.Text("recipientPincode"),
 		VaccinationBatch:          data.Text("vaccinationBatch"),
 		VaccinationDate:           data.Text("vaccinationDate"),
 		VaccinationDose:           data.Text("vaccinationDose"),
@@ -186,7 +187,7 @@ func convertToCertifyUploadFields(data *Scanner) *db.CertifyUploadFields {
 		FacilityAddressLine2:      data.Text("facilityAddressLine2"),
 		FacilityDistrict:          data.Text("facilityDistrict"),
 		FacilityState:             data.Text("facilityState"),
-		FacilityPincode:           data.int64("facilityPincode"),
+		FacilityPincode:           data.Text("facilityPincode"),
 	}
 }
 

@@ -5,7 +5,7 @@
 //  Digital infra for vaccination certificates
 //  Schemes:
 //    https
-//  Host: divoc.k8s.sandboxaddis.com
+//  Host: divoc.xiv.in
 //  BasePath: /divoc/api/v1
 //  Version: 1.0.0
 //

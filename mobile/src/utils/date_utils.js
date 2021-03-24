@@ -26,5 +26,32 @@ export function formatDate(givenDate) {
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
 
+    if (parseInt(day) <= 9) {
+        day = '0' + day
+    }
     return `${day}-${monthName}-${year}`;
 }
+
+export const getMeridiemTime = (time) => {
+    const timeInNumber = parseInt(time.split(":")[0])
+    if(timeInNumber >= 0 && timeInNumber <=11) {
+        return time + " AM"
+    } else {
+        let t = timeInNumber-12 + ":" + time.split(":")[1]
+        return t + " PM"
+    }
+}
+
+export const formatAppointmentSlot = (date, startTime, endTime) => {
+    return formatDate(date)+", "+getMeridiemTime(startTime)+" to "+ getMeridiemTime(endTime)
+}
+
+export const weekdays = {
+    0: "sun",
+    1: "mon",
+    2: "tue",
+    3: "wed",
+    4: "thu",
+    5: "fri",
+    6: "sat",
+};

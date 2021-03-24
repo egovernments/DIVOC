@@ -1,10 +1,10 @@
 [{
-	"preEnrollmentCode": "EYV56KL",
+	"preEnrollmentCode": "",
     "facility": {
         "address": {
             "addressLine1": "123, Koramangala",
             "district": "Bengaluru South",
-            "pincode": 560034,
+            "pincode": "560034",
             "state": "Karnataka"
         },
         "name": "ABC Medical Center"
@@ -21,7 +21,7 @@
         "address": {
             "addressLine1": "444, 2nd Street",
             "district": "Bengaluru",
-            "pincode": 560034,
+            "pincode": "560034",
             "state": "Karnataka"
         }
     },

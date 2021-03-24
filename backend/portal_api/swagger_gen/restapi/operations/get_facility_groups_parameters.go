@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetFacilityGroupsParams creates a new GetFacilityGroupsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetFacilityGroupsParams() GetFacilityGroupsParams {
 
 	return GetFacilityGroupsParams{}

@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -15,7 +17,7 @@ import (
 //
 // swagger:model UpdateMedicineRequest
 type UpdateMedicineRequest struct {
-	CreateMedicineRequest
+	Medicine
 
 	// osid
 	Osid string `json:"osid,omitempty"`
@@ -24,11 +26,11 @@ type UpdateMedicineRequest struct {
 // UnmarshalJSON unmarshals this object from a JSON structure
 func (m *UpdateMedicineRequest) UnmarshalJSON(raw []byte) error {
 	// AO0
-	var aO0 CreateMedicineRequest
+	var aO0 Medicine
 	if err := swag.ReadJSON(raw, &aO0); err != nil {
 		return err
 	}
-	m.CreateMedicineRequest = aO0
+	m.Medicine = aO0
 
 	// AO1
 	var dataAO1 struct {
@@ -47,7 +49,7 @@ func (m *UpdateMedicineRequest) UnmarshalJSON(raw []byte) error {
 func (m UpdateMedicineRequest) MarshalJSON() ([]byte, error) {
 	_parts := make([][]byte, 0, 2)
 
-	aO0, err := swag.WriteJSON(m.CreateMedicineRequest)
+	aO0, err := swag.WriteJSON(m.Medicine)
 	if err != nil {
 		return nil, err
 	}
@@ -70,8 +72,23 @@ func (m UpdateMedicineRequest) MarshalJSON() ([]byte, error) {
 func (m *UpdateMedicineRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
-	// validation for a type composition with CreateMedicineRequest
-	if err := m.CreateMedicineRequest.Validate(formats); err != nil {
+	// validation for a type composition with Medicine
+	if err := m.Medicine.Validate(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+// ContextValidate validate this update medicine request based on the context it is used
+func (m *UpdateMedicineRequest) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	// validation for a type composition with Medicine
+	if err := m.Medicine.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 

@@ -13,7 +13,7 @@ services:
   db:
     image: postgres
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   registry:
@@ -35,7 +35,7 @@ services:
       - DB_VENDOR=postgres
       - DB_ADDR=db
       - DB_PORT=5432
-      - DB_DATABASE=postgres
+      - DB_DATABASE=registry
       - DB_USER=postgres
       - DB_PASSWORD=postgres
       - KEYCLOAK_USER=admin
@@ -55,8 +55,8 @@ services:
   flagr:
     image: checkr/flagr
     environment:
-      FLAGR_DB_DBDRIVER: postgres
-      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/postgres?sslmode=disable
+      FLAGR_DB_DBDRIVER: registry
+      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/registry?sslmode=disable
       HOST: 0.0.0.0
       FLAGR_WEB_PREFIX: /config
     ports:

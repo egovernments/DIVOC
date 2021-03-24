@@ -8,6 +8,9 @@ const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
 const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
 const FLAGR_APPLICATION_CONFIG = "/config/api/v1/evaluation";
+const FACILITY_ID = "FACILITY_ID"
+const PROGRAM_ID = "PROGRAM_ID"
+const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/program/${PROGRAM_ID}/schedule`
 
 export class ApiServices {
 
@@ -56,12 +59,15 @@ export class ApiServices {
             const patientDetails = item.patient;
             return {
                 preEnrollmentCode: item.enrollCode,
+                enrollmentType: patientDetails.enrollmentType,
+                programId: patientDetails.programId,
+                comorbidities: patientDetails.comorbidities ?? [],
                 recipient: {
                     contact: [
                         "tel:" + patientDetails.phone,
                         "mailto:" + patientDetails.email
                     ],
-                    dob: patientDetails.dob,
+                    age: "" + (new Date().getFullYear() - patientDetails.yob),
                     gender: patientDetails.gender,
                     identity: item.identity ? item.identity : "",
                     name: patientDetails.name,
@@ -72,7 +78,7 @@ export class ApiServices {
                         addressLine2: patientDetails.address.addressLine2 ?? "N/A",
                         district: patientDetails.address.district ?? "N/A",
                         state: patientDetails.address.state ?? "N/A",
-                        pincode: patientDetails.address.pincode ?? 100000
+                        pincode: patientDetails.address.pincode ?? "N/A"
                     }
                 },
 
@@ -96,7 +102,7 @@ export class ApiServices {
                         addressLine2: facilityDetails.address.addressLine2 ?? "N/A",
                         district: facilityDetails.address.district ?? "N/A",
                         state: facilityDetails.address.state ?? "N/A",
-                        pincode: facilityDetails.address.pincode ?? 100000
+                        pincode: facilityDetails.address.pincode ?? "N/A"
                     }
                 }
             }
@@ -155,6 +161,10 @@ export class ApiServices {
         const data = {
             "flagKey": "country_specific_features"
         };
+        return this.fetchFlagrConfigs(data);
+    }
+
+    static fetchFlagrConfigs(data) {
         const requestOptions = {
             method: 'POST',
             headers: {
@@ -164,6 +174,25 @@ export class ApiServices {
             body: JSON.stringify(data)
         };
         return fetch(FLAGR_APPLICATION_CONFIG, requestOptions)
+            .then(response => {
+                return response.json()
+            })
+    }
+
+    static async fetchFacilitySchedule(facilityId, programId) {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+        };
+        const apiURL = FACILITY_SLOTS
+            .replace(FACILITY_ID, facilityId)
+            .replace(PROGRAM_ID, programId);
+
+        return fetch(apiURL, requestOptions)
             .then(response => {
                 return response.json()
             })

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styles from "./FacilityActivation.module.css";
-import {
-    CheckboxItem,
-    FacilityFilterTab,
-    RadioItem,
-} from "../FacilityFilterTab";
-import { useAxios } from "../../utils/useAxios";
-import { API_URL , CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
+import { CheckboxItem, FacilityFilterTab, RadioItem } from "../FacilityFilterTab";
+import { CONSTANTS, FACILITY_TYPE} from "../../utils/constants";
 import DetailsCard from "../DetailsCard/DetailsCard";
+import { Button, Modal } from "react-bootstrap";
 
 function FacilityActivation({
                                 facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
@@ -16,7 +12,7 @@ function FacilityActivation({
                             }) {
 
     const [allChecked, setAllChecked] = useState(false);
-    const axiosInstance = useAxios("");
+    const [showDialog, setShowDialog] = useState(false);
     const [showCard, setShowCard] = useState(false);
     const [selectedRow, setSelectedRow] = useState([]);
     const oppositeStatus = status !== CONSTANTS.ACTIVE ? CONSTANTS.ACTIVE : CONSTANTS.IN_ACTIVE;
@@ -83,10 +79,31 @@ function FacilityActivation({
         (facility) => facility.isChecked
     );
 
-    const handleActiveClick = () => {
+    const updateSelectedFacilityStatus = () => {
         setAllChecked(false);
         updateFacilityProgramStatus(selectedFacilities, oppositeStatus);
+    }
+
+    const handleActiveClick = () => {
+        if (selectedFacilities.length > 1) {
+            setShowDialog(true);
+        } else {
+            updateSelectedFacilityStatus();
+        }
     };
+
+    const handleConfirmation = (e) => {
+        switch (e.target.name) {
+            case "ok":
+                updateSelectedFacilityStatus();
+            default:
+                setShowDialog(false);
+        }
+    }
+
+    const handleClose = () => {
+        setShowDialog(false);
+    }
 
     return (
         <div className={`row ${styles["container"]}`}>
@@ -178,18 +195,26 @@ function FacilityActivation({
                 <div className="col-sm-3 container">
                     <div className={`card ${styles["card-continer"]}`}>
                         {selectedProgram && <div className={`text-center ${styles["pad-1rem"]}`}>
-                            {/*{facilities.length > 0 ? '' : <p>Success</p>}*/}
                             <p>
                                 Make {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for the {selectedProgram}
                             </p>
-                            <button
-                                onClick={handleActiveClick}
-                                className={styles["button"]}
-                            >
+                            <button 
+                                onClick={handleActiveClick} 
+                                className={styles["button"]}>
                                 MAKE {oppositeStatus.toUpperCase()}
                             </button>
-                        </div>
-                        }
+                            <Modal show={showDialog} onHide={handleClose} centered>
+                                <Modal.Header  style={{"justifyContent": "center"}}>
+                                    <Modal.Title>
+                                        Making {selectedFacilities.length} facilities {oppositeStatus.toLowerCase()} for {selectedProgram}
+                                    </Modal.Title>
+                                </Modal.Header>
+                                <Modal.Footer>
+                                    <Button variant="secondary" name="cancel" onClick={handleConfirmation}>CANCEL</Button>
+                                    <Button variant="primary" name="ok" onClick={handleConfirmation}>OK</Button>
+                                </Modal.Footer>
+                            </Modal>
+                        </div>}
                     </div>
                 </div>
             }

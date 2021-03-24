@@ -5,7 +5,7 @@ import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
 import PrivateSvg from "../../assets/img/icon-private.svg"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
-import {formatDate} from "../../utils/CustomDate";
+import {formatDate, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
@@ -17,7 +17,7 @@ import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id} = props.match.params;
-    const {name} = props.location.state;
+    const {state} = props.location;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
@@ -29,32 +29,40 @@ export const Appointment = (props) => {
     const [facilitySlots, setFacilitySlots] = useState({});
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
 
-    useEffect(() => {
-        setIsLoading(true);
-        let params = {
-            // pincode: searchText
-        };
-        params = reject(equals(''))(params);
-        const queryParams = new URLSearchParams(params);
+    function triggerSearchFacilityAPI() {
+        if (searchText && searchText.length <= 3) {
+            return;
+        }
+        if (state === undefined) {
+            history.push("/registration")
+            return;
+        }
+        if (searchText === "" || searchText.length > 3) {
+            setIsLoading(true);
+            let params = {
+                pincode: searchText
+            };
+            params = reject(equals(''))(params);
+            const queryParams = new URLSearchParams(params);
+            axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
+                .then(res => {
+                    const {facilities, facilitiesSchedule} = res.data;
+                    let schedule = {};
+                    facilitiesSchedule.map(d => {
+                        if (d.facilityId) {
+                            schedule[d.facilityId] = d
+                        }
+                    });
+                    setFacilities(facilities.filter(d => d.osid in schedule));
+                    setFacilitiesSchedule(schedule);
+                    setIsLoading(false);
+                });
+        }
+    }
 
-        axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
-            .then(res => {
-                const {facilities, facilitiesSchedule} = res.data;
-                let data = facilities.map(d => {
-                    return d
-                });
-                let schedule = {};
-                facilitiesSchedule.map(d => {
-                    if (d.facilityId) {
-                        schedule[d.facilityId] = d
-                    }
-                });
-                data = data.filter(d => ("" + d.address.pincode).startsWith(searchText) && d.osid in schedule);
-                setFacilities(data);
-                setFacilitiesSchedule(schedule);
-                setIsLoading(false);
-            });
-    }, [searchText, searchDate]);
+    useEffect(() => {
+        triggerSearchFacilityAPI();
+    }, []);
 
     function formatAddress({addressLine1, addressLine2, district, state, pincode}) {
         return [addressLine1, addressLine2, district, state, pincode].filter(d => d && ("" + d).trim().length > 0).join(", ")
@@ -62,26 +70,26 @@ export const Appointment = (props) => {
 
     function getAvailableAllotments() {
         let facility = facilities[selectedFacilityIndex];
-        const program = getProgramInfo(facility, program_id)
         return (
-            <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
+            facility && <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
-                    <h5>Available Time Slot for {facility.facilityName}</h5>
+                    <h5>Available Time Slots for {facility?.facilityName}</h5>
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
-                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility.osid]}
+                <FacilityAllotment facilitySlots={facilitySlots} facilitySchedule={facilitiesSchedule[facility?.osid]}
                                    showModal={(allotmentDate, allotmentTime, slotKey) => {
-                                       setShowModal(true)
-                                       setSelectedAllotment({
-                                           facilityId: facility.osid,
-                                           facilityName: facility.facilityName,
-                                           facilityAddress: facility.address,
-                                           programName: program.name,
-                                           allotmentDate,
-                                           allotmentTime,
-                                           slotKey
-                                       })
+                                       if (facility) {
+                                           setShowModal(true)
+                                           setSelectedAllotment({
+                                               facilityId: facility.osid,
+                                               facilityName: facility.facilityName,
+                                               facilityAddress: facility.address,
+                                               allotmentDate,
+                                               allotmentTime,
+                                               slotKey
+                                           })
+                                       }
                                    }}/>
             </div>
         )
@@ -96,17 +104,24 @@ export const Appointment = (props) => {
         }
     }
 
-    function getSlotsForFacility(facilityIndex, pageNumber = 0) {
+    function getSlotsForFacility(facilityIndex, pageNumber = 0, pageSize=12) {
         setSelectedFacilityIndex(facilityIndex);
         const facilityId = facilities[facilityIndex].facilityCode;
         setIsLoading(true);
         let params = {
             facilityId,
-            pageNumber
+            pageNumber,
+            pageSize
         };
         params = reject(equals(''))(params);
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const queryParams = new URLSearchParams(params);
-        axios.get("/divoc/api/citizen/facility/slots", {params: queryParams})
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
+            params: queryParams
+        };
+
+        axios.get("/divoc/api/citizen/facility/slots", config)
             .then(res => {
                 const {keys, slots} = res.data;
                 const dayWiseSlotsInfo = {};
@@ -136,15 +151,21 @@ export const Appointment = (props) => {
     function bookSlot() {
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
-            headers: {"recipientToken": token, "Content-Type": "application/json"},
+            headers: {"Authorization": token, "Content-Type": "application/json"},
         };
 
-        axios.post("/divoc/api/citizen/facility/slot/book", {
+        axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
-            facilitySlotId: selectedAllotment.slotKey
+            facilitySlotId: selectedAllotment.slotKey,
+            programId: program_id,
+            // dose func is not yet configured
+            dose: "1"
         }, config)
             .then(res => {
-                history.push("/" + enrollment_code + "/appointment/confirm")
+                history.push({
+                    pathname:"/" + enrollment_code + "/appointment/confirm",
+                    state:{nationalId: state.nationalId, program: state.program}
+                })
             })
             .catch(() => {
                 alert("Something went wrong. Please try again");
@@ -165,13 +186,13 @@ export const Appointment = (props) => {
                 </div>
                 <Row>
                     <Col lg={6}>
-                        <TextInputWithIcon title={"Search by Pincode"} value={searchText} onChange={setSearchText}
+                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"} value={searchText} onChange={setSearchText}
                                            img={Img}/>
                     </Col>
 
                 </Row>
                 <br/>
-                <h4>Facilities availability for next 3 days</h4>
+                <h4>Facilities' availability for next few days</h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
@@ -192,7 +213,7 @@ export const Appointment = (props) => {
                                         <div>{formatAddress(facility.address)}
                                             <div>
                                                 <span
-                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walk-in"}</span>
+                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walkin"}</span>
                                                 <span
                                                     className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
                                             </div>
@@ -215,36 +236,37 @@ export const Appointment = (props) => {
             }} centered backdrop="static"
                    keyboard={false}>
                 <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
-                    <div className="d-flex justify-content-between align-items-center">
+                    <div className="d-flex">
                         <div/>
                         <h5>Confirm Appointment Details </h5>
-                        <img src={CloseImg} className="cursor-pointer" alt={""}
-                             onClick={() => setShowModal(false)}/>
                     </div>
-                    <div className="d-flex flex-column justify-content-center align-items-center">
-                        {/*TODO: replace with name*/}
-                        <span>For {name}</span>
-                        <span className="text-center mt-1">{getFacilityDetails()}</span>
-                        <span className="mt-1">{formatDate(selectedAllotment.allotmentDate)}</span>
-                        <span className="mt-1">{selectedAllotment.allotmentTime}</span>
-                        <CustomButton className="blue-btn" onClick={() => {
+                    <div className="d-flex flex-column">
+                        <span>For {state && state.name}</span>
+                        <span className="mt-2">{getFacilityDetails()}</span>
+                        <span className="mt-2">{formatDateLong(selectedAllotment.allotmentDate)}</span>
+                        <span className="mt-1">{formatTimeInterval12hr(selectedAllotment.allotmentTime)}</span>
+                    </div>
+                    <Row>
+                       <Col style={{"margin": "15px"}}>
+                            <Button variant="outline-light" onClick={() => {
+                                setShowModal(false)
+                            }}>
+                                <span className="cancel-btn-appnt">
+                                    CANCEL
+                                </span>
+                            </Button>
+                       </Col> 
+                       <Col>
+                       <CustomButton className="blue-btn" onClick={() => {
                             bookSlot()
                         }}>CONFIRM</CustomButton>
-                    </div>
+                       </Col>
+                    </Row>
                 </div>
             </Modal>
         </div>
     )
 };
-
-function getProgramInfo(facility, programId) {
-    const program = (facility.programs || []).find(program => program.programId === programId);
-    if (program) {
-        return program
-    } else {
-        return undefined
-    }
-}
 
 const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
     if (Object.keys(facilitySlots).length > 0) {
@@ -293,12 +315,12 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                         }
                     </tr>
                     {
-                        [...timeStamps].map(ts => (
+                        [...timeStamps].sort().map(ts => (
                             <tr>
                                 <td className="text-nowrap ">{ts}</td>
                                 {
                                     dates.map(date => {
-                                        if (date in timeStampWiseSlots[ts]) {
+                                        if (timeStampWiseSlots[ts][date]?.slots) {
                                             let slots = timeStampWiseSlots[ts][date].slots;
                                             return (
                                                 <td className="text-nowrap text-center">

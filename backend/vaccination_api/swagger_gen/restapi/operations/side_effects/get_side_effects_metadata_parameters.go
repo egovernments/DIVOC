@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetSideEffectsMetadataParams creates a new GetSideEffectsMetadataParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetSideEffectsMetadataParams() GetSideEffectsMetadataParams {
 
 	return GetSideEffectsMetadataParams{}

@@ -2,8 +2,11 @@
   "$schema": "http://json-schema.org/draft-07/schema",
   "type": "object",
   "properties": {
-    "Facility": {
-      "$ref": "#/definitions/Enrollment"
+    "Enrollment": {
+      "allOf": [
+        {"$ref": "#/definitions/Enrollment"},
+        {"required": ["code", "enrollmentType"]}
+      ]
     }
   },
   "required": [
@@ -15,13 +18,14 @@
       "type": "object",
       "required": ["nationalId"],
       "properties": {
+        "enrollmentType": {
+          "type": "string",
+          "enum": ["SELF_ENRL", "PRE_ENRL", "WALK_IN"]
+        },
         "beneficiaryPhone" : {
           "type": "string"
         },
         "phone" : {
-          "type": "string"
-        },
-        "enrollmentScopeId": {
           "type": "string"
         },
         "nationalId": {
@@ -47,24 +51,50 @@
         "code": {
           "type": "string"
         },
-        "certified": {
-          "type": "boolean",
-          "default": false
-        },
-        "programId": {
-          "type": "string"
-        },
-        "appointmentSlot": {
-          "type": "string"
-        },
-        "appointmentDate": {
-          "type": "string",
-          "format": "date"
+        "appointments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "osid": {
+                "type": "string"
+              },
+              "programId": {
+                "type": "string"
+              },
+              "appointmentSlot": {
+                "type": "string",
+                "x-omitempty": false
+              },
+              "appointmentDate": {
+                "type": "string",
+                "format": "date",
+                "x-omitempty": false
+              },
+              "certified": {
+                "type": "boolean",
+                "x-omitempty": false
+              },
+              "enrollmentScopeId": {
+                "type": "string",
+                "x-omitempty": false
+              },
+              "dose": {
+                "type": "string"
+              }
+            }
+          }
         },
         "address": {
           "$id": "#/properties/address",
           "$ref": "Common.json#/definitions/Address",
           "title": "Address"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     }

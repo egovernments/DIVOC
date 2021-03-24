@@ -35,8 +35,13 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/facility/slot/book": {
+    "/appointment": {
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Book a slot in facility",
         "operationId": "bookSlotOfFacility",
         "parameters": [
@@ -47,13 +52,21 @@ func init() {
               "type": "object",
               "required": [
                 "facilitySlotId",
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
                   "type": "string"
                 },
                 "facilitySlotId": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -74,10 +87,71 @@ func init() {
             "description": "Unauthorized"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the appointment",
+        "operationId": "deleteAppointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode",
+                "programId",
+                "dose"
+              ],
+              "properties": {
+                "dose": {
+                  "type": "string"
+                },
+                "enrollmentCode": {
+                  "type": "string"
+                },
+                "programId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/facility/slots": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -87,9 +161,15 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 0,
+            "name": "pageSize",
             "in": "query"
           }
         ],
@@ -111,6 +191,7 @@ func init() {
     },
     "/facility/slots/init": {
       "post": {
+        "security": [],
         "summary": "Initialize facility slots",
         "operationId": "initializeFacilitySlots",
         "parameters": [
@@ -139,6 +220,7 @@ func init() {
     },
     "/generateOTP": {
       "post": {
+        "security": [],
         "summary": "Generate OTP",
         "operationId": "generateOTP",
         "parameters": [
@@ -172,8 +254,25 @@ func init() {
         }
       }
     },
+    "/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/recipients": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get all the recipients",
         "operationId": "getRecipients",
         "responses": {
@@ -196,6 +295,11 @@ func init() {
         }
       },
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
         "parameters": [
@@ -216,10 +320,59 @@ func init() {
             "description": "Invalid token"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient",
+        "operationId": "deleteRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/verifyOTP": {
       "post": {
+        "security": [],
         "summary": "Verify OTP",
         "operationId": "verifyOTP",
         "parameters": [
@@ -267,6 +420,13 @@ func init() {
         }
       }
     }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
   }
 }`))
 	FlatSwaggerJSON = json.RawMessage([]byte(`{
@@ -287,8 +447,13 @@ func init() {
   },
   "basePath": "/divoc/api/citizen",
   "paths": {
-    "/facility/slot/book": {
+    "/appointment": {
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Book a slot in facility",
         "operationId": "bookSlotOfFacility",
         "parameters": [
@@ -299,13 +464,21 @@ func init() {
               "type": "object",
               "required": [
                 "facilitySlotId",
-                "enrollmentCode"
+                "enrollmentCode",
+                "programId",
+                "dose"
               ],
               "properties": {
+                "dose": {
+                  "type": "string"
+                },
                 "enrollmentCode": {
                   "type": "string"
                 },
                 "facilitySlotId": {
+                  "type": "string"
+                },
+                "programId": {
                   "type": "string"
                 }
               }
@@ -326,10 +499,71 @@ func init() {
             "description": "Unauthorized"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the appointment",
+        "operationId": "deleteAppointment",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode",
+                "programId",
+                "dose"
+              ],
+              "properties": {
+                "dose": {
+                  "type": "string"
+                },
+                "enrollmentCode": {
+                  "type": "string"
+                },
+                "programId": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/facility/slots": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get slots for facilites",
         "operationId": "getSlotsForFacilities",
         "parameters": [
@@ -339,9 +573,15 @@ func init() {
             "in": "query"
           },
           {
-            "type": "number",
+            "type": "integer",
             "default": 0,
             "name": "pageNumber",
+            "in": "query"
+          },
+          {
+            "type": "integer",
+            "default": 0,
+            "name": "pageSize",
             "in": "query"
           }
         ],
@@ -363,6 +603,7 @@ func init() {
     },
     "/facility/slots/init": {
       "post": {
+        "security": [],
         "summary": "Initialize facility slots",
         "operationId": "initializeFacilitySlots",
         "parameters": [
@@ -391,6 +632,7 @@ func init() {
     },
     "/generateOTP": {
       "post": {
+        "security": [],
         "summary": "Generate OTP",
         "operationId": "generateOTP",
         "parameters": [
@@ -424,8 +666,25 @@ func init() {
         }
       }
     },
+    "/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/recipients": {
       "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Get all the recipients",
         "operationId": "getRecipients",
         "responses": {
@@ -448,6 +707,11 @@ func init() {
         }
       },
       "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
         "summary": "Enroll Recipient",
         "operationId": "enrollRecipient",
         "parameters": [
@@ -468,10 +732,59 @@ func init() {
             "description": "Invalid token"
           }
         }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient",
+        "operationId": "deleteRecipient",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "required": [
+                "enrollmentCode"
+              ],
+              "properties": {
+                "enrollmentCode": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
       }
     },
     "/verifyOTP": {
       "post": {
+        "security": [],
         "summary": "Verify OTP",
         "operationId": "verifyOTP",
         "parameters": [
@@ -521,6 +834,37 @@ func init() {
     }
   },
   "definitions": {
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date",
+          "x-omitempty": false
+        },
+        "appointmentSlot": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "certified": {
+          "type": "boolean",
+          "x-omitempty": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "osid": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
     "address": {
       "description": "Indian address format",
       "type": "object",
@@ -536,7 +880,6 @@ func init() {
           "description": "Address line 1",
           "type": "string",
           "title": "The address line 1",
-          "default": "",
           "$id": "#/properties/address/properties/addressLine1"
         },
         "addressLine2": {
@@ -550,7 +893,7 @@ func init() {
           "$id": "#/properties/address/properties/district"
         },
         "pincode": {
-          "type": "integer",
+          "type": "string",
           "title": "The pincode schema",
           "$id": "#/properties/address/properties/pincode"
         },
@@ -569,7 +912,7 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
@@ -583,22 +926,23 @@ func init() {
         "address": {
           "$ref": "#/definitions/address"
         },
-        "appointmentDate": {
-          "type": "string",
-          "format": "date"
-        },
-        "appointmentSlot": {
-          "type": "string"
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
         },
         "beneficiaryPhone": {
           "type": "string"
         },
-        "certified": {
-          "type": "boolean",
-          "default": false
-        },
         "code": {
           "type": "string"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "dob": {
           "type": "string",
@@ -607,8 +951,13 @@ func init() {
         "email": {
           "type": "string"
         },
-        "enrollmentScopeId": {
-          "type": "string"
+        "enrollmentType": {
+          "type": "string",
+          "enum": [
+            "SELF_ENRL",
+            "PRE_ENRL",
+            "WALK_IN"
+          ]
         },
         "gender": {
           "type": "string",
@@ -627,13 +976,17 @@ func init() {
         "phone": {
           "type": "string"
         },
-        "programId": {
-          "type": "string"
-        },
         "yob": {
           "type": "integer"
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "Bearer": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
     }
   }
 }`))

@@ -2,6 +2,7 @@ package consumers
 
 import (
 	"encoding/json"
+
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/swagger_gen/models"
@@ -29,21 +30,30 @@ func StartEnrollmentConsumer() {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				log.Info("Got the message to create new enrollment")
-				var enrollment models.Enrollment
+				var enrollment = services.EnrollmentPayload{}
 				err = json.Unmarshal(msg.Value, &enrollment)
 
 				if err == nil {
 					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					err = services.CreateEnrollment(&enrollment, 1)
+					osid, err := services.CreateEnrollment(&enrollment, 1)
+
+					services.PublishEnrollmentACK(
+						enrollment.RowID,
+						enrollment.VaccinationDetails,
+						enrollment.Enrollment.EnrollmentType,
+						err,
+					)
+
 					// Below condition flow will be used by WALK_IN component.
 					if err == nil {
-						err = services.NotifyRecipient(enrollment)
+						cacheEnrollmentInfo(enrollment.Enrollment, osid)
+						err := services.NotifyRecipient(enrollment.Enrollment)
 						if err != nil {
-							log.Error("Unable to send notification to the enrolled user",  err)
+							log.Error("Unable to send notification to the enrolled user", err)
 						}
 					} else {
 						// Push to error topic
-						log.Errorf("Error occured while trying to create the enrollment (%v)",  err)
+						log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
 					}
 					_, _ = consumer.CommitMessage(msg)
 				} else {
@@ -56,4 +66,16 @@ func StartEnrollmentConsumer() {
 			}
 		}
 	}()
+}
+
+func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
+	data := map[string]interface{}{
+		"phone":        enrollment.Phone,
+		"updatedCount": 0, //to restrict multiple updates
+		"osid":         osid,
+	}
+	_, err := services.SetHMSet(enrollment.Code, data)
+	if err != nil {
+		log.Error("Unable to cache enrollment info", err)
+	}
 }

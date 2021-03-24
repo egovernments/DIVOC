@@ -79,7 +79,7 @@ func (k *KeycloakUserAttributes) UnmarshalJson(data []byte) error {
 func CreateKeycloakUser(user KeyCloakUserRequest) (*req.Resp, error) {
 	authHeader := getAuthHeader()
 	url := config.Config.Keycloak.Url + "/admin/realms/" + config.Config.Keycloak.Realm + "/users"
-	log.Infof("creating user %s : %s, %+v", url, authHeader, user)
+	log.Debugf("creating user %s : %s, %+v", url, authHeader, user)
 	return req.Post(url, req.BodyJSON(user),
 		req.Header{"Authorization": authHeader},
 	)
@@ -106,7 +106,7 @@ func isUserCreatedOrAlreadyExists(resp *req.Resp) bool {
 }
 
 func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest) string {
-	userUrl := resp.Response().Header.Get("Location") //https://divoc.k8s.sandboxaddis.com/keycloak/auth/admin/realms/divoc/users/f8c7067d-c0c8-4518-95b1-6681afbbf986
+	userUrl := resp.Response().Header.Get("Location") //https://divoc.xiv.in/keycloak/auth/admin/realms/divoc/users/f8c7067d-c0c8-4518-95b1-6681afbbf986
 	slices := strings.Split(userUrl, "/")
 	var keycloakUserId = ""
 	if len(slices) > 1 {

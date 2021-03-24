@@ -58,7 +58,7 @@ type CertifyUploadFields struct {
 	RecipientAddressLine2     string `json:"recipientAddressLine2"`
 	RecipientDistrict         string `json:"recipientDistrict"`
 	RecipientState            string `json:"recipientState"`
-	RecipientPincode          int64  `json:"recipientPincode"`
+	RecipientPincode          string  `json:"recipientPincode"`
 	VaccinationBatch          string `json:"vaccinationBatch"`
 	VaccinationDate           string `json:"vaccinationDate"`
 	VaccinationDose           string `json:"vaccinationDose"`
@@ -73,7 +73,7 @@ type CertifyUploadFields struct {
 	FacilityAddressLine2      string `json:"facilityAddressLine2"`
 	FacilityDistrict          string `json:"facilityDistrict"`
 	FacilityState             string `json:"facilityState"`
-	FacilityPincode           int64  `json:"facilityPincode"`
+	FacilityPincode           string  `json:"facilityPincode"`
 }
 
 func Init() {

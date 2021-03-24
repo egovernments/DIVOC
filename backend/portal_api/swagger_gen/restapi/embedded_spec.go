@@ -324,19 +324,25 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "type": "object",
-                "properties": {
-                  "facilityId": {
+              "type": "object",
+              "required": [
+                "message",
+                "facilities"
+              ],
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
                     "type": "string"
-                  },
-                  "pendingTasks": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
                   }
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "subject": {
+                  "type": "string"
                 }
               }
             }
@@ -614,7 +620,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
@@ -766,6 +773,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -790,7 +800,7 @@ func init() {
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/CreateMedicineRequest"
+                "$ref": "#/definitions/Medicine"
               }
             }
           }
@@ -844,7 +854,7 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/CreateMedicineRequest"
+              "$ref": "#/definitions/Medicine"
             }
           }
         ],
@@ -1264,7 +1274,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "description": "State of address",
@@ -1280,62 +1290,10 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
-    },
-    "CreateMedicineRequest": {
-      "type": "object",
-      "properties": {
-        "doseIntervals": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "properties": {
-              "max": {
-                "type": "integer"
-              },
-              "min": {
-                "type": "integer"
-              },
-              "osid": {
-                "type": "string"
-              }
-            }
-          }
-        },
-        "effectiveUntil": {
-          "description": "Effective until n days after the last dose",
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
-        },
-        "price": {
-          "description": "Indicative price if fixed or max price available.",
-          "type": "number"
-        },
-        "provider": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Active",
-            "Inactive",
-            "Blocked"
-          ]
-        },
-        "vaccinationMode": {
-          "type": "string",
-          "enum": [
-            "muscular injection",
-            "oral",
-            "nasal"
-          ]
-        }
-      }
     },
     "Error": {
       "type": "object",
@@ -1431,10 +1389,6 @@ func init() {
               }
             }
           }
-        },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
         },
         "stamp": {
           "type": "string"
@@ -1673,6 +1627,9 @@ func init() {
         }
       }
     },
+    "Medicine": {
+      "$ref": "../registry/Medicine.json#/definitions/Medicine"
+    },
     "Program": {
       "type": "object",
       "title": "Program",
@@ -1883,7 +1840,7 @@ func init() {
     "UpdateMedicineRequest": {
       "allOf": [
         {
-          "$ref": "#/definitions/CreateMedicineRequest"
+          "$ref": "#/definitions/Medicine"
         },
         {
           "properties": {
@@ -2410,9 +2367,26 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/NotifyFacilitiesParamsBodyItems0"
+              "type": "object",
+              "required": [
+                "message",
+                "facilities"
+              ],
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "message": {
+                  "type": "string",
+                  "minLength": 5
+                },
+                "subject": {
+                  "type": "string"
+                }
               }
             }
           }
@@ -2689,7 +2663,8 @@ func init() {
         "security": [
           {
             "hasRole": [
-              "facility-admin"
+              "facility-admin",
+              "facility-staff"
             ]
           }
         ],
@@ -2841,6 +2816,9 @@ func init() {
           },
           "400": {
             "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -2865,7 +2843,7 @@ func init() {
               "type": "array",
               "items": {
                 "type": "object",
-                "$ref": "#/definitions/CreateMedicineRequest"
+                "$ref": "#/definitions/Medicine"
               }
             }
           }
@@ -2919,7 +2897,7 @@ func init() {
             "name": "body",
             "in": "body",
             "schema": {
-              "$ref": "#/definitions/CreateMedicineRequest"
+              "$ref": "#/definitions/Medicine"
             }
           }
         ],
@@ -3339,7 +3317,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "description": "State of address",
@@ -3355,65 +3333,10 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
-    },
-    "CreateMedicineRequest": {
-      "type": "object",
-      "properties": {
-        "doseIntervals": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/CreateMedicineRequestDoseIntervalsItems0"
-          }
-        },
-        "effectiveUntil": {
-          "description": "Effective until n days after the last dose",
-          "type": "integer"
-        },
-        "name": {
-          "type": "string"
-        },
-        "price": {
-          "description": "Indicative price if fixed or max price available.",
-          "type": "number"
-        },
-        "provider": {
-          "type": "string"
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "Active",
-            "Inactive",
-            "Blocked"
-          ]
-        },
-        "vaccinationMode": {
-          "type": "string",
-          "enum": [
-            "muscular injection",
-            "oral",
-            "nasal"
-          ]
-        }
-      }
-    },
-    "CreateMedicineRequestDoseIntervalsItems0": {
-      "type": "object",
-      "properties": {
-        "max": {
-          "type": "integer"
-        },
-        "min": {
-          "type": "integer"
-        },
-        "osid": {
-          "type": "string"
-        }
-      }
     },
     "EnrollmentAddress": {
       "description": "Indian address format",
@@ -3430,7 +3353,6 @@ func init() {
           "description": "Address line 1",
           "type": "string",
           "title": "The address line 1",
-          "default": "",
           "$id": "#/properties/address/properties/addressLine1"
         },
         "addressLine2": {
@@ -3444,7 +3366,7 @@ func init() {
           "$id": "#/properties/address/properties/district"
         },
         "pincode": {
-          "type": "integer",
+          "type": "string",
           "title": "The pincode schema",
           "$id": "#/properties/address/properties/pincode"
         },
@@ -3463,10 +3385,41 @@ func init() {
           "addressLine1": "no. 23, some lane, some road",
           "addressLine2": "some nagar",
           "district": "bangalore south",
-          "pincode": 560000,
+          "pincode": "560000",
           "state": "Karnataka"
         }
       ]
+    },
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date",
+          "x-omitempty": false
+        },
+        "appointmentSlot": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "certified": {
+          "type": "boolean",
+          "x-omitempty": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "osid": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
     },
     "Error": {
       "type": "object",
@@ -3542,10 +3495,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/FacilityProgramsItems0"
           }
-        },
-        "serialNum": {
-          "type": "integer",
-          "title": "Serial Number"
         },
         "stamp": {
           "type": "string"
@@ -3833,17 +3782,77 @@ func init() {
         }
       }
     },
-    "NotifyFacilitiesParamsBodyItems0": {
+    "Medicine": {
+      "type": "object",
+      "title": "Medicine",
+      "required": [
+        "name",
+        "status",
+        "provider"
+      ],
+      "properties": {
+        "doseIntervals": {
+          "description": "How many days to wait after each dose",
+          "type": "array",
+          "title": "Interval for Doses",
+          "items": {
+            "$ref": "#/definitions/MedicineDoseIntervalsItems0"
+          }
+        },
+        "effectiveUntil": {
+          "description": "Effective until n days after the last dose",
+          "type": "integer",
+          "title": "Effective until (Days)",
+          "minimum": 0
+        },
+        "name": {
+          "type": "string",
+          "title": "Name of Vaccine / Medicine",
+          "$id": "#/properties/name"
+        },
+        "price": {
+          "type": "number",
+          "title": "Price Range",
+          "minimum": 0
+        },
+        "provider": {
+          "type": "string",
+          "title": "Manufacturer",
+          "$id": "#/properties/provider"
+        },
+        "status": {
+          "type": "string",
+          "title": "Status",
+          "enum": [
+            "Active",
+            "Inactive",
+            "Blocked"
+          ]
+        },
+        "vaccinationMode": {
+          "type": "string",
+          "default": "muscular injection",
+          "enum": [
+            "muscular injection",
+            "oral",
+            "nasal"
+          ]
+        }
+      },
+      "$id": "#properties/Medicine"
+    },
+    "MedicineDoseIntervalsItems0": {
       "type": "object",
       "properties": {
-        "facilityId": {
-          "type": "string"
+        "max": {
+          "description": "Maximum Interval",
+          "type": "integer",
+          "minimum": 0
         },
-        "pendingTasks": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
+        "min": {
+          "description": "Minimum Interval",
+          "type": "integer",
+          "minimum": 0
         }
       }
     },
@@ -4077,7 +4086,7 @@ func init() {
     "UpdateMedicineRequest": {
       "allOf": [
         {
-          "$ref": "#/definitions/CreateMedicineRequest"
+          "$ref": "#/definitions/Medicine"
         },
         {
           "properties": {
@@ -4288,8 +4297,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId",
-        "dob"
+        "nationalId"
       ],
       "properties": {
         "address": {
@@ -4307,7 +4315,6 @@ func init() {
               "description": "Address line 1",
               "type": "string",
               "title": "The address line 1",
-              "default": "",
               "$id": "#/properties/address/properties/addressLine1"
             },
             "addressLine2": {
@@ -4321,7 +4328,7 @@ func init() {
               "$id": "#/properties/address/properties/district"
             },
             "pincode": {
-              "type": "integer",
+              "type": "string",
               "title": "The pincode schema",
               "$id": "#/properties/address/properties/pincode"
             },
@@ -4340,27 +4347,28 @@ func init() {
               "addressLine1": "no. 23, some lane, some road",
               "addressLine2": "some nagar",
               "district": "bangalore south",
-              "pincode": 560000,
+              "pincode": "560000",
               "state": "Karnataka"
             }
           ]
         },
-        "appointmentDate": {
-          "type": "string",
-          "format": "date"
-        },
-        "appointmentSlot": {
-          "type": "string"
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
         },
         "beneficiaryPhone": {
           "type": "string"
         },
-        "certified": {
-          "type": "boolean",
-          "default": false
-        },
         "code": {
           "type": "string"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         },
         "dob": {
           "type": "string",
@@ -4369,8 +4377,13 @@ func init() {
         "email": {
           "type": "string"
         },
-        "enrollmentScopeId": {
-          "type": "string"
+        "enrollmentType": {
+          "type": "string",
+          "enum": [
+            "SELF_ENRL",
+            "PRE_ENRL",
+            "WALK_IN"
+          ]
         },
         "gender": {
           "type": "string",
@@ -4389,8 +4402,8 @@ func init() {
         "phone": {
           "type": "string"
         },
-        "programId": {
-          "type": "string"
+        "yob": {
+          "type": "integer"
         }
       }
     },

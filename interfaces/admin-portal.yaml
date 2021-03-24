@@ -166,16 +166,21 @@ paths:
         - in: body
           name: body
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                facilityId:
+            type: object
+            properties:
+              subject:
+                type: string
+              message:
+                type: string
+                minLength: 5
+              facilities:
+                type: array
+                items:
                   type: string
-                pendingTasks:
-                  type: array
-                  items:
-                    type: string
+                minItems: 1
+            required:
+              - message
+              - facilities
       responses:
         '200':
           description: OK
@@ -358,7 +363,7 @@ paths:
             type: array
             items:
               type: object
-              $ref: '#/definitions/CreateMedicineRequest'
+              $ref: '#/definitions/Medicine'
     post:
       summary: Create Medicine
       operationId: createMedicine
@@ -368,7 +373,7 @@ paths:
         - in: body
           name: body
           schema:
-            $ref: '#/definitions/CreateMedicineRequest'
+            $ref: '#/definitions/Medicine'
           description: Create Medicine
       responses:
         '200':
@@ -495,7 +500,7 @@ paths:
       summary: Get slots for given program and facility
       operationId: getFacilityProgramSchedule
       security:
-        - hasRole: ["facility-admin"]
+        - hasRole: ["facility-admin", "facility-staff"]
       parameters:
         - name: facilityId
           in: path
@@ -553,6 +558,8 @@ paths:
           description: OK
         '400':
           description: Invalid input
+        '401':
+          description: Unauthorized
     put:
       summary: update schedule for program in facility
       operationId: updateFacilityProgramSchedule
@@ -823,43 +830,12 @@ definitions:
             type: string
   UpdateMedicineRequest:
     allOf:
-      - $ref: "#/definitions/CreateMedicineRequest"
+      - $ref: "#/definitions/Medicine"
       - properties:
           osid:
             type: string
-  CreateMedicineRequest:
-    type: object
-    properties:
-      name:
-        type: string
-      provider:
-        type: string
-      vaccinationMode:
-        type: string
-        enum: ["muscular injection", "oral", "nasal"]
-      doseIntervals:
-        type: array
-        items:
-          type: object
-          properties:
-            osid:
-              type: string
-            min:
-              type: integer
-            max:
-              type: integer
-      effectiveUntil:
-        type: integer
-        description: Effective until n days after the last dose
-      status:
-        type: string
-        enum:
-          - Active
-          - Inactive
-          - Blocked
-      price:
-        type: number
-        description: Indicative price if fixed or max price available.
+  Medicine:
+    $ref: '../registry/Medicine.json#/definitions/Medicine'
   PublicFacility:
     properties:
       osid:
@@ -941,9 +917,6 @@ definitions:
                     type: string
   Facility:
     properties:
-      serialNum:
-        type: integer
-        title: Serial Number
       facilityCode:
         type: string
         title: Facility Code
@@ -1028,7 +1001,7 @@ definitions:
         addressLine2: some nagar
         district: bangalore south
         state: Karnataka
-        pincode: 560000
+        pincode: "560000"
     required:
       - addressLine1
       - addressLine2
@@ -1043,7 +1016,7 @@ definitions:
       district:
         type: string
       pincode:
-        type: integer
+        type: string
       state:
         type: string
         title: The state schema

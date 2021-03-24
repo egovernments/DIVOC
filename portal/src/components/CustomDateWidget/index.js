@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import date from "../../assets/img/date.png";
@@ -6,7 +6,22 @@ import "./index.css";
 
 
 export const CustomDateWidget = (props) => {
+
+  const getMinDate = () => {
+    if (props["options"]) {
+      return props["options"]["minDate"]
+    }
+  }
+  const [minDate, setMinDate] = useState();
   const [startDate, setStartDate] = useState(new Date(props.value || new Date()));
+
+  useEffect(() => {
+    const newMinDate = getMinDate();
+    setMinDate(newMinDate);
+    if (newMinDate && (newMinDate > startDate)) {
+      setStartDate(newMinDate);
+    }
+  }, [props]);
 
   const updateValue = (newValue) => {
     setStartDate(newValue);
@@ -28,6 +43,7 @@ export const CustomDateWidget = (props) => {
             onChange={updateValue} 
             dateFormat="dd-MM-yyyy"
             id="date-picker"
+            minDate={minDate}
             customInput={<CustomInput />}
         />
     </div>

@@ -52,15 +52,13 @@
           "$id": "#/properties/sideEffectsResponse/properties/symptom",
           "type": "string",
           "title": "symptom",
-          "description": "symptom",
-          "default": ""
+          "description": "symptom"
         },
         "response": {
           "$id": "#/properties/sideEffectsResponse/properties/response",
           "type": "string",
           "title": "response",
-          "description": "response",
-          "default": ""
+          "description": "response"
         }
       }
     }

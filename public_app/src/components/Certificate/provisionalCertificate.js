@@ -226,7 +226,7 @@ export const ProvisionalCertificate = function ({
                                     </span>
                                     <br />
                                     <img src={globe}></img>{" "}
-                                    <b> {"https://divoc.k8s.sandboxaddis.com/learn"}</b>
+                                    <b> {"https://divoc.xiv.in/learn"}</b>
                                     <br />
                                     <img src={phone}></img> <b> 1800 000 000</b>
                                 </div>

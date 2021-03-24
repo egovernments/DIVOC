@@ -4,20 +4,19 @@ import "./Home.scss"
 import {Col} from "react-bootstrap";
 import {useHistory} from "react-router";
 import {FORM_PRE_ENROLL_CODE} from "./Forms/PreEnrollmentFlow";
-import NoImagePlaceholder from "../assets/img/no_image.svg"
 import enrollRecipient from "./enroll_recipient.png"
-import recipientQueue from "./recipent_queue.png"
 import verifyRecipient from "./verify_recpient.png"
 import {getMessageComponent, LANGUAGE_KEYS} from "../lang/LocaleContext";
-import {FORM_WALK_IN_ENROLL_FORM} from "../components/WalkEnrollments";
-import {WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
+import {FORM_WALK_IN_ELIGIBILITY_CRITERIA, WALK_IN_ROUTE} from "../components/WalkEnrollments/context";
 import config from "../config"
 import {SyncFacade} from "../SyncFacade";
-import {VaccinationStatus} from "./VaccinationStatus";
 import NoNetworkImg from "assets/img/no_network.svg"
+import NetworkImg from "assets/img/network_online.svg"
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
+import {AppointmentDetails} from "./AppointmentDetails";
+import {formatDate} from "../utils/date_utils";
 
 function ProgramHeader() {
     const [bannerImage, setBannerImage] = useState();
@@ -60,7 +59,7 @@ function ProgramHeader() {
     </div>;
 }
 
-function Title({text, content}) {
+export function Title({text, content}) {
     return <div className={"title-container"}>
         <div className={"title"}>{text}</div>
         {content}
@@ -82,65 +81,90 @@ function EnrollmentTypes() {
                             onClick={() => {
                                 goToNewEnroll()
                             }}/>
-            <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} icon={recipientQueue}
-                            onClick={goToQueue}/>
         </div>
     </>;
 }
 
-function EnrolmentItems({icon, title, onClick}) {
+function VaccinationProgress() {
+    const [beneficiaryStatus, setRecipientDetails] = useState([])
+    useEffect(() => {
+        appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary))
+    }, [])
+    const {goToQueue} = useHome();
+    if (beneficiaryStatus.length > 0) {
+        return <>
+            <div className="enroll-container mt-2">
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                                onClick={goToQueue} value={beneficiaryStatus[0].value}/>
+                <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
+                                value={beneficiaryStatus[1].value}/>
+            </div>
+        </>;
+    } else {
+        return <></>
+    }
+}
+
+export function EnrolmentItems({icon, title, onClick, value}) {
     return (
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>
                 <Col>
                     <img className={"icon"} src={icon} alt={""}/>
-                    <h6>{title}</h6>
+                    <h5>{value}</h5>
+                    <h5>{title}</h5>
                 </Col>
             </BaseCard>
         </div>
     );
 }
 
-
 export function VaccineProgram() {
     const [isNotSynced, setNotSynced] = useState(false)
+    const [eventsCount, setEventsCount] = useState(false)
     useEffect(() => {
-        SyncFacade.isSyncedIn24Hours()
+        appIndexDb.getAllEvents()
+            .then((events) => setEventsCount(events.length))
+            .catch(e => console.log(e.message))
+        SyncFacade.isNotSynced()
             .then((result) => setNotSynced(result))
             .catch(e => console.log(e.message))
     }, [])
     return <div className={"home-container"}>
         <ProgramHeader/>
-        {isNotSynced && <SyncData onSyncDone={() => setNotSynced(false)}/>}
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ACTIONS)} content={<EnrollmentTypes/>}/>
-        <Title text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY)} content={<VaccinationStatus/>}/>
+        <SyncData isNotSynced={isNotSynced} eventsCount={eventsCount}/>
+        <Title text={""} content={<EnrollmentTypes/>}/>
+        <Title
+            text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY, "", {date: formatDate(new Date().toISOString())})}
+            content={<VaccinationProgress/>}/>
+        <AppointmentDetails/>
     </div>;
 }
 
-function SyncData({onSyncDone}) {
-    const [loading, setLoading] = useState(false)
-    const lastSyncedDate = SyncFacade.lastSyncedOn();
+function SyncData(props) {
+    let baseCard;
+    if (!props.isNotSynced) {
+        baseCard = <BaseCard>
+            <div className="d-flex pl-3 ml-4">
+                <img className="network" src={NetworkImg} alt={"no_network"} width="25px"/>
+                <div className="p-3" style={{fontWeight: 600}}>Sync upto date</div>
+            </div>
+        </BaseCard>
+    } else {
+        const lastSyncedDate = SyncFacade.lastSyncedOn();
+        baseCard = <BaseCard>
+            <div className="d-flex pl-3">
+                <img className="network mr-2" src={NoNetworkImg} alt={"no_network"} width="25px"/>
+                <div className="p-3 ml-4">
+                    <label style={{fontWeight: 600}}>Last synced {lastSyncedDate}.</label>
+                    <label>Information of {props.eventsCount} beneficiaries is not yet synced.</label>
+                </div>
+            </div>
+        </BaseCard>
+    }
     return (
         <div className="mt-3">
-            <BaseCard>
-                <div className="d-flex pl-3">
-                    <img src={NoNetworkImg} alt={"no_network"} width="25px"/>
-                    <div className="p-3">Last synced {lastSyncedDate}</div>
-                    <div className="p-3" style={{color: "#5C9EF8"}} onClick={() => {
-                        if (!loading) {
-                            setLoading(true)
-                            SyncFacade.push()
-                                .then((result) => {
-                                    setLoading(false)
-                                    if (onSyncDone != null) {
-                                        onSyncDone()
-                                    }
-                                })
-                                .catch((e) => setLoading(false))
-                        }
-                    }}>{loading ? "Syncing..." : <u>Sync now</u>}</div>
-                </div>
-            </BaseCard>
+            {baseCard}
         </div>
     );
 }
@@ -191,7 +215,7 @@ export function useHome() {
         history.push(`${config.urlPath}/queue`)
     };
     const goToNewEnroll = function () {
-        history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ENROLL_FORM)
+        history.push(config.urlPath + '/' + WALK_IN_ROUTE + '/' + FORM_WALK_IN_ELIGIBILITY_CRITERIA)
     };
 
     return {

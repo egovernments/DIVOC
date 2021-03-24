@@ -6,7 +6,6 @@
     "gender",
     "nationalId",
     "dob",
-    "email",
     "phone",
     "addressLine1",
     "district",
@@ -92,7 +91,7 @@
     },
     "pincode": {
       "$id": "#/properties/pincode",
-      "type": "number",
+      "type": "string",
       "title": "Pincode"
     }
   }

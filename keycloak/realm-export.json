@@ -32,7 +32,7 @@
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": false,
-  "editUsernameAllowed": false,
+  "editUsernameAllowed": true,
   "bruteForceProtected": false,
   "permanentLockout": false,
   "maxFailureWaitSeconds": 900,
@@ -655,6 +655,9 @@
         "realm-management": [
           "manage-users"
         ],
+        "admin-api": [
+          "api"
+        ],
         "account": [
           "manage-account",
           "view-profile"
@@ -820,20 +823,20 @@
     {
       "id": "cd59dfa9-6289-40f9-b5c1-d76b1565501d",
       "clientId": "admin-api",
-      "rootUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/account/",
-      "adminUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/account/",
+      "rootUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
+      "adminUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "https://divoc.k8s.sandboxaddis.com",
-        "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/account/*",
+        "https://divoc.xiv.in",
+        "https://divoc.xiv.in/keycloak/auth/realms/divoc/account/*",
         "https://oauth.pstmn.io/v1/callback"
       ],
       "webOrigins": [
-        "https://divoc.k8s.sandboxaddis.com"
+        "https://divoc.xiv.in"
       ],
       "notBefore": 0,
       "bearerOnly": false,
@@ -1102,7 +1105,7 @@
     {
       "id": "ac354645-3c3c-4592-879b-20a2f4f48302",
       "clientId": "certificate-login",
-      "rootUrl": "https://divoc.k8s.sandboxaddis.com/certificate/",
+      "rootUrl": "https://divoc.xiv.in/certificate/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -1110,15 +1113,15 @@
       "secret": "**********",
       "redirectUris": [
         "http://192.168.0.103:3000/*",
-        "https://divoc.k8s.sandboxaddis.com/*",
+        "https://divoc.xiv.in/*",
         "http://localhost:3000/*",
         "*",
-        "https://divoc.k8s.sandboxaddis.com/certificate/",
+        "https://divoc.xiv.in/certificate/",
         "http://localhost/certificate/*",
-        "https://divoc.k8s.sandboxaddis.com/certificate/*"
+        "https://divoc.xiv.in/certificate/*"
       ],
       "webOrigins": [
-        "https://divoc.k8s.sandboxaddis.com",
+        "https://divoc.xiv.in",
         "*",
         "http://localhost",
         "http://192.168.0.103:3000",
@@ -1279,13 +1282,13 @@
         "https://divoc-app.xiv.in/*",
         "http://divoc-portal.xiv.in/*",
         "https://divoc-portal.xiv.in/*",
-        "https://divoc.k8s.sandboxaddis.com/*",
+        "https://divoc.xiv.in/*",
         "http://localhost:3000/*",
         "*",
         "http://localhost:5000/*"
       ],
       "webOrigins": [
-        "https://divoc.k8s.sandboxaddis.com",
+        "https://divoc.xiv.in",
         "http://localhost:5000",
         "*",
         "https://divoc-app.xiv.in",
@@ -1463,7 +1466,7 @@
       "clientAuthenticatorType": "client-secret",
       "secret": "**********",
       "redirectUris": [
-        "https://divoc.k8s.sandboxaddis.com",
+        "https://divoc.xiv.in",
         "https://oauth.pstmn.io/v1/callback"
       ],
       "webOrigins": [],

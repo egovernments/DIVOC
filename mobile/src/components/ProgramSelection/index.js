@@ -1,18 +1,13 @@
-import {Card} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 import "./index.scss"
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {programDb} from "../../Services/ProgramDB";
-import Col from "react-bootstrap/Col";
 import ImgPlaceholder from "assets/img/no_image.svg"
 import ImgTick from "assets/img/tick.svg"
 import Button from "react-bootstrap/Button";
 import {ApiServices} from "../../Services/ApiServices";
 import {AuthSafeComponent} from "../../utils/keycloak";
-import {SyncFacade} from "../../SyncFacade";
-import {appIndexDb} from "../../AppDatabase";
-import {Messages} from "../../Base/Constants";
 import {BaseCard} from "../../Base/Base";
 import config from "../../config";
 
@@ -29,7 +24,8 @@ export function ProgramSelection() {
     }, [])
 
     const onProgramSelected = (program) => {
-        saveSelectedProgram(program)
+        saveSelectedProgram(program.name)
+        saveSelectedProgramId(program.id)
     }
 
     return (
@@ -44,7 +40,7 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
     const [selectedProgram, setSelectedProgram] = useState(getSelectedProgram())
 
     const onProgramSelected = (program) => {
-        setSelectedProgram(program)
+        setSelectedProgram(program.name)
         if (onProgramSelectedCallback) {
             onProgramSelectedCallback(program)
         }
@@ -56,7 +52,7 @@ export function ProgramSelectionGrid({programs, onProgramSelectedCallback}) {
                     key={item.id}
                     program={item}
                     selected={item.name === selectedProgram}
-                    onClick={() => onProgramSelected(item.name)}/>
+                    onClick={() => onProgramSelected(item)}/>
             })}
         </div>
     )
@@ -91,6 +87,11 @@ export function SelectProgram({onDone}) {
             .then((result) => {
                 setLoading(false);
                 setPrograms(result);
+                if (result?.length === 1) {
+                    saveSelectedProgram(result[0].name);
+                    saveSelectedProgramId(result[0].id);
+                    onDone(result[0].name);
+                }
             })
             .catch(e => {
                 setLoading(false);
@@ -124,7 +125,7 @@ export function SelectProgram({onDone}) {
                             saveSelectedProgram(selectedProgram)
                             onDone(selectedProgram)
                         }
-                    }}>Done</Button>
+                    }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_DONE)}</Button>
             </div>
         </div>
     );
@@ -157,6 +158,14 @@ function NoProgramFound({keycloak}) {
 
 export function getSelectedProgram() {
     return localStorage.getItem("program")
+}
+
+export function getSelectedProgramId() {
+    return localStorage.getItem("programId")
+}
+
+export function saveSelectedProgramId(programId) {
+    localStorage.setItem("programId", programId)
 }
 
 export function saveSelectedProgram(programName) {

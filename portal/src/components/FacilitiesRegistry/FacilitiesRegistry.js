@@ -22,7 +22,11 @@ function Facilities() {
                 return []
             })
             .then((result) => {
-                return result.map((item, index) => {
+                return result
+                .sort((a, b) => {
+                    return new Date(b["osCreatedAt"]) - new Date(a["osCreatedAt"]);
+                })
+                .map((item, index) => {
                     return {
                         facilityId: item["facilityCode"],
                         name: item["facilityName"],

@@ -33,7 +33,7 @@ func init() {
     "title": "Divoc",
     "version": "1.0.0"
   },
-  "host": "divoc.k8s.sandboxaddis.com",
+  "host": "divoc.xiv.in",
   "basePath": "/divoc/api/v1",
   "paths": {
     "/authorize": {
@@ -140,7 +140,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -344,6 +344,12 @@ func init() {
             "type": "number",
             "name": "offset",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "name": "date",
+            "in": "query"
           }
         ],
         "responses": {
@@ -352,7 +358,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PreEnrollment"
+                "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
               }
             }
           }
@@ -389,7 +395,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/PreEnrollment"
+              "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
             }
           }
         }
@@ -555,6 +561,15 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -581,7 +596,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -599,6 +614,9 @@ func init() {
         "preEnrollmentCode": {
           "type": "string"
         },
+        "programId": {
+          "type": "string"
+        },
         "recipient": {
           "type": "object",
           "required": [
@@ -607,7 +625,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -629,7 +649,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -767,7 +787,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -781,70 +802,6 @@ func init() {
           "type": "string"
         },
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollment": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "object",
-          "properties": {
-            "addressLine1": {
-              "type": "string"
-            },
-            "addressLine2": {
-              "type": "string"
-            },
-            "district": {
-              "type": "string"
-            },
-            "pincode": {
-              "type": "integer"
-            },
-            "state": {
-              "type": "string"
-            }
-          }
-        },
-        "certified": {
-          "type": "boolean"
-        },
-        "code": {
-          "type": "string"
-        },
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "email": {
-          "type": "string"
-        },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "string",
-          "enum": [
-            "Male",
-            "Female",
-            "Other"
-          ]
-        },
-        "meta": {
-          "type": "object"
-        },
-        "name": {
-          "type": "string"
-        },
-        "nationalId": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "programId": {
           "type": "string"
         }
       }
@@ -943,8 +900,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",
@@ -976,7 +933,7 @@ func init() {
     "title": "Divoc",
     "version": "1.0.0"
   },
-  "host": "divoc.k8s.sandboxaddis.com",
+  "host": "divoc.xiv.in",
   "basePath": "/divoc/api/v1",
   "paths": {
     "/authorize": {
@@ -1083,7 +1040,7 @@ func init() {
     },
     "/certify": {
       "post": {
-        "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
           "certification"
         ],
@@ -1287,6 +1244,12 @@ func init() {
             "type": "number",
             "name": "offset",
             "in": "query"
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "name": "date",
+            "in": "query"
           }
         ],
         "responses": {
@@ -1295,7 +1258,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/PreEnrollment"
+                "$ref": "#/definitions/enrollment"
               }
             }
           }
@@ -1332,7 +1295,7 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "$ref": "#/definitions/PreEnrollment"
+              "$ref": "#/definitions/enrollment"
             }
           }
         }
@@ -1498,6 +1461,15 @@ func init() {
         "facility"
       ],
       "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string"
+        },
         "facility": {
           "type": "object",
           "required": [
@@ -1524,7 +1496,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -1542,6 +1514,9 @@ func init() {
         "preEnrollmentCode": {
           "type": "string"
         },
+        "programId": {
+          "type": "string"
+        },
         "recipient": {
           "type": "object",
           "required": [
@@ -1550,7 +1525,9 @@ func init() {
             "nationality",
             "identity",
             "contact",
-            "address"
+            "address",
+            "enrollmentType",
+            "programId"
           ],
           "properties": {
             "address": {
@@ -1572,7 +1549,7 @@ func init() {
                   "type": "string"
                 },
                 "pincode": {
-                  "type": "integer"
+                  "type": "string"
                 },
                 "state": {
                   "type": "string"
@@ -1691,7 +1668,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -1722,7 +1699,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "type": "string"
@@ -1737,7 +1714,9 @@ func init() {
         "nationality",
         "identity",
         "contact",
-        "address"
+        "address",
+        "enrollmentType",
+        "programId"
       ],
       "properties": {
         "address": {
@@ -1759,7 +1738,7 @@ func init() {
               "type": "string"
             },
             "pincode": {
-              "type": "integer"
+              "type": "string"
             },
             "state": {
               "type": "string"
@@ -1813,7 +1792,7 @@ func init() {
           "type": "string"
         },
         "pincode": {
-          "type": "integer"
+          "type": "string"
         },
         "state": {
           "type": "string"
@@ -1876,6 +1855,37 @@ func init() {
         }
       }
     },
+    "EnrollmentAppointmentsItems0": {
+      "type": "object",
+      "properties": {
+        "appointmentDate": {
+          "type": "string",
+          "format": "date",
+          "x-omitempty": false
+        },
+        "appointmentSlot": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "certified": {
+          "type": "boolean",
+          "x-omitempty": false
+        },
+        "dose": {
+          "type": "string"
+        },
+        "enrollmentScopeId": {
+          "type": "string",
+          "x-omitempty": false
+        },
+        "osid": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string"
+        }
+      }
+    },
     "Error": {
       "type": "object",
       "required": [
@@ -1921,7 +1931,8 @@ func init() {
       "type": "object",
       "properties": {
         "mobile": {
-          "type": "string"
+          "type": "string",
+          "format": "string"
         },
         "token2fa": {
           "type": "string"
@@ -1935,90 +1946,6 @@ func init() {
           "type": "string"
         },
         "token": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollment": {
-      "type": "object",
-      "properties": {
-        "address": {
-          "type": "object",
-          "properties": {
-            "addressLine1": {
-              "type": "string"
-            },
-            "addressLine2": {
-              "type": "string"
-            },
-            "district": {
-              "type": "string"
-            },
-            "pincode": {
-              "type": "integer"
-            },
-            "state": {
-              "type": "string"
-            }
-          }
-        },
-        "certified": {
-          "type": "boolean"
-        },
-        "code": {
-          "type": "string"
-        },
-        "dob": {
-          "type": "string",
-          "format": "date"
-        },
-        "email": {
-          "type": "string"
-        },
-        "enrollmentScopeId": {
-          "type": "string"
-        },
-        "gender": {
-          "type": "string",
-          "enum": [
-            "Male",
-            "Female",
-            "Other"
-          ]
-        },
-        "meta": {
-          "type": "object"
-        },
-        "name": {
-          "type": "string"
-        },
-        "nationalId": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "programId": {
-          "type": "string"
-        }
-      }
-    },
-    "PreEnrollmentAddress": {
-      "type": "object",
-      "properties": {
-        "addressLine1": {
-          "type": "string"
-        },
-        "addressLine2": {
-          "type": "string"
-        },
-        "district": {
-          "type": "string"
-        },
-        "pincode": {
-          "type": "integer"
-        },
-        "state": {
           "type": "string"
         }
       }
@@ -2139,6 +2066,122 @@ func init() {
         }
       }
     },
+    "address": {
+      "description": "Indian address format",
+      "type": "object",
+      "title": "Address",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "description": "Address line 1",
+          "type": "string",
+          "title": "The address line 1",
+          "$id": "#/properties/address/properties/addressLine1"
+        },
+        "addressLine2": {
+          "type": "string",
+          "title": "The address2 schema",
+          "$id": "#/properties/address/properties/addressLine2"
+        },
+        "district": {
+          "type": "string",
+          "title": "The district schema",
+          "$id": "#/properties/address/properties/district"
+        },
+        "pincode": {
+          "type": "string",
+          "title": "The pincode schema",
+          "$id": "#/properties/address/properties/pincode"
+        },
+        "state": {
+          "description": "State of address",
+          "type": "string",
+          "title": "The state schema",
+          "$id": "#/properties/address/properties/state",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      },
+      "examples": [
+        {
+          "addressLine1": "no. 23, some lane, some road",
+          "addressLine2": "some nagar",
+          "district": "bangalore south",
+          "pincode": "560000",
+          "state": "Karnataka"
+        }
+      ]
+    },
+    "enrollment": {
+      "type": "object",
+      "required": [
+        "nationalId"
+      ],
+      "properties": {
+        "address": {
+          "$ref": "#/definitions/address"
+        },
+        "appointments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/EnrollmentAppointmentsItems0"
+          }
+        },
+        "beneficiaryPhone": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date"
+        },
+        "email": {
+          "type": "string"
+        },
+        "enrollmentType": {
+          "type": "string",
+          "enum": [
+            "SELF_ENRL",
+            "PRE_ENRL",
+            "WALK_IN"
+          ]
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "Male",
+            "Female",
+            "Other"
+          ]
+        },
+        "name": {
+          "type": "string"
+        },
+        "nationalId": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "yob": {
+          "type": "integer"
+        }
+      }
+    },
     "sideEffectsResponse": {
       "description": "Indian address format",
       "type": "object",
@@ -2152,14 +2195,12 @@ func init() {
           "description": "response",
           "type": "string",
           "title": "response",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/response"
         },
         "symptom": {
           "description": "symptom",
           "type": "string",
           "title": "symptom",
-          "default": "",
           "$id": "#/properties/sideEffectsResponse/properties/symptom"
         }
       },
@@ -2319,8 +2360,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",

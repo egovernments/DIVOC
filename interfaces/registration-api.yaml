@@ -3,6 +3,11 @@ info:
   title: Registration API
   description: Registration API
   version: 1.0.0
+securityDefinitions:
+  Bearer:
+    type: apiKey
+    name: Authorization
+    in: header
 schemes:
   - https
 basePath: /divoc/api/citizen
@@ -11,10 +16,47 @@ consumes:
 produces:
   - application/json
 paths:
-  /facility/slot/book:
+  /appointment:
+    delete:
+      summary: Delete the appointment
+      operationId: deleteAppointment
+      security:
+       - Bearer: [ ]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - enrollmentCode
+              - programId
+              - dose
+            properties:
+              enrollmentCode:
+                type: string
+              programId:
+                type: string
+              dose:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '401':
+          description: Unauthorized
     post:
       summary: Book a slot in facility
       operationId: bookSlotOfFacility
+      security:
+        - Bearer: [ ]
       parameters:
         - in: body
           name: body
@@ -23,10 +65,16 @@ paths:
             required:
               - facilitySlotId
               - enrollmentCode
+              - programId
+              - dose
             properties:
               facilitySlotId:
                 type: string
               enrollmentCode:
+                type: string
+              programId:
+                type: string
+              dose:
                 type: string
       responses:
         '200':
@@ -41,13 +89,19 @@ paths:
     get:
       summary: Get slots for facilites
       operationId: getSlotsForFacilities
+      security:
+        - Bearer: [ ]
       parameters:
         - in: query
           name: facilityId
           type: string
         - in: query
           name: pageNumber
-          type: number
+          type: integer
+          default: 0
+        - in: query
+          name: pageSize
+          type: integer
           default: 0
       responses:
         '200':
@@ -62,6 +116,7 @@ paths:
     post:
       summary: Initialize facility slots
       operationId: initializeFacilitySlots
+      security: [ ]
       parameters:
         - in: body
           name: body
@@ -77,9 +132,40 @@ paths:
           description: Unauthorized
 
   /recipients:
+    delete:
+      summary: Delete the recipient
+      operationId: deleteRecipient
+      security:
+        - Bearer: [ ]
+      parameters:
+        - in: body
+          name: body
+          schema:
+            type: object
+            required:
+              - enrollmentCode
+            properties:
+              enrollmentCode:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+        '401':
+          description: Unauthorized
     post:
       summary: Enroll Recipient
       operationId: enrollRecipient
+      security:
+        - Bearer: [ ]
       parameters:
         - in: body
           name: body
@@ -94,6 +180,8 @@ paths:
     get:
       summary: Get all the recipients
       operationId: getRecipients
+      security:
+        - Bearer: [ ]
       responses:
         '200':
           description: OK
@@ -111,6 +199,7 @@ paths:
    post:
      summary: Generate OTP
      operationId: generateOTP
+     security: []
      parameters:
        - in: body
          name: body
@@ -133,6 +222,7 @@ paths:
     post:
       summary: Verify OTP
       operationId: verifyOTP
+      security: []
       parameters:
         - in: body
           name: body
@@ -160,3 +250,13 @@ paths:
           description: Internal error
         '429':
           description: Verify otp attempts exceeded, generate new OTP
+  /ping:
+    get:
+      summary: Server heartbeat operation
+      description: >-
+        This operation shows how to override the global security defined above,
+        as we want to open it up for all users.
+      security: []
+      responses:
+        '200':
+          description: OK

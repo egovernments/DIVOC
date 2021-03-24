@@ -19,3 +19,12 @@
 .members-container .card {
     border: 0;
 }
+
+@media (max-width: 961px) {
+    .main-container {
+        padding: 1rem 0.5rem;
+    }
+    .members-container {
+        padding: 1rem 0.5rem;
+    }
+}

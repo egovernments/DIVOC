@@ -57,19 +57,25 @@ const UploadHistory = ({
                         date: uploadLocalDate,
                         time: uploadLocalTime,
                         success: getSuccessRecords(item),
-                        errors: item["TotalErrorRows"]
+                        errors: item["TotalErrorRows"],
+                        uploadedDate: uploadedDate
                     }
                 })
             })
             .then((result) => {
+                result.sort((a, b) => b.uploadedDate - a.uploadedDate);
                 setSelectedHistory(result[0]);
                 setUploadHistory(result)
             });
     }
 
     function getSuccessRecords(item) {
-        if (!isNaN(item["TotalRecords"]) && !isNaN(item["TotalErrorRows"])) {
-            return item["TotalRecords"] - item["TotalErrorRows"]
+        let totalErrRows = 0;
+        if (!isNaN(item["TotalErrorRows"])) {
+            totalErrRows =  item["TotalErrorRows"]
+        }
+        if (!isNaN(item["TotalRecords"])) {
+            return item["TotalRecords"] - totalErrRows
         }
         return 0
     }

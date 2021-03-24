@@ -2,7 +2,9 @@ package config
 
 import "github.com/jinzhu/configor"
 
+var EsRegistries []string
 func init() {
+	EsRegistries = []string{"Facility"}
 	print("kernel config initialization")
 	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
 
@@ -14,6 +16,7 @@ func init() {
 var Config = struct {
 	Registry struct {
 		Url               string `default:"localhost:8081" env:"REGISTRY_URL"`
+		UrlForES          string `default:"http://localhost:8082" env:"REGISTRY_WITH_ES_URL"`
 		AddOperationId    string `default:"add"`
 		SearchOperationId string `default:"search"`
 		UpdateOperationId string `default:"update"`

@@ -95,7 +95,7 @@ paths:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/PreEnrollment'
+            $ref: '../registry/Enrollment.json#/definitions/Enrollment'
   '/preEnrollments':
     get:
       tags:
@@ -109,13 +109,17 @@ paths:
         - in: query
           name: offset
           type: number
+        - in: query
+          name: date
+          type: string
+          format: date
       responses:
         '200':
           description: OK
           schema:
             type: array
             items:
-              $ref: '#/definitions/PreEnrollment'
+              $ref: '../registry/Enrollment.json#/definitions/Enrollment'
   /certify:
     post:
       tags:
@@ -123,7 +127,7 @@ paths:
       summary: Certify the one or more vaccination
       description: >-
         Certification happens asynchronously, this requires vaccinator
-        athorization and vaccinator should be trained for the vaccination that
+        authorization and vaccinator should be trained for the vaccination that
         is being certified.
       operationId: certify
       parameters:
@@ -336,7 +340,7 @@ definitions:
     properties:
       mobile:
         type: string
-        format: ''
+        format: "string"
       token2fa:
         type: string
   LoginResponse:
@@ -346,51 +350,19 @@ definitions:
         type: string
       refreshToken:
         type: string
-  PreEnrollment:
-    type: object
-    properties:
-      code:
-        type: string
-      enrollmentScopeId:
-        type: string
-      phone:
-        type: string
-      nationalId:
-        type: string
-      dob:
-        type: string
-        format: date
-      gender:
-        type: string
-        enum: ["Male", "Female", "Other"]
-      name:
-        type: string
-      email:
-        type: string
-      meta:
-        type: object
-      certified:
-        type: boolean
-      programId:
-        type: string
-      address:
-        type: object
-        properties:
-          addressLine1:
-            type: string
-          addressLine2:
-            type: string
-          district:
-            type: string
-          state:
-            type: string
-          pincode:
-            type: integer
   CertificationRequest:
     type: object
     properties:
       preEnrollmentCode:
         type: string
+      enrollmentType:
+        type: string
+      programId:
+        type: string
+      comorbidities:
+        type: array
+        items:
+          type: string
       recipient:
         type: object
         properties:
@@ -424,7 +396,7 @@ definitions:
               state:
                 type: string
               pincode:
-                type: integer
+                type: string
             required:
               - addressLine1
               - district
@@ -437,6 +409,8 @@ definitions:
           - identity
           - contact
           - address
+          - enrollmentType
+          - programId
       vaccination:
         type: object
         properties:
@@ -497,7 +471,7 @@ definitions:
               state:
                 type: string
               pincode:
-                type: integer
+                type: string
             required:
               - addressLine1
               - district

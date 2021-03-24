@@ -40,14 +40,17 @@
           "description": "How many days to wait after each dose",
           "items": {
             "type": "object",
+            "required": ["min"],
             "properties": {
               "min": {
                 "type": "integer",
-                "description": "Minimum Interval"
+                "description": "Minimum Interval",
+                "minimum": 0
               },
               "max": {
                 "type": "integer",
-                "description": "Maximum Interval"
+                "description": "Maximum Interval",
+                "minimum": 0
               }              
             }
           }
@@ -55,7 +58,8 @@
         "effectiveUntil": {
           "type": "integer",
           "description": "Effective until n days after the last dose",
-          "title": "Effective until (Days)"
+          "title": "Effective until (Days)",
+          "minimum": 0
         },
         "status": {
           "type": "string",
@@ -64,7 +68,8 @@
         },
         "price": {
           "title": "Price Range",
-          "type": "number"
+          "type": "number",
+          "minimum": 0
         }
       }
     }

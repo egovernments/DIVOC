@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -41,7 +42,7 @@ var Config = struct {
 		Password string `default:"postgres" yaml:"password" env:"DB_PASSWORD"`
 		User     string `default:"postgres" yaml:"user" env:"DB_USER"`
 		Port     string `default:"5432" yaml:"port" env:"DB_PORT"`
-		DBName   string `default:"postgres" yaml:"dbname"`
+		DBName   string `default:"registry" yaml:"dbname" env:"DB_DATABASE"`
 	}
 	Facility struct {
 		Upload struct {
@@ -66,7 +67,7 @@ var Config = struct {
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
 		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
 		EnrollmentTopic  string `default:"enrollment" yaml:"enrollmenttopic"`
-
+		EnrollmentACKTopic	string	`default:"enrollment_ack" yaml:"enrollmentacktopic"`
 	}
 	SearchRegistry struct {
 		DefaultLimit  int `default:"100"`

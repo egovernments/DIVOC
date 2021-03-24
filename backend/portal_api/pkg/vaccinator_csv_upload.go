@@ -2,11 +2,12 @@ package pkg
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
-	"strings"
 )
 
 type VaccinatorCSV struct {
@@ -22,7 +23,7 @@ func (vaccinatorCSV VaccinatorCSV) ValidateRow() []string {
 	return vaccinatorCSV.CSVMetadata.ValidateRow(requiredHeaders)
 }
 
-func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
+func (vaccinatorCSV VaccinatorCSV) ProcessRow(uploadID uint) error {
 	data := vaccinatorCSV.Data
 	mobileNumber := data.Text("mobileNumber")
 	nationalIdentifier := data.Text("nationalIdentifier")
@@ -47,7 +48,7 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 		Email:               email,
 	}
 	//services.MakeRegistryCreateRequest(vaccinator, "Vaccinator")
-	errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")
+	_, errorVaccinator := services.CreateNewRegistry(vaccinator, "Vaccinator")
 	if errorVaccinator != nil {
 		errmsg := errorVaccinator.Error()
 		if strings.Contains(errmsg, "Detail:") {
@@ -62,6 +63,6 @@ func (vaccinatorCSV VaccinatorCSV) CreateCsvUpload() error {
 	return nil
 }
 
-func (vaccinatorCSV VaccinatorCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	vaccinatorCSV.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (vaccinatorCSV VaccinatorCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return vaccinatorCSV.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }

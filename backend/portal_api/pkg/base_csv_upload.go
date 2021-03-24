@@ -1,11 +1,13 @@
 package pkg
 
 import (
+	"strings"
+	"time"
+
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 type CSVMetadata struct {
@@ -19,8 +21,8 @@ type BaseCSV interface {
 	ValidateHeaders() *models.Error
 	CreateCsvUploadHistory() *db.CSVUploads
 	ValidateRow() []string
-	CreateCsvUpload() error
-	SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint)
+	ProcessRow(uploadID uint) error
+	SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgess bool) *db.CSVUploadErrors
 }
 
 func (baseCsv CSVMetadata) ValidateHeaders() *models.Error {
@@ -57,60 +59,60 @@ func (baseCsv CSVMetadata) CreateCsvUploadHistory(uploadType string) *db.CSVUplo
 	uploadEntry.Filename = baseCsv.FileName
 	uploadEntry.UserID = baseCsv.UserName
 	uploadEntry.FileHeaders = headers
-	uploadEntry.Status = "Processing"
 	uploadEntry.UploadType = uploadType
 	uploadEntry.TotalRecords = 0
-	uploadEntry.TotalErrorRows = 0
 	_ = db.CreateCSVUpload(&uploadEntry)
 	return &uploadEntry
 }
 
-func (baseCsv CSVMetadata) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
+func (baseCsv CSVMetadata) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgess bool) *db.CSVUploadErrors {
 	csvUploadErrors := db.CSVUploadErrors{}
 	csvUploadErrors.Errors = strings.Join(rowErrors, ",")
 	csvUploadErrors.CSVUploadID = csvUploadHistoryId
+	csvUploadErrors.InProgress = inProgess
 	var row []string
 	for _, item := range baseCsv.Data.Row {
 		row = append(row, "\""+item+"\"")
 	}
 	csvUploadErrors.RowData = strings.Join(row, ",")
 	_ = db.CreateCSVUploadError(&csvUploadErrors)
+	return &csvUploadErrors
 }
 
 type CSVUpload struct {
 	BaseCSV
 }
 
-func ProcessCSV(baseCsv BaseCSV, data *Scanner) *models.Error {
+func ProcessCSV(baseCsv BaseCSV, data *Scanner) {
 	csvUploadHistory := baseCsv.CreateCsvUploadHistory()
-
-	var totalRowErrors int64 = 0
 	var totalRecords int64 = 0
-	for data.Scan() {
-		rowErrors := baseCsv.ValidateRow()
-		log.Error(rowErrors)
-		if len(rowErrors) > 0 {
-			totalRowErrors += 1
-		} else {
-			err := baseCsv.CreateCsvUpload()
-			if err != nil {
-				rowErrors = append(rowErrors, err.Error())
-				totalRowErrors += 1
-			}
-		}
-		if len(rowErrors) > 0 {
-			baseCsv.SaveCsvErrors(rowErrors, csvUploadHistory.ID)
-		}
-		totalRecords += 1
+	// start time
+	startTime := time.Now()
+	log.Infof("CSV file ingestion started at %v", startTime)
+
+	saveErrors := func (errors []string) {
+		log.Error("Error while processing row : ", errors)
+		baseCsv.SaveCsvErrors(errors, csvUploadHistory.ID, false)
 	}
+
+	for data.Scan() {
+		totalRecords++
+		rowErrors := baseCsv.ValidateRow()
+		if len(rowErrors) > 0 {
+			saveErrors(rowErrors)
+			continue
+		}
+		err := baseCsv.ProcessRow(csvUploadHistory.ID)
+		if err != nil {
+			saveErrors([]string{err.Error()})
+		}
+	}
+	// end time
+	endTime := time.Now()
+	log.Infof("CSV file ingestion ended at %v", endTime)
+	var d = time.Duration(endTime.UnixNano() - startTime.UnixNano())
+	log.Infof("Total Time taken %v", d.Seconds())
 
 	csvUploadHistory.TotalRecords = totalRecords
-	csvUploadHistory.TotalErrorRows = totalRowErrors
-	if csvUploadHistory.TotalErrorRows > 0 {
-		csvUploadHistory.Status = "Failed"
-	} else {
-		csvUploadHistory.Status = "Success"
-	}
 	db.UpdateCSVUpload(csvUploadHistory)
-	return nil
 }

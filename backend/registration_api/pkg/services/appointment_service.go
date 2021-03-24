@@ -3,26 +3,19 @@ package services
 import (
 	"errors"
 	"fmt"
-	"github.com/divoc/registration-api/config"
-	log "github.com/sirupsen/logrus"
 	"strconv"
-	"time"
+
+	"github.com/divoc/registration-api/config"
+	"github.com/divoc/registration-api/pkg/models"
+	log "github.com/sirupsen/logrus"
 )
 
-type FacilitySchedule struct {
-	FacilityCode string
-	ProgramId    string
-	Date         time.Time
-	Time         string
-	Slots        string
-}
-
 var (
-	appointmentScheduleChannel chan FacilitySchedule
+	appointmentScheduleChannel chan models.FacilitySchedule
 )
 
 func InitializeAppointmentScheduler() {
-	appointmentScheduleChannel = make(chan FacilitySchedule, config.Config.AppointmentScheduler.ChannelSize)
+	appointmentScheduleChannel = make(chan models.FacilitySchedule, config.Config.AppointmentScheduler.ChannelSize)
 	createAppointmentSchedulers()
 }
 
@@ -32,7 +25,7 @@ func createAppointmentSchedulers() {
 	}
 }
 
-func worker(workerID int, appointmentSchedulerChannel <-chan FacilitySchedule) {
+func worker(workerID int, appointmentSchedulerChannel <-chan models.FacilitySchedule) {
 	prefix := fmt.Sprintf("[WORKER_%d] ", workerID)
 	prefix = fmt.Sprintf("%15s", prefix)
 	log.Infof("%s : Started listening to service request channel\n", prefix)
@@ -41,16 +34,17 @@ func worker(workerID int, appointmentSchedulerChannel <-chan FacilitySchedule) {
 	}
 }
 
-func AddFacilityScheduleToChannel(serviceReq FacilitySchedule) {
+func AddFacilityScheduleToChannel(serviceReq models.FacilitySchedule) {
+	log.Info("Published the message to channel")
 	appointmentScheduleChannel <- serviceReq
 }
 
-func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
-	log.Infof("Creating slot for facility %s at time : %s %s", schedule.FacilityCode, schedule.Date, schedule.Time)
-	key := fmt.Sprintf("%s_%s_%s_%s", schedule.FacilityCode, schedule.ProgramId, schedule.Date.Format("2006-01-02"), schedule.Time)
-	_, err := AddToSet(schedule.FacilityCode, key, float64(schedule.Date.Unix()))
+func createFacilityWiseAppointmentSlots(schedule models.FacilitySchedule) {
+	log.Infof("Creating slot for facility %s at time : %s %s-%s", schedule.FacilityCode, schedule.Date, schedule.StartTime, schedule.EndTime)
+	key := schedule.Key()
+	_, err := AddToSet(schedule.FacilityCode, key, float64(schedule.GetStartTimeEpoch()))
 	if err == nil {
-		err = SetValueWithoutExpiry(key, schedule.Slots)
+		err = SetValue(key, schedule.Slots, schedule.GetTTL())
 		if err != nil {
 			log.Errorf("Error while creating key: %s slots: %d %v", key, schedule.Slots, err)
 		}
@@ -60,12 +54,20 @@ func createFacilityWiseAppointmentSlots(schedule FacilitySchedule) {
 	}
 }
 
+func ClearOldSlots(facilityCode string, beforeTimeStamp int64) {
+	if e := RemoveElementsByScoreInSet(facilityCode, "-inf", fmt.Sprintf("(%d", beforeTimeStamp)); e != nil {
+		log.Errorf("Error clearing old slots for FacilityCode: %s, timeStamp: %d", facilityCode, beforeTimeStamp)
+	}
+	log.Infof("Clearing old slots for %d[FacilityCode] before %d[epoch]", facilityCode, beforeTimeStamp)
+}
+
 func BookAppointmentSlot(slotId string) error {
+	//TODO: make the below transaction as atomic, use WATCH
 	log.Infof("Blocking appointment slot: %s", slotId)
 	remainingSlotsStr, err := GetValue(slotId)
 	if err != nil {
 		log.Errorf("Failed getting slots info: %s %v", slotId, err)
-		return nil
+		return err
 	}
 	remainingSlots, err := strconv.Atoi(remainingSlotsStr)
 	if remainingSlots <= 0 {
@@ -78,7 +80,7 @@ func BookAppointmentSlot(slotId string) error {
 	return err
 }
 
-func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
+func MarkEnrollmentAsBooked(enrollmentCode string, slotId string) bool {
 	success, err := SetHash(enrollmentCode, "slotId", slotId)
 	if err != nil {
 		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
@@ -86,4 +88,25 @@ func MarkEnrollmentCodeAsBooked(enrollmentCode string, slotId string) bool {
 		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
 	}
 	return success
+}
+
+func CancelBookedAppointment(slotId string) error {
+	_, err := IncrValue(slotId)
+	return err
+}
+
+func RevokeEnrollmentBookedStatus(enrollmentCode string) bool {
+	success, err := RemoveHastField(enrollmentCode, "slotId")
+	if err != nil {
+		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, err)
+	} else {
+		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode)
+	}
+	_, err = IncrHashField(enrollmentCode, "updatedCount")
+	if err != nil {
+		log.Errorf("Failed to increase %s updated count", enrollmentCode, err)
+	} else {
+		log.Infof("Successfully increased %s updated count", enrollmentCode)
+	}
+	return success == 1
 }

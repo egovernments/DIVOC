@@ -2,13 +2,13 @@ package pkg
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/pkg/db"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"strings"
 )
 
 type FacilityCSV struct {
@@ -24,21 +24,16 @@ func (facilityCsv FacilityCSV) ValidateRow() []string {
 	return facilityCsv.CSVMetadata.ValidateRow(requiredHeaders)
 }
 
-func (facilityCsv FacilityCSV) CreateCsvUpload() error {
+func (facilityCsv FacilityCSV) ProcessRow(uploadID uint) error {
 	data := facilityCsv.Data
-	//serialNum, facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
+	//facilityCode,facilityName,contact,operatingHourStart, operatingHourEnd, category, type, status,
 	//admins,addressLine1,addressLine2, district, state, pincode, geoLocationLat, geoLocationLon,adminName,adminMobile
-	serialNum, err := strconv.ParseInt(data.Text("serialNum"), 10, 64)
-	if err != nil {
-		return err
-	}
 
 	var admins []*models.FacilityAdmin
 	admins = append(admins, buildVaccinator(data))
 
 	facilityCode := data.Text("facilityCode")
 	facility := models.Facility{
-		SerialNum:          serialNum,
 		FacilityCode:       facilityCode,
 		FacilityName:       data.Text("facilityName"),
 		Contact:            data.Text("contact"),
@@ -54,7 +49,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		WebsiteURL:         data.Text("websiteURL"),
 		Programs:           []*models.FacilityProgramsItems0{},
 	}
-	err = services.CreateNewRegistry(facility, "Facility")
+	_, err := services.CreateNewRegistry(facility, "Facility")
 	if err != nil {
 		errmsg := err.Error()
 		if strings.Contains(errmsg, "Detail:") {
@@ -81,7 +76,7 @@ func (facilityCsv FacilityCSV) CreateCsvUpload() error {
 		}
 
 		resp, err := CreateKeycloakUser(userRequest)
-		log.Infof("Create keycloak user %+v", resp)
+		log.Debugf("Create keycloak user %+v", resp)
 		if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 			log.Errorf("Error while creating keycloak user : %s", admin)
 		} else {
@@ -109,6 +104,6 @@ func buildVaccinator(data *Scanner) *models.FacilityAdmin {
 	}
 }
 
-func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint) {
-	facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId)
+func (facilityCsv FacilityCSV) SaveCsvErrors(rowErrors []string, csvUploadHistoryId uint, inProgress bool) *db.CSVUploadErrors {
+	return facilityCsv.CSVMetadata.SaveCsvErrors(rowErrors, csvUploadHistoryId, inProgress)
 }
