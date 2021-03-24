@@ -14,7 +14,6 @@ import (
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
 	"github.com/divoc/registration-api/pkg/utils"
-	"github.com/divoc/registration-api/swagger_gen/models"
 	models3 "github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
@@ -58,19 +57,29 @@ func pingHandler(params operations.GetPingParams) middleware.Responder {
 }
 
 func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
-	enrollmentArr, err := services.FetchEnrollments(principal.Phone)
+	filter := map[string]interface{}{}
+	filter["phone"] = map[string]interface{}{
+		"eq": principal.Phone,
+	}
+	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
 	if err != nil {
+		log.Error("Error occurred while querying Enrollment registry ", err)
+		return operations.NewGetRecipientsInternalServerError()
+	}
+	if enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]); err == nil {
+		var enrollments []map[string]interface{}
+		err := json.Unmarshal(enrollmentArr, &enrollments)
+		if err != nil {
+			log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+			return model.NewGenericServerError()
+		} else {
+			services.EnrichFacilityDetails(enrollments)
+			return model.NewGenericJSONResponse(enrollments)
+		}
+	} else {
+		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
 		return model.NewGenericServerError()
 	}
-	var enrollments []struct{
-		models.Enrollment
-		OsCreatedAt time.Time	`json:"osCreatedAt"`
-	}
-	if err := json.Unmarshal(enrollmentArr, &enrollments); err != nil {
-		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-		return model.NewGenericServerError()
-	} 
-	return model.NewGenericJSONResponse(enrollments)
 }
 
 func enrollRecipient(params operations.EnrollRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
