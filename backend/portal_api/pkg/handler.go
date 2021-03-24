@@ -253,9 +253,6 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 			"facilityId": map[string]interface{}{
 				"eq": facility.Osid,
 			},
-			"osCreatedAt": map[string]interface{}{
-				"lt": time.Now().Format("2006-01-02"),
-			},
 		}
 		facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
 		facilitySchedules := facilitySlotsResponse["FacilityProgramSlot"].([]interface{})
