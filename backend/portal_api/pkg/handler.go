@@ -247,24 +247,25 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	var facilityIds []string
+	var facilitySlots []interface{}
 	for _, facility := range facilities {
-		facilityIds = append(facilityIds, facility.Osid)
+		filter = map[string]interface{}{
+			"facilityId": map[string]interface{}{
+				"eq": facility.Osid,
+			},
+			"osCreatedAt": map[string]interface{}{
+				"lt": time.Now().Format("2006-01-02"),
+			},
+		}
+		facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
+		facilitySchedules := facilitySlotsResponse["FacilityProgramSlot"].([]interface{})
+		if err2 == nil && len(facilitySchedules) > 0 {
+			facilitySlots = append(facilitySlots, facilitySchedules[0])
+		}
 	}
-	filter = map[string]interface{}{
-		"facilityId": map[string]interface{}{
-			"or": facilityIds,
-		},
-		"osCreatedAt": map[string]interface{}{
-			"lt": time.Now().Format("2006-01-02"),
-		},
-	}
-	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
 	responseData := map[string]interface{}{
-		"facilities": facilities,
-	}
-	if err2 == nil {
-		responseData["facilitiesSchedule"] = facilitySlotsResponse["FacilityProgramSlot"]
+		"facilities":         facilities,
+		"facilitiesSchedule": facilitySlots,
 	}
 	return model.NewGenericJSONResponse(responseData)
 }
