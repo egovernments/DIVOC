@@ -1,7 +1,9 @@
 export const NATIONAL_ID_TYPE_ERROR_MSG = "* ID Type is require";
 export const NATIONAL_ID_ERROR_MSG = "* ID Number is required";
+export const DUPLICATE_NATIONAL_ID_ERR_MSG = "* Beneficiary with this ID already exists";
 export const NAME_ERROR_MSG = "* Beneficiary Name is required";
 export const INVALID_NAME_ERR_MSG = "* Beneficiary Name should have only alphabets"
+export const DUPLICATE_NAME_YOB = "* Beneficiary with same Name and Age already exists"
 export const MINIMUM_LENGTH_OF_NAME_ERROR_MSG = "* Name should have at least 1 characters"
 export const MAXIMUM_LENGTH_OF_NAME_ERROR_MSG = "* Name should have maximum 99 characters"
 export const STATE_ERROR_MSG = "* State is required";

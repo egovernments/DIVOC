@@ -58,44 +58,16 @@ export const AddMembersFlow = () => {
     const {step, navigation} = useStep({initialStep: 0, steps});
     const {id} = step;
     const [programs, setPrograms] = useState([]);
+    const [members, setMembers] = useState([]);
     const [isValidationLoading, setValidationLoading] = useState(true);
 
     useEffect(() => {
-        fetchPrograms()
+      if (!getUserNumberFromRecipientToken()) {
+        history.push("/citizen")
+      }
+      fetchPrograms();
+      fetchMembers();
     }, []);
-
-
-    useEffect(() => {
-        if (!getUserNumberFromRecipientToken()) {
-            history.push("/citizen")
-        }
-
-        checkIfMemberLimitCrossed()
-            .then((isLimitCrossed) => {
-                console.log(isLimitCrossed);
-                if (isLimitCrossed) {
-                    history.push("/registration")
-                }
-                setValidationLoading(isLimitCrossed)
-            })
-    }, []);
-
-
-    async function checkIfMemberLimitCrossed() {
-        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
-        const config = {
-            headers: {"Authorization": token, "Content-Type": "application/json"},
-        };
-        return axios
-            .get(RECIPIENTS_API, config)
-            .then((res) => {
-                return res && res.data && res.data.length >= appConfig.registerMemberLimit;
-            })
-            .catch(e => {
-                console.log(e);
-                return false;
-            })
-    }
 
     function fetchPrograms() {
         axios.get(PROGRAM_API)
@@ -112,11 +84,30 @@ export const AddMembersFlow = () => {
             })
     }
 
+    function fetchMembers() {
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
+        };
+        axios
+          .get(RECIPIENTS_API, config)
+          .then((res) => {
+              setMembers(res.data);
+              if (res && res.data && res.data.length >= appConfig.registerMemberLimit) {
+                history.push("/registration");
+              }
+              setValidationLoading(false);
+            })
+          .catch(e => {
+              console.log(e);
+          })
+    }
+
     if (isValidationLoading) {
         return <div>Loading...</div>
     }
 
-  let props = {formData, setValue, navigation, programs};
+  let props = {formData, setValue, navigation, programs, members};
 
   switch (id) {
     case FORM_SELECT_PROGRAM:
