@@ -175,7 +175,7 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 		return model.NewGenericServerError()
 	}
 	if canInitializeSlots() {
-		log.Infof("Initializing facility slots")
+		log.Info("Initializing facility slots")
 		filters := map[string]interface{}{}
 		limit := 1000
 		offset := -1000
