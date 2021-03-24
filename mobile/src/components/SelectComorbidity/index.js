@@ -69,7 +69,7 @@ export const SelectComorbidity = ({}) => {
 
     }, []);
 
-    for (let i = MINIMUM_SUPPORT_YEAR; i < curYear; i++) {
+    for (let i = MINIMUM_SUPPORT_YEAR; i <= curYear; i++) {
         years.push("" + i)
     }
 

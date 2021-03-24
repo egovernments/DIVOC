@@ -11,7 +11,7 @@
                     console.log(evt.target.value)
                     sessionStorage.setItem("mobile_number", evt.target.value)
                 })
-                if(window.location.protocol === "https:") {
+                if(window.location.protocol === "http:") {
                     let formField = document.getElementById("kc-form-login");
                     if (formField) {
                         formField.action = formField.action.replace("http","https");
