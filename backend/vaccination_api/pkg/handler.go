@@ -7,6 +7,7 @@ import (
 	eventsModel "github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -29,7 +30,6 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
-	kernelService "github.com/divoc/kernel_library/services"
 )
 
 func SetupHandlers(api *operations.DivocAPI) {
@@ -57,8 +57,11 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
+	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 }
+
+const CertificateEntity = "VaccinationCertificate"
 
 type GenericResponse struct {
 	statusCode int
@@ -221,6 +224,82 @@ func getPreEnrollmentForFacility(params vaccination.GetPreEnrollmentsForFacility
 		return vaccination.NewGetPreEnrollmentsForFacilityOK().WithPayload(enrollments)
 	}
 	return NewGenericServerError()
+}
+
+func updateCertificate(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	log.Debugf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+			log.Infof("Certificate update request approved %+v", request)
+			if request.Meta == nil {
+				request.Meta = map[string]interface{}{
+					"previousCertificateId": certificateId,
+				}
+			} else {
+				meta := request.Meta.(map[string]interface{})
+				meta["previousCertificateId"] = certificateId
+			}
+			if jsonRequestString, err := json.Marshal(request); err == nil {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
+		} else {
+			log.Infof("Certificate update request rejected %+v", request)
+			return certification.NewUpdateCertificatePreconditionFailed()
+		}
+	}
+	return certification.NewCertifyV2OK()
+}
+
+func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
+
+	filter := map[string]interface{}{
+		"preEnrollmentCode":  map[string]interface{}{
+			"eq": request.PreEnrollmentCode,
+		},
+	}
+	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificates := certificateFromRegistry[CertificateEntity].([]interface{})
+	if err == nil && len(certificates) > 0 {
+		certificates = SortCertificatesByCreateAt(certificates)
+		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
+		// no changes to provisional certificate if final certificate is generated
+		if request.Vaccination.Dose < request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
+			log.Error("Updating provisional certificate restricted")
+			return nil
+		}
+		// check if certificate exists for a dose
+		if certificateIds, ok := doseWiseCertificateIds[int(request.Vaccination.Dose)]; ok && len(certificateIds) > 0 {
+			// check if maximum time of correction is reached
+			count := len(certificateIds)
+			if count < (config.Config.Certificate.UpdateLimit + 1) {
+				certificateId := doseWiseCertificateIds[int(request.Vaccination.Dose)][count-1]
+				return &certificateId
+			} else {
+				log.Error("Certificate update limit reached")
+			}
+		} else {
+			log.Error("No certificate found to update")
+		}
+	}
+	return nil
+}
+
+func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
+	doseWiseCertificateIds := map[int][]string{}
+	for _, certificateObj := range certificates {
+		if certificate, ok := certificateObj.(map[string]interface{}); ok {
+			if doseValue, found := certificate["dose"]; found {
+				if doseValueFloat, ok := doseValue.(float64); ok {
+					if certificateId, found := certificate["certificateId"]; found {
+						doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
+					}
+				}
+			}
+		}
+	}
+	return doseWiseCertificateIds
 }
 
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
@@ -429,7 +508,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 			"eq": preEnrollmentCode,
 		},
 	}
-	if resp, err := kernelService.QueryRegistry(typeId,filter); err == nil {
+	if resp, err := services.QueryRegistry(typeId,filter); err == nil {
 		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificates) > 0 {
 				return certificate_revoked.NewCertificateRevokedOK()
@@ -438,4 +517,16 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 		}
 	}
 	return certificate_revoked.NewCertificateRevokedBadRequest()
+}
+
+
+func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
+	sort.Slice(certificateArr, func(i, j int) bool {
+		certificateA := certificateArr[i].(map[string]interface{})
+		certificateB := certificateArr[j].(map[string]interface{})
+		certificateACreateAt := certificateA["_osCreatedAt"].(string)
+		certificateBCreateAt := certificateB["_osCreatedAt"].(string)
+		return certificateACreateAt < certificateBCreateAt
+	})
+	return certificateArr
 }

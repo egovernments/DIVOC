@@ -145,6 +145,46 @@ func init() {
         }
       }
     },
+    "/v1/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/v1/certificates": {
       "get": {
         "security": [
@@ -764,6 +804,9 @@ func init() {
                 "I"
               ]
             },
+            "previousCertificateId": {
+              "type": "string"
+            },
             "registrationCategory": {
               "description": "F for frontline officers, C for comorbidity category, R for regular others",
               "type": "string",
@@ -1298,6 +1341,46 @@ func init() {
           },
           "404": {
             "description": "certificate not found in revocation list"
+          }
+        }
+      }
+    },
+    "/v1/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           }
         }
       }
@@ -2051,6 +2134,9 @@ func init() {
                 "I"
               ]
             },
+            "previousCertificateId": {
+              "type": "string"
+            },
             "registrationCategory": {
               "description": "F for frontline officers, C for comorbidity category, R for regular others",
               "type": "string",
@@ -2332,6 +2418,9 @@ func init() {
             "A",
             "I"
           ]
+        },
+        "previousCertificateId": {
+          "type": "string"
         },
         "registrationCategory": {
           "description": "F for frontline officers, C for comorbidity category, R for regular others",
