@@ -397,34 +397,44 @@ func getCertifyUploadErrors(params certification.GetCertifyUploadErrorsParams, p
 
 func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams) middleware.Responder {
 	typeId := "RevokedCertificate"
-	if body, ok := params.Body.(map[string]interface{}); ok {
-		if credentialSubject, ok := body["credentialSubject"].(map[string]interface{}); ok {
-			preEnrollmentCode := credentialSubject["refId"]
-			if evidence, ok := body["evidence"].([]interface{}); ok {
-				if certificateInfo, ok := evidence[0].(map[string]interface{}); ok {
-					certificateId := certificateInfo["certificateId"]
-					dose := certificateInfo["dose"]
-					filter := map[string]interface{}{
-						"certificateId": map[string]interface{}{
-							"eq": certificateId,
-						},
-						"dose": map[string]interface{}{
-							"eq": dose,
-						},
-						"preEnrollmentCode": map[string]interface{}{
-							"eq": preEnrollmentCode,
-						},
-					}
-					if resp, err := kernelService.QueryRegistry(typeId,filter); err == nil {
-						if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
-							if len(revokedCertificates) > 0 {
-								return certificate_revoked.NewCertificateRevokedOK()
-							}
-							return certificate_revoked.NewCertificateRevokedNotFound()
-						}
-					}
-				}
+	requestBody, err := json.Marshal(params.Body)
+	if err != nil {
+		log.Printf("JSON marshalling error %v", err)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+
+	var certificate eventsModel.Certificate
+	err = json.Unmarshal(requestBody, &certificate)
+	if err != nil {
+		log.Printf("Error while converting requestBody to Certificate object %v", err)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+	if len(certificate.Evidence) == 0 {
+		log.Printf("Error while getting Evidence array in requestBody %v", certificate)
+		return certificate_revoked.NewCertificateRevokedBadRequest()
+	}
+
+	preEnrollmentCode := certificate.CredentialSubject.RefId
+	certificateId := certificate.Evidence[0].CertificateId
+	dose := certificate.Evidence[0].Dose
+
+	filter := map[string]interface{}{
+		"certificateId": map[string]interface{}{
+			"eq": certificateId,
+		},
+		"dose": map[string]interface{}{
+			"eq": dose,
+		},
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if resp, err := kernelService.QueryRegistry(typeId,filter); err == nil {
+		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+			if len(revokedCertificates) > 0 {
+				return certificate_revoked.NewCertificateRevokedOK()
 			}
+			return certificate_revoked.NewCertificateRevokedNotFound()
 		}
 	}
 	return certificate_revoked.NewCertificateRevokedBadRequest()
