@@ -42,7 +42,7 @@
 
   "privateFields": [],
   "signedFields": [],
-  "indexFields": ["(preEnrollmentCode,dose)"],
+  "indexFields": ["(certificateId,preEnrollmentCode,dose)"],
   "uniqueIndexFields": [],
   "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
 }
