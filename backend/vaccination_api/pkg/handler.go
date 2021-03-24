@@ -261,35 +261,18 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 	certificates := certificateFromRegistry[CertificateEntity].([]interface{})
 	if err == nil && len(certificates) > 0 {
 		certificates = SortCertificatesByCreateAt(certificates)
-		doseWiseCount := map[int]int{}
-		doseWiseCertificateIds := map[int][]string{}
-		for _, certificateObj := range certificates {
-			if certificate, ok := certificateObj.(map[string]interface{}); ok {
-				if doseValue, found := certificate["dose"]; found {
-					if doseValueFloat, ok := doseValue.(float64); ok {
-						if certificateId, found := certificate["certificateId"]; found {
-							if _, ok := doseWiseCount[int(doseValueFloat)]; ok {
-								doseWiseCount[int(doseValueFloat)] += 1
-								doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
-							} else {
-								doseWiseCount[int(doseValueFloat)] = 1
-								doseWiseCertificateIds[int(doseValueFloat)] = []string{certificateId.(string)}
-							}
-						}
-					}
-				}
-			}
-		}
+		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
 		// no changes to provisional certificate if final certificate is generated
-		if request.Vaccination.Dose < request.Vaccination.TotalDoses && len(doseWiseCount) > 1 {
+		if request.Vaccination.Dose < request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
 			log.Error("Updating provisional certificate restricted")
 			return nil
 		}
 		// check if certificate exists for a dose
-		if count, ok := doseWiseCount[int(request.Vaccination.Dose)]; ok && count > 0 {
+		if certificateIds, ok := doseWiseCertificateIds[int(request.Vaccination.Dose)]; ok && len(certificateIds) > 0 {
 			// check if maximum time of correction is reached
+			count := len(certificateIds)
 			if count < (config.Config.Certificate.UpdateLimit + 1) {
-				certificateId := doseWiseCertificateIds[int(request.Vaccination.Dose)][count - 1]
+				certificateId := doseWiseCertificateIds[int(request.Vaccination.Dose)][count-1]
 				return &certificateId
 			} else {
 				log.Error("Certificate update limit reached")
@@ -299,6 +282,22 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 		}
 	}
 	return nil
+}
+
+func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
+	doseWiseCertificateIds := map[int][]string{}
+	for _, certificateObj := range certificates {
+		if certificate, ok := certificateObj.(map[string]interface{}); ok {
+			if doseValue, found := certificate["dose"]; found {
+				if doseValueFloat, ok := doseValue.(float64); ok {
+					if certificateId, found := certificate["certificateId"]; found {
+						doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
+					}
+				}
+			}
+		}
+	}
+	return doseWiseCertificateIds
 }
 
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
