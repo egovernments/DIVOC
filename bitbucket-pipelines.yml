@@ -15,6 +15,7 @@ pipelines:
             - sed -i "s|bindock|$BASE_URL|g" backend/Makefile
             - sed -i "s|bindock|$BASE_URL|g" backend/certificate_signer/Makefile
             - sed -i "s|bindock|$BASE_URL|g" registry/Makefile
+            - sed -i "s|bindock|$BASE_URL|g" keycloak/Makefile
             - sed -i "s|RELEASE_VERSION := latest|RELEASE_VERSION := ${BITBUCKET_COMMIT}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_BRANCH}|g" Makefile
             - make
             - make release
