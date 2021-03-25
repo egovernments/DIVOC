@@ -1,5 +1,5 @@
 registry:
-  url: http://localhost:8081
+  url: http://registry:8081
   addoperationid: add
   searchoperationid: search
   readoperationid: read
@@ -31,7 +31,7 @@ vaccinator:
     columns: "code,name,nationalIdentifier,mobileNumber,email,status,facilityIds"
     required: "code,name,email,nationalIdentifier,mobileNumber,status,facilityIds"
 kafka:
-  bootstrapServers: localhost:9092
+  bootstrapServers: kafka-service:9092
   notifyTopic: notify
   certifiedTopic: certified
   enrollmenttopic: enrollment
