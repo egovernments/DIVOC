@@ -31,7 +31,7 @@ spec:
               value: jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
             - name: connectionInfo_username
               value: postgres
-          image: bindock/registry
+          image: bindock/registry:TAG
           name: registry
           ports:
             - containerPort: 8081

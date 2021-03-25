@@ -35,7 +35,7 @@ spec:
               value: http://registry:8081
             - name: REGISTRY_WITH_ES_URL
               value: http://registry-es:8081
-          image: bindock/digilocker_support_api
+          image: bindock/digilocker_support_api:TAG
           name: digilocker-support-api
           resources: {}
       restartPolicy: Always

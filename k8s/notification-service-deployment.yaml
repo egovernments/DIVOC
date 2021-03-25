@@ -33,7 +33,7 @@ spec:
               value: xxxx
             - name: SMS_AUTH_KEY
               value: xxxx
-          image: bindock/notification-service
+          image: bindock/notification-service:TAGs
           name: notification-service
           ports:
             - containerPort: 8765

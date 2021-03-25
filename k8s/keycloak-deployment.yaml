@@ -41,7 +41,7 @@ spec:
               value: admin
             - name: KEYCLOAK_USER
               value: admin
-          image: bindock/keycloak
+          image: bindock/keycloak:TAG
           name: keycloak
           ports:
             - containerPort: 8080

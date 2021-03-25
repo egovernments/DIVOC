@@ -39,7 +39,7 @@ spec:
               value: http://registry:8081
             - name: REGISTRY_WITH_ES_URL
               value: http://registry-es:8081
-          image: bindock/portal_api
+          image: bindock/portal_api:TAG
           name: portal-api
           ports:
             - containerPort: 8001

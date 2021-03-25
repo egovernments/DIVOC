@@ -24,7 +24,7 @@ spec:
         io.kompose.service: nginx
     spec:
       containers:
-        - image: bindock/nginx
+        - image: bindock/nginx:TAG
           name: nginx
           ports:
             - containerPort: 80

@@ -35,7 +35,7 @@ spec:
               value: es:9200
             - name: search_provider
               value: io.opensaber.registry.service.ElasticSearchService
-          image: bindock/registry-es
+          image: bindock/registry-es:TAG
           name: registry-es
           ports:
             - containerPort: 8081
