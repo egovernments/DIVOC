@@ -27,7 +27,6 @@ backend/vaccination_api/analytics_feed
 backend/vaccination_api/certificate_processor
 backend/vaccination_api/divoc-server
 yarn.lock
-keycloak/themes
 *.pyo
 *.pyc
 perf/results
