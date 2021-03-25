@@ -25,6 +25,7 @@ export const initialWalkInEnrollmentState = {
     programId: "",
     programName: "",
     nationalId: "",
+    identity: "",
     name: "",
     gender: "",
     district: "",

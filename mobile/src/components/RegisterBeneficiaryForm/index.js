@@ -66,8 +66,8 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
 
     function validateUserDetails() {
         const errorsData = {}
-        const nationalIDType = getNationalIdType(formData.nationalId)
-        const nationIDNumber = getNationalIdNumber(formData.nationalId)
+        const nationalIDType = getNationalIdType(formData.identity)
+        const nationIDNumber = getNationalIdNumber(formData.identity)
 
         if(!nationalIDType) {
             errorsData.nationalIDType = NATIONAL_ID_TYPE_ERROR_MSG
@@ -139,7 +139,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
 
 const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
     function getSelectedIdType() {
-        const preSelectedIdValue = formData.nationalId ? getNationalIdType(formData.nationalId) : undefined;
+        const preSelectedIdValue = formData.identity ? getNationalIdType(formData.identity) : undefined;
         return preSelectedIdValue ? ID_TYPES.filter(a => a.value === preSelectedIdValue)[0].name : ""
     }
 
@@ -147,21 +147,21 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
         if (type === "idType") {
             const idValue = event.target.value;
             let existingIdNumber = "";
-            if (formData.nationalId) {
-                const nationalIdNumber = getNationalIdNumber(formData.nationalId);
+            if (formData.identity) {
+                const nationalIdNumber = getNationalIdNumber(formData.identity);
                 existingIdNumber = nationalIdNumber ? nationalIdNumber : ""
             }
-            let nationalId = constuctNationalId(idValue, existingIdNumber)
-            setValue({target: {name: "nationalId", value: nationalId}})
+            let identity = constuctNationalId(idValue, existingIdNumber)
+            setValue({target: {name: "identity", value: identity}})
         } else if (type === "idNumber") {
             const idNumber = event.target.value;
             let existingIdType = "";
-            if (formData.nationalId) {
-                const nationalIdType = getNationalIdType(formData.nationalId);
+            if (formData.identity) {
+                const nationalIdType = getNationalIdType(formData.identity);
                 existingIdType = nationalIdType ? nationalIdType : "";
             }
-            let nationalId = constuctNationalId(existingIdType, idNumber);
-            setValue({target: {name: "nationalId", value: nationalId}})
+            let identity = constuctNationalId(existingIdType, idNumber);
+            setValue({target: {name: "identity", value: identity}})
         }
     }
 
@@ -211,7 +211,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                 <input className="form-control" id="idNumber"
                        hidden={verifyDetails}
                        type="text" placeholder="Enter ID Number"
-                       defaultValue={getNationalIdNumber(formData.nationalId)}
+                       defaultValue={getNationalIdNumber(formData.identity)}
                        onBlur={(e) => onIdChange(e, "idNumber")}/>
                 <div className="invalid-input">
                     {errors.nationalID}
@@ -222,7 +222,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                 </div>
                 {
                     verifyDetails &&
-                    <p>{getNationalIdNumber(formData.nationalId)}</p>
+                    <p>{getNationalIdNumber(formData.identity)}</p>
                 }
             </div>
             <div>
