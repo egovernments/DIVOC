@@ -12,7 +12,10 @@ pipelines:
             - export BASE_URL=$DOCKER_GCR_REPO_URL/$GCLOUD_PROJECT_ID
             - gcloud auth activate-service-account --key-file ~/.gcloud-api-key.json
             - docker login -u _json_key --password-stdin https://$DOCKER_GCR_REPO_URL < ~/.gcloud-api-key.json
-            - sed -i "s|bindock|$BASE_URL|g" Makefiile
+            - sed -i "s|bindock|$BASE_URL|g" Makefile
+            - sed -i "s|bindock|$BASE_URL|g" backend/Makefile
+            - sed -i "s|bindock|$BASE_URL|g" backend/certificate_signer/Makefile
+            - sed -i "s|bindock|$BASE_URL|g" registry/Makefile
             - sed -i "s|latest|${BITBUCKET_COMMIT}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_BRANCH}|g"
             #- docker build -t $IMAGE_NAME .
             - make
