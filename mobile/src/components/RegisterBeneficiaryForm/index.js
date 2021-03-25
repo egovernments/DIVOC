@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./index.css"
 import {useSelector} from "react-redux";
 import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} from "../../utils/national-id";
@@ -47,8 +47,15 @@ export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinu
 }
 
 export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) {
+    const walkInForm = useRef(null)
+
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({...state});
+
+    useEffect(() => {
+        walkInForm.current.scrollIntoView()
+
+    }, [verifyDetails]);
 
     function setValue(evt) {
         setFormData((state) => ({
@@ -119,7 +126,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
     }
 
     return (
-        <div className="text-left verify-mobile-container">
+        <div className="text-left verify-mobile-container" ref={walkInForm}>
             <IdDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
                                 errors={errors}/>
