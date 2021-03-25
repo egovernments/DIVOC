@@ -7,10 +7,8 @@
         <link href="${url.resourcesPath}/img/favicon.png" rel="icon"/>
         <script>
             window.onload = function(e){
-                document.getElementById("mobile_number").addEventListener("change", function(evt) {
-                    console.log(evt.target.value)
-                    sessionStorage.setItem("mobile_number", evt.target.value)
-                })
+                var mobileNumber = sessionStorage.getItem("mobile_number");
+                document.getElementById("mobile_number").value= mobileNumber;
                 if(window.location.protocol === "https:") {
                     let formField = document.getElementById("kc-form-login");
                     if (formField) {
@@ -28,17 +26,23 @@
                           action="${url.loginAction}" method="post">
                         <div class="input-wrapper">
                             <div class="input-field mobile">
-<#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
+<#--                                <label for="mobile_number" class="mobile-prefix">+251</label>-->
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
                                        name="mobile_number"
-                                       tabindex="1" autofocus/>
+                                       tabindex="1"/>
                             </div>
 
+                            <div class="input-field otp">
+                                <label for="otp" class="otp-prefix">OTP</label>
+                                <input id="otp" class="login-field" placeholder="XX XX"
+                                       type="password" autofocus
+                                       name="otp" tabindex="2">
+                            </div>
                         </div>
-                        <input type="hidden" id="type-hidden-input" name="form_type" value="login"/>
-                        <button id="submit-btn" class="submit" type="submit" tabindex="3">
-                            <span>Generate OTP</span>
+                        <input type="hidden" id="type-hidden-input" name="form_type" value="verify_otp"/>
+                        <button class="submit" type="submit" tabindex="3">
+                            <span>Login to Portal</span>
                             <img class="login-arrow" src="${url.resourcesPath}/img/login-arrow.png" alt="">
                         </button>
                     </form>
