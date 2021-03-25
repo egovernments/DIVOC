@@ -340,7 +340,12 @@ const MemberCard = (props) => {
                                                   onClick={() => {
                                                       history.push({
                                                           pathname: `/${member.code}/${member["appointments"][0].programId}/appointment`,
-                                                          state: {name: member.name, nationalId: member.nationalId, program: program}
+                                                          state: {
+                                                              name: member.name,
+                                                              nationalId: member.nationalId,
+                                                              program: program,
+                                                              recipientPinCode: member?.address?.pincode
+                                                          }
                                                       })
                                                   }}>{isAppointmentBooked ? "Edit" : "Book"}
                                         <br/>Appointment</CustomButton>

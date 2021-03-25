@@ -247,7 +247,7 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	var facilitySlots []interface{}
+	facilitySlots := make([]interface{}, 0)
 	for _, facility := range facilities {
 		filter = map[string]interface{}{
 			"facilityId": map[string]interface{}{
@@ -260,7 +260,9 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
 		facilitySchedules := facilitySlotsResponse["FacilityProgramSlot"].([]interface{})
 		if err2 == nil && len(facilitySchedules) > 0 {
-			facilitySlots = append(facilitySlots, facilitySchedules[0])
+			for _, facilitySchedule := range facilitySchedules {
+				facilitySlots = append(facilitySlots, facilitySchedule)
+			}
 		}
 	}
 	responseData := map[string]interface{}{

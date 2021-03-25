@@ -20,7 +20,7 @@ export const Appointment = (props) => {
     const {state} = props.location;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
-    const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState(state?.recipientPinCode || "");
     const [searchDate, setSearchDate] = useState("");
     const [facilities, setFacilities] = useState([]);
     const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(-1);
@@ -37,14 +37,12 @@ export const Appointment = (props) => {
             history.push("/registration")
             return;
         }
-        if (searchText === "" || searchText.length > 3) {
+        if (searchText.length > 3) {
             setIsLoading(true);
             let params = {
                 pincode: searchText
             };
-            params = reject(equals(''))(params);
-            const queryParams = new URLSearchParams(params);
-            axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
+            axios.get("/divoc/admin/api/v1/public/facilities", {params: params})
                 .then(res => {
                     const {facilities, facilitiesSchedule} = res.data;
                     let schedule = {};
