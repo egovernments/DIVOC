@@ -6,8 +6,8 @@ $(info RELEASE VERSION $(RELEASE_VERSION))
 
 docker:
 	docker build -t bindock/nginx .
-	#$(MAKE) -C backend
-	#$(MAKE) -C registry
+	$(MAKE) -C backend
+	$(MAKE) -C registry
 test:
 	echo "Starting services in e2e testing mode"
 	echo "version: \"2.4\"" > docker-compose.v2.yml && tail -n +2 docker-compose.yml >> docker-compose.v2.yml
