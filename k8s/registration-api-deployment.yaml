@@ -68,7 +68,11 @@ spec:
             - name: CACHE_TTL
               value: "60"
             - name: DB_HOST
-              value: db
+              value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+            - name: DB_PASSWORD
+              value: uhAer5489
+            - name: DB_NAME
+              value: divoc
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: kafka:9092
             - name: KEYCLOAK_URL

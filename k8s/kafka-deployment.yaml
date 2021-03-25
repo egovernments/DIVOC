@@ -26,7 +26,7 @@ spec:
       containers:
         - env:
             - name: KAFKA_ADVERTISED_LISTENERS
-              value: INTERNAL://kafka:9092,OUTSIDE://localhost:9094
+              value: INTERNAL://kafka-service:9092,OUTSIDE://localhost:9094
             - name: KAFKA_BROKER_ID
               value: "1"
             - name: KAFKA_INTER_BROKER_LISTENER_NAME

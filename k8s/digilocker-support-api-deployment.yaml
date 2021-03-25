@@ -28,7 +28,7 @@ spec:
             - name: DIGILOCKER_HMAC_AUTHKEY
               value: UPDATE_KEY_GIVEN_IN_DIGILOCKER
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              value: kafka-service:9092
             - name: KEYCLOAK_URL
               value: http://keycloak:8080/auth
             - name: REGISTRY_URL

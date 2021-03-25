@@ -42,7 +42,7 @@ spec:
             - name: CERTIFICATE_PUBKEY_ID
               value: https://example.com/i/india
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              value: kafka-service:9092
             - name: REDIS_URL
               value: redis://redis:6379
             - name: REGISTRY_URL

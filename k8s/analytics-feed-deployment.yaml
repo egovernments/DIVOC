@@ -28,7 +28,7 @@ spec:
             - name: CLICK_HOUSE_URL
               value: tcp://clickhouse-server:9000?debug=true
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              value: kafka-service:9092
           image: bindock/analytics_feed:TAG
           name: analytics-feed
           resources: {}

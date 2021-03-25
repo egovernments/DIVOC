@@ -27,6 +27,8 @@ spec:
         - env:
             - name: DB_HOST
               value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+            - name: DB_PORT
+              value: "5432"
             - name: DB_PASSWORD
               value: uhAer5489
             - name: DB_NAME
