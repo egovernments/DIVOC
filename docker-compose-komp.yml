@@ -13,11 +13,11 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-    healthcheck:
-        test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
-        interval: 30s
-        timeout: 10s
-        retries: 4
+    #healthcheck:
+     #   test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+     #   interval: 30s
+     #   timeout: 10s
+     #   retries: 4
   db:
     image: postgres
     ports:
@@ -37,11 +37,11 @@ services:
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
     ports:
       - "8082:8081"
-    depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
+   # depends_on:
+   #   es:
+   #     condition: service_healthy
+   #   db:
+   #     condition: service_started
   registry:
     image: bindock/registry
     environment:
@@ -50,11 +50,11 @@ services:
       - connectionInfo_password=uhAer5489
     ports:
       - "8081:8081"
-    depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
+    #depends_on:
+    #  es:
+    #    condition: service_healthy
+    #  db:
+    #    condition: service_started
   keycloak:
     image: bindock/keycloak
     environment:
@@ -67,18 +67,18 @@ services:
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
 #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
-    healthcheck:
-      test:
-        ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
+   # healthcheck:
+   #   test:
+    #    ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
+    #  interval: 30s
+    #  timeout: 10s
+    #  retries: 5
     ports:
       - "8080:8080"
       - "9990:9990"
-    depends_on:
-      db:
-        condition: service_started
+   ## depends_on:
+     # db:
+     #   condition: service_started
   flagr:
     image: checkr/flagr
     environment:
@@ -88,9 +88,9 @@ services:
       FLAGR_WEB_PREFIX: /config
     ports:
       - "18000:18000"
-    depends_on:
-      db:
-        condition: service_started
+   # depends_on:
+   #   db:
+   #     condition: service_started
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
     ports:
@@ -100,9 +100,9 @@ services:
       ZOOKEEPER_TICK_TIME: "2000"
   kafka:
     image: confluentinc/cp-kafka:latest
-    depends_on:
-      zookeeper:
-        condition: service_started
+   # depends_on:
+   ##   zookeeper:
+     #   condition: service_started
     ports:
       - "9092:9092"
     environment:
@@ -112,12 +112,12 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
       KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
-    healthcheck:
-      test:
-        ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
-      interval: 30s
-      timeout: 10s
-      retries: 4
+   # healthcheck:
+   #   test:
+   #     ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+   #   interval: 30s
+   #   timeout: 10s
+   #   retries: 4
   clickhouse-server:
     image: yandex/clickhouse-server
     ports:
@@ -131,18 +131,18 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
+  #  healthcheck:
+  #    test: ["CMD", "curl", "-f", "http://localhost:8000"]
+  #    interval: 10s
+  #    timeout: 10s
+  #    retries: 10
     ports:
       - "8000:8000"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
+  #    keycloak:
+  #      condition: service_healthy
   portal_api:
     image: bindock/portal_api
     ports:
@@ -155,11 +155,11 @@ services:
       ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+   # depends_on:
+   #   kafka:
+   #     condition: service_healthy
+   #   keycloak:
+   #     condition: service_healthy
   registration_api:
     image: bindock/registration_api
     ports:
@@ -211,19 +211,19 @@ services:
         57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
         OQIDAQAB
         -----END PUBLIC KEY-----
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
+  #    keycloak:
+  #      condition: service_healthy
   analytics_feed:
     image: bindock/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      clickhouse-server:
-        condition: service_started
+ #   depends_on:
+ ##     clickhouse-server:
+   #     condition: service_started
   certificate_processor:
     image: bindock/certificate_processor
     environment:
@@ -232,9 +232,9 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
-    depends_on:
-      registry:
-        condition: service_started
+ #   depends_on:
+ #     registry:
+  #      condition: service_started
   certificate_signer:
     image: bindock/certificate_signer
     environment:
@@ -250,22 +250,22 @@ services:
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
-    depends_on:
-      kafka:
-        condition: service_healthy
+  #  depends_on:
+   #   kafka:
+   #     condition: service_healthy
   nginx:
     image: bindock/nginx
     ports:
       - "80:80"
-    depends_on:
-      vaccination_api:
-        condition: service_started
-      portal_api:
-        condition: service_started
-      registration_api:
-        condition: service_started
-      digilocker_support_api:
-        condition: service_started
+   ## depends_on:
+    #  vaccination_api:
+    #    condition: service_started
+    ##  portal_api:
+    #    condition: service_started
+    ##  registration_api:
+    #    condition: service_started
+    #  digilocker_support_api:
+    #    condition: service_started
   notification-service:
     image: bindock/notification-service
     ports:
@@ -275,9 +275,9 @@ services:
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
-    depends_on:
-      kafka:
-        condition: service_healthy
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
   digilocker_support_api:
     image: bindock/digilocker_support_api
     environment:
@@ -286,8 +286,8 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
+  #  depends_on:
+   #   kafka:
+   #     condition: service_healthy
+   #   keycloak:
+   #     condition: service_healthy
