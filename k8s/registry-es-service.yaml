@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: registry-es
+  name: registry-es
+spec:
+  ports:
+    - name: "8082"
+      port: 8082
+      targetPort: 8081
+  selector:
+    io.kompose.service: registry-es
+status:
+  loadBalancer: {}

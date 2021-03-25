@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: registration-api
+  name: registration-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: registration-api
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: registration-api
+    spec:
+      containers:
+        - env:
+            - name: AUTH_PRIVATE_KEY
+              value: |
+                -----BEGIN RSA PRIVATE KEY-----
+                MIIEpAIBAAKCAQEA1mIX9SFluySnfIfT6Jz5LdORWO+O0j3L7cF+BLaAdX7JuiN1
+                0MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3rsb6ut/PweLn9sLmwsj9OGSAuH7DF
+                OHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgvd2+WnKYtdWfgo8kB82WkGolAT7++
+                efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpzTm87zshvOoEvkBUcBJdmKNjzLwBc
+                0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR557KyVGKL9NUvlbbp9jglcZERtpE6
+                pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6OQIDAQABAoIBAQDGeozZqvDngTj7
+                Bzm+m03rCnv/jdJ5fTMHTOOh82Ec5qRXC6tw/C6/PRAR8k72VGhdhwXxA5TWOFTM
+                zIqWW7AxoGtb7aGN9AwWiOQ5MnjYtD1fo6YD7kYJDEbVRc55CxsCo/fVz7XMkHd5
+                KA53YF/JwOr83rEpiGGm4VtH/6sd0JBLWZxIW1SEd7gPTOCNeRQku4xGXOARfNlC
+                l87FfqgZc4CeYh7c2OYwgjtShli2RMvcXKVQGI1BciTQQm2muLeoUU3P5Vn2NeGY
+                7WpbpjFQhN1nUIZq4cfN1QiNSTSIct0VXt6/qLZXLGOYLhkn9U/oDYOOYG1rY5xf
+                L0vumnrxAoGBAPJk0czb5gWbqd7AUEcfkVmRp3HZxHew6L+qmcfioiX+JTGHjW/f
+                OMgpipqXRJKmWZan+GT2MI5q36KIo7rcbwjXccA4DKw3JBukKHhS891iNqinwzX8
+                +ox2GH4bwYaHc35a9wIV4F8+IzcRRFiTgIW5bVs55ekgxqc7p2L3wb/dAoGBAOJq
+                w2HPddArOeI+S+YRYziKWoldJGwJFF9hILfsCWT2OCrVhiuBpRHvSJb3k1L6R0mn
+                gRGsss0HvpK6bUnWEAmNX9xEpll7g5kaWS1NSZMyvbOX6jTnoWE3jhdkXnQ1j8Uv
+                gxDB6zvtR60DTA9fCqPo09YeM4zcGLVySi+o/OwNAoGBAKUTNC4ns8ct88nXftRx
+                EzPElhxbCgnZWSjurjwKhBMLuZi5kAEYLDtkzxfo3LJix7BqRCe94eObtSGjnJ2t
+                cZC76KPXiAngo56PdWA8Xgfu0vqZBcDGwHrYEmYP0QQlSupKWN36uAsk7iaag8ku
+                6uAnH+p4y7Kwt5k8bwpfYHuhAoGAI3sTjxpRngOIGJomjrEe2VdlBK2h7YQmuyOf
+                WvMULcwf1SaM1fiFA6B5wZ6eaZxq23HyWfC0PEkAZkHsqmtvK/AJm5zubItcffuR
+                CfZYl0aWT7R4sT2zHmb0T1odKxzRoNbnNRMOZ9+xIb2oh6gfJLxxpdYpweMjxBta
+                4MkciWkCgYAOaBqc63WmPzFf0BDVlRPR4E5x2WjkNaNtMPNF0bj3rC7ZWVmXW6Ay
+                7tYqIxcu4KrP2MOFS0b2FL1KsBJlhUlvAfNEL5hn6IO73vl3OhhaJMNIBQ8NiJ/k
+                PbX9Cjh7u/BqNQmyROpFGHWbs4gjdQHeqY29CrmMaURZMo7U8g4b6w==
+                -----END RSA PRIVATE KEY-----
+            - name: AUTH_PUBLIC_KEY
+              value: |
+                -----BEGIN PUBLIC KEY-----
+                MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
+                LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
+                sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
+                d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
+                Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
+                57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
+                OQIDAQAB
+                -----END PUBLIC KEY-----
+            - name: CACHE_TTL
+              value: "60"
+            - name: DB_HOST
+              value: db
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080/auth
+            - name: REDIS_URL
+              value: redis://redis:6379
+            - name: REGISTRY_URL
+              value: http://registry:8081
+            - name: REGISTRY_WITH_ES_URL
+              value: http://registry-es:8081
+          image: bindock/registration_api
+          name: registration-api
+          ports:
+            - containerPort: 8002
+          resources: {}
+      restartPolicy: Always
+status: {}

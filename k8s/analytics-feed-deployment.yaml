@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: analytics-feed
+  name: analytics-feed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: analytics-feed
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: analytics-feed
+    spec:
+      containers:
+        - env:
+            - name: CLICK_HOUSE_URL
+              value: tcp://clickhouse-server:9000?debug=true
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+          image: bindock/analytics_feed
+          name: analytics-feed
+          resources: {}
+      restartPolicy: Always
+status: {}

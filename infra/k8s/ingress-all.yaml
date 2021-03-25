@@ -1,0 +1,22 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/issue-temporary-certificate: "true"
+    acme.cert-manager.io/http01-edit-in-place: "true"
+  name: divoc-ingress
+spec:
+  rules:
+  - host: divoc.k8s.sandboxaddis.com
+    http:
+      paths:
+      - backend:
+          serviceName: nginx
+          servicePort: 80
+        path: /
+  tls:
+  - hosts:
+    - divoc.k8s.sandboxaddis.com
+    secretName: divoc-ing-tls

@@ -1,0 +1,293 @@
+version: "2"
+
+services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    #healthcheck:
+     #   test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+     #   interval: 30s
+     #   timeout: 10s
+     #   retries: 4
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=registry
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  registry-es:
+    image: bindock/registry-es
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
+      - connectionInfo_username=postgres
+      - connectionInfo_password=uhAer5489
+      - elastic_search_connection_url=es:9200
+      - search_provider=io.opensaber.registry.service.ElasticSearchService
+    #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
+    ports:
+      - "8082:8081"
+   # depends_on:
+   #   es:
+   #     condition: service_healthy
+   #   db:
+   #     condition: service_started
+  registry:
+    image: bindock/registry
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
+      - connectionInfo_username=postgres
+      - connectionInfo_password=uhAer5489
+    ports:
+      - "8081:8081"
+    #depends_on:
+    #  es:
+    #    condition: service_healthy
+    #  db:
+    #    condition: service_started
+  keycloak:
+    image: bindock/keycloak
+    environment:
+      - DB_VENDOR=postgres
+      - DB_ADDR=jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+      - DB_PORT=5432
+      - DB_DATABASE=divoc
+      - DB_USER=postgres
+      - DB_PASSWORD=uhAer5489
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+#      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+   # healthcheck:
+   #   test:
+    #    ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
+    #  interval: 30s
+    #  timeout: 10s
+    #  retries: 5
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+   ## depends_on:
+     # db:
+     #   condition: service_started
+  flagr:
+    image: checkr/flagr
+    environment:
+      FLAGR_DB_DBDRIVER: postgres
+      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:uhAer5489@jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc?sslmode=disable
+      HOST: 0.0.0.0
+      FLAGR_WEB_PREFIX: /config
+    ports:
+      - "18000:18000"
+   # depends_on:
+   #   db:
+   #     condition: service_started
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+  kafka:
+    image: confluentinc/cp-kafka:latest
+   # depends_on:
+   ##   zookeeper:
+     #   condition: service_started
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9092,OUTSIDE://localhost:9094"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+   # healthcheck:
+   #   test:
+   #     ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+   #   interval: 30s
+   #   timeout: 10s
+   #   retries: 4
+  clickhouse-server:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+  vaccination_api:
+    image: bindock/vaccination_api
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      DB_HOST: db
+  #  healthcheck:
+  #    test: ["CMD", "curl", "-f", "http://localhost:8000"]
+  #    interval: 10s
+  #    timeout: 10s
+  #    retries: 10
+    ports:
+      - "8000:8000"
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
+  #    keycloak:
+  #      condition: service_healthy
+  portal_api:
+    image: bindock/portal_api
+    ports:
+      - "8001:8001"
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
+      DB_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+   # depends_on:
+   #   kafka:
+   #     condition: service_healthy
+   #   keycloak:
+   #     condition: service_healthy
+  registration_api:
+    image: bindock/registration_api
+    ports:
+      - "8002:8002"
+    environment:
+      REDIS_URL: redis://redis:6379
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      DB_HOST: db
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      # in min
+      CACHE_TTL: 60
+      AUTH_PRIVATE_KEY: |
+        -----BEGIN RSA PRIVATE KEY-----
+        MIIEpAIBAAKCAQEA1mIX9SFluySnfIfT6Jz5LdORWO+O0j3L7cF+BLaAdX7JuiN1
+        0MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3rsb6ut/PweLn9sLmwsj9OGSAuH7DF
+        OHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgvd2+WnKYtdWfgo8kB82WkGolAT7++
+        efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpzTm87zshvOoEvkBUcBJdmKNjzLwBc
+        0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR557KyVGKL9NUvlbbp9jglcZERtpE6
+        pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6OQIDAQABAoIBAQDGeozZqvDngTj7
+        Bzm+m03rCnv/jdJ5fTMHTOOh82Ec5qRXC6tw/C6/PRAR8k72VGhdhwXxA5TWOFTM
+        zIqWW7AxoGtb7aGN9AwWiOQ5MnjYtD1fo6YD7kYJDEbVRc55CxsCo/fVz7XMkHd5
+        KA53YF/JwOr83rEpiGGm4VtH/6sd0JBLWZxIW1SEd7gPTOCNeRQku4xGXOARfNlC
+        l87FfqgZc4CeYh7c2OYwgjtShli2RMvcXKVQGI1BciTQQm2muLeoUU3P5Vn2NeGY
+        7WpbpjFQhN1nUIZq4cfN1QiNSTSIct0VXt6/qLZXLGOYLhkn9U/oDYOOYG1rY5xf
+        L0vumnrxAoGBAPJk0czb5gWbqd7AUEcfkVmRp3HZxHew6L+qmcfioiX+JTGHjW/f
+        OMgpipqXRJKmWZan+GT2MI5q36KIo7rcbwjXccA4DKw3JBukKHhS891iNqinwzX8
+        +ox2GH4bwYaHc35a9wIV4F8+IzcRRFiTgIW5bVs55ekgxqc7p2L3wb/dAoGBAOJq
+        w2HPddArOeI+S+YRYziKWoldJGwJFF9hILfsCWT2OCrVhiuBpRHvSJb3k1L6R0mn
+        gRGsss0HvpK6bUnWEAmNX9xEpll7g5kaWS1NSZMyvbOX6jTnoWE3jhdkXnQ1j8Uv
+        gxDB6zvtR60DTA9fCqPo09YeM4zcGLVySi+o/OwNAoGBAKUTNC4ns8ct88nXftRx
+        EzPElhxbCgnZWSjurjwKhBMLuZi5kAEYLDtkzxfo3LJix7BqRCe94eObtSGjnJ2t
+        cZC76KPXiAngo56PdWA8Xgfu0vqZBcDGwHrYEmYP0QQlSupKWN36uAsk7iaag8ku
+        6uAnH+p4y7Kwt5k8bwpfYHuhAoGAI3sTjxpRngOIGJomjrEe2VdlBK2h7YQmuyOf
+        WvMULcwf1SaM1fiFA6B5wZ6eaZxq23HyWfC0PEkAZkHsqmtvK/AJm5zubItcffuR
+        CfZYl0aWT7R4sT2zHmb0T1odKxzRoNbnNRMOZ9+xIb2oh6gfJLxxpdYpweMjxBta
+        4MkciWkCgYAOaBqc63WmPzFf0BDVlRPR4E5x2WjkNaNtMPNF0bj3rC7ZWVmXW6Ay
+        7tYqIxcu4KrP2MOFS0b2FL1KsBJlhUlvAfNEL5hn6IO73vl3OhhaJMNIBQ8NiJ/k
+        PbX9Cjh7u/BqNQmyROpFGHWbs4gjdQHeqY29CrmMaURZMo7U8g4b6w==
+        -----END RSA PRIVATE KEY-----
+      AUTH_PUBLIC_KEY: |
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
+        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
+        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
+        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
+        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
+        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
+        OQIDAQAB
+        -----END PUBLIC KEY-----
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
+  #    keycloak:
+  #      condition: service_healthy
+  analytics_feed:
+    image: bindock/analytics_feed
+    environment:
+      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+ #   depends_on:
+ ##     clickhouse-server:
+   #     condition: service_started
+  certificate_processor:
+    image: bindock/certificate_processor
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
+ #   depends_on:
+ #     registry:
+  #      condition: service_started
+  certificate_signer:
+    image: bindock/certificate_signer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      REDIS_URL: redis://redis:6379
+      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
+      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+      CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
+      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
+      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+  #  depends_on:
+   #   kafka:
+   #     condition: service_healthy
+  nginx:
+    image: bindock/nginx
+    ports:
+      - "80:80"
+   ## depends_on:
+    #  vaccination_api:
+    #    condition: service_started
+    ##  portal_api:
+    #    condition: service_started
+    ##  registration_api:
+    #    condition: service_started
+    #  digilocker_support_api:
+    #    condition: service_started
+  notification-service:
+    image: bindock/notification-service
+    ports:
+      - "8765:8765"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SMS_AUTH_KEY: xxxx
+      SENDER_EMAIL: xxxx@mail.com
+      SENDER_PASSWORD: xxxx
+  #  depends_on:
+  #    kafka:
+  #      condition: service_healthy
+  digilocker_support_api:
+    image: bindock/digilocker_support_api
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+  #  depends_on:
+   #   kafka:
+   #     condition: service_healthy
+   #   keycloak:
+   #     condition: service_healthy

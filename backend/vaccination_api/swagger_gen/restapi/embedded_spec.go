@@ -33,7 +33,7 @@ func init() {
     "title": "Divoc",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "https://divoc.k8s.sandboxaddis.com",
   "basePath": "/divoc/api/v1",
   "paths": {
     "/authorize": {
@@ -900,8 +900,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",
@@ -933,7 +933,7 @@ func init() {
     "title": "Divoc",
     "version": "1.0.0"
   },
-  "host": "divoc.xiv.in",
+  "host": "https://divoc.k8s.sandboxaddis.com",
   "basePath": "/divoc/api/v1",
   "paths": {
     "/authorize": {
@@ -2360,8 +2360,8 @@ func init() {
     "hasRole": {
       "type": "oauth2",
       "flow": "accessCode",
-      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
-      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "authorizationUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.k8s.sandboxaddis.com/keycloak/auth/realms/divoc/protocol/openid-connect/token",
       "scopes": {
         "admin": "scope of super admin",
         "facility-admin": "scope of facility admin",

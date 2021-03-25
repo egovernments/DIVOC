@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: digilocker-support-api
+  name: digilocker-support-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: digilocker-support-api
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: digilocker-support-api
+    spec:
+      containers:
+        - env:
+            - name: DIGILOCKER_HMAC_AUTHKEY
+              value: UPDATE_KEY_GIVEN_IN_DIGILOCKER
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080/auth
+            - name: REGISTRY_URL
+              value: http://registry:8081
+            - name: REGISTRY_WITH_ES_URL
+              value: http://registry-es:8081
+          image: bindock/digilocker_support_api
+          name: digilocker-support-api
+          resources: {}
+      restartPolicy: Always
+status: {}

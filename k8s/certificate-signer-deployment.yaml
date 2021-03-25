@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: certificate-signer
+  name: certificate-signer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: certificate-signer
+    spec:
+      containers:
+        - env:
+            - name: CERTIFICATE_BASE_URL
+              value: https://cowin.gov.in/vaccine/
+            - name: CERTIFICATE_CONTROLLER_ID
+              value: https://cowin.gov.in/
+            - name: CERTIFICATE_DID
+              value: did:india
+            - name: CERTIFICATE_FEEDBACK_BASE_URL
+              value: https://cowin.gov.in/?
+            - name: CERTIFICATE_INFO_BASE_URL
+              value: https://cowin.gov.in/?
+            - name: CERTIFICATE_ISSUER
+              value: https://cowin.gov.in/
+            - name: CERTIFICATE_NAMESPACE
+              value: https://cowin.gov.in/credentials/vaccination/v1
+            - name: CERTIFICATE_PUBKEY_ID
+              value: https://example.com/i/india
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka:9092
+            - name: REDIS_URL
+              value: redis://redis:6379
+            - name: REGISTRY_URL
+              value: http://registry:8081
+            - name: REGISTRY_WITH_ES_URL
+              value: http://registry-es:8081
+          image: bindock/certificate_signer
+          name: certificate-signer
+          resources: {}
+      restartPolicy: Always
+status: {}
