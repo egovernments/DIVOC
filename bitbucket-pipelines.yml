@@ -16,7 +16,7 @@ pipelines:
             - sed -i "s|bindock|$BASE_URL|g" backend/Makefile
             - sed -i "s|bindock|$BASE_URL|g" backend/certificate_signer/Makefile
             - sed -i "s|bindock|$BASE_URL|g" registry/Makefile
-            - sed -i "s|latest|${BITBUCKET_COMMIT}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_BRANCH}|g"
+            - sed -i "s|latest|${BITBUCKET_COMMIT}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_BRANCH}|g" Makefile
             #- docker build -t $IMAGE_NAME .
             - make
             - make release
