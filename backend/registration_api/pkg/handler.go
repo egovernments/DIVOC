@@ -178,7 +178,7 @@ func canInitializeSlots() bool {
 }
 
 func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) middleware.Responder {
-	currentDate := time.Now()
+	currentDate := time.Now().Truncate(24 * time.Hour)
 	programDates, err := services.GetActiveProgramDates()
 	if err != nil {
 		return model.NewGenericServerError()
