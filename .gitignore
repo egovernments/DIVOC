@@ -16,7 +16,6 @@ backend/registration_api/divoc-registration-api-server
 backend/vaccination_api/certificate_processor
 backend/vaccination_api/digilocker_support_api
 keycloak/divoc-realm.json
-*.jar
 .eslintcache*
 certificate_processor/config/keys.js
 backend/vaccination_api/analytics_feed
