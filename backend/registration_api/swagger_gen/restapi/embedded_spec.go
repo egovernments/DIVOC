@@ -371,6 +371,9 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
           }
         }
       }
@@ -788,6 +791,9 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
           }
         }
       }

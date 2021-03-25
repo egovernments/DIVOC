@@ -399,33 +399,37 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 }
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
+
+	badReqResponse := func (errMsg string) *operations.DeleteRecipientBadRequest {
+		r := operations.NewDeleteRecipientBadRequest()
+		r.Payload = &operations.DeleteRecipientBadRequestBody{
+			Message: errMsg,
+		}
+		log.Error(errMsg)
+		return r
+	}
+
 	enrollmentCode := *params.Body.EnrollmentCode
 	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, principal.Phone)
-	if enrollmentInfo != nil && !checkIfAlreadyAppointed(enrollmentInfo) {
-		if osid, ok := enrollmentInfo["osid"]; ok {
-			err := enrollment.DeleteRecipient(osid)
-			if err != nil {
-				log.Error(err)
-				return operations.NewDeleteRecipientBadRequest()
-			} else {
-				if err := services.DeleteValue(enrollmentCode); err == nil {
-					services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)	
-				} else {
-					log.Error(err)
-				}
-			}
-			return operations.NewDeleteRecipientOK()
-		}
-	} else {
-		errorMessage := "Deleting a recipient is not allowed if appointment is scheduled."
-		response := operations.NewDeleteAppointmentBadRequest()
-		response.Payload = &operations.DeleteAppointmentBadRequestBody{
-			Message: errorMessage,
-		}
-		log.Info(errorMessage)
-		return response
+	if enrollmentInfo == nil {
+		return badReqResponse("Recipient does not exist or already deleted")
 	}
-	return operations.NewDeleteRecipientBadRequest()
+
+	if checkIfAlreadyAppointed(enrollmentInfo) {
+		return badReqResponse("Deleting a recipient is not allowed if appointment is scheduled.")
+	}
+	
+	if err := enrollment.DeleteRecipient(enrollmentInfo["osid"]); err != nil {
+		log.Error("Error deleting from registry : ", err)
+		return operations.NewDeleteRecipientInternalServerError()
+	}
+	
+	if err := services.DeleteValue(enrollmentCode); err != nil {
+		log.Error("Error deleting from redis : ", err)
+	}
+
+	services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)	
+	return operations.NewDeleteRecipientOK()
 }
 
 func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {
