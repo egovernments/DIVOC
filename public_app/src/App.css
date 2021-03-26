@@ -52,3 +52,8 @@ label.custom-verify-text-label {
 label.required:after {
   content: " *";
 }
+
+button:focus {
+  outline: none;
+  box-shadow: none;
+}

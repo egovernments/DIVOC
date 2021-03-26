@@ -16,7 +16,6 @@ import {
 } from "./error-constants";
 import DeleteIcon from "../../assets/img/icon-delete.svg";
 import AddIcon from "../../assets/img/add-admin.svg";
-import {Add} from "@material-ui/icons";
 
 const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
 const APPOINTMENT_SCHEDULE = "appointmentSchedule";
@@ -388,7 +387,7 @@ export default function FacilityConfigureSlot ({location}) {
                                    type="checkbox"
                                    name="appointmentHours"
                                    id="appointmentHours"/>
-                            <label htmlFor="appointmentHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
+                            <label className="ml-2" htmlFor="appointmentHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
                                 Appointment Hours
                             </label>
                         </Col>
@@ -407,8 +406,9 @@ export default function FacilityConfigureSlot ({location}) {
                                                             enableInput={!appointmentScheduleEnabled}
                                     />)
                         }
-
-                        <img hidden={!appointmentScheduleEnabled} className="addIcon" alt={""} src={AddIcon} width={30} onClick={addScheduleHandler}/>
+                        <button disabled={!appointmentScheduleEnabled} className="p-0 btn addIcon" onClick={addScheduleHandler}>
+                            <img title="Add" alt={""} src={AddIcon} width={30}/>
+                        </button>
                     </div>
                 </div>
                 <div className="mt-4">
@@ -419,7 +419,7 @@ export default function FacilityConfigureSlot ({location}) {
                                    checked={walkinScheduleEnabled}
                                    name="walkinHours"
                                    id="walkinHours"/>
-                            <label htmlFor="walkinHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
+                            <label className="ml-2" htmlFor="walkinHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
                                 Walk-in Hours
                             </label>
                         </Col>
@@ -522,8 +522,10 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                         </div>
                     </Col>
                     {schedule.index !== 0 && <Col className="m-0 p-1 flex-grow-0">
-                        <img hidden={enableInput} alt={""} style={{cursor:"pointer"}} src={DeleteIcon} width={30}
-                             onClick={() => deleteHandler(schedule.index)}/>
+                        <button className="p-0 btn" disabled = {enableInput} onClick={() => deleteHandler(schedule.index)}>
+                            <img alt={""} title="Delete" src={DeleteIcon} width={30}
+                            />
+                        </button>
                     </Col>}
                 </Row>
             </Col>
