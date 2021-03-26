@@ -1,7 +1,19 @@
 @import "styles/colors";
 
+@mixin backgroundColor($online: true) {
+
+  background: linear-gradient($offlineThemeColor 20%, $textWhiteColor 20%);
+  @if $online {
+    background: linear-gradient($primaryThemeColor 20%, $textWhiteColor 20%);
+  }
+}
+
 .App {
-  background: linear-gradient($primaryThemeColor 20%, $textWhiteColor 20%);
+  @include backgroundColor(true)
+}
+
+.App-offline {
+  @include backgroundColor(false)
 }
 
 @media (min-width: 961px) {
