@@ -281,11 +281,8 @@ export class AppDatabase {
     async getFacilitySchedule() {
         const selectedProgramId = getSelectedProgramId()
         if (selectedProgramId) {
-            const fs = await this.db.get(FACILITY_SCHEDULE, selectedProgramId);
-            console.log(fs)
-            return fs;
+            return await this.db.get(FACILITY_SCHEDULE, selectedProgramId);
         }
-        console.log("Nada")
     }
 
     async getCurrentAppointmentSlot() {

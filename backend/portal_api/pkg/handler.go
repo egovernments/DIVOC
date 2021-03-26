@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"net/http"
-	"sort"
 	"strings"
 	"time"
 
@@ -973,19 +972,11 @@ func validateIfUserHasPermissionsForFacilityProgram(facilityId string, programId
 }
 
 func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-	appointmentScheduleKey := "appointmentSchedule"
 	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
 	if e {
 		return responder
 	}
 	response, err := getFacilityProgramSchedule(params.FacilityID, params.ProgramID)
-
-	// sort the appointment schedules
-	appointmentSchedules := response[appointmentScheduleKey].([]interface{})
-	sort.Slice(appointmentSchedules, func(i, j int) bool {
-		return appointmentSchedules[i].(map[string]interface{})["startTime"].(string) < appointmentSchedules[j].(map[string]interface{})["startTime"].(string)
-	})
-	response[appointmentScheduleKey] = appointmentSchedules
 	if err != nil {
 		return operations.NewGetFacilityProgramScheduleNotFound()
 	}
@@ -1046,7 +1037,7 @@ func getProgramsForPublic(params operations.GetProgramsForPublicParams) middlewa
 }
 
 func getFacilitySchedules(params operations.GetFacilitySchedulesParams, principal *models.JWTClaimBody) middleware.Responder {
-	response, err := getAllFacilitySchedules(params.FacilityID)
+	response, err := getAllFacilitySchedules(&params.FacilityID, nil)
 	if err != nil {
 		return operations.NewGetFacilitySchedulesNotFound()
 	}
