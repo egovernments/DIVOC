@@ -22,7 +22,7 @@ import axios from "axios";
 import {PROGRAM_API} from "../../constants";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
-    <Col lg={3}>
+    <Col lg={4}>
         <div className="d-flex flex-column justify-content-center align-items-center pb-3 pl-4 pr-4 pt-0 mt-3"
              style={{width: "100%", height: "65vh", backgroundColor: backgroundColor, borderRadius: "20px"}}>
             <div className="d-inline-flex justify-content-center" style={{height: "30%"}}>
@@ -98,11 +98,11 @@ export const Home = () => {
 
     return (
         <div className="home-section">
-            <div className="section ">
+            <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
-                    <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
+                    <div className="p-4 p-lg-4 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
-                            <Col style={{paddingRight:"10vmin", paddingLeft:"10vmin"}}>
+                            <Col style={{paddingRight:"10vmin", paddingLeft:"08vmin"}}>
                                 <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
                                 <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
                                 <input placeholder="Enter mobile number"
@@ -128,7 +128,7 @@ export const Home = () => {
             </div>
             <div className="section ">
                 <div className="info-section d-flex flex-column" style={{height: "100%"}}>
-                    <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
+                    <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center" style={{margin:"auto"}}>
                         <Row className="d-flex justify-content-center">
                             <InfoCard img={<img src={enterMobileImg} alt={""}/>}
                                       title={"Enter Mobile"}
@@ -150,9 +150,9 @@ export const Home = () => {
                     </div>
                 </div>
             </div>
-            <div className="section ">
+            <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
-                    <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center">
+                    <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center" style={{margin:"20px"}}>
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={"Download your Vaccination Certificate"}
@@ -196,15 +196,17 @@ export const Home = () => {
                     </div>
                 </div>
             </div>
-            <div className="section ">
+            <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center">
                         <Row className="justify-content-center">
                         {
                             programs.map(p =>
-                                <Col lg={5} className="p-4 mb-4 mr-4" style={{backgroundColor:"#F9FAFA", borderRadius: "10px"}}>
-                                    <h4 className="pb-2" style={{fontWeight:"bold"}}>{p.name}</h4>
-                                    <p className="info-input">{p.description}</p>
+                                <Col lg={6} >
+                                    <div className="p-4 mb-4" style={{backgroundColor:"#F9FAFA", borderRadius: "10px"}}>
+                                        <h4 className="pb-2" style={{fontWeight:"bold"}}>{p.name}</h4>
+                                        <p className="info-input">{p.description}</p>
+                                    </div>
                                 </Col>
                             )
                         }
