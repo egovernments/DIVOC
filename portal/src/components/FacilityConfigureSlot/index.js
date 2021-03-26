@@ -369,7 +369,7 @@ export default function FacilityConfigureSlot ({location}) {
                     <Row>
                         <Col className="col-4">
                             <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
-                                Appointment Scheduler
+                                Appointment Hours
                             </p>
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}}>
@@ -392,7 +392,7 @@ export default function FacilityConfigureSlot ({location}) {
                 <div className="mt-4">
                     <Row>
                         <Col className="col-4">
-                            <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Walk-in Scheduler</p>
+                            <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Walk-in Hours</p>
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}} >
                             Select Walk-in Days
