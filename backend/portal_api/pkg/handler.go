@@ -66,6 +66,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
 	api.GetProgramsForPublicHandler = operations.GetProgramsForPublicHandlerFunc(getProgramsForPublic)
+	api.GetFacilitySchedulesHandler = operations.GetFacilitySchedulesHandlerFunc(getFacilitySchedules)
 }
 
 type GenericResponse struct {
@@ -1042,4 +1043,12 @@ func getProgramsForPublic(params operations.GetProgramsForPublicParams) middlewa
 		return model.NewGenericServerError()
 	}
 	return model.NewGenericJSONResponse(response[entityType])
+}
+
+func getFacilitySchedules(params operations.GetFacilitySchedulesParams, principal *models.JWTClaimBody) middleware.Responder {
+	response, err := getAllFacilitySchedules(params.FacilityID)
+	if err != nil {
+		return operations.NewGetFacilitySchedulesNotFound()
+	}
+	return model.NewGenericJSONResponse(response)
 }

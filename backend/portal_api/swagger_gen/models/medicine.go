@@ -309,8 +309,9 @@ type MedicineDoseIntervalsItems0 struct {
 	Max *int64 `json:"max,omitempty"`
 
 	// Minimum Interval
+	// Required: true
 	// Minimum: 0
-	Min *int64 `json:"min,omitempty"`
+	Min *int64 `json:"min"`
 }
 
 // Validate validates this medicine dose intervals items0
@@ -344,8 +345,9 @@ func (m *MedicineDoseIntervalsItems0) validateMax(formats strfmt.Registry) error
 }
 
 func (m *MedicineDoseIntervalsItems0) validateMin(formats strfmt.Registry) error {
-	if swag.IsZero(m.Min) { // not required
-		return nil
+
+	if err := validate.Required("min", "body", m.Min); err != nil {
+		return err
 	}
 
 	if err := validate.MinimumInt("min", "body", *m.Min, 0, false); err != nil {
