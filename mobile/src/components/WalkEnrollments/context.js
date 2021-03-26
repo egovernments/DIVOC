@@ -10,6 +10,7 @@ export const FORM_WALK_IN_ENROLL_FORM = "form";
 export const FORM_WALK_IN_VERIFY_FORM = "verify_form";
 export const FORM_WALK_IN_ENROLL_PAYMENTS = "payments";
 export const FORM_WALK_IN_ENROLL_CONFIRMATION = "confirm";
+export const INVALID_ELIGIBILITY_CRITERIA = "invalid_eligibility_criteria"
 
 export const WALK_IN_ROUTE = "walkInEnroll";
 
@@ -17,7 +18,7 @@ const WalkInEnrollmentContext = createContext(null);
 
 export const initialWalkInEnrollmentState = {
     comorbidities: [],
-    yob: -1,
+    yob: "",
     choice: "yes",
     currentForm: FORM_WALK_IN_ELIGIBILITY_CRITERIA,
     nextForm: FORM_WALK_IN_ELIGIBILITY_CRITERIA,
@@ -55,6 +56,7 @@ function walkInEnrollmentReducer(state, action) {
         case FORM_WALK_IN_VERIFY_OTP:
         case FORM_WALK_IN_VERIFY_FORM:
         case FORM_WALK_IN_ENROLL_CONFIRMATION:
+        case INVALID_ELIGIBILITY_CRITERIA:
         case FORM_WALK_IN_ENROLL_PAYMENTS: {
             return {
                 ...state,
