@@ -96,7 +96,6 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     documentLoader: customLoader,
                     compactProof: false
                 });
-                alert(JSON.stringify(result));
                 if (result.verified) {
                     console.log('Signature verified.');
                     setValid(true);
