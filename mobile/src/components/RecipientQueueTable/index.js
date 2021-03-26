@@ -20,7 +20,7 @@ export const RecipientQueueTable = () => {
     })
     const history = useHistory();
     return (
-        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_TITLE)}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} onBack={() => history.push(config.urlPath)}>
             <Table responsive>
                 <thead>
                 <tr>
