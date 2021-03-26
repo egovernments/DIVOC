@@ -5,7 +5,7 @@ import {programDb} from "./Services/ProgramDB";
 import {monthNames, weekdays} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 13;
+const DATABASE_VERSION = 14;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
@@ -16,6 +16,7 @@ const STATUS = "status";
 const USER_DETAILS = "user_details";
 const FACILITY_SCHEDULE = "facility_schedule";
 const COMORBIDITIES = "comorbidities";
+const APPLICATION_CONFIGS = "application_configs";
 
 const dbConfigs = [
     {
@@ -53,6 +54,10 @@ const dbConfigs = [
     {
         table: COMORBIDITIES,
         optionalParameters: {keyPath: "programId"}
+    },
+    {
+        table: APPLICATION_CONFIGS,
+        optionalParameters: {}
     }
 ]
 

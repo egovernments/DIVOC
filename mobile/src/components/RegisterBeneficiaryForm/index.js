@@ -20,13 +20,14 @@ import {
     INVALID_NAME_ERR_MSG,
     MAXIMUM_LENGTH_OF_NAME_ERROR_MSG,
     MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
-    NAME_ERROR_MSG, NATIONAL_ID_ERROR_MSG, NATIONAL_ID_TYPE_ERROR_MSG,
+    NAME_ERROR_MSG, NATIONAL_ID_ERROR_MSG, NATIONAL_ID_TYPE_ERROR_MSG, NATIONALITY_ERROR_MSG,
     PINCODE_ERROR_MESSAGE,
     STATE_ERROR_MSG
 } from "./error-constants";
 import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../utils/validations";
 import {appIndexDb} from "../../AppDatabase";
 import {formatAppointmentSlot} from "../../utils/date_utils";
+import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
 
 const GENDERS = [
     "Male",
@@ -95,6 +96,10 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
         }
         if(!formData.district) {
             errorsData.district = DISTRICT_ERROR_MSG
+        }
+
+        if(!formData.nationalId) {
+            errorsData.nationalId = NATIONALITY_ERROR_MSG
         }
 
         if(formData.pincode && !isValidPincode(formData.pincode)) {
@@ -255,10 +260,16 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
 const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
     const state_and_districts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const STATES = Object.values(state_and_districts['states']).map(obj => obj.name);
+
     const [districts, setDistricts] = useState([]);
+    const [nationalities, setNationalities] = useState([]);
 
     useEffect(() => {
         setDistictsForState(formData.state)
+        applicationConfigsDB.getApplicationConfigs()
+            .then(res => {
+                setNationalities(res.nationalities)
+            })
     }, []);
 
     function onStateSelected(stateSelected) {
@@ -353,6 +364,25 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                 {
                     verifyDetails &&
                     <p>{formData.pincode}</p>
+                }
+            </div>
+            <div>
+                <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
+                       htmlFor="state">Nationality </label>
+                <select className="form-control" name="nationalId" id="nationalId"
+                        onChange={setValue}
+                        hidden={verifyDetails}>
+                    <option disabled selected={!formData.nationalId} value>Select Nationality</option>
+                    {
+                        nationalities.map(id => <option selected={id === formData.nationalId} value={id}>{id}</option>)
+                    }
+                </select>
+                <div className="invalid-input">
+                    {errors.nationalId}
+                </div>
+                {
+                    verifyDetails &&
+                    <p>{formData.nationalId}</p>
                 }
             </div>
         </div>
