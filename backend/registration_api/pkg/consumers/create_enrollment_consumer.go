@@ -28,42 +28,39 @@ func StartEnrollmentConsumer() {
 		}
 		for {
 			msg, err := consumer.ReadMessage(-1)
-			if err == nil {
-				log.Info("Got the message to create new enrollment")
-				var enrollment = services.EnrollmentPayload{}
-				err = json.Unmarshal(msg.Value, &enrollment)
-
-				if err == nil {
-					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					osid, err := services.CreateEnrollment(&enrollment, 1)
-
-					services.PublishEnrollmentACK(
-						enrollment.RowID,
-						enrollment.VaccinationDetails,
-						enrollment.Enrollment.EnrollmentType,
-						err,
-					)
-
-					// Below condition flow will be used by WALK_IN component.
-					if err == nil {
-						cacheEnrollmentInfo(enrollment.Enrollment, osid)
-						err := services.NotifyRecipient(enrollment.Enrollment)
-						if err != nil {
-							log.Error("Unable to send notification to the enrolled user", err)
-						}
-					} else {
-						// Push to error topic
-						log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
-					}
-					_, _ = consumer.CommitMessage(msg)
-				} else {
-					log.Info("Unable to serialize the request body", err)
-				}
-
-			} else {
+			if err != nil {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
+				continue
 			}
+			log.Info("Got the message to create new enrollment")
+			var enrollment = services.EnrollmentPayload{}
+			if err = json.Unmarshal(msg.Value, &enrollment); err != nil {
+				// Push to error topic
+				log.Info("Unable to serialize the request body", err)
+				continue
+			}
+			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
+			
+			if err := services.ValidateEnrollment(enrollment); err != nil {
+				log.Error("Error validating enrollment", err)
+				services.PublishEnrollmentACK(enrollment, err)
+				continue
+			}
+
+			osid, err := services.CreateEnrollment(&enrollment, 1)
+			services.PublishEnrollmentACK(enrollment,err)
+			if err != nil {
+				// Push to error topic
+				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
+				continue
+			}
+			cacheEnrollmentInfo(enrollment.Enrollment, osid)
+			if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
+				log.Error("Unable to send notification to the enrolled user", err)
+			}
+			_, _ = consumer.CommitMessage(msg)
+
 		}
 	}()
 }

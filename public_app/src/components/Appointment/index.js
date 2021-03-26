@@ -46,7 +46,7 @@ export const Appointment = (props) => {
                 .then(res => {
                     const {facilities, facilitiesSchedule} = res.data;
                     let schedule = {};
-                    facilitiesSchedule.map(d => {
+                    (facilitiesSchedule||[]).map(d => {
                         if (d.facilityId) {
                             schedule[d.facilityId] = d
                         }
