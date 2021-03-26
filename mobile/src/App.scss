@@ -1,10 +1,14 @@
 @import "styles/colors";
 
 .App {
-  height: 100vh;
-  max-width: 60vh;
-  margin: auto;
   background: linear-gradient($primaryThemeColor 20%, $textWhiteColor 20%);
+}
+
+@media (min-width: 961px) {
+  .App {
+    max-width: 60vh;
+    margin: auto;
+  }
 }
 
 .invalid-input {

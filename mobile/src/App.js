@@ -49,7 +49,7 @@ function App({keycloak, initialized}) {
     }
 
     return (
-        <div className="App">
+        <div className="App" style={{height: window.innerHeight}}>
             {programSelected ? <Dashboard/> : <SelectProgram onDone={onDone}/>}
         </div>
     );

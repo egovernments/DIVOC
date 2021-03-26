@@ -110,7 +110,7 @@ export function EnrolmentItems({icon, title, onClick, value}) {
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>
                 <Col>
-                    <img className={"icon"} src={icon} alt={""}/>
+                    {icon && <img className="icon" src={icon} alt={""}/>}
                     <h5>{value}</h5>
                     <h5>{title}</h5>
                 </Col>
