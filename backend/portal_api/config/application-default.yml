@@ -21,7 +21,7 @@ analytics:
 facility:
   upload:
     columns: "facilityCode,facilityName,contact,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,adminName,adminMobile"
-      required: "facilityCode,facilityName,contact,addressLine1,addressLine1,district,state,pincode,adminName,adminMobile"
+    required: "facilityCode,facilityName,contact,addressLine1,addressLine1,district,state,pincode,adminName,adminMobile"
     preenrollment:
       upload:
         columns: "phone,nationalId,dob,gender,name,email,addressLine1,addressLine2,district,state,pincode"
