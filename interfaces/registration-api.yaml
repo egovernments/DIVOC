@@ -164,6 +164,8 @@ paths:
                 type: string
         '401':
           description: Unauthorized
+        '500':
+         description: Internal Error
     post:
       summary: Enroll Recipient
       operationId: enrollRecipient
