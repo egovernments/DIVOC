@@ -4,6 +4,8 @@ import {Button, Col, Modal, Row} from "react-bootstrap";
 import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
 import PrivateSvg from "../../assets/img/icon-private.svg"
+import statusAppointmentImg from "../../assets/img/status-appointment.png"
+import statusWalkInImg from "../../assets/img/status-walkin.png"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
 import {formatDate, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
@@ -211,10 +213,8 @@ export const Appointment = (props) => {
                                         </div>
                                         <div>{formatAddress(facility.address)}
                                             <div>
-                                                <span
-                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walkin"}</span>
-                                                <span
-                                                    className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
+                                                <img hidden={!(facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule?.length > 0)} src={statusAppointmentImg} height="17px" />
+                                                <img hidden={!(facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule?.length > 0)} src={statusWalkInImg} height="17px" />
                                             </div>
                                         </div>
 
