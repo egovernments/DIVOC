@@ -17,6 +17,7 @@ func getFacilityProgramSchedule(facilityId string, programId string) (map[string
 }
 
 func getAllFacilitySchedules(facilityId *string, programId *string) ([]interface{}, error) {
+	appointmentScheduleKey := "appointmentSchedule"
 	entityType := "FacilityProgramSlot"
 	limit, offset := getLimitAndOffset(nil, nil)
 	filter := map[string]interface{}{}
@@ -39,12 +40,15 @@ func getAllFacilitySchedules(facilityId *string, programId *string) ([]interface
 
 	if len(respArr) > 0 {
 		for _ , res := range respArr {
+			result := res.(map[string]interface{})
 			// sort the appointment schedules
-			appointmentSchedules := res.(map[string]interface{})["appointmentSchedule"].([]interface{})
-			sort.Slice(appointmentSchedules, func(i, j int) bool {
-				return appointmentSchedules[i].(map[string]interface{})["startTime"].(string) < appointmentSchedules[j].(map[string]interface{})["startTime"].(string)
-			})
-			response["appointmentSchedule"] = appointmentSchedules
+			if _, ok := result[appointmentScheduleKey]; ok {
+				appointmentSchedules := result[appointmentScheduleKey].([]interface{})
+				sort.Slice(appointmentSchedules, func(i, j int) bool {
+					return appointmentSchedules[i].(map[string]interface{})["startTime"].(string) < appointmentSchedules[j].(map[string]interface{})["startTime"].(string)
+				})
+				response[appointmentScheduleKey] = appointmentSchedules
+			}
 		}
 		return respArr, nil
 	}

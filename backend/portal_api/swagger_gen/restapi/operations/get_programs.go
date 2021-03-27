@@ -31,7 +31,7 @@ func NewGetPrograms(ctx *middleware.Context, handler GetProgramsHandler) *GetPro
 	return &GetPrograms{Context: ctx, Handler: handler}
 }
 
-/* GetPrograms swagger:route GET /programs getPrograms
+/*GetPrograms swagger:route GET /programs getPrograms
 
 get program list
 
@@ -47,6 +47,7 @@ func (o *GetPrograms) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewGetProgramsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetPrograms) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

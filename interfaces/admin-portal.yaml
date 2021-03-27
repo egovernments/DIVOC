@@ -1289,6 +1289,8 @@ definitions:
             maxAppointments:
               type: integer
               title: Maximum appointment per day
+              x-nullable: true
+              minimum: 0
   FacilityWalkInSchedule:
     properties:
       days:

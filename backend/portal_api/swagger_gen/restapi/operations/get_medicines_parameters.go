@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetMedicinesParams creates a new GetMedicinesParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetMedicinesParams() GetMedicinesParams {
 
 	return GetMedicinesParams{}

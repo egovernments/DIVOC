@@ -16,8 +16,7 @@ import (
 )
 
 // NewGetFacilitiesForPublicParams creates a new GetFacilitiesForPublicParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetFacilitiesForPublicParams() GetFacilitiesForPublicParams {
 
 	return GetFacilitiesForPublicParams{}
@@ -71,6 +70,7 @@ func (o *GetFacilitiesForPublicParams) BindRequest(r *http.Request, route *middl
 	if err := o.bindPincode(qPincode, qhkPincode, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -86,7 +86,6 @@ func (o *GetFacilitiesForPublicParams) bindLimit(rawData []string, hasKey bool, 
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
@@ -109,7 +108,6 @@ func (o *GetFacilitiesForPublicParams) bindOffset(rawData []string, hasKey bool,
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
@@ -132,10 +130,10 @@ func (o *GetFacilitiesForPublicParams) bindPincode(rawData []string, hasKey bool
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.Pincode = &raw
 
 	return nil
