@@ -2,7 +2,7 @@ import {useForm, useStep} from "react-hooks-helper";
 import React, {useEffect, useState} from "react";
 import {FormPersonalDetails} from "./FormPersonalDetails";
 import axios from "axios";
-import {Card, CardGroup, Container} from "react-bootstrap";
+import {Modal, Card, CardGroup, Container} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import SelectedLogo from "../../../assets/img/check.svg"
@@ -14,6 +14,7 @@ import "./index.css"
 import Row from "react-bootstrap/Row";
 import {getCookie} from "../../../utils/cookies";
 import appConfig from "../../../config.json";
+import {INVALID_BENEFICIARY_ERROR_MSG} from "./error-constants";
 
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
@@ -134,6 +135,8 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   const years = [];
   const curYear = new Date().getFullYear();
   const [showCommorbidity, setShowCommorbidity] = useState("yes");
+  const [invalidCondition, setInvalidCondition] = useState(false)
+  const history = useHistory()
 
   const [minAge, setMinAge] = useState(0);
   const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
@@ -188,15 +191,20 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
       next()
     }
     else if (formData.yob && (curYear - formData.yob) < minAge) {
-      setErrors({...errors, "yob":"Without any below mentioned conditions, minimum age for eligibility is " + minAge});
+      setInvalidCondition(true)
     }
     else if (formData.yob && (curYear - formData.yob) > maxAge) {
-      setErrors({...errors, "yob":"Without any below mentioned conditions, maximum age for eligibility is " + maxAge});
+      setInvalidCondition(true)
     }
     else {
       // errors.yob = "Please select year of birth";
       setErrors({...errors, "yob":"Please select year of birth"});
     }
+  }
+  function handleClose() {
+      setInvalidCondition(false);
+      history.push("/registration");
+
   }
 
   function onYOBChange(year) {
@@ -223,9 +231,16 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
       setValue({target: {name: "comorbidities", value: []}})
     }
   }
-
-  return (
+    return (
     <Container fluid>
+        <Modal show={invalidCondition} centered onHide={handleClose}>
+            <Modal.Header>
+                <strong className="text-center">{INVALID_BENEFICIARY_ERROR_MSG}  {formData.programName}</strong>
+            </Modal.Header>
+            <Modal.Footer>
+                <CustomButton onClick = {handleClose} style={{margin: "auto"}} className="blue-btn" >Ok</CustomButton>
+            </Modal.Footer>
+        </Modal>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
           <h3>Check beneficiary's eligibility for {formData.programName}</h3>

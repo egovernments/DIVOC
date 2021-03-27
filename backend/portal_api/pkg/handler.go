@@ -980,11 +980,18 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 	if err != nil {
 		return operations.NewGetFacilityProgramScheduleNotFound()
 	}
+	// sort the appointment schedules
+	if _, ok := response[appointmentScheduleKey]; ok {
+		appointmentSchedules := response[appointmentScheduleKey].([]interface{})
+		sort.Slice(appointmentSchedules, func(i, j int) bool {
+			return appointmentSchedules[i].(map[string]interface{})["startTime"].(string) < appointmentSchedules[j].(map[string]interface{})["startTime"].(string)
+		})
+		response[appointmentScheduleKey] = appointmentSchedules
+	}
 	return model.NewGenericJSONResponse(response)
 }
 
 func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-
 	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
 	if e {
 		return responder
@@ -1009,15 +1016,19 @@ func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgra
 	}
 	requestMap["osid"] = osid
 
-	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if val, _ := requestMap["walkInSchedule"]; val == nil || len(val.([]interface{})) == 0 {
+		requestMap["walkInSchedule"] = make([]map[string]interface{}, 0)
+	}
+	if val, _ := requestMap["appointmentSchedule"]; val == nil || len(val.([]interface{})) == 0 {
+		requestMap["appointmentSchedule"] = make([]map[string]interface{}, 0)
+	}
+	_, err = kernelService.UpdateRegistry(objectId, requestMap)
 	if err != nil {
 		log.Error(err)
 		return operations.NewUpdateFacilityProgramScheduleBadRequest()
 	} else {
-		log.Print(resp)
 		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
-
 }
 
 func getProgramsForPublic(params operations.GetProgramsForPublicParams) middleware.Responder {
