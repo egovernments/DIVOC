@@ -88,7 +88,7 @@ func PublishEnrollmentACK(enrollmentPayload EnrollmentPayload, e error) {
 		RowID              uint   `json:"rowID,omitempty"`
 		ErrMsg             string `json:"errMsg,omitempty"`
 		EnrollmentType     string `json:"enrollmentType"`
-		VaccinationDetails []byte `json:"vaccinationDetails"`
+		VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
 	}{
 		RowID:              enrollmentPayload.RowID,
 		VaccinationDetails: enrollmentPayload.VaccinationDetails,

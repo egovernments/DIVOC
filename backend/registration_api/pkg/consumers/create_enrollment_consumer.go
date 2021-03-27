@@ -42,8 +42,13 @@ func StartEnrollmentConsumer() {
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 			
-			if err := services.ValidateEnrollment(enrollment); err != nil {
-				log.Error("Error validating enrollment", err)
+			if err := services.CheckForDuplicateEnrollmets(enrollment); err != nil {
+				if err.Duplicate == nil {
+					log.Errorf("Error checking for Duplicates : %v", err)
+				} else {
+					log.Error("Duplicates Found : ", err)
+					enrollment.OverrideEnrollmentCode(err.Duplicate.Code)
+				}
 				services.PublishEnrollmentACK(enrollment, err)
 				continue
 			}

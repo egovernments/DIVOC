@@ -3,6 +3,7 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"text/template"
 
 	errors2 "github.com/pkg/errors"
@@ -15,6 +16,11 @@ import (
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
 )
+
+var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool {
+	"National ID": func(e1, e2 models.Enrollment) bool {return *e1.NationalID == *e2.NationalID},
+	"Name and Age": func(e1, e2 models.Enrollment) bool {return e1.Name == e2.Name && e1.Yob == e2.Yob},
+}
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
 
@@ -38,35 +44,15 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (strin
 		return "", err
 	}
 	if exists == 0 {
-		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
-			enrollmentPayload.Enrollment = enrollment
-			return CreateWalkInEnrollment(enrollmentPayload)
-		}
 		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
 		if err != nil {
 			return "", err
 		}
 		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+		enrollmentPayload.OverrideEnrollmentCode(enrollment.Code)
 		return result.(string), nil
 	}
 	return CreateEnrollment(enrollmentPayload, position+1)
-}
-
-func CreateWalkInEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
-	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
-	enrollment := map[string]interface{}{
-		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
-		"certified":         true,
-		"programId":         enrollmentPayload.Appointments[0].ProgramID,
-	}
-	err = json.Unmarshal(marshal, &enrollment)
-
-	registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-	if err != nil {
-		return "", err
-	}
-	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
-	return result.(string), nil
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
@@ -183,32 +169,34 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 	return nil
 }
 
-func ValidateEnrollment(enrollmentPayload EnrollmentPayload) error {
+func CheckForDuplicateEnrollmets(enrollmentPayload EnrollmentPayload) *DuplicateEnrollmentError {
 	enrollmentArr, err := FetchEnrollments(enrollmentPayload.Phone)
 	if err != nil {
-		return err
+		return &DuplicateEnrollmentError{Err: err}
 	}
 	var enrollments []models.Enrollment
 	if err := json.Unmarshal(enrollmentArr, &enrollments); err != nil {
 		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-		return err
+		return &DuplicateEnrollmentError{Err: err}
 	}
-	if duplicates := FilterEnrollments(enrollments, func(e models.Enrollment) bool {
-		return (e.Name == enrollmentPayload.Name && e.Yob == enrollmentPayload.Yob) || (*e.NationalID == *enrollmentPayload.NationalID)
-	}); len(duplicates) > 0 {
-		return errors2.New("Enrollment with same details [Name-YOB or national ID] already exists")
+	for fields, criteria := range DuplicateEnrollmentCriteria {
+		if duplicate := FindDuplicateEnrollment(enrollments, *enrollmentPayload.Enrollment, criteria); duplicate != nil {
+			return &DuplicateEnrollmentError{
+				Duplicate: duplicate,
+				Err: errors2.New(fmt.Sprintf("Enrollment with same %s already exists", fields)),
+			}
+		}
 	}
 	return nil
 }
 
-func FilterEnrollments(enrollments []models.Enrollment, criteria func(e models.Enrollment) bool) []models.Enrollment {
-	var res []models.Enrollment
+func FindDuplicateEnrollment(enrollments []models.Enrollment, target models.Enrollment, criteria func(e1, e2 models.Enrollment) bool) *models.Enrollment {
 	for _, e := range enrollments {
-		if criteria(e) {
-			res = append(res, e)
+		if criteria(e, target) {
+			return &e
 		}
 	}
-	return res
+	return nil
 }
 
 func FetchEnrollments(mobile string) ([]byte, error){
@@ -232,6 +220,21 @@ func FetchEnrollments(mobile string) ([]byte, error){
 type EnrollmentPayload struct {
 	RowID              uint   `json:"rowID"`
 	EnrollmentScopeId  string `json:"enrollmentScopeId"`
-	VaccinationDetails []byte `json:"vaccinationDetails"`
+	VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
 	*models.Enrollment
+}
+
+func (ep EnrollmentPayload) OverrideEnrollmentCode(code string) {
+	if len(ep.VaccinationDetails) > 0 && ep.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		ep.VaccinationDetails["preEnrollmentCode"] = code
+	}
+}
+
+type DuplicateEnrollmentError struct {
+	Duplicate	*models.Enrollment
+	Err	error
+}
+
+func (d *DuplicateEnrollmentError) Error() string {
+	return d.Err.Error()
 }
