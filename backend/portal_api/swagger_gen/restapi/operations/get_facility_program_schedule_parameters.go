@@ -14,8 +14,7 @@ import (
 )
 
 // NewGetFacilityProgramScheduleParams creates a new GetFacilityProgramScheduleParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetFacilityProgramScheduleParams() GetFacilityProgramScheduleParams {
 
 	return GetFacilityProgramScheduleParams{}
@@ -60,6 +59,7 @@ func (o *GetFacilityProgramScheduleParams) BindRequest(r *http.Request, route *m
 	if err := o.bindProgramID(rProgramID, rhkProgramID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -75,6 +75,7 @@ func (o *GetFacilityProgramScheduleParams) bindFacilityID(rawData []string, hasK
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.FacilityID = raw
 
 	return nil
@@ -89,6 +90,7 @@ func (o *GetFacilityProgramScheduleParams) bindProgramID(rawData []string, hasKe
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.ProgramID = raw
 
 	return nil

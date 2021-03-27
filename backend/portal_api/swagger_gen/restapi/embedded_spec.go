@@ -1490,7 +1490,8 @@ func init() {
               },
               "maxAppointments": {
                 "type": "integer",
-                "title": "Maximum appointment per day"
+                "title": "Maximum appointment per day",
+                "x-nullable": true
               }
             }
           }
@@ -3652,7 +3653,8 @@ func init() {
         },
         "maxAppointments": {
           "type": "integer",
-          "title": "Maximum appointment per day"
+          "title": "Maximum appointment per day",
+          "x-nullable": true
         }
       }
     },

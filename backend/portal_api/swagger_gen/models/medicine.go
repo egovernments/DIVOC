@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 	"strconv"
 
@@ -93,6 +92,7 @@ func (m *Medicine) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Medicine) validateDoseIntervals(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.DoseIntervals) { // not required
 		return nil
 	}
@@ -117,11 +117,12 @@ func (m *Medicine) validateDoseIntervals(formats strfmt.Registry) error {
 }
 
 func (m *Medicine) validateEffectiveUntil(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.EffectiveUntil) { // not required
 		return nil
 	}
 
-	if err := validate.MinimumInt("effectiveUntil", "body", *m.EffectiveUntil, 0, false); err != nil {
+	if err := validate.MinimumInt("effectiveUntil", "body", int64(*m.EffectiveUntil), 0, false); err != nil {
 		return err
 	}
 
@@ -138,11 +139,12 @@ func (m *Medicine) validateName(formats strfmt.Registry) error {
 }
 
 func (m *Medicine) validatePrice(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Price) { // not required
 		return nil
 	}
 
-	if err := validate.Minimum("price", "body", *m.Price, 0, false); err != nil {
+	if err := validate.Minimum("price", "body", float64(*m.Price), 0, false); err != nil {
 		return err
 	}
 
@@ -237,6 +239,7 @@ func (m *Medicine) validateVaccinationModeEnum(path, location string, value stri
 }
 
 func (m *Medicine) validateVaccinationMode(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -244,38 +247,6 @@ func (m *Medicine) validateVaccinationMode(formats strfmt.Registry) error {
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", *m.VaccinationMode); err != nil {
 		return err
-	}
-
-	return nil
-}
-
-// ContextValidate validate this medicine based on the context it is used
-func (m *Medicine) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateDoseIntervals(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *Medicine) contextValidateDoseIntervals(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.DoseIntervals); i++ {
-
-		if m.DoseIntervals[i] != nil {
-			if err := m.DoseIntervals[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("doseIntervals" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
 	}
 
 	return nil
@@ -333,11 +304,12 @@ func (m *MedicineDoseIntervalsItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *MedicineDoseIntervalsItems0) validateMax(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Max) { // not required
 		return nil
 	}
 
-	if err := validate.MinimumInt("max", "body", *m.Max, 0, false); err != nil {
+	if err := validate.MinimumInt("max", "body", int64(*m.Max), 0, false); err != nil {
 		return err
 	}
 
@@ -350,15 +322,10 @@ func (m *MedicineDoseIntervalsItems0) validateMin(formats strfmt.Registry) error
 		return err
 	}
 
-	if err := validate.MinimumInt("min", "body", *m.Min, 0, false); err != nil {
+	if err := validate.MinimumInt("min", "body", int64(*m.Min), 0, false); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this medicine dose intervals items0 based on context it is used
-func (m *MedicineDoseIntervalsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
