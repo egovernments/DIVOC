@@ -34,3 +34,8 @@
 .logo-di{
   background-image: 'logo.svg';
 }
+
+button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}

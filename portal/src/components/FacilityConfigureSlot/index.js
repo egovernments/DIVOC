@@ -482,7 +482,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                     }
                 });
             } else {
-                newSchedule.days.concat({ "day": day, maxAppointments: value})
+                newSchedule.days = newSchedule.days.concat({ "day": day, maxAppointments: value})
             }
             onChange(newSchedule);
         }
