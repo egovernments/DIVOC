@@ -980,14 +980,6 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 	if err != nil {
 		return operations.NewGetFacilityProgramScheduleNotFound()
 	}
-	// sort the appointment schedules
-	if _, ok := response[appointmentScheduleKey]; ok {
-		appointmentSchedules := response[appointmentScheduleKey].([]interface{})
-		sort.Slice(appointmentSchedules, func(i, j int) bool {
-			return appointmentSchedules[i].(map[string]interface{})["startTime"].(string) < appointmentSchedules[j].(map[string]interface{})["startTime"].(string)
-		})
-		response[appointmentScheduleKey] = appointmentSchedules
-	}
 	return model.NewGenericJSONResponse(response)
 }
 
