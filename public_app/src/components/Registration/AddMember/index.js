@@ -129,7 +129,7 @@ export const AddMembersFlow = () => {
 };
 
 const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
-  const MINIMUM_SUPPORT_YEAR = 1920;
+  const MINIMUM_SUPPORT_AGE = 120;
   const [errors, setErrors] = useState({});
   const [conditions, setConditions] = useState([])
   const years = [];
@@ -139,7 +139,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   const history = useHistory()
 
   const [minAge, setMinAge] = useState(0);
-  const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
+  const [maxAge, setMaxAge] = useState(MINIMUM_SUPPORT_AGE);
 
   useEffect(() => {
     const data = {
@@ -160,14 +160,14 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
         if(result["variantAttachment"]) {
           setConditions(result["variantAttachment"].commorbidities || [])
           setMinAge(result["variantAttachment"].minAge || 0)
-          setMaxAge(result["variantAttachment"].maxAge || curYear - MINIMUM_SUPPORT_YEAR)
+          setMaxAge(result["variantAttachment"].maxAge || MINIMUM_SUPPORT_AGE)
         } else {
           console.error("program eligibility criteria is not configure");
         }
       })
   }, []);
 
-  for (let i = MINIMUM_SUPPORT_YEAR; i < curYear; i++) {
+  for (let i = curYear - maxAge; i < curYear; i++) {
     years.push("" + i)
   }
   const {previous, next} = navigation;

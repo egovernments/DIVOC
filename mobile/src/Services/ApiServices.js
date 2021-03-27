@@ -62,7 +62,7 @@ export class ApiServices {
             return {
                 preEnrollmentCode: item.enrollCode,
                 enrollmentType: patientDetails.enrollmentType,
-                programId: patientDetails.programId,
+                programId: item.programId,
                 comorbidities: patientDetails.comorbidities ?? [],
                 recipient: {
                     contact: [
