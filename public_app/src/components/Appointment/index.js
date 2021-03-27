@@ -44,7 +44,9 @@ export const Appointment = (props) => {
             };
             axios.get("/divoc/admin/api/v1/public/facilities", {params: params})
                 .then(res => {
-                    const {facilities, facilitiesSchedule} = res.data;
+                    let {facilities, facilitiesSchedule} = res.data;
+                    facilities = facilities.filter(f => f.programs.filter(p => p.programId == programId).length > 0)
+                    facilitiesSchedule = facilitiesSchedule.filter(fs => fs.programId == programId)
                     let schedule = {};
                     (facilitiesSchedule||[]).map(d => {
                         if (d.facilityId) {

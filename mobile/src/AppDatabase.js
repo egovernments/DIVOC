@@ -49,7 +49,7 @@ const dbConfigs = [
     },
     {
         table: FACILITY_SCHEDULE,
-        optionalParameters: {},
+        optionalParameters: {keyPath: "programId"},
     },
     {
         table: COMORBIDITIES,
@@ -265,6 +265,7 @@ export class AppDatabase {
         const deleteQueue = this.db.clear(QUEUE);
         const deletePrograms = this.db.clear(PROGRAMS);
         const deleteUserDetails = this.db.clear(USER_DETAILS);
+        const deleteFacilitySchedule = this.db.clear(FACILITY_SCHEDULE);
         localStorage.clear()
         return Promise.all(
             [
@@ -273,7 +274,8 @@ export class AppDatabase {
                 deleteQueue,
                 deleteVaccinators,
                 deletePrograms,
-                deleteUserDetails
+                deleteUserDetails,
+                deleteFacilitySchedule
             ]);
     }
 
@@ -282,7 +284,10 @@ export class AppDatabase {
     }
 
     async getFacilitySchedule() {
-        return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+        const selectedProgramId = getSelectedProgramId()
+        if (selectedProgramId) {
+            return await this.db.get(FACILITY_SCHEDULE, selectedProgramId);
+        }
     }
 
     async getCurrentAppointmentSlot() {
@@ -306,8 +311,11 @@ export class AppDatabase {
         return currentSlot
     }
 
-    async saveFacilitySchedule(facilitySchedule) {
-        return this.db.put(FACILITY_SCHEDULE, facilitySchedule, FACILITY_SCHEDULE)
+    async saveFacilitySchedule(facilitySchedules) {
+        const schedules = (facilitySchedules || []).map(s => {
+            return this.db.put(FACILITY_SCHEDULE, s)
+        })
+        return Promise.all(schedules);
     }
 }
 

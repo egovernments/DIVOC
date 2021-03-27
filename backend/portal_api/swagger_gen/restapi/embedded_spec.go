@@ -780,6 +780,50 @@ func init() {
         }
       }
     },
+    "/facility/{facilityId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "facility-staff"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilitySchedules",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityConfigureSlot"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "schedule for given facility not found"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -2823,6 +2867,50 @@ func init() {
         }
       }
     },
+    "/facility/{facilityId}/schedule": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "facility-staff"
+            ]
+          }
+        ],
+        "summary": "Get slots for given program and facility",
+        "operationId": "getFacilitySchedules",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of facility",
+            "name": "facilityId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/FacilityConfigureSlot"
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "schedule for given facility not found"
+          }
+        }
+      }
+    },
     "/medicines": {
       "get": {
         "security": [
@@ -3843,6 +3931,9 @@ func init() {
     },
     "MedicineDoseIntervalsItems0": {
       "type": "object",
+      "required": [
+        "min"
+      ],
       "properties": {
         "max": {
           "description": "Maximum Interval",
