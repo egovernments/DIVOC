@@ -14,6 +14,7 @@ import {storeApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
 import {CONSTANT} from "./utils/constants";
 
 function App({keycloak, initialized}) {
+    const isOnline = useOnlineStatus()
     const [isDBInit, setDBInit] = useState(false);
     const [programSelected, setProgramSelected] = useState(getSelectedProgram())
     useEffect(() => {
@@ -49,7 +50,7 @@ function App({keycloak, initialized}) {
     }
 
     return (
-        <div className="App">
+        <div className={`App ${!isOnline ? 'App-offline' : ""}`} style={{height: window.innerHeight}}>
             {programSelected ? <Dashboard/> : <SelectProgram onDone={onDone}/>}
         </div>
     );

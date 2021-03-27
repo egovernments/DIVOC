@@ -1,5 +1,6 @@
 import state_and_districts from '../../utils/state_and_districts.json';
 import {ApiServices} from "../../Services/ApiServices";
+import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
 
 const FLAGR_ACTION_TYPES = {
     "LOAD_APPLICATION_CONFIG": "LOAD_APPLICATION_CONFIG"
@@ -10,7 +11,8 @@ const initialState = {
         "currency": "INR",
         "countryCode": "+91",
         "countryName": "India",
-        "stateAndDistricts": state_and_districts
+        "stateAndDistricts": state_and_districts,
+        "nationalities": ["Others"]
     }
 };
 
@@ -41,7 +43,11 @@ export const storeApplicationConfigFromFlagr = (dispatch) => {
     try {
         ApiServices.fetchApplicationConfigFromFlagr()
             .then((res) => {
-                return dispatch(loadApplicationConfig(res["variantAttachment"]))
+                const configs = res["variantAttachment"];
+                return applicationConfigsDB.saveApplicationConfigs(configs)
+                    .finally(() => {
+                        dispatch(loadApplicationConfig(configs))
+                    })
             })
             .catch((err) => {
                 console.log("Error occurred while fetching application config from flagr");
