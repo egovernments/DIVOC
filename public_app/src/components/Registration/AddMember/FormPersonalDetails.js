@@ -103,7 +103,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
 
     const onContinue = () => {
         if (validateUserDetails()) {
-            alert("Please fill all the required field")
+            alert("Errors found in submission. Please retry")
         } else {
             next()
         }
