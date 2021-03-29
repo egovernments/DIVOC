@@ -184,10 +184,10 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     if(hasConditions() && formData.choice === "yes" && formData.comorbidities.length === 0) {
       setErrors({...errors, "choice":"* Please select at least one comorbidity"});
     }
-    else if (formData.yob && formData.yob > 1900 && formData.choice === "yes" &&
+    else if (formData.yob && formData.yob >= (curYear - maxAge) && formData.choice === "yes" &&
       (isValidAge() || formData.comorbidities.length>0)) {
       next()
-    } else if(formData.yob && formData.yob > 1900 && formData.choice === "no" && isValidAge()) {
+    } else if(formData.yob && formData.yob >= (curYear - maxAge) && formData.choice === "no" && isValidAge()) {
       next()
     }
     else if (formData.yob && (curYear - formData.yob) < minAge) {
