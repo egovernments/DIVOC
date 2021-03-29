@@ -83,6 +83,7 @@ function preEnrollmentReducer(state, action) {
             const newState = {...state, ...action.payload};
             newState.state = action.payload.address.state;
             newState.district = action.payload.address.district;
+            newState.identity = action.payload.nationalId;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
 
