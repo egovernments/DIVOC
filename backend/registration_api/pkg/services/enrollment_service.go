@@ -18,7 +18,7 @@ import (
 )
 
 var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool {
-	"National ID": func(e1, e2 models.Enrollment) bool {return *e1.NationalID == *e2.NationalID},
+	"Identity Number": func(e1, e2 models.Enrollment) bool {return *e1.Identity == *e2.Identity},
 	"Name and Age": func(e1, e2 models.Enrollment) bool {return e1.Name == e2.Name && e1.Yob == e2.Yob},
 }
 

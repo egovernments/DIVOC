@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -36,7 +35,7 @@ func NewDeleteRecipient(ctx *middleware.Context, handler DeleteRecipientHandler)
 	return &DeleteRecipient{Context: ctx, Handler: handler}
 }
 
-/* DeleteRecipient swagger:route DELETE /recipients deleteRecipient
+/*DeleteRecipient swagger:route DELETE /recipients deleteRecipient
 
 Delete the recipient
 
@@ -52,6 +51,7 @@ func (o *DeleteRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewDeleteRecipientParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,6 +71,7 @@ func (o *DeleteRecipient) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -86,11 +87,6 @@ type DeleteRecipientBadRequestBody struct {
 
 // Validate validates this delete recipient bad request body
 func (o *DeleteRecipientBadRequestBody) Validate(formats strfmt.Registry) error {
-	return nil
-}
-
-// ContextValidate validates this delete recipient bad request body based on context it is used
-func (o *DeleteRecipientBadRequestBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -142,11 +138,6 @@ func (o *DeleteRecipientBody) validateEnrollmentCode(formats strfmt.Registry) er
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this delete recipient body based on context it is used
-func (o *DeleteRecipientBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
