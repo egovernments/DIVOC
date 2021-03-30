@@ -69,12 +69,12 @@ export default function ProgramOverview() {
                 const selectedMedicine = medicinesList.find((medicine) => medicine.osid === data);
                 if(selectedMedicine) {
                     const effectiveUntil = selectedMedicine.effectiveUntil === undefined ? "N/A" :
-                        selectedMedicine.effectiveUntil;
+                        selectedMedicine.effectiveUntil + " Days";
                     return (
                         <div className="medicine-row">
                             <div className="d-flex justify-content-between">
                                 <b className="">{selectedMedicine['name']}</b>
-                                <span className="">Validity {effectiveUntil} Days</span>
+                                <span className="">Validity {effectiveUntil}</span>
                             </div>
                             <div className="d-flex justify-content-between">
                                 <span className="">{selectedMedicine['provider']}</span>
