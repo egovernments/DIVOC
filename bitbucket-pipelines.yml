@@ -34,7 +34,8 @@ pipelines:
             - gcloud container clusters get-credentials $K8s_CLUSTER_NAME --zone=$GCLOUD_ZONE --project $GCLOUD_PROJECT_ID
             - sed -i "s|bindock|$BASE_URL|g" k8s/*
             - sed -i "s|TAG|${BITBUCKET_COMMIT}-${BITBUCKET_BUILD_NUMBER}-${BITBUCKET_BRANCH}|g" k8s/*
-            - kubectl apply -n divoc -f k8s/
+           # - kubectl apply -n divoc -f k8s/
+            - kubectl apply -n divoc -f k8s/portal-api-deployment.yaml
             services:
               - docker
     mfr-v2:
