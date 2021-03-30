@@ -235,7 +235,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
     <Container fluid>
         <Modal show={invalidCondition} centered onHide={handleClose}>
             <Modal.Header>
-                <strong className="text-center">{INVALID_BENEFICIARY_ERROR_MSG}  {formData.programName}</strong>
+                <strong className="text-center">{INVALID_BENEFICIARY_ERROR_MSG.replace('PROGRAM_NAME', formData.programName)}</strong>
             </Modal.Header>
             <Modal.Footer>
                 <CustomButton onClick = {handleClose} style={{margin: "auto"}} className="blue-btn" >Ok</CustomButton>
