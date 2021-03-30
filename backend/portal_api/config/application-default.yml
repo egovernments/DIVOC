@@ -4,7 +4,7 @@ registry:
   searchoperationid: search
   readoperationid: read
 keycloak:
-  url: https://divoc.k8s.sandboxaddis.com/keycloak/auth
+  url: https://mbrana.k8s.sandboxaddis.com/keycloak/auth
   realm: divoc
   facilityAdmin:
     roleName: facility-admin
@@ -36,7 +36,7 @@ kafka:
   certifiedTopic: certified
   enrollmenttopic: enrollment
 flagr:
-  url: https://divoc.k8s.sandboxaddis.com/config
+  url: https://mbrana.k8s.sandboxaddis.com/config
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
