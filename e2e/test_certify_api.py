@@ -1,26 +1,19 @@
 import json
 import requests as r
-import logging
 import sys
 import time
 import utils
 import random
 
-log = logging.getLogger();
-log.setLevel(logging.DEBUG);
-log.addHandler(logging.StreamHandler(sys.stdout));
-
 VACCINATION_API = "http://vaccination_api:8000" + "/divoc/api/v1/"
 CERTIFY_REQUEST_BODY = "test_data/certify.json"
-GET_CERTIFICATE_BODY = "test_data/get_certificate.json"
-
 
 def service_check():
     try:
         vacc_api_resp = r.get(VACCINATION_API + "ping")
         registry_resp = r.get(utils.REGISTRY_SEARCH)
     except Exception as e:
-        log.info("Error : %s", e)
+        print("Error : %s" % (e))
         return False
     return (vacc_api_resp.status_code == 200) and (registry_resp.status_code == 200)
 
@@ -28,7 +21,7 @@ def call_and_verify():
     cid = str(random.randint(1e11, 1e12))
     print("Creating certificate %s"%cid)
     old_certs = utils.fetch_certificates(cid);
-    log.info("User has %s old certificates", len(old_certs))
+    print("User has %s old certificates" % (len(old_certs)))
 
     headers = {
         'Authorization' : 'Bearer ' + utils.fetch_auth_token(),
@@ -38,20 +31,20 @@ def call_and_verify():
     certify_data["preEnrollmentCode"] = cid
     certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
     assert certify_res.status_code == 200, "post /cerify call failed. Response code : {code}".format(code = certify_res.status_code)
-    log.info("Cerify request sent")
+    print("Cerify request sent")
     
     new_certs = []
     max_tries = 12
     for i in range(max_tries):
-        log.info("Fetching certificates...., try no : %s", i+1)
+        print("Fetching certificates...., try no : %s" % (i+1))
         new_certs = utils.fetch_certificates(cid)
         if(len(new_certs) == len(old_certs) + 1):
             latest_cert = [x for x in new_certs if x not in old_certs][0]
             assert latest_cert["name"] == certify_data["recipient"]["name"], "recipient name mismatch"
             assert latest_cert["mobile"] == certify_data["recipient"]["contact"][0][4:], "recipient contact mismatch"
-            log.info("Test Certify Successful")
+            print("Test Certify Successful")
             break;
-        log.info("No new Certificate found")
+        print("No new Certificate found")
         time.sleep(5)
     assert len(new_certs) == len(old_certs) + 1, "Cerrificate creation failed"
 
@@ -59,13 +52,13 @@ def test_cert():
     test_ran = False
     ping_retries = 24
     for i in range(ping_retries):
-        log.info("Trying to ping...., try no : %s", i+1)
+        print("Trying to ping...., try no : %s", i+1)
         if(service_check()):
-            log.info("Ping successful. Starting tests")
+            print("Ping successful. Starting tests")
             call_and_verify()
             test_ran = True
             break
-        log.info("Ping failed. Services not ready")
+        print("Ping failed. Services not ready")
         time.sleep(5)
     if(not test_ran):
         exit(1)
