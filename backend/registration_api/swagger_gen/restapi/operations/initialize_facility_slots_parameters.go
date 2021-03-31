@@ -11,13 +11,23 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
 )
 
 // NewInitializeFacilitySlotsParams creates a new InitializeFacilitySlotsParams object
-// no default values defined in spec.
+// with the default values initialized.
 func NewInitializeFacilitySlotsParams() InitializeFacilitySlotsParams {
 
-	return InitializeFacilitySlotsParams{}
+	var (
+		// initialize parameters with default values
+
+		forceDefault = bool(false)
+	)
+
+	return InitializeFacilitySlotsParams{
+		Force: &forceDefault,
+	}
 }
 
 // InitializeFacilitySlotsParams contains all the bound params for the initialize facility slots operation
@@ -33,6 +43,11 @@ type InitializeFacilitySlotsParams struct {
 	  In: body
 	*/
 	Body InitializeFacilitySlotsBody
+	/*
+	  In: query
+	  Default: false
+	*/
+	Force *bool
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -43,6 +58,8 @@ func (o *InitializeFacilitySlotsParams) BindRequest(r *http.Request, route *midd
 	var res []error
 
 	o.HTTPRequest = r
+
+	qs := runtime.Values(r.URL.Query())
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
@@ -60,8 +77,36 @@ func (o *InitializeFacilitySlotsParams) BindRequest(r *http.Request, route *midd
 			}
 		}
 	}
+	qForce, qhkForce, _ := qs.GetOK("force")
+	if err := o.bindForce(qForce, qhkForce, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+// bindForce binds and validates parameter Force from query.
+func (o *InitializeFacilitySlotsParams) bindForce(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		// Default values have been previously initialized by NewInitializeFacilitySlotsParams()
+		return nil
+	}
+
+	value, err := swag.ConvertBool(raw)
+	if err != nil {
+		return errors.InvalidType("force", "query", "bool", raw)
+	}
+	o.Force = &value
+
 	return nil
 }
