@@ -153,6 +153,7 @@ func BookSlot(enrollmentCode, phone, facilitySlotID, dose, programID string) err
 		AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
 		CreatedAt:       time.Now(),
 		Status:          models.AllottedStatus,
+		EnrollmentOsid:  enrollmentInfo["osid"],
 	})
 	return nil
 }

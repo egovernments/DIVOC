@@ -2,6 +2,7 @@ package services
 
 import (
 	"bytes"
+	"github.com/divoc/portal-api/pkg/utils"
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
@@ -13,7 +14,7 @@ import (
 const EnrollmentEntity = "Enrollment"
 const PreEnrollmentRegistered = "preEnrollmentRegistered"
 
-func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string) {
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64) {
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": preEnrollmentCode,
@@ -30,14 +31,24 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 	if err == nil {
 		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
 		if len(enrollments) > 0 {
-			enrollment, ok := enrollments[0].(map[string]interface{})
+			enrollmentObj, ok := enrollments[0].(map[string]interface{})
 			if ok {
-				enrollment["certified"] = true
-				response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollment)
-				if err == nil {
-					log.Debugf("Updated enrollment registry successfully %v", response)
-				} else {
-					log.Error("Failed updating enrollment registry", err)
+				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
+					for _, appointmentObj := range appointments {
+						appointment := appointmentObj.(map[string]interface{})
+						appointmentDose := appointment["dose"].(string)
+						appointmentCertified := appointment["certified"].(bool)
+						if appointmentDose == utils.ToString(dose) && !appointmentCertified {
+							appointment["certified"] = true
+							break
+						}
+					}
+					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
+					if err == nil {
+						log.Debugf("Updated enrollment registry successfully %v", response)
+					} else {
+						log.Error("Failed updating enrollment registry", err)
+					}
 				}
 			}
 		} else {

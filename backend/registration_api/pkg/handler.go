@@ -337,6 +337,7 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 							AppointmentTime: "",
 							CreatedAt:       time.Now(),
 							Status:          models2.CancelledStatus,
+							EnrollmentOsid:  enrollmentInfo["osid"],
 						})
 						return nil
 					}

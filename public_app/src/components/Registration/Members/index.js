@@ -343,6 +343,7 @@ const MemberCard = (props) => {
                                                           state: {
                                                               name: member.name,
                                                               nationalId: member.nationalId,
+                                                              identity: member.identity,
                                                               program: program,
                                                               recipientPinCode: member?.address?.pincode
                                                           }

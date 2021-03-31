@@ -16,6 +16,7 @@ type AppointmentAck struct {
 	AppointmentTime string
 	CreatedAt       time.Time
 	Status          string
+	EnrollmentOsid	string
 }
 
 const AllottedStatus = "ALLOTTED"

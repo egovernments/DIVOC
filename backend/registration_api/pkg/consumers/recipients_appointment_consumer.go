@@ -45,17 +45,12 @@ func StartRecipientsAppointmentBookingConsumer() {
 				continue
 			}
 
-			filter := map[string]interface{}{}
-			filter["code"] = map[string]interface{}{
-				"eq": appointmentAckMessage.EnrollmentCode,
-			}
-			responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0)
-			if err != nil || len(responseFromRegistry["Enrollment"].([]interface{})) == 0 {
-				log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode, err)
+			responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", appointmentAckMessage.EnrollmentOsid)
+			enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
+			if !ok {
+				log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode)
 				continue
-			} 
-
-			enrollmentResp := responseFromRegistry["Enrollment"].([]interface{})[0].(map[string]interface{})
+			}
 			enrollmentStr, err := json.Marshal(enrollmentResp)
 			if err != nil {
 				log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())

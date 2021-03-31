@@ -168,7 +168,7 @@ export const Appointment = (props) => {
             .then(res => {
                 history.push({
                     pathname:"/" + enrollment_code + "/appointment/confirm",
-                    state:{nationalId: state.nationalId, program: state.program}
+                    state:{identity: state.identity, program: state.program}
                 })
             })
             .catch(() => {
