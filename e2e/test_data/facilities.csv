@@ -1,0 +1,6 @@
+facilityCode,facilityName,contact,email,operatingHourStart,operatingHourEnd,category,type,status,addressLine1,addressLine2,district,state,pincode,geoLocationLat,geoLocationLon,websiteURL,adminName,adminMobile
+DEL010,Final Destination,9809989981,awesome@mailinator.com,9,18,GOVT,Fixed location,Active,No 23,"Road, NIBM Road",Delhi,Delhi,100001,28,77,www.awesome.com  ,Suresh,1111111111
+BLR311,Chinmaya Mission Hospital,9876543210,aolo@mailinator.com,10,17,PRIVATE,Fixed location,Active,ER34,"My C,D,E",Bengaluru,Karnataka,560001,13,75,www.aolo.com,ramesh,1111111112
+PUN001,Mobile Vaccination Center,9879879879,mobile@mailinator.com,8,18,GOVT,Mobile,Active,PU34,"Road, NIBM Road",Pune,Maharashtra,560001,,,www.mobile.com,Mahesh,1111111113
+BID001,iCare Hospital,9876543211,aolo@mailinator.com,10,17,PRIVATE,Fixed location,Active,ER34,"My C,D,E",Bidar,Karnataka,470891,13,33,www.aolo.com,Krishna,1111111114
+HYD111,St. Mary’s Medical Center,9876543212,apollo@mailinator.com,7,19,GOVT,Fixed location,Active,OMG 143,"Road, NIBM Road",Hyderabad,Telangana,100001,28,77,www.awesome.com  ,Gowri Shankar,1111111115

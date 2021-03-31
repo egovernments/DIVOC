@@ -1,0 +1,4 @@
+code,name,nationalIdentifier,mobileNumber,email,status,facilityIds
+A1,Amar,QWERTY12,2111111111,a@v.com,Active,"DEL010,BLR311"
+A2,Akbar,QWERTY13,2111111112,b@v.com,Active,PUN001
+A3,Anthony,QWERTY14,2111111113,c@v.com,Active,BID001
