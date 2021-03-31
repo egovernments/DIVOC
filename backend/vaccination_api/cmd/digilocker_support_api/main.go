@@ -64,44 +64,42 @@ var (
 )
 
 var statesEnabled = map[string]bool{
-	"odisha": true,
-	"nagaland": true,
-	"bihar": true,
-	"karnataka": true,
-	"uttar pradesh": true,
-	"chhattisgarh": true,
-	"maharashtra": true,
-	"madhya pradesh": true,
-	"himachal pradesh": true,
-	"uttarakhand": true,
-	"jammu and kashmir": true,
-	"goa": true,
-	"gujarat": true,
-	"rajasthan": true,
-	"delhi": true,
-	"telangana": true,
-	"andhra pradesh": true,
-	"jharkhand": true,
-	"punjab": true,
-	"tripura": true,
-	"haryana": true,
-	"sikkim": true,
-	"mizoram": true,
-	"chandigarh": true,
-	"meghalaya": true,
-	"arunachal pradesh": true,
-	"dadra and nagar haveli": true,
-	"manipur": true,
-	"daman and diu": true,
-	"ladakh": true,
+	"odisha":                      true,
+	"nagaland":                    true,
+	"bihar":                       true,
+	"karnataka":                   true,
+	"uttar pradesh":               true,
+	"chhattisgarh":                true,
+	"maharashtra":                 true,
+	"madhya pradesh":              true,
+	"himachal pradesh":            true,
+	"uttarakhand":                 true,
+	"jammu and kashmir":           true,
+	"goa":                         true,
+	"gujarat":                     true,
+	"rajasthan":                   true,
+	"delhi":                       true,
+	"telangana":                   true,
+	"andhra pradesh":              true,
+	"jharkhand":                   true,
+	"punjab":                      true,
+	"tripura":                     true,
+	"haryana":                     true,
+	"sikkim":                      true,
+	"mizoram":                     true,
+	"chandigarh":                  true,
+	"meghalaya":                   true,
+	"arunachal pradesh":           true,
+	"dadra and nagar haveli":      true,
+	"manipur":                     true,
+	"daman and diu":               true,
+	"ladakh":                      true,
 	"andaman and nicobar islands": true,
-	"lakshadweep": true,
-	"himachal": true,
+	"lakshadweep":                 true,
+	"himachal":                    true,
 }
 
 var ctx = context.Background()
-
-
 
 func getVaccineValidDays(start string, end string) string {
 	days := DEFAULT_DUE_DATE_N_DAYS
@@ -119,7 +117,7 @@ func getVaccineValidDays(start string, end string) string {
 }
 
 func showLabelsAsPerTemplate(certificate models.Certificate) []string {
-	if (!isFinal(certificate)) {
+	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
@@ -139,6 +137,33 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 		formatId(certificate.CredentialSubject.ID),
 		certificate.CredentialSubject.RefId,
 		formatRecipientAddress(certificate),
+		certificate.Evidence[0].Vaccine,
+		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+		certificate.Evidence[0].Verifier.Name,
+		formatFacilityAddress(certificate),
+	}
+}
+func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
+	if !isFinal(certificate) {
+		return []string{certificate.CredentialSubject.Name,
+			certificate.CredentialSubject.Age,
+			certificate.CredentialSubject.Gender,
+			formatId(certificate.CredentialSubject.ID),
+			certificate.CredentialSubject.RefId,
+			certificate.CredentialSubject.ID,
+			certificate.Evidence[0].Vaccine,
+			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
+			certificate.Evidence[0].Verifier.Name,
+			formatFacilityAddress(certificate),
+		}
+	}
+	return []string{certificate.CredentialSubject.Name,
+		certificate.CredentialSubject.Age,
+		certificate.CredentialSubject.Gender,
+		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.RefId,
+		certificate.CredentialSubject.ID,
 		certificate.Evidence[0].Vaccine,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		certificate.Evidence[0].Verifier.Name,
@@ -166,7 +191,7 @@ func templateType(certificate models.Certificate) string {
 		basePath = checkIdType(certificate.CredentialSubject.ID, "config/provisional-with-aadhaar", "config/provisional-with-other")
 	}
 
-	return  fmt.Sprintf("%s%s.pdf", basePath, variant)
+	return fmt.Sprintf("%s%s.pdf", basePath, variant)
 }
 
 func getCertificateVariant(certificate models.Certificate) string {
@@ -177,6 +202,62 @@ func getCertificateVariant(certificate models.Certificate) string {
 		}
 	}
 	return "-plain"
+}
+
+func getCertificateAsPdfV2(certificateText string) ([]byte, error) {
+	var certificate models.Certificate
+	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
+		log.Error("Unable to parse certificate string", err)
+		return nil, err
+	}
+
+	pdf := gopdf.GoPdf{}
+	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
+	pdf.AddPage()
+
+	if err := pdf.AddTTFFont("wts11", "config/Roboto-Light.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	tpl1 := pdf.ImportPage(GetTemplateName(certificate, isFinal(certificate), "HIN"), 1, "/MediaBox")
+	// Draw pdf onto page
+	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
+
+	if err := pdf.SetFont("wts11", "", 11); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	offsetX := 300.0
+	offsetY := 205.0
+	offsetNewX := 300.0
+	offsetNewY := 240.0
+	rowSize := 6
+	displayLabels := showLabelsAsPerTemplateV2(certificate)
+	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
+	i := 0
+	for i = 0; i < rowSize; i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*25.0)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	for i = rowSize; i < len(displayLabels); i++ {
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY + float64(i)*25.0)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	e := pasteQrCodeOnPage(certificateText, &pdf, 335, 565)
+	if e != nil {
+		log.Errorf("error in pasting qr code %v", e)
+		return nil, e
+	}
+
+	//pdf.Image("qr.png", 200, 50, nil)
+	//pdf.WritePdf("new_certificate.pdf")
+	var b bytes.Buffer
+	_ = pdf.Write(&b)
+	return b.Bytes(), nil
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
@@ -230,7 +311,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	pdf.SetY(offsetNewY + float64(i)*42)
 	_ = pdf.Cell(nil, certificate.Evidence[0].Facility.Address.AddressRegion)
 
-	e := pasteQrCodeOnPage(certificateText, &pdf)
+	e := pasteQrCodeOnPage(certificateText, &pdf, 290, 30)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
@@ -244,8 +325,9 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 }
 
 func formatFacilityAddress(certificate models.Certificate) string {
-	return concatenateReadableString(certificate.Evidence[0].Facility.Name,
-		certificate.Evidence[0].Facility.Address.District)
+	return concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+		certificate.Evidence[0].Facility.Address.District),
+		certificate.Evidence[0].Facility.Address.AddressRegion)
 }
 
 func formatRecipientAddress(certificate models.Certificate) string {
@@ -288,7 +370,7 @@ func formatId(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
 	if strings.Contains(identity, "adhaar") {
-		if len(lastFragment)>0 {
+		if len(lastFragment) > 0 {
 			return "Aadhaar  # " + maskId(lastFragment)
 		} else {
 			return "Aadhaar"
@@ -318,7 +400,7 @@ func formatId(identity string) string {
 	return lastFragment
 }
 
-func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
+func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf, offSetX float64, offSetY float64) error {
 	buf, err := compress(certificateText)
 	if err != nil {
 		log.Error("Error compressing certificate data", err)
@@ -331,7 +413,7 @@ func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
 
 	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
-	err = pdf.ImageByHolder(holder, 290, 30, nil)
+	err = pdf.ImageByHolder(holder, offSetX, offSetY, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
@@ -385,18 +467,18 @@ func handleFetchPDFPostRequest(w http.ResponseWriter, r *http.Request) {
 func headCertificateWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err!=nil {
-		w.WriteHeader(400);
+	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err != nil {
+		w.WriteHeader(400)
 	} else {
 		exists, err := isCertificatePresent(preEnrollmentCode, dose)
 		if err != nil {
-			w.WriteHeader(500);
+			w.WriteHeader(500)
 			return
 		}
 		if exists {
-			w.WriteHeader(200);
+			w.WriteHeader(200)
 		} else {
-			w.WriteHeader(404);
+			w.WriteHeader(404)
 		}
 	}
 }
@@ -405,7 +487,7 @@ func isCertificatePresent(preEnrollmentCode string, dose int64) (bool, error) {
 	if certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode); err != nil {
 		log.Errorf("Error in querying from registry %+v", err)
 		return false, errors.New("Internal error (registry)")
-	} else  {
+	} else {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		return isCertificatePresentInCertificatesForGivenDose(certificateArr, dose), nil
 	}
@@ -413,7 +495,7 @@ func isCertificatePresent(preEnrollmentCode string, dose int64) (bool, error) {
 
 func isCertificatePresentInCertificatesForGivenDose(certificateArr []interface{}, dose int64) bool {
 	for _, cert := range certificateArr {
-		if certificateMap, ok  := cert.(map[string]interface{}); ok {
+		if certificateMap, ok := cert.(map[string]interface{}); ok {
 			if doseValue, found := certificateMap["dose"]; found {
 				if doseValueFloat, ok := doseValue.(float64); ok {
 					if int64(doseValueFloat) == dose {
@@ -450,9 +532,9 @@ func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if signedJson != "" {
-		w.WriteHeader(200);
+		w.WriteHeader(200)
 	} else {
-		w.WriteHeader(404);
+		w.WriteHeader(404)
 	}
 }
 
@@ -486,9 +568,39 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
+	log.Info("get pdf certificate")
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	signedJson, err := getSignedJson(preEnrollmentCode)
+
+	if err != nil {
+		log.Infof("Error %+v", err)
+		w.WriteHeader(500)
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
+		return
+	}
+
+	if signedJson != "" {
+		if pdfBytes, err := getCertificateAsPdfV2(signedJson); err != nil {
+			log.Errorf("Error in creating certificate pdf")
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
+		} else {
+			w.WriteHeader(200)
+			_, _ = w.Write(pdfBytes)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
+		}
+	} else {
+		log.Errorf("No certificates found for request %v", preEnrollmentCode)
+		w.WriteHeader(404)
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+	}
+}
+
 var redisClient *redis.Client
 
-func initRedis(){
+func initRedis() {
 	options, err := redis.ParseURL(config.Config.Redis.Url)
 	if err != nil {
 		panic(err)
@@ -570,7 +682,7 @@ func authorize(next http.HandlerFunc, roles []string, eventTag string) http.Hand
 				return
 			}
 		}
-		publishEvent("", eventTag + EventTagFailed, "Unauthorized access")
+		publishEvent("", eventTag+EventTagFailed, "Unauthorized access")
 		http.Error(w, "Forbidden", http.StatusForbidden)
 	}
 }
@@ -590,6 +702,7 @@ func main() {
 	r.HandleFunc("/cert/api/pullDocRequest", timed(docRequest)).Methods("POST")
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
+	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")

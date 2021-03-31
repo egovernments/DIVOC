@@ -1,6 +1,10 @@
 version: "3"
 
 services:
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     environment:
@@ -10,6 +14,8 @@ services:
       - "9300:9300"
   db:
     image: postgres
+    ports:
+      - "5432:5432"
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -131,7 +137,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: 883f2758-ac89-461c-b394-dc3aa8e81057
     depends_on:
       - registry
   certificate_signer:
@@ -139,6 +145,7 @@ services:
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
+      REDIS_URL: redis://redis:6379
     depends_on:
       - kafka
   nginx:
