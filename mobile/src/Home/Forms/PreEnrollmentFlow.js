@@ -83,7 +83,6 @@ function preEnrollmentReducer(state, action) {
             const newState = {...state, ...action.payload};
             newState.state = action.payload.address.state;
             newState.district = action.payload.address.district;
-            newState.identity = action.payload.nationalId;
             newState.previousForm = action.payload.currentForm ?? null;
             return newState
 
@@ -162,7 +161,8 @@ export function usePreEnrollment() {
             status: QUEUE_STATUS.IN_QUEUE,
             code: state.code,
             programId: localStorage.getItem("programId"),
-            identity: state.nationalId,
+            identity: state.identity,
+            nationality: state.nationalId,
             appointments: state.appointments
         }
         return appIndexDb.addToQueue(queue)

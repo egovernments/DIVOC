@@ -92,6 +92,7 @@ func (o *GetSlotsForFacilitiesParams) BindRequest(r *http.Request, route *middle
 	if err := o.bindProgramID(qProgramID, qhkProgramID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -107,10 +108,10 @@ func (o *GetSlotsForFacilitiesParams) bindFacilityID(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.FacilityID = &raw
 
 	return nil
@@ -125,7 +126,6 @@ func (o *GetSlotsForFacilitiesParams) bindPageNumber(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil
@@ -149,7 +149,6 @@ func (o *GetSlotsForFacilitiesParams) bindPageSize(rawData []string, hasKey bool
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil
@@ -173,10 +172,10 @@ func (o *GetSlotsForFacilitiesParams) bindProgramID(rawData []string, hasKey boo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.ProgramID = &raw
 
 	return nil

@@ -3654,6 +3654,7 @@ func init() {
         "maxAppointments": {
           "type": "integer",
           "title": "Maximum appointment per day",
+          "minimum": 0,
           "x-nullable": true
         }
       }
@@ -4390,7 +4391,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId"
+        "identity"
       ],
       "properties": {
         "address": {
@@ -4485,6 +4486,9 @@ func init() {
             "Female",
             "Other"
           ]
+        },
+        "identity": {
+          "type": "string"
         },
         "name": {
           "type": "string"
