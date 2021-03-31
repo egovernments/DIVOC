@@ -3,7 +3,7 @@ import requests as r
 import logging
 import sys
 import time
-import test_utils
+import utils
 import random
 
 log = logging.getLogger();
@@ -18,20 +18,20 @@ GET_CERTIFICATE_BODY = "test_data/get_certificate.json"
 def service_check():
     try:
         vacc_api_resp = r.get(VACCINATION_API + "ping")
-        registry_resp = r.get(test_utils.REGISTRY_SEARCH)
+        registry_resp = r.get(utils.REGISTRY_SEARCH)
     except Exception as e:
         log.info("Error : %s", e)
         return False
     return (vacc_api_resp.status_code == 200) and (registry_resp.status_code == 200)
 
-def test_certify():
+def call_and_verify():
     cid = str(random.randint(1e11, 1e12))
     print("Creating certificate %s"%cid)
-    old_certs = test_utils.fetch_certificates(cid);
+    old_certs = utils.fetch_certificates(cid);
     log.info("User has %s old certificates", len(old_certs))
 
     headers = {
-        'Authorization' : 'Bearer ' + test_utils.fetch_auth_token(),
+        'Authorization' : 'Bearer ' + utils.fetch_auth_token(),
         'Content-Type': 'application/json'
     }
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
@@ -44,7 +44,7 @@ def test_certify():
     max_tries = 12
     for i in range(max_tries):
         log.info("Fetching certificates...., try no : %s", i+1)
-        new_certs = test_utils.fetch_certificates(cid)
+        new_certs = utils.fetch_certificates(cid)
         if(len(new_certs) == len(old_certs) + 1):
             latest_cert = [x for x in new_certs if x not in old_certs][0]
             assert latest_cert["name"] == certify_data["recipient"]["name"], "recipient name mismatch"
@@ -55,19 +55,17 @@ def test_certify():
         time.sleep(5)
     assert len(new_certs) == len(old_certs) + 1, "Cerrificate creation failed"
 
-def run_tests():
-    test_certify()
-
-tests_ran = False
-ping_retries = 24
-for i in range(ping_retries):
-    log.info("Trying to ping...., try no : %s", i+1)
-    if(service_check()):
-        log.info("Ping successful. Starting tests")
-        run_tests()
-        tests_ran = True
-        break
-    log.info("Ping failed. Services not ready")
-    time.sleep(5)
-if(not tests_ran):
-    exit(1)
+def test_cert():
+    test_ran = False
+    ping_retries = 24
+    for i in range(ping_retries):
+        log.info("Trying to ping...., try no : %s", i+1)
+        if(service_check()):
+            log.info("Ping successful. Starting tests")
+            call_and_verify()
+            test_ran = True
+            break
+        log.info("Ping failed. Services not ready")
+        time.sleep(5)
+    if(not test_ran):
+        exit(1)
