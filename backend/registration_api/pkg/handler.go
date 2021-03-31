@@ -183,7 +183,7 @@ func initializeFacilitySlots(params operations.InitializeFacilitySlotsParams) mi
 	if err != nil {
 		return model.NewGenericServerError()
 	}
-	if canInitializeSlots() {
+	if canInitializeSlots() || *params.Force {
 		log.Infof("Initializing facility slots")
 		filters := map[string]interface{}{}
 		limit := 1000

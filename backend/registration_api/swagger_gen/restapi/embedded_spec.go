@@ -211,6 +211,12 @@ func init() {
                 }
               }
             }
+          },
+          {
+            "type": "boolean",
+            "default": false,
+            "name": "force",
+            "in": "query"
           }
         ],
         "responses": {
@@ -631,6 +637,12 @@ func init() {
                 }
               }
             }
+          },
+          {
+            "type": "boolean",
+            "default": false,
+            "name": "force",
+            "in": "query"
           }
         ],
         "responses": {
