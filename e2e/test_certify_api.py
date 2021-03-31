@@ -48,7 +48,7 @@ def call_and_verify():
         time.sleep(5)
     assert len(new_certs) == len(old_certs) + 1, "Cerrificate creation failed"
 
-def test_cert():
+def test_certify():
     test_ran = False
     ping_retries = 24
     for i in range(ping_retries):

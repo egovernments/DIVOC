@@ -22,6 +22,13 @@ services:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json
     volumes:
       - ./keycloak:/config
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://keycloak:8080/auth/realms/divoc/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
   certificate_processor:
       environment:
         ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
