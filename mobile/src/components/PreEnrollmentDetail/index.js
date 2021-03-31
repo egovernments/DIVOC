@@ -36,7 +36,7 @@ export function PatientInfo(props) {
 
     return (
         <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
-            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}/>;
+            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}/>
         </BaseFormCard>
     )
 }
