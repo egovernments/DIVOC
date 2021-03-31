@@ -6,12 +6,13 @@ import (
 )
 
 func GetTemplateName(certificate models.Certificate, isFinal bool, language string) string {
-	states := []string{"TN"}
+	//TODO: configure the state names correctly
+	pollingStates := []string{"TN"}
 	var certType string
 	var pollingType string
 
 	isPolling := false
-	for _, state := range states {
+	for _, state := range pollingStates {
 		if state == certificate.Evidence[0].Facility.Address.AddressRegion {
 			isPolling = true
 		}

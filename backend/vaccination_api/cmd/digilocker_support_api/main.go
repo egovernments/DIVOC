@@ -155,7 +155,9 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
 			certificate.Evidence[0].Verifier.Name,
-			formatFacilityAddress(certificate),
+			concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+				certificate.Evidence[0].Facility.Address.District),
+				certificate.Evidence[0].Facility.Address.AddressRegion),
 		}
 	}
 	return []string{certificate.CredentialSubject.Name,
@@ -167,7 +169,9 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		certificate.Evidence[0].Vaccine,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		certificate.Evidence[0].Verifier.Name,
-		formatFacilityAddress(certificate),
+		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+			certificate.Evidence[0].Facility.Address.District),
+			certificate.Evidence[0].Facility.Address.AddressRegion),
 	}
 }
 
@@ -324,9 +328,8 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 }
 
 func formatFacilityAddress(certificate models.Certificate) string {
-	return concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
-		certificate.Evidence[0].Facility.Address.District),
-		certificate.Evidence[0].Facility.Address.AddressRegion)
+	return concatenateReadableString(certificate.Evidence[0].Facility.Name,
+		certificate.Evidence[0].Facility.Address.District)
 }
 
 func formatRecipientAddress(certificate models.Certificate) string {
