@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/models"
+	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 )
@@ -153,4 +155,42 @@ func BookSlot(enrollmentCode, phone, facilitySlotID, dose, programID string) err
 		Status:          models.AllottedStatus,
 	})
 	return nil
+}
+
+func GetOpenFacilitySlot(facilityCode, programID string) (string, error) {
+	pageSize := 100
+	offSet := 0
+	tomorrowStart := fmt.Sprintf("%d", utils.GetTomorrowStart().Unix())
+	for {
+		slotKeys, err := GetValuesByScoreFromSet(facilityCode, tomorrowStart, "inf", int64(pageSize), int64(offSet))
+		if err != nil {
+			log.Error("Error fetching slots : ", err)
+			return "", err
+		}
+		if len(slotKeys) == 0 {
+			return "", errors.New("no slots available")
+		}
+		filteredSlots := utils.Filter(slotKeys, func(s string) bool {return strings.Contains(s, programID)})
+		remainingCounts, err := GetValues(filteredSlots...)
+		if err != nil {
+			return "", errors.New("errors fetching remaining slots from Redis")
+		}
+		for i , rc := range remainingCounts {
+			countStr, ok := rc.(string)
+			if !ok {
+				log.Error("Error parsing %s to string", rc)
+				continue
+			}
+			count, err := strconv.Atoi(countStr)
+			if err != nil {
+				log.Error("Error parsing %s to int", countStr)
+				continue
+			}
+			if count > 0 {
+				log.Info("Open slot found : ", filteredSlots[i])
+				return filteredSlots[i], nil
+			}
+		}
+		offSet = offSet + pageSize
+	}
 }

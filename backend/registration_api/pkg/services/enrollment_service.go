@@ -20,22 +20,22 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 	"Name and Age": func(e1, e2 models.Enrollment) bool {return e1.Name == e2.Name && e1.Yob == e2.Yob},
 }
 
-func CreateEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 
 	enrollmentArr, err := FetchEnrollments(enrollmentPayload.Phone)
 	if err != nil {
-		return "", err
+		return err
 	}
 	var enrollments []enrollment
 	if err := json.Unmarshal(enrollmentArr, &enrollments); err != nil {
 		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-		return "", err
+		return err
 	}
 
 	dupEnrollment, err := FindDuplicate(*enrollmentPayload, enrollments)
 	if err != nil {
 		log.Error("Error finding duplicates ", err)
-		return "", err
+		return err
 	}
 
 	if dupEnrollment != nil {
@@ -43,23 +43,23 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
 		duplicateErr := fmt.Errorf("enrollment with same %s already exists", dupEnrollment.Criteria)
 		if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypePREENRL {
 			log.Error("Duplicates Found : ", duplicateErr)
-			return "", duplicateErr
+			return duplicateErr
 		}
 		if shouldAutoBookAppointment(enrollmentPayload) {
-			return "", BookAppointment(enrollmentPayload.Code, enrollmentPayload.Appointments[0].EnrollmentScopeID, enrollmentPayload.Appointments[0].ProgramID)
+			return BookAppointment(dupEnrollment.Duplicate.Phone, dupEnrollment.Duplicate.Code, enrollmentPayload.Appointments[0])
 		}
-		return "", duplicateErr
+		return duplicateErr
 	}
 
 	// no duplicates, not walk-in, error with enrollment limit reached
 	if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypeWALKIN && len(enrollments) >= config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed {
 		errMsg := "Maximum enrollment creation limit is reached"
 		log.Error(errMsg)
-		return "", errors.New(400, errMsg)
+		return errors.New(400, errMsg)
 	}
 
 	// no duplicates, after maxEnrollment check
-	enrollmentPayload.Code = func() string {
+	enrollmentPayload.OverrideEnrollmentCode(func() string {
 		existingCodes := map[string]bool{}
 		for _ , e := range enrollments {
 			existingCodes[e.Code] = true
@@ -73,22 +73,27 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
 			}
 			i++
 		}
-	}()
+	}())
 	registryResponse, err := kernelService.CreateNewRegistry(enrollmentPayload.Enrollment, "Enrollment")
 	if err != nil {
-		return "", nil
+		log.Error("Error quering registry : ", err)
+		return err
 	}
 	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
-	enrollmentPayload.OverrideEnrollmentCode(enrollmentPayload.Code)
+	cacheEnrollmentInfo(enrollmentPayload.Enrollment, result.(string))
 	if shouldAutoBookAppointment(enrollmentPayload) {
-		return result.(string), BookAppointment(enrollmentPayload.Code, enrollmentPayload.Appointments[0].EnrollmentScopeID, enrollmentPayload.Appointments[0].ProgramID)
+		return BookAppointment(enrollmentPayload.Phone, enrollmentPayload.Code, enrollmentPayload.Appointments[0])
 	}
-	return result.(string), nil
+	return nil
 }
 
-func BookAppointment(enrollmentCode, facilityID, programID string) error {
-	log.Info("Will book appointment at this point")
-	return nil
+func BookAppointment(phone, enrollmentCode string, appointment *models.EnrollmentAppointmentsItems0) error {
+	openSlot, err := GetOpenFacilitySlot(appointment.EnrollmentScopeID, appointment.ProgramID)
+	if err != nil {
+		log.Error("Error fetching open slot : ", err)
+		return err
+	}
+	return BookSlot(enrollmentCode, phone, openSlot, appointment.Dose, appointment.ProgramID)
 }
 
 func shouldAutoBookAppointment(enrollmentPayload *EnrollmentPayload) bool {
@@ -258,6 +263,17 @@ func FetchEnrollments(mobile string) ([]byte, error){
 	return enrollmentArr, nil
 }
 
+func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
+	data := map[string]interface{}{
+		"phone":        enrollment.Phone,
+		"updatedCount": 0, //to restrict multiple updates
+		"osid":         osid,
+	}
+	_, err := SetHMSet(enrollment.Code, data)
+	if err != nil {
+		log.Error("Unable to cache enrollment info", err)
+	}
+}
 type EnrollmentPayload struct {
 	RowID              uint   `json:"rowID"`
 	EnrollmentScopeId  string `json:"enrollmentScopeId"`
@@ -266,6 +282,7 @@ type EnrollmentPayload struct {
 }
 
 func (ep EnrollmentPayload) OverrideEnrollmentCode(code string) {
+	ep.Code = code
 	if len(ep.VaccinationDetails) > 0 && ep.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 		ep.VaccinationDetails["preEnrollmentCode"] = code
 	}
