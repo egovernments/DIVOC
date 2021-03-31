@@ -17,7 +17,7 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
   registry:
-    image: dockerhub/registry-es:1.20.2-generic
+    image: dockerhub/registry-es:1.22.0-generic
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
@@ -30,7 +30,7 @@ services:
     depends_on:
       - db
   keycloak:
-    image: dockerhub/keycloak:1.20.2-generic
+    image: dockerhub/keycloak:1.22.0-generic
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -95,7 +95,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api:1.20.2-generic
+    image: dockerhub/vaccination_api:1.22.0-generic
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -107,7 +107,7 @@ services:
       - kafka
       - keycloak
   registration_api:
-    image: dockerhub/registration_api:1.20.2-generic
+    image: dockerhub/registration_api:1.22.0-generic
     ports:
       - "8002:8002"
     environment:
@@ -121,7 +121,7 @@ services:
       - kafka
       - keycloak
   portal_api:
-    image: dockerhub/portal_api:1.20.2-generic
+    image: dockerhub/portal_api:1.22.0-generic
     ports:
       - "8001:8001"
     environment:
@@ -135,14 +135,14 @@ services:
       - kafka
       - keycloak
   analytics_feed:
-    image: dockerhub/analytics_feed:1.20.2-generic
+    image: dockerhub/analytics_feed:1.22.0-generic
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
   certificate_processor:
-    image: dockerhub/certificate_processor:1.20.2-generic
+    image: dockerhub/certificate_processor:1.22.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -151,7 +151,7 @@ services:
     depends_on:
       - registry
   certificate_signer:
-    image: dockerhub/certificate_signer:1.20.2-generic
+    image: dockerhub/certificate_signer:1.22.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -160,7 +160,7 @@ services:
       - kafka
       - redis
   nginx:
-    image: dockerhub/nginx:1.20.2-generic
+    image: dockerhub/nginx:1.22.0-generic
     ports:
       - "81:80"
     depends_on:
@@ -168,7 +168,7 @@ services:
       - portal_api
       - registration_api
   notification-service:
-    image: dockerhub/notification-service:1.20.2-generic
+    image: dockerhub/notification-service:1.22.0-generic
     ports:
       - "8765:8765"
     environment:
@@ -179,7 +179,7 @@ services:
     depends_on:
       - kafka
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api:1.20.2-generic
+    image: dockerhub/digilocker_support_api:1.22.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
