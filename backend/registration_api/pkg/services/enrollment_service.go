@@ -230,7 +230,15 @@ func FindDuplicate(enrollmentPayload EnrollmentPayload, enrollments []enrollment
 	return nil, nil
 }
 
-
+func GetEnrollmentInfoIfValid(enrollmentCode string, phone string) map[string]string {
+	values, err := GetHashValues(enrollmentCode)
+	if err == nil {
+		if val, ok := values["phone"]; ok && val == phone {
+			return values
+		}
+	}
+	return nil
+}
 
 func FetchEnrollments(mobile string) ([]byte, error){
 	filter := map[string]interface{}{}

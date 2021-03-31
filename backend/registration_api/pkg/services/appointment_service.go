@@ -4,9 +4,11 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/models"
+	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -32,6 +34,13 @@ func worker(workerID int, appointmentSchedulerChannel <-chan models.FacilitySche
 	for appointmentSchedule := range appointmentSchedulerChannel {
 		createFacilityWiseAppointmentSlots(appointmentSchedule)
 	}
+}
+
+func CheckIfAlreadyAppointed(enrollmentInfo map[string]string) bool {
+	if _, ok := enrollmentInfo["slotId"]; ok {
+		return true
+	}
+	return false
 }
 
 func AddFacilityScheduleToChannel(serviceReq models.FacilitySchedule) {
@@ -109,4 +118,39 @@ func RevokeEnrollmentBookedStatus(enrollmentCode string) bool {
 		log.Infof("Successfully increased %s updated count", enrollmentCode)
 	}
 	return success == 1
+}
+
+func BookSlot(enrollmentCode, phone, facilitySlotID, dose, programID string) error {
+	enrollmentInfo := GetEnrollmentInfoIfValid(enrollmentCode, phone)
+	if enrollmentInfo == nil {
+		msg := fmt.Sprintf("Invalid booking request %s, %s", enrollmentCode, phone)
+		log.Errorf(msg)
+		return errors.New(msg)
+	}
+	if CheckIfAlreadyAppointed(enrollmentInfo) {
+		msg := fmt.Sprintf("Already booked %s, %s", enrollmentCode, phone)
+		return errors.New(msg)
+	}
+	
+	if err := BookAppointmentSlot(facilitySlotID); err != nil {
+		return fmt.Errorf("error booking slot : %s", err.Error())
+	}
+
+	if isMarked := MarkEnrollmentAsBooked(enrollmentCode, facilitySlotID); !isMarked {
+		return fmt.Errorf("error marking enrollment as Booked")
+	}
+
+	facilitySchedule := models.ToFacilitySchedule(facilitySlotID)
+	PublishAppointmentAcknowledgement(models.AppointmentAck{
+		Dose:            dose,
+		ProgramId:       programID,
+		EnrollmentCode:  enrollmentCode,
+		SlotID:          facilitySlotID,
+		FacilityCode:    facilitySchedule.FacilityCode,
+		AppointmentDate: strfmt.Date(facilitySchedule.Date),
+		AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
+		CreatedAt:       time.Now(),
+		Status:          models.AllottedStatus,
+	})
+	return nil
 }

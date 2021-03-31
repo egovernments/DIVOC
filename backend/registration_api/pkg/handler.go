@@ -285,59 +285,15 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 }
 
 func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWTClaimBody) middleware.Responder {
-	if params.Body.EnrollmentCode == nil || params.Body.FacilitySlotID == nil {
+	enrollmentCode, facilitySlotID, phone := params.Body.EnrollmentCode,  params.Body.FacilitySlotID, principal.Phone
+	if enrollmentCode == nil || facilitySlotID == nil || phone == "" {
 		return operations.NewBookSlotOfFacilityBadRequest()
 	}
-
-	enrollmentInfo := getEnrollmentInfoIfValid(*params.Body.EnrollmentCode, principal.Phone)
-	if enrollmentInfo != nil {
-		if !checkIfAlreadyAppointed(enrollmentInfo) {
-			err := services.BookAppointmentSlot(*params.Body.FacilitySlotID)
-			if err != nil {
-				return operations.NewBookSlotOfFacilityBadRequest()
-			} else {
-				isMarked := services.MarkEnrollmentAsBooked(*params.Body.EnrollmentCode, *params.Body.FacilitySlotID)
-				if isMarked {
-					facilitySchedule := models2.ToFacilitySchedule(*params.Body.FacilitySlotID)
-					services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
-						Dose:            *params.Body.Dose,
-						ProgramId:       *params.Body.ProgramID,
-						EnrollmentCode:  *params.Body.EnrollmentCode,
-						SlotID:          *params.Body.FacilitySlotID,
-						FacilityCode:    facilitySchedule.FacilityCode,
-						AppointmentDate: strfmt.Date(facilitySchedule.Date),
-						AppointmentTime: facilitySchedule.StartTime + "-" + facilitySchedule.EndTime,
-						CreatedAt:       time.Now(),
-						Status:          models2.AllottedStatus,
-					})
-
-					return operations.NewGetSlotsForFacilitiesOK()
-				}
-			}
-		} else {
-			log.Errorf("Already booked %s, %s", *params.Body.EnrollmentCode, principal.Phone)
-		}
-	} else {
-		log.Errorf("Invalid booking request %s, %s", *params.Body.EnrollmentCode, principal.Phone)
+	dose, programID := *params.Body.Dose, *params.Body.ProgramID
+	if err := services.BookSlot(*enrollmentCode, phone, *facilitySlotID, dose, programID); err != nil {
+		return operations.NewBookSlotOfFacilityBadRequest()
 	}
-	return operations.NewGetSlotsForFacilitiesBadRequest()
-}
-
-func checkIfAlreadyAppointed(enrollmentInfo map[string]string) bool {
-	if _, ok := enrollmentInfo["slotId"]; ok {
-		return true
-	}
-	return false
-}
-
-func getEnrollmentInfoIfValid(enrollmentCode string, phone string) map[string]string {
-	values, err := services.GetHashValues(enrollmentCode)
-	if err == nil {
-		if val, ok := values["phone"]; ok && val == phone {
-			return values
-		}
-	}
-	return nil
+	return operations.NewBookSlotOfFacilityOK()
 }
 
 func deleteAppointment(params operations.DeleteAppointmentParams, principal *models3.JWTClaimBody) middleware.Responder {
@@ -360,9 +316,9 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 }
 
 func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose string, programId string) error {
-	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, phone)
+	enrollmentInfo := services.GetEnrollmentInfoIfValid(enrollmentCode, phone)
 	if enrollmentInfo != nil {
-		if checkIfAlreadyAppointed(enrollmentInfo) {
+		if services.CheckIfAlreadyAppointed(enrollmentInfo) {
 			if msg := checkIfCancellationAllowed(enrollmentInfo); msg == "" {
 				lastBookedSlotId := enrollmentInfo["slotId"]
 				err := services.CancelBookedAppointment(lastBookedSlotId)
@@ -410,12 +366,12 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 	}
 
 	enrollmentCode := *params.Body.EnrollmentCode
-	enrollmentInfo := getEnrollmentInfoIfValid(enrollmentCode, principal.Phone)
+	enrollmentInfo := services.GetEnrollmentInfoIfValid(enrollmentCode, principal.Phone)
 	if enrollmentInfo == nil {
 		return badReqResponse("Recipient does not exist or already deleted")
 	}
 
-	if checkIfAlreadyAppointed(enrollmentInfo) {
+	if services.CheckIfAlreadyAppointed(enrollmentInfo) {
 		return badReqResponse("Deleting a recipient is not allowed if appointment is scheduled.")
 	}
 	
