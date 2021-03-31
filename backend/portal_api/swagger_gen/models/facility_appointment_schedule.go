@@ -11,6 +11,7 @@ import (
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // FacilityAppointmentSchedule facility appointment schedule
@@ -94,11 +95,34 @@ type FacilityAppointmentScheduleDaysItems0 struct {
 	Day string `json:"day,omitempty"`
 
 	// Maximum appointment per day
+	// Minimum: 0
 	MaxAppointments *int64 `json:"maxAppointments,omitempty"`
 }
 
 // Validate validates this facility appointment schedule days items0
 func (m *FacilityAppointmentScheduleDaysItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateMaxAppointments(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *FacilityAppointmentScheduleDaysItems0) validateMaxAppointments(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.MaxAppointments) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("maxAppointments", "body", int64(*m.MaxAppointments), 0, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
