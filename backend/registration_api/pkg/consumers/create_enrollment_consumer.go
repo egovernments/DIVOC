@@ -5,7 +5,6 @@ import (
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
-	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -35,32 +34,20 @@ func StartEnrollmentConsumer() {
 			}
 			log.Info("Got the message to create new enrollment")
 			var enrollment = services.EnrollmentPayload{}
-			if err = json.Unmarshal(msg.Value, &enrollment); err != nil {
+			if err := json.Unmarshal(msg.Value, &enrollment); err != nil {
 				// Push to error topic
 				log.Info("Unable to serialize the request body", err)
 				continue
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 			
-			if err := services.CheckForDuplicateEnrollmets(enrollment); err != nil {
-				if err.Duplicate == nil {
-					log.Errorf("Error checking for Duplicates : %v", err)
-				} else {
-					log.Error("Duplicates Found : ", err)
-					enrollment.OverrideEnrollmentCode(err.Duplicate.Code)
-				}
-				services.PublishEnrollmentACK(enrollment, err)
-				continue
-			}
-
-			osid, err := services.CreateEnrollment(&enrollment, 1)
+			err = services.CreateEnrollment(&enrollment)
 			services.PublishEnrollmentACK(enrollment,err)
 			if err != nil {
 				// Push to error topic
 				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
 				continue
 			}
-			cacheEnrollmentInfo(enrollment.Enrollment, osid)
 			if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
 				log.Error("Unable to send notification to the enrolled user", err)
 			}
@@ -70,14 +57,4 @@ func StartEnrollmentConsumer() {
 	}()
 }
 
-func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
-	data := map[string]interface{}{
-		"phone":        enrollment.Phone,
-		"updatedCount": 0, //to restrict multiple updates
-		"osid":         osid,
-	}
-	_, err := services.SetHMSet(enrollment.Code, data)
-	if err != nil {
-		log.Error("Unable to cache enrollment info", err)
-	}
-}
+
