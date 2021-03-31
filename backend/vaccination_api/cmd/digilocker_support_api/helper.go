@@ -26,5 +26,5 @@ func GetTemplateName(certificate models.Certificate, isFinal bool, language stri
 	} else {
 		certType = "1"
 	}
-	return fmt.Sprintf("config/cov19-%s-%s-%s.pdf", language, certType, pollingType)
+	return fmt.Sprintf("config/cov19–%s-%s-%s.pdf", language, certType, pollingType)
 }

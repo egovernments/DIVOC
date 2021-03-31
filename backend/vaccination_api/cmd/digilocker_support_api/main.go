@@ -149,9 +149,9 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
 			formatId(certificate.CredentialSubject.ID),
+			certificate.CredentialSubject.UHID,
 			certificate.CredentialSubject.RefId,
-			certificate.CredentialSubject.ID,
-			certificate.Evidence[0].Vaccine,
+			strings.ToUpper(certificate.Evidence[0].Vaccine),
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
 			certificate.Evidence[0].Verifier.Name,
@@ -162,8 +162,8 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
 		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.UHID,
 		certificate.CredentialSubject.RefId,
-		certificate.CredentialSubject.ID,
 		certificate.Evidence[0].Vaccine,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		certificate.Evidence[0].Verifier.Name,
@@ -204,7 +204,7 @@ func getCertificateVariant(certificate models.Certificate) string {
 	return "-plain"
 }
 
-func getCertificateAsPdfV2(certificateText string) ([]byte, error) {
+func getCertificateAsPdfV2(certificateText string, language string) ([]byte, error) {
 	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
@@ -215,39 +215,38 @@ func getCertificateAsPdfV2(certificateText string) ([]byte, error) {
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
 
-	if err := pdf.AddTTFFont("wts11", "config/Roboto-Light.ttf"); err != nil {
+	if err := pdf.AddTTFFont("Proxima-Nova-Bold", "config/FontsFree-Net-proxima_nova_bold-webfont.ttf"); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
-
-	tpl1 := pdf.ImportPage(GetTemplateName(certificate, isFinal(certificate), "HIN"), 1, "/MediaBox")
+	tpl1 := pdf.ImportPage(GetTemplateName(certificate, isFinal(certificate), language), 1, "/MediaBox")
 	// Draw pdf onto page
-	pdf.UseImportedTemplate(tpl1, 0, 0, 580, 0)
+	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
-	if err := pdf.SetFont("wts11", "", 11); err != nil {
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
 
-	offsetX := 300.0
-	offsetY := 205.0
-	offsetNewX := 300.0
-	offsetNewY := 240.0
+	offsetX := 310.0
+	offsetY := 211.0
+	offsetNewX := 310.0
+	offsetNewY := 245.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplateV2(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
 	for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*25.0)
+		pdf.SetY(offsetY + float64(i)*24.5)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	for i = rowSize; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY + float64(i)*25.0)
+		pdf.SetY(offsetNewY + float64(i)*26.5)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
-	e := pasteQrCodeOnPage(certificateText, &pdf, 335, 565)
+	e := pasteQrCodeOnPage(certificateText, &pdf, 352, 582)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
@@ -582,7 +581,7 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(signedJson); err != nil {
+		if pdfBytes, err := getCertificateAsPdfV2(signedJson, r.URL.Query().Get("language")); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")

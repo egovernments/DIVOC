@@ -12,6 +12,7 @@ type Certificate struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
 		RefId       string `json:"refId"`
+		UHID        string `json:"uhid"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
