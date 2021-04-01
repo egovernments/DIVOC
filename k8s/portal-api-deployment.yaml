@@ -33,14 +33,14 @@ spec:
               value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
             - name: DB_PASSWORD
               value: uhAer5489
-            - name: DB_NAME
+            - name: DB_DATABASE
               value: divoc
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: kafka-service:9092
             - name: KEYCLOAK_URL
               value: http://keycloak:8080/auth
             - name: REGISTRY_URL
-              value: http://registry:8081
+              value: http://registry-es:8081
             - name: REGISTRY_WITH_ES_URL
               value: http://registry-es:8081
           image: bindock/portal_api:TAG

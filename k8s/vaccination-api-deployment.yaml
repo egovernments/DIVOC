@@ -36,7 +36,7 @@ spec:
             - name: KEYCLOAK_URL
               value: http://keycloak:8080/auth
             - name: REGISTRY_URL
-              value: http://registry:8081
+              value: http://registry-es:8081
             - name: REGISTRY_WITH_ES_URL
               value: http://registry-es:8081
           image: bindock/vaccination_api:TAG
