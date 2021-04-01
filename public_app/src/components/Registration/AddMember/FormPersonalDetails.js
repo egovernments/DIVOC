@@ -400,7 +400,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
 
     useEffect(() => {
         setDistictsForState(formData.state)
-    }, []);
+    }, [stateAndDistricts]);
 
     function onStateSelected(stateSelected) {
         setValue({target: {name:"state", value:stateSelected}});
