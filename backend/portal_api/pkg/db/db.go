@@ -61,8 +61,9 @@ func Init() {
 	// No need to close the connection
 	// As we will be reusing it
 	// defer db.Close()
-
+	log.Infof("Connecting to DB %s", dbPath)
 	if e != nil {
+		log.Error(e)
 		panic("failed to connect to database")
 	}
 
