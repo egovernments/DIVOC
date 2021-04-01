@@ -46,6 +46,10 @@ func StartRecipientsAppointmentBookingConsumer() {
 			}
 
 			responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", appointmentAckMessage.EnrollmentOsid)
+			if err != nil {
+				log.Errorf("Error reading osid : %s from registry", appointmentAckMessage.EnrollmentOsid)
+				continue
+			}
 			enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
 			if !ok {
 				log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode)
@@ -72,7 +76,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 			}
 			if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
 				"osid": enrollment.Osid,
-				"appointments": enrollment.Appointments,
+				"appointments": services.DRefAppointments(enrollment.Appointments),
 			}); err != nil {
 				log.Error("Booking appointment failed ", err)
 				continue
