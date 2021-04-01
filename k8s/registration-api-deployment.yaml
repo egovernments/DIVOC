@@ -74,7 +74,7 @@ spec:
             - name: DB_NAME
               value: divoc
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka:9092
+              value: kafka-service:9092
             - name: KEYCLOAK_URL
               value: http://keycloak:8080/auth
             - name: REDIS_URL
