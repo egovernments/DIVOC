@@ -29,6 +29,25 @@ spec:
           ports:
             - containerPort: 8123
             - containerPort: 9000
-          resources: {}
+          volumeMounts:
+          - name: clickhouse-persistent-storage
+            mountPath: /var/lib/clickhouse
       restartPolicy: Always
+      volumes:
+      - name: clickhouse-persistent-storage
+        persistentVolumeClaim:
+          claimName: clickhouse-pv-claim
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clickhouse-pv-claim
+  labels:
+    app: clickhouse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi

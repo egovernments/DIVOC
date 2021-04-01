@@ -35,5 +35,25 @@ spec:
             - containerPort: 9200
             - containerPort: 9300
           resources: {}
+          volumeMounts:
+          - name: es-persistent-storage
+            mountPath: /usr/share/elasticsearch/data
       restartPolicy: Always
+      volumes:
+      - name: es-persistent-storage
+        persistentVolumeClaim:
+          claimName: es-pv-claim
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: es-pv-claim
+  labels:
+    app: es
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 80Gi

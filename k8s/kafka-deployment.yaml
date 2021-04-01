@@ -42,5 +42,25 @@ spec:
           ports:
             - containerPort: 9092
           resources: {}
+          volumeMounts:
+          - name: kafka-persistent-storage
+            mountPath: /var/lib/kafka/data
       restartPolicy: Always
+      volumes:
+      - name: kafka-persistent-storage
+        persistentVolumeClaim:
+          claimName: kafka-pv-claim
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: kafka-pv-claim
+  labels:
+    app: kafka
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 100Gi

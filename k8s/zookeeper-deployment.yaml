@@ -33,6 +33,26 @@ spec:
           name: zookeeper
           ports:
             - containerPort: 2181
+          volumeMounts:
+          - name: zookeeper-persistent-storage
+            mountPath: /var/lib/zookeeper/data
           resources: {}
       restartPolicy: Always
+      volumes:
+      - name: zookeeper-persistent-storage
+        persistentVolumeClaim:
+          claimName: zookeeper-pv-claim
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zookeeper-pv-claim
+  labels:
+    app: zookeeper
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi

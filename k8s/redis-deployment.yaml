@@ -29,5 +29,25 @@ spec:
           ports:
             - containerPort: 6379
           resources: {}
+          volumeMounts:
+          - name: redis-persistent-storage
+            mountPath: /data
       restartPolicy: Always
+      volumes:
+      - name: redis-persistent-storage
+        persistentVolumeClaim:
+          claimName: redis-pv-claim
 status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-pv-claim
+  labels:
+    app: redis
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Gi
