@@ -45,6 +45,9 @@ spec:
           volumeMounts:
           - name: kafka-persistent-storage
             mountPath: /var/lib/kafka/data
+          podSecurityContext:
+            fsGroup: 65531
+            runAsUser: 1000
       restartPolicy: Always
       volumes:
       - name: kafka-persistent-storage
