@@ -3,6 +3,9 @@ package services
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"text/template"
+
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
@@ -10,60 +13,91 @@ import (
 	"github.com/divoc/registration-api/swagger_gen/models"
 	"github.com/go-openapi/errors"
 	log "github.com/sirupsen/logrus"
-	"text/template"
 )
 
-func CreateEnrollment(enrollmentPayload *EnrollmentPayload, position int) (string, error) {
-
-	maxEnrollmentCreationAllowed := 0
-	if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
-		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxWalkEnrollmentCreationAllowed
-	} else {
-		maxEnrollmentCreationAllowed = config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed
-	}
-
-	if position > maxEnrollmentCreationAllowed {
-		failedErrorMessage := "Maximum enrollment creation limit is reached"
-		log.Info(failedErrorMessage)
-		return "", errors.New(400, failedErrorMessage)
-	}
-
-	enrollment := enrollmentPayload.Enrollment
-	enrollment.Code = utils.GenerateEnrollmentCode(enrollment.Phone, position)
-	exists, err := KeyExists(enrollment.Code)
-	if err != nil {
-		return "", err
-	}
-	if exists == 0 {
-		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
-			enrollmentPayload.Enrollment = enrollment
-			return CreateWalkInEnrollment(enrollmentPayload)
-		}
-		registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
-		if err != nil {
-			return "", err
-		}
-		result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
-		return result.(string), nil
-	}
-	return CreateEnrollment(enrollmentPayload, position+1)
+var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool {
+	"Identity Number": func(e1, e2 models.Enrollment) bool {return *e1.Identity == *e2.Identity},
+	"Name and Age": func(e1, e2 models.Enrollment) bool {return e1.Name == e2.Name && e1.Yob == e2.Yob},
 }
 
-func CreateWalkInEnrollment(enrollmentPayload *EnrollmentPayload) (string, error) {
-	marshal, err := json.Marshal(&enrollmentPayload.Enrollment)
-	enrollment := map[string]interface{}{
-		"enrollmentScopeId": enrollmentPayload.EnrollmentScopeId,
-		"certified":         true,
-		"programId":         enrollmentPayload.Appointments[0].ProgramID,
-	}
-	err = json.Unmarshal(marshal, &enrollment)
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 
-	registryResponse, err := kernelService.CreateNewRegistry(enrollment, "Enrollment")
+	enrollmentArr, err := FetchEnrollments(enrollmentPayload.Phone)
 	if err != nil {
-		return "", err
+		return err
+	}
+	var enrollments []enrollment
+	if err := json.Unmarshal(enrollmentArr, &enrollments); err != nil {
+		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+		return err
+	}
+
+	dupEnrollment, err := FindDuplicate(*enrollmentPayload, enrollments)
+	if err != nil {
+		log.Error("Error finding duplicates ", err)
+		return err
+	}
+
+	if dupEnrollment != nil {
+		enrollmentPayload.OverrideEnrollmentCode(dupEnrollment.Duplicate.Code)
+		duplicateErr := fmt.Errorf("enrollment with same %s already exists", dupEnrollment.Criteria)
+		if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypePREENRL {
+			log.Error("Duplicates Found : ", duplicateErr)
+			return duplicateErr
+		}
+		if shouldAutoBookAppointment(enrollmentPayload) {
+			return BookAppointment(dupEnrollment.Duplicate.Phone, dupEnrollment.Duplicate.Code, enrollmentPayload.Appointments[0])
+		}
+		return duplicateErr
+	}
+
+	// no duplicates, not walk-in, error with enrollment limit reached
+	if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypeWALKIN && len(enrollments) >= config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed {
+		errMsg := "Maximum enrollment creation limit is reached"
+		log.Error(errMsg)
+		return errors.New(400, errMsg)
+	}
+
+	// no duplicates, after maxEnrollment check
+	enrollmentPayload.OverrideEnrollmentCode(func() string {
+		existingCodes := map[string]bool{}
+		for _ , e := range enrollments {
+			existingCodes[e.Code] = true
+		}
+		i := 1
+		for {
+			newCode := utils.GenerateEnrollmentCode(enrollmentPayload.Phone, i)
+			if !existingCodes[newCode] {
+				log.Info("New Code : ", newCode)
+				return newCode
+			}
+			i++
+		}
+	}())
+	registryResponse, err := kernelService.CreateNewRegistry(enrollmentPayload.Enrollment, "Enrollment")
+	if err != nil {
+		log.Error("Error quering registry : ", err)
+		return err
 	}
 	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
-	return result.(string), nil
+	cacheEnrollmentInfo(enrollmentPayload.Enrollment, result.(string))
+	if shouldAutoBookAppointment(enrollmentPayload) {
+		return BookAppointment(enrollmentPayload.Phone, enrollmentPayload.Code, enrollmentPayload.Appointments[0])
+	}
+	return nil
+}
+
+func BookAppointment(phone, enrollmentCode string, appointment *models.EnrollmentAppointmentsItems0) error {
+	openSlot, err := GetOpenFacilitySlot(appointment.EnrollmentScopeID, appointment.ProgramID)
+	if err != nil {
+		log.Error("Error fetching open slot : ", err)
+		return err
+	}
+	return BookSlot(enrollmentCode, phone, openSlot, appointment.Dose, appointment.ProgramID)
+}
+
+func shouldAutoBookAppointment(enrollmentPayload *EnrollmentPayload) bool {
+	return enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypePREENRL && len(enrollmentPayload.Appointments) > 0 && enrollmentPayload.Appointments[0].EnrollmentScopeID != ""
 }
 
 func EnrichFacilityDetails(enrollments []map[string]interface{}) {
@@ -180,9 +214,86 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 	return nil
 }
 
+func FindDuplicate(enrollmentPayload EnrollmentPayload, enrollments []enrollment) (*DuplicateEnrollment, error) {
+	searchDuplicateEnrollment := func (enrollments []enrollment, target models.Enrollment, criteria func(e1, e2 models.Enrollment) bool) *enrollment {
+		for _, e := range enrollments {
+			if criteria(e.Enrollment, target) {
+				return &e
+			}
+		}
+		return nil
+	}
+
+	for fields, criteria := range DuplicateEnrollmentCriteria {
+		if duplicate := searchDuplicateEnrollment(enrollments, *enrollmentPayload.Enrollment, criteria); duplicate != nil {
+			return &DuplicateEnrollment{
+				Duplicate: duplicate,
+				Criteria: fields,
+			}, nil
+		}
+	}
+	return nil, nil
+}
+
+func GetEnrollmentInfoIfValid(enrollmentCode string, phone string) map[string]string {
+	values, err := GetHashValues(enrollmentCode)
+	if err == nil {
+		if val, ok := values["phone"]; ok && val == phone {
+			return values
+		}
+	}
+	return nil
+}
+
+func FetchEnrollments(mobile string) ([]byte, error){
+	filter := map[string]interface{}{}
+	filter["phone"] = map[string]interface{}{
+		"eq": mobile,
+	}
+	responseFromRegistry, err := kernelService.QueryRegistry("Enrollment", filter, 100, 0)
+	if err != nil {
+		log.Error("Error occurred while querying Enrollment registry ", err)
+		return nil, err
+	}
+	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]);
+	if err != nil {
+		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
+		return nil, err
+	}
+	return enrollmentArr, nil
+}
+
+func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
+	data := map[string]interface{}{
+		"phone":        enrollment.Phone,
+		"updatedCount": 0, //to restrict multiple updates
+		"osid":         osid,
+	}
+	_, err := SetHMSet(enrollment.Code, data)
+	if err != nil {
+		log.Error("Unable to cache enrollment info", err)
+	}
+}
 type EnrollmentPayload struct {
 	RowID              uint   `json:"rowID"`
 	EnrollmentScopeId  string `json:"enrollmentScopeId"`
-	VaccinationDetails []byte `json:"vaccinationDetails"`
+	VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
 	*models.Enrollment
+}
+
+func (ep EnrollmentPayload) OverrideEnrollmentCode(code string) {
+	ep.Code = code
+	if len(ep.VaccinationDetails) > 0 && ep.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		ep.VaccinationDetails["preEnrollmentCode"] = code
+	}
+}
+
+type DuplicateEnrollment struct {
+	Duplicate	*enrollment
+	Criteria	string
+}
+
+type enrollment struct {
+	Osid	string	`json:"osid"`
+	models.Enrollment
 }

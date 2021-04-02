@@ -33,7 +33,7 @@ export const Header = (props) => {
             <Navbar.Brand>
                 <img
                     src={logo ? logo : NavbarLogo}
-                    height="28"
+                    height="34"
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />

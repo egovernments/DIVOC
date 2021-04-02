@@ -31,7 +31,7 @@ func NewGetSlotsForFacilities(ctx *middleware.Context, handler GetSlotsForFacili
 	return &GetSlotsForFacilities{Context: ctx, Handler: handler}
 }
 
-/* GetSlotsForFacilities swagger:route GET /facility/slots getSlotsForFacilities
+/*GetSlotsForFacilities swagger:route GET /facility/slots getSlotsForFacilities
 
 Get slots for facilites
 
@@ -47,6 +47,7 @@ func (o *GetSlotsForFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 		r = rCtx
 	}
 	var Params = NewGetSlotsForFacilitiesParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -66,6 +67,7 @@ func (o *GetSlotsForFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

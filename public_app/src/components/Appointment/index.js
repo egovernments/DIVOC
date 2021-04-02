@@ -4,6 +4,8 @@ import {Button, Col, Modal, Row} from "react-bootstrap";
 import {TextInputWithIcon} from "../TextInputWithIcon";
 import CloseImg from "../../assets/img/icon-cross.svg"
 import PrivateSvg from "../../assets/img/icon-private.svg"
+import statusAppointmentImg from "../../assets/img/status-appointment.png"
+import statusWalkInImg from "../../assets/img/status-walkin.png"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
 import {formatDate, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
@@ -14,13 +16,14 @@ import {equals, reject} from "ramda";
 import {Loader} from "../Loader";
 import {getCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
+import {getMeridiemTime} from "../../utils/dateUtils";
 
 export const Appointment = (props) => {
-    const {enrollment_code, program_id} = props.match.params;
+    const {enrollment_code, program_id: programId} = props.match.params;
     const {state} = props.location;
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
-    const [searchText, setSearchText] = useState("");
+    const [searchText, setSearchText] = useState(state?.recipientPinCode || "");
     const [searchDate, setSearchDate] = useState("");
     const [facilities, setFacilities] = useState([]);
     const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(-1);
@@ -37,18 +40,18 @@ export const Appointment = (props) => {
             history.push("/registration")
             return;
         }
-        if (searchText === "" || searchText.length > 3) {
+        if (searchText.length > 3) {
             setIsLoading(true);
             let params = {
                 pincode: searchText
             };
-            params = reject(equals(''))(params);
-            const queryParams = new URLSearchParams(params);
-            axios.get("/divoc/admin/api/v1/public/facilities", {params: queryParams})
+            axios.get("/divoc/admin/api/v1/public/facilities", {params: params})
                 .then(res => {
-                    const {facilities, facilitiesSchedule} = res.data;
+                    let {facilities, facilitiesSchedule} = res.data;
+                    facilities = facilities.filter(f => f.programs.filter(p => p.programId == programId).length > 0)
+                    facilitiesSchedule = facilitiesSchedule.filter(fs => fs.programId == programId)
                     let schedule = {};
-                    facilitiesSchedule.map(d => {
+                    (facilitiesSchedule||[]).map(d => {
                         if (d.facilityId) {
                             schedule[d.facilityId] = d
                         }
@@ -110,6 +113,7 @@ export const Appointment = (props) => {
         setIsLoading(true);
         let params = {
             facilityId,
+            programId,
             pageNumber,
             pageSize
         };
@@ -157,14 +161,14 @@ export const Appointment = (props) => {
         axios.post("/divoc/api/citizen/appointment", {
             enrollmentCode: enrollment_code,
             facilitySlotId: selectedAllotment.slotKey,
-            programId: program_id,
+            programId: programId,
             // dose func is not yet configured
             dose: "1"
         }, config)
             .then(res => {
                 history.push({
                     pathname:"/" + enrollment_code + "/appointment/confirm",
-                    state:{nationalId: state.nationalId, program: state.program}
+                    state:{identity: state.identity, program: state.program}
                 })
             })
             .catch(() => {
@@ -174,6 +178,8 @@ export const Appointment = (props) => {
             });
     }
 
+    const searchLabel = facilities.length > 0 ?<h4>Facilities' availability for next few days</h4> :
+        <h4>No nearby facilities with appointments / walk-ins found</h4>;
     return (
         <div className="appointment-container">
             {isLoading && <Loader/>}
@@ -186,13 +192,14 @@ export const Appointment = (props) => {
                 </div>
                 <Row>
                     <Col lg={6}>
-                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"} value={searchText} onChange={setSearchText}
+                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"}
+                                           value={searchText} onChange={setSearchText}
                                            img={Img}/>
                     </Col>
 
                 </Row>
                 <br/>
-                <h4>Facilities' availability for next few days</h4>
+                {searchLabel}
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
@@ -212,10 +219,12 @@ export const Appointment = (props) => {
                                         </div>
                                         <div>{formatAddress(facility.address)}
                                             <div>
-                                                <span
-                                                    className="badge purple">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule.length > 0 && "Walkin"}</span>
-                                                <span
-                                                    className="badge green">{facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule.length > 0 && "Appointments"}</span>
+                                                <img
+                                                    hidden={!(facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].appointmentSchedule?.length > 0)}
+                                                    src={statusAppointmentImg} height="17px"/>
+                                                <img
+                                                    hidden={!(facility.osid in facilitiesSchedule && facilitiesSchedule[facility.osid].walkInSchedule?.length > 0)}
+                                                    src={statusWalkInImg} height="17px"/>
                                             </div>
                                         </div>
 
@@ -247,7 +256,7 @@ export const Appointment = (props) => {
                         <span className="mt-1">{formatTimeInterval12hr(selectedAllotment.allotmentTime)}</span>
                     </div>
                     <Row>
-                       <Col style={{"margin": "15px"}}>
+                        <Col style={{"margin": "15px"}}>
                             <Button variant="outline-light" onClick={() => {
                                 setShowModal(false)
                             }}>
@@ -255,12 +264,12 @@ export const Appointment = (props) => {
                                     CANCEL
                                 </span>
                             </Button>
-                       </Col> 
-                       <Col>
-                       <CustomButton className="blue-btn" onClick={() => {
-                            bookSlot()
-                        }}>CONFIRM</CustomButton>
-                       </Col>
+                        </Col>
+                        <Col>
+                            <CustomButton className="blue-btn" onClick={() => {
+                                bookSlot()
+                            }}>CONFIRM</CustomButton>
+                        </Col>
                     </Row>
                 </div>
             </Modal>
@@ -297,7 +306,7 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                 const toDate = new Date(d);
                 let schedule = facilitySchedule.walkInSchedule[0];
                 if (schedule.days.includes(weekdays[toDate.getDay()])) {
-                    dateWiseWalkinInfo[d] = `${schedule.startTime} - ${schedule.endTime}`
+                    dateWiseWalkinInfo[d] = `${getMeridiemTime(schedule.startTime)} - ${getMeridiemTime(schedule.endTime)}`
                 } else {
                     dateWiseWalkinInfo[d] = "-"
                 }
@@ -308,46 +317,50 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                 <table>
                     <tbody>
                     <tr>
-                        <td className="text-nowrap pl-3 pr-3 font-weight-bold"/>
+                        <td style={{paddingLeft: "2.4rem"}} className="text-nowrap font-weight-bold"/>
                         {
-                            dates.map(date => <td
-                                className="text-nowrap pl-3 pr-3 font-weight-bold slot-booking-header">{date.length > 0 ? formatDate(date) : date}</td>)
+                            dates.map(date => <td style={{paddingLeft: "2.4rem"}}
+                                className="text-nowrap font-weight-bold slot-booking-header">{date.length > 0 ? formatDate(date) : date}</td>)
                         }
                     </tr>
                     {
-                        [...timeStamps].sort().map(ts => (
-                            <tr>
-                                <td className="text-nowrap ">{ts}</td>
-                                {
-                                    dates.map(date => {
-                                        if (timeStampWiseSlots[ts][date]?.slots) {
-                                            let slots = timeStampWiseSlots[ts][date].slots;
-                                            return (
-                                                <td className="text-nowrap text-center">
-                                                    <Button
-                                                        variant="outline-primary"
-                                                        onClick={() => {
-                                                            if (slots != 0) {
-                                                                showModal(date, ts, timeStampWiseSlots[ts][date].key)
-                                                            }
-                                                        }}
-                                                        className={`slot-booking-btn mt-3 mb-3 ${slots == 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
-                                                </td>
-                                            )
-                                        } else {
-                                            return (<td className="text-nowrap"/>)
-                                        }
-                                    })
-                                }
-                            </tr>
-                        ))
+                        [...timeStamps].sort().map(ts => {
+                            const [startTime, endTime] = ts.split('-');
+                            console.log(ts, startTime, endTime);
+                            return (
+                                <tr>
+                                    <td className="text-nowrap ">{getMeridiemTime(startTime)} - {getMeridiemTime(endTime)}</td>
+                                    {
+                                        dates.map(date => {
+                                            if (timeStampWiseSlots[ts][date]?.slots) {
+                                                let slots = timeStampWiseSlots[ts][date].slots;
+                                                return (
+                                                    <td className="text-nowrap text-center">
+                                                        <Button
+                                                            variant="outline-primary"
+                                                            onClick={() => {
+                                                                if (slots != 0) {
+                                                                    showModal(date, ts, timeStampWiseSlots[ts][date].key)
+                                                                }
+                                                            }}
+                                                            className={`slot-booking-btn mt-3 mb-3 ${slots == 0 && "slot-booking-btn-disabled"}`}>{slots}</Button>
+                                                    </td>
+                                                )
+                                            } else {
+                                                return (<td className="text-nowrap"/>)
+                                            }
+                                        })
+                                    }
+                                </tr>
+                            );
+                        })
                     }
                     {
                         Object.keys(dateWiseWalkinInfo).length > 0 && <tr>
-                            <td className="text-nowrap text-center">Walkin</td>
+                            <td className="text-nowrap text-center pl-2 pr-2">Walkin</td>
                             {
                                 dates.map(date => {
-                                    return <td className="text-nowrap text-center">{dateWiseWalkinInfo[date]}</td>
+                                    return <td className="text-nowrap text-center pl-2 pr-2">{dateWiseWalkinInfo[date]}</td>
                                 })
                             }
                         </tr>

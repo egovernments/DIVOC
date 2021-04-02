@@ -56,6 +56,10 @@ type GetSlotsForFacilitiesParams struct {
 	  Default: 0
 	*/
 	PageSize *int64
+	/*
+	  In: query
+	*/
+	ProgramID *string
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -83,6 +87,12 @@ func (o *GetSlotsForFacilitiesParams) BindRequest(r *http.Request, route *middle
 	if err := o.bindPageSize(qPageSize, qhkPageSize, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
+	qProgramID, qhkProgramID, _ := qs.GetOK("programId")
+	if err := o.bindProgramID(qProgramID, qhkProgramID, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -98,10 +108,10 @@ func (o *GetSlotsForFacilitiesParams) bindFacilityID(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
+
 	o.FacilityID = &raw
 
 	return nil
@@ -116,7 +126,6 @@ func (o *GetSlotsForFacilitiesParams) bindPageNumber(rawData []string, hasKey bo
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil
@@ -140,7 +149,6 @@ func (o *GetSlotsForFacilitiesParams) bindPageSize(rawData []string, hasKey bool
 
 	// Required: false
 	// AllowEmptyValue: false
-
 	if raw == "" { // empty values pass all other validations
 		// Default values have been previously initialized by NewGetSlotsForFacilitiesParams()
 		return nil
@@ -151,6 +159,24 @@ func (o *GetSlotsForFacilitiesParams) bindPageSize(rawData []string, hasKey bool
 		return errors.InvalidType("pageSize", "query", "int64", raw)
 	}
 	o.PageSize = &value
+
+	return nil
+}
+
+// bindProgramID binds and validates parameter ProgramID from query.
+func (o *GetSlotsForFacilitiesParams) bindProgramID(rawData []string, hasKey bool, formats strfmt.Registry) error {
+	var raw string
+	if len(rawData) > 0 {
+		raw = rawData[len(rawData)-1]
+	}
+
+	// Required: false
+	// AllowEmptyValue: false
+	if raw == "" { // empty values pass all other validations
+		return nil
+	}
+
+	o.ProgramID = &raw
 
 	return nil
 }

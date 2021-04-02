@@ -27,7 +27,7 @@ function PreEnrollment() {
             .then((result) => {
                 return result.map((item, index) => {
                     return {
-                        nationalId: maskPersonalDetails(item["nationalId"]),
+                        identity: maskPersonalDetails(item["identity"]),
                         name: item["name"],
                         uploadedOn: item["osCreatedAt"] ? formatDate(item["osCreatedAt"]) : "-"
                     }
@@ -41,7 +41,7 @@ function PreEnrollment() {
     const AllFacilitiesHeaderData = [
         {
             title: "National ID",
-            key: "nationalId"
+            key: "identity"
         },
         {
             title: "NAME",

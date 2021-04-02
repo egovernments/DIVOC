@@ -120,3 +120,27 @@ func (o *DeleteRecipientUnauthorized) WriteResponse(rw http.ResponseWriter, prod
 
 	rw.WriteHeader(401)
 }
+
+// DeleteRecipientInternalServerErrorCode is the HTTP code returned for type DeleteRecipientInternalServerError
+const DeleteRecipientInternalServerErrorCode int = 500
+
+/*DeleteRecipientInternalServerError Internal Error
+
+swagger:response deleteRecipientInternalServerError
+*/
+type DeleteRecipientInternalServerError struct {
+}
+
+// NewDeleteRecipientInternalServerError creates DeleteRecipientInternalServerError with default headers values
+func NewDeleteRecipientInternalServerError() *DeleteRecipientInternalServerError {
+
+	return &DeleteRecipientInternalServerError{}
+}
+
+// WriteResponse to the client
+func (o *DeleteRecipientInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
+
+	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
+
+	rw.WriteHeader(500)
+}

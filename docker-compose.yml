@@ -34,20 +34,6 @@ services:
       - connectionInfo_password=uhAer5489
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
-    #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
-    ports:
-      - "8082:8081"
-    depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
-  registry:
-    image: bindock/registry
-    environment:
-      - connectionInfo_uri=jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
-      - connectionInfo_username=postgres
-      - connectionInfo_password=uhAer5489
     ports:
       - "8081:8081"
     depends_on:

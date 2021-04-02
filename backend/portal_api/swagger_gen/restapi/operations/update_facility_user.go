@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -35,7 +34,7 @@ func NewUpdateFacilityUser(ctx *middleware.Context, handler UpdateFacilityUserHa
 	return &UpdateFacilityUser{Context: ctx, Handler: handler}
 }
 
-/* UpdateFacilityUser swagger:route PUT /facility/users updateFacilityUser
+/*UpdateFacilityUser swagger:route PUT /facility/users updateFacilityUser
 
 Update Facility User
 
@@ -51,6 +50,7 @@ func (o *UpdateFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 		r = rCtx
 	}
 	var Params = NewUpdateFacilityUserParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -70,6 +70,7 @@ func (o *UpdateFacilityUser) ServeHTTP(rw http.ResponseWriter, r *http.Request) 
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -135,21 +136,6 @@ func (o *UpdateFacilityUserBody) Validate(formats strfmt.Registry) error {
 
 	// validation for a type composition with models.FacilityUser
 	if err := o.FacilityUser.Validate(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-// ContextValidate validate this update facility user body based on the context it is used
-func (o *UpdateFacilityUserBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	// validation for a type composition with models.FacilityUser
-	if err := o.FacilityUser.ContextValidate(ctx, formats); err != nil {
 		res = append(res, err)
 	}
 

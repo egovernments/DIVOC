@@ -2,7 +2,6 @@ import React from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import {makeStyles, withStyles} from '@material-ui/core/styles';
-import {Button, Row} from "react-bootstrap";
 
 
 export const StyledTabs = withStyles({
@@ -42,8 +41,8 @@ export const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export const TabPanels = ({tabs}) => {
-    const [value, setValue] = React.useState(0);
+export const TabPanels = ({tabs, ...props}) => {
+    const [value, setValue] = React.useState(props.tabIndex || 0);
     const classes = useStyles();
     const handleChange = (event, newValue) => {
         setValue(newValue);

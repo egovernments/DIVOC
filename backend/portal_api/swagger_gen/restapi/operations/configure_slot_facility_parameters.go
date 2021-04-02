@@ -6,19 +6,16 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
-	"github.com/go-openapi/validate"
 )
 
 // NewConfigureSlotFacilityParams creates a new ConfigureSlotFacilityParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewConfigureSlotFacilityParams() ConfigureSlotFacilityParams {
 
 	return ConfigureSlotFacilityParams{}
@@ -69,17 +66,11 @@ func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middle
 				res = append(res, err)
 			}
 
-			ctx := validate.WithOperationRequest(context.Background())
-			if err := body.ContextValidate(ctx, route.Formats); err != nil {
-				res = append(res, err)
-			}
-
 			if len(res) == 0 {
 				o.Body = body
 			}
 		}
 	}
-
 	rFacilityID, rhkFacilityID, _ := route.Params.GetOK("facilityId")
 	if err := o.bindFacilityID(rFacilityID, rhkFacilityID, route.Formats); err != nil {
 		res = append(res, err)
@@ -89,6 +80,7 @@ func (o *ConfigureSlotFacilityParams) BindRequest(r *http.Request, route *middle
 	if err := o.bindProgramID(rProgramID, rhkProgramID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -104,6 +96,7 @@ func (o *ConfigureSlotFacilityParams) bindFacilityID(rawData []string, hasKey bo
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.FacilityID = raw
 
 	return nil
@@ -118,6 +111,7 @@ func (o *ConfigureSlotFacilityParams) bindProgramID(rawData []string, hasKey boo
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.ProgramID = raw
 
 	return nil

@@ -75,7 +75,7 @@ func GetActiveProgramDates() (map[string]TimeInterval, error) {
 		},
 	}
 
-	programsResp, err := services.QueryRegistry(Program, filter, -1, 0)
+	programsResp, err := services.QueryRegistry(Program, filter, 100, 0)
 	if err != nil {
 		log.Errorf("Error fetching Programs [%s]", err.Error())
 		return nil, err
@@ -156,7 +156,7 @@ func GetMinifiedFacilityDetails(facilityCode string) FacilityMinifiedDetails {
 				if facilityDetailsBytes, err := json.Marshal(facilityDetails); err != nil {
 					log.Errorf("Error in Marshaling the facility details %+v", err)
 				} else {
-					err := SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL))
+					err := SetValue(redisKey, facilityDetailsBytes, time.Duration(config.Config.Redis.CacheTTL)*time.Minute)
 					if err != nil {
 						log.Errorf("Unable to set the value in Cache (%v)", err)
 					}

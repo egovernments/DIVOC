@@ -10,7 +10,7 @@ import {
     FORM_WALK_IN_VERIFY_FORM,
     FORM_WALK_IN_VERIFY_MOBILE,
     FORM_WALK_IN_VERIFY_OTP,
-    initialWalkInEnrollmentState,
+    initialWalkInEnrollmentState, INVALID_ELIGIBILITY_CRITERIA,
     useWalkInEnrollment,
     WALK_IN_ROUTE,
     WalkInEnrollmentProvider
@@ -29,6 +29,7 @@ import {VerifyOTP} from "../VerifyOTP";
 import {RegisterBeneficiaryForm} from "../RegisterBeneficiaryForm";
 import {WalkInConfirmation} from "../WalkInConfirmation";
 import {CustomButton} from "../CustomButton";
+import {InvalidEligibilityCriteria} from "../InvalidElgiibilityCriteria";
 
 
 export function WalkEnrollmentFlow(props) {
@@ -68,6 +69,8 @@ function WalkInEnrollmentRouteCheck({pageName}) {
             }
             case FORM_WALK_IN_ENROLL_CONFIRMATION:
                 return <WalkInConfirmation/>
+            case INVALID_ELIGIBILITY_CRITERIA:
+                return <InvalidEligibilityCriteria/>
             default:
         }
     }

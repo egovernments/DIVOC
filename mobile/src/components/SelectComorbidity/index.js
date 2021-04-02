@@ -3,7 +3,7 @@ import {ApiServices} from "../../Services/ApiServices";
 import {
     FORM_WALK_IN_ELIGIBILITY_CRITERIA,
     FORM_WALK_IN_VERIFY_MOBILE,
-    initialWalkInEnrollmentState,
+    initialWalkInEnrollmentState, INVALID_ELIGIBILITY_CRITERIA,
     useWalkInEnrollment
 } from "../WalkEnrollments/context";
 import {BaseFormCard} from "../BaseFormCard";
@@ -94,10 +94,10 @@ export const SelectComorbidity = ({}) => {
             goNext(FORM_WALK_IN_ELIGIBILITY_CRITERIA, FORM_WALK_IN_VERIFY_MOBILE, formData)
         }
         else if (formData.yob && (curYear - formData.yob) < minAge) {
-            setErrors({"yob":"Without any below mentioned conditions, minimum age for eligibility is " + minAge});
+            goNext(FORM_WALK_IN_ELIGIBILITY_CRITERIA, INVALID_ELIGIBILITY_CRITERIA, formData)
         }
         else if (formData.yob && (curYear - formData.yob) > maxAge) {
-            setErrors({"yob":"Without any below mentioned conditions, maximum age for eligibility is " + maxAge});
+            goNext(FORM_WALK_IN_ELIGIBILITY_CRITERIA, INVALID_ELIGIBILITY_CRITERIA, formData)
         }
         else {
             setErrors({"yob":"Please select year of birth"});
@@ -156,8 +156,8 @@ export const SelectComorbidity = ({}) => {
                                 {errors.yob}
                             </div>
                         </div>
-                        <div className="d-flex flex-column align-items-start"
-                             hidden={!conditions || conditions.length === 0}>
+                        <div hidden={!conditions || conditions.length === 0}>
+                        <div className="d-flex flex-column align-items-start">
                             <label className="custom-text-label required text-left mt-2" htmlFor="yearSelect">Does the
                                 beneficiary have any of the following comorbidities?</label>
                             <div className="d-flex">
@@ -193,6 +193,7 @@ export const SelectComorbidity = ({}) => {
                                     </div>
                                 </div>
                             </div>
+                        </div>
                         </div>
                     </div>
                     <div className="pb-3">

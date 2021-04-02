@@ -4,6 +4,7 @@ import regStyles from "../VaccineRegistration/VaccineRegistration.module.css"
 import schema from '../../jsonSchema/vaccineSchema.json';
 import Button from 'react-bootstrap/Button';
 import { Col, Form } from "react-bootstrap";
+import {useSelector} from "react-redux";
 
 const IS_REQUIRED = " is required";
 const GT_ZERO = " cannot be negative";
@@ -12,6 +13,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
 
     const [formData, setFormData] = useState(transformToFormData(vaccine));
     const [validationErrors, setValidationErrors] = useState();
+    const currency = useSelector(state => state.flagr.appConfig.currency);
 
     function transformToFormData(vaccine) {
         const data = {...vaccine};
@@ -28,7 +30,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
         if (vaccine?.effectiveUntil) {
             data["effectiveUntil"] = {count: vaccine.effectiveUntil, unit: "Days"};
         } else {
-            data["effectiveUntil"] = {count: 0, unit: "Days"};
+            data["effectiveUntil"] = {count: undefined, unit: "Days"};
         }
         return data;
     }
@@ -109,7 +111,8 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
             });
         }
         if (formData.effectiveUntil) {
-            updatedVaccine.effectiveUntil = convertIntervalToDays(updatedVaccine.effectiveUntil);
+            const days = convertIntervalToDays(updatedVaccine.effectiveUntil);
+            updatedVaccine.effectiveUntil = parseInt(days) >= 0  ? days : undefined;
         }
         if (validateFormData(formData)) {
             onSubmit(updatedVaccine);
@@ -125,8 +128,10 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
                 return count * 365;
             case "Lifetime":
                 return 73000;
-            default:
+            case "Days":
                 return count;
+            default:
+                return undefined
         }
     }
 
@@ -161,7 +166,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
             </Form.Group>
             <Form.Group>
                 <Form.Label>
-                    {schema.properties.price.title}*
+                    {schema.properties.price.title} ({currency})*
                     {validationErrors?.price && <p className={styles["error-message"]}>{validationErrors.price}</p>}
                 </Form.Label>
                 <Form.Control type="number" defaultValue={formData.price} name="price" onChange={handleChange}/>

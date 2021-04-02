@@ -6,18 +6,15 @@ package operations
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
-	"github.com/go-openapi/validate"
 )
 
 // NewUpdateFacilityUserParams creates a new UpdateFacilityUserParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewUpdateFacilityUserParams() UpdateFacilityUserParams {
 
 	return UpdateFacilityUserParams{}
@@ -55,11 +52,6 @@ func (o *UpdateFacilityUserParams) BindRequest(r *http.Request, route *middlewar
 		} else {
 			// validate body object
 			if err := body.Validate(route.Formats); err != nil {
-				res = append(res, err)
-			}
-
-			ctx := validate.WithOperationRequest(context.Background())
-			if err := body.ContextValidate(ctx, route.Formats); err != nil {
 				res = append(res, err)
 			}
 
