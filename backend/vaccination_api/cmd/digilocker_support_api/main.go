@@ -146,7 +146,14 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 }
 
 func isFinal(certificate models.Certificate) bool {
-	return certificate.Evidence[0].Dose == certificate.Evidence[0].TotalDoses
+	return certificate.Evidence[0].Dose == toInteger(certificate.Evidence[0].TotalDoses, 2)
+}
+
+func toInteger(TotalDoses interface{}, defaultValue int) int {
+	if value, ok := TotalDoses.(int); ok {
+		return value
+	}
+	return defaultValue
 }
 
 func checkIdType(identity string, aadhaarPDF string, otherPDF string) string {
@@ -236,7 +243,7 @@ func getCertificateAsPdf(certificateText string) ([]byte, error) {
 	}
 
 	//pdf.Image("qr.png", 200, 50, nil)
-	//pdf.WritePdf("certificate.pdf")
+	pdf.WritePdf("certificate.pdf")
 	var b bytes.Buffer
 	_ = pdf.Write(&b)
 	return b.Bytes(), nil

@@ -39,7 +39,7 @@ type Certificate struct {
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
 		Dose           int       `json:"dose"`
-		TotalDoses     int       `json:"totalDoses"`
+		TotalDoses     interface{}       `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`

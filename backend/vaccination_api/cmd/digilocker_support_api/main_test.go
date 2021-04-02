@@ -92,15 +92,6 @@ func Test_isCertificatePresent(t *testing.T) {
 			name: "select by dose",
 			args: args{
 				certs: []interface{}{map[string]interface{}{"dose":1}},
-				dose:              1,
-			},
-			want: true,
-			wantErr: false,
-		},
-		{
-			name: "select by dose",
-			args: args{
-				certs: []interface{}{map[string]interface{}{"dose":1}},
 				dose:              2,
 			},
 			want: false,
@@ -145,14 +136,40 @@ func Test_isCertificatePresent(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := isCertificatePresentInCertificatesForGivenDose(tt.args.certs, tt.args.dose)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("isCertificatePresent() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got := isCertificatePresentInCertificatesForGivenDose(tt.args.certs, tt.args.dose)
+
 			if got != tt.want {
 				t.Errorf("isCertificatePresent() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
 }
+
+
+
+
+func Test_toInteger(t *testing.T) {
+	type args struct {
+		TotalDoses   interface{}
+		defaultValue int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{name: "test blank", args:args{TotalDoses:"", defaultValue: 2} , want: 2},
+		{name: "test number 2", args:args{TotalDoses:2, defaultValue: 2}, want: 2},
+		{name: "test number 0", args:args{TotalDoses:0, defaultValue: 2}, want: 0},
+		{name: "test number nil", args:args{TotalDoses:nil, defaultValue: 2}, want: 2},
+		{name: "test number 1", args:args{TotalDoses:1, defaultValue: 2}, want: 1},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := toInteger(tt.args.TotalDoses, tt.args.defaultValue); got != tt.want {
+				t.Errorf("toInteger() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+

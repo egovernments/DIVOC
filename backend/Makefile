@@ -1,4 +1,4 @@
-IMAGES:=portal_api vaccination_api certificate_processor analytics_feed notification-service digilocker_support_api caching-dash-server
+IMAGES:=portal_api vaccination_api certificate_processor analytics_feed notification-service digilocker_support_api caching-dash-server divoc-certification-ack
 
 docker:
 	@mkdir dockerdeps || true
