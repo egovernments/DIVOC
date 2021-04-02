@@ -65,6 +65,7 @@ func SetupHandlers(api *operations.DivocPortalAPIAPI) {
 	api.GetFacilityProgramScheduleHandler = operations.GetFacilityProgramScheduleHandlerFunc(getFacilityProgramScheduleHandler)
 	api.UpdateFacilityProgramScheduleHandler = operations.UpdateFacilityProgramScheduleHandlerFunc(updateFacilityProgramScheduleHandler)
 	api.GetProgramsForPublicHandler = operations.GetProgramsForPublicHandlerFunc(getProgramsForPublic)
+	api.GetFacilitySchedulesHandler = operations.GetFacilitySchedulesHandlerFunc(getFacilitySchedules)
 }
 
 type GenericResponse struct {
@@ -246,24 +247,24 @@ func getFacilitiesForPublic(params operations.GetFacilitiesForPublicParams) midd
 		log.Errorf("Error parsing registry response", err)
 		return model.NewGenericServerError()
 	}
-	var facilityIds []string
+	facilitySlots := make([]interface{}, 0)
 	for _, facility := range facilities {
-		facilityIds = append(facilityIds, facility.Osid)
+		filter = map[string]interface{}{
+			"facilityId": map[string]interface{}{
+				"eq": facility.Osid,
+			},
+		}
+		facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
+		facilitySchedules := facilitySlotsResponse["FacilityProgramSlot"].([]interface{})
+		if err2 == nil && len(facilitySchedules) > 0 {
+			for _, facilitySchedule := range facilitySchedules {
+				facilitySlots = append(facilitySlots, facilitySchedule)
+			}
+		}
 	}
-	filter = map[string]interface{}{
-		"facilityId": map[string]interface{}{
-			"or": facilityIds,
-		},
-		"osCreatedAt": map[string]interface{}{
-			"lt": time.Now().Format("2006-01-02"),
-		},
-	}
-	facilitySlotsResponse, err2 := kernelService.QueryRegistry("FacilityProgramSlot", filter, limit, offset)
 	responseData := map[string]interface{}{
-		"facilities": facilities,
-	}
-	if err2 == nil {
-		responseData["facilitiesSchedule"] = facilitySlotsResponse["FacilityProgramSlot"]
+		"facilities":         facilities,
+		"facilitiesSchedule": facilitySlots,
 	}
 	return model.NewGenericJSONResponse(responseData)
 }
@@ -983,7 +984,6 @@ func getFacilityProgramScheduleHandler(params operations.GetFacilityProgramSched
 }
 
 func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
-
 	responder, e := validateIfUserHasPermissionsForFacilityProgram(params.FacilityID, params.ProgramID, principal)
 	if e {
 		return responder
@@ -1008,15 +1008,19 @@ func updateFacilityProgramScheduleHandler(params operations.UpdateFacilityProgra
 	}
 	requestMap["osid"] = osid
 
-	resp, err := kernelService.UpdateRegistry(objectId, requestMap)
+	if val, _ := requestMap["walkInSchedule"]; val == nil || len(val.([]interface{})) == 0 {
+		requestMap["walkInSchedule"] = make([]map[string]interface{}, 0)
+	}
+	if val, _ := requestMap["appointmentSchedule"]; val == nil || len(val.([]interface{})) == 0 {
+		requestMap["appointmentSchedule"] = make([]map[string]interface{}, 0)
+	}
+	_, err = kernelService.UpdateRegistry(objectId, requestMap)
 	if err != nil {
 		log.Error(err)
 		return operations.NewUpdateFacilityProgramScheduleBadRequest()
 	} else {
-		log.Print(resp)
 		return operations.NewUpdateFacilityProgramScheduleOK()
 	}
-
 }
 
 func getProgramsForPublic(params operations.GetProgramsForPublicParams) middleware.Responder {
@@ -1033,4 +1037,12 @@ func getProgramsForPublic(params operations.GetProgramsForPublicParams) middlewa
 		return model.NewGenericServerError()
 	}
 	return model.NewGenericJSONResponse(response[entityType])
+}
+
+func getFacilitySchedules(params operations.GetFacilitySchedulesParams, principal *models.JWTClaimBody) middleware.Responder {
+	response, err := getAllFacilitySchedules(&params.FacilityID, nil)
+	if err != nil {
+		return operations.NewGetFacilitySchedulesNotFound()
+	}
+	return model.NewGenericJSONResponse(response)
 }

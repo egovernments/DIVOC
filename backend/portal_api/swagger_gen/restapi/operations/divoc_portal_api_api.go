@@ -99,6 +99,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetFacilityProgramScheduleHandler: GetFacilityProgramScheduleHandlerFunc(func(params GetFacilityProgramScheduleParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityProgramSchedule has not yet been implemented")
 		}),
+		GetFacilitySchedulesHandler: GetFacilitySchedulesHandlerFunc(func(params GetFacilitySchedulesParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetFacilitySchedules has not yet been implemented")
+		}),
 		GetFacilityUploadsHandler: GetFacilityUploadsHandlerFunc(func(params GetFacilityUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetFacilityUploads has not yet been implemented")
 		}),
@@ -178,11 +181,9 @@ type DivocPortalAPIAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -241,6 +242,8 @@ type DivocPortalAPIAPI struct {
 	GetFacilityGroupsHandler GetFacilityGroupsHandler
 	// GetFacilityProgramScheduleHandler sets the operation handler for the get facility program schedule operation
 	GetFacilityProgramScheduleHandler GetFacilityProgramScheduleHandler
+	// GetFacilitySchedulesHandler sets the operation handler for the get facility schedules operation
+	GetFacilitySchedulesHandler GetFacilitySchedulesHandler
 	// GetFacilityUploadsHandler sets the operation handler for the get facility uploads operation
 	GetFacilityUploadsHandler GetFacilityUploadsHandler
 	// GetFacilityUploadsErrorsHandler sets the operation handler for the get facility uploads errors operation
@@ -277,7 +280,6 @@ type DivocPortalAPIAPI struct {
 	UpdateProgramHandler UpdateProgramHandler
 	// UpdateVaccinatorsHandler sets the operation handler for the update vaccinators operation
 	UpdateVaccinatorsHandler UpdateVaccinatorsHandler
-
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -414,6 +416,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetFacilityProgramScheduleHandler == nil {
 		unregistered = append(unregistered, "GetFacilityProgramScheduleHandler")
+	}
+	if o.GetFacilitySchedulesHandler == nil {
+		unregistered = append(unregistered, "GetFacilitySchedulesHandler")
 	}
 	if o.GetFacilityUploadsHandler == nil {
 		unregistered = append(unregistered, "GetFacilityUploadsHandler")
@@ -641,6 +646,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/facility/{facilityId}/program/{programId}/schedule"] = NewGetFacilityProgramSchedule(o.context, o.GetFacilityProgramScheduleHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/facility/{facilityId}/schedule"] = NewGetFacilitySchedules(o.context, o.GetFacilitySchedulesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

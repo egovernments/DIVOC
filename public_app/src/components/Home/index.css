@@ -240,3 +240,12 @@
         font-size: 12px;
     }
 }
+
+.vaccinate-img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 1rem;
+    width: 60vmin;
+    max-width: 412px
+}

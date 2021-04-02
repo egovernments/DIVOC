@@ -93,6 +93,9 @@ paths:
         - Bearer: [ ]
       parameters:
         - in: query
+          name: programId
+          type: string
+        - in: query
           name: facilityId
           type: string
         - in: query
@@ -125,6 +128,10 @@ paths:
             properties:
               apiKey:
                 type: string
+        - in: query
+          name: force
+          type: boolean
+          default: false
       responses:
         '200':
           description: OK
@@ -161,6 +168,8 @@ paths:
                 type: string
         '401':
           description: Unauthorized
+        '500':
+         description: Internal Error
     post:
       summary: Enroll Recipient
       operationId: enrollRecipient

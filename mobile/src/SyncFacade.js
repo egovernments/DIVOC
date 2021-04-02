@@ -53,8 +53,8 @@ export class SyncFacade {
         const selectedProgram = getSelectedProgramId();
         const userDetails = await appIndexDb.getUserDetails()
         const facilityId = userDetails["facilityDetails"]["osid"]
-        const facilitySchedule = await ApiServices.fetchFacilitySchedule(facilityId,selectedProgram)
-        await appIndexDb.saveFacilitySchedule(facilitySchedule)
+        const facilitySchedules = await ApiServices.fetchFacilitySchedule(facilityId)
+        await appIndexDb.saveFacilitySchedule(facilitySchedules)
 
         await queueDb.popData()
     }

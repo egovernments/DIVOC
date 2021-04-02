@@ -6,12 +6,12 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 )
 
 // FacilityAppointmentSchedule facility appointment schedule
@@ -44,6 +44,7 @@ func (m *FacilityAppointmentSchedule) Validate(formats strfmt.Registry) error {
 }
 
 func (m *FacilityAppointmentSchedule) validateDays(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Days) { // not required
 		return nil
 	}
@@ -55,38 +56,6 @@ func (m *FacilityAppointmentSchedule) validateDays(formats strfmt.Registry) erro
 
 		if m.Days[i] != nil {
 			if err := m.Days[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("days" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ContextValidate validate this facility appointment schedule based on the context it is used
-func (m *FacilityAppointmentSchedule) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := m.contextValidateDays(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (m *FacilityAppointmentSchedule) contextValidateDays(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(m.Days); i++ {
-
-		if m.Days[i] != nil {
-			if err := m.Days[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("days" + "." + strconv.Itoa(i))
 				}
@@ -126,16 +95,34 @@ type FacilityAppointmentScheduleDaysItems0 struct {
 	Day string `json:"day,omitempty"`
 
 	// Maximum appointment per day
-	MaxAppointments int64 `json:"maxAppointments,omitempty"`
+	// Minimum: 0
+	MaxAppointments *int64 `json:"maxAppointments,omitempty"`
 }
 
 // Validate validates this facility appointment schedule days items0
 func (m *FacilityAppointmentScheduleDaysItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.validateMaxAppointments(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
 	return nil
 }
 
-// ContextValidate validates this facility appointment schedule days items0 based on context it is used
-func (m *FacilityAppointmentScheduleDaysItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+func (m *FacilityAppointmentScheduleDaysItems0) validateMaxAppointments(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.MaxAppointments) { // not required
+		return nil
+	}
+
+	if err := validate.MinimumInt("maxAppointments", "body", int64(*m.MaxAppointments), 0, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 

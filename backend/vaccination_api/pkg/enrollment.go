@@ -3,10 +3,12 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/go-openapi/strfmt"
+	"fmt"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-openapi/strfmt"
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/swagger_gen/models"
@@ -116,7 +118,7 @@ func getUserAssociatedFacility(authHeader string) (string, error) {
 	return claimBody.FacilityCode, nil
 }
 
-func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string, vaccinationDetails []byte) []byte {
+func createEnrollmentFromCertificationRequest(request *models.CertificationRequest, facilityCode string) []byte {
 	contacts := request.Recipient.Contact
 	mobile := ""
 	email := ""
@@ -143,7 +145,8 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 		Code:           *request.PreEnrollmentCode,
 		Phone:          mobile,
 		EnrollmentType: models.EnrollmentEnrollmentTypeWALKIN,
-		NationalID:     request.Recipient.Nationality,
+		Identity:     	request.Recipient.Identity,
+		NationalID:     *request.Recipient.Nationality,
 		Dob:            dob,
 		Gender:         *request.Recipient.Gender,
 		Name:           *request.Recipient.Name,
@@ -158,6 +161,10 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 		Appointments: []*models.EnrollmentAppointmentsItems0{
 			{
 				ProgramID: request.ProgramID,
+				EnrollmentScopeID: facilityCode,
+				Certified: true,
+				Dose: fmt.Sprintf("%d", int(*request.Vaccination.Dose)),
+				AppointmentDate: strfmt.Date(*request.Vaccination.Date),
 			},
 		},
 		Yob:           int64(yob),
@@ -166,12 +173,12 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 
 	enrollmentMsg, _ := json.Marshal(struct {
 		EnrollmentScopeId  string `json:"enrollmentScopeId"`
-		VaccinationDetails []byte `json:"vaccinationDetails"`
+		VaccinationDetails *models.CertificationRequest `json:"vaccinationDetails"`
 		models.Enrollment
 	}{
 		EnrollmentScopeId:  facilityCode,
 		Enrollment:         enrollment,
-		VaccinationDetails: vaccinationDetails,
+		VaccinationDetails: request,
 	})
 	return enrollmentMsg
 }

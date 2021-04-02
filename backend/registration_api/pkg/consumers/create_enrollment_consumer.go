@@ -5,7 +5,6 @@ import (
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
-	"github.com/divoc/registration-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -28,54 +27,34 @@ func StartEnrollmentConsumer() {
 		}
 		for {
 			msg, err := consumer.ReadMessage(-1)
-			if err == nil {
-				log.Info("Got the message to create new enrollment")
-				var enrollment = services.EnrollmentPayload{}
-				err = json.Unmarshal(msg.Value, &enrollment)
-
-				if err == nil {
-					log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-					osid, err := services.CreateEnrollment(&enrollment, 1)
-
-					services.PublishEnrollmentACK(
-						enrollment.RowID,
-						enrollment.VaccinationDetails,
-						enrollment.Enrollment.EnrollmentType,
-						err,
-					)
-
-					// Below condition flow will be used by WALK_IN component.
-					if err == nil {
-						cacheEnrollmentInfo(enrollment.Enrollment, osid)
-						err := services.NotifyRecipient(enrollment.Enrollment)
-						if err != nil {
-							log.Error("Unable to send notification to the enrolled user", err)
-						}
-					} else {
-						// Push to error topic
-						log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
-					}
-					_, _ = consumer.CommitMessage(msg)
-				} else {
-					log.Info("Unable to serialize the request body", err)
-				}
-
-			} else {
+			if err != nil {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
+				continue
 			}
+			log.Info("Got the message to create new enrollment")
+			var enrollment = services.EnrollmentPayload{}
+			if err := json.Unmarshal(msg.Value, &enrollment); err != nil {
+				// Push to error topic
+				log.Info("Unable to serialize the request body", err)
+				continue
+			}
+			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
+			
+			err = services.CreateEnrollment(&enrollment)
+			services.PublishEnrollmentACK(enrollment,err)
+			if err != nil {
+				// Push to error topic
+				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
+				continue
+			}
+			if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
+				log.Error("Unable to send notification to the enrolled user", err)
+			}
+			_, _ = consumer.CommitMessage(msg)
+
 		}
 	}()
 }
 
-func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
-	data := map[string]interface{}{
-		"phone":        enrollment.Phone,
-		"updatedCount": 0, //to restrict multiple updates
-		"osid":         osid,
-	}
-	_, err := services.SetHMSet(enrollment.Code, data)
-	if err != nil {
-		log.Error("Unable to cache enrollment info", err)
-	}
-}
+

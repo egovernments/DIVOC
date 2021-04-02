@@ -12,7 +12,7 @@ import config from "../config"
 import {SyncFacade} from "../SyncFacade";
 import NoNetworkImg from "assets/img/no_network.svg"
 import NetworkImg from "assets/img/network_online.svg"
-import {getSelectedProgram} from "../components/ProgramSelection";
+import {getSelectedProgram, getSelectedProgramId} from "../components/ProgramSelection";
 import {programDb} from "../Services/ProgramDB";
 import {appIndexDb} from "../AppDatabase";
 import {AppointmentDetails} from "./AppointmentDetails";
@@ -110,7 +110,7 @@ export function EnrolmentItems({icon, title, onClick, value}) {
         <div className={"verify-card"} onClick={onClick}>
             <BaseCard>
                 <Col>
-                    <img className={"icon"} src={icon} alt={""}/>
+                    {icon && <img className="icon" src={icon} alt={""}/>}
                     <h5>{value}</h5>
                     <h5>{title}</h5>
                 </Col>
@@ -137,7 +137,7 @@ export function VaccineProgram() {
         <Title
             text={getMessageComponent(LANGUAGE_KEYS.ENROLLMENT_TODAY, "", {date: formatDate(new Date().toISOString())})}
             content={<VaccinationProgress/>}/>
-        <AppointmentDetails/>
+        <AppointmentDetails selectedProgramId={getSelectedProgramId()}/>
     </div>;
 }
 

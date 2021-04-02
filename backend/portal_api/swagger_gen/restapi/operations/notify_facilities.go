@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -36,7 +35,7 @@ func NewNotifyFacilities(ctx *middleware.Context, handler NotifyFacilitiesHandle
 	return &NotifyFacilities{Context: ctx, Handler: handler}
 }
 
-/* NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
+/*NotifyFacilities swagger:route POST /facilities/notify notifyFacilities
 
 notify facilities
 
@@ -52,6 +51,7 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		r = rCtx
 	}
 	var Params = NewNotifyFacilitiesParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,6 +71,7 @@ func (o *NotifyFacilities) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -133,15 +134,10 @@ func (o *NotifyFacilitiesBody) validateMessage(formats strfmt.Registry) error {
 		return err
 	}
 
-	if err := validate.MinLength("body"+"."+"message", "body", *o.Message, 5); err != nil {
+	if err := validate.MinLength("body"+"."+"message", "body", string(*o.Message), 5); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this notify facilities body based on context it is used
-func (o *NotifyFacilitiesBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

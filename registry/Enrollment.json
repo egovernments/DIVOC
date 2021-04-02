@@ -16,7 +16,7 @@
   "definitions": {
     "Enrollment": {
       "type": "object",
-      "required": ["nationalId"],
+      "required": ["identity"],
       "properties": {
         "enrollmentType": {
           "type": "string",
@@ -29,6 +29,9 @@
           "type": "string"
         },
         "nationalId": {
+          "type": "string"
+        },
+        "identity": {
           "type": "string"
         },
         "yob": {

@@ -5,7 +5,7 @@ import {programDb} from "./Services/ProgramDB";
 import {monthNames, weekdays} from "./utils/date_utils";
 
 const DATABASE_NAME = "DivocDB";
-const DATABASE_VERSION = 13;
+const DATABASE_VERSION = 14;
 const PATIENTS = "patients";
 const PROGRAMS = "programs";
 const QUEUE = "queue";
@@ -16,6 +16,7 @@ const STATUS = "status";
 const USER_DETAILS = "user_details";
 const FACILITY_SCHEDULE = "facility_schedule";
 const COMORBIDITIES = "comorbidities";
+const APPLICATION_CONFIGS = "application_configs";
 
 const dbConfigs = [
     {
@@ -48,11 +49,15 @@ const dbConfigs = [
     },
     {
         table: FACILITY_SCHEDULE,
-        optionalParameters: {},
+        optionalParameters: {keyPath: "programId"},
     },
     {
         table: COMORBIDITIES,
         optionalParameters: {keyPath: "programId"}
+    },
+    {
+        table: APPLICATION_CONFIGS,
+        optionalParameters: {}
     }
 ]
 
@@ -237,13 +242,14 @@ export class AppDatabase {
         const vaccinator = await this.db.get(VACCINATORS, event.vaccinatorId);
         const queue = await this.db.get(QUEUE, event.enrollCode);
         if (patient && vaccinator && queue) {
-            const vaccination = await programDb.getVaccinationDetails(event, patient.programId);
+            const vaccination = await programDb.getVaccinationDetails(event, queue.programId);
             return {
                 vaccinatorName: vaccinator.name,
                 patient: patient,
                 enrollCode: event.enrollCode,
                 identity: queue.identity || "",
-                vaccination: vaccination
+                vaccination: vaccination,
+                programId: queue.programId
             }
         }
         return {}
@@ -260,6 +266,7 @@ export class AppDatabase {
         const deleteQueue = this.db.clear(QUEUE);
         const deletePrograms = this.db.clear(PROGRAMS);
         const deleteUserDetails = this.db.clear(USER_DETAILS);
+        const deleteFacilitySchedule = this.db.clear(FACILITY_SCHEDULE);
         localStorage.clear()
         return Promise.all(
             [
@@ -268,7 +275,8 @@ export class AppDatabase {
                 deleteQueue,
                 deleteVaccinators,
                 deletePrograms,
-                deleteUserDetails
+                deleteUserDetails,
+                deleteFacilitySchedule
             ]);
     }
 
@@ -277,7 +285,10 @@ export class AppDatabase {
     }
 
     async getFacilitySchedule() {
-        return this.db.get(FACILITY_SCHEDULE, FACILITY_SCHEDULE);
+        const selectedProgramId = getSelectedProgramId()
+        if (selectedProgramId) {
+            return await this.db.get(FACILITY_SCHEDULE, selectedProgramId);
+        }
     }
 
     async getCurrentAppointmentSlot() {
@@ -301,8 +312,11 @@ export class AppDatabase {
         return currentSlot
     }
 
-    async saveFacilitySchedule(facilitySchedule) {
-        return this.db.put(FACILITY_SCHEDULE, facilitySchedule, FACILITY_SCHEDULE)
+    async saveFacilitySchedule(facilitySchedules) {
+        const schedules = (facilitySchedules || []).map(s => {
+            return this.db.put(FACILITY_SCHEDULE, s)
+        })
+        return Promise.all(schedules);
     }
 }
 

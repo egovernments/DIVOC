@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import "./index.css"
 import {useSelector} from "react-redux";
 import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} from "../../utils/national-id";
@@ -20,13 +20,14 @@ import {
     INVALID_NAME_ERR_MSG,
     MAXIMUM_LENGTH_OF_NAME_ERROR_MSG,
     MINIMUM_LENGTH_OF_NAME_ERROR_MSG,
-    NAME_ERROR_MSG, NATIONAL_ID_ERROR_MSG, NATIONAL_ID_TYPE_ERROR_MSG,
+    NAME_ERROR_MSG, NATIONAL_ID_ERROR_MSG, NATIONAL_ID_TYPE_ERROR_MSG, NATIONALITY_ERROR_MSG,
     PINCODE_ERROR_MESSAGE,
     STATE_ERROR_MSG
 } from "./error-constants";
 import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../utils/validations";
 import {appIndexDb} from "../../AppDatabase";
 import {formatAppointmentSlot} from "../../utils/date_utils";
+import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
 
 const GENDERS = [
     "Male",
@@ -47,8 +48,15 @@ export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinu
 }
 
 export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) {
+    const walkInForm = useRef(null)
+
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({...state});
+
+    useEffect(() => {
+        walkInForm.current.scrollIntoView()
+
+    }, [verifyDetails]);
 
     function setValue(evt) {
         setFormData((state) => ({
@@ -59,8 +67,8 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
 
     function validateUserDetails() {
         const errorsData = {}
-        const nationalIDType = getNationalIdType(formData.nationalId)
-        const nationIDNumber = getNationalIdNumber(formData.nationalId)
+        const nationalIDType = getNationalIdType(formData.identity)
+        const nationIDNumber = getNationalIdNumber(formData.identity)
 
         if(!nationalIDType) {
             errorsData.nationalIDType = NATIONAL_ID_TYPE_ERROR_MSG
@@ -88,6 +96,10 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
         }
         if(!formData.district) {
             errorsData.district = DISTRICT_ERROR_MSG
+        }
+
+        if(!formData.nationalId) {
+            errorsData.nationalId = NATIONALITY_ERROR_MSG
         }
 
         if(formData.pincode && !isValidPincode(formData.pincode)) {
@@ -119,7 +131,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
     }
 
     return (
-        <div className="text-left verify-mobile-container">
+        <div className="text-left verify-mobile-container" ref={walkInForm}>
             <IdDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
                                 errors={errors}/>
@@ -132,7 +144,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
 
 const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
     function getSelectedIdType() {
-        const preSelectedIdValue = formData.nationalId ? getNationalIdType(formData.nationalId) : undefined;
+        const preSelectedIdValue = formData.identity ? getNationalIdType(formData.identity) : undefined;
         return preSelectedIdValue ? ID_TYPES.filter(a => a.value === preSelectedIdValue)[0].name : ""
     }
 
@@ -140,21 +152,21 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
         if (type === "idType") {
             const idValue = event.target.value;
             let existingIdNumber = "";
-            if (formData.nationalId) {
-                const nationalIdNumber = getNationalIdNumber(formData.nationalId);
+            if (formData.identity) {
+                const nationalIdNumber = getNationalIdNumber(formData.identity);
                 existingIdNumber = nationalIdNumber ? nationalIdNumber : ""
             }
-            let nationalId = constuctNationalId(idValue, existingIdNumber)
-            setValue({target: {name: "nationalId", value: nationalId}})
+            let identity = constuctNationalId(idValue, existingIdNumber)
+            setValue({target: {name: "identity", value: identity}})
         } else if (type === "idNumber") {
             const idNumber = event.target.value;
             let existingIdType = "";
-            if (formData.nationalId) {
-                const nationalIdType = getNationalIdType(formData.nationalId);
+            if (formData.identity) {
+                const nationalIdType = getNationalIdType(formData.identity);
                 existingIdType = nationalIdType ? nationalIdType : "";
             }
-            let nationalId = constuctNationalId(existingIdType, idNumber);
-            setValue({target: {name: "nationalId", value: nationalId}})
+            let identity = constuctNationalId(existingIdType, idNumber);
+            setValue({target: {name: "identity", value: identity}})
         }
     }
 
@@ -204,7 +216,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                 <input className="form-control" id="idNumber"
                        hidden={verifyDetails}
                        type="text" placeholder="Enter ID Number"
-                       defaultValue={getNationalIdNumber(formData.nationalId)}
+                       defaultValue={getNationalIdNumber(formData.identity)}
                        onBlur={(e) => onIdChange(e, "idNumber")}/>
                 <div className="invalid-input">
                     {errors.nationalID}
@@ -215,7 +227,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
                 </div>
                 {
                     verifyDetails &&
-                    <p>{getNationalIdNumber(formData.nationalId)}</p>
+                    <p>{getNationalIdNumber(formData.identity)}</p>
                 }
             </div>
             <div>
@@ -248,10 +260,16 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
 const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
     const state_and_districts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
     const STATES = Object.values(state_and_districts['states']).map(obj => obj.name);
+
     const [districts, setDistricts] = useState([]);
+    const [nationalities, setNationalities] = useState([]);
 
     useEffect(() => {
         setDistictsForState(formData.state)
+        applicationConfigsDB.getApplicationConfigs()
+            .then(res => {
+                setNationalities(res.nationalities)
+            })
     }, []);
 
     function onStateSelected(stateSelected) {
@@ -346,6 +364,25 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                 {
                     verifyDetails &&
                     <p>{formData.pincode}</p>
+                }
+            </div>
+            <div>
+                <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
+                       htmlFor="state">Nationality </label>
+                <select className="form-control" name="nationalId" id="nationalId"
+                        onChange={setValue}
+                        hidden={verifyDetails}>
+                    <option disabled selected={!formData.nationalId} value>Select Nationality</option>
+                    {
+                        nationalities.map(id => <option selected={id === formData.nationalId} value={id}>{id}</option>)
+                    }
+                </select>
+                <div className="invalid-input">
+                    {errors.nationalId}
+                </div>
+                {
+                    verifyDetails &&
+                    <p>{formData.nationalId}</p>
                 }
             </div>
         </div>

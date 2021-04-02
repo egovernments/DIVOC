@@ -36,7 +36,7 @@ export function PatientInfo(props) {
 
     return (
         <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.VERIFY_RECIPIENT)}>
-            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}/>;
+            <BeneficiaryForm verifyDetails={true} state={state} onContinue={onContinue} buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}/>
         </BaseFormCard>
     )
 }
@@ -70,12 +70,12 @@ function WarningInfo(props) {
                 <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current</p>
             }
             </div>
-            <div className="mt-5">
+            <div className="mt-4">
                 <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
                 <p>{currentSlot || "N/A"}</p>
             </div>
             {   recipientDetails.length > 0 &&
-                <div className="enroll-container mt-4" style={{height:"30%"}}>
+                <div className="enroll-container mt-4" style={{height:"110px"}}>
                     <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
                                      value={recipientDetails[0].value}
                     />
@@ -86,7 +86,7 @@ function WarningInfo(props) {
             }
             <Col className="register-with-aadhaar">
                 <div>
-                    <Button hidden={props.patientDetailsError} variant="outline-primary" className="primary-btn w-100 mt-5 mb-5" onClick={() => {
+                    <Button hidden={props.patientDetailsError} variant="outline-primary" className="primary-btn w-100 mt-5 mb-2" onClick={() => {
                         props.onContinue()
                     }}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_CONTINUE)}</Button>
                 </div>
