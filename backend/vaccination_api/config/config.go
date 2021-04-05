@@ -86,4 +86,5 @@ var Config = struct {
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
 		DocType     string `env:"DIGILOCKER_DOCTYPE"`
 	}
+	PollingStates []string `default:"[]" yaml:"pollingstates" env:"POLLING_STATES"`
 }{}
