@@ -149,7 +149,6 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
 			formatId(certificate.CredentialSubject.ID),
-			certificate.CredentialSubject.UHID,
 			certificate.CredentialSubject.RefId,
 			strings.ToUpper(certificate.Evidence[0].Vaccine),
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
@@ -164,7 +163,6 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
 		formatId(certificate.CredentialSubject.ID),
-		certificate.CredentialSubject.UHID,
 		certificate.CredentialSubject.RefId,
 		certificate.Evidence[0].Vaccine,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
@@ -223,7 +221,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(GetTemplateName(certificate, isFinal(certificate), language), 1, "/MediaBox")
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), language), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 

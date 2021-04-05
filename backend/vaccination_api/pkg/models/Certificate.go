@@ -1,7 +1,10 @@
 package models
 
 import (
+	"fmt"
+	"github.com/divoc/api/config"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -12,7 +15,6 @@ type Certificate struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
 		RefId       string `json:"refId"`
-		UHID        string `json:"uhid"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
@@ -73,4 +75,36 @@ func (certificate *Certificate) GetFacilityPostalCode() string {
 		return strconv.Itoa(int(postalCode))
 	}
 	return certificate.Evidence[0].Facility.Address.PostalCode.(string)
+}
+
+func (certificate *Certificate) GetTemplateName(isFinal bool, language string) string {
+	var certType string
+	var pollingType string
+
+	isPolling := false
+	stateName := certificate.getStateNameInLowerCaseLetter()
+	for _, state := range config.Config.PollingStates {
+		if state == stateName {
+			isPolling = true
+		}
+	}
+	if isPolling {
+		pollingType = "PS"
+	} else {
+		pollingType = "NPS"
+	}
+	if isFinal {
+		certType = "2"
+	} else {
+		certType = "1"
+	}
+	return fmt.Sprintf("config/cov19–%s-%s-%s.pdf", language, certType, pollingType)
+}
+
+func (certificate *Certificate) getStateNameInLowerCaseLetter() string {
+	stateName := ""
+	if len(certificate.Evidence) > 0 {
+		stateName = strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
+	}
+	return stateName
 }
