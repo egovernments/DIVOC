@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
@@ -15,9 +16,58 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool {
-	"Identity Number": func(e1, e2 models.Enrollment) bool {return *e1.Identity == *e2.Identity},
-	"Name and Age": func(e1, e2 models.Enrollment) bool {return e1.Name == e2.Name && e1.Yob == e2.Yob},
+var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool{
+	"Identity Number": func(e1, e2 models.Enrollment) bool { return *e1.Identity == *e2.Identity },
+	"Name and Age":    func(e1, e2 models.Enrollment) bool { return e1.Name == e2.Name && e1.Yob == e2.Yob },
+}
+
+const EnrollmentEntity = "Enrollment"
+
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string) {
+	filter := map[string]interface{}{
+		"code": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+		"phone": map[string]interface{}{
+			"eq": phone,
+		},
+		"name": map[string]interface{}{
+			"eq": name,
+		},
+	}
+	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+	if err == nil {
+		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
+		if len(enrollments) > 0 {
+			enrollmentObj, ok := enrollments[0].(map[string]interface{})
+			if ok {
+				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
+					for _, appointmentObj := range appointments {
+						appointment := appointmentObj.(map[string]interface{})
+						appointmentDose := appointment["dose"].(string)
+						appointmentCertified := appointment["certified"].(bool)
+						if appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
+							appointment["certified"] = true
+							appointment["certificateId"] = certificateId
+							appointment["vaccine"] = vaccine
+							break
+						}
+					}
+					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
+					if err == nil {
+						log.Debugf("Updated enrollment registry successfully %v", response)
+					} else {
+						log.Error("Failed updating enrollment registry", err)
+					}
+				}
+			}
+		} else {
+			log.Error("Enrollment not found for query %v", filter)
+		}
+
+	} else {
+		log.Error("Failed querying enrollments registry", filter, err)
+	}
 }
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
@@ -61,7 +111,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 	// no duplicates, after maxEnrollment check
 	enrollmentPayload.OverrideEnrollmentCode(func() string {
 		existingCodes := map[string]bool{}
-		for _ , e := range enrollments {
+		for _, e := range enrollments {
 			existingCodes[e.Code] = true
 		}
 		i := 1
@@ -215,7 +265,7 @@ func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string)
 }
 
 func FindDuplicate(enrollmentPayload EnrollmentPayload, enrollments []enrollment) (*DuplicateEnrollment, error) {
-	searchDuplicateEnrollment := func (enrollments []enrollment, target models.Enrollment, criteria func(e1, e2 models.Enrollment) bool) *enrollment {
+	searchDuplicateEnrollment := func(enrollments []enrollment, target models.Enrollment, criteria func(e1, e2 models.Enrollment) bool) *enrollment {
 		for _, e := range enrollments {
 			if criteria(e.Enrollment, target) {
 				return &e
@@ -228,7 +278,7 @@ func FindDuplicate(enrollmentPayload EnrollmentPayload, enrollments []enrollment
 		if duplicate := searchDuplicateEnrollment(enrollments, *enrollmentPayload.Enrollment, criteria); duplicate != nil {
 			return &DuplicateEnrollment{
 				Duplicate: duplicate,
-				Criteria: fields,
+				Criteria:  fields,
 			}, nil
 		}
 	}
@@ -245,7 +295,7 @@ func GetEnrollmentInfoIfValid(enrollmentCode string, phone string) map[string]st
 	return nil
 }
 
-func FetchEnrollments(mobile string) ([]byte, error){
+func FetchEnrollments(mobile string) ([]byte, error) {
 	filter := map[string]interface{}{}
 	filter["phone"] = map[string]interface{}{
 		"eq": mobile,
@@ -255,7 +305,7 @@ func FetchEnrollments(mobile string) ([]byte, error){
 		log.Error("Error occurred while querying Enrollment registry ", err)
 		return nil, err
 	}
-	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]);
+	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"])
 	if err != nil {
 		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
 		return nil, err
@@ -274,9 +324,10 @@ func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 		log.Error("Unable to cache enrollment info", err)
 	}
 }
+
 type EnrollmentPayload struct {
-	RowID              uint   `json:"rowID"`
-	EnrollmentScopeId  string `json:"enrollmentScopeId"`
+	RowID              uint                   `json:"rowID"`
+	EnrollmentScopeId  string                 `json:"enrollmentScopeId"`
 	VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
 	*models.Enrollment
 }
@@ -289,11 +340,11 @@ func (ep EnrollmentPayload) OverrideEnrollmentCode(code string) {
 }
 
 type DuplicateEnrollment struct {
-	Duplicate	*enrollment
-	Criteria	string
+	Duplicate *enrollment
+	Criteria  string
 }
 
 type enrollment struct {
-	Osid	string	`json:"osid"`
+	Osid string `json:"osid"`
 	models.Enrollment
 }
