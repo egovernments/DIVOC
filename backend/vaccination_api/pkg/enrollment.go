@@ -34,14 +34,11 @@ func filterEnrollemntAppointments(enrollments []*models.Enrollment, criteria fun
 	return relEnrollments
 }
 
-func findEnrollmentScopeAndCode(scopeID string, code string, limit int, offset int) (*models.Enrollment, error) {
+func findEnrollmentForCode(code string, limit int, offset int) (*models.Enrollment, error) {
 	typeID := "Enrollment"
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": code,
-		},
-		"appointments.enrollmentScopeId": map[string]interface{}{
-			"eq": scopeID,
 		},
 	}
 	if enrollmentsJSON, err := services.QueryRegistry(typeID, filter, limit, offset); err == nil {
@@ -56,11 +53,9 @@ func findEnrollmentScopeAndCode(scopeID string, code string, limit int, offset i
 			log.Infof("Number of enrollments %v", len(listOfEnrollments))
 			if len(listOfEnrollments) >= 1 {
 				log.Infof("Enrollment %+v", listOfEnrollments[0])
-				return filterEnrollemntAppointments(listOfEnrollments, func(ea *models.EnrollmentAppointmentsItems0) bool {
-					return ea.EnrollmentScopeID == scopeID
-				})[0], nil
+				return listOfEnrollments[0], nil
 			}
-			log.Infof("No enrollment found for the scope %s code %s", scopeID, code)
+			log.Infof("No enrollment found for the code %s", code)
 			return nil, errors.New("no enrollment found")
 		}
 	}
