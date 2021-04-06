@@ -15,8 +15,7 @@ import (
 )
 
 // NewGetEnrollmentsUploadsErrorsParams creates a new GetEnrollmentsUploadsErrorsParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetEnrollmentsUploadsErrorsParams() GetEnrollmentsUploadsErrorsParams {
 
 	return GetEnrollmentsUploadsErrorsParams{}
@@ -51,6 +50,7 @@ func (o *GetEnrollmentsUploadsErrorsParams) BindRequest(r *http.Request, route *
 	if err := o.bindUploadID(rUploadID, rhkUploadID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}

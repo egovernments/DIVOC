@@ -211,6 +211,12 @@ func init() {
                 }
               }
             }
+          },
+          {
+            "type": "boolean",
+            "default": false,
+            "name": "force",
+            "in": "query"
           }
         ],
         "responses": {
@@ -371,6 +377,9 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
           }
         }
       }
@@ -628,6 +637,12 @@ func init() {
                 }
               }
             }
+          },
+          {
+            "type": "boolean",
+            "default": false,
+            "name": "force",
+            "in": "query"
           }
         ],
         "responses": {
@@ -788,6 +803,9 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
           }
         }
       }
@@ -930,7 +948,7 @@ func init() {
     "enrollment": {
       "type": "object",
       "required": [
-        "nationalId"
+        "identity"
       ],
       "properties": {
         "address": {
@@ -976,6 +994,9 @@ func init() {
             "Female",
             "Other"
           ]
+        },
+        "identity": {
+          "type": "string"
         },
         "name": {
           "type": "string"

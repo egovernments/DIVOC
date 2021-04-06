@@ -30,7 +30,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
         if (vaccine?.effectiveUntil) {
             data["effectiveUntil"] = {count: vaccine.effectiveUntil, unit: "Days"};
         } else {
-            data["effectiveUntil"] = {count: 0, unit: "Days"};
+            data["effectiveUntil"] = {count: undefined, unit: "Days"};
         }
         return data;
     }
@@ -111,7 +111,8 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
             });
         }
         if (formData.effectiveUntil) {
-            updatedVaccine.effectiveUntil = convertIntervalToDays(updatedVaccine.effectiveUntil);
+            const days = convertIntervalToDays(updatedVaccine.effectiveUntil);
+            updatedVaccine.effectiveUntil = parseInt(days) >= 0  ? days : undefined;
         }
         if (validateFormData(formData)) {
             onSubmit(updatedVaccine);
@@ -127,8 +128,10 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
                 return count * 365;
             case "Lifetime":
                 return 73000;
-            default:
+            case "Days":
                 return count;
+            default:
+                return undefined
         }
     }
 

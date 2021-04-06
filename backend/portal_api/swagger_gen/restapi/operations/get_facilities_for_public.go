@@ -29,7 +29,7 @@ func NewGetFacilitiesForPublic(ctx *middleware.Context, handler GetFacilitiesFor
 	return &GetFacilitiesForPublic{Context: ctx, Handler: handler}
 }
 
-/* GetFacilitiesForPublic swagger:route GET /public/facilities getFacilitiesForPublic
+/*GetFacilitiesForPublic swagger:route GET /public/facilities getFacilitiesForPublic
 
 get facilities for public
 
@@ -45,12 +45,14 @@ func (o *GetFacilitiesForPublic) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 		r = rCtx
 	}
 	var Params = NewGetFacilitiesForPublicParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

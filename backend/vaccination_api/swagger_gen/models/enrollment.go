@@ -50,12 +50,15 @@ type Enrollment struct {
 	// Enum: [Male Female Other]
 	Gender string `json:"gender,omitempty"`
 
+	// identity
+	// Required: true
+	Identity *string `json:"identity"`
+
 	// name
 	Name string `json:"name,omitempty"`
 
 	// national Id
-	// Required: true
-	NationalID *string `json:"nationalId"`
+	NationalID string `json:"nationalId,omitempty"`
 
 	// phone
 	Phone string `json:"phone,omitempty"`
@@ -88,7 +91,7 @@ func (m *Enrollment) Validate(formats strfmt.Registry) error {
 		res = append(res, err)
 	}
 
-	if err := m.validateNationalID(formats); err != nil {
+	if err := m.validateIdentity(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -246,9 +249,9 @@ func (m *Enrollment) validateGender(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Enrollment) validateNationalID(formats strfmt.Registry) error {
+func (m *Enrollment) validateIdentity(formats strfmt.Registry) error {
 
-	if err := validate.Required("nationalId", "body", m.NationalID); err != nil {
+	if err := validate.Required("identity", "body", m.Identity); err != nil {
 		return err
 	}
 

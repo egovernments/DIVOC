@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"github.com/divoc/portal-api/config"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -47,7 +48,19 @@ func StartCertifiedConsumer() {
 					consumer.CommitMessage(msg)
 					continue
 				}
-				MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name)
+				certificateStr, ok := message["certificate"].(string)
+				if !ok {
+					logrus.Error("certificate not found to mark pre-enrolled user certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
+				var certificateMsg map[string]interface{}
+				if err := json.Unmarshal([]byte(certificateStr), &certificateMsg); err == nil {
+					if dose, err := getDose(certificateMsg); err == nil {
+						MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name, dose)
+					}
+				}
+
 				consumer.CommitMessage(msg)
 			} else {
 				// The client will automatically try to recover from all errors.
@@ -56,4 +69,13 @@ func StartCertifiedConsumer() {
 
 		}
 	}()
+}
+
+func getDose(certificateMsg map[string]interface{}) (float64, error) {
+	if evidence, ok := certificateMsg["evidence"].([]interface{})[0].(map[string]interface{}); ok {
+		if dose, ok := evidence["dose"].(float64); ok {
+			return dose, nil
+		}
+	}
+	return -1, errors.New("dose not found")
 }

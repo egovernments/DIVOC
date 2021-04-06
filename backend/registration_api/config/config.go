@@ -35,7 +35,7 @@ var Config = struct {
 	AppointmentScheduler struct {
 		ChannelSize    int `default:"100"`
 		ChannelWorkers int `default:"10"`
-		ScheduleDays   int `default:"30"`
+		ScheduleDays   int `default:"100"`
 	}
 	MockOtp                      bool   `default:"true" env:"MOCK_OTP"`
 	MinCancellationHours         int    `default:"24"`

@@ -14,7 +14,7 @@
                 if(window.location.protocol === "http:") {
                     let formField = document.getElementById("kc-form-login");
                     if (formField) {
-                        formField.action = formField.action.replace("http","https");
+                        formField.action = formField.action.replace("http:","https:");
                     }
                 }
             }

@@ -6,7 +6,6 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
@@ -36,7 +35,7 @@ func NewConfigureSlotFacility(ctx *middleware.Context, handler ConfigureSlotFaci
 	return &ConfigureSlotFacility{Context: ctx, Handler: handler}
 }
 
-/* ConfigureSlotFacility swagger:route POST /facility/{facilityId}/program/{programId}/schedule configureSlotFacility
+/*ConfigureSlotFacility swagger:route POST /facility/{facilityId}/program/{programId}/schedule configureSlotFacility
 
 configure slot for program in facility
 
@@ -52,6 +51,7 @@ func (o *ConfigureSlotFacility) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 		r = rCtx
 	}
 	var Params = NewConfigureSlotFacilityParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
@@ -71,6 +71,7 @@ func (o *ConfigureSlotFacility) ServeHTTP(rw http.ResponseWriter, r *http.Reques
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -106,6 +107,7 @@ func (o *ConfigureSlotFacilityBody) Validate(formats strfmt.Registry) error {
 }
 
 func (o *ConfigureSlotFacilityBody) validateAppointmentSchedule(formats strfmt.Registry) error {
+
 	if swag.IsZero(o.AppointmentSchedule) { // not required
 		return nil
 	}
@@ -130,6 +132,7 @@ func (o *ConfigureSlotFacilityBody) validateAppointmentSchedule(formats strfmt.R
 }
 
 func (o *ConfigureSlotFacilityBody) validateWalkInSchedule(formats strfmt.Registry) error {
+
 	if swag.IsZero(o.WalkInSchedule) { // not required
 		return nil
 	}
@@ -141,60 +144,6 @@ func (o *ConfigureSlotFacilityBody) validateWalkInSchedule(formats strfmt.Regist
 
 		if o.WalkInSchedule[i] != nil {
 			if err := o.WalkInSchedule[i].Validate(formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("body" + "." + "walkInSchedule" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-// ContextValidate validate this configure slot facility body based on the context it is used
-func (o *ConfigureSlotFacilityBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
-	var res []error
-
-	if err := o.contextValidateAppointmentSchedule(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := o.contextValidateWalkInSchedule(ctx, formats); err != nil {
-		res = append(res, err)
-	}
-
-	if len(res) > 0 {
-		return errors.CompositeValidationError(res...)
-	}
-	return nil
-}
-
-func (o *ConfigureSlotFacilityBody) contextValidateAppointmentSchedule(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(o.AppointmentSchedule); i++ {
-
-		if o.AppointmentSchedule[i] != nil {
-			if err := o.AppointmentSchedule[i].ContextValidate(ctx, formats); err != nil {
-				if ve, ok := err.(*errors.Validation); ok {
-					return ve.ValidateName("body" + "." + "appointmentSchedule" + "." + strconv.Itoa(i))
-				}
-				return err
-			}
-		}
-
-	}
-
-	return nil
-}
-
-func (o *ConfigureSlotFacilityBody) contextValidateWalkInSchedule(ctx context.Context, formats strfmt.Registry) error {
-
-	for i := 0; i < len(o.WalkInSchedule); i++ {
-
-		if o.WalkInSchedule[i] != nil {
-			if err := o.WalkInSchedule[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("body" + "." + "walkInSchedule" + "." + strconv.Itoa(i))
 				}

@@ -19,7 +19,7 @@ function Header() {
     
     function logoutRecipient() {
         removeCookie(CITIZEN_TOKEN_COOKIE_NAME);
-        window.location.href = "/citizen"
+        window.location.href = "/"
     }
 
     function onLogoutClicked() {

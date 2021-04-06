@@ -122,7 +122,8 @@ export function SelectProgram({onDone}) {
                     variant="outline-primary" className="action-btn mt-4"
                     onClick={() => {
                         if (selectedProgram && onDone) {
-                            saveSelectedProgram(selectedProgram)
+                            saveSelectedProgram(selectedProgram.name)
+                            saveSelectedProgramId(selectedProgram.id)
                             onDone(selectedProgram)
                         }
                     }}>{getMessageComponent(LANGUAGE_KEYS.BUTTON_DONE)}</Button>

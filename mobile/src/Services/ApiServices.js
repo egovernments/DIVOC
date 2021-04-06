@@ -10,7 +10,7 @@ const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
 const FLAGR_APPLICATION_CONFIG = "/config/api/v1/evaluation";
 const FACILITY_ID = "FACILITY_ID"
 const PROGRAM_ID = "PROGRAM_ID"
-const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/program/${PROGRAM_ID}/schedule`
+const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/schedule`
 
 export class ApiServices {
 
@@ -62,7 +62,7 @@ export class ApiServices {
             return {
                 preEnrollmentCode: item.enrollCode,
                 enrollmentType: patientDetails.enrollmentType,
-                programId: patientDetails.programId,
+                programId: item.programId,
                 comorbidities: patientDetails.comorbidities ?? [],
                 recipient: {
                     contact: [
@@ -181,7 +181,7 @@ export class ApiServices {
             })
     }
 
-    static async fetchFacilitySchedule(facilityId, programId) {
+    static async fetchFacilitySchedule(facilityId) {
         const requestOptions = {
             method: 'GET',
             headers: {
@@ -191,8 +191,7 @@ export class ApiServices {
             },
         };
         const apiURL = FACILITY_SLOTS
-            .replace(FACILITY_ID, facilityId)
-            .replace(PROGRAM_ID, programId);
+            .replace(FACILITY_ID, facilityId);
 
         return fetch(apiURL, requestOptions)
             .then(response => {

@@ -30,6 +30,8 @@ export default function FacilityConfigureSlot ({location}) {
     const [appointmentSchedules, setAppointmentSchedules] = useState([]);
     const [walkInSchedules, setWalkInSchedules] = useState([]);
     const [errors, setErrors] = useState({});
+    const [appointmentScheduleEnabled, setAppointmentScheduleEnabled] = useState(true);
+    const [walkinScheduleEnabled, setWalkinScheduleEnabled] = useState(true);
 
     const axiosInstance = useAxios('');
 
@@ -76,7 +78,9 @@ export default function FacilityConfigureSlot ({location}) {
                     edited: false
                 }
             ])
+            setWalkinScheduleEnabled(false);
         } else {
+            setWalkinScheduleEnabled(true);
             let schedule = program.walkInSchedule.map(sd => {
                 return {...sd, edited: false, scheduleType: WALKIN_SCHEDULE,}
             });
@@ -108,6 +112,7 @@ export default function FacilityConfigureSlot ({location}) {
         let appointmentSchedules = [];
 
         if(appointmentSchedulesResponse.appointmentSchedule.length === 0) {
+            setAppointmentScheduleEnabled(false);
             appointmentSchedules.push({
                 startTime: "",
                 endTime: "",
@@ -117,6 +122,7 @@ export default function FacilityConfigureSlot ({location}) {
                 index: 0
             })
         } else {
+            setAppointmentScheduleEnabled(true)
             appointmentSchedulesResponse.appointmentSchedule.forEach((as, index) => {
                 appointmentSchedules.push({...as, scheduleType: APPOINTMENT_SCHEDULE, edited: false, index})
             });
@@ -248,11 +254,18 @@ export default function FacilityConfigureSlot ({location}) {
 
         function validateSchedule(schedule) {
             let err = {};
-            err = validateStartTime(schedule, err);
-            err = validateEndTime(schedule, err);
-            err = validateTimeRange(schedule, err);
-            err = validateSlotFrequencyCount(schedule, err);
-            err = validateWalkinSchedule(schedule, err);
+            if (appointmentScheduleEnabled && schedule.scheduleType === APPOINTMENT_SCHEDULE) {
+                err = validateStartTime(schedule, err);
+                err = validateEndTime(schedule, err);
+                err = validateTimeRange(schedule, err);
+                err = validateSlotFrequencyCount(schedule, err);
+            }
+
+            if(walkinScheduleEnabled && schedule.scheduleType === WALKIN_SCHEDULE) {
+                err = validateStartTime(schedule, err);
+                err = validateEndTime(schedule, err);
+                err = validateWalkinSchedule(schedule, err);
+            }
             return err
         }
 
@@ -270,17 +283,20 @@ export default function FacilityConfigureSlot ({location}) {
         let data = {};
 
         let isAppointmentSchedulesChanged = scheduleDeleted ||
-            appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
-        let isWalkInSchedulesChanged = walkInSchedules.map(ms => ms.edited).reduce((a, b) => a || b);
+            appointmentSchedules.map(ms => ms.edited).reduce((a, b) => a || b) ||
+            (appointmentScheduleEnabled && !facilityProgramSchedules.appointmentSchedule) ||
+            (!appointmentScheduleEnabled && facilityProgramSchedules.appointmentSchedule);
+        let isWalkInSchedulesChanged = walkInSchedules.map(ms => ms.edited).reduce((a, b) => a || b) ||
+            (walkinScheduleEnabled && !facilityProgramSchedules.walkInSchedule) ||
+            (!walkinScheduleEnabled && facilityProgramSchedules.walkInSchedule);
 
         if (validateSchedules()) {
             return
         }
-
+        data["appointmentSchedule"] = appointmentScheduleEnabled ? [ ...appointmentSchedules] : []
+        data["walkInSchedule"] = walkinScheduleEnabled ? [...walkInSchedules] : []
         if (facilityProgramSchedules.osid) {
             // update
-            data["appointmentSchedule"] = [...appointmentSchedules]
-            data["walkInSchedule"] = [...walkInSchedules]
             if (isAppointmentSchedulesChanged || isWalkInSchedulesChanged) {
                 let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
                 axiosInstance.current.put(apiUrl, data)
@@ -293,8 +309,6 @@ export default function FacilityConfigureSlot ({location}) {
             }
         } else {
             // post
-            data["appointmentSchedule"] = appointmentSchedules
-            data["walkInSchedule"] = [...walkInSchedules]
             if (isAppointmentSchedulesChanged || isWalkInSchedulesChanged) {
                 let apiUrl = API_URL.FACILITY_PROGRAM_SCHEDULE_API.replace(":facilityId", facilityId).replace(":programId", programId)
                 axiosInstance.current.post(apiUrl, data)
@@ -368,9 +382,14 @@ export default function FacilityConfigureSlot ({location}) {
                 <div>
                     <Row>
                         <Col className="col-4">
-                            <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
-                                Appointment Scheduler
-                            </p>
+                            <input onChange={event => setAppointmentScheduleEnabled(event.target.checked)}
+                                   checked={appointmentScheduleEnabled}
+                                   type="checkbox"
+                                   name="appointmentHours"
+                                   id="appointmentHours"/>
+                            <label className="ml-2" htmlFor="appointmentHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
+                                Appointment Hours
+                            </label>
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}}>
                                 Maximum number of appointments allowed
@@ -384,15 +403,25 @@ export default function FacilityConfigureSlot ({location}) {
                                                             schedule={schedule} onChange={onScheduleChange}
                                                             errors={errors} selectedDays={selectedDays}
                                                             deleteHandler={deleteHandler}
+                                                            enableInput={!appointmentScheduleEnabled}
                                     />)
                         }
-                        <img className="addIcon" alt={""} src={AddIcon} width={30} onClick={addScheduleHandler}/>
+                        <button disabled={!appointmentScheduleEnabled} className="p-0 btn addIcon" onClick={addScheduleHandler}>
+                            <img title="Add" alt={""} src={AddIcon} width={30}/>
+                        </button>
                     </div>
                 </div>
                 <div className="mt-4">
                     <Row>
                         <Col className="col-4">
-                            <p style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>Walk-in Scheduler</p>
+                            <input onChange={event => setWalkinScheduleEnabled(event.target.checked)}
+                                   type="checkbox"
+                                   checked={walkinScheduleEnabled}
+                                   name="walkinHours"
+                                   id="walkinHours"/>
+                            <label className="ml-2" htmlFor="walkinHours" style={{fontSize: "large", fontWeight: "bold", marginBottom: 0}}>
+                                Walk-in Hours
+                            </label>
                         </Col>
                         <Col style={{ fontWeight: "bold", color: "#646D82"}} >
                             Select Walk-in Days
@@ -407,7 +436,9 @@ export default function FacilityConfigureSlot ({location}) {
                                 walkInSchedules.map((ws, i) =>
                                     <WalkInScheduleRow key={"wis_"+i}
                                                        schedule={ws} onChange={onWalkInScheduleChange}
-                                                       errors={errors} selectedDays={selectedDays}/>)
+                                                       errors={errors} selectedDays={selectedDays}
+                                                       enableInput={!walkinScheduleEnabled}
+                                    />)
                         }
                     </div>
                 </div>
@@ -422,7 +453,7 @@ export default function FacilityConfigureSlot ({location}) {
     )
 }
 
-function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, deleteHandler}) {
+function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, deleteHandler, enableInput}) {
     function onValueChange(evt, field) {
         onChange({...schedule, [field]: evt.target.value, edited: true});
     }
@@ -451,7 +482,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                     }
                 });
             } else {
-                newSchedule.days.concat({ "day": day, maxAppointments: value})
+                newSchedule.days = newSchedule.days.concat({ "day": day, maxAppointments: value})
             }
             onChange(newSchedule);
         }
@@ -463,6 +494,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                 <Row style={schedule.index === 0 ? {marginRight: "0%", width: "92.5%"}: {}}>
                     <Col>
                         <input
+                            disabled={enableInput}
                             className="form-control"
                             value={schedule.startTime}
                             type="time"
@@ -479,6 +511,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                     <Col>
                         <input
                             className="form-control"
+                            disabled={enableInput}
                             value={schedule.endTime}
                             type="time"
                             name="endTime"
@@ -489,8 +522,10 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                         </div>
                     </Col>
                     {schedule.index !== 0 && <Col className="m-0 p-1 flex-grow-0">
-                        <img alt={""} style={{cursor:"pointer"}} src={DeleteIcon} width={30}
-                             onClick={() => deleteHandler(schedule.index)}/>
+                        <button className="p-0 btn" disabled = {enableInput} onClick={() => deleteHandler(schedule.index)}>
+                            <img alt={""} title="Delete" src={DeleteIcon} width={30}
+                            />
+                        </button>
                     </Col>}
                 </Row>
             </Col>
@@ -500,7 +535,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
                         <input
                             className="form-control"
                             value={getMaxAppointments(d)}
-                            disabled={!selectedDays.includes(d)}
+                            disabled={enableInput || !selectedDays.includes(d)}
                             type="number"
                             name="maxAppointments"
                             onChange={(evt) => onMaxAppointmentsChange(evt, d)}
@@ -514,7 +549,7 @@ function AppointmentScheduleRow({schedule, onChange, selectedDays, errors, delet
     )
 }
 
-function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
+function WalkInScheduleRow({schedule, onChange, selectedDays, errors, enableInput}) {
     function onValueChange(evt, field) {
         onChange({...schedule, [field]: evt.target.value, edited: true});
     }
@@ -533,6 +568,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                 <Row style={{width: "92.5%"}}>
                     <Col>
                         <input
+                            disabled={enableInput}
                             className="form-control"
                             defaultValue={schedule.startTime}
                             type="time"
@@ -548,6 +584,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                     </Col>
                     <Col>
                         <input
+                            disabled={enableInput}
                             className="form-control"
                             defaultValue={schedule.endTime}
                             type="time"
@@ -566,7 +603,7 @@ function WalkInScheduleRow({schedule, onChange, selectedDays, errors}) {
                         <CheckboxItem
                             checkedColor={"#5C9EF8"}
                             text={d}
-                            disabled={!selectedDays.includes(d)}
+                            disabled={enableInput || !selectedDays.includes(d)}
                             checked={schedule.days.includes(d)}
                             onSelect={(event) =>
                                 handleDayChange(event.target.name)

@@ -1,6 +1,4 @@
 .home-section {
-    max-width: 1300px;
-    margin: auto !important;
 }
 
 .home-section .section .title{
@@ -249,4 +247,5 @@
     margin-right: auto;
     margin-top: 1rem;
     width: 60vmin;
+    max-width: 412px
 }
