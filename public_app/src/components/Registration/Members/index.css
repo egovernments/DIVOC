@@ -28,3 +28,83 @@
         padding: 1rem 0.5rem;
     }
 }
+
+.main-container {
+    background-color: #F9FAFA;
+}
+
+.member-card {
+    box-shadow: 0px 6px 20px #C1CFD933 !important;
+    margin-bottom: 1rem;
+    border-radius: 10px !important;
+}
+
+.member-card-header {
+    background-color: white !important;
+
+    color: #5C9EF8;
+    font-weight: bolder;
+    padding: 1rem 3rem!important;
+    font-size: 18px;
+}
+
+
+.member-card-body {
+    background-color: white !important;
+    padding: 1rem 3rem!important;
+}
+
+.appointment-wrapper {
+    border-bottom: 3px dashed gainsboro;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    display: flex;
+}
+
+.appointment-details {
+    width: 15%;
+    display: flex;
+    flex-direction: column;
+}
+
+.appointment-title {
+    color: #646D82;
+    padding-bottom:  .5rem;
+}
+
+.appointment-schedule {
+    width: 70%;
+}
+
+.appointment-inactive-circle {
+    background-color: #F8F8F8;
+    border: 1px solid #E6E6E6;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100px;
+}
+
+.appointment-inactive-title {
+    color: #B1B1B1;
+    font-size: 14px;
+}
+
+.appointment-active-title {
+    font-size: 14px;
+}
+
+.appointment-line {
+    position: absolute;
+    border: 2px solid #E6E6E6;
+    width: 90%;
+    top: 28%;
+    left: 2%;
+}
+
+.appointment-link-btn {
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    font-size: 14px !important;
+    font-weight: normal !important;
+}

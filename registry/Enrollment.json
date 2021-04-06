@@ -63,7 +63,8 @@
                 "type": "string"
               },
               "programId": {
-                "type": "string"
+                "type": "string",
+                "x-omitempty": false
               },
               "appointmentSlot": {
                 "type": "string",
@@ -83,7 +84,14 @@
                 "x-omitempty": false
               },
               "dose": {
-                "type": "string"
+                "type": "string",
+                "x-omitempty": false
+              },
+              "comorbidities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
