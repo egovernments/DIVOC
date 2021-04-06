@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"strconv"
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
@@ -20,6 +21,55 @@ import (
 var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool{
 	"Identity Number": func(e1, e2 models.Enrollment) bool { return *e1.Identity == *e2.Identity },
 	"Name and Age":    func(e1, e2 models.Enrollment) bool { return e1.Name == e2.Name && e1.Yob == e2.Yob },
+}
+
+const EnrollmentEntity = "Enrollment"
+
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string) {
+	filter := map[string]interface{}{
+		"code": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+		"phone": map[string]interface{}{
+			"eq": phone,
+		},
+		"name": map[string]interface{}{
+			"eq": name,
+		},
+	}
+	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+	if err == nil {
+		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
+		if len(enrollments) > 0 {
+			enrollmentObj, ok := enrollments[0].(map[string]interface{})
+			if ok {
+				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
+					for _, appointmentObj := range appointments {
+						appointment := appointmentObj.(map[string]interface{})
+						appointmentDose := appointment["dose"].(string)
+						appointmentCertified := appointment["certified"].(bool)
+						if appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
+							appointment["certified"] = true
+							appointment["certificateId"] = certificateId
+							appointment["vaccine"] = vaccine
+							break
+						}
+					}
+					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
+					if err == nil {
+						log.Debugf("Updated enrollment registry successfully %v", response)
+					} else {
+						log.Error("Failed updating enrollment registry", err)
+					}
+				}
+			}
+		} else {
+			log.Error("Enrollment not found for query %v", filter)
+		}
+
+	} else {
+		log.Error("Failed querying enrollments registry", filter, err)
+	}
 }
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
@@ -257,7 +307,7 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 		log.Error("Error occurred while querying Enrollment registry ", err)
 		return nil, err
 	}
-	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]);
+	enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"])
 	if err != nil {
 		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
 		return nil, err

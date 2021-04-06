@@ -83,6 +83,12 @@
                 "type": "string",
                 "x-omitempty": false
               },
+              "vaccine": {
+                "type": "string"
+              },
+              "certificateId": {
+                "type": "string"
+              },
               "dose": {
                 "type": "string",
                 "x-omitempty": false
