@@ -132,6 +132,7 @@ var stateLanguageMapping = map[string]string{
 	"sikkim":                      "NEP",
 	"tamil nadu":                  "TAM",
 	"telangana":                   "TEL",
+	"tripura":                     "BNG",
 	"uttar pradesh":               "HIN",
 	"uttarakhand":                 "HIN",
 	"west bengal":                 "BNG",
@@ -299,7 +300,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	}
 
 	//pdf.Image("qr.png", 200, 50, nil)
-	//pdf.WritePdf("new_certificate.pdf")
+	pdf.WritePdf("new_certificate.pdf")
 	var b bytes.Buffer
 	_ = pdf.Write(&b)
 	return b.Bytes(), nil
