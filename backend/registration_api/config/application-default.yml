@@ -3,6 +3,7 @@ kafka:
   notifyTopic: notify
   enrollmenttopic: enrollment
   recipientappointmenttopic: recipientappointment
+  certifiedtopic: certified
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
