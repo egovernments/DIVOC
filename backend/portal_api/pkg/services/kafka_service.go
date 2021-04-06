@@ -25,7 +25,6 @@ func InitializeKafka() {
 	}
 
 	log.Infof("Connected to kafka on %s", servers)
-	StartCertifiedConsumer()
 	StartEnrollmentACKConsumer()
 	go func() {
 		topic := config.Config.Kafka.NotifyTopic
@@ -43,11 +42,11 @@ func InitializeKafka() {
 	go func() {
 		topic := config.Config.Kafka.EnrollmentTopic
 		for {
-			msg:= <-enrollmentMessages
+			msg := <-enrollmentMessages
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-					Value: msg,
-				}, nil); err != nil {
+				Value:          msg,
+			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
 			}
 		}
@@ -85,4 +84,3 @@ func PublishNotificationMessage(recipient string, subject string, message string
 		notifications <- messageJson
 	}
 }
-

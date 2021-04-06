@@ -2,63 +2,14 @@ package services
 
 import (
 	"bytes"
-	"github.com/divoc/portal-api/pkg/utils"
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
-	"github.com/divoc/portal-api/config"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 )
 
-const EnrollmentEntity = "Enrollment"
 const PreEnrollmentRegistered = "preEnrollmentRegistered"
-
-func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64) {
-	filter := map[string]interface{}{
-		"code": map[string]interface{}{
-			"eq": preEnrollmentCode,
-		},
-		"phone": map[string]interface{}{
-			"eq": phone,
-		},
-		"name": map[string]interface{}{
-			"eq": name,
-		},
-	}
-	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter,
-		config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
-	if err == nil {
-		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
-		if len(enrollments) > 0 {
-			enrollmentObj, ok := enrollments[0].(map[string]interface{})
-			if ok {
-				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
-					for _, appointmentObj := range appointments {
-						appointment := appointmentObj.(map[string]interface{})
-						appointmentDose := appointment["dose"].(string)
-						appointmentCertified := appointment["certified"].(bool)
-						if appointmentDose == utils.ToString(dose) && !appointmentCertified {
-							appointment["certified"] = true
-							break
-						}
-					}
-					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
-					if err == nil {
-						log.Debugf("Updated enrollment registry successfully %v", response)
-					} else {
-						log.Error("Failed updating enrollment registry", err)
-					}
-				}
-			}
-		} else {
-			log.Error("Enrollment not found for query %v", filter)
-		}
-
-	} else {
-		log.Error("Failed querying enrollments registry", filter, err)
-	}
-}
 
 func NotifyRecipient(enrollment models.Enrollment) error {
 	preEnrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[PreEnrollmentRegistered].Message
