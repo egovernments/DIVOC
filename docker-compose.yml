@@ -99,12 +99,6 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
-      POLLING_STATES:
-        - "assam"
-        - "wb"
-        - "tn"
-        - "puducherry"
-        - "kl"
     ports:
       - "8000:8000"
     depends_on:

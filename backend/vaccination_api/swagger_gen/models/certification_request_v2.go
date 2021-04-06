@@ -959,6 +959,9 @@ type CertificationRequestV2Recipient struct {
 
 	// nationality
 	Nationality string `json:"nationality,omitempty"`
+
+	// uhid
+	Uhid string `json:"uhid,omitempty"`
 }
 
 // Validate validates this certification request v2 recipient

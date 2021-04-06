@@ -387,6 +387,8 @@ definitions:
         properties:
           name:
             type: string
+          uhid:
+            type: string
           dob:
             type: string
             format: date

@@ -149,6 +149,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
 			formatId(certificate.CredentialSubject.ID),
+			certificate.CredentialSubject.Uhid,
 			certificate.CredentialSubject.RefId,
 			strings.ToUpper(certificate.Evidence[0].Vaccine),
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
@@ -163,6 +164,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
 		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.Uhid,
 		certificate.CredentialSubject.RefId,
 		certificate.Evidence[0].Vaccine,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
@@ -233,14 +235,14 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	offsetX := 310.0
 	offsetY := 211.0
 	offsetNewX := 310.0
-	offsetNewY := 245.0
+	offsetNewY := 243.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplateV2(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
 	for i = 0; i < rowSize; i++ {
 		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*24.5)
+		pdf.SetY(offsetY + float64(i)*24.7)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	for i = rowSize; i < len(displayLabels); i++ {

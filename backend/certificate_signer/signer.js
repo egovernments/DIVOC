@@ -105,6 +105,7 @@ function transformW3(cert, certificateId) {
       id: R.pathOr('', ['recipient', 'identity'], cert),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
+      uhid: R.pathOr('', ['recipient', 'uhid'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
       age: ageOfRecipient(cert.recipient), //from dob
       nationality: R.pathOr('', ['recipient', 'nationality'], cert),
@@ -133,6 +134,7 @@ function transformW3(cert, certificateId) {
       "effectiveStart": R.pathOr('', ['vaccination', 'effectiveStart'], cert),
       "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
       "dose": R.pathOr('', ['vaccination', 'dose'], cert),
+      // TODO: get default count
       "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
