@@ -55,7 +55,7 @@ function UploadCSV({sampleCSV, fileUploadAPI, onUploadComplete,uploadHistoryCoun
         return(
             <div className="d-flex justify-content-between">
                 <p>{errorCount} Errors Found</p>
-                <Button style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
+                <Button hidden={errorCount === 0} style={{background: "#FC573B"}} onClick={()=>{handleShow()}}>VIEW</Button>
             </div>
         )
     }
