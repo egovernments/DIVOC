@@ -50,6 +50,8 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.DeleteAppointmentHandler = operations.DeleteAppointmentHandlerFunc(deleteAppointment)
 	api.DeleteRecipientHandler = operations.DeleteRecipientHandlerFunc(deleteRecipient)
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingHandler)
+	api.RegisterRecipientToProgramHandler = operations.RegisterRecipientToProgramHandlerFunc(services.RegisterEnrollmentToProgram)
+	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
@@ -291,6 +293,7 @@ func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWT
 	}
 	dose, programID := *params.Body.Dose, *params.Body.ProgramID
 	if err := services.BookSlot(*enrollmentCode, phone, *facilitySlotID, dose, programID); err != nil {
+		log.Error(err)
 		return operations.NewBookSlotOfFacilityBadRequest()
 	}
 	return operations.NewBookSlotOfFacilityOK()
@@ -318,14 +321,15 @@ func deleteAppointment(params operations.DeleteAppointmentParams, principal *mod
 func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose string, programId string) error {
 	enrollmentInfo := services.GetEnrollmentInfoIfValid(enrollmentCode, phone)
 	if enrollmentInfo != nil {
-		if services.CheckIfAlreadyAppointed(enrollmentInfo) {
-			if msg := checkIfCancellationAllowed(enrollmentInfo); msg == "" {
-				lastBookedSlotId := enrollmentInfo["slotId"]
+		if services.CheckIfAlreadyAppointed(enrollmentInfo, programId, dose) {
+			if msg := checkIfCancellationAllowed(enrollmentInfo, programId, dose); msg == "" {
+				slotKey := fmt.Sprintf("%s-%s-slotId", programId, dose)
+				lastBookedSlotId := enrollmentInfo[slotKey]
 				err := services.CancelBookedAppointment(lastBookedSlotId)
 				if err != nil {
 					return errors.New("Failed to cancel appointment")
 				} else {
-					isMarked := services.RevokeEnrollmentBookedStatus(enrollmentCode)
+					isMarked := services.RevokeEnrollmentBookedStatus(enrollmentCode, programId, dose)
 					if isMarked {
 						services.PublishAppointmentAcknowledgement(models2.AppointmentAck{
 							EnrollmentCode:  enrollmentCode,
@@ -371,11 +375,12 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 	if enrollmentInfo == nil {
 		return badReqResponse("Recipient does not exist or already deleted")
 	}
-
-	if services.CheckIfAlreadyAppointed(enrollmentInfo) {
-		return badReqResponse("Deleting a recipient is not allowed if appointment is scheduled.")
+	for key, _ := range enrollmentInfo {
+		if strings.Contains(key, "slotId") {
+			return badReqResponse("Deleting a recipient is not allowed if appointment is scheduled.")
+		}
 	}
-	
+
 	if err := enrollment.DeleteRecipient(enrollmentInfo["osid"]); err != nil {
 		log.Error("Error deleting from registry : ", err)
 		return operations.NewDeleteRecipientInternalServerError()
@@ -389,8 +394,9 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 	return operations.NewDeleteRecipientOK()
 }
 
-func checkIfCancellationAllowed(enrollmentInfo map[string]string) string {
-	lastBookedSlotId := enrollmentInfo["slotId"]
+func checkIfCancellationAllowed(enrollmentInfo map[string]string, programId string, dose string) string {
+	slotKey := fmt.Sprintf("%s-%s-slotId", programId, dose)
+	lastBookedSlotId := enrollmentInfo[slotKey]
 	facilitySchedule := models2.ToFacilitySchedule(lastBookedSlotId)
 	remainingHoursForSchedule := facilitySchedule.Date.Sub(time.Now()).Hours()
 	if remainingHoursForSchedule <= 0 {

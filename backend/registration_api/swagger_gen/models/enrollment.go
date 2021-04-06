@@ -294,8 +294,11 @@ type EnrollmentAppointmentsItems0 struct {
 	// certified
 	Certified bool `json:"certified"`
 
+	// comorbidities
+	Comorbidities []string `json:"comorbidities"`
+
 	// dose
-	Dose string `json:"dose,omitempty"`
+	Dose string `json:"dose"`
 
 	// enrollment scope Id
 	EnrollmentScopeID string `json:"enrollmentScopeId"`
