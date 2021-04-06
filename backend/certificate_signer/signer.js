@@ -12,6 +12,7 @@ const {contexts} = require('security-context');
 const credentialsv1 = require('./credentials.json');
 const {vaccinationContext} = require("vaccination-context");
 const redis = require('./redis');
+const {DEFAULT_TOTAL_DOSES_COUNT} = require("./config/config");
 
 const UNSUCCESSFUL = "UNSUCCESSFUL";
 const SUCCESSFUL = "SUCCESSFUL";
@@ -135,7 +136,7 @@ function transformW3(cert, certificateId) {
       "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
       "dose": R.pathOr('', ['vaccination', 'dose'], cert),
       // TODO: get default count
-      "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
+      "totalDoses": R.pathOr(parseInt(DEFAULT_TOTAL_DOSES_COUNT), ['vaccination', 'totalDoses'], cert),
       "verifier": {
         // "id": "https://nha.gov.in/evidence/vaccinator/" + cert.vaccinator.id,
         "name": R.pathOr('', ['vaccinator', 'name'], cert),
