@@ -98,6 +98,44 @@ var statesEnabled = map[string]bool{
 	"lakshadweep":                 true,
 	"himachal":                    true,
 }
+var stateLanguageMapping = map[string]string{
+	"andaman and nicobar islands": "HIN",
+	"andhra pradesh":              "TEL",
+	"arunachal pradesh":           "HIN",
+	"assam":                       "ASM",
+	"bihar":                       "HIN",
+	"chandigarh":                  "PUN",
+	"chhattisgarh":                "HIN",
+	"dadra and nagar haveli":      "GUJ",
+	"daman and diu":               "GUJ",
+	"delhi":                       "HIN",
+	"goa":                         "KKN",
+	"gujarat":                     "GUJ",
+	"haryana":                     "HIN",
+	"himachal pradesh":            "HIN",
+	"jammu and kashmir":           "URD",
+	"jharkhand":                   "HIN",
+	"karnataka":                   "KND",
+	"kerala":                      "MAL",
+	"ladakh":                      "HIN",
+	"lakshadweep":                 "MAL",
+	"madhya pradesh":              "HIN",
+	"maharashtra":                 "MAR",
+	"manipur":                     "BNG",
+	"meghalaya":                   "HIN",
+	"mizoram":                     "HIN",
+	"nagaland":                    "HIN",
+	"odisha":                      "ORY",
+	"puducherry":                  "TAM",
+	"punjab":                      "PUN",
+	"rajasthan":                   "HIN",
+	"sikkim":                      "NEP",
+	"tamil nadu":                  "TAM",
+	"telangana":                   "TEL",
+	"uttar pradesh":               "HIN",
+	"uttarakhand":                 "HIN",
+	"west bengal":                 "BNG",
+}
 
 var ctx = context.Background()
 
@@ -214,7 +252,9 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
-
+	if len(language) == 0 {
+		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
+	}
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
@@ -235,7 +275,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	offsetX := 310.0
 	offsetY := 211.0
 	offsetNewX := 310.0
-	offsetNewY := 243.0
+	offsetNewY := 400.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplateV2(certificate)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
@@ -245,10 +285,12 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 		pdf.SetY(offsetY + float64(i)*24.7)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
+	j := 0
 	for i = rowSize; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY + float64(i)*26.5)
+		pdf.SetY(offsetNewY + float64(j)*27)
 		_ = pdf.Cell(nil, displayLabels[i])
+		j++
 	}
 	e := pasteQrCodeOnPage(certificateText, &pdf, 352, 582)
 	if e != nil {

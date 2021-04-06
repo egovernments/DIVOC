@@ -83,7 +83,7 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	var pollingType string
 
 	isPolling := false
-	stateName := certificate.getStateNameInLowerCaseLetter()
+	stateName := certificate.GetStateNameInLowerCaseLetter()
 	for _, state := range config.Config.PollingStates {
 		if state == stateName {
 			isPolling = true
@@ -102,7 +102,7 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	return fmt.Sprintf("config/cov19–%s-%s-%s.pdf", language, certType, pollingType)
 }
 
-func (certificate *Certificate) getStateNameInLowerCaseLetter() string {
+func (certificate *Certificate) GetStateNameInLowerCaseLetter() string {
 	stateName := ""
 	if len(certificate.Evidence) > 0 {
 		stateName = strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
