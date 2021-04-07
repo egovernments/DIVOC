@@ -453,7 +453,14 @@ const MemberCard = (props) => {
             <CustomAccordion>
                 <Card className="member-card">
                     <Card.Header className="member-card-header">
-                        <ContextAwareToggle eventKey={"" + 0} title={member.name}/>
+                        <ContextAwareToggle eventKey={"" + 0} title={member.name} onTitleClick={() => {
+                            history.push({
+                                pathname: `/member/${member.code}`,
+                                state: {
+                                    member
+                                }
+                            })
+                        }}/>
                     </Card.Header>
                     <Accordion.Collapse eventKey={"" + 0}>
                         <Card.Body className="member-card-body">
