@@ -96,7 +96,6 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     documentLoader: customLoader,
                     compactProof: false
                 });
-                alert(JSON.stringify(result));
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON)
                     if (revokedResponse.response.status === 404) {
@@ -136,7 +135,23 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 return e
             });
     }
+
+    function getCertificateStatusAsString(data) {
+        if (!data || !data["evidence"]) {
+            return ""
+        }
+
+        const dose = data["evidence"][0]["dose"]
+        const totalDoses = data["evidence"][0]["totalDoses"] || 2
+
+        if (dose === totalDoses) {
+            return "Final Certificate for COVID-19 Vaccination"
+        } else {
+            return "Provisional Certificate for COVID-19 Vaccination (1st Dose)"
+        }
+    }
     return (
+        data && Object.keys(data).length > 0 ?
         <div className="certificate-status-wrapper">
             <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
                  className="certificate-status-image"/>
@@ -145,14 +160,22 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     isValid ? "Certificate Successfully Verified" : "Certificate Invalid"
                 }
             </h3>
+            <br/>
+            {
+                isValid && <h5>
+                    {
+                        getCertificateStatusAsString(data)
+                    }
+                </h5>
+            }
             {
                 isValid && <table className="mt-3">
                     {
                         Object.keys(CertificateDetailsPaths).map((key, index) => {
                             const context = CertificateDetailsPaths[key];
                             return (
-                                <tr key={index}>
-                                    <td className="pr-3">{key}</td>
+                                <tr key={index} style={{fontSize:"smaller", textAlign: "left"}}>
+                                    <td className="pr-3" >{key}</td>
                                     <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
                                 </tr>
                             )
@@ -161,6 +184,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
                 </table>
             }
+            <br/>
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
             {/*<SmallInfoCards text={"Provide Feedback"}*/}
             {/*                onClick={() => {*/}
@@ -172,7 +196,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             {/*                    history.push("/learn")*/}
             {/*                }}*/}
             {/*                backgroundColor={"#EFF5FD"}/>*/}
-        </div>
+        </div> : <span>Processing...</span>
     )
 };
 
