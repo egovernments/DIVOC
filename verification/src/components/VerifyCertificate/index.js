@@ -42,7 +42,7 @@ export const VerifyCertificate = () => {
                         <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
                         <h3 className="text-center">Verify a vaccination certificate</h3>
                         <CustomButton className="green-btn" onClick={() => setShowScanner(true)}>
-                            <span>SCAN WITH QR</span>
+                            <span>Scan QR code</span>
                             <img className="ml-3" src={QRCodeImg} alt={""}/>
                         </CustomButton>
                         <Container className="mt-2 p-4">
