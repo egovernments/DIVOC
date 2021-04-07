@@ -122,6 +122,26 @@ paths:
       responses:
         '200':
           description: OK
+  /v1/certificate/revoked:
+    post:
+      tags:
+        - certificateRevoked
+      summary: Check if given certificate is revoked
+      operationId: certificateRevoked
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: certificate not found in revocation list
+        '400':
+          description: Invalid input
   /v1/bulkCertify:
     post:
       tags:
@@ -304,6 +324,33 @@ paths:
       responses:
         '200':
           description: OK
+  /v1/certificate:
+    put:
+      tags:
+        - certification
+      summary: Update existing certificate request
+      description: >-
+        Update existing certificate if all checks are passed
+      operationId: updateCertificate
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Update not allowed
+          schema:
+            $ref: '#/definitions/Error'
   /v2/certify:
     post:
       tags:
@@ -430,6 +477,8 @@ definitions:
       meta:
         type: object
         properties:
+          previousCertificateId:
+            type: string
           vaccinationApp:
             type: object
             properties:

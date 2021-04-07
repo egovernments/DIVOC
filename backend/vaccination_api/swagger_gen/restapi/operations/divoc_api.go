@@ -20,6 +20,7 @@ import (
 	"github.com/go-openapi/swag"
 
 	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
 	"github.com/divoc/api/swagger_gen/restapi/operations/configuration"
 	"github.com/divoc/api/swagger_gen/restapi/operations/identity"
@@ -64,6 +65,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.BulkCertify has not yet been implemented")
 		}),
+		CertificateRevokedCertificateRevokedHandler: certificate_revoked.CertificateRevokedHandlerFunc(func(params certificate_revoked.CertificateRevokedParams) middleware.Responder {
+			return middleware.NotImplemented("operation certificate_revoked.CertificateRevoked has not yet been implemented")
+		}),
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
 		}),
@@ -105,6 +109,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
+		}),
+		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
 		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
@@ -164,6 +171,8 @@ type DivocAPI struct {
 	IdentityPostV1IdentityVerifyHandler identity.PostV1IdentityVerifyHandler
 	// CertificationBulkCertifyHandler sets the operation handler for the bulk certify operation
 	CertificationBulkCertifyHandler certification.BulkCertifyHandler
+	// CertificateRevokedCertificateRevokedHandler sets the operation handler for the certificate revoked operation
+	CertificateRevokedCertificateRevokedHandler certificate_revoked.CertificateRevokedHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
 	// CertificationCertifyV2Handler sets the operation handler for the certify v2 operation
@@ -192,6 +201,8 @@ type DivocAPI struct {
 	SideEffectsGetSideEffectsMetadataHandler side_effects.GetSideEffectsMetadataHandler
 	// ConfigurationGetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
+	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
+	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -287,6 +298,9 @@ func (o *DivocAPI) Validate() error {
 	if o.CertificationBulkCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.BulkCertifyHandler")
 	}
+	if o.CertificateRevokedCertificateRevokedHandler == nil {
+		unregistered = append(unregistered, "certificate_revoked.CertificateRevokedHandler")
+	}
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
 	}
@@ -328,6 +342,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.ConfigurationGetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "configuration.GetVaccinatorsHandler")
+	}
+	if o.CertificationUpdateCertificateHandler == nil {
+		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
 	}
 
 	if len(unregistered) > 0 {
@@ -448,6 +465,10 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/v1/certificate/revoked"] = certificate_revoked.NewCertificateRevoked(o.context, o.CertificateRevokedCertificateRevokedHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/v1/certify"] = certification.NewCertify(o.context, o.CertificationCertifyHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -501,6 +522,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/v1/vaccinators"] = configuration.NewGetVaccinators(o.context, o.ConfigurationGetVaccinatorsHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v1/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

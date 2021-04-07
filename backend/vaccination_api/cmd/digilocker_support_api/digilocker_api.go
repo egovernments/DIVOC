@@ -7,11 +7,11 @@ import (
 	"encoding/hex"
 	"encoding/xml"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"net/http"
-	"sort"
 	"strings"
 	"time"
 )
@@ -326,7 +326,7 @@ func getCertificate(preEnrollmentCode string, dob string, mobile string) *Vaccin
 func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		certificateArr = sortCertificatesByCreateAt(certificateArr)
+		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
 		if len(certificateArr) > 0 {
 			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", certificateObj)
@@ -343,13 +343,3 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 	return nil
 }
 
-func sortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
-	sort.Slice(certificateArr, func(i, j int) bool {
-		certificateA := certificateArr[i].(map[string]interface{})
-		certificateB := certificateArr[j].(map[string]interface{})
-		certificateACreateAt := certificateA["_osCreatedAt"].(string)
-		certificateBCreateAt := certificateB["_osCreatedAt"].(string)
-		return certificateACreateAt < certificateBCreateAt
-	})
-	return certificateArr
-}

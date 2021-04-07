@@ -10,8 +10,6 @@ services:
       - "9300:9300"
   db:
     image: postgres
-      volumes:
-      - ./data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -22,8 +20,8 @@ services:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
-      - elastic_search_connection_url=es:9200
-        #  - search_provider=io.opensaber.registry.service.ElasticSearchService
+#      - elastic_search_connection_url=es:9200
+#      - search_provider=io.opensaber.registry.service.ElasticSearchService
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
     ports:
       - "8081:8081"

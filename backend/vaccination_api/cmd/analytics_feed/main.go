@@ -152,6 +152,13 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	_, err = connect.Exec(`
+ALTER TABLE certifiedv1 ADD COLUMN IF NOT EXISTS updatedCertificate UInt8, ADD COLUMN IF NOT EXISTS previousCertificateId String;
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
 	//	_, err = connect.Exec(`
 	//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
 	//`)
@@ -384,6 +391,11 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 	if certifiedMessage.Meta.VaccinationApp == nil {
 		certifiedMessage.Meta.VaccinationApp = &models2.CertificationRequestV2MetaVaccinationApp{}
 	}
+	updatedCertificate := 0
+	if certifiedMessage.Meta.PreviousCertificateID != "" {
+		updatedCertificate = 1
+	}
+
 	// push to click house - todo: batch it
 	var (
 		tx, _     = connect.Begin()
@@ -430,7 +442,9 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
   uploadTimestamp,
   verificationAttempts,
   verificationDurationInSeconds,
-  waitForVaccinationInMinutes) 
+  waitForVaccinationInMinutes,
+  updatedCertificate,
+  previousCertificateId) 
 	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
 	)
 
@@ -485,6 +499,9 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		certifiedMessage.Meta.VerificationAttempts,
 		certifiedMessage.Meta.VerificationDurationInSeconds,
 		certifiedMessage.Meta.WaitForVaccinationInMinutes,
+
+		updatedCertificate,
+		certifiedMessage.Meta.PreviousCertificateID,
 	); err != nil {
 		log.Fatal(err)
 	}

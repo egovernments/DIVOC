@@ -304,6 +304,9 @@ type CertificationRequestV2Meta struct {
 	// Enum: [G S V D A I]
 	PaymentType string `json:"paymentType,omitempty"`
 
+	// previous certificate Id
+	PreviousCertificateID string `json:"previousCertificateId,omitempty"`
+
 	// F for frontline officers, C for comorbidity category, R for regular others
 	// Enum: [F C R]
 	RegistrationCategory string `json:"registrationCategory,omitempty"`
