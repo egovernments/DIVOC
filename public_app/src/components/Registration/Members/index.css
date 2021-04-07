@@ -128,3 +128,19 @@
     justify-content: center;
     align-items: center;
 }
+
+.select-program-modal .shadow-sm {
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+.select-program-modal .shadow-sm .comorbidities-wrapper {
+    padding-top: 0 !important;
+}
+
+.select-program-modal .shadow-sm .comorbidities-list-wrapper {
+    min-height: 20vh;
+    max-height: 60vh;
+    max-width: 100%;
+    overflow: auto;
+}
