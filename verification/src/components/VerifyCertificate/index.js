@@ -61,10 +61,9 @@ export const VerifyCertificate = () => {
                                         <Col>
                                             <ul className="success-verify">
                                                 <li>Message “Certificate Successfully Verified”</li>
-                                                <li>Beneficiary Name</li>
+                                                <li>Name</li>
                                                 <li>Age</li>
                                                 <li>Gender</li>
-                                                <li>ID verified</li>
                                                 <li>Beneficiary Reference ID</li>
                                                 <li>Date of Dose</li>
                                                 <li>Certificate Issued: Provisional/Final</li>
