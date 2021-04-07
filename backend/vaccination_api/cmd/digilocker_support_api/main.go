@@ -170,7 +170,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		formatId(certificate.CredentialSubject.ID),
 		certificate.CredentialSubject.Uhid,
 		certificate.CredentialSubject.RefId,
-		certificate.Evidence[0].Vaccine,
+		strings.ToUpper(certificate.Evidence[0].Vaccine),
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		certificate.Evidence[0].Verifier.Name,
 		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
@@ -379,7 +379,7 @@ func formatId(identity string) string {
 	lastFragment := split[len(split)-1]
 	if strings.Contains(identity, "adhaar") {
 		if len(lastFragment) > 0 {
-			return "Aadhaar  # " + maskId(lastFragment)
+			return "Aadhaar # " + maskId(lastFragment)
 		} else {
 			return "Aadhaar"
 		}
