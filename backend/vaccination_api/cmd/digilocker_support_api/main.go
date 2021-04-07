@@ -157,7 +157,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 			certificate.CredentialSubject.RefId,
 			strings.ToUpper(certificate.Evidence[0].Vaccine),
 			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
-			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
+			certificate.GetNextDueDateInfo(),
 			certificate.Evidence[0].Verifier.Name,
 			concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
 				certificate.Evidence[0].Facility.Address.District),

@@ -8,6 +8,19 @@ import (
 	"time"
 )
 
+const layout = "02 Jan 2006"
+
+var vaccineEffectiveDaysInfo = map[string]map[string]int{
+	"covaxin": {
+		"from": 28,
+		"to":   42,
+	},
+	"covishield": {
+		"from": 28,
+		"to":   56,
+	},
+}
+
 type Certificate struct {
 	Context           []string `json:"@context"`
 	Type              []string `json:"type"`
@@ -82,14 +95,7 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	var certType string
 	var pollingType string
 
-	isPolling := false
-	stateName := certificate.GetStateNameInLowerCaseLetter()
-	for _, state := range config.Config.PollingStates {
-		if state == stateName {
-			isPolling = true
-		}
-	}
-	if isPolling {
+	if certificate.IsVaccinatedStatePollingOne() {
 		pollingType = "PS"
 	} else {
 		pollingType = "NPS"
@@ -102,10 +108,32 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	return fmt.Sprintf("config/cov19–%s-%s-%s.pdf", language, certType, pollingType)
 }
 
+func (certificate *Certificate) IsVaccinatedStatePollingOne() bool {
+	isPolling := false
+	stateName := certificate.GetStateNameInLowerCaseLetter()
+	for _, state := range config.PollingStates {
+		if state == stateName {
+			isPolling = true
+		}
+	}
+	return isPolling
+}
+
 func (certificate *Certificate) GetStateNameInLowerCaseLetter() string {
 	stateName := ""
 	if len(certificate.Evidence) > 0 {
 		stateName = strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
 	}
 	return stateName
+}
+
+func (certificate *Certificate) GetNextDueDateInfo() string {
+	if len(certificate.Evidence) > 0 {
+		evidence := certificate.Evidence[0]
+		vaccine := strings.ToLower(evidence.Vaccine)
+		fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["from"]) * 24)
+		toDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["to"]) * 24)
+		return "From " + fromDate.Format(layout) + " to " + toDate.Format(layout)
+	}
+	return ""
 }
