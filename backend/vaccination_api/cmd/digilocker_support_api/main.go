@@ -63,41 +63,6 @@ var (
 	})
 )
 
-var statesEnabled = map[string]bool{
-	"odisha":                      true,
-	"nagaland":                    true,
-	"bihar":                       true,
-	"karnataka":                   true,
-	"uttar pradesh":               true,
-	"chhattisgarh":                true,
-	"maharashtra":                 true,
-	"madhya pradesh":              true,
-	"himachal pradesh":            true,
-	"uttarakhand":                 true,
-	"jammu and kashmir":           true,
-	"goa":                         true,
-	"gujarat":                     true,
-	"rajasthan":                   true,
-	"delhi":                       true,
-	"telangana":                   true,
-	"andhra pradesh":              true,
-	"jharkhand":                   true,
-	"punjab":                      true,
-	"tripura":                     true,
-	"haryana":                     true,
-	"sikkim":                      true,
-	"mizoram":                     true,
-	"chandigarh":                  true,
-	"meghalaya":                   true,
-	"arunachal pradesh":           true,
-	"dadra and nagar haveli":      true,
-	"manipur":                     true,
-	"daman and diu":               true,
-	"ladakh":                      true,
-	"andaman and nicobar islands": true,
-	"lakshadweep":                 true,
-	"himachal":                    true,
-}
 var stateLanguageMapping = map[string]string{
 	"andaman and nicobar islands": "HIN",
 	"andhra pradesh":              "TEL",
@@ -238,13 +203,11 @@ func templateType(certificate models.Certificate) string {
 }
 
 func getCertificateVariant(certificate models.Certificate) string {
-	if len(certificate.Evidence) > 0 {
-		stateName := strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
-		if _, found := statesEnabled[stateName]; found {
-			return ""
-		}
+	if certificate.IsVaccinatedStatePollingOne() {
+		return "-plain"
+	} else {
+		return ""
 	}
-	return "-plain"
 }
 
 func getCertificateAsPdfV2(certificateText string, language string) ([]byte, error) {
@@ -300,7 +263,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	}
 
 	//pdf.Image("qr.png", 200, 50, nil)
-	pdf.WritePdf("new_certificate.pdf")
+	//pdf.WritePdf("new_certificate.pdf")
 	var b bytes.Buffer
 	_ = pdf.Write(&b)
 	return b.Bytes(), nil
