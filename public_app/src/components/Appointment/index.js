@@ -163,7 +163,7 @@ export const Appointment = (props) => {
             facilitySlotId: selectedAllotment.slotKey,
             programId: programId,
             // dose func is not yet configured
-            dose: "1"
+            dose: state.dose.toString()
         }, config)
             .then(res => {
                 history.push({

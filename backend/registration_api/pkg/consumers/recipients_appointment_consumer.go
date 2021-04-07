@@ -42,6 +42,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 			var appointmentAckMessage models2.AppointmentAck
 			if err = json.Unmarshal(msg.Value, &appointmentAckMessage); err != nil {
 				log.Info("Unable to serialize the ack message body", err)
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 
@@ -49,11 +50,13 @@ func StartRecipientsAppointmentBookingConsumer() {
 			enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
 			if !ok {
 				log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode)
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 			enrollmentStr, err := json.Marshal(enrollmentResp)
 			if err != nil {
 				log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 
@@ -63,11 +66,13 @@ func StartRecipientsAppointmentBookingConsumer() {
 			}
 			if err := json.Unmarshal(enrollmentStr, &enrollment); err != nil {
 				log.Errorf("Error parsing Enrollment to expected format. Enrollment [%s], error [%s]", enrollmentStr, err.Error())
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 
 			if err := findAndUpdateAppointment(&enrollment.Enrollment, appointmentAckMessage); err != nil {
 				log.Error(err.Error())
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 			if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
@@ -75,6 +80,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 				"appointments": enrollment.Appointments,
 			}); err != nil {
 				log.Error("Booking appointment failed ", err)
+				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 			notify(enrollment.Enrollment, appointmentAckMessage)

@@ -36,3 +36,12 @@
     font-size: 18px;
     font-weight: bold;
 }
+
+.disabled-outline-btn {
+    border: 2px solid #d3d3d3;
+    border-radius: 6px;
+    color: #d3d3d3;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: not-allowed;
+}

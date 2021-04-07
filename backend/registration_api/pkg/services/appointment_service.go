@@ -96,10 +96,9 @@ func MarkEnrollmentAsBooked(enrollmentCode string, slotId string, programID stri
 	slotKey := fmt.Sprintf("%s-%s-slotId", programID, dose)
 	updatedCountKey := fmt.Sprintf("%s-%s-updatedCount", programID, dose)
 	if success, err := SetHash(enrollmentCode, slotKey, slotId); err == nil && success {
-		if success, err := SetHash(enrollmentCode, updatedCountKey, slotId); err == nil {
-			log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
-			return success
-		}
+		_, _ = SetHash(enrollmentCode, updatedCountKey, "0")
+		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
+		return success
 	} else {
 		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
 	}

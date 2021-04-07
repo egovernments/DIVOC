@@ -85,4 +85,7 @@ var Config = struct {
 		DefaultLimit  int `default:"100"`
 		DefaultOffset int `default:"0"`
 	}
+	Auth struct {
+		RegistrationAPIPublicKey string `yaml:"registrationAPIPublickey" env:"REGISTRATION_API_PUBLIC_KEY"`
+	}
 }{}
