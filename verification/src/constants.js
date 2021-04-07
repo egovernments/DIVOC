@@ -34,19 +34,11 @@ export const CertificateDetailsPaths = {
         path: ["credentialSubject", "refId"],
         format: (data) => (data)
     },
-    "Date of Issue": {
+    "Date of Dose": {
         path: ["evidence", "0", "effectiveStart"],
         format: (data) => (formatDate(data))
     },
-    "Dose": {
-        path: ["evidence", "0", "dose"],
-        format: (data) => (data)
-    },
-    "Total Doses": {
-        path: ["evidence", "0", "totalDoses"],
-        format: (data) => (data)
-    },
-    "Vaccination Facility": {
+    "Vaccination at": {
         path: ["evidence", "0", "facility", "name"],
         format: (data) => (data)
     }
