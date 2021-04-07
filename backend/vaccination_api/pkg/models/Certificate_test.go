@@ -126,12 +126,12 @@ func TestCertificate_GetNextDueDateInfo(t *testing.T) {
 		{
 			"Derive next dose due date info for covaxin",
 			certificateWithPS,
-			"From 27 Apr 2021 to 11 May 2021",
+			"Between 27 Apr 2021 and 11 May 2021",
 		},
 		{
 			"Derive next dose due date info for Covishield",
 			covishieldCertificate,
-			"From 27 Apr 2021 to 25 May 2021",
+			"Between 27 Apr 2021 and 25 May 2021",
 		},
 	}
 	for _, tt := range tests {

@@ -133,7 +133,7 @@ func (certificate *Certificate) GetNextDueDateInfo() string {
 		vaccine := strings.ToLower(evidence.Vaccine)
 		fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["from"]) * 24)
 		toDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["to"]) * 24)
-		return "From " + fromDate.Format(layout) + " to " + toDate.Format(layout)
+		return "Between " + fromDate.Format(layout) + " and " + toDate.Format(layout)
 	}
 	return ""
 }
