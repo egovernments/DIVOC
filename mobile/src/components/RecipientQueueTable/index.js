@@ -20,30 +20,22 @@ export const RecipientQueueTable = () => {
     })
     const history = useHistory();
     return (
-        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)} onBack={() => history.push(config.urlPath)}>
+        <BaseFormCard title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_WITH_SIZE, "", {size: queueData.length})} onBack={() => history.push(config.urlPath)}>
             <Table responsive>
-                <thead>
-                <tr>
-                    <th>{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_NUMBER)}</th>
-                    <th>{getMessageComponent(LANGUAGE_KEYS.NAME)}</th>
-                    <th>{getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE_STATUS)}</th>
-                </tr>
-                </thead>
                 <tbody>
                 {
                     queueData.map((data, index) => (
                         <tr key={index} onClick={() => {
                             history.push(config.urlPath + `/confirm/vaccination/${data.enrollCode}/${CONSTANT.SELECT_VACCINATOR}`)
                         }}>
-                            <td>{index + 1}</td>
                             <td>
                                 <div className="d-flex flex-column">
                                     <span>{data.name}</span>
-                                    <span style={{fontSize: "12px"}}>{`${data.gender}, ${new Date().getFullYear() - data.yob} Years`}</span>
+                                    <span style={{fontSize: "12px"}}>{`${data.gender} ${new Date().getFullYear() - data.yob}`}</span>
                                 </div>
                             </td>
-                            <td>
-                                <img src={data.vaccinated ? VaccinationActiveImg : VaccinationInActiveImg} alt=""/>
+                            <td hidden={!data.appointments}>
+                                {/* TODO: Put doses circle here*/}
                             </td>
                         </tr>
                     ))
