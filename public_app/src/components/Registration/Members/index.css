@@ -31,6 +31,8 @@
 
 .main-container {
     background-color: #F9FAFA;
+    height: calc(100vh - 6rem);
+    overflow: auto;
 }
 
 .member-card {
@@ -76,6 +78,12 @@
     width: 70%;
 }
 
+.appointment-active-circle {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 100px;
+}
+
 .appointment-inactive-circle {
     background-color: #F8F8F8;
     border: 1px solid #E6E6E6;
@@ -96,9 +104,9 @@
 .appointment-line {
     position: absolute;
     border: 2px solid #E6E6E6;
-    width: 90%;
-    top: 28%;
-    left: 2%;
+    width: 95%;
+    top: 1.5rem;
+    right: 5%;
 }
 
 .appointment-link-btn {
@@ -107,4 +115,16 @@
     display: flex !important;
     font-size: 14px !important;
     font-weight: normal !important;
+}
+
+.appointment-add-program {
+    border: 2px solid #5C9EF8;
+    border-radius: 261px;
+    font-weight: bold;
+    font-size: 2rem;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
