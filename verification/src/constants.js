@@ -14,7 +14,7 @@ export function formatDate(givenDate) {
 }
 
 export const CertificateDetailsPaths = {
-    "Name": {
+    "Beneficiary Name": {
         path: ["credentialSubject", "name"],
         format: (data) => (data)
     },
@@ -26,31 +26,23 @@ export const CertificateDetailsPaths = {
         path: ["credentialSubject", "gender"],
         format: (data) => (data)
     },
-    "Certificate ID": {
+    "Beneficiary Reference ID": {
         path: ["evidence", "0", "certificateId"],
         format: (data) => (data)
     },
-    "Beneficiary ID": {
+    "ID Verified": {
         path: ["credentialSubject", "refId"],
         format: (data) => (data)
     },
-    "Date of Issue": {
+    "Date of Dose": {
         path: ["evidence", "0", "effectiveStart"],
         format: (data) => (formatDate(data))
     },
-    "Valid Until": {
-        path: ["evidence", "0", "effectiveUntil"],
-        format: (data) => (formatDate(data))
-    },
-    "Dose": {
+    "Certificate Issued: Provisional/Final": {
         path: ["evidence", "0", "dose"],
         format: (data) => (data)
     },
-    "Total Doses": {
-        path: ["evidence", "0", "totalDoses"],
-        format: (data) => (data)
-    },
-    "Vaccination Facility": {
+    "Vaccination at": {
         path: ["evidence", "0", "facility", "name"],
         format: (data) => (data)
     }
