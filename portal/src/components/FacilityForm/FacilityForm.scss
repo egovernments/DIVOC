@@ -6,6 +6,7 @@
         opacity: 1;
         margin-top: 10px;
         padding-left: 15px;
+        padding-bottom: 15px;
     }
 
     #facility-details {
@@ -28,7 +29,6 @@
     
     input:disabled {
         border: none;
-        background-color: white;
     }
     
     input:enabled {
@@ -46,7 +46,7 @@
     
     .time-input {
         display: inline-block;
-        max-width: 100px;
+        max-width: 130px;
         margin-right: 5px;
     }
     

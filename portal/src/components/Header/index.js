@@ -9,16 +9,18 @@ import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
 import config from "../../config";
 import {useSelector} from "react-redux";
-import {NavLink} from "react-router-dom";
+import {NavLink, useHistory} from "react-router-dom";
 
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
+    const history = useHistory();
     const logo = useSelector(state => state.flagr.appConfig.applicationLogo);
     const facility = useSelector(state => state.facility);
     const isFacilityUser = () => {
         return keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) ||
             keycloak.hasResourceRole(CONSTANTS.FACILITY_PRINT_STAFF, CONSTANTS.PORTAL_CLIENT)
     };
+    const userMobileNumber = keycloak.idTokenParsed?.preferred_username;
 
     function getFacilityAddress() {
         if ("address" in facility && facility.address) {
@@ -26,6 +28,16 @@ export const Header = (props) => {
         } else {
             return ""
         }
+    }
+
+    function getRoleAsString() {
+        if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT))
+            return "(Facility Admin)"
+        if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT))
+            return "(Admin)"
+        if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT))
+            return "(Controller)"
+        return ""
     }
 
     return (
@@ -42,24 +54,36 @@ export const Header = (props) => {
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
                 <Nav className="align-items-center">
                     {
-                        isFacilityUser() && facility && <div className="d-flex align-items-center" style={{fontSize: "14px"}}>
-                            <img src={ProfileImg}/>
-                            <div className="d-flex flex-column ml-2 mr-2">
-                                <b>{facility.facilityName}</b>
-                                <span>{getFacilityAddress()}</span>
-                            </div>
+                        <div className="d-flex align-items-center" style={{fontSize: "14px"}}>
+                            <NavDropdown title={userMobileNumber + " " + getRoleAsString()} className="d-flex flex-column ml-2 mr-2">
+                                { isFacilityUser() && facility &&
+                                    <div>
+                                        <NavDropdown.Item onClick={() => history.push(config.urlPath+"/facility_info")}>
+                                            <b style={{fontSize:"small"}}>Facility Profile</b>
+                                        </NavDropdown.Item>
+                                        <NavDropdown.Divider />
+                                    </div>
+                                }
+                                {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
+                                <><NavDropdown.Item href="/analytics"><b style={{fontSize:"small"}}>Analytics</b></NavDropdown.Item><NavDropdown.Divider /></>}
+                                {keycloak.authenticated && <NavDropdown.Item onClick={() => {
+                                    keycloak.logout({redirectUri: window.location.origin + config.urlPath});
+                                }}><b style={{fontSize:"small"}}>Logout</b></NavDropdown.Item>}
+                            </NavDropdown>
                         </div>
                     }
                     {
-                        isFacilityUser() && facility && <NavLink to={"/portal/facility_info"} >PROFILE</NavLink>
+                        // isFacilityUser() && facility && <NavLink to={"/portal/facility_info"} >PROFILE</NavLink>
                     }
                     {/*{!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}*/}
                     {/*<Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>*/}
-                    {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
-                    < Nav.Link href="/analytics">ANALYTICS</Nav.Link>}
-                    {keycloak.authenticated && <Nav.Link onClick={() => {
-                        keycloak.logout({redirectUri: window.location.origin + config.urlPath});
-                    }}>LOGOUT</Nav.Link>}
+
+                    {/*{keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&*/}
+                    {/*< Nav.Link href="/analytics">ANALYTICS</Nav.Link>}*/}
+                    {/*{keycloak.authenticated && <Nav.Link onClick={() => {*/}
+                    {/*    keycloak.logout({redirectUri: window.location.origin + config.urlPath});*/}
+                    {/*}}>LOGOUT</Nav.Link>}*/}
+
                     {/*{!keycloak.authenticated &&*/}
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
