@@ -16,7 +16,7 @@ import {pathOr} from "ramda";
 import appConfig from "../../../config.json";
 import {EligibilityWarning} from "../../EligibilityWarning";
 import {ContextAwareToggle, CustomAccordion} from "../../CustomAccordion";
-import {SelectComorbidity, SelectProgram} from "../AddMember";
+import {ProgramCard} from "../AddMember";
 import {ordinal_suffix_of} from "../../../utils/dateUtils";
 
 const DELETE_MEMBER = "DELETE_MEMBER";
@@ -275,7 +275,6 @@ export const Members = () => {
                                             setShowProgramModal(true)
                                         }
                                     }
-
                                 />
                             })
 
@@ -293,7 +292,6 @@ export const Members = () => {
                     member={members[selectedMemberIndex]}
                     fetchRecipients={fetchRecipients}
                     setIsLoading={setIsLoading}
-                    programEligibility={programEligibility}
                 />}
                 {selectedMemberIndex > -1 && members.length > 0 && showModal && <Modal show={showModal} onHide={() => {
                     setShowModal(false)
@@ -378,15 +376,6 @@ const MemberCard = (props) => {
 
     function getAppointmentDetails() {
         let appointments = {};
-        member.appointments.sort((a, b) => {
-            if (a.programId < b.programId) {
-                return -1;
-            }
-            if (a.programId > b.programId) {
-                return 1;
-            }
-            return 0;
-        })
         member.appointments.forEach((appointment, index) => {
             if (appointment.programId !== "") {
                 if (appointment.programId in appointments) {
@@ -502,15 +491,11 @@ const AppointmentTimeline = ({
             </div>}
             {!certified && <div className="d-flex flex-column" style={{zIndex: 1}}>
                 {
-                    isAppointmentScheduled ? <img src={CheckImg} className="appointment-active-circle"/> :
-                        <span className="appointment-inactive-circle"/>
+                    isAppointmentScheduled ? <img src={CheckImg} className="appointment-active-circle"/> : <span className="appointment-inactive-circle"/>
                 }
-                <span
-                    className={`${isAppointmentScheduled ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Scheduled ({ordinal_suffix_of(dose)} Dose)</span>
-                {isAppointmentScheduled &&
-                <span className="appointment-active-title">{formatDate(appointmentDate)} {appointmentSlot}</span>}
-                {isAppointmentScheduled && <span
-                    className="appointment-active-title">{facilityDetails.facilityName}, {facilityDetails.district}, {facilityDetails.state}, {facilityDetails.pincode}</span>}
+                <span className={`${isAppointmentScheduled ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Scheduled ({ordinal_suffix_of(dose)} Dose)</span>
+                {isAppointmentScheduled && <span className="appointment-active-title">{formatDate(appointmentDate)} {appointmentSlot}</span>}
+                {isAppointmentScheduled && <span className="appointment-active-title">{facilityDetails.facilityName}, {facilityDetails.district}, {facilityDetails.state}, {facilityDetails.pincode}</span>}
                 {showBookAppointment &&
                 <CustomButton isLink onClick={onBookAppointment} className="appointment-link-btn">Book
                     Appointment</CustomButton>}
@@ -522,16 +507,14 @@ const AppointmentTimeline = ({
             </div>}
             <div className="d-flex flex-column" style={{zIndex: 1}}>
                 {
-                    certified ? <img src={CheckImg} className="appointment-active-circle"/> :
-                        <span className="appointment-inactive-circle"/>
+                    certified ? <img src={CheckImg} className="appointment-active-circle"/> : <span className="appointment-inactive-circle"/>
                 }
-                <span
-                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated</span>
+                <span className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated</span>
                 {
                     certified && <>
-                        <span className="appointment-active-title">{formatDate(registeredDate)}</span>
-                        <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
-                            Certificate</CustomButton>
+                    <span className="appointment-active-title">{formatDate(registeredDate)}</span>
+                    <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
+                        Certificate</CustomButton>
                     </>
                 }
             </div>
@@ -539,27 +522,17 @@ const AppointmentTimeline = ({
     )
 }
 
-const RegisterProgram = ({showModal, onHideModal, member, programs, fetchRecipients, setIsLoading, programEligibility}) => {
-    const [currentView, setCurrentView] = useState(0);
-    const [formData, setFormData] = useState({
-        programId: "",
-        programName: "",
-        yob: "" + member.yob,
-        choice: "yes",
-        comorbidities: []
-
-    });
-
+const RegisterProgram = ({showModal, onHideModal, member, programs, fetchRecipients, setIsLoading}) => {
+    const [selectedProgramId, setSelectedProgramId] = useState("");
     function registerProgram() {
-        setIsLoading(true);
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"Authorization": token, "Content-Type": "application/json"}
         };
         let data = {
-            comorbidities: formData.comorbidities
+            comorbidities: []
         }
-        axios.post(`/divoc/api/citizen/recipient/${member.osid}/program/${formData.programId}`, data, config)
+        axios.post(`/divoc/api/citizen/recipient/${member.osid}/program/${selectedProgramId}`, data, config)
             .then(res => {
                 setIsLoading(true);
                 setTimeout(() => {
@@ -572,53 +545,46 @@ const RegisterProgram = ({showModal, onHideModal, member, programs, fetchRecipie
                 onHideModal()
             });
     }
-
-    function setValue(evt) {
-        setFormData((fd) => {
-            return {
-                ...fd,
-                [evt.target.name]: evt.target.value
-            }
-        })
-    }
-
     let registeredProgramIds = [];
     member.appointments.forEach(appointment => {
         if (!registeredProgramIds.includes(appointment.programId)) {
             registeredProgramIds.push(appointment.programId)
         }
     });
-    let programAvailable = programs.filter(program => !registeredProgramIds.includes(program.osid));
+    let programAvailable = programs.filter(program => !registeredProgramIds.includes(program.osid))
     return (
-        <Modal size={"xl"} show={showModal} onHide={onHideModal} centered backdrop="static" keyboard={false}
-               className="select-program-modal">
-            <div className="position-absolute" style={{right: 20, top: 20}}>
-                <img src={CloseImg} className="cursor-pointer" alt={""}
-                     onClick={onHideModal}/>
+        <Modal size={"xl"} show={showModal} onHide={onHideModal} centered backdrop="static" keyboard={false}>
+            <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
+                <div className="d-flex justify-content-between align-items-center">
+                    <div/>
+                    <h3>Please select vaccination program</h3>
+                    <img src={CloseImg} className="cursor-pointer" alt={""}
+                         onClick={onHideModal}/>
+                </div>
+                <div className="d-flex flex-wrap justify-content-center">
+                    {
+                        programAvailable.map(program => (
+                            <ProgramCard
+                                program={program}
+                                selectedProgramId={selectedProgramId}
+                                onProgramSelect={() => {
+                                    setSelectedProgramId(program.osid)
+                                }}
+                            />
+                        ))
+                    }
+
+                </div>
+                <div className="d-flex justify-content-center">
+                    {
+                        <CustomButton
+                            className={`${selectedProgramId === "" ? "disabled-outline-btn" : "blue-outline-btn "}`}
+                            onClick={registerProgram}>
+                            <span>Register</span>
+                        </CustomButton>
+                    }
+                </div>
             </div>
-            {currentView === 0 && <SelectProgram navigation={{
-                previous: onHideModal,
-                next: () => {
-                    if (formData.programId !== "") {
-                        setCurrentView(1)
-                    }
-                }
-            }} formData={formData} setValue={setValue} programs={programAvailable} showBack={false}/>}
-            {currentView === 1 &&
-            <SelectComorbidity
-                navigation={{
-                    previous: () => {
-                        setCurrentView(0)
-                    }, next: () => {
-                        registerProgram()
-                    }
-                }}
-                formData={formData}
-                setValue={setValue}
-                programs={programs}
-                hideYOB={true}
-            />
-            }
         </Modal>
     )
 }
