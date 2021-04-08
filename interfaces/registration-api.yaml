@@ -164,7 +164,7 @@ paths:
         '401':
           description: Unauthorized
     post:
-      summary: register recipient to program
+      summary: register recipient to a program
       operationId: registerRecipientToProgram
       security:
         - Bearer: [ ]

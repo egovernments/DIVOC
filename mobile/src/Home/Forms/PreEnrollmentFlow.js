@@ -47,7 +47,7 @@ function PreEnrollmentRouteCheck({pageName}) {
             }
             break;
         case FORM_WALK_IN_VERIFY_FORM:
-            return <PatientInfo/>
+            return <PatientInfo/>;
         case FORM_WALK_IN_ENROLL_PAYMENTS : {
             return <BeneficiaryVerifyPayment/>
         }

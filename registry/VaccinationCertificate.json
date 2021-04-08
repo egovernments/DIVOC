@@ -50,9 +50,6 @@
         "certificate" : {
           "type": "string"
         },
-        "programId" : {
-          "type": "string"
-        },
         "meta": {
           "type": "object"
         }

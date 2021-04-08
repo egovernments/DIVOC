@@ -328,7 +328,19 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
         <CardGroup className="mt-5">
           {
             programs.map(p =>
-              <ProgramCard program={p} selectedProgramId={formData.programId} onProgramSelect={onProgramSelect}/>
+              <div className="p-2">
+                <a key={p.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(p.osid, p.name)}>
+                  <Card border={p.osid === formData.programId ? "success" : "light"} style={{width: '15rem'}}
+                        className="text-center h-100">
+                    {p.osid === formData.programId && <img src={SelectedLogo} className="selected-program-img"/>}
+                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4"
+                              style={{maxHeight: '9rem', height: '9rem'}}/>
+                    <Card.Body>
+                      <Card.Title>{p.name}</Card.Title>
+                    </Card.Body>
+                  </Card>
+                </a>
+              </div>
             )
           }
         </CardGroup>
@@ -341,22 +353,4 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
       </div>
     </Container>
   )
-}
-
-export const ProgramCard = ({program, selectedProgramId, onProgramSelect}) => {
-    return (
-        <div className="p-2">
-            <a key={program.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(program.osid, program.name)}>
-                <Card border={program.osid === selectedProgramId ? "success" : "light"} style={{width: '15rem'}}
-                      className="text-center h-100">
-                    {program.osid === selectedProgramId && <img src={SelectedLogo} className="selected-program-img"/>}
-                    <Card.Img variant="top" src={program.logoURL ? program.logoURL : DefaultProgramLogo} className="p-4"
-                              style={{maxHeight: '9rem', height: '9rem'}}/>
-                    <Card.Body>
-                        <Card.Title>{program.name}</Card.Title>
-                    </Card.Body>
-                </Card>
-            </a>
-        </div>
-    )
 }

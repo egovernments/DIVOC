@@ -61,16 +61,10 @@ func StartCertifiedConsumer() {
 					consumer.CommitMessage(msg)
 					continue
 				}
-				programId, ok := message["programId"].(string)
-				if !ok {
-					logrus.Error("programId not found to mark the user certified %v", message)
-					consumer.CommitMessage(msg)
-					continue
-				}
 				var certificateMsg map[string]interface{}
 				if err := json.Unmarshal([]byte(certificateStr), &certificateMsg); err == nil {
-					if dose, totalDoses, vaccine, err := getVaccineDetails(certificateMsg); err == nil {
-						services.MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name, dose, certificateId, vaccine, programId, totalDoses)
+					if dose, vaccine, err := getVaccineDetails(certificateMsg); err == nil {
+						services.MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name, dose, certificateId, vaccine)
 					}
 				}
 
@@ -84,21 +78,17 @@ func StartCertifiedConsumer() {
 	}()
 }
 
-func getVaccineDetails(certificateMsg map[string]interface{}) (float64, float64, string, error) {
+func getVaccineDetails(certificateMsg map[string]interface{}) (float64, string, error) {
 	if evidence, ok := certificateMsg["evidence"].([]interface{})[0].(map[string]interface{}); ok {
 		var dose = -1.0
-		var totalDoses = -1.0
 		var vaccine = ""
 		if doseFromResponse, ok := evidence["dose"].(float64); ok {
 			dose = doseFromResponse
 		}
-		if totalDosesFromResponse, ok := evidence["totalDoses"].(float64); ok {
-			totalDoses = totalDosesFromResponse
-		}
 		if vaccineFromMessage, ok := evidence["vaccine"].(string); ok {
 			vaccine = vaccineFromMessage
 		}
-		return dose, totalDoses, vaccine, nil
+		return dose, vaccine, nil
 	}
-	return -1, 0, "", errors.New("dose not found")
+	return -1, "", errors.New("dose not found")
 }

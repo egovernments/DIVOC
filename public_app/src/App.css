@@ -52,7 +52,3 @@ label.custom-verify-text-label {
 label.required:after {
   content: " *";
 }
-
-.cursor-notallowed {
-  cursor: not-allowed !important;
-}

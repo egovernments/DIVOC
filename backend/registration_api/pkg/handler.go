@@ -396,7 +396,6 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 
 func checkIfCancellationAllowed(enrollmentInfo map[string]string, programId string, dose string) string {
 	slotKey := fmt.Sprintf("%s-%s-slotId", programId, dose)
-	updatedCountKey := fmt.Sprintf("%s-%s-updatedCount", programId, dose)
 	lastBookedSlotId := enrollmentInfo[slotKey]
 	facilitySchedule := models2.ToFacilitySchedule(lastBookedSlotId)
 	remainingHoursForSchedule := facilitySchedule.Date.Sub(time.Now()).Hours()
@@ -406,7 +405,7 @@ func checkIfCancellationAllowed(enrollmentInfo map[string]string, programId stri
 	if remainingHoursForSchedule <= float64(config.Config.MinCancellationHours) {
 		return fmt.Sprintf("Cancellation within %d hours of appointment is not allowed", config.Config.MinCancellationHours)
 	}
-	updatedCount, _ := strconv.Atoi(enrollmentInfo[updatedCountKey])
+	updatedCount, _ := strconv.Atoi(enrollmentInfo["updatedCount"])
 	if updatedCount >= config.Config.MaxAppointmentUpdatesAllowed {
 		return fmt.Sprintf("You have reached the maximum number of times to update appointment")
 	}

@@ -35,7 +35,7 @@ function App() {
             <div className={""}>
                 <Router>
                     <Header/>
-                    <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
+                    <div style={{paddingBottom: "6rem", paddingTop: "3rem"}}>
                         <Switch>
                             <Route exact path={"/"} component={Home}/>
                             <Route exact path={config.urlPath + "/login"} component={Login}/>

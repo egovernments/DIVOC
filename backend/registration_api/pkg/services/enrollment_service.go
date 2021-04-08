@@ -25,7 +25,7 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 
 const EnrollmentEntity = "Enrollment"
 
-func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64) {
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string) {
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": preEnrollmentCode,
@@ -46,19 +46,14 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
 					for _, appointmentObj := range appointments {
 						appointment := appointmentObj.(map[string]interface{})
-						appointmentProgramId := appointment["programId"].(string)
 						appointmentDose := appointment["dose"].(string)
 						appointmentCertified := appointment["certified"].(bool)
-						if appointmentProgramId == programId && appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
+						if appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
 							appointment["certified"] = true
 							appointment["certificateId"] = certificateId
 							appointment["vaccine"] = vaccine
 							break
 						}
-					}
-					if dose < totalDoses {
-						log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
-						enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
 					}
 					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
 					if err == nil {
@@ -75,19 +70,6 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 	} else {
 		log.Error("Failed querying enrollments registry", filter, err)
 	}
-}
-
-func registerToNextDose(programId string, dose float64) map[string]interface{} {
-	newAppointment := map[string]interface{}{}
-	newAppointment["programId"] = programId
-	newAppointment["certified"] = false
-	newAppointment["certificateId"] = ""
-	newAppointment["vaccine"] = ""
-	newAppointment["enrollmentScopeId"] = ""
-	newAppointment["appointmentDate"] = "0001-01-01"
-	newAppointment["appointmentSlot"] = ""
-	newAppointment["dose"] = dose + 1
-	return newAppointment
 }
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
@@ -379,6 +361,7 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
 		"phone": enrollment.Phone,
+		"updatedCount": 0, //to restrict multiple updates
 		"osid":  osid,
 	}
 	_, err := SetHMSet(enrollment.Code, data)
