@@ -5,6 +5,7 @@ import (
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
+	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
@@ -39,6 +40,7 @@ func InitializeKafka() {
 		panic(err)
 	}
 	StartEnrollmentACKConsumer()
+	startCertificateRevocationConsumer(servers)
 	log.Infof("Connected to kafka on %s", servers)
 
 	go func() {
@@ -195,4 +197,48 @@ func PublishReportedSideEffects(event models.ReportedSideEffectsEvent) {
 		reportedSideEffects <- messageJson
 	}
 	log.Infof("Successfully published reported side Effects")
+}
+
+func startCertificateRevocationConsumer(servers string) {
+	go func() {
+		consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+			"bootstrap.servers":  servers,
+			"group.id":           "certificate_revocation",
+			"auto.offset.reset":  "earliest",
+			"enable.auto.commit": "false",
+		})
+		if err != nil {
+			panic(err)
+		}
+
+		consumer.SubscribeTopics([]string{"certified"}, nil)
+
+		for {
+			msg, err := consumer.ReadMessage(-1)
+			if err == nil {
+				var message models.CertifiedMessage
+				if err := json.Unmarshal(msg.Value, &message); err == nil {
+					// check the status
+					// update that status to certifyErrorRows db
+					if message.Meta.PreviousCertificateID != "" {
+						log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
+						revokedCertificate := map[string]interface{}{
+							"preEnrollmentCode":     message.PreEnrollmentCode,
+							"certificateId":         message.CertificateId,
+							"dose":                  message.Dose,
+							"previousCertificateId": message.Meta.PreviousCertificateID,
+						}
+						_, err := services.CreateNewRegistry(revokedCertificate, "RevokedCertificate")
+						if err != nil {
+							log.Error("Failed saving revoked certificate %+v", err)
+						}
+					}
+				}
+				consumer.CommitMessage(msg)
+			} else {
+				// The client will automatically try to recover from all errors.
+				log.Infof("Consumer error: %v \n", err)
+			}
+		}
+	}()
 }

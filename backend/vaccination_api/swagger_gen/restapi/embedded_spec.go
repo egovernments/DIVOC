@@ -117,6 +117,77 @@ func init() {
         }
       }
     },
+    "/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/certificate/revoked": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certificateRevoked"
+        ],
+        "summary": "Check if given certificate is revoked",
+        "operationId": "certificateRevoked",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found in revocation list"
+          }
+        }
+      }
+    },
     "/certificates": {
       "get": {
         "security": [
@@ -1017,6 +1088,77 @@ func init() {
         }
       }
     },
+    "/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificate",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/certificate/revoked": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certificateRevoked"
+        ],
+        "summary": "Check if given certificate is revoked",
+        "operationId": "certificateRevoked",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found in revocation list"
+          }
+        }
+      }
+    },
     "/certificates": {
       "get": {
         "security": [
@@ -1867,6 +2009,9 @@ func init() {
           "type": "string",
           "x-omitempty": false
         },
+        "certificateId": {
+          "type": "string"
+        },
         "certified": {
           "type": "boolean",
           "x-omitempty": false
@@ -1882,6 +2027,9 @@ func init() {
           "type": "string"
         },
         "programId": {
+          "type": "string"
+        },
+        "vaccine": {
           "type": "string"
         }
       }
