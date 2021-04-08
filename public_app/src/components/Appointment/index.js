@@ -31,6 +31,7 @@ export const Appointment = (props) => {
     const [selectedAllotment, setSelectedAllotment] = useState({});
     const [facilitySlots, setFacilitySlots] = useState({});
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
+    const [searchLabel, setSearchLabel] = useState("");
 
     function triggerSearchFacilityAPI() {
         if (searchText && searchText.length <= 3) {
@@ -57,6 +58,10 @@ export const Appointment = (props) => {
                         }
                     });
                     setFacilities(facilities.filter(d => d.osid in schedule));
+
+                    let s = facilities.filter(d => d.osid in schedule).length > 0 ? "Facilities' availability for next few days" :
+                        "No nearby facilities with appointments / walk-ins found";
+                    setSearchLabel(s)
                     setFacilitiesSchedule(schedule);
                     setIsLoading(false);
                 });
@@ -178,8 +183,6 @@ export const Appointment = (props) => {
             });
     }
 
-    const searchLabel = facilities.length > 0 ?<h4>Facilities' availability for next few days</h4> :
-        <h4>No nearby facilities with appointments / walk-ins found</h4>;
     return (
         <div className="appointment-container">
             {isLoading && <Loader/>}
@@ -199,7 +202,9 @@ export const Appointment = (props) => {
 
                 </Row>
                 <br/>
-                {searchLabel}
+                <h4>
+                    {searchLabel}
+                </h4>
                 <Row className="facility-list-wrapper">
                     <Col lg={6} className="facility-list">
                         {
