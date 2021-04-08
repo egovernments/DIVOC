@@ -86,7 +86,7 @@ func registerToNextDose(programId string, dose float64) map[string]interface{} {
 	newAppointment["enrollmentScopeId"] = ""
 	newAppointment["appointmentDate"] = "0001-01-01"
 	newAppointment["appointmentSlot"] = ""
-	newAppointment["dose"] = dose + 1
+	newAppointment["dose"] = utils.ToString(dose + 1)
 	return newAppointment
 }
 
