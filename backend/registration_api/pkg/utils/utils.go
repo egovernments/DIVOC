@@ -57,14 +57,16 @@ func SendOTP(prefix string, phone string, otp string) (*sns.PublishOutput, error
 	return resp, err
 }
 
-func ToMap(obj interface{}) map[string]interface{}{
-	if bytes, err := json.Marshal(obj); err == nil {
-		var resp map[string]interface{}
-		if err := json.Unmarshal(bytes, &resp); err == nil {
-			return resp
-		}
+func ToMap(obj interface{}) (map[string]interface{},error) {
+	bytes, err := json.Marshal(obj)
+	if err != nil {
+		return nil, err
 	}
-	return nil
+	var resp map[string]interface{}
+	if err := json.Unmarshal(bytes, &resp); err != nil {
+		return nil, err
+	}
+	return resp, nil
 }
 
 func GetTomorrowStart() time.Time {

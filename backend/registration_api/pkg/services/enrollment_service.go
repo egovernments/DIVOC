@@ -91,9 +91,9 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 	if dupEnrollment != nil {
 		enrollmentPayload.OverrideEnrollmentCode(dupEnrollment.Duplicate.Code)
 		duplicateErr := fmt.Errorf("enrollment with same %s already exists", dupEnrollment.Criteria)
-		if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypePREENRL {
-			log.Error("Duplicates Found : ", duplicateErr)
-			return duplicateErr
+		log.Error("Duplicates Found : ", duplicateErr)
+		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+			return updateEnrollmentWithWalkInInfo(*dupEnrollment.Duplicate, *enrollmentPayload)
 		}
 		if shouldAutoBookAppointment(enrollmentPayload) {
 			return BookAppointment(dupEnrollment.Duplicate.Phone, dupEnrollment.Duplicate.Code, enrollmentPayload.Appointments[0])
@@ -133,6 +133,49 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 	cacheEnrollmentInfo(enrollmentPayload.Enrollment, result.(string))
 	if shouldAutoBookAppointment(enrollmentPayload) {
 		return BookAppointment(enrollmentPayload.Phone, enrollmentPayload.Code, enrollmentPayload.Appointments[0])
+	}
+	return nil
+}
+
+func updateEnrollmentWithWalkInInfo(enrollment enrollment, walkInfo EnrollmentPayload) error {
+	if len(walkInfo.Appointments) != 1 {
+		return fmt.Errorf("payload has more than one or no appointment info")
+	}
+	if walkInfo.Address == nil {
+		return fmt.Errorf("payload has no address details")
+	}
+	log.Infof("Updating Address, Booking Info & comorbidities for the enrollment %s from walk-in payload", enrollment.Code)
+	appointmentWalkInfo := walkInfo.Appointments[0]
+	existingAppointment := func() *models.EnrollmentAppointmentsItems0{
+		for _ , a := range enrollment.Appointments {
+			if a.ProgramID == appointmentWalkInfo.ProgramID && a.Dose == appointmentWalkInfo.Dose && !a.Certified {
+				log.Info("Enrollee has already booked an appointment. Overriding it")
+				return a
+			}
+		}
+		log.Info("Enrolle did not book an appointment. Adding it")
+		return nil
+	}()
+	if existingAppointment != nil {
+		existingAppointment.EnrollmentScopeID = appointmentWalkInfo.EnrollmentScopeID
+		existingAppointment.AppointmentDate = appointmentWalkInfo.AppointmentDate
+		existingAppointment.Certified = appointmentWalkInfo.Certified
+		existingAppointment.AppointmentSlot = appointmentWalkInfo.AppointmentSlot
+	} else {
+		enrollment.Appointments = append(enrollment.Appointments, appointmentWalkInfo)
+	}
+
+	enrollment.Address.Address = *walkInfo.Address
+	enrollment.Comorbidities = walkInfo.Comorbidities
+
+	enrollmentJSON, err := utils.ToMap(enrollment)
+	if err != nil {
+		log.Error("Error converting enrollment to map ", err)
+		return err
+	}
+	if _, err := kernelService.UpdateRegistry("Enrollment", enrollmentJSON); err != nil {
+		log.Error("Error updating registry : ", err)
+		return err
 	}
 	return nil
 }
@@ -347,4 +390,18 @@ type DuplicateEnrollment struct {
 type enrollment struct {
 	Osid string `json:"osid"`
 	models.Enrollment
+	Address	*struct {
+		Osid	string	`json:"osid"`
+		models.Address
+	}	`json:"address"`
+}
+
+func DRefAppointments(ptrSlice []*models.EnrollmentAppointmentsItems0) []models.EnrollmentAppointmentsItems0 {
+	r := make([]models.EnrollmentAppointmentsItems0, 0, len(ptrSlice))
+	for _, a := range ptrSlice {
+		if a != nil {
+			r = append(r, *a)
+		}
+	}
+	return r
 }
