@@ -146,14 +146,23 @@ export const Members = () => {
 
     function callCancelAppointment() {
         const member = members[selectedMemberIndex];
+        member.appointments.sort((a, b) => {
+            if (a.programId < b.programId) {
+                return -1;
+            }
+            if (a.programId > b.programId) {
+                return 1;
+            }
+            return 0;
+        });
+        const appointment = member.appointments[selectedAppointmentIndex];
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
             headers: {"Authorization": token, "Content-Type": "application/json"},
             data: {
                 enrollmentCode: member.code,
-                // TODO: MULTI_PROGRAMS_SUPPORT Hard coded logic, in future (program,dose) needed to delete an appointment
-                programId: member["appointments"][0]["programId"],
-                dose: member["appointments"][0]["dose"],
+                programId: appointment["programId"],
+                dose: appointment["dose"],
             }
         };
 
@@ -176,6 +185,7 @@ export const Members = () => {
             .finally(() => {
                 setShowModal(false);
                 setSelectedMemberIndex(-1)
+                setSelectedAppointmentIndex(-1)
             });
     }
 
@@ -295,39 +305,63 @@ export const Members = () => {
                     setIsLoading={setIsLoading}
                     programEligibility={programEligibility}
                 />}
-                {selectedMemberIndex > -1 && members.length > 0 && showModal && <Modal show={showModal} onHide={() => {
-                    setShowModal(false)
-                }} centered backdrop="static" keyboard={false}>
-                    <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
-                        <div className="d-flex justify-content-between align-items-center">
-                            <div/>
-                            <h5>{memberAction === CANCEL_APPOINTMENT ? "Confirm Cancelling Appointment" : "Confirm Removing Member"}</h5>
-                            <img src={CloseImg} className="cursor-pointer" alt={""}
-                                 onClick={() => {
-                                     setShowModal(false)
-                                 }}/>
-                        </div>
-                        <div className="d-flex flex-column justify-content-center align-items-center">
-                            <b>{members[selectedMemberIndex].name}</b>
-                            <b className="text-center mt-1">Enrollment number: {members[selectedMemberIndex].code}</b>
-                            {memberAction === CANCEL_APPOINTMENT &&
-                            <>
-                                <span
-                                    className="mt-1 text-center">{`${members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].facilityDetails.facilityName}, ${members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].facilityDetails.district}, \n ${members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].facilityDetails.state}, ${members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].facilityDetails.pincode}`}</span>
-                                <span
-                                    className="mt-1">{formatDate(members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].appointmentDate || "")}, {members[selectedMemberIndex]["appointments"][selectedAppointmentIndex].appointmentSlot || ""}</span>
-                            </>
-                            }
-                            <CustomButton className="blue-btn" onClick={() => {
-                                memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : callDeleteRecipient()
-                            }}>CONFIRM</CustomButton>
-                        </div>
-                    </div>
-                </Modal>}
+                {selectedMemberIndex > -1 && members.length > 0 && showModal &&
+                <CancelAppointmentModal
+                    showModal={showModal}
+                    setShowModal={setShowModal}
+                    memberAction={memberAction}
+                    member={members[selectedMemberIndex]}
+                    callCancelAppointment={callCancelAppointment}
+                    callDeleteRecipient={callDeleteRecipient}
+                    selectedAppointmentIndex={selectedAppointmentIndex}
+                />}
             </Container>
         </div>
     );
 };
+
+const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, callDeleteRecipient, callCancelAppointment, selectedAppointmentIndex}) => {
+    member.appointments.sort((a, b) => {
+        if (a.programId < b.programId) {
+            return -1;
+        }
+        if (a.programId > b.programId) {
+            return 1;
+        }
+        return 0;
+    })
+    return (
+        <Modal show={showModal} onHide={() => {
+            setShowModal(false)
+        }} centered backdrop="static" keyboard={false}>
+            <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
+                <div className="d-flex justify-content-between align-items-center">
+                    <div/>
+                    <h5>{memberAction === CANCEL_APPOINTMENT ? "Confirm Cancelling Appointment" : "Confirm Removing Member"}</h5>
+                    <img src={CloseImg} className="cursor-pointer" alt={""}
+                         onClick={() => {
+                             setShowModal(false)
+                         }}/>
+                </div>
+                <div className="d-flex flex-column justify-content-center align-items-center">
+                    <b>{member.name}</b>
+                    <b className="text-center mt-1">Enrollment number: {member.code}</b>
+                    {memberAction === CANCEL_APPOINTMENT &&
+                    <>
+                                <span
+                                    className="mt-1 text-center">{`${member["appointments"][selectedAppointmentIndex].facilityDetails.facilityName}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.district}, \n ${member["appointments"][selectedAppointmentIndex].facilityDetails.state}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.pincode}`}</span>
+                        <span
+                            className="mt-1">{formatDate(member["appointments"][selectedAppointmentIndex].appointmentDate || "")}, {member["appointments"][selectedAppointmentIndex].appointmentSlot || ""}</span>
+                    </>
+                    }
+                    <CustomButton className="blue-btn" onClick={() => {
+                        memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : callDeleteRecipient()
+                    }}>CONFIRM</CustomButton>
+                </div>
+            </div>
+        </Modal>
+    )
+}
 
 const MemberCard = (props) => {
     const history = useHistory();
