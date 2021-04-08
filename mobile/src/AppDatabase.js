@@ -99,6 +99,19 @@ export class AppDatabase {
         let patient = await this.db.get(PATIENTS, enrollCode);
         if (!patient && isOnline) {
             patient = await ApiServices.fetchEnrollmentByCode(enrollCode);
+            const currentAppointment = patient["appointments"].filter(a => a["programId"] === getSelectedProgramId() && !a.certified)[0]
+            if (!currentAppointment.enrollmentScopeId) {
+                const facilityDetails = await this.getUserDetails();
+                const currSch = await this.getCurrentAppointmentSlot();
+                patient["appointments"].map(a => {
+                    if (a["programId"] === getSelectedProgramId() && !a.certified) {
+                        a.enrollmentScopeId = facilityDetails["facility_code"];
+                        a.appointmentDate = new Date().toISOString().slice(0, 10);
+                        a.appointmentSlot = currSch ? currSch.startTime+"-"+currSch.endTime : "";
+                    }
+                })
+            }
+            await this.db.put(PATIENTS, patient);
         }
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
