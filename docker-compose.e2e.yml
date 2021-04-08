@@ -1,27 +1,27 @@
 version: "2.4"
 
 services:
-  portal_api:
-    entrypoint: /bin/true
-  registration_api:
-    entrypoint: /bin/true
   analytics_feed:
-    entrypoint: /bin/true
-  nginx:
     entrypoint: /bin/true
   notification-service:
     entrypoint: /bin/true
-  digilocker_support_api:
-    entrypoint: /bin/true
-  flagr:
-    entrypoint: /bin/true
   clickhouse-server:
     entrypoint: /bin/true
+  portal_api:
+    environment:
+        ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
   keycloak:
     environment:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json
     volumes:
       - ./keycloak:/config
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://keycloak:8080/auth/realms/divoc/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 1m
   certificate_processor:
       environment:
         ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
