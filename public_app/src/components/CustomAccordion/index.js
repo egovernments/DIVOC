@@ -1,9 +1,8 @@
 import React, {useContext} from "react";
 import {Accordion, AccordionContext, Card, useAccordionToggle} from "react-bootstrap";
 import AccordionArrow from "../../assets/img/accordion_arrow.svg";
-import {CustomButton} from "../CustomButton";
 
-export function ContextAwareToggle({title, eventKey, callback, onTitleClick}) {
+export function ContextAwareToggle({title, eventKey, callback}) {
     const currentEventKey = useContext(AccordionContext);
 
     const decoratedOnClick = useAccordionToggle(
@@ -14,11 +13,9 @@ export function ContextAwareToggle({title, eventKey, callback, onTitleClick}) {
     const isCurrentEventKey = currentEventKey === eventKey;
 
     return (
-        <div className="user-select-none d-flex justify-content-between cursor-pointer align-items-center">
-            <CustomButton isLink={true} type="submit" onClick={onTitleClick} className="p-0">
-                <span>{title}</span>
-            </CustomButton>
-            <img onClick={decoratedOnClick} src={AccordionArrow} style={{transform: isCurrentEventKey ? "rotate(180deg)" : ""}}/>
+        <div onClick={decoratedOnClick} className="user-select-none d-flex justify-content-between cursor-pointer align-items-center">
+            <span>{title}</span>
+            <img src={AccordionArrow} style={{transform: isCurrentEventKey ? "rotate(180deg)" : ""}}/>
         </div>
     );
 }
