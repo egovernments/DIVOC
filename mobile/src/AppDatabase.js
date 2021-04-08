@@ -3,6 +3,7 @@ import {LANGUAGE_KEYS} from "./lang/LocaleContext";
 import {getSelectedProgramId} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
 import {monthNames, weekdays} from "./utils/date_utils";
+import {ApiServices} from "./Services/ApiServices";
 
 const DATABASE_NAME = "DivocDB";
 const DATABASE_VERSION = 14;
@@ -94,12 +95,15 @@ export class AppDatabase {
         return this.db.put(QUEUE, patients);
     }
 
-    async getPatientDetails(enrollCode) {
-        const patient = await this.db.get(PATIENTS, enrollCode);
+    async getPatientDetails(enrollCode, isOnline) {
+        let patient = await this.db.get(PATIENTS, enrollCode);
+        if (!patient && isOnline) {
+            patient = await ApiServices.fetchEnrollmentByCode(enrollCode);
+        }
         const inQueue = await this.db.get(QUEUE, enrollCode);
         if (patient && !inQueue) {
             const selectedProgramId = getSelectedProgramId();
-            if (patient["appointments"][0][PROGRAM_ID] === selectedProgramId) {
+            if (patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId && !a.certified)) {
                 return patient
             } else {
                 return null;

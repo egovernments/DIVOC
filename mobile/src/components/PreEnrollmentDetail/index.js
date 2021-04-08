@@ -15,6 +15,8 @@ import {useHistory} from "react-router";
 import config from "../../config";
 import {FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_VERIFY_FORM} from "../WalkEnrollments/context";
 import {BeneficiaryForm} from "../RegisterBeneficiaryForm";
+import {useOnlineStatus} from "../../utils/offlineStatus";
+import {getSelectedProgramId} from "../ProgramSelection";
 
 export function PreEnrollmentDetails(props) {
     return (
@@ -45,6 +47,7 @@ function WarningInfo(props) {
     const [recipientDetails, setRecipientDetails] = useState([]);
     const [currentSlot, setCurrentSlot] = useState("");
     const history = useHistory();
+    const appointment = props.patientDetails["appointments"].filter(a => a["programId"] === getSelectedProgramId() && !a.certified)[0]
 
     useEffect(() => {
         appIndexDb.recipientDetails().then(beneficiary => setRecipientDetails(beneficiary));
@@ -60,14 +63,14 @@ function WarningInfo(props) {
             {props.otherSlotError &&
                 <p className="invalid-input" style={{fontSize:"100%"}}>{props.patientDetails.name}'s scheduled appointment: <br/>
                     Time: {formatAppointmentSlot(
-                        props.patientDetails["appointments"][0].appointmentDate,
-                        props.patientDetails["appointments"][0].appointmentSlot.split("-")[0],
-                        props.patientDetails["appointments"][0].appointmentSlot.split("-")[1],
+                        appointment.appointmentDate,
+                        appointment.appointmentSlot.split("-")[0],
+                        appointment.appointmentSlot.split("-")[1],
                     )}
                 </p>
             }
             {props.patientDetailsError &&
-                <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current</p>
+                <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current day</p>
             }
             </div>
             <div className="mt-4">
@@ -84,7 +87,7 @@ function WarningInfo(props) {
                     />
                 </div>
             }
-            <Col className="register-with-aadhaar">
+            <div className="register-with-aadhaar">
                 <div>
                     <Button hidden={props.patientDetailsError} variant="outline-primary" className="primary-btn w-100 mt-5 mb-2" onClick={() => {
                         props.onContinue()
@@ -95,7 +98,7 @@ function WarningInfo(props) {
                         history.push(config.urlPath + '/')
                     }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
                 </div>
-            </Col>
+            </div>
         </div>
     )
 }
@@ -108,9 +111,11 @@ function PatientDetails(props) {
     const [otherSlotError, setOtherSlotError] = useState(false);
     const [currentAppointmentSlot, setCurrentAppointmentSlot] = useState({});
     const [showPatientInfo, setShowPatientInfo] = useState(false);
+    const isOnline = useOnlineStatus();
+    const history = useHistory();
 
     useEffect(() => {
-        getUserDetails(state.enrollCode)
+        getUserDetails(state.enrollCode, isOnline)
             .then((patient) => {
                 appIndexDb.getUserDetails()
                     .then((userDetails) => {
@@ -128,6 +133,19 @@ function PatientDetails(props) {
     }, [state.enrollCode]);
 
     if (!patientDetails) {
+        if (isOnline) {
+            return (
+                <div className={"home-container"}>
+                    <p className="invalid-input" style={{fontSize:"100%"}}>Enrollment number "{state.enrollCode}" not found</p>
+                    <div>
+                        <Button variant="outline-primary" className="action-btn w-100 mt-3" onClick={() => {
+                            history.push(config.urlPath + '/')
+                        }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
+                    </div>
+                </div>
+            )
+        }
+
         return (
             <WarningInfo
                 patientDetailsError={true}
@@ -148,14 +166,16 @@ function PatientDetails(props) {
         }
 
         // check if appointment belong to same facility
-        if (userDetails.facilityDetails.facilityCode !== patient["appointments"][0].enrollmentScopeId) {
+        const selectedProgramId = getSelectedProgramId()
+        const appointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0]
+        if (userDetails.facilityDetails.facilityCode !== appointment.enrollmentScopeId) {
             setOtherFacilityError(true);
             return false
         }
 
         // check if appointment belong to current slot
-        if (!(patient["appointments"][0].appointmentDate === new Date().toISOString().slice(0, 10) &&
-            patient["appointments"][0].appointmentSlot === currSch.startTime+"-"+currSch.endTime)) {
+        if (!(appointment.appointmentDate === new Date().toISOString().slice(0, 10) &&
+            appointment.appointmentSlot === currSch.startTime+"-"+currSch.endTime)) {
             setOtherSlotError(true);
             return false
         }

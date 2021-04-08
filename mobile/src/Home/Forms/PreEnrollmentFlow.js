@@ -11,6 +11,7 @@ import {
     FORM_WALK_IN_VERIFY_FORM
 } from "../../components/WalkEnrollments/context";
 import {BeneficiaryVerifyPayment} from "./BeneficiaryVerifyPayment";
+import {useOnlineStatus} from "../../utils/offlineStatus";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode";
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails";
@@ -172,8 +173,8 @@ export function usePreEnrollment() {
         history.goBack()
     };
 
-    const getUserDetails = function (enrollCode) {
-        return appIndexDb.getPatientDetails(enrollCode)
+    const getUserDetails = function (enrollCode, isOnline) {
+        return appIndexDb.getPatientDetails(enrollCode, isOnline)
     };
 
     return {
