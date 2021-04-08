@@ -10,7 +10,7 @@ export function formatDate(givenDate) {
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
 
-    return `${day}-${monthName}-${year}`;
+    return `${padDigit(day)}-${monthName}-${year}`;
 }
 
 export function padDigit(digit, totalDigits = 2) {

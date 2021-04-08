@@ -35,7 +35,7 @@ const GENDERS = [
 const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
 const RESPONSIVE_ROW_DIV_CLASS = "p-0 pt-2 col-lg-6 col-md-6 col-sm-12";
 
-export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails, members}) => {
+export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDetails, members, header, footer}) => {
     //"did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"
 
     const { previous, next } = navigation;
@@ -160,7 +160,8 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         // While registering the user, By default user will be assigned to the selected program with dose 1
         dataToSend["appointments"] = [{
             "programId": formData.programId,
-            "dose": "1"
+            "dose": "1",
+            "comorbidities": formData.comorbidities
         }]
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {
@@ -179,27 +180,32 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     return (
         <Container fluid>
             <div className="side-effect-container">
-                <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to register beneficiary"}</h3>
+                {
+                    header ? header : <h3>{verifyDetails ? "Verify beneficiary details" : "Add details to register beneficiary"}</h3>
+                }
+
                 <div className="shadow-sm bg-white form-container">
                     <IdDetails  verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                     <BeneficiaryDetails verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors} stateAndDistricts={stateAndDistricts} nationalities={nationalities}/>
                     <ContactInfo verifyDetails={verifyDetails} formData={formData} setValue={setValue} errors={errors}/>
                 </div>
-                <div className="pt-3">
-                    <CustomButton isLink={true} type="submit" onClick={previous}>
-                        <span>Back</span>
-                    </CustomButton>
-                    { !verifyDetails &&
-                    <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
-                        <span>Continue &#8594;</span>
-                    </CustomButton>
-                    }
-                    { verifyDetails &&
-                    <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
-                        <span>Confirm</span>
-                    </CustomButton>
-                    }
-                </div>
+                {
+                    footer ? footer : <div className="pt-3">
+                        <CustomButton isLink={true} type="submit" onClick={previous}>
+                            <span>Back</span>
+                        </CustomButton>
+                        { !verifyDetails &&
+                        <CustomButton className="blue-btn" type="submit" onClick={onContinue}>
+                            <span>Continue &#8594;</span>
+                        </CustomButton>
+                        }
+                        { verifyDetails &&
+                        <CustomButton className="blue-btn" type="submit" onClick={onSubmit}>
+                            <span>Confirm</span>
+                        </CustomButton>
+                        }
+                    </div>
+                }
             </div>
         </Container>
 

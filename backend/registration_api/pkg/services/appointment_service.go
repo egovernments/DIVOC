@@ -38,8 +38,9 @@ func worker(workerID int, appointmentSchedulerChannel <-chan models.FacilitySche
 	}
 }
 
-func CheckIfAlreadyAppointed(enrollmentInfo map[string]string) bool {
-	if _, ok := enrollmentInfo["slotId"]; ok {
+func CheckIfAlreadyAppointed(enrollmentInfo map[string]string, programID string, dose string) bool {
+	slotKey := fmt.Sprintf("%s-%s-slotId", programID, dose)
+	if _, ok := enrollmentInfo[slotKey]; ok {
 		return true
 	}
 	return false
@@ -91,14 +92,18 @@ func BookAppointmentSlot(slotId string) error {
 	return err
 }
 
-func MarkEnrollmentAsBooked(enrollmentCode string, slotId string) bool {
-	success, err := SetHash(enrollmentCode, "slotId", slotId)
-	if err != nil {
-		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
-	} else {
+func MarkEnrollmentAsBooked(enrollmentCode string, slotId string, programID string, dose string) bool {
+	slotKey := fmt.Sprintf("%s-%s-slotId", programID, dose)
+	updatedCountKey := fmt.Sprintf("%s-%s-updatedCount", programID, dose)
+	if success, err := SetHash(enrollmentCode, slotKey, slotId); err == nil && success {
+		_, _ = SetHash(enrollmentCode, updatedCountKey, "0")
 		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotId)
+		return success
+	} else {
+		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotId, err)
 	}
-	return success
+	return false
+
 }
 
 func CancelBookedAppointment(slotId string) error {
@@ -106,14 +111,16 @@ func CancelBookedAppointment(slotId string) error {
 	return err
 }
 
-func RevokeEnrollmentBookedStatus(enrollmentCode string) bool {
-	success, err := RemoveHastField(enrollmentCode, "slotId")
+func RevokeEnrollmentBookedStatus(enrollmentCode string, programId string, dose string) bool {
+	slotKey := fmt.Sprintf("%s-%s-slotId", programId, dose)
+	updatedCountKey := fmt.Sprintf("%s-%s-updatedCount", programId, dose)
+	success, err := RemoveHastField(enrollmentCode, slotKey)
 	if err != nil {
 		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, err)
 	} else {
 		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode)
 	}
-	_, err = IncrHashField(enrollmentCode, "updatedCount")
+	_, err = IncrHashField(enrollmentCode, updatedCountKey)
 	if err != nil {
 		log.Errorf("Failed to increase %s updated count", enrollmentCode, err)
 	} else {
@@ -129,7 +136,7 @@ func BookSlot(enrollmentCode, phone, facilitySlotID, dose, programID string) err
 		log.Errorf(msg)
 		return errors.New(msg)
 	}
-	if CheckIfAlreadyAppointed(enrollmentInfo) {
+	if CheckIfAlreadyAppointed(enrollmentInfo, programID, dose) {
 		msg := fmt.Sprintf("Already booked %s, %s", enrollmentCode, phone)
 		return errors.New(msg)
 	}
@@ -138,7 +145,7 @@ func BookSlot(enrollmentCode, phone, facilitySlotID, dose, programID string) err
 		return fmt.Errorf("error booking slot : %s", err.Error())
 	}
 
-	if isMarked := MarkEnrollmentAsBooked(enrollmentCode, facilitySlotID); !isMarked {
+	if isMarked := MarkEnrollmentAsBooked(enrollmentCode, facilitySlotID, programID, dose); !isMarked {
 		return fmt.Errorf("error marking enrollment as Booked")
 	}
 

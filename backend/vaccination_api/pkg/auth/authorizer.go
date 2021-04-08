@@ -152,3 +152,22 @@ func ExtractClaimBodyFromHeader(params *http.Request) *models.JWTClaimBody {
 	}
 	return nil
 }
+
+type RecipientClaimBody struct {
+	Phone string
+	jwt.StandardClaims
+}
+
+func VerifyRecipientToken(jwtToken string) (*RecipientClaimBody, error) {
+	keyFromPEM, _ := jwt.ParseRSAPublicKeyFromPEM([]byte(config.Config.Auth.RegistrationAPIPublicKey))
+	c := RecipientClaimBody{}
+	token, err := jwt.ParseWithClaims(jwtToken, &c, func(token *jwt.Token) (interface{}, error) {
+		return keyFromPEM, nil
+	})
+	if err!= nil {
+		log.Info("Unable to get the claims out of token", err)
+		return nil, err
+	}
+	claims := token.Claims.(*RecipientClaimBody)
+	return claims, err
+}

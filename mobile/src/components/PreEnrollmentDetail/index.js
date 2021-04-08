@@ -218,7 +218,7 @@ function PatientDetails(props) {
                             state={getFormData(patientDetails)}
                             onContinue={onFormContinue}
                             buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}
-                        />;
+                        />
                     </div>
             }
 

@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
+	"github.com/go-openapi/runtime/middleware"
 	"strconv"
 	"text/template"
 
@@ -23,7 +25,7 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 
 const EnrollmentEntity = "Enrollment"
 
-func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string) {
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64) {
 	filter := map[string]interface{}{
 		"code": map[string]interface{}{
 			"eq": preEnrollmentCode,
@@ -44,14 +46,19 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
 					for _, appointmentObj := range appointments {
 						appointment := appointmentObj.(map[string]interface{})
+						appointmentProgramId := appointment["programId"].(string)
 						appointmentDose := appointment["dose"].(string)
 						appointmentCertified := appointment["certified"].(bool)
-						if appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
+						if appointmentProgramId == programId && appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
 							appointment["certified"] = true
 							appointment["certificateId"] = certificateId
 							appointment["vaccine"] = vaccine
 							break
 						}
+					}
+					if dose < totalDoses {
+						log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
+						enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
 					}
 					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
 					if err == nil {
@@ -68,6 +75,19 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 	} else {
 		log.Error("Failed querying enrollments registry", filter, err)
 	}
+}
+
+func registerToNextDose(programId string, dose float64) map[string]interface{} {
+	newAppointment := map[string]interface{}{}
+	newAppointment["programId"] = programId
+	newAppointment["certified"] = false
+	newAppointment["certificateId"] = ""
+	newAppointment["vaccine"] = ""
+	newAppointment["enrollmentScopeId"] = ""
+	newAppointment["appointmentDate"] = "0001-01-01"
+	newAppointment["appointmentSlot"] = ""
+	newAppointment["dose"] = dose + 1
+	return newAppointment
 }
 
 func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
@@ -359,7 +379,6 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
 		"phone":        enrollment.Phone,
-		"updatedCount": 0, //to restrict multiple updates
 		"osid":         osid,
 	}
 	_, err := SetHMSet(enrollment.Code, data)
@@ -404,4 +423,107 @@ func DRefAppointments(ptrSlice []*models.EnrollmentAppointmentsItems0) []models.
 		}
 	}
 	return r
+}
+func validateEnrollmentAccess(enrollmentPhone string, jwtPhone string) bool {
+	return enrollmentPhone == jwtPhone
+}
+
+func RegisterEnrollmentToProgram(params operations.RegisterRecipientToProgramParams, claimBody *models.JWTClaimBody) middleware.Responder {
+	responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", params.EnrollmentOsid)
+	enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
+	if !ok {
+		log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", params.EnrollmentOsid)
+		return operations.NewRegisterRecipientToProgramBadRequest()
+	}
+	enrollmentStr, err := json.Marshal(enrollmentResp)
+	if err != nil {
+		log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())
+		return operations.NewRegisterRecipientToProgramBadRequest()
+	}
+
+	var enrollment struct {
+		Osid string `json:"osid"`
+		models.Enrollment
+	}
+	if err := json.Unmarshal(enrollmentStr, &enrollment); err != nil {
+		log.Errorf("Error parsing Enrollment to expected format. Enrollment [%s], error [%s]", enrollmentStr, err.Error())
+		return operations.NewRegisterRecipientToProgramInternalServerError()
+	}
+	if valid := validateEnrollmentAccess(enrollment.Phone, claimBody.Phone); !valid {
+		log.Errorf("Unauthorized access to update enrollment [%s], by phone [%s]", enrollmentStr, claimBody.Phone)
+		return operations.NewRegisterRecipientToProgramUnauthorized()
+	}
+	for _, appointment := range enrollment.Appointments {
+		if appointment.ProgramID == params.ProgramID {
+			log.Infof("Recipient %s already registered for program %s", enrollment.Osid, params.ProgramID)
+			return operations.NewRegisterRecipientToProgramOK()
+		}
+	}
+	registration := models.EnrollmentAppointmentsItems0{
+		Dose:          "1",
+		ProgramID:     params.ProgramID,
+		Comorbidities: params.Body.Comorbidities,
+	}
+	enrollment.Appointments = append(enrollment.Appointments, &registration)
+	if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
+		"osid":         enrollment.Osid,
+		"appointments": enrollment.Appointments,
+	}); err != nil {
+		log.Error("Booking appointment failed ", err)
+		return operations.NewRegisterRecipientToProgramInternalServerError()
+	}
+	return operations.NewRegisterRecipientToProgramOK()
+}
+
+func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, claimBody *models.JWTClaimBody) middleware.Responder {
+	responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", params.EnrollmentOsid)
+	enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
+	if !ok {
+		log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", params.EnrollmentOsid)
+		return operations.NewRegisterRecipientToProgramBadRequest()
+	}
+	enrollmentStr, err := json.Marshal(enrollmentResp)
+	if err != nil {
+		log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())
+		return operations.NewRegisterRecipientToProgramBadRequest()
+	}
+
+	var enrollment struct {
+		Osid string `json:"osid"`
+		models.Enrollment
+	}
+	if err := json.Unmarshal(enrollmentStr, &enrollment); err != nil {
+		log.Errorf("Error parsing Enrollment to expected format. Enrollment [%s], error [%s]", enrollmentStr, err.Error())
+		return operations.NewRegisterRecipientToProgramInternalServerError()
+	}
+	if valid := validateEnrollmentAccess(enrollment.Phone, claimBody.Phone); !valid {
+		log.Errorf("Unauthorized access to update enrollment [%s], by phone [%s]", enrollmentStr, claimBody.Phone)
+		return operations.NewRegisterRecipientToProgramUnauthorized()
+	}
+	updatedAppointments := removeAppointmentWithProgramId(enrollment.Appointments, params.ProgramID)
+	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1{
+		if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
+			"osid":         enrollment.Osid,
+			"appointments": updatedAppointments,
+		}); err != nil {
+			log.Error("Booking appointment failed ", err)
+			return operations.NewRegisterRecipientToProgramInternalServerError()
+		}
+	}
+	return operations.NewRegisterRecipientToProgramOK()
+}
+
+func removeAppointmentWithProgramId(appointments []*models.EnrollmentAppointmentsItems0, programId string) []*models.EnrollmentAppointmentsItems0 {
+	appointmentList:=  make([]*models.EnrollmentAppointmentsItems0, 0, 1)
+	for _, appointment := range appointments {
+		if !(appointment.ProgramID == programId && appointment.Dose == "1" && appointment.EnrollmentScopeID == "" && !appointment.Certified) && appointment.ProgramID != "" {
+			appointmentList = append(appointmentList, appointment)
+		}
+	}
+	if len(appointmentList) == 0 {
+		appointmentList = append(appointmentList, &models.EnrollmentAppointmentsItems0{
+			Comorbidities: []string{},
+		})
+	}
+	return appointmentList
 }

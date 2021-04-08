@@ -56,6 +56,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		DeleteRecipientHandler: DeleteRecipientHandlerFunc(func(params DeleteRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation DeleteRecipient has not yet been implemented")
 		}),
+		DeleteRecipientProgramHandler: DeleteRecipientProgramHandlerFunc(func(params DeleteRecipientProgramParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation DeleteRecipientProgram has not yet been implemented")
+		}),
 		EnrollRecipientHandler: EnrollRecipientHandlerFunc(func(params EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation EnrollRecipient has not yet been implemented")
 		}),
@@ -70,6 +73,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		}),
 		InitializeFacilitySlotsHandler: InitializeFacilitySlotsHandlerFunc(func(params InitializeFacilitySlotsParams) middleware.Responder {
 			return middleware.NotImplemented("operation InitializeFacilitySlots has not yet been implemented")
+		}),
+		RegisterRecipientToProgramHandler: RegisterRecipientToProgramHandlerFunc(func(params RegisterRecipientToProgramParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation RegisterRecipientToProgram has not yet been implemented")
 		}),
 		VerifyOTPHandler: VerifyOTPHandlerFunc(func(params VerifyOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation VerifyOTP has not yet been implemented")
@@ -130,6 +136,8 @@ type RegistrationAPIAPI struct {
 	DeleteAppointmentHandler DeleteAppointmentHandler
 	// DeleteRecipientHandler sets the operation handler for the delete recipient operation
 	DeleteRecipientHandler DeleteRecipientHandler
+	// DeleteRecipientProgramHandler sets the operation handler for the delete recipient program operation
+	DeleteRecipientProgramHandler DeleteRecipientProgramHandler
 	// EnrollRecipientHandler sets the operation handler for the enroll recipient operation
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
@@ -140,6 +148,8 @@ type RegistrationAPIAPI struct {
 	GetSlotsForFacilitiesHandler GetSlotsForFacilitiesHandler
 	// InitializeFacilitySlotsHandler sets the operation handler for the initialize facility slots operation
 	InitializeFacilitySlotsHandler InitializeFacilitySlotsHandler
+	// RegisterRecipientToProgramHandler sets the operation handler for the register recipient to program operation
+	RegisterRecipientToProgramHandler RegisterRecipientToProgramHandler
 	// VerifyOTPHandler sets the operation handler for the verify o t p operation
 	VerifyOTPHandler VerifyOTPHandler
 	// ServeError is called when an error is received, there is a default handler
@@ -234,6 +244,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	if o.DeleteRecipientHandler == nil {
 		unregistered = append(unregistered, "DeleteRecipientHandler")
 	}
+	if o.DeleteRecipientProgramHandler == nil {
+		unregistered = append(unregistered, "DeleteRecipientProgramHandler")
+	}
 	if o.EnrollRecipientHandler == nil {
 		unregistered = append(unregistered, "EnrollRecipientHandler")
 	}
@@ -248,6 +261,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.InitializeFacilitySlotsHandler == nil {
 		unregistered = append(unregistered, "InitializeFacilitySlotsHandler")
+	}
+	if o.RegisterRecipientToProgramHandler == nil {
+		unregistered = append(unregistered, "RegisterRecipientToProgramHandler")
 	}
 	if o.VerifyOTPHandler == nil {
 		unregistered = append(unregistered, "VerifyOTPHandler")
@@ -367,6 +383,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
 	o.handlers["DELETE"]["/recipients"] = NewDeleteRecipient(o.context, o.DeleteRecipientHandler)
+	if o.handlers["DELETE"] == nil {
+		o.handlers["DELETE"] = make(map[string]http.Handler)
+	}
+	o.handlers["DELETE"]["/recipient/{enrollment_osid}/program/{program_id}"] = NewDeleteRecipientProgram(o.context, o.DeleteRecipientProgramHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
@@ -387,6 +407,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/facility/slots/init"] = NewInitializeFacilitySlots(o.context, o.InitializeFacilitySlotsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/recipient/{enrollment_osid}/program/{program_id}"] = NewRegisterRecipientToProgram(o.context, o.RegisterRecipientToProgramHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -291,8 +291,11 @@ type EnrollmentAppointmentsItems0 struct {
 	// certified
 	Certified bool `json:"certified"`
 
+	// comorbidities
+	Comorbidities []string `json:"comorbidities"`
+
 	// dose
-	Dose string `json:"dose,omitempty"`
+	Dose string `json:"dose"`
 
 	// enrollment scope Id
 	EnrollmentScopeID string `json:"enrollmentScopeId"`
@@ -301,7 +304,7 @@ type EnrollmentAppointmentsItems0 struct {
 	Osid string `json:"osid,omitempty"`
 
 	// program Id
-	ProgramID string `json:"programId,omitempty"`
+	ProgramID string `json:"programId"`
 }
 
 // Validate validates this enrollment appointments items0

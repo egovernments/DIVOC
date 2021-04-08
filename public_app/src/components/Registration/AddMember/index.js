@@ -2,7 +2,7 @@ import {useForm, useStep} from "react-hooks-helper";
 import React, {useEffect, useState} from "react";
 import {FormPersonalDetails} from "./FormPersonalDetails";
 import axios from "axios";
-import {Modal, Card, CardGroup, Container} from "react-bootstrap";
+import {Card, CardGroup, Container, Modal} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import SelectedLogo from "../../../assets/img/check.svg"
@@ -129,7 +129,7 @@ export const AddMembersFlow = () => {
   }
 };
 
-const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
+export const SelectComorbidity = ({setValue, formData, navigation, programs, hideYOB=false}) => {
   const MINIMUM_SUPPORT_AGE = 120;
   const [errors, setErrors] = useState({});
   const [conditions, setConditions] = useState([])
@@ -247,23 +247,29 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
           <h3>Check beneficiary's eligibility for {formData.programName}</h3>
         </div>
         <div className="shadow-sm bg-white p-4">
-          <div className="p-2">
-            <h5>Enter beneficiary's year of birth</h5>
-          </div>
-          <div className={"col-sm-4"}>
-            <label className="custom-text-label required" for="yearSelect">Year of birth</label>
-            <select className="form-control form-control-inline" id="yearSelect" placeholder="Select"
-                    onChange={(t) => onYOBChange(t.target && t.target.value)}>
-              <option>Select</option>
-              {
-                years.map(x => <option selected={formData.yob === x} value={x}>{x}</option>)
-              }
-            </select>
-            <div className="invalid-input">
-              {errors.yob}
-            </div>
-          </div>
-          <div className="pt-5" hidden={!conditions || conditions.length === 0}>
+            {!hideYOB &&
+            <>
+                <div className="p-2">
+                    <h5>Enter beneficiary's year of birth</h5>
+                </div>
+                <div className={"col-sm-4"}>
+                    <label className="custom-text-label required" for="yearSelect">Year of birth</label>
+                    <select className="form-control form-control-inline" id="yearSelect" disabled={hideYOB}
+                            placeholder="Select"
+                            onChange={(t) => onYOBChange(t.target && t.target.value)}>
+                        <option>Select</option>
+                        {
+                            years.map(x => {
+                                return <option selected={formData.yob === x} value={x}>{x}</option>
+                            })
+                        }
+                    </select>
+                    <div className="invalid-input">
+                        {errors.yob}
+                    </div>
+                </div>
+            </>}
+          <div className="pt-5 comorbidities-wrapper" hidden={!conditions || conditions.length === 0}>
               <p style={{fontSize:"1.1rem"}}>Does the beneficiary have any of the following comorbidities?</p>
               <div className="pl-2 form-check form-check-inline">
                 <input className="form-check-input" type="radio" onChange={showComorbiditiesHandler}
@@ -277,7 +283,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
               </div>
             <div hidden={formData.choice === "no"} className="pt-3">
               <p>If yes, please select (all) applicable comorbidities</p>
-              <Row className={"col-6 ml-0"}>
+              <Row className={"col-6 ml-0 comorbidities-list-wrapper"}>
                 {
                   conditions.map(x =>
                     <div className="col-md-6">
@@ -308,7 +314,7 @@ const SelectComorbidity = ({setValue, formData, navigation, programs}) => {
   );
 };
 
-const SelectProgram = ({setValue, formData, navigation, programs}) => {
+export const SelectProgram = ({setValue, formData, navigation, programs, showBack=true}) => {
   const history = useHistory();
   const {next} = navigation;
 
@@ -328,29 +334,35 @@ const SelectProgram = ({setValue, formData, navigation, programs}) => {
         <CardGroup className="mt-5">
           {
             programs.map(p =>
-              <div className="p-2">
-                <a key={p.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(p.osid, p.name)}>
-                  <Card border={p.osid === formData.programId ? "success" : "light"} style={{width: '15rem'}}
-                        className="text-center h-100">
-                    {p.osid === formData.programId && <img src={SelectedLogo} className="selected-program-img"/>}
-                    <Card.Img variant="top" src={p.logoURL ? p.logoURL : DefaultProgramLogo} className="p-4"
-                              style={{maxHeight: '9rem', height: '9rem'}}/>
-                    <Card.Body>
-                      <Card.Title>{p.name}</Card.Title>
-                    </Card.Body>
-                  </Card>
-                </a>
-              </div>
+              <ProgramCard program={p} selectedProgramId={formData.programId} onProgramSelect={onProgramSelect}/>
             )
           }
         </CardGroup>
-        <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
+          {showBack && <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
           <span>Back</span>
-        </CustomButton>
+        </CustomButton>}
           {programs.length>0 && <CustomButton className="blue-btn" type="submit" onClick={next}>
           <span>Continue &#8594;</span>
         </CustomButton>}
       </div>
     </Container>
   )
+}
+
+export const ProgramCard = ({program, selectedProgramId, onProgramSelect}) => {
+    return (
+        <div className="p-2">
+            <a key={program.osid} style={{cursor: 'pointer'}} onClick={() => onProgramSelect(program.osid, program.name)}>
+                <Card border={program.osid === selectedProgramId ? "success" : "light"} style={{width: '15rem'}}
+                      className="text-center h-100">
+                    {program.osid === selectedProgramId && <img src={SelectedLogo} className="selected-program-img"/>}
+                    <Card.Img variant="top" src={program.logoURL ? program.logoURL : DefaultProgramLogo} className="p-4"
+                              style={{maxHeight: '9rem', height: '9rem'}}/>
+                    <Card.Body>
+                        <Card.Title>{program.name}</Card.Title>
+                    </Card.Body>
+                </Card>
+            </a>
+        </div>
+    )
 }
