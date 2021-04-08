@@ -27,12 +27,3 @@
     font-size: 18px;
     margin-right: 25px;
 }
-
-.blue-outline-btn {
-    background: #FFFFFF 0% 0% no-repeat padding-box;
-    border: 2px solid #5C9EF8;
-    border-radius: 6px;
-    color: #5C9EF8;
-    font-size: 18px;
-    font-weight: bold;
-}

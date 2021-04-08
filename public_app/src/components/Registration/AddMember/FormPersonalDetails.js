@@ -160,8 +160,7 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
         // While registering the user, By default user will be assigned to the selected program with dose 1
         dataToSend["appointments"] = [{
             "programId": formData.programId,
-            "dose": "1",
-            "comorbidities": formData.comorbidities
+            "dose": "1"
         }]
         const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const config = {

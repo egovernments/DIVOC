@@ -30,9 +30,6 @@ func StartEnrollmentConsumer() {
 			if err != nil {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
-				if msg != nil {
-					_, _ = consumer.CommitMessage(msg)
-				}
 				continue
 			}
 			log.Info("Got the message to create new enrollment")
@@ -40,7 +37,6 @@ func StartEnrollmentConsumer() {
 			if err := json.Unmarshal(msg.Value, &enrollment); err != nil {
 				// Push to error topic
 				log.Info("Unable to serialize the request body", err)
-				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
@@ -50,7 +46,6 @@ func StartEnrollmentConsumer() {
 			if err != nil {
 				// Push to error topic
 				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
-				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
 			if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
