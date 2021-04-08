@@ -57,7 +57,7 @@ func SendOTP(prefix string, phone string, otp string) (*sns.PublishOutput, error
 	return resp, err
 }
 
-func ToMap(obj interface{}) (map[string]interface{},error) {
+func ToMap(obj interface{}) (map[string]interface{}, error) {
 	bytes, err := json.Marshal(obj)
 	if err != nil {
 		return nil, err
@@ -70,7 +70,7 @@ func ToMap(obj interface{}) (map[string]interface{},error) {
 }
 
 func GetTomorrowStart() time.Time {
-	return time.Now().Truncate(24 * time.Hour).AddDate(0, 0, 1)
+	return time.Now().Truncate(24*time.Hour).AddDate(0, 0, 1)
 }
 
 //Filter returns new slice with elements that fit the criteria
@@ -82,27 +82,4 @@ func Filter(entries []string, criteria func(s string) bool) []string {
 		}
 	}
 	return res
-}
-
-func ToString(arg interface{}) string {
-	switch v := arg.(type) {
-	case int:
-		return strconv.Itoa(v)
-	case int8:
-		return strconv.FormatInt(int64(v), 10)
-	case int16:
-		return strconv.FormatInt(int64(v), 10)
-	case int32:
-		return strconv.FormatInt(int64(v), 10)
-	case int64:
-		return strconv.FormatInt(v, 10)
-	case string:
-		return v
-	case float32:
-		return strconv.FormatFloat(float64(v), 'f', -1, 32)
-	case float64:
-		return strconv.FormatFloat(v, 'f', -1, 64)
-	default:
-		return ""
-	}
 }

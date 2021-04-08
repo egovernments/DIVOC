@@ -86,7 +86,7 @@ func registerToNextDose(programId string, dose float64) map[string]interface{} {
 	newAppointment["enrollmentScopeId"] = ""
 	newAppointment["appointmentDate"] = "0001-01-01"
 	newAppointment["appointmentSlot"] = ""
-	newAppointment["dose"] = utils.ToString(dose + 1)
+	newAppointment["dose"] = dose + 1
 	return newAppointment
 }
 
@@ -166,8 +166,8 @@ func updateEnrollmentWithWalkInInfo(enrollment enrollment, walkInfo EnrollmentPa
 	}
 	log.Infof("Updating Address, Booking Info & comorbidities for the enrollment %s from walk-in payload", enrollment.Code)
 	appointmentWalkInfo := walkInfo.Appointments[0]
-	existingAppointment := func() *models.EnrollmentAppointmentsItems0{
-		for _ , a := range enrollment.Appointments {
+	existingAppointment := func() *models.EnrollmentAppointmentsItems0 {
+		for _, a := range enrollment.Appointments {
 			if a.ProgramID == appointmentWalkInfo.ProgramID && a.Dose == appointmentWalkInfo.Dose && !a.Certified {
 				log.Info("Enrollee has already booked an appointment. Overriding it")
 				return a
@@ -378,8 +378,8 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 
 func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
-		"phone":        enrollment.Phone,
-		"osid":         osid,
+		"phone": enrollment.Phone,
+		"osid":  osid,
 	}
 	_, err := SetHMSet(enrollment.Code, data)
 	if err != nil {
@@ -409,10 +409,10 @@ type DuplicateEnrollment struct {
 type enrollment struct {
 	Osid string `json:"osid"`
 	models.Enrollment
-	Address	*struct {
-		Osid	string	`json:"osid"`
+	Address *struct {
+		Osid string `json:"osid"`
 		models.Address
-	}	`json:"address"`
+	} `json:"address"`
 }
 
 func DRefAppointments(ptrSlice []*models.EnrollmentAppointmentsItems0) []models.EnrollmentAppointmentsItems0 {
@@ -501,7 +501,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 		return operations.NewRegisterRecipientToProgramUnauthorized()
 	}
 	updatedAppointments := removeAppointmentWithProgramId(enrollment.Appointments, params.ProgramID)
-	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1{
+	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1 {
 		if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
 			"osid":         enrollment.Osid,
 			"appointments": updatedAppointments,
@@ -514,7 +514,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 }
 
 func removeAppointmentWithProgramId(appointments []*models.EnrollmentAppointmentsItems0, programId string) []*models.EnrollmentAppointmentsItems0 {
-	appointmentList:=  make([]*models.EnrollmentAppointmentsItems0, 0, 1)
+	appointmentList := make([]*models.EnrollmentAppointmentsItems0, 0, 1)
 	for _, appointment := range appointments {
 		if !(appointment.ProgramID == programId && appointment.Dose == "1" && appointment.EnrollmentScopeID == "" && !appointment.Certified) && appointment.ProgramID != "" {
 			appointmentList = append(appointmentList, appointment)
