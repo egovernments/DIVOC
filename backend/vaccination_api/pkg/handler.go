@@ -247,12 +247,8 @@ func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
 
 func getPreEnrollment(params vaccination.GetPreEnrollmentParams, principal *models.JWTClaimBody) middleware.Responder {
 	code := params.PreEnrollmentCode
-	scopeId, err := getUserAssociatedFacility(params.HTTPRequest.Header.Get("Authorization"))
-	if err != nil {
-		return NewGenericServerError()
-	}
 	limit, offset := getLimitAndOffset(params.Limit, params.Offset)
-	if enrollment, err := findEnrollmentScopeAndCode(scopeId, code, limit, offset); err == nil {
+	if enrollment, err := findEnrollmentForCode(code, limit, offset); err == nil {
 		return vaccination.NewGetPreEnrollmentOK().WithPayload(enrollment)
 	}
 	return NewGenericServerError()

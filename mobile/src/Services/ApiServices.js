@@ -9,8 +9,10 @@ const USER_INFO = "/divoc/api/v1/users/me"
 const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
 const FLAGR_APPLICATION_CONFIG = "/config/api/v1/evaluation";
 const FACILITY_ID = "FACILITY_ID"
+const ENROLLMENT_ID = "ENROLLMENT_ID"
 const PROGRAM_ID = "PROGRAM_ID"
 const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/schedule`
+const ENROLLMENT_BY_CODE = `/divoc/api/v1/preEnrollments/${ENROLLMENT_ID}`
 
 export class ApiServices {
 
@@ -32,6 +34,16 @@ export class ApiServices {
             headers: {'accept': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem("token")}
         };
         return fetch(PRE_ENROLLMENT + `?${qParams.toString()}`, requestOptions)
+            .then(response => response.json())
+    }
+
+    static async fetchEnrollmentByCode(enrollCode) {
+        const requestOptions = {
+            method: 'GET',
+            headers: {'accept': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem("token")}
+        };
+        const apiURL = ENROLLMENT_BY_CODE.replace(ENROLLMENT_ID, enrollCode)
+        return fetch(apiURL, requestOptions)
             .then(response => response.json())
     }
 
