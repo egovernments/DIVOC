@@ -222,7 +222,7 @@ function FacilityForm({facility, refreshFacility, heading}) {
                 </Container>
 
                     <h4>Contact Details</h4>
-                    <Container  style={{"columnCount": activePrograms?.length === 1 ? 1 : 2}}>
+                    <Container  style={{"columnCount": 2}}>
                         <div>
                             <label className={!editFacility ? "custom-verify-text-label" : "custom-text-label required"}>
                                 Address
@@ -254,6 +254,68 @@ function FacilityForm({facility, refreshFacility, heading}) {
                     <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleSubmit}>SAVE</Button>
                 }
             </div>
+
+        {isFacilityController() && <>
+
+            <div className="facility-info-section">
+                <h4>Registered Staff</h4>
+                <Container>
+                    <div>
+                        <label>
+                            <div><b>Vaccinators: </b>{vaccinators ? vaccinators : "-"}</div>
+                        </label>
+                    </div>
+                </Container>
+            </div>
+
+            <div className="facility-info-section">
+                <h4 style={{"display":"inline-block"}}>Adminstrator Details</h4>
+                {isFacilityController() &&
+                <span className="begin-edit" onClick={() => setEditAdmin(!editAdmin)}>
+                            {editAdmin ? "cancel" : "edit"}
+                        </span>
+                }
+                <Container>
+                    {facility && facility.admins && facility.admins[0] &&
+                    <div style={{"columnCount": 2}}>
+                        <div>
+                            <label className={!editAdmin ? "custom-verify-text-label" : "custom-text-label required"}>
+                                Name
+                            </label>
+                            <input className="form-control" type="text" name="adminName" defaultValue={facility.admins[0].name} disabled={!editAdmin} onChange={handleChange}/>
+                        </div>
+                        <div>
+                            <label className={!editAdmin ? "custom-verify-text-label" : "custom-text-label required"}>
+                                Contact
+                            </label>
+                            <InputMask
+                                type="tel"
+                                name="adminContact"
+                                defaultValue={facility.admins[0].mobile}
+                                disabled={!editAdmin}
+                                handleChange={handleChange}
+                            />
+                        </div>
+                        <div>
+                            <label className={!editAdmin ? "custom-verify-text-label" : "custom-text-label"}>
+                                Email
+                            </label>
+                            <InputMask
+                                type="text"
+                                name="adminEmail"
+                                defaultValue={facility.admins[0].email}
+                                disabled={!editAdmin}
+                                handleChange={handleChange}
+                            />
+                        </div>
+                    </div>
+                    }
+                </Container>
+                {editAdmin &&
+                <Button style={{"margin":"10px 0"}} className="mr-2 blue-btn" variant="outlined" color="primary" onClick={handleEditAdmin}>SAVE</Button>
+                }
+            </div>
+        </>}
         </form></Container>}
 
 export default FacilityForm;

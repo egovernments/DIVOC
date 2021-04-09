@@ -10,6 +10,8 @@ import {CONSTANTS} from "../../utils/constants";
 import config from "../../config";
 import {useSelector} from "react-redux";
 import {NavLink, useHistory} from "react-router-dom";
+import Dropdown from "react-bootstrap/Dropdown";
+import Button from "react-bootstrap/Button";
 
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
@@ -21,6 +23,7 @@ export const Header = (props) => {
             keycloak.hasResourceRole(CONSTANTS.FACILITY_PRINT_STAFF, CONSTANTS.PORTAL_CLIENT)
     };
     const userMobileNumber = keycloak.idTokenParsed?.preferred_username;
+    const userName = keycloak.idTokenParsed?.full_name;
 
     function getFacilityAddress() {
         if ("address" in facility && facility.address) {
@@ -55,21 +58,29 @@ export const Header = (props) => {
                 <Nav className="align-items-center">
                     {
                         <div className="d-flex align-items-center" style={{fontSize: "14px"}}>
-                            <NavDropdown title={userMobileNumber + " " + getRoleAsString()} className="d-flex flex-column ml-2 mr-2">
+                            <Dropdown title={(userName ? userName : userMobileNumber) + " " + getRoleAsString()} className="d-flex flex-column ml-2 mr-2">
+                                <Dropdown.Toggle id="dropdown-split-basic" >
+                                    <span>
+                                        <p style={{fontWeight:"bold"}}>{userName ? userName : userMobileNumber}</p>
+                                        <p style={{fontWeight:"light"}}>{getRoleAsString()}</p>
+                                    </span>
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
                                 { isFacilityUser() && facility &&
                                     <div>
-                                        <NavDropdown.Item onClick={() => history.push(config.urlPath+"/facility_info")}>
+                                        <Dropdown.Item onClick={() => history.push(config.urlPath+"/facility_info")}>
                                             <b style={{fontSize:"small"}}>Facility Profile</b>
-                                        </NavDropdown.Item>
-                                        <NavDropdown.Divider />
+                                        </Dropdown.Item>
+                                        <Dropdown.Divider />
                                     </div>
                                 }
                                 {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
-                                <><NavDropdown.Item href="/analytics"><b style={{fontSize:"small"}}>Analytics</b></NavDropdown.Item><NavDropdown.Divider /></>}
-                                {keycloak.authenticated && <NavDropdown.Item onClick={() => {
+                                <><Dropdown.Item href="/analytics"><b style={{fontSize:"small"}}>Analytics</b></Dropdown.Item><Dropdown.Divider /></>}
+                                {keycloak.authenticated && <Dropdown.Item onClick={() => {
                                     keycloak.logout({redirectUri: window.location.origin + config.urlPath});
-                                }}><b style={{fontSize:"small"}}>Logout</b></NavDropdown.Item>}
-                            </NavDropdown>
+                                }}><b style={{fontSize:"small"}}>Logout</b></Dropdown.Item>}
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
                     }
                     {

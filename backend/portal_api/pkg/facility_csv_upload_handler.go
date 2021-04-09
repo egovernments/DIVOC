@@ -72,6 +72,7 @@ func (facilityCsv FacilityCSV) ProcessRow(uploadID uint) error {
 			Attributes: KeycloakUserAttributes{
 				MobileNumber: []string{admin.Mobile},
 				FacilityCode: facility.FacilityCode,
+				FullName:     admin.Name,
 			},
 		}
 
