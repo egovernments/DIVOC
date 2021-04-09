@@ -35,11 +35,11 @@ export const Header = (props) => {
 
     function getRoleAsString() {
         if (keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT))
-            return "(Facility Admin)"
+            return "Facility Admin"
         if (keycloak.hasResourceRole(CONSTANTS.ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT))
-            return "(Admin)"
+            return "Admin"
         if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT))
-            return "(Controller)"
+            return "Controller"
         return ""
     }
 
@@ -58,7 +58,7 @@ export const Header = (props) => {
                 <Nav className="align-items-center">
                     {
                         <div className="d-flex align-items-center" style={{fontSize: "14px"}}>
-                            <Dropdown title={(userName ? userName : userMobileNumber) + " " + getRoleAsString()} className="d-flex flex-column ml-2 mr-2">
+                            <Dropdown title={(userName ? userName : userMobileNumber) + " (" + getRoleAsString() + ")"} className="d-flex flex-column ml-2 mr-2">
                                 <Dropdown.Toggle id="dropdown-split-basic" >
                                     <span>
                                         <p style={{fontWeight:"bold"}}>{userName ? userName : userMobileNumber}</p>
