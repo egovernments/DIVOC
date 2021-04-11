@@ -52,7 +52,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 				return
 			} else {
 				signedJson := certificateObj["certificate"].(string)
-				if pdfBytes, err := getCertificateAsPdfV2(signedJson, ""); err != nil {
+				if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
 					log.Errorf("Error in creating certificate pdf")
 					publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Unknown "+err.Error())
 					w.WriteHeader(500)

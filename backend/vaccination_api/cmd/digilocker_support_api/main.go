@@ -575,7 +575,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(signedJson, ""); err != nil {
+		if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -605,7 +605,7 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(signedJson, r.URL.Query().Get("language")); err != nil {
+		if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -618,6 +618,14 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("No certificates found for request %v", preEnrollmentCode)
 		w.WriteHeader(404)
 		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+	}
+}
+
+func getLanguageFromQueryParams(r *http.Request) string {
+	if language := r.URL.Query().Get("language"); language != "" {
+		return language
+	} else {
+		return ""
 	}
 }
 
