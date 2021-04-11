@@ -399,6 +399,9 @@ type EnrollmentAppointmentsItems0 struct {
 	// appointment slot
 	AppointmentSlot string `json:"appointmentSlot"`
 
+	// certificate Id
+	CertificateID string `json:"certificateId,omitempty"`
+
 	// certified
 	Certified bool `json:"certified"`
 
@@ -413,6 +416,9 @@ type EnrollmentAppointmentsItems0 struct {
 
 	// program Id
 	ProgramID string `json:"programId,omitempty"`
+
+	// vaccine
+	Vaccine string `json:"vaccine,omitempty"`
 }
 
 // Validate validates this enrollment appointments items0
