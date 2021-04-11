@@ -3491,6 +3491,9 @@ func init() {
           "type": "string",
           "x-omitempty": false
         },
+        "certificateId": {
+          "type": "string"
+        },
         "certified": {
           "type": "boolean",
           "x-omitempty": false
@@ -3506,6 +3509,9 @@ func init() {
           "type": "string"
         },
         "programId": {
+          "type": "string"
+        },
+        "vaccine": {
           "type": "string"
         }
       }
