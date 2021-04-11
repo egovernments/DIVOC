@@ -1,9 +1,25 @@
 package models
 
 import (
+	"fmt"
+	"github.com/divoc/api/config"
 	"strconv"
+	"strings"
 	"time"
 )
+
+const layout = "02 Jan 2006"
+
+var vaccineEffectiveDaysInfo = map[string]map[string]int{
+	"covaxin": {
+		"from": 28,
+		"to":   42,
+	},
+	"covishield": {
+		"from": 28,
+		"to":   56,
+	},
+}
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -12,6 +28,7 @@ type Certificate struct {
 		Type        string `json:"type"`
 		ID          string `json:"id"`
 		RefId       string `json:"refId"`
+		Uhid        string `json:"uhid"`
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
@@ -72,4 +89,51 @@ func (certificate *Certificate) GetFacilityPostalCode() string {
 		return strconv.Itoa(int(postalCode))
 	}
 	return certificate.Evidence[0].Facility.Address.PostalCode.(string)
+}
+
+func (certificate *Certificate) GetTemplateName(isFinal bool, language string) string {
+	var certType string
+	var pollingType string
+
+	if certificate.IsVaccinatedStatePollingOne() {
+		pollingType = "PS"
+	} else {
+		pollingType = "NPS"
+	}
+	if isFinal {
+		certType = "2"
+	} else {
+		certType = "1"
+	}
+	return fmt.Sprintf("config/cov19–%s-%s-%s.pdf", language, certType, pollingType)
+}
+
+func (certificate *Certificate) IsVaccinatedStatePollingOne() bool {
+	isPolling := false
+	stateName := certificate.GetStateNameInLowerCaseLetter()
+	for _, state := range config.PollingStates {
+		if state == stateName {
+			isPolling = true
+		}
+	}
+	return isPolling
+}
+
+func (certificate *Certificate) GetStateNameInLowerCaseLetter() string {
+	stateName := ""
+	if len(certificate.Evidence) > 0 {
+		stateName = strings.TrimSpace(strings.ToLower(certificate.Evidence[0].Facility.Address.AddressRegion))
+	}
+	return stateName
+}
+
+func (certificate *Certificate) GetNextDueDateInfo() string {
+	if len(certificate.Evidence) > 0 {
+		evidence := certificate.Evidence[0]
+		vaccine := strings.ToLower(evidence.Vaccine)
+		fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["from"]) * 24)
+		toDate := evidence.Date.Add(time.Hour * time.Duration(vaccineEffectiveDaysInfo[vaccine]["to"]) * 24)
+		return "Between " + fromDate.Format(layout) + " and " + toDate.Format(layout)
+	}
+	return ""
 }

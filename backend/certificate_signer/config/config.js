@@ -1,5 +1,6 @@
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
+const DEFAULT_TOTAL_DOSES_COUNT = process.env.DEFAULT_TOTAL_DOSES_COUNT || '2'
 const CERTIFY_TOPIC = 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
 const CERTIFIED_TOPIC = 'certified';
@@ -12,6 +13,7 @@ const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
 const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
 const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
 module.exports = {
+  DEFAULT_TOTAL_DOSES_COUNT,
   KAFKA_BOOTSTRAP_SERVER,
   CERTIFY_TOPIC,
   REGISTRY_URL,
