@@ -231,7 +231,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -255,7 +255,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 
 	filter := map[string]interface{}{
-		"preEnrollmentCode":  map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
 			"eq": request.PreEnrollmentCode,
 		},
 	}
@@ -498,7 +498,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	dose := certificate.Evidence[0].Dose
 
 	filter := map[string]interface{}{
-		"certificateId": map[string]interface{}{
+		"previousCertificateId": map[string]interface{}{
 			"eq": certificateId,
 		},
 		"dose": map[string]interface{}{
@@ -508,7 +508,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 			"eq": preEnrollmentCode,
 		},
 	}
-	if resp, err := services.QueryRegistry(typeId,filter); err == nil {
+	if resp, err := services.QueryRegistry(typeId, filter); err == nil {
 		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificates) > 0 {
 				return certificate_revoked.NewCertificateRevokedOK()
@@ -518,7 +518,6 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	}
 	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
-
 
 func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
 	sort.Slice(certificateArr, func(i, j int) bool {
