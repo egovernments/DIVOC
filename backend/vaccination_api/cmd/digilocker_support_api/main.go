@@ -575,7 +575,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
+		if pdfBytes, err := getCertificateAsPdfV2(signedJson, ""); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")

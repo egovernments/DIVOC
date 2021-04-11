@@ -104,7 +104,7 @@ type PullDocResponse struct {
 	} `xml:"DocDetails"`
 }
 
-func ValidMAC(message string, messageMAC [] byte, keyString string) bool {
+func ValidMAC(message string, messageMAC []byte, keyString string) bool {
 	if keyString == "ignore" {
 		return true
 	}
@@ -140,7 +140,7 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 			if certBundle != nil {
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
+					if pdfBytes, err := getCertificateAsPdfV2(certBundle.signedJson, ""); err != nil {
 						log.Errorf("Error in creating certificate pdf %+v", err)
 						go kafkaService.PublishEvent(models.Event{
 							Date:          time.Time{},
@@ -224,7 +224,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdf(certBundle.signedJson); err != nil {
+					if pdfBytes, err := getCertificateAsPdfV2(certBundle.signedJson, ""); err != nil {
 						log.Errorf("Error in creating certificate pdf")
 					} else {
 						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
@@ -342,4 +342,3 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 	}
 	return nil
 }
-
