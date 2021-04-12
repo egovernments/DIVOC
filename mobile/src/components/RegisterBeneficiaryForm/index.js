@@ -413,7 +413,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     <><br/><p>{formData.phone}</p></>
                 }
             </div>
-            <div>
+            {/* <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
                        hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                 <div hidden={verifyDetails}>
@@ -449,7 +449,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     verifyDetails &&
                     <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                 }
-            </div>
+            </div> */}
             <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
                 <label htmlFor="confirmEmail">Comorbidities</label>
                 <p>
