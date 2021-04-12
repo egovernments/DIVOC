@@ -29,7 +29,7 @@
         },
         "identity": {
           "type": "string",
-          "examples": ["did:in.gov.uidai.aadhaar:11111111111", "did:in.gov.driverlicense:KA53/2323423"]
+          "examples": ["did:in.gov.driverlicense:KA53/2323423"]
         },
         "contact": {
           "type": "array",
