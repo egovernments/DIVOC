@@ -52,9 +52,9 @@
   "app.enrollment.identityType": "Identity Type",
   "app.enrollment.identityValue": "Identity Number",
   "app.enrollment.addressLine1": "Address",
-  "app.enrollment.state": "State",
-  "app.enrollment.district": "District",
-  "app.enrollment.locality": "Locality",
+  "app.enrollment.state": "Region",
+  "app.enrollment.district": "Subcity / Zone",
+  "app.enrollment.locality": "Woreda",
   "app.enrollment.pincode": "Pincode",
   "app.preenrollment.title": "Verify Recipient",
   "app.preenrollment.details": "Confirm beneficiary details",
@@ -74,7 +74,7 @@
   "app.button.otp": "GENERATE OTP",
   "app.button.sendvaccination": "SEND FOR VACCINATION",
   "app.payment.title": "Please select mode of payment",
-  "app.payment.govt": "Government",
+  "app.payment.govt": "MOH",
   "app.payment.voucher": "Voucher",
   "app.payment.direct": "Direct"
 }
