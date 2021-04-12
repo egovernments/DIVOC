@@ -490,7 +490,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label
                                className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                               htmlFor="locality">Locality</label>
+                               htmlFor="locality">Woreda</label>
                         <input className="form-control" name="locality" id="locality" type="text"
                                hidden={verifyDetails}
                                placeholder="Enter your locality"
@@ -502,7 +502,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                         }
                     </Col>
                 </div>
-                <div hidden={verifyDetails && !formData.pincode} className={RESPONSIVE_ROW_DIV_CLASS}>
+                {/* <div hidden={verifyDetails && !formData.pincode} className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label
                                className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
@@ -521,7 +521,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                             <p>{formData.pincode}</p>
                         }
                     </Col>
-                </div>
+                </div> */}
             </Row>
         </div>
     )
