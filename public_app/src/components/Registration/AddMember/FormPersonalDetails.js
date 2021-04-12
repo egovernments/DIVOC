@@ -232,7 +232,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         }
                     </Col>
                 </div>
-                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                {/* <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"} hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                         <div hidden={verifyDetails}>
@@ -262,7 +262,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                             <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                         }
                     </Col>
-                </div>
+                </div> */}
             </Row>
         </div>
     )
