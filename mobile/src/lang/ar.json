@@ -68,7 +68,7 @@
   "app.button.otp": "GENERATE OTP",
   "app.button.sendvaccination": "SEND FOR VACCINATION",
   "app.payment.title": "Please select mode of payment",
-  "app.payment.govt": "Government",
+  "app.payment.govt": "MOH",
   "app.payment.voucher": "Voucher",
   "app.payment.direct": "Direct"
 }

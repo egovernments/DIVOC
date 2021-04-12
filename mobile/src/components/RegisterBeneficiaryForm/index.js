@@ -336,10 +336,10 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             <div>
                 <label hidden={verifyDetails && !formData.locality}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="locality">Locality</label>
+                       htmlFor="locality">Woreda</label>
                 <input className="form-control" name="locality" id="locality" type="text"
                        hidden={verifyDetails}
-                       placeholder="Enter your locality"
+                       placeholder="Enter your woreda"
                        defaultValue={formData.locality}
                        onBlur={setValue}/>
                 {
@@ -347,7 +347,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                     <p>{formData.locality}</p>
                 }
             </div>
-            <div>
+            {/* <div>
                 <label hidden={verifyDetails && !formData.pincode}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
                        htmlFor="pinCode">Pin code</label>
@@ -364,7 +364,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                     verifyDetails &&
                     <p>{formData.pincode}</p>
                 }
-            </div>
+            </div> */}
             <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
                        htmlFor="state">Nationality </label>
