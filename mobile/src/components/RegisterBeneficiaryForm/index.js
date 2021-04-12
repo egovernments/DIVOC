@@ -13,7 +13,7 @@ import {
 } from "../WalkEnrollments/context";
 import {CustomButton} from "../CustomButton";
 import {
-    AADHAAR_ERROR_MESSAGE,
+    ERROR_ID_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
     GENDER_ERROR_MSG,
@@ -75,8 +75,9 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
         if(!nationIDNumber) {
             errorsData.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
-            if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
-                errorsData.aadhaar = AADHAAR_ERROR_MESSAGE
+            // if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
+            if(nationalIDType === ID_TYPES[0].value) {
+                errorsData.aadhaar = ERROR_ID_MESSAGE
             }
         }
         if(!formData.name) {
