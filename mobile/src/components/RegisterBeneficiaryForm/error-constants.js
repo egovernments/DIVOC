@@ -8,6 +8,6 @@ export const STATE_ERROR_MSG = "* State is required";
 export const DISTRICT_ERROR_MSG = "* District is required";
 export const NATIONALITY_ERROR_MSG = "* Nationality is required";
 export const GENDER_ERROR_MSG = "* Gender is required";
-export const AADHAAR_ERROR_MESSAGE = "* Invalid Aadhaar number";
+export const ERROR_ID_MESSAGE = "* InvalidID number";
 export const EMAIL_ERROR_MESSAGE = "* Email ID is not matching";
 export const PINCODE_ERROR_MESSAGE = "* Invalid pin code";
