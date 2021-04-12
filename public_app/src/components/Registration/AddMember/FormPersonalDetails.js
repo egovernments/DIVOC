@@ -28,8 +28,7 @@ import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} fr
 
 const GENDERS = [
     "Male",
-    "Female",
-    "Other"
+    "Female"
 ];
 
 const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";

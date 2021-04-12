@@ -32,7 +32,6 @@ import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
 const GENDERS = [
     "Male",
     "Female",
-    "Other"
 ];
 export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinue, buttonText}) => {
     const [formData, setFormData] = useState({...state});

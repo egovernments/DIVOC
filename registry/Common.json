@@ -9,8 +9,7 @@
       "type": "string",
       "enum": [
         "MALE",
-        "FEMALE",
-        "OTHER"
+        "FEMALE"
       ]
     },
     "Date": {
