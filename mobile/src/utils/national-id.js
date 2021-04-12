@@ -26,9 +26,9 @@ export const ID_TYPES = [
         "value": "in.gov.workid"
     },
     {
-        "id": "driverLicense",
-        "name": "Driver License",
-        "value": "in.gov.driverlicense"
+        "id": "drivingLicense",
+        "name": "Driving License",
+        "value": "in.gov.drivinglicense"
     },
     {
         "id": "passport",
