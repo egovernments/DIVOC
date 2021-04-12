@@ -298,11 +298,11 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             <h5>Residence Details</h5>
             <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
-                       htmlFor="state">State </label>
+                       htmlFor="state">Region </label>
                 <select className="form-control" name="state" id="state"
                         onChange={(e) => onStateSelected(e.target.value)}
                         hidden={verifyDetails}>
-                    <option disabled selected={!formData.state} value>Select State</option>
+                    <option disabled selected={!formData.state} value>Select Region</option>
                     {
                         STATES.map(id => <option selected={id === formData.state} value={id}>{id}</option>)
                     }
@@ -317,10 +317,10 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             </div>
             <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
-                       htmlFor="district">District </label>
+                       htmlFor="district">Subcity / Zone </label>
                 <select className="form-control" id="district" name="district" onChange={setValue}
                         hidden={verifyDetails}>
-                    <option disabled selected={!formData.district} value>Select District</option>
+                    <option disabled selected={!formData.district} value>Select Subcity / Zone</option>
                     {
                         districts.map(d => <option selected={d.name === formData.district}
                                                    value={d.name}>{d.name}</option>)
