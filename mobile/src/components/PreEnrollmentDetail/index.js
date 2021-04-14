@@ -69,9 +69,6 @@ function WarningInfo(props) {
                     )}
                 </p>
             }
-            {props.patientDetailsError &&
-                <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current day</p>
-            }
             </div>
             <div className="mt-4">
                 <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
@@ -133,28 +130,17 @@ function PatientDetails(props) {
     }, [state.enrollCode]);
 
     if (!patientDetails) {
-        if (isOnline) {
-            return (
-                <div className={"home-container"}>
-                    <p className="invalid-input" style={{fontSize:"100%"}}>Enrollment number "{state.enrollCode}" not found</p>
-                    <div>
-                        <Button variant="outline-primary" className="action-btn w-100 mt-3" onClick={() => {
-                            history.push(config.urlPath + '/')
-                        }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
-                    </div>
-                </div>
-            )
-        }
-
         return (
-            <WarningInfo
-                patientDetailsError={true}
-                patientDetails={patientDetails}
-                currentAppointmentSlot={currentAppointmentSlot}
-                onContinue={onContinue}
-            />
-        )
-        return <div className={"no-details"}>{getMessageComponent(LANGUAGE_KEYS.PRE_ENROLLMENT_NO_PATIENTS)}</div>
+            <div className={"home-container"}>
+                {isOnline && <p className="invalid-input" style={{fontSize:"100%"}}>Enrollment number "{state.enrollCode}" not found</p>}
+                {!isOnline && <p className="invalid-input" style={{fontSize:"100%"}}>Appointment is not scheduled for current day</p>}
+                <div>
+                    <Button variant="outline-primary" className="action-btn w-100 mt-3" onClick={() => {
+                        history.push(config.urlPath + '/')
+                    }} style={{textTransform:"uppercase"}}>{getMessageComponent(LANGUAGE_KEYS.HOME)}</Button>
+                </div>
+            </div>
+        );
     }
 
     function validateAppointment(patient, userDetails, currSch) {
