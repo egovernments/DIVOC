@@ -164,7 +164,8 @@ export function usePreEnrollment() {
             programId: localStorage.getItem("programId"),
             identity: state.identity,
             nationality: state.nationalId,
-            appointments: state.appointments
+            appointments: state.appointments,
+            enrollmentType: state.enrollmentType
         }
         return appIndexDb.addToQueue(queue)
     };

@@ -232,8 +232,28 @@ export class AppDatabase {
         }
     }
 
-    async markPatientAsComplete(enrollCode) {
-        const patient = await this.db.get(QUEUE, enrollCode);
+    async markPatientAsComplete(payload) {
+        const patient = await this.db.get(QUEUE, payload.enrollCode);
+        const selectedProgramId = getSelectedProgramId()
+        // if not walkin, update appointment info
+        if (patient.enrollmentType !== ENROLLMENT_TYPES.WALK_IN) {
+            patient.appointments.map(a => {
+                if (a["programId"] === selectedProgramId && !a.certified) {
+                    a["certified"] = true
+                    a["vaccine"] = a["vaccine"] ? a["vaccine"]: payload.medicineId
+                }
+            });
+
+            // update in patients table
+            const patientFromEnrollment = await this.db.get(PATIENTS, payload.enrollCode)
+            patientFromEnrollment.appointments.map(a => {
+                if (a["programId"] === selectedProgramId && !a.certified) {
+                    a["certified"] = true;
+                    a["vaccine"] = a["vaccine"] ? a["vaccine"]: payload.medicineId
+                }
+            });
+            await this.db.put(PATIENTS, patientFromEnrollment)
+        }
         patient.status = QUEUE_STATUS.COMPLETED;
         return this.db.put(QUEUE, patient)
     }
@@ -258,7 +278,7 @@ export class AppDatabase {
     async saveEnrollments(enrollments, enrollmentType) {
         const enrollmentsList = enrollments || [];
         const patients = enrollmentsList.map((item, index) => {
-            item.enrollmentType = enrollmentType;
+            item.enrollmentType = item.enrollmentType ? item.enrollmentType: enrollmentType;
             return this.db.put(PATIENTS, item)
         });
         return Promise.all(patients)
