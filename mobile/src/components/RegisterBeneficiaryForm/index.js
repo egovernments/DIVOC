@@ -389,7 +389,6 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
 
 const HistoryAndPhysicalExam = ({verifyDetails, formData, setValue, errors}) => {
 
-    const userMobileNumber = "";
 
     return (
         <div className="pt-3">
@@ -411,9 +410,9 @@ const HistoryAndPhysicalExam = ({verifyDetails, formData, setValue, errors}) => 
             <div>
                 <label hidden={verifyDetails && !formData.pulseRate}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="pulseRate">Pulse Rate</label>
+                       htmlFor="pulseRate">Pulse Rate (beats per minute)</label>
                 <input className="form-control" name="pulseRate" id="pulseRate" type="text"
-                       placeholder="Pulse Rate"
+                       placeholder="Pulse Rate (beats per minute)"
                        defaultValue={formData.pulseRate}
                        onBlur={setValue}/>
                 {
@@ -424,9 +423,9 @@ const HistoryAndPhysicalExam = ({verifyDetails, formData, setValue, errors}) => 
             <div>
                 <label hidden={verifyDetails && !formData.respiratoryRate}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="respiratoryRate">Respiratory Rate</label>
-                <input className="form-control" name="respiratoryRate" id="respiratoryRate" type="text"
-                       placeholder="Respiratory Rate"
+                       htmlFor="respiratoryRate">Respiratory Rate (Breaths/ min)</label>
+                <input className="form-control" name="respiratoryRate" id="respiratoryRate" type="number"
+                       placeholder="Respiratory Rate (Breaths/ min)"
                        defaultValue={formData.respiratoryRate}
                        onBlur={setValue}/>
                 {
@@ -437,9 +436,9 @@ const HistoryAndPhysicalExam = ({verifyDetails, formData, setValue, errors}) => 
             <div>
                 <label hidden={verifyDetails && !formData.bloodPressure}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="bloodPressure">Blood Pressure</label>
+                       htmlFor="bloodPressure">Blood Pressure (mmhg)</label>
                 <input className="form-control" name="bloodPressure" id="bloodPressure" type="number"
-                       placeholder="Blood Pressure"
+                       placeholder="Blood Pressure (mmhg)"
                        defaultValue={formData.bloodPressure}
                        onBlur={setValue}/>
                 {
