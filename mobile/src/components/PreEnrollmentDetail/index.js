@@ -10,13 +10,15 @@ import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {appIndexDb} from "../../AppDatabase";
 import {EnrolmentItems, VaccinationProgress} from "../../Home/Home";
-import {formatAppointmentSlot} from "../../utils/date_utils";
+import {formatAppointmentSlot, formatDate} from "../../utils/date_utils";
 import {useHistory} from "react-router";
 import config from "../../config";
 import {FORM_WALK_IN_ENROLL_PAYMENTS, FORM_WALK_IN_VERIFY_FORM} from "../WalkEnrollments/context";
 import {BeneficiaryForm} from "../RegisterBeneficiaryForm";
 import {useOnlineStatus} from "../../utils/offlineStatus";
-import {getSelectedProgramId} from "../ProgramSelection";
+import {getSelectedProgram, getSelectedProgramId} from "../ProgramSelection";
+import {programDb} from "../../Services/ProgramDB";
+import {DosesState} from "../DosesState";
 
 export function PreEnrollmentDetails(props) {
     return (
@@ -57,33 +59,26 @@ function WarningInfo(props) {
     return (
         <div className={"home-container"}>
             <div>
-            {props.otherFacilityError &&
-                <p className="invalid-input" style={{fontSize:"100%"}}>{props.patientDetails.name}'s scheduled appointment: <br/>Not at this facility</p>
-            }
-            {props.otherSlotError &&
-                <p className="invalid-input" style={{fontSize:"100%"}}>{props.patientDetails.name}'s scheduled appointment: <br/>
-                    Time: {formatAppointmentSlot(
-                        appointment.appointmentDate,
-                        appointment.appointmentSlot.split("-")[0],
-                        appointment.appointmentSlot.split("-")[1],
-                    )}
-                </p>
+            {props.warningMsg &&
+                <p className="invalid-input" style={{fontSize:"100%"}}>{props.warningMsg}</p>
             }
             </div>
-            <div className="mt-4">
-                <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
-                <p>{currentSlot || "N/A"}</p>
-            </div>
-            {   recipientDetails.length > 0 &&
-                <div className="enroll-container mt-4" style={{height:"110px"}}>
-                    <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
-                                     value={recipientDetails[0].value}
-                    />
-                    <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
-                                    value={recipientDetails[1].value}
-                    />
+            <div hidden={props.patientDetailsError}>
+                <div className="mt-4">
+                    <p className="mb-0" style={{ color:"#777777"}}>Current Appointment Slot</p>
+                    <p>{currentSlot || "N/A"}</p>
                 </div>
-            }
+                {   recipientDetails.length > 0 &&
+                    <div className="enroll-container mt-4" style={{height:"110px"}}>
+                        <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.RECIPIENT_QUEUE)}
+                                         value={recipientDetails[0].value}
+                        />
+                        <EnrolmentItems title={getMessageComponent(LANGUAGE_KEYS.CERTIFICATE_ISSUED)}
+                                        value={recipientDetails[1].value}
+                        />
+                    </div>
+                }
+            </div>
             <div className="register-with-aadhaar">
                 <div>
                     <Button hidden={props.patientDetailsError} variant="outline-primary" className="primary-btn w-100 mt-5 mb-2" onClick={() => {
@@ -103,29 +98,26 @@ function PatientDetails(props) {
     const {state, goNext, getUserDetails} = usePreEnrollment()
     const [patientDetails, setPatientDetails] = useState()
     const [invalidAppointment, setInvalidAppointment] = useState(false);
-    const [userDetails, setUserDetails] = useState()
-    const [otherFacilityError, setOtherFacilityError] = useState(false);
-    const [otherSlotError, setOtherSlotError] = useState(false);
+    const [warningMsg, setWarningMsg] = useState("");
     const [currentAppointmentSlot, setCurrentAppointmentSlot] = useState({});
     const [showPatientInfo, setShowPatientInfo] = useState(false);
+    const [patientDetailsError, setPatientDetailsError] = useState(false);
     const isOnline = useOnlineStatus();
     const history = useHistory();
 
     useEffect(() => {
         getUserDetails(state.enrollCode, isOnline)
             .then((patient) => {
-                appIndexDb.getUserDetails()
-                    .then((userDetails) => {
-                        appIndexDb.getCurrentAppointmentSlot().then(schedule => {
-                            setCurrentAppointmentSlot(schedule);
-                            setInvalidAppointment(!validateAppointment(patient, userDetails, schedule));
-                            setPatientDetails(patient);
-                            setUserDetails(userDetails);
-                        })
+                appIndexDb.getCurrentAppointmentSlot().then(schedule => {
+                    validateAppointment(patient, schedule).then(res=> {
+                        setInvalidAppointment(!res);
+                        setPatientDetails(patient);
+                        setCurrentAppointmentSlot(schedule);
                     })
-                    .catch((e) => {
-                        console.log("error getting facility user details ", e)
-                    })
+                })
+                .catch((e) => {
+                    console.log("error setting user details ", e)
+                });
             });
     }, [state.enrollCode]);
 
@@ -143,7 +135,7 @@ function PatientDetails(props) {
         );
     }
 
-    function validateAppointment(patient, userDetails, currSch) {
+    async function validateAppointment(patient, currSch) {
         if (showPatientInfo) {
             return true
         }
@@ -151,18 +143,76 @@ function PatientDetails(props) {
             return false
         }
 
+        const selectedProgramId = getSelectedProgramId();
+
+        let currentAppointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0];
+        if (!currentAppointment) {
+            let vaccine = {};
+            let program = await programDb.getProgramByName(getSelectedProgram());
+            patient["appointments"]
+                .filter(a => a["programId"] === getSelectedProgramId() && a.vaccine)
+                .map(a => program.medicines.filter(m => m.name === a.vaccine).map(v => vaccine = v));
+            if (!vaccine) {
+                setWarningMsg(<span>No open appointments found for {patient.name} ({state.enrollCode})</span>);
+                setPatientDetailsError(true)
+                return false
+            }
+
+            // check if all doses are been taken
+            if (patient["appointments"].filter(a => a["programId"] === selectedProgramId).length === vaccine.doseIntervals.length+1) {
+                setWarningMsg(<span>{patient.name} ({state.enrollCode}) has already taken {vaccine.doseIntervals.length+1} doses
+                    <br/>
+                    <span style={{color:"black"}}>{vaccine.name}<DosesState appointments={patient["appointments"]}/></span>
+                </span>);
+                setPatientDetailsError(true)
+                return false
+            }
+            const lastDoseTaken = patient["appointments"].filter(a => a["programId"] === selectedProgramId).length
+            const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
+                .sort((a, b) => {
+                    if (parseInt(a.dose) > parseInt(b.dose)) return 1;
+                    if (parseInt(a.dose) < parseInt(b.dose)) return -1;
+                    return 0;
+                });
+
+            // check if minimum next vaccine dose date is less than current day
+            if (parseInt(((new Date() - new Date(sortedAppointments[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) < vaccine.doseIntervals[lastDoseTaken-1].min) {
+                let currentDate = new Date();
+                setWarningMsg(<span>
+                    {patient.name} ({state.enrollCode}) next dose should be taken after {formatDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate()+vaccine.doseIntervals[lastDoseTaken-1].min))}
+                    <br/>
+                    <span style={{color:"black"}}>{vaccine.name}<DosesState appointments={patient["appointments"]}/></span>
+                </span>);
+                setPatientDetailsError(true);
+                return false
+            }
+        }
+
+        // check if not already added to queue
+        let queue = await appIndexDb.getPatientDetailsFromQueue(state.enrollCode);
+        if (queue && queue["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified).length > 0) {
+            setWarningMsg(<span>{patient.name} ({state.enrollCode}) has already added to the queue</span>);
+            setPatientDetailsError(true)
+            return false
+        }
+
         // check if appointment belong to same facility
-        const selectedProgramId = getSelectedProgramId()
         const appointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0]
+        let userDetails = await appIndexDb.getUserDetails();
         if (userDetails.facilityDetails.facilityCode !== appointment.enrollmentScopeId) {
-            setOtherFacilityError(true);
+            setWarningMsg(<span>{patient.name}'s scheduled appointment: <br/>Not at this facility</span>);
             return false
         }
 
         // check if appointment belong to current slot
-        if (!(appointment.appointmentDate === new Date().toISOString().slice(0, 10) &&
+        if (appointment.appointmentSlot !== "" && !(appointment.appointmentDate === new Date().toISOString().slice(0, 10) &&
             appointment.appointmentSlot === currSch.startTime+"-"+currSch.endTime)) {
-            setOtherSlotError(true);
+            setWarningMsg(<span>{patient.name}'s scheduled appointment: <br/>
+                    Time: {formatAppointmentSlot(
+                    appointment.appointmentDate,
+                    appointment.appointmentSlot.split("-")[0],
+                    appointment.appointmentSlot.split("-")[1],
+                )}</span>);
             return false
         }
 
@@ -187,9 +237,9 @@ function PatientDetails(props) {
                 invalidAppointment &&
                         <div>
                             <WarningInfo
-                                otherFacilityError={otherFacilityError}
-                                otherSlotError={otherSlotError}
+                                warningMsg={warningMsg}
                                 patientDetails={patientDetails}
+                                patientDetailsError={patientDetailsError}
                                 currentAppointmentSlot={currentAppointmentSlot}
                                 onContinue={onContinue}
                             />
