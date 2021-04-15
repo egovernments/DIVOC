@@ -151,7 +151,6 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         }
     }
     return (
-        data && Object.keys(data).length > 0 ?
         <div className="certificate-status-wrapper">
             <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
                  className="certificate-status-image"/>
@@ -196,7 +195,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             {/*                    history.push("/learn")*/}
             {/*                }}*/}
             {/*                backgroundColor={"#EFF5FD"}/>*/}
-        </div> : <span>Processing...</span>
+        </div>
     )
 };
 
