@@ -165,3 +165,7 @@ services:
     environment:
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
+  divoc-certification-ack:
+    image: dockerhub/divoc-certification-ack
+    environment:
+      REGISTRY_URL: "http://registry:8081"

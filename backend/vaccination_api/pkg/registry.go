@@ -39,7 +39,7 @@ func getVaccinatorsForFacility(facilityCode string) interface{} {
 	filter := map[string]interface{}{}
 	response, err := services.QueryRegistry(typeId, filter)
 	if err != nil {
-		log.Errorf("Error in querying registry", err)
+		log.Errorf("Error in querying registry %+v", err)
 		return NewGenericServerError()
 	}
 	return response[typeId]

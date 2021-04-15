@@ -122,7 +122,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			result := []interface{}{}
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
-					log.Infof("cert ", body)
+					log.Infof("cert %+v", body)
 					if certString, ok := body["certificate"].(string); ok {
 						cert := map[string]interface{}{}
 						if err := json.Unmarshal([]byte(certString), &cert); err == nil {
@@ -317,6 +317,11 @@ func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimB
 func certify(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
+	valid, errorMessage := validateCertifyRequest(params)
+	if !valid {
+		log.Infof("Validation failure for the certificate request %+v", errorMessage)
+		return certification.NewBulkCertifyBadRequest()
+	}
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
@@ -324,6 +329,13 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		}
 	}
 	return certification.NewCertifyOK()
+}
+
+func validateCertifyRequest(params certification.CertifyParams) (bool, string) {
+	if len(params.Body) < 1 {
+		return false, "Atleast one certification request is expected."
+	}
+	return true, ""
 }
 
 func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {

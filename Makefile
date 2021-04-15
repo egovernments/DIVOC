@@ -8,6 +8,7 @@ docker:
 	docker build -t dockerhub/nginx .
 	$(MAKE) -C backend
 	$(MAKE) -C registry
+	$(MAKE) -C verification
 run:
 	docker-compose up -d
 publish:

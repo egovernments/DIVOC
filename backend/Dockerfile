@@ -93,3 +93,13 @@ COPY vaccination_api/config /config
 #RUN useradd -u 8004 divoc-cache
 USER 8004
 CMD ["/app/caching-dash-server"]
+
+#divoc-certification-ack
+FROM alpine:3.9 as divoc-certification-ack
+LABEL name=divoc-certification-ack
+RUN apk add ca-certificates
+COPY --from=build_base /tmp/divoc/vaccination_api/divoc-certification-ack /app/divoc-certification-ack
+COPY vaccination_api/config /config
+#RUN useradd -u 8004 divoc-cache
+USER 8006
+CMD ["/app/divoc-certification-ack"]

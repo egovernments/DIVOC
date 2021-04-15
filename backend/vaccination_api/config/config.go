@@ -62,6 +62,7 @@ var Config = struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
 		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
+		ErrorCertificateTopic    string `default:"error_certificate" yaml:"ErrorCertificateTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
@@ -91,6 +92,12 @@ var Config = struct {
 		AuthKeyName string `env:"DIGILOCKER_AUTHKEYNAME" default:"x-digilocker-hmac"`
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
 		DocType     string `env:"DIGILOCKER_DOCTYPE"`
+	}
+	Acknowledgement struct {
+		CallbackAuthUrl string `env:"ACK_CALLBACK_AUTH_URL"`
+		CallbackAuthKey     string `env:"ACK_CALLBACK_AUTH_KEY"`
+		CallbackAuthExpiryMinutes int `default:"10" env:"ACK_CALLBACK_AUTH_TOKEN_EXPIRY"`
+		CallbackUrl     string `env:"ACK_CALLBACK_URL"`
 	}
 	PollingStatesCSV string `default:"" yaml:"pollingstates" env:"POLLING_STATES"`
 }{}

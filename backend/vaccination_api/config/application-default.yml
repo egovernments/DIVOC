@@ -24,4 +24,7 @@ certificate:
      columns: "recipientName,recipientMobileNumber,recipientDOB,recipientGender,recipientNationality,recipientIdentity,vaccinationBatch,vaccinationDate,vaccinationDose,vaccinationTotalDoses,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,vaccinatorName,facilityName,facilityAddressLine1,facilityAddressLine2,facilityDistrict,facilityState,facilityPincode"
 clickhouse:
   dsn: tcp://127.0.0.1:9000?debug=true
+acknowledgement:
+  callbackauthurl: "https://api.sit.co-vin.in/api/v1/auth/guest/login"
+  callbackurl: "https://api.sit.co-vin.in/api/v1/registration/certificate/ackCertificate"
 pollingstates: assam,west bengal,tamil nadu,puducherry,kerala
