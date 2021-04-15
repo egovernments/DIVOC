@@ -5,7 +5,10 @@ import (
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
+
+var PollingStates []string
 
 func Initialize() {
 	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
@@ -15,6 +18,9 @@ func Initialize() {
 	}
 	if Config.Keycloak.Enable && Config.Keycloak.Pubkey == "" {
 		updatePublicKeyFromKeycloak()
+	}
+	for _, state := range strings.Split(Config.PollingStatesCSV, ",") {
+		PollingStates = append(PollingStates, strings.TrimSpace(state))
 	}
 }
 
@@ -93,4 +99,5 @@ var Config = struct {
 		CallbackAuthExpiryMinutes int `default:"10" env:"ACK_CALLBACK_AUTH_TOKEN_EXPIRY"`
 		CallbackUrl     string `env:"ACK_CALLBACK_URL"`
 	}
+	PollingStatesCSV string `default:"" yaml:"pollingstates" env:"POLLING_STATES"`
 }{}

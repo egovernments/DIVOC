@@ -20,6 +20,7 @@ const vaccinationContext = {
         "@version": 1.1,
         "@protected": true,
         "refId": "schema:id",
+        "uhid": "schema:id",
         "name": "schema:name",
         "age": "schema:Number",
         "gender": "schema:gender",
