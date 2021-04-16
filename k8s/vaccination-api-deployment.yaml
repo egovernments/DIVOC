@@ -26,11 +26,11 @@ spec:
       containers:
         - env:
             - name: DB_HOST
-              value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+              value: --
             - name: DB_PASSWORD
-              value: uhAer5489
+              value: --
             - name: DB_NAME
-              value: divoc
+              value: --
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: kafka-service:9092
             - name: KEYCLOAK_URL

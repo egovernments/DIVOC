@@ -26,9 +26,9 @@ spec:
       containers:
         - env:
             - name: connectionInfo_password
-              value: uhAer5489
+              value: --
             - name: connectionInfo_uri
-              value: jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
+              value: --
             - name: connectionInfo_username
               value: postgres
           image: bindock/registry-es:TAG

@@ -26,7 +26,7 @@ spec:
       containers:
         - env:
             - name: ADMIN_API_CLIENT_SECRET
-              value: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
+              value: --
             - name: KAFKA_BOOTSTRAP_SERVERS
               value: kafka-service:9092
             - name: KEYCLOAK_URL

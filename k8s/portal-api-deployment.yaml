@@ -26,17 +26,17 @@ spec:
       containers:
         - env:
             - name: ADMIN_API_CLIENT_SECRET
-              value: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
+              value: --
             - name: CLICK_HOUSE_URL
-              value: tcp://clickhouse-server:9000?debug=true
+              value: --
             - name: DB_HOST
               value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
             - name: DB_PASSWORD
-              value: uhAer5489
+              value: --
             - name: DB_DATABASE
               value: divoc
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka-service:9092
+              value: --
             - name: KEYCLOAK_URL
               value: http://keycloak:8080/auth
             - name: REGISTRY_URL

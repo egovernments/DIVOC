@@ -26,13 +26,13 @@ spec:
       containers:
         - env:
             - name: connectionInfo_password
-              value: uhAer5489
+              value: -- password from env
             - name: connectionInfo_uri
-              value: jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
+              value: -- DB  value
             - name: connectionInfo_username
               value: postgres
             - name: elastic_search_connection_url
-              value: es:9200
+              value:  -- es url
             - name: search_provider
               value: io.opensaber.registry.service.ElasticSearchService
           image: bindock/registry-es:TAG

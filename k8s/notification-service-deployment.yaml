@@ -26,7 +26,7 @@ spec:
       containers:
         - env:
             - name: KAFKA_BOOTSTRAP_SERVERS
-              value: kafka-service:9092
+              value: --
             - name: SENDER_EMAIL
               value: xxxx@mail.com
             - name: SENDER_PASSWORD

@@ -26,7 +26,7 @@ spec:
       containers:
         - env:
             - name: FLAGR_DB_DBCONNECTIONSTR
-              value: postgres://postgres:uhAer5489@jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc?sslmode=disable
+              value: --
             - name: FLAGR_DB_DBDRIVER
               value: postgres
             - name: FLAGR_WEB_PREFIX

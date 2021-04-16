@@ -26,11 +26,11 @@ spec:
       containers:
         - env:
             - name: DB_ADDR
-              value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+              value: --
             - name: DB_DATABASE
-              value: divoc
+              value: --
             - name: DB_PASSWORD
-              value: uhAer5489
+              value: --
             - name: DB_PORT
               value: "5432"
             - name: DB_USER
