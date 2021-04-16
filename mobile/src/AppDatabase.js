@@ -106,6 +106,25 @@ export class AppDatabase {
         const facilityDetails = await this.getUserDetails();
         const program = await programDb.getProgramByName(getSelectedProgram());
 
+        function canCreateAppointmentForNextDose(patient) {
+            let result = false;
+            patient["appointments"]
+                .filter(a => a["programId"] === selectedProgramId && a.vaccine)
+                .map(a => program.medicines.filter(m => m.name === a.vaccine).map(v => {
+                    const lastDoseTaken = patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId && a.certified).length
+                    const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId && a.certified)
+                        .sort((a, b) => {
+                            if (parseInt(a.dose) > parseInt(b.dose)) return 1;
+                            if (parseInt(a.dose) < parseInt(b.dose)) return -1;
+                            return 0;
+                        });
+                    if (parseInt(((new Date() - new Date(sortedAppointments.filter(a => a.certified)[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) >= v.doseIntervals[lastDoseTaken-1].min) {
+                        result = true
+                    }
+                }));
+            return result
+        }
+
         // get open appointment for current program
         let currentAppointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0];
         if (!currentAppointment) {
@@ -141,14 +160,18 @@ export class AppDatabase {
 
         // adding enrollment details for non booked appointments
         if (!currentAppointment.enrollmentScopeId) {
-            patient["appointments"].map(a => {
-                if (a["programId"] === getSelectedProgramId() && !a.certified) {
-                    a.enrollmentScopeId = facilityDetails["facility_code"];
-                    a.appointmentDate = new Date().toISOString().slice(0, 10);
-                    a.appointmentSlot = currSch.startTime ? currSch.startTime+"-"+currSch.endTime : "";
-                }
-            });
-            await this.db.put(PATIENTS, patient)
+            if (currentAppointment.dose === "1" || canCreateAppointmentForNextDose(patient)) {
+                patient["appointments"].map(a => {
+                    if (a["programId"] === getSelectedProgramId() && !a.certified) {
+                        a.enrollmentScopeId = facilityDetails["facility_code"];
+                        a.appointmentDate = new Date().toISOString().slice(0, 10);
+                        a.appointmentSlot = currSch.startTime ? currSch.startTime+"-"+currSch.endTime : "";
+                    }
+                });
+                await this.db.put(PATIENTS, patient)
+            } else {
+
+            }
         }
         return patient
     }
