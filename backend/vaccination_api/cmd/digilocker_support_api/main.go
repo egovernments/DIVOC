@@ -217,16 +217,6 @@ func getCertificateVariant(certificate models.Certificate) string {
 	}
 }
 
-func isValidCertificateLanguage(language string) bool {
-	for _, lang := range stateLanguageMapping {
-		if lang == language {
-			return true
-		}
-	}
-	log.Error("Requested language not supported", language)
-	return false
-}
-
 func getCertificateAsPdfV2(certificateText string, language string) ([]byte, error) {
 	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
@@ -235,12 +225,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	}
 	if len(language) == 0 {
 		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
-	} else {
-		if !isValidCertificateLanguage(language) {
-			language = "HIN"
-		}
 	}
-
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
