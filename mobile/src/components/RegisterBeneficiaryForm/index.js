@@ -7,7 +7,7 @@ import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {maskPersonalDetails} from "../../utils/maskPersonalDetails";
 import {CustomButton} from "../CustomButton";
 import {
-    AADHAAR_ERROR_MESSAGE,
+    ERROR_ID_MESSAGE,
     DISTRICT_ERROR_MSG,
     EMAIL_ERROR_MESSAGE,
     GENDER_ERROR_MSG,
@@ -30,7 +30,6 @@ import {DosesState} from "../DosesState";
 const GENDERS = [
     "Male",
     "Female",
-    "Other"
 ];
 export const RegisterBeneficiaryForm = ({verifyDetails, state, onBack, onContinue, buttonText}) => {
     const [formData, setFormData] = useState({...state});
@@ -74,8 +73,9 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
         if(!nationIDNumber) {
             errorsData.nationalID = NATIONAL_ID_ERROR_MSG;
         } else {
-            if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
-                errorsData.aadhaar = AADHAAR_ERROR_MESSAGE
+            // if(nationalIDType === ID_TYPES[0].value && isInValidAadhaarNumber(nationIDNumber)) {
+            if(nationalIDType === ID_TYPES[0].value) {
+                errorsData.aadhaar = ERROR_ID_MESSAGE
             }
         }
         if(!formData.name) {
@@ -133,6 +133,8 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
             <IdDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
                                 errors={errors}/>
+            <HistoryAndPhysicalExam formData={formData} setValue={setValue} verifyDetails={verifyDetails}
+                                errors={errors}/>                                
             <ContactInfo formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <VaccineDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <CustomButton className="primary-btn w-100 mt-5 mb-5"
@@ -297,11 +299,11 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             <h5>Residence Details</h5>
             <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
-                       htmlFor="state">State </label>
+                       htmlFor="state">Region </label>
                 <select className="form-control" name="state" id="state"
                         onChange={(e) => onStateSelected(e.target.value)}
                         hidden={verifyDetails}>
-                    <option disabled selected={!formData.state} value>Select State</option>
+                    <option disabled selected={!formData.state} value>Select Region</option>
                     {
                         STATES.map(id => <option selected={id === formData.state} value={id}>{id}</option>)
                     }
@@ -316,10 +318,10 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             </div>
             <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label required"}
-                       htmlFor="district">District </label>
+                       htmlFor="district">Subcity / Zone </label>
                 <select className="form-control" id="district" name="district" onChange={setValue}
                         hidden={verifyDetails}>
-                    <option disabled selected={!formData.district} value>Select District</option>
+                    <option disabled selected={!formData.district} value>Select Subcity / Zone</option>
                     {
                         districts.map(d => <option selected={d.name === formData.district}
                                                    value={d.name}>{d.name}</option>)
@@ -336,10 +338,10 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
             <div>
                 <label hidden={verifyDetails && !formData.locality}
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="locality">Locality</label>
+                       htmlFor="locality">Woreda</label>
                 <input className="form-control" name="locality" id="locality" type="text"
                        hidden={verifyDetails}
-                       placeholder="Enter your locality"
+                       placeholder="Enter your woreda"
                        defaultValue={formData.locality}
                        onBlur={setValue}/>
                 {
@@ -348,21 +350,17 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
                 }
             </div>
             <div>
-                <label hidden={verifyDetails && !formData.pincode}
+                <label
                        className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       htmlFor="pinCode">Pin code</label>
-                <input className="form-control" name="pincode" id="pinCode" type="text"
+                       htmlFor="occupation">Occupation</label>
+                <input className="form-control" name="occupation" id="occupation" type="text"
                        hidden={verifyDetails}
-                       placeholder="Enter your pin code"
-                       defaultValue={formData.pincode}
-                       onBlur={setValue}
-                />
-                <div className="invalid-input">
-                    {errors.pincode}
-                </div>
+                       placeholder="Enter patient Occupation"
+                       defaultValue={formData.occupation}
+                       onBlur={setValue}/>
                 {
                     verifyDetails &&
-                    <p>{formData.pincode}</p>
+                    <p>{formData.occupation}</p>
                 }
             </div>
             <div>
@@ -388,6 +386,124 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
     )
 };
 
+const HistoryAndPhysicalExam = ({verifyDetails, formData, setValue, errors}) => {
+
+
+    return (
+        <div className="pt-3">
+            <h5>Medical Info</h5>
+            <div>
+                <label hidden={verifyDetails && !formData.comorbidity}
+                       className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       htmlFor="comorbidity">Comorbid Conditions</label>
+                <input className="form-control" name="comorbidity" id="comorbidity" type="text"
+                       placeholder="Enter comorbid Conditions, if any"
+                       defaultValue={formData.comorbidity}
+                       onBlur={setValue}/>
+                {
+                    verifyDetails &&
+                    <p>{formData.comorbidity}</p>
+                }
+            </div>
+            <h5>Vital Signs</h5>
+            <div>
+                <label hidden={verifyDetails && !formData.pulseRate}
+                       className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       htmlFor="pulseRate">Pulse Rate (beats per minute)</label>
+                <input className="form-control" name="pulseRate" id="pulseRate" type="text"
+                       placeholder="Pulse Rate (beats per minute)"
+                       defaultValue={formData.pulseRate}
+                       onBlur={setValue}/>
+                {
+                    verifyDetails &&
+                    <p>{formData.pulseRate}</p>
+                }
+            </div>
+            <div>
+                <label hidden={verifyDetails && !formData.respiratoryRate}
+                       className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       htmlFor="respiratoryRate">Respiratory Rate (Breaths/ min)</label>
+                <input className="form-control" name="respiratoryRate" id="respiratoryRate" type="number"
+                       placeholder="Respiratory Rate (Breaths/ min)"
+                       defaultValue={formData.respiratoryRate}
+                       onBlur={setValue}/>
+                {
+                    verifyDetails &&
+                    <p>{formData.respiratoryRate}</p>
+                }
+            </div>
+            <div>
+                <label hidden={verifyDetails && !formData.bloodPressure}
+                       className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       htmlFor="bloodPressure">Blood Pressure (mmhg)</label>
+                <input className="form-control" name="bloodPressure" id="bloodPressure" type="number"
+                       placeholder="Blood Pressure (mmhg)"
+                       defaultValue={formData.bloodPressure}
+                       onBlur={setValue}/>
+                {
+                    verifyDetails &&
+                    <p>{formData.bloodPressure}</p>
+                }
+            </div>
+            <div>
+                <label hidden={verifyDetails && !formData.temprature}
+                       className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       htmlFor="temprature">Temprature (Celsius degree)</label>
+                <input className="form-control" name="temprature" id="temprature" type="number"
+                       placeholder="Temprature"
+                       defaultValue={formData.temprature}
+                       onBlur={setValue}/>
+                {
+                    verifyDetails &&
+                    <p>{formData.temprature}</p>
+                }
+            </div>
+            {/* <div>
+                <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                       hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
+                <div hidden={verifyDetails}>
+                    <input className="form-control" id="email" name="email" type="text"
+                           placeholder="Enter Email ID"
+                           defaultValue={maskPersonalDetails(formData.email, true)}
+                           onBlur={(evt) => evt.target.value = maskPersonalDetails(evt.target.value, true)}
+                           onFocus={(evt) => evt.target.value = formData.email}
+                           onChange={(e) => setValue({target: {name: "email", value: e.target.value}})}/>
+                    <div className="pt-2">
+                        <label hidden={verifyDetails && !formData.email} htmlFor="confirmEmail">Verify Beneficiary Email
+                            ID</label>
+                        <input className="form-control" id="confirmEmail" name="email" type="text"
+                               placeholder="Confirm Email ID"
+                               value={formData.confirmEmail}
+                               onPaste={(e) => {
+                                   e.preventDefault()
+                               }}
+                               onDrag={(e) => {
+                                   e.preventDefault()
+                               }}
+                               onDrop={(e) => {
+                                   e.preventDefault()
+                               }}
+                               onChange={(e) => setValue({target: {name: "confirmEmail", value: e.target.value}})}
+                        />
+                    </div>
+                    <div className="invalid-input">
+                        {errors.email}
+                    </div>
+                </div>
+                {
+                    verifyDetails &&
+                    <><br/><p>{maskPersonalDetails(formData.email)}</p></>
+                }
+            </div> */}
+            <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
+                <label htmlFor="confirmEmail">Comorbidities</label>
+                <p>
+                    {formData.comorbidities.join(", ")}
+                </p>
+            </div>
+        </div>
+    )
+};
 const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
 
     const userMobileNumber = "";
@@ -413,7 +529,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     <><br/><p>{formData.phone}</p></>
                 }
             </div>
-            <div hidden={verifyDetails && !formData.email} >
+            {/* <div>
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
                        htmlFor="email">Beneficiary Email ID</label>
                 <div hidden={verifyDetails}>
@@ -449,35 +565,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     verifyDetails &&
                     <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                 }
-            </div>
-        </div>
-    )
-};
-
-const VaccineDetails = ({verifyDetails, formData, setValue, errors}) => {
-
-    const hasVaccine = formData.appointments ?
-        formData.appointments.filter(a => a["programId"] === getSelectedProgramId() && a.vaccine).length > 0 : false;
-
-    return (
-        <div className="pt-3">
-            <div hidden={!hasVaccine}>
-                <h5>Vaccine Details</h5>
-                <div>
-                    <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                           htmlFor="mobile">Vaccine</label>
-                    {
-                        verifyDetails &&
-                        <><br/>
-                        <p>
-                            {formData.appointments.filter(a => a["programId"] === getSelectedProgramId() && !a.certified)[0]?.vaccine}
-                            {
-                                <DosesState appointments={formData.appointments}/>
-                            }
-                        </p></>
-                    }
-                </div>
-            </div>
+            </div> */}
             <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
                 <label htmlFor="confirmEmail">Comorbidities</label>
                 <p>

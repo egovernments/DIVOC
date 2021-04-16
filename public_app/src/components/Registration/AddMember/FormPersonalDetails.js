@@ -28,8 +28,7 @@ import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} fr
 
 const GENDERS = [
     "Male",
-    "Female",
-    "Other"
+    "Female"
 ];
 
 const RESPONSIVE_COL_CLASS = "col-lg-7 col-md col-sm-10";
@@ -233,7 +232,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                         }
                     </Col>
                 </div>
-                <div className={RESPONSIVE_ROW_DIV_CLASS}>
+                {/* <div className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"} hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
                         <div hidden={verifyDetails}>
@@ -263,7 +262,7 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                             <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                         }
                     </Col>
-                </div>
+                </div> */}
             </Row>
         </div>
     )
@@ -491,7 +490,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label
                                className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                               htmlFor="locality">Locality</label>
+                               htmlFor="locality">Woreda</label>
                         <input className="form-control" name="locality" id="locality" type="text"
                                hidden={verifyDetails}
                                placeholder="Enter your locality"
@@ -503,7 +502,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                         }
                     </Col>
                 </div>
-                <div hidden={verifyDetails && !formData.pincode} className={RESPONSIVE_ROW_DIV_CLASS}>
+                {/* <div hidden={verifyDetails && !formData.pincode} className={RESPONSIVE_ROW_DIV_CLASS}>
                     <Col className={RESPONSIVE_COL_CLASS}>
                         <label
                                className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
@@ -522,7 +521,7 @@ const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors, stateAnd
                             <p>{formData.pincode}</p>
                         }
                     </Col>
-                </div>
+                </div> */}
             </Row>
         </div>
     )

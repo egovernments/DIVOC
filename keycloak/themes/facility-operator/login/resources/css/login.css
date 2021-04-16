@@ -1,0 +1,96 @@
+.box-container {
+    padding-top: 5%;
+    width: 100%;
+}
+
+.input-field {
+    display: flex;
+    border: 1px solid #E9E9F0;
+    border-radius: 4px;
+    padding: 15px;
+    align-items: center;
+}
+
+.input-field:focus-within {
+    border: 1px solid #88C6A9;
+}
+
+
+.box-container .login-field {
+    width: 85%;
+    letter-spacing: 1px;
+    border: none;
+    outline: none;
+}
+
+.box-container input[type="text"]:focus, .box-container input[type="password"]:focus {
+    outline: none;
+}
+
+.box-container input[type="text"]:-webkit-autofill, .box-container input[type="password"]:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px white inset;
+}
+
+.box-container .submit {
+    color: #ffffff;
+    border-style: none;
+    margin-top: 2rem;
+    background: #88C6A9;
+    border-radius: 4px;
+    padding: 0.5rem 2rem;
+}
+
+.input-wrapper {
+    width: 35%;
+}
+
+.mobile-logo {
+    width: 10%;
+    content: url("../img/mobile-icon.png");
+}
+
+.mobile-prefix, .otp-prefix {
+    padding: 1px 2px;
+    margin: 0;
+}
+
+.mobile-prefix {
+    padding-left: 10px;
+}
+
+@media (max-width: 992px) {
+    .input-wrapper {
+        width: 100%;
+    }
+
+    .form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+    }
+}
+
+#otp {
+    padding-left: 15px;
+    letter-spacing: 42px;
+    border: 0;
+    background-image: linear-gradient(to left, #88C6A9 70%, rgba(255, 255, 255, 0) 0%);
+    background-position: bottom;
+    background-size: 50px 1px;
+    background-repeat: repeat-x;
+    background-position-x: 35px;
+    width: 220px;
+    min-width: 220px;
+}
+
+#divInner {
+    left: 0;
+    position: sticky;
+}
+
+#divOuter {
+    width: 190px;
+    overflow: hidden;
+}

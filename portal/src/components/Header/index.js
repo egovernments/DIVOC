@@ -87,14 +87,12 @@ export const Header = (props) => {
                         // isFacilityUser() && facility && <NavLink to={"/portal/facility_info"} >PROFILE</NavLink>
                     }
                     {/*{!keycloak.authenticated && <Nav.Link href="#home">MAP</Nav.Link>}*/}
-                    {/*<Nav.Link href="https://divoc.xiv.in" target="_blank">PUBLIC PORTAL</Nav.Link>*/}
-
-                    {/*{keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&*/}
-                    {/*< Nav.Link href="/analytics">ANALYTICS</Nav.Link>}*/}
-                    {/*{keycloak.authenticated && <Nav.Link onClick={() => {*/}
-                    {/*    keycloak.logout({redirectUri: window.location.origin + config.urlPath});*/}
-                    {/*}}>LOGOUT</Nav.Link>}*/}
-
+                    {/*<Nav.Link href="https://divoc.k8s.sandboxaddis.com" target="_blank">PUBLIC PORTAL</Nav.Link>*/}
+                    {keycloak.authenticated && keycloak.hasResourceRole(CONSTANTS.MONITORING, CONSTANTS.PORTAL_CLIENT) &&
+                    < Nav.Link href="/analytics">ANALYTICS</Nav.Link>}
+                    {keycloak.authenticated && <Nav.Link onClick={() => {
+                        keycloak.logout({redirectUri: window.location.origin + config.urlPath});
+                    }}>LOGOUT</Nav.Link>}
                     {/*{!keycloak.authenticated &&*/}
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}

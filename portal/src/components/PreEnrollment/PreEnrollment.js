@@ -58,7 +58,7 @@ function PreEnrollment() {
         fileUploadAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_API}
         fileUploadHistoryAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Records in the DIVOC Pre-Enrollment Registry"}
+        infoTitle={"Records in the mBrana Pre-Enrollment Registry"}
         UploadComponent={PreEnrollmentUploadCSV}
         tableTitle="All Pre-Enrollments"
         emptyListMessage={"No Pre-Enrollment Found"}

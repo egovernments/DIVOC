@@ -1,16 +1,19 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/registration_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry-es dockerhub/keycloak
+IMAGES:=bindock/nginx bindock/portal_api bindock/registration_api bindock/vaccination_api bindock/certificate_processor bindock/analytics_feed bindock/notification-service bindock/digilocker_support_api bindock/certificate_signer bindock/registry-es bindock/keycloak
 ifeq ($(RELEASE_VERSION), )
-RELEASE_VERSION := 1.22.1-generic
+RELEASE_VERSION := latest
 endif
 $(info RELEASE VERSION $(RELEASE_VERSION))
 
 docker:
-	docker build -t dockerhub/nginx .
+	docker build -t bindock/nginx .
 	$(MAKE) -C backend
 	$(MAKE) -C registry
+	$(MAKE) -C keycloak
 test:
 	echo "Starting services in e2e testing mode"
-	docker-compose -f docker-compose.yml -f docker-compose.e2e.yml up -d
+	echo "version: \"2.4\"" > docker-compose.v2.yml && tail -n +2 docker-compose.yml >> docker-compose.v2.yml
+	docker-compose -f docker-compose.v2.yml -f docker-compose.e2e.yml up -d
+	rm docker-compose.v2.yml
 	docker logs -f e2e_test
 	bash ./e2e/e2e_test_spy.sh
 	docker rm e2e_test
