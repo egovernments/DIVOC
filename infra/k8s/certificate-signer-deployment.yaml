@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: certificate-signer
+  name: certificate-signer
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: certificate-signer
+    spec:
+      containers:
+        - env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-service:9092
+            - name: REGISTRY_URL
+              value: http://registry:8081
+          image: dockerhub/certificate_signer
+          name: certificate-signer
+          resources: {}
+      restartPolicy: Always
+status: {}

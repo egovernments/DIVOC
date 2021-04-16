@@ -78,11 +78,11 @@ export const SideEffects = () => {
                         backgroundColor={"#F2FAF6"}
                     />
                     <br/>
-                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnMoreImg}
+                    {/* <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnMoreImg}
                                     onClick={() => {
                                         history.push("/learn/")
                                     }}
-                                    backgroundColor={"#EFF5FD"}/>
+                                    backgroundColor={"#EFF5FD"}/> */}
 
 
                 </div>

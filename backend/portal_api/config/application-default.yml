@@ -1,10 +1,10 @@
 registry:
-  url: http://localhost:8081
+  url: http://registry:8081
   addoperationid: add
   searchoperationid: search
   readoperationid: read
 keycloak:
-  url: https://divoc.xiv.in/keycloak/auth
+  url: https://mbrana.k8s.sandboxaddis.com/keycloak/auth
   realm: divoc
   facilityAdmin:
     roleName: facility-admin
@@ -31,12 +31,12 @@ vaccinator:
     columns: "code,name,nationalIdentifier,mobileNumber,email,status,facilityIds"
     required: "code,name,email,nationalIdentifier,mobileNumber,status,facilityIds"
 kafka:
-  bootstrapServers: localhost:9092
+  bootstrapServers: kafka-service:9092
   notifyTopic: notify
   certifiedTopic: certified
   enrollmenttopic: enrollment
 flagr:
-  url: https://divoc.xiv.in/config
+  url: https://mbrana.k8s.sandboxaddis.com/config
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3

@@ -84,10 +84,6 @@ export const CertificateAnalysis = ({analytics}) => {
                                                    {
                                                        x: "Female",
                                                        y: pathOr(0, ["numberOfCertificatesIssued", "Female"], analytics)
-                                                   },
-                                                   {
-                                                       x: "Others",
-                                                       y: pathOr(0, ["numberOfCertificatesIssued", ""], analytics) + pathOr(0, ["numberOfCertificatesIssued", "Others"], analytics)
                                                    }
                                                ]}
                                                width={500} height={150}

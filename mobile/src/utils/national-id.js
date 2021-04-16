@@ -16,19 +16,19 @@ export function getNameOfTheId(value) {
 
 export const ID_TYPES = [
     {
-        "id": "aadhaar",
-        "name": "Aadhaar",
-        "value": "in.gov.uidai.aadhaar"
+        "id": "kebeleId",
+        "name": "Kebele Id",
+        "value": "in.gov.kebele"
     },
     {
-        "id": "driverLicense",
-        "name": "Driver License",
-        "value": "in.gov.driverlicense"
+        "id": "workId",
+        "name": "Work Id",
+        "value": "in.gov.workid"
     },
     {
-        "id": "panCard",
-        "name": "Pan Card",
-        "value": "in.gov.pancard"
+        "id": "drivingLicense",
+        "name": "Driving License",
+        "value": "in.gov.drivinglicense"
     },
     {
         "id": "passport",
@@ -36,18 +36,8 @@ export const ID_TYPES = [
         "value": "in.gov.passport"
     },
     {
-        "id": "healthInsurance",
-        "name": "Health Insurance Smart Card",
-        "value": "in.gov.healthInsurance"
+        "id": "other",
+        "name": "Other",
+        "value": "in.gov.other"
     },
-    {
-        "id": "mnrega",
-        "name": "MNREGA Job Card",
-        "value": "in.gov.mnrega"
-    },
-    {
-        "id": "id",
-        "name": "Official Identity Card issued to MPs/MLAs",
-        "value": "in.gov.id"
-    }
 ];

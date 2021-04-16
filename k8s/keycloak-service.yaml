@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: keycloak
+  name: keycloak
+spec:
+  ports:
+    - name: "8080"
+      port: 8080
+      targetPort: 8080
+    - name: "9990"
+      port: 9990
+      targetPort: 9990
+  selector:
+    io.kompose.service: keycloak
+status:
+  loadBalancer: {}

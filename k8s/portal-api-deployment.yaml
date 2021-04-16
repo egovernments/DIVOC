@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: portal-api
+  name: portal-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: portal-api
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: portal-api
+    spec:
+      containers:
+        - env:
+            - name: ADMIN_API_CLIENT_SECRET
+              value: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
+            - name: CLICK_HOUSE_URL
+              value: tcp://clickhouse-server:9000?debug=true
+            - name: DB_HOST
+              value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+            - name: DB_PASSWORD
+              value: uhAer5489
+            - name: DB_DATABASE
+              value: divoc
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-service:9092
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080/auth
+            - name: REGISTRY_URL
+              value: http://registry-es:8081
+            - name: REGISTRY_WITH_ES_URL
+              value: http://registry-es:8081
+          image: bindock/portal_api:TAG
+          name: portal-api
+          ports:
+            - containerPort: 8001
+          resources: {}
+      restartPolicy: Always
+status: {}

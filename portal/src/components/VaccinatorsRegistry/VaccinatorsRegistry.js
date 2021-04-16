@@ -56,7 +56,7 @@ function VaccinatorsRegistry() {
         fileUploadAPI={API_URL.VACCINATORS_API}
         fileUploadHistoryAPI={API_URL.VACCINATOR_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.VACCINATOR_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Records in the DIVOC Vaccinator Registry"}
+        infoTitle={"Records in the mBrana Vaccinator Registry"}
         tableTitle="All Vaccinators"
         emptyListMessage={"No Vaccinator Found"}
         tableData={data}

@@ -4,10 +4,10 @@ docker:
 	@mkdir dockerdeps || true
 	@cp -r ../interfaces dockerdeps/
 	@cp -r ../registry dockerdeps/
+	@docker build .
 	for image in $(IMAGES); do\
-		docker build --target $$image .;\
   		echo $$image;\
-  		docker tag `docker images --filter=label=name=$$image --format "{{.ID}}"|head -1` dockerhub/$$image;\
+  		docker tag `docker images --filter=label=name=$$image --format "{{.ID}}"|head -1` bindock/$$image;\
 	done
 	$(MAKE) -C certificate_signer
 clean:

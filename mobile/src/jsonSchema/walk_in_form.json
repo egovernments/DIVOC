@@ -10,7 +10,6 @@
     "addressLine1",
     "district",
     "state",
-    "pincode",
     "identityType",
     "identityValue"
   ],
@@ -25,8 +24,7 @@
       "type": "string",
       "enum": [
         "Male",
-        "Female",
-        "Other"
+        "Female"
       ]
     },
     "nationalId": {
@@ -34,10 +32,10 @@
       "type": "string",
       "$id": "#/properties/nationalId",
       "enum": [
-        "Indian",
+        "Ethiopian",
         "Other"
       ],
-      "default": "Indian"
+      "default": "Ethiopian"
     },
     "dob": {
       "title": "Date of Birth",
@@ -87,12 +85,7 @@
     "addressLine1": {
       "$id": "#/properties/addressLine1",
       "type": "string",
-      "title": "Locality"
-    },
-    "pincode": {
-      "$id": "#/properties/pincode",
-      "type": "string",
-      "title": "Pincode"
+      "title": "Woreda"
     }
   }
 }

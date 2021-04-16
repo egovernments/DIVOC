@@ -1,4 +1,4 @@
-version: "2.4"
+version: "2"
 
 services:
   redis:
@@ -26,12 +26,12 @@ services:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  registry:
-    image: dockerhub/registry-es
+  registry-es:
+    image: bindock/registry-es
     environment:
-      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
+      - connectionInfo_uri=jdbc:postgresql://jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc
       - connectionInfo_username=postgres
-      - connectionInfo_password=postgres
+      - connectionInfo_password=uhAer5489
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
     ports:
@@ -42,17 +42,17 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: dockerhub/keycloak
+    image: bindock/keycloak
     environment:
       - DB_VENDOR=postgres
-      - DB_ADDR=db
+      - DB_ADDR=jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
       - DB_PORT=5432
-      - DB_DATABASE=registry
+      - DB_DATABASE=divoc
       - DB_USER=postgres
-      - DB_PASSWORD=postgres
+      - DB_PASSWORD=uhAer5489
       - KEYCLOAK_USER=admin
       - KEYCLOAK_PASSWORD=admin
-    #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+#      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
         ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
@@ -69,7 +69,7 @@ services:
     image: checkr/flagr
     environment:
       FLAGR_DB_DBDRIVER: postgres
-      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/registry?sslmode=disable
+      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:uhAer5489@jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com:5432/divoc?sslmode=disable
       HOST: 0.0.0.0
       FLAGR_WEB_PREFIX: /config
     ports:
@@ -110,7 +110,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api
+    image: bindock/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
@@ -130,7 +130,7 @@ services:
       keycloak:
         condition: service_healthy
   portal_api:
-    image: dockerhub/portal_api
+    image: bindock/portal_api
     ports:
       - "8001:8001"
     environment:
@@ -147,7 +147,7 @@ services:
       keycloak:
         condition: service_healthy
   registration_api:
-    image: dockerhub/registration_api
+    image: bindock/registration_api
     ports:
       - "8002:8002"
     environment:
@@ -201,9 +201,9 @@ services:
       kafka:
         condition: service_healthy
       keycloak:
-        condition: service_healthy  
+        condition: service_healthy
   analytics_feed:
-    image: dockerhub/analytics_feed
+    image: bindock/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -211,7 +211,7 @@ services:
       clickhouse-server:
         condition: service_started
   certificate_processor:
-    image: dockerhub/certificate_processor
+    image: bindock/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -222,7 +222,7 @@ services:
       registry:
         condition: service_started
   certificate_signer:
-    image: dockerhub/certificate_signer
+    image: bindock/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -240,7 +240,7 @@ services:
       kafka:
         condition: service_healthy
   nginx:
-    image: dockerhub/nginx
+    image: bindock/nginx
     ports:
       - "80:80"
     depends_on:
@@ -253,7 +253,7 @@ services:
       digilocker_support_api:
         condition: service_started
   notification-service:
-    image: dockerhub/notification-service
+    image: bindock/notification-service
     ports:
       - "8765:8765"
     environment:
@@ -265,7 +265,7 @@ services:
       kafka:
         condition: service_healthy
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+    image: bindock/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"

@@ -98,7 +98,7 @@ export const Home = () => {
 
     return (
         <div className="home-section">
-            <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
+            {/* <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-4 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
@@ -125,8 +125,8 @@ export const Home = () => {
                         </Row>
                     </div>
                 </div>
-            </div>
-            <div className="section ">
+            </div> */}
+            {/* <div className="section ">
                 <div className="info-section d-flex flex-column" style={{height: "100%"}}>
                     <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center" style={{margin:"auto"}}>
                         <Row className="d-flex justify-content-center">
@@ -149,7 +149,7 @@ export const Home = () => {
                         </Row>
                     </div>
                 </div>
-            </div>
+            </div> */}
             <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center" style={{margin:"20px"}}>

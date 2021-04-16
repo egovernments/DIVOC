@@ -63,7 +63,7 @@ function Facilities() {
         fileUploadAPI={API_URL.FACILITY_API}
         fileUploadHistoryAPI={API_URL.FACILITY_FILE_UPLOAD_HISTORY_API}
         fileUploadErrorsAPI={API_URL.FACILITY_FILE_UPLOAD_ERRORS_API}
-        infoTitle={"Records in the DIVOC Facility Registry"}
+        infoTitle={"Records in the mBrana Facility Registry"}
         tableTitle="All Facilities"
         emptyListMessage={"No Facility Found"}
         tableData={data}

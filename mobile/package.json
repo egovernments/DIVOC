@@ -1,7 +1,7 @@
 {
   "name": "divoc",
   "version": "0.1.0",
-  "homepage": "https://divoc.xiv.in/facility_app/",
+  "homepage": "https://divoc.k8s.sandboxaddis.com/facility_app/",
   "private": true,
   "dependencies": {
     "@react-keycloak/web": "^3.4.0",
@@ -75,5 +75,5 @@
     "mockdate": "^3.0.2",
     "sass": "^1.29.0"
   },
-  "proxy": "https://divoc.xiv.in"
+  "proxy": "https://divoc.k8s.sandboxaddis.com"
 }
