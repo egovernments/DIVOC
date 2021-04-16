@@ -146,7 +146,7 @@ function PatientDetails(props) {
         const selectedProgramId = getSelectedProgramId();
 
         let currentAppointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0];
-        if (!currentAppointment) {
+        if (!currentAppointment || !currentAppointment.enrollmentScopeId) {
             let vaccine = {};
             let program = await programDb.getProgramByName(getSelectedProgram());
             patient["appointments"]
@@ -158,8 +158,8 @@ function PatientDetails(props) {
                 return false
             }
 
-            const lastDoseTaken = patient["appointments"].filter(a => a["programId"] === selectedProgramId).length
-            const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
+            const lastDoseTaken = patient["appointments"].filter(a => a["programId"] === selectedProgramId && a.certified).length
+            const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId && a.certified)
                 .sort((a, b) => {
                     if (parseInt(a.dose) > parseInt(b.dose)) return 1;
                     if (parseInt(a.dose) < parseInt(b.dose)) return -1;
