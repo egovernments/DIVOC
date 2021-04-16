@@ -77,6 +77,7 @@ func sendForEnrollment(preEnrollmentCsv PreEnrollmentCSV, uploadID uint) error {
 				ProgramID: preEnrollmentCsv.ProgramId,
 				Dose: dose,
 				EnrollmentScopeID: data.Text("enrollmentScopeId"),
+				Comorbidities: []string{},
 			},
 		},
 		Yob: int64(dob.Year()),

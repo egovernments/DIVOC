@@ -284,7 +284,7 @@ func init() {
             "Bearer": []
           }
         ],
-        "summary": "register recipient to a program",
+        "summary": "register recipient to program",
         "operationId": "registerRecipientToProgram",
         "parameters": [
           {
@@ -807,7 +807,7 @@ func init() {
             "Bearer": []
           }
         ],
-        "summary": "register recipient to a program",
+        "summary": "register recipient to program",
         "operationId": "registerRecipientToProgram",
         "parameters": [
           {
@@ -1093,7 +1093,8 @@ func init() {
           "type": "string"
         },
         "programId": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "vaccine": {
           "type": "string"

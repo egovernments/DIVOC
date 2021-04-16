@@ -35,7 +35,7 @@ func NewRegisterRecipientToProgram(ctx *middleware.Context, handler RegisterReci
 
 /*RegisterRecipientToProgram swagger:route POST /recipient/{enrollment_osid}/program/{program_id}/ registerRecipientToProgram
 
-register recipient to a program
+register recipient to program
 
 */
 type RegisterRecipientToProgram struct {

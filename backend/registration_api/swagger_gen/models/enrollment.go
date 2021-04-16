@@ -307,7 +307,7 @@ type EnrollmentAppointmentsItems0 struct {
 	Osid string `json:"osid,omitempty"`
 
 	// program Id
-	ProgramID string `json:"programId,omitempty"`
+	ProgramID string `json:"programId"`
 
 	// vaccine
 	Vaccine string `json:"vaccine,omitempty"`
