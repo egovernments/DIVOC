@@ -92,6 +92,12 @@
               "dose": {
                 "type": "string",
                 "x-omitempty": false
+              },
+              "comorbidities": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
               }
             }
           }
