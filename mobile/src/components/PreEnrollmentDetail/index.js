@@ -152,21 +152,12 @@ function PatientDetails(props) {
             patient["appointments"]
                 .filter(a => a["programId"] === getSelectedProgramId() && a.vaccine)
                 .map(a => program.medicines.filter(m => m.name === a.vaccine).map(v => vaccine = v));
-            if (!vaccine) {
+            if (!vaccine || Object.keys(vaccine).length === 0) {
                 setWarningMsg(<span>No open appointments found for {patient.name} ({state.enrollCode})</span>);
                 setPatientDetailsError(true)
                 return false
             }
 
-            // check if all doses are been taken
-            if (patient["appointments"].filter(a => a["programId"] === selectedProgramId).length === vaccine.doseIntervals.length+1) {
-                setWarningMsg(<span>{patient.name} ({state.enrollCode}) has already taken {vaccine.doseIntervals.length+1} doses
-                    <br/>
-                    <span style={{color:"black"}}>{vaccine.name}<DosesState appointments={patient["appointments"]}/></span>
-                </span>);
-                setPatientDetailsError(true)
-                return false
-            }
             const lastDoseTaken = patient["appointments"].filter(a => a["programId"] === selectedProgramId).length
             const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
                 .sort((a, b) => {
@@ -174,6 +165,15 @@ function PatientDetails(props) {
                     if (parseInt(a.dose) < parseInt(b.dose)) return -1;
                     return 0;
                 });
+            // check if all doses are been taken
+            if (parseInt(sortedAppointments[sortedAppointments.length-1].dose) === vaccine.doseIntervals.length+1) {
+                setWarningMsg(<span>{patient.name} ({state.enrollCode}) has already taken {vaccine.doseIntervals.length+1} doses
+                    <br/>
+                    <span style={{color:"black"}}>{vaccine.name}<DosesState appointments={patient["appointments"]}/></span>
+                </span>);
+                setPatientDetailsError(true)
+                return false
+            }
 
             // check if minimum next vaccine dose date is less than current day
             if (parseInt(((new Date() - new Date(sortedAppointments[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) < vaccine.doseIntervals[lastDoseTaken-1].min) {
@@ -254,7 +254,7 @@ function PatientDetails(props) {
                             state={getFormData(patientDetails)}
                             onContinue={onFormContinue}
                             buttonText={getMessageComponent(LANGUAGE_KEYS.BUTTON_CONTINUE)}
-                        />;
+                        />
                     </div>
             }
 

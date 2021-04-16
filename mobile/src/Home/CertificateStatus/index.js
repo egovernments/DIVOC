@@ -111,7 +111,13 @@ export const CertificateStatus = ({certificateData, goBack, onContinue}) => {
 
     async function onContinueClick() {
         let patientDetails = {
-            address: {...data.credentialSubject.address},
+            address: {
+                "addressLine1": data.credentialSubject.address.streetAddress,
+                "addressLine2": data.credentialSubject.address.streetAddress2,
+                "district": data.credentialSubject.address.district,
+                "pincode": data.credentialSubject.address.postalCode,
+                "state": data.credentialSubject.address.addressRegion
+            },
             "code": data.credentialSubject.refId,
             "comorbidities": data.credentialSubject.comorbidities || [],
             "email": data.credentialSubject.email || "",
@@ -128,7 +134,7 @@ export const CertificateStatus = ({certificateData, goBack, onContinue}) => {
                 "certificateId": data.evidence[0].certificateId,
                 "certified": true,
                 "dose": data.evidence[0].dose,
-                "enrollmentScopeId": data.evidence[0].facility.name === facilityDetails.facility.facilityName ? facilityDetails["facility_code"] : "N/A",
+                "enrollmentScopeId": facilityDetails["facility_code"],
                 "programId": getSelectedProgramId(),
                 "vaccine": data.evidence[0].vaccine
             }]

@@ -277,6 +277,103 @@ func init() {
         }
       }
     },
+    "/recipient/{enrollment_osid}/program/{program_id}/": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "register recipient to a program",
+        "operationId": "registerRecipientToProgram",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "program_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "enrollment_osid",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comorbidities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient program",
+        "operationId": "deleteRecipientProgram",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "program_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "enrollment_osid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      }
+    },
     "/recipients": {
       "get": {
         "security": [
@@ -703,6 +800,103 @@ func init() {
         }
       }
     },
+    "/recipient/{enrollment_osid}/program/{program_id}/": {
+      "post": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "register recipient to a program",
+        "operationId": "registerRecipientToProgram",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "program_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "enrollment_osid",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "comorbidities": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      },
+      "delete": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "Delete the recipient program",
+        "operationId": "deleteRecipientProgram",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "program_id",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "string",
+            "name": "enrollment_osid",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      }
+    },
     "/recipients": {
       "get": {
         "security": [
@@ -881,8 +1075,15 @@ func init() {
           "type": "boolean",
           "x-omitempty": false
         },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dose": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "enrollmentScopeId": {
           "type": "string",

@@ -113,16 +113,16 @@ export class AppDatabase {
             patient["appointments"]
                 .filter(a => a["programId"] === selectedProgramId && a.vaccine)
                 .map(a => program.medicines.filter(m => m.name === a.vaccine).map(v => {
-                    if (patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length < v.doseIntervals.length+1) {
-                        const lastDoseTaken = patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length
-                        const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
-                            .sort((a, b) => {
-                                if (parseInt(a.dose) > parseInt(b.dose)) return 1;
-                                if (parseInt(a.dose) < parseInt(b.dose)) return -1;
-                                return 0;
-                            });
+                    const lastDoseTaken = patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length
+                    const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
+                        .sort((a, b) => {
+                            if (parseInt(a.dose) > parseInt(b.dose)) return 1;
+                            if (parseInt(a.dose) < parseInt(b.dose)) return -1;
+                            return 0;
+                        });
+                    if (parseInt(sortedAppointments[sortedAppointments.length-1].dose) < v.doseIntervals.length+1) {
                         // check if next dose min interval is matched
-                        if (parseInt(((new Date() - new Date(sortedAppointments[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) > v.doseIntervals[lastDoseTaken-1].min) {
+                        if (parseInt(((new Date() - new Date(sortedAppointments[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) >= v.doseIntervals[lastDoseTaken-1].min) {
                             patient["appointments"].push({
                                 "programId": selectedProgramId,
                                 "dose": patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length+1,

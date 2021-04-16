@@ -41,12 +41,14 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         jsonMessage = JSON.parse(message.value.toString());
         const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
-        if (preEnrollmentCode === "" || currentDose === "") {
+        const programId = R.pathOr("", ["programId"], jsonMessage);
+        if (preEnrollmentCode === "" || currentDose === "" || programId === "") {
           throw Error("Required parameters not available")
         }
-        const isSigned = await redis.checkIfKeyExists(`${preEnrollmentCode}-${currentDose}`);
+        const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
+        const isSigned = await redis.checkIfKeyExists(key);
         if (!isSigned) {
-          redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
+          redis.storeKeyWithExpiry(key, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {
               console.log(`${preEnrollmentCode} | statusCode: ${res.status} `);

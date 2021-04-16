@@ -24,3 +24,14 @@ certificate:
      required_fields: "preEnrollmentCode,recipientName,recipientMobileNumber,recipientDOB,recipientAge,recipientGender,recipientNationality,recipientIdentity,recipientAddressLine1,recipientDistrict,recipientState,recipientPincode,vaccinationDate,vaccinationDose,vaccinationTotalDoses,vaccinationEffectiveStart,vaccinationEffectiveEnd,vaccinationManufacturer,vaccinationName,vaccinatorName,facilityName,facilityAddressLine1,facilityDistrict,facilityState,facilityPincode"
 clickhouse:
   dsn: tcp://127.0.0.1:9000?debug=true
+auth:
+  registrationAPIPublickey: |
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
+    LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
+    sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
+    d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
+    Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
+    57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
+    OQIDAQAB
+    -----END PUBLIC KEY-----

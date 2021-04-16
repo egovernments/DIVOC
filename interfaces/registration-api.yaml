@@ -137,6 +137,66 @@ paths:
           description: OK
         '401':
           description: Unauthorized
+  /recipient/{enrollment_osid}/program/{program_id}/:
+    delete:
+      summary: Delete the recipient program
+      operationId: deleteRecipientProgram
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: program_id
+          in: path
+          required: true
+          type: string
+        - name: enrollment_osid
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Error
+        '401':
+          description: Unauthorized
+    post:
+      summary: register recipient to program
+      operationId: registerRecipientToProgram
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: program_id
+          in: path
+          required: true
+          type: string
+        - name: enrollment_osid
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          schema:
+            type: object
+            properties:
+              comorbidities:
+                type: array
+                items:
+                  type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Error
+        '401':
+          description: Unauthorized
 
   /recipients:
     delete:

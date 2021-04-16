@@ -23,6 +23,7 @@ import {PageNotFound} from "./components/PageNotFound";
 import React from "react";
 import {Appointment} from "./components/Appointment";
 import {AppointmentConfirm} from "./components/AppointmentConfirm";
+import {ViewRecipient} from "./components/ViewRecipient";
 
 function App() {
     const {initialized, keycloak} = useKeycloak();
@@ -35,7 +36,7 @@ function App() {
             <div className={""}>
                 <Router>
                     <Header/>
-                    <div style={{paddingBottom: "6rem", paddingTop: "3rem"}}>
+                    <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
                         <Switch>
                             <Route exact path={"/"} component={Home}/>
                             <Route exact path={config.urlPath + "/login"} component={Login}/>
@@ -57,6 +58,7 @@ function App() {
                             />
                             <Route exact path={"/registration"} component={Members} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
+                            <Route exact path={"/member/:enrollment_code"} component={ViewRecipient} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/citizen"} component={CitizenLoginComponent}/>
                             <Redirect to={"/not-found"}/>
                         </Switch>
