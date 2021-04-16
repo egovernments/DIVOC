@@ -234,7 +234,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), language), 1, "/MediaBox")
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
