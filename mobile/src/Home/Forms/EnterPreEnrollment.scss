@@ -10,6 +10,20 @@
     margin-top: 20%;
   }
 
+  .scan-qr {
+    width: 100%;
+    text-align: center;
+    border-bottom: 1px solid #ced4da;
+    line-height: 0.1em;
+    margin: 10px 0 20px;
+  }
+
+  .scan-qr span {
+    background:#fff;
+    padding:0 10px;
+    color: #707070;
+  }
+
   .input-container {
     margin-bottom: 20%;
     display: grid;

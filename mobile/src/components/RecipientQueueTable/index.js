@@ -11,6 +11,7 @@ import "./index.scss"
 import config from "config.json"
 import {formatDate} from "../../utils/date_utils";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
+import {DosesState} from "../DosesState";
 
 
 export const RecipientQueueTable = () => {
@@ -34,8 +35,8 @@ export const RecipientQueueTable = () => {
                                     <span style={{fontSize: "12px"}}>{`${data.gender} ${new Date().getFullYear() - data.yob}`}</span>
                                 </div>
                             </td>
-                            <td hidden={!data.appointments}>
-                                {/* TODO: Put doses circle here*/}
+                            <td className="pt-4" style={{maxWidth:"30px"}} hidden={!data.appointments}>
+                                {<DosesState appointments={data.appointments}/>}
                             </td>
                         </tr>
                     ))

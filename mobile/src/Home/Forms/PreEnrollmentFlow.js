@@ -76,7 +76,6 @@ function preEnrollmentReducer(state, action) {
         case FORM_PRE_ENROLL_CODE: {
             const newState = {...state};
             newState.enrollCode = action.payload.enrollCode;
-            newState.mobileNumber = action.payload.mobileNumber;
             newState.previousForm = action.payload.currentForm;
             return newState
         }
@@ -164,7 +163,8 @@ export function usePreEnrollment() {
             programId: localStorage.getItem("programId"),
             identity: state.identity,
             nationality: state.nationalId,
-            appointments: state.appointments
+            appointments: state.appointments,
+            enrollmentType: state.enrollmentType
         }
         return appIndexDb.addToQueue(queue)
     };

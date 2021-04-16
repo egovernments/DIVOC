@@ -62,6 +62,7 @@
   "app.preenrollment.continue": "CONTINUE",
   "app.preenrollment.noPatient": "इस मोबाइल नम्बर एवं पन्जीकरण क्रमांक का लाभार्थी नहीं है।",
   "app.preenrollment.enterOTP": "ओ. टी. पी. लिखें",
+  "app.preenrollment.scanQrCode": "SCAN QR CODE",
   "app.vaccination.title": "टीकाकरण की पुष्टि करें",
   "app.vaccination.vaccinator": "टीकाकर्मी",
   "app.vaccination.vaccine": "टीका",

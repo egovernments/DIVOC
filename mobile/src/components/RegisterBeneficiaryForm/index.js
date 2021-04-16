@@ -5,12 +5,6 @@ import {constuctNationalId, getNationalIdNumber, getNationalIdType, ID_TYPES} fr
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {maskPersonalDetails} from "../../utils/maskPersonalDetails";
-import {
-    FORM_WALK_IN_ENROLL_CONFIRMATION,
-    FORM_WALK_IN_ENROLL_FORM, FORM_WALK_IN_ENROLL_PAYMENTS,
-    FORM_WALK_IN_VERIFY_FORM,
-    useWalkInEnrollment
-} from "../WalkEnrollments/context";
 import {CustomButton} from "../CustomButton";
 import {
     AADHAAR_ERROR_MESSAGE,
@@ -25,9 +19,13 @@ import {
     STATE_ERROR_MSG
 } from "./error-constants";
 import {isInValidAadhaarNumber, isValidName, isValidPincode} from "../../utils/validations";
-import {appIndexDb} from "../../AppDatabase";
-import {formatAppointmentSlot} from "../../utils/date_utils";
 import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
+import {getSelectedProgram, getSelectedProgramId} from "../ProgramSelection";
+import {programDb} from "../../Services/ProgramDB";
+import doseCompletedImg from "../../assets/img/dose-completed.svg";
+import currentDoseImg from "../../assets/img/dose-currentdose.svg";
+import nextDoseImg from "../../assets/img/dose-nextdose.svg";
+import {DosesState} from "../DosesState";
 
 const GENDERS = [
     "Male",
@@ -136,6 +134,7 @@ export function BeneficiaryForm({verifyDetails, state, onContinue, buttonText}) 
             <BeneficiaryDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails}
                                 errors={errors}/>
             <ContactInfo formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
+            <VaccineDetails formData={formData} setValue={setValue} verifyDetails={verifyDetails} errors={errors}/>
             <CustomButton className="primary-btn w-100 mt-5 mb-5"
                           onClick={onContinueClick}>{buttonText}</CustomButton>
         </div>
@@ -414,9 +413,9 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     <><br/><p>{formData.phone}</p></>
                 }
             </div>
-            <div>
+            <div hidden={verifyDetails && !formData.email} >
                 <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
-                       hidden={verifyDetails && !formData.email} htmlFor="email">Beneficiary Email ID</label>
+                       htmlFor="email">Beneficiary Email ID</label>
                 <div hidden={verifyDetails}>
                     <input className="form-control" id="email" name="email" type="text"
                            placeholder="Enter Email ID"
@@ -450,6 +449,34 @@ const ContactInfo = ({verifyDetails, formData, setValue, errors}) => {
                     verifyDetails &&
                     <><br/><p>{maskPersonalDetails(formData.email)}</p></>
                 }
+            </div>
+        </div>
+    )
+};
+
+const VaccineDetails = ({verifyDetails, formData, setValue, errors}) => {
+
+    const hasVaccine = formData.appointments ?
+        formData.appointments.filter(a => a["programId"] === getSelectedProgramId() && a.vaccine).length > 0 : false;
+
+    return (
+        <div className="pt-3">
+            <div hidden={!hasVaccine}>
+                <h5>Vaccine Details</h5>
+                <div>
+                    <label className={verifyDetails ? "custom-verify-text-label" : "custom-text-label"}
+                           htmlFor="mobile">Vaccine</label>
+                    {
+                        verifyDetails &&
+                        <><br/>
+                        <p>
+                            {formData.appointments.filter(a => a["programId"] === getSelectedProgramId() && !a.certified)[0]?.vaccine}
+                            {
+                                <DosesState appointments={formData.appointments}/>
+                            }
+                        </p></>
+                    }
+                </div>
             </div>
             <div hidden={!formData.comorbidities || formData.comorbidities.length === 0} className="comorbidities-section">
                 <label htmlFor="confirmEmail">Comorbidities</label>

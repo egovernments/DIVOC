@@ -56,6 +56,7 @@
   "app.preenrollment.continue": "CONTINUE",
   "app.preenrollment.noPatient": "No beneficiary details found",
   "app.preenrollment.enterOTP": "Enter OTP",
+  "app.preenrollment.scanQrCode": "SCAN QR CODE",
   "app.vaccination.title": "Confirm Vaccination",
   "app.vaccination.vaccinator": "Vaccinator",
   "app.vaccination.vaccine": "Vaccine",

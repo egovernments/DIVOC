@@ -36,7 +36,15 @@
     "workbox-range-requests": "^5.1.3",
     "workbox-routing": "^5.1.3",
     "workbox-strategies": "^5.1.3",
-    "workbox-streams": "^5.1.3"
+    "workbox-streams": "^5.1.3",
+    "zbar.wasm": "^2.0.3",
+    "jszip": "^3.5.0",
+    "crypto-ld": "latest",
+    "jsonld": "latest",
+    "security-context": "latest",
+    "jsonld-signatures": "^6.0.0",
+    "ramda": "^0.27.1",
+    "vaccination-context": "^1.0.7"
   },
   "scripts": {
     "start": "react-scripts start",

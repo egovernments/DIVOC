@@ -1,6 +1,6 @@
 import {openDB} from "idb";
 import {LANGUAGE_KEYS} from "./lang/LocaleContext";
-import {getSelectedProgramId} from "./components/ProgramSelection";
+import {getSelectedProgram, getSelectedProgramId} from "./components/ProgramSelection";
 import {programDb} from "./Services/ProgramDB";
 import {monthNames, weekdays} from "./utils/date_utils";
 import {ApiServices} from "./Services/ApiServices";
@@ -65,7 +65,7 @@ const dbConfigs = [
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
-export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", WALK_IN: "WALK_IN"});
+export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", SELF_ENROLLMENT: "SELF_ENRL", WALK_IN: "WALK_IN"});
 
 export class AppDatabase {
 
@@ -95,28 +95,79 @@ export class AppDatabase {
         return this.db.put(QUEUE, patients);
     }
 
+    async getPatientDetailsFromQueue(enrollCode) {
+        const queue = await this.db.get(QUEUE, enrollCode);
+        return queue
+    }
+
+    async createAppointment(patient) {
+        const selectedProgramId = await getSelectedProgramId();
+        const currSch = await this.getCurrentAppointmentSlot();
+        const facilityDetails = await this.getUserDetails();
+        const program = await programDb.getProgramByName(getSelectedProgram());
+
+        // get open appointment for current program
+        let currentAppointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0];
+        if (!currentAppointment) {
+            // createAppointment for next dose if applicable
+            patient["appointments"]
+                .filter(a => a["programId"] === selectedProgramId && a.vaccine)
+                .map(a => program.medicines.filter(m => m.name === a.vaccine).map(v => {
+                    if (patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length < v.doseIntervals.length+1) {
+                        const lastDoseTaken = patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length
+                        const sortedAppointments = patient["appointments"].filter(a => a["programId"] === selectedProgramId)
+                            .sort((a, b) => {
+                                if (parseInt(a.dose) > parseInt(b.dose)) return 1;
+                                if (parseInt(a.dose) < parseInt(b.dose)) return -1;
+                                return 0;
+                            });
+                        // check if next dose min interval is matched
+                        if (parseInt(((new Date() - new Date(sortedAppointments[sortedAppointments.length-1].appointmentDate))/(1000*60*60*24)).toFixed()) > v.doseIntervals[lastDoseTaken-1].min) {
+                            patient["appointments"].push({
+                                "programId": selectedProgramId,
+                                "dose": patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId).length+1,
+                                "certified": false,
+                                "vaccine": v.name,
+                                "enrollmentScopeId": facilityDetails["facility_code"],
+                                "appointmentDate": new Date().toISOString().slice(0, 10),
+                                "appointmentSlot": currSch.startTime ? currSch.startTime+"-"+currSch.endTime : ""
+                            });
+                            this.db.put(PATIENTS, patient)
+                        }
+                    }
+                }));
+            return patient
+        }
+
+        // adding enrollment details for non booked appointments
+        if (!currentAppointment.enrollmentScopeId) {
+            patient["appointments"].map(a => {
+                if (a["programId"] === getSelectedProgramId() && !a.certified) {
+                    a.enrollmentScopeId = facilityDetails["facility_code"];
+                    a.appointmentDate = new Date().toISOString().slice(0, 10);
+                    a.appointmentSlot = currSch.startTime ? currSch.startTime+"-"+currSch.endTime : "";
+                }
+            });
+            await this.db.put(PATIENTS, patient)
+        }
+        return patient
+    }
+
     async getPatientDetails(enrollCode, isOnline) {
         let patient = await this.db.get(PATIENTS, enrollCode);
         if (!patient && isOnline) {
             patient = await ApiServices.fetchEnrollmentByCode(enrollCode);
-            const currentAppointment = patient["appointments"].filter(a => a["programId"] === getSelectedProgramId() && !a.certified)[0]
-            if (!currentAppointment.enrollmentScopeId) {
-                const facilityDetails = await this.getUserDetails();
-                const currSch = await this.getCurrentAppointmentSlot();
-                patient["appointments"].map(a => {
-                    if (a["programId"] === getSelectedProgramId() && !a.certified) {
-                        a.enrollmentScopeId = facilityDetails["facility_code"];
-                        a.appointmentDate = new Date().toISOString().slice(0, 10);
-                        a.appointmentSlot = currSch ? currSch.startTime+"-"+currSch.endTime : "";
-                    }
-                })
-            }
             await this.db.put(PATIENTS, patient);
         }
-        const inQueue = await this.db.get(QUEUE, enrollCode);
-        if (patient && !inQueue) {
-            const selectedProgramId = getSelectedProgramId();
-            if (patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId && !a.certified)) {
+
+        const selectedProgramId = getSelectedProgramId();
+
+        if (patient) {
+            if (patient["appointments"].filter(a => a[PROGRAM_ID] === selectedProgramId)) {
+                let currentAppointment = patient["appointments"].filter(a => a["programId"] === selectedProgramId && !a.certified)[0]
+                if (!currentAppointment || !currentAppointment.enrollmentScopeId) {
+                    return await this.createAppointment(patient);
+                }
                 return patient
             } else {
                 return null;
@@ -181,8 +232,28 @@ export class AppDatabase {
         }
     }
 
-    async markPatientAsComplete(enrollCode) {
-        const patient = await this.db.get(QUEUE, enrollCode);
+    async markPatientAsComplete(payload) {
+        const patient = await this.db.get(QUEUE, payload.enrollCode);
+        const selectedProgramId = getSelectedProgramId()
+        // if not walkin, update appointment info
+        if (patient.enrollmentType !== ENROLLMENT_TYPES.WALK_IN) {
+            patient.appointments.map(a => {
+                if (a["programId"] === selectedProgramId && !a.certified) {
+                    a["certified"] = true
+                    a["vaccine"] = a["vaccine"] ? a["vaccine"]: payload.medicineId
+                }
+            });
+
+            // update in patients table
+            const patientFromEnrollment = await this.db.get(PATIENTS, payload.enrollCode)
+            patientFromEnrollment.appointments.map(a => {
+                if (a["programId"] === selectedProgramId && !a.certified) {
+                    a["certified"] = true;
+                    a["vaccine"] = a["vaccine"] ? a["vaccine"]: payload.medicineId
+                }
+            });
+            await this.db.put(PATIENTS, patientFromEnrollment)
+        }
         patient.status = QUEUE_STATUS.COMPLETED;
         return this.db.put(QUEUE, patient)
     }
@@ -207,7 +278,7 @@ export class AppDatabase {
     async saveEnrollments(enrollments, enrollmentType) {
         const enrollmentsList = enrollments || [];
         const patients = enrollmentsList.map((item, index) => {
-            item.enrollmentType = enrollmentType;
+            item.enrollmentType = item.enrollmentType ? item.enrollmentType: enrollmentType;
             return this.db.put(PATIENTS, item)
         });
         return Promise.all(patients)

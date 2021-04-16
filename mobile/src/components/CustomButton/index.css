@@ -14,6 +14,11 @@
     background: transparent linear-gradient(90deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
 }
 
+.blue-btn-outline {
+    color: #5c9ef8;
+    border-color: #5c9ef8
+}
+
 .yellow-btn {
     background: transparent linear-gradient(91deg, #FDBD22 0%, #DE9D00 100%) 0% 0% no-repeat padding-box;
 }
