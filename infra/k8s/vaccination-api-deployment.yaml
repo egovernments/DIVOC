@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: vaccination-api
+  name: vaccination-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: vaccination-api
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: vaccination-api
+    spec:
+      containers:
+        - env:
+            - name: DB_HOST
+              value: jsi-pg.c47qvcjxjdo1.us-east-1.rds.amazonaws.com
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_PASSWORD
+              value: uhAer5489
+            - name: DB_NAME
+              value: divoc
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: kafka-service:9092
+            - name: KEYCLOAK_URL
+              value: http://keycloak:8080/auth
+            - name: REGISTRY_URL
+              value: http://registry:8081
+          image: dockerhub/vaccination_api
+          name: vaccination-api
+          ports:
+            - containerPort: 8000
+          resources: {}
+      restartPolicy: Always
+status: {}

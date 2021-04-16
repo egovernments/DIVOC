@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: registry-es
+  name: registry-es
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: registry-es
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: registry-es
+    spec:
+      containers:
+        - env:
+            - name: connectionInfo_password
+              value: -- password from env
+            - name: connectionInfo_uri
+              value: -- DB  value
+            - name: connectionInfo_username
+              value: postgres
+            - name: elastic_search_connection_url
+              value:  -- es url
+            - name: search_provider
+              value: io.opensaber.registry.service.ElasticSearchService
+          image: bindock/registry-es:TAG
+          name: registry-es
+          ports:
+            - containerPort: 8081
+          resources: {}
+      restartPolicy: Always
+status: {}

@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2021-02-17T09:57:07Z"
+  generateName: digilocker-support-api-
+  labels:
+    io.kompose.service: digilocker-support-api
+  name: digilocker-support-api
+  namespace: divoc
+  resourceVersion: "62951359"
+  selfLink: /api/v1/namespaces/divoc/services/digilocker-support-api-mrgdn
+  uid: bd140952-f20a-4032-b9d5-f7aadf8657f2
+spec:
+  ports:
+  - port: 8003
+    protocol: TCP
+    targetPort: 8003
+  selector:
+    io.kompose.service: digilocker-support-api
+  sessionAffinity: None
+  type: ClusterIP
+status:
+  loadBalancer: {}

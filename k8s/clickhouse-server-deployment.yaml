@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+    kompose.version: 1.22.0 (955b78124)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: clickhouse-server
+  name: clickhouse-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: clickhouse-server
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert -f ../docker-compose-komp.yml
+        kompose.version: 1.22.0 (955b78124)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: clickhouse-server
+    spec:
+      containers:
+        - image: yandex/clickhouse-server
+          name: clickhouse-server
+          ports:
+            - containerPort: 8123
+            - containerPort: 9000
+          volumeMounts:
+          - name: clickhouse-persistent-storage
+            mountPath: /var/lib/clickhouse
+      restartPolicy: Always
+      volumes:
+      - name: clickhouse-persistent-storage
+        persistentVolumeClaim:
+          claimName: clickhouse-pv-claim
+status: {}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: clickhouse-pv-claim
+  labels:
+    app: clickhouse
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
