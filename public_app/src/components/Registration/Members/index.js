@@ -528,7 +528,7 @@ const AppointmentTimeline = ({
         if (window.location.host.split(":")[0] === "localhost") {
             certificateURL = "https://divoc.xiv.in"
         }
-        window.open(`${certificateURL}/cert/api/certificate/${certificateId}?authToken=${token}`, '_blank').focus();
+        window.open(`${certificateURL}/certificate/api/certificate/${certificateId}?authToken=${token}`, '_blank').focus();
     }
 
     return (
