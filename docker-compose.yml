@@ -287,3 +287,23 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
+  certificate_api:
+    image: dockerhub/certificate_api
+    ports:
+      - "4321:4321"
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      AUTH_PUBLIC_KEY: |
+        -----BEGIN PUBLIC KEY-----
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
+        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
+        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
+        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
+        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
+        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
+        OQIDAQAB
+        -----END PUBLIC KEY-----
+    depends_on:
+      kafka:
+        condition: service_healthy

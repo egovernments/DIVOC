@@ -10,5 +10,6 @@ docker:
   		docker tag `docker images --filter=label=name=$$image --format "{{.ID}}"|head -1` dockerhub/$$image;\
 	done
 	$(MAKE) -C certificate_signer
+	$(MAKE) -C certificate_api
 clean:
 	@rm -rf dockerdeps
