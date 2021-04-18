@@ -12,6 +12,9 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificate/")) {
         const data = await certificateController.getCertificate(req, res);
         res.end(data)
+    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificatePDF")) {
+        const data = await certificateController.getCertificatePDF(req, res);
+        res.end(data)
     } else {
         res.end(`{"error": "${http.STATUS_CODES[404]}"}`)
     }
@@ -20,5 +23,6 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, async () => {
     await initKafa();
+    await KeycloakFactory.getPublicKey();
     console.log(`Server listening on port ${port}`);
 });

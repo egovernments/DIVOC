@@ -11,6 +11,18 @@ async function verifyToken(token) {
     }
 }
 
+async function verifyKeycloakToken(bearerToken) {
+    try {
+        const token = bearerToken.split(" ")[1];
+        const publicKey = await KeycloakFactory.getPublicKey();
+        const decoded = jwt.verify(token, "-----BEGIN PUBLIC KEY-----\n"+publicKey+"\n-----END PUBLIC KEY-----\n");
+        return decoded;
+    } catch (err) {
+        throw err
+    }
+}
+
 module.exports = {
-    verifyToken
+    verifyToken,
+    verifyKeycloakToken
 };

@@ -292,6 +292,7 @@ services:
     ports:
       - "4321:4321"
     environment:
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       AUTH_PUBLIC_KEY: |
