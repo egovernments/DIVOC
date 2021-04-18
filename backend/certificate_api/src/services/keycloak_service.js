@@ -25,7 +25,7 @@ const KeycloakFactory = (function(){
             }
             return instance;
         },
-        getPublicToken : async function () {
+        getPublicKey : async function () {
             let obj = await this.getInstance();
             return obj.keycloakPublicToken;
         }

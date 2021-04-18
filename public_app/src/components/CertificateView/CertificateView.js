@@ -133,7 +133,7 @@ function CertificateView() {
         return (
             <div id="certificate">
                 <Document
-                    file={{ url: '/cert/api/certificatePDF?certificateId='+certificateData.certificateId, httpHeaders: { 'Authorization': config.headers.Authorization }, withCredentials: true }}
+                    file={{ url: '/certificate/api/certificatePDF?certificateId='+certificateData.certificateId, httpHeaders: { 'Authorization': config.headers.Authorization }, withCredentials: true }}
                     onLoadSuccess={onDocumentLoadSuccess}
                 >
                     {Array.from(
