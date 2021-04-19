@@ -286,7 +286,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
               <Row className={"col-6 ml-0 comorbidities-list-wrapper"}>
                 {
                   conditions.map(x =>
-                    <div className="col-md-6">
+                    <div>
                       <input className="form-check-input" type="checkbox" checked={formData.comorbidities.includes(x)}
                              value={x} id={x} onChange={(e) => {
                         selectComorbidity(e.target);
