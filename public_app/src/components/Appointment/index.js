@@ -7,7 +7,7 @@ import PrivateSvg from "../../assets/img/icon-private.svg"
 import statusAppointmentImg from "../../assets/img/status-appointment.png"
 import statusWalkInImg from "../../assets/img/status-walkin.png"
 import GovernmentSvg from "../../assets/img/icon-government.svg"
-import {formatDate, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
+import {formatDateForSlot, formatDateLong, formatTimeInterval12hr} from "../../utils/CustomDate";
 import {CustomButton} from "../CustomButton";
 import Img from "../../assets/img/icon-search.svg"
 import {useHistory} from "react-router-dom";
@@ -24,7 +24,6 @@ export const Appointment = (props) => {
     const history = useHistory();
     const [isLoading, setIsLoading] = useState(false);
     const [searchText, setSearchText] = useState(state?.recipientPinCode || "");
-    const [searchDate, setSearchDate] = useState("");
     const [facilities, setFacilities] = useState([]);
     const [selectedFacilityIndex, setSelectedFacilityIndex] = useState(-1);
     const [showModal, setShowModal] = useState(false);
@@ -326,7 +325,7 @@ const FacilityAllotment = ({facilitySlots, showModal, facilitySchedule}) => {
                         <td style={{paddingLeft: "2.4rem"}} className="text-nowrap font-weight-bold"/>
                         {
                             dates.map(date => <td style={{paddingLeft: "2.4rem"}}
-                                className="text-nowrap font-weight-bold slot-booking-header">{date.length > 0 ? formatDate(date) : date}</td>)
+                                className="text-nowrap font-weight-bold slot-booking-header">{date.length > 0 ? formatDateForSlot(date) : date}</td>)
                         }
                     </tr>
                     {

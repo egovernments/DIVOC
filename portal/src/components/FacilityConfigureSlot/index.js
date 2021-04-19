@@ -9,7 +9,7 @@ import config from "../../config"
 import {useAxios} from "../../utils/useAxios";
 import {API_URL, TAB_INDICES} from "../../utils/constants";
 import {
-    INVALID_FIRST_SLOT_TIME, INVALID_SLOT_COUNT,
+    INVALID_SLOT_COUNT,
     INVALID_SLOT_TIME,
     INVALID_TIME,
     SCHEDULE_WITH_NO_DAYS_SELECTED, WALKIN_SCHEDULE_ERROR_MSG
@@ -207,15 +207,20 @@ export default function FacilityConfigureSlot ({location}) {
                 return parseInt(hrMin[0] + hrMin[1])
             }
             if (APPOINTMENT_SCHEDULE === schedule.scheduleType && schedule.startTime && schedule.endTime) {
-                if (timeToNumber(schedule.startTime) > timeToNumber(schedule.endTime)) {
-                    err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_FIRST_SLOT_TIME};
+                if (timeToNumber(schedule.startTime) >= timeToNumber(schedule.endTime)) {
+                    err = {...err, [schedule.scheduleType + schedule.index + "endTime"]: INVALID_SLOT_TIME};
+                    err = {...err, [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME};
                 }
                 if (schedule.index - 1 >= 0) {
                     if (appointmentSchedules[schedule.index - 1].endTime &&
                         timeToNumber(schedule.startTime) < timeToNumber(appointmentSchedules[schedule.index - 1].endTime)) {
                         err = {
                             ...err,
-                            [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME
+                            [schedule.scheduleType + schedule.index + "startTime"]: INVALID_SLOT_TIME,
+                        };
+                        err = {
+                            ...err,
+                            [schedule.scheduleType + (schedule.index - 1) + "endTime"]: INVALID_SLOT_TIME,
                         };
                     }
                 }

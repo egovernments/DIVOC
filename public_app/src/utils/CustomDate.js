@@ -26,6 +26,14 @@ export function formatDateLong(givenDate) {
     return `${weekday}, ${day}-${monthName}-${year}`
 }
 
+export function formatDateForSlot(givenDate) {
+    const d = new Date(givenDate);
+    const weekday = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getDay()]
+    const day = d.getDate()
+    const monthName = monthNames[d.getMonth()];
+    return `${weekday}, ${monthName} ${day}`
+}
+
 export function formatTimeInterval12hr(t) {
 
     const to12Hr = (time) => {
