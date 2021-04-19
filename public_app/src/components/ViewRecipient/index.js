@@ -47,8 +47,8 @@ export const ViewRecipient = (props) => {
     </div>;
     return (
         <div className="view-details-wrapper">
-            {isLoading && <Loader/>}
-            <FormPersonalDetails
+            {isLoading ? <Loader/> :
+            <><FormPersonalDetails
                 formData={formData}
                 header={header}
                 footer={footer}
@@ -61,7 +61,7 @@ export const ViewRecipient = (props) => {
                 }}/>
             <DeleteRecipientModal member={state.member} showModal={showModal} onHideModal={() => {
                 setShowModal(false)
-            }} setIsLoading={setIsLoading}/>
+            }} setIsLoading={setIsLoading}/></>}
         </div>
     )
 };

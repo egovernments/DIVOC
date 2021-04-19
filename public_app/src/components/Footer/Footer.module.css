@@ -5,6 +5,7 @@
     position: fixed !important;
     bottom: 0 !important;
     width: 100%;
+    z-index: 100;
 }
 
 .nav-link {

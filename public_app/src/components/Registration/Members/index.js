@@ -226,9 +226,10 @@ export const Members = () => {
             <Container fluid>
                 <div className="members-container">
                     {/*<marquee style={{color: ""}}>{marqueeMsg}</marquee>*/}
-                    <div className="d-flex justify-content-between align-items-center mb-3">
-                        <h3>Registered Beneficiaries <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
-                        </h3>
+                    <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                        <div className="d-flex flex-wrap align-items-center">
+                            <h3>Registered Beneficiaries</h3> <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
+                        </div>
                         {members.length < appConfig.registerMemberLimit &&
                         <CustomButton className="blue-outline-btn" onClick={() => {
                             history.push("/addMember")
@@ -532,50 +533,56 @@ const AppointmentTimeline = ({
     }
 
     return (
-        <div className={`d-flex justify-content-between position-relative ${isAppointmentScheduled && "w-50"}`}>
-            {!certified && <span className="appointment-line"/>}
-            {!isAppointmentScheduled && dose === "1" && <div className="d-flex flex-column" style={{zIndex: 1}}>
+        <div className={`appointment-timeline ${isAppointmentScheduled && "w-50"}`}>
+            {!certified && <span className={`appointment-line ${isAppointmentScheduled && "appointment-line-mini"}`}/>}
+            {!isAppointmentScheduled && dose === "1" && <div className="timeline-node" style={{zIndex: 1}}>
                 <img src={CheckImg} className="appointment-active-circle"/>
-                <span className="appointment-active-title font-weight-bold">Registered</span>
-                <span className="appointment-active-title">{registeredDate}</span>
-                {showDeleteRecipientProgram && <CustomButton isLink onClick={onDeleteRecipientProgram}
-                                                             className="appointment-link-btn">Delete</CustomButton>}
+                <div className="timeline-node-text">
+                    <span className="appointment-active-title font-weight-bold">Registered</span>
+                    <span className="appointment-active-title">{registeredDate}</span>
+                    {showDeleteRecipientProgram && <CustomButton isLink onClick={onDeleteRecipientProgram}
+                                                                 className="appointment-link-btn">Delete</CustomButton>}
+                </div>
             </div>}
-            {!certified && <div className="d-flex flex-column" style={{zIndex: 1}}>
+            {!certified && <div className="timeline-node" style={{zIndex: 1}}>
                 {
                     isAppointmentScheduled ? <img src={CheckImg} className="appointment-active-circle"/> :
                         <span className="appointment-inactive-circle"/>
                 }
+                <div className="timeline-node-text">
                 <span
                     className={`${isAppointmentScheduled ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Scheduled ({ordinal_suffix_of(dose)} Dose)</span>
-                {isAppointmentScheduled &&
-                <span className="appointment-active-title">{formatDate(appointmentDate)} {appointmentSlot}</span>}
-                {isAppointmentScheduled && <span
-                    className="appointment-active-title">{facilityDetails.facilityName}, {facilityDetails.district}, {facilityDetails.state}, {facilityDetails.pincode}</span>}
-                {showBookAppointment &&
-                <CustomButton isLink onClick={onBookAppointment} className="appointment-link-btn">Book
-                    Appointment</CustomButton>}
-                {
-                    showCancelAppointment &&
-                    <CustomButton isLink onClick={onCancelAppointment} className="appointment-link-btn">Cancel
-                        Appointment</CustomButton>
-                }
+                    {isAppointmentScheduled &&
+                    <span className="appointment-active-title">{formatDate(appointmentDate)} {appointmentSlot}</span>}
+                    {isAppointmentScheduled && <span
+                        className="appointment-active-title">{facilityDetails.facilityName}, {facilityDetails.district}, {facilityDetails.state}, {facilityDetails.pincode}</span>}
+                    {showBookAppointment &&
+                    <CustomButton isLink onClick={onBookAppointment} className="appointment-link-btn">Book
+                        Appointment</CustomButton>}
+                    {
+                        showCancelAppointment &&
+                        <CustomButton isLink onClick={onCancelAppointment} className="appointment-link-btn">Cancel
+                            Appointment</CustomButton>
+                    }
+                </div>
             </div>}
-            <div className="d-flex flex-column" style={{zIndex: 1}}>
+            <div className="timeline-node" style={{zIndex: 1}}>
                 {
                     certified ? <img src={CheckImg} className="appointment-active-circle"/> :
                         <span className="appointment-inactive-circle"/>
                 }
+                <div className="timeline-node-text">
                 <span
                     className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
-                    {certified && <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span> }
+                        {certified && <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span> }
                 </span>
                 {
                     certified && <>
-                        <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
-                            Certificate</CustomButton>
-                    </>
-                }
+                            <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
+                                Certificate</CustomButton>
+                        </>
+                    }
+                </div>
             </div>
         </div>
     )

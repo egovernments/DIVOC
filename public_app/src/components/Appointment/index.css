@@ -3,6 +3,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    overflow: auto;
 }
 
 .appointment-container .card-container {
@@ -105,4 +106,10 @@
     color: cornflowerblue;
     font-weight: bold;
     padding: 5px;
+}
+
+@media only screen and (max-width: 768px) {
+    .appointment-container .card-container {
+        padding: 1rem 0rem;
+    }
 }
