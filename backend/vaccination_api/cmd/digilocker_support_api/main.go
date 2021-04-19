@@ -226,6 +226,9 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	if len(language) == 0 {
 		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
 	}
+	if len(language) == 0 {
+		language = "ENG"
+	}
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
@@ -724,7 +727,7 @@ func main() {
 	r.HandleFunc("/cert/api/pullUriRequest", timed(uriRequest)).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", timed(docRequest)).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(getPDFHandler)).Methods("GET")
 	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
