@@ -205,6 +205,12 @@
 
 
 @media only screen and (max-width: 768px) {
+    .allotment-wrapper {
+        font-size: 14px;
+    }
+    .allotment-wrapper h5{
+        font-size: 14px;
+    }
     .appointment-schedule {
         width: 100%;
     }
@@ -254,6 +260,32 @@
     .appointment-schedule .w-50 {
         width: 100% !important;
     }
+    .select-program-modal {
+        font-size: 14px;
+    }
+    .select-program-modal h3{
+        font-size: 14px;
+    }
+    .select-program-modal .position-absolute img{
+        width: 80%;
+    }
+    .select-program-container {
+         padding-top: 1.5rem !important;
+         display: flex;
+         flex-direction: column;
+         align-items: center;
+     }
+
+    .select-program-container >:first-child {
+        align-self: flex-start;
+    }
+    .modal {
+        top: 5% !important;
+        height: 90% !important;
+    }
+    .select-program-modal .shadow-sm .comorbidities-list-wrapper {
+        max-height: 40vh !important;
+    }
 }
 
 
@@ -264,5 +296,26 @@
     .member-card-body {
         padding: 1rem 2rem!important;
         padding-top: 0 !important;
+    }
+}
+
+
+@media only screen and (min-width: 1520px){
+    .appointment-line {
+        width: 93%;
+    }
+
+    .appointment-line-mini {
+        width: 85%;
+    }
+}
+
+@media only screen and (min-width: 1970px){
+    .appointment-line {
+        width: 95%;
+    }
+
+    .appointment-line-mini {
+        width: 90%;
     }
 }
