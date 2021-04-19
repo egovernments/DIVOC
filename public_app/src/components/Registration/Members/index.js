@@ -567,10 +567,11 @@ const AppointmentTimeline = ({
                         <span className="appointment-inactive-circle"/>
                 }
                 <span
-                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated</span>
+                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
+                    {certified && <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span> }
+                </span>
                 {
                     certified && <>
-                        <span className="appointment-active-title">{formatDate(registeredDate)}</span>
                         <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
                             Certificate</CustomButton>
                     </>
