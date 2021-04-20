@@ -6,6 +6,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -287,6 +288,14 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		}
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
+		}
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Invalid Age or DOB. Should be less than current date"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code:    &errorCode,
+				Message: &errorMsg,
+			})
 		}
 
 		if jsonRequestString, err := json.Marshal(request); err == nil {
