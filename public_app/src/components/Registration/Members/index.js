@@ -603,7 +603,7 @@ const AppointmentTimeline = ({
                 }
                 <div className="timeline-node-text">
                 <span
-                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
+                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"} d-flex flex-wrap`}>Vaccinated <span className="ml-1 ml-lg-0"> ({ordinal_suffix_of(dose)} Dose)</span>
                     {certified &&
                     <span className="appointment-active-title font-weight-normal ml-1">{formatDate(registeredDate)}</span>}
                 </span>
