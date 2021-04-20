@@ -1,4 +1,4 @@
-ansible==2.6.18
+ansible==2.9.20
 docker-py==1.10.6
 flake8==3.5.0
 molecule==2.19.0
