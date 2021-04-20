@@ -460,7 +460,7 @@ const MemberCard = (props) => {
                                     onCancelAppointment={() => {
                                         props.onCancelAppointment(appointment.index)
                                     }}
-                                    isAppointmentScheduled={appointment.enrollmentScopeId !== ""}
+                                    isAppointmentScheduled={appointment.enrollmentScopeId !== "" || appointment.certified}
                                     appointmentDate={appointment.appointmentDate}
                                     appointmentSlot={appointment.appointmentSlot}
                                     facilityDetails={appointment.facilityDetails}
@@ -574,7 +574,7 @@ const AppointmentTimeline = ({
                 <div className="timeline-node-text">
                 <span
                     className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
-                        {certified && <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span> }
+                        {certified && <span className="appointment-active-title font-weight-normal ml-1">{formatDate(registeredDate)}</span> }
                 </span>
                 {
                     certified && <>
