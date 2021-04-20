@@ -6,3 +6,16 @@
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px;
 }
+
+.view-details-wrapper .delete-tooltip{
+    text-align: center;
+    display: inline-block;
+    width: 2rem;
+    padding: 2px;
+    border-radius: 1000px;
+    border: 1px solid gainsboro;
+    margin-left: 1rem;
+    color: darkgrey;
+    background: ghostwhite;
+    cursor: pointer;
+}

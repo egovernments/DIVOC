@@ -18,8 +18,10 @@ import {EligibilityWarning} from "../../EligibilityWarning";
 import {ContextAwareToggle, CustomAccordion} from "../../CustomAccordion";
 import {SelectComorbidity, SelectProgram} from "../AddMember";
 import {ordinal_suffix_of} from "../../../utils/dateUtils";
+import {CustomModal} from "../../CustomModal";
 
 const DELETE_MEMBER = "DELETE_MEMBER";
+const DELETE_REGISTERED_PROGRAM = "DELETE_REGISTERED_PROGRAM";
 const CANCEL_APPOINTMENT = "CANCEL_APPOINTMENT";
 export const Members = () => {
     const history = useHistory();
@@ -143,6 +145,47 @@ export const Members = () => {
                 console.log("throwened error", e);
             })
     }
+
+    function onDeleteRecipientProgram(recipientOsid, programId) {
+        const member = members[selectedMemberIndex];
+        member.appointments.sort((a, b) => {
+            if (a.programId < b.programId) {
+                return -1;
+            }
+            if (a.programId > b.programId) {
+                return 1;
+            }
+            return 0;
+        });
+        const appointment = member.appointments[selectedAppointmentIndex];
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"}
+        };
+
+        axios.delete(`/divoc/api/citizen/recipient/${member.osid}/program/${appointment.programId}`, config)
+            .then(res => {
+                setIsLoading(true);
+                setTimeout(() => {
+                    fetchRecipients();
+                    fetchPrograms()
+                }, 3000);
+
+            })
+            .catch((err) => {
+                if (pathOr("", ["response", "data", "message"], err) !== "") {
+                    alert(err.response.data.message);
+                } else {
+                    alert("Something went wrong. Please try again");
+                }
+            })
+            .finally(() => {
+                setShowModal(false);
+                setSelectedMemberIndex(-1)
+                setSelectedAppointmentIndex(-1)
+            });
+    }
+
 
     function callCancelAppointment() {
         const member = members[selectedMemberIndex];
@@ -271,6 +314,14 @@ export const Members = () => {
                                             setMemberAction(CANCEL_APPOINTMENT)
                                         }
                                     }
+                                    onDeleteRegisteredProgram={
+                                        (appointmentIndex) => {
+                                            setShowModal(true);
+                                            setSelectedMemberIndex(index);
+                                            setSelectedAppointmentIndex(appointmentIndex)
+                                            setMemberAction(DELETE_REGISTERED_PROGRAM)
+                                        }
+                                    }
                                     onDeleteMember={
                                         () => {
                                             setShowModal(true);
@@ -315,13 +366,16 @@ export const Members = () => {
                     callCancelAppointment={callCancelAppointment}
                     callDeleteRecipient={callDeleteRecipient}
                     selectedAppointmentIndex={selectedAppointmentIndex}
+                    onDeleteRecipientProgram={onDeleteRecipientProgram}
+                    programsById={programsById}
                 />}
             </Container>
         </div>
     );
 };
 
-const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, callDeleteRecipient, callCancelAppointment, selectedAppointmentIndex}) => {
+const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, callDeleteRecipient,
+                                    callCancelAppointment, selectedAppointmentIndex, onDeleteRecipientProgram, programsById}) => {
     member.appointments.sort((a, b) => {
         if (a.programId < b.programId) {
             return -1;
@@ -332,35 +386,29 @@ const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, 
         return 0;
     })
     return (
-        <Modal show={showModal} onHide={() => {
-            setShowModal(false)
-        }} centered backdrop="static" keyboard={false}>
-            <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
-                <div className="d-flex justify-content-between align-items-center">
-                    <div/>
-                    <h5>{memberAction === CANCEL_APPOINTMENT ? "Confirm Cancelling Appointment" : "Confirm Removing Member"}</h5>
-                    <img src={CloseImg} className="cursor-pointer" alt={""}
-                         onClick={() => {
-                             setShowModal(false)
-                         }}/>
-                </div>
-                <div className="d-flex flex-column justify-content-center align-items-center">
-                    <b>{member.name}</b>
-                    <b className="text-center mt-1">Enrollment number: {member.code}</b>
+        <>
+            <CustomModal title={memberAction === CANCEL_APPOINTMENT ? "Cancel Appointment" : "Delete Registration"}
+                         showModal={true} onClose={() => {
+                setShowModal(false)
+            }} onPrimaryBtnClick={() => {
+                memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : onDeleteRecipientProgram()
+            }} primaryBtnText={memberAction === CANCEL_APPOINTMENT ? "Continue" : "Yes, Delete"}>
+                <div className="d-flex flex-column ">
+                    {memberAction === DELETE_REGISTERED_PROGRAM && <spam>{`'${programsById[member["appointments"][selectedAppointmentIndex].programId].name}' program registration will be deleted for ${member.name}`}</spam>}
                     {memberAction === CANCEL_APPOINTMENT &&
                     <>
-                                <span
-                                    className="mt-1 text-center">{`${member["appointments"][selectedAppointmentIndex].facilityDetails.facilityName}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.district}, \n ${member["appointments"][selectedAppointmentIndex].facilityDetails.state}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.pincode}`}</span>
+                        <span>For {member.name}</span>
+                        <span className="mt-1">Enrollment number: {member.code}</span>
+                        <span
+                            className="mt-1 ">At {`${member["appointments"][selectedAppointmentIndex].facilityDetails.facilityName}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.district}, \n ${member["appointments"][selectedAppointmentIndex].facilityDetails.state}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.pincode}`}</span>
                         <span
                             className="mt-1">{formatDate(member["appointments"][selectedAppointmentIndex].appointmentDate || "")}, {member["appointments"][selectedAppointmentIndex].appointmentSlot || ""}</span>
                     </>
                     }
-                    <CustomButton className="blue-btn" onClick={() => {
-                        memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : callDeleteRecipient()
-                    }}>CONFIRM</CustomButton>
                 </div>
-            </div>
-        </Modal>
+            </CustomModal>
+
+        </>
     )
 }
 
@@ -391,24 +439,6 @@ const MemberCard = (props) => {
                 dose
             }
         })
-    }
-
-    function onDeleteRecipientProgram(recipientOsid, programId) {
-        props.setIsLoading(true)
-        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
-        const config = {
-            headers: {"Authorization": token, "Content-Type": "application/json"}
-        };
-
-        axios.delete(`/divoc/api/citizen/recipient/${recipientOsid}/program/${programId}`, config)
-            .then(res => {
-                setTimeout(() => {
-                    props.fetchRecipients();
-                }, 5000)
-
-            })
-            .catch((err) => {
-            });
     }
 
     function getAppointmentDetails() {
@@ -450,7 +480,7 @@ const MemberCard = (props) => {
                                     registeredDate={formatDate(appointment.osUpdatedAt)}
                                     showDeleteRecipientProgram={canShowDeleteRecipientProgram(appointment)}
                                     onDeleteRecipientProgram={() => {
-                                        onDeleteRecipientProgram(member.osid, programId)
+                                        props.onDeleteRegisteredProgram(appointment.index)
                                     }}
                                     showBookAppointment={canShowDeleteRecipientProgram(appointment)}
                                     onBookAppointment={() => {
@@ -574,10 +604,11 @@ const AppointmentTimeline = ({
                 <div className="timeline-node-text">
                 <span
                     className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
-                        {certified && <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span> }
+                    {certified &&
+                    <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span>}
                 </span>
-                {
-                    certified && <>
+                    {
+                        certified && <>
                             <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
                                 Certificate</CustomButton>
                         </>

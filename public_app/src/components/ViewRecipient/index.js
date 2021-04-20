@@ -1,8 +1,7 @@
 import React, {useState} from "react";
 import axios from "axios";
-import {Modal} from "react-bootstrap";
+import {Button, Modal, OverlayTrigger, Tooltip} from "react-bootstrap";
 import {CustomButton} from "../CustomButton";
-import CloseImg from "../../assets/img/icon-cross.svg";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 import {getCookie} from "../../utils/cookies";
 import {useHistory} from "react-router-dom";
@@ -10,6 +9,7 @@ import {FormPersonalDetails} from "../Registration/AddMember/FormPersonalDetails
 import {pathOr} from "ramda";
 import {Loader} from "../Loader";
 import "./index.css"
+import {CustomModal} from "../CustomModal";
 
 export const ViewRecipient = (props) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -39,29 +39,44 @@ export const ViewRecipient = (props) => {
 
     const appointments = state.member.appointments.filter(appointment => appointment.enrollmentScopeId !== "");
     const footer = <div>
-        <CustomButton disabled={appointments.length !== 0} className={`${appointments.length === 0 ? "blue-outline-btn" : "disabled-outline-btn"}`} onClick={() => {
-            setShowModal(true)
-        }}>
+        <CustomButton disabled={appointments.length !== 0}
+                      className={`${appointments.length === 0 ? "blue-outline-btn" : "disabled-outline-btn"}`}
+                      onClick={() => {
+                          setShowModal(true)
+                      }}>
             <span>Delete</span>
         </CustomButton>
+        <OverlayTrigger
+            trigger="click"
+            key={"right"}
+            placement={"right"}
+            delay={{ hide: 4000 }}
+            overlay={
+                <Tooltip id={`tooltip-right`}>
+                    A member can deleted only if the member is not registered to any program
+                </Tooltip>
+            }
+        >
+            <span className="delete-tooltip">?</span>
+        </OverlayTrigger>
     </div>;
     return (
         <div className="view-details-wrapper">
             {isLoading ? <Loader/> :
-            <><FormPersonalDetails
-                formData={formData}
-                header={header}
-                footer={footer}
-                verifyDetails={true}
-                navigation={{
-                    previous: () => {
-                    },
-                    next: () => {
-                    }
-                }}/>
-            <DeleteRecipientModal member={state.member} showModal={showModal} onHideModal={() => {
-                setShowModal(false)
-            }} setIsLoading={setIsLoading}/></>}
+                <><FormPersonalDetails
+                    formData={formData}
+                    header={header}
+                    footer={footer}
+                    verifyDetails={true}
+                    navigation={{
+                        previous: () => {
+                        },
+                        next: () => {
+                        }
+                    }}/>
+                    <DeleteRecipientModal member={state.member} showModal={showModal} onHideModal={() => {
+                        setShowModal(false)
+                    }} setIsLoading={setIsLoading}/></>}
         </div>
     )
 };
@@ -99,17 +114,21 @@ const DeleteRecipientModal = ({showModal, onHideModal, member, setIsLoading}) =>
     }
 
     return (
-        <Modal size={"md"} show={showModal} onHide={onHideModal} centered backdrop="static" keyboard={false}
-               className="select-program-modal p-3">
-            <div className="d-flex justify-content-between align-items-center p-3">
-                <div/>
-                <h5>Confirm Delete Member</h5>
-                <img src={CloseImg} className="cursor-pointer" alt={""}
-                     onClick={onHideModal}/>
-            </div>
-            <div className="d-flex flex-column justify-content-center align-items-center pb-3">
-                <CustomButton className="blue-btn" onClick={callDeleteRecipient}>CONFIRM</CustomButton>
-            </div>
-        </Modal>
-    )
+        <>
+            <CustomModal title={"Delete Member"} onClose={onHideModal} onPrimaryBtnClick={callDeleteRecipient}
+                         showModal={showModal} primaryBtnText={"Yes, Delete"}>
+                <div className="d-flex justify-content-between align-items-center">
+                    {`${member.name} member and all associated information will be deleted`}
+                </div>
+
+            </CustomModal>
+            <Modal size={"md"} show={false} onHide={onHideModal} centered backdrop="static" keyboard={false}
+                   className="select-program-modal p-3">
+
+                <div className="d-flex flex-column justify-content-center align-items-center pb-3">
+                    <CustomButton className="blue-btn" onClick={callDeleteRecipient}>CONFIRM</CustomButton>
+                </div>
+            </Modal>
+        </>
+)
 }

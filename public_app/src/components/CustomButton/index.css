@@ -37,6 +37,16 @@
     font-weight: bold;
 }
 
+
+.blue-primary-btn {
+    background: #5C9EF8 0% 0% no-repeat padding-box;
+    border: 2px solid #5C9EF8;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 .disabled-outline-btn {
     border: 2px solid #d3d3d3;
     border-radius: 6px;

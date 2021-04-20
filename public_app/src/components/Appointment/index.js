@@ -17,6 +17,7 @@ import {Loader} from "../Loader";
 import {getCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 import {getMeridiemTime} from "../../utils/dateUtils";
+import {CustomModal} from "../CustomModal";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id: programId} = props.match.params;
@@ -245,39 +246,14 @@ export const Appointment = (props) => {
                     </Col>}
                 </Row>
             </div>
-            <Modal show={showModal} onHide={() => {
-                setShowModal(false)
-            }} centered backdrop="static"
-                   keyboard={false}>
-                <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
-                    <div className="d-flex">
-                        <div/>
-                        <h5>Confirm Appointment Details </h5>
-                    </div>
-                    <div className="d-flex flex-column">
-                        <span>For {state && state.name}</span>
-                        <span className="mt-2">{getFacilityDetails()}</span>
-                        <span className="mt-2">{formatDateLong(selectedAllotment.allotmentDate)}</span>
-                        <span className="mt-1">{formatTimeInterval12hr(selectedAllotment.allotmentTime)}</span>
-                    </div>
-                    <Row>
-                        <Col style={{"margin": "15px"}}>
-                            <Button variant="outline-light" onClick={() => {
-                                setShowModal(false)
-                            }}>
-                                <span className="cancel-btn-appnt">
-                                    CANCEL
-                                </span>
-                            </Button>
-                        </Col>
-                        <Col>
-                            <CustomButton className="blue-btn" onClick={() => {
-                                bookSlot()
-                            }}>CONFIRM</CustomButton>
-                        </Col>
-                    </Row>
+            <CustomModal title={"Confirm Appointment"} onClose={() => {setShowModal(false)}} showModal={showModal} onPrimaryBtnClick={bookSlot}>
+                <div className="d-flex flex-column">
+                    <span>For {state && state.name}</span>
+                    <span className="mt-1">{getFacilityDetails()}</span>
+                    <span className="mt-1">{formatDateLong(selectedAllotment.allotmentDate)}</span>
+                    <span className="mt-1">{formatTimeInterval12hr(selectedAllotment.allotmentTime)}</span>
                 </div>
-            </Modal>
+            </CustomModal>
         </div>
     )
 };

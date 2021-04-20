@@ -299,23 +299,72 @@
     }
 }
 
-
-@media only screen and (min-width: 1520px){
+@media only screen and (min-width: 770px){
     .appointment-line {
-        width: 93%;
+        width: 76%;
     }
 
     .appointment-line-mini {
-        width: 85%;
+        width: 71%;
+    }
+}
+
+@media only screen and (min-width: 1010px){
+    .appointment-line {
+        width: 76%;
+    }
+
+    .appointment-line-mini {
+        width: 71%;
+    }
+}
+
+@media only screen and (min-width: 1170px){
+    .appointment-line {
+        width: 80%;
+    }
+
+    .appointment-line-mini {
+        width: 72%;
+    }
+}
+
+
+@media only screen and (min-width: 1390px){
+    .appointment-line {
+        width: 84%;
+    }
+
+    .appointment-line-mini {
+        width: 75%;
+    }
+}
+
+@media only screen and (min-width: 1660px){
+    .appointment-line {
+        width: 87%;
+    }
+
+    .appointment-line-mini {
+        width: 75%;
     }
 }
 
 @media only screen and (min-width: 1970px){
     .appointment-line {
-        width: 95%;
+        width: 89%;
     }
 
     .appointment-line-mini {
-        width: 90%;
+        width: 78%;
+    }
+}
+@media only screen and (min-width: 2250px){
+    .appointment-line {
+        width: 91%;
+    }
+
+    .appointment-line-mini {
+        width: 82%;
     }
 }

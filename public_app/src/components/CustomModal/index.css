@@ -1,0 +1,13 @@
+.custom-modal-wrapper .modal-content {
+    padding: 2rem 3rem;
+}
+
+.custom-modal-wrapper .custom-modal-title {
+    font-size: 18px;
+    padding-bottom: 1rem;
+}
+
+.custom-modal-wrapper .custom-button {
+    font-size: 14px;
+    text-transform: uppercase;
+}
