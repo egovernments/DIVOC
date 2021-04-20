@@ -639,7 +639,8 @@ func init() {
           }
         },
         "enrollmentType": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "facility": {
           "type": "object",
@@ -658,24 +659,29 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "addressLine2": {
                   "type": "string"
                 },
                 "district": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "pincode": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "state": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 }
               }
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
@@ -686,7 +692,8 @@ func init() {
           "type": "string"
         },
         "programId": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "recipient": {
           "type": "object",
@@ -711,29 +718,35 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "addressLine2": {
                   "type": "string"
                 },
                 "district": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "pincode": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "state": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 }
               }
             },
             "age": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "contact": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               }
             },
             "dob": {
@@ -742,16 +755,20 @@ func init() {
               "x-nullable": true
             },
             "gender": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "identity": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "nationality": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
@@ -777,6 +794,7 @@ func init() {
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
               "type": "number",
+              "minimum": 1,
               "example": 1
             },
             "effectiveStart": {
@@ -796,6 +814,7 @@ func init() {
             "totalDoses": {
               "description": "Total number of doses required for this vaccination.",
               "type": "number",
+              "minimum": 1,
               "example": 2
             }
           }
@@ -807,7 +826,8 @@ func init() {
           ],
           "properties": {
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         }
@@ -1610,7 +1630,8 @@ func init() {
           }
         },
         "enrollmentType": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "facility": {
           "type": "object",
@@ -1629,24 +1650,29 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "addressLine2": {
                   "type": "string"
                 },
                 "district": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "pincode": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "state": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 }
               }
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
@@ -1657,7 +1683,8 @@ func init() {
           "type": "string"
         },
         "programId": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "recipient": {
           "type": "object",
@@ -1682,29 +1709,35 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "addressLine2": {
                   "type": "string"
                 },
                 "district": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "pincode": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 },
                 "state": {
-                  "type": "string"
+                  "type": "string",
+                  "minLength": 1
                 }
               }
             },
             "age": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "contact": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "minLength": 1
               }
             },
             "dob": {
@@ -1713,16 +1746,20 @@ func init() {
               "x-nullable": true
             },
             "gender": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "identity": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "nationality": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
@@ -1748,6 +1785,7 @@ func init() {
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
               "type": "number",
+              "minimum": 1,
               "example": 1
             },
             "effectiveStart": {
@@ -1767,6 +1805,7 @@ func init() {
             "totalDoses": {
               "description": "Total number of doses required for this vaccination.",
               "type": "number",
+              "minimum": 1,
               "example": 2
             }
           }
@@ -1778,7 +1817,8 @@ func init() {
           ],
           "properties": {
             "name": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         }
@@ -1801,24 +1841,29 @@ func init() {
           ],
           "properties": {
             "addressLine1": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "addressLine2": {
               "type": "string"
             },
             "district": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "pincode": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "state": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -1832,19 +1877,23 @@ func init() {
       ],
       "properties": {
         "addressLine1": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "addressLine2": {
           "type": "string"
         },
         "district": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "pincode": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "state": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -1871,29 +1920,35 @@ func init() {
           ],
           "properties": {
             "addressLine1": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "addressLine2": {
               "type": "string"
             },
             "district": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "pincode": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             },
             "state": {
-              "type": "string"
+              "type": "string",
+              "minLength": 1
             }
           }
         },
         "age": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "contact": {
           "type": "array",
           "items": {
-            "type": "string"
+            "type": "string",
+            "minLength": 1
           }
         },
         "dob": {
@@ -1902,16 +1957,20 @@ func init() {
           "x-nullable": true
         },
         "gender": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "identity": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "nationality": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -1925,19 +1984,23 @@ func init() {
       ],
       "properties": {
         "addressLine1": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "addressLine2": {
           "type": "string"
         },
         "district": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "pincode": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         },
         "state": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -1963,6 +2026,7 @@ func init() {
         "dose": {
           "description": "Dose number for example 1 for first dose of 2 doses",
           "type": "number",
+          "minimum": 1,
           "example": 1
         },
         "effectiveStart": {
@@ -1982,6 +2046,7 @@ func init() {
         "totalDoses": {
           "description": "Total number of doses required for this vaccination.",
           "type": "number",
+          "minimum": 1,
           "example": 2
         }
       }
@@ -1993,7 +2058,8 @@ func init() {
       ],
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "minLength": 1
         }
       }
     },
@@ -2016,8 +2082,15 @@ func init() {
           "type": "boolean",
           "x-omitempty": false
         },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dose": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "enrollmentScopeId": {
           "type": "string",
@@ -2027,7 +2100,8 @@ func init() {
           "type": "string"
         },
         "programId": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "vaccine": {
           "type": "string"
