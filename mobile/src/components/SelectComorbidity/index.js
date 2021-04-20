@@ -179,8 +179,8 @@ export const SelectComorbidity = ({}) => {
                                 <div className="text-left">
                                     {
                                         conditions.map(x =>
-                                            <div className="d-flex align-items-center mb-1">
-                                                <input type="checkbox"
+                                            <div className="d-flex mb-1">
+                                                <input className="mt-2" type="checkbox"
                                                        checked={formData.comorbidities.includes(x)}
                                                        value={x} id={x} onChange={(e) => {
                                                     selectComorbidity(e.target);
