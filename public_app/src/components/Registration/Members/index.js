@@ -127,7 +127,7 @@ export const Members = () => {
     function fetchPrograms() {
         axios.get(PROGRAM_API)
             .then(res => {
-                const programs = res.data.map(obj => ({
+                const programs = res.data.filter(p => new Date(p.endDate+ " 00:00") - new Date() > 0).map(obj => ({
                     name: obj.name,
                     id: obj.osid,
                     osid: obj.osid,
@@ -490,7 +490,7 @@ const MemberCard = (props) => {
                                     onCancelAppointment={() => {
                                         props.onCancelAppointment(appointment.index)
                                     }}
-                                    isAppointmentScheduled={appointment.enrollmentScopeId !== ""}
+                                    isAppointmentScheduled={appointment.enrollmentScopeId !== "" || appointment.certified}
                                     appointmentDate={appointment.appointmentDate}
                                     appointmentSlot={appointment.appointmentSlot}
                                     facilityDetails={appointment.facilityDetails}
@@ -605,7 +605,7 @@ const AppointmentTimeline = ({
                 <span
                     className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Vaccinated ({ordinal_suffix_of(dose)} Dose)
                     {certified &&
-                    <span className="appointment-active-title font-weight-normal">{formatDate(registeredDate)}</span>}
+                    <span className="appointment-active-title font-weight-normal ml-1">{formatDate(registeredDate)}</span>}
                 </span>
                     {
                         certified && <>

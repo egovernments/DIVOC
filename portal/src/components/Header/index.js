@@ -58,10 +58,10 @@ export const Header = (props) => {
                 <Nav className="align-items-center">
                     {
                         <div className="d-flex align-items-center" style={{fontSize: "14px"}}>
-                            <Dropdown title={(userName ? userName : userMobileNumber) + " (" + getRoleAsString() + ")"} className="d-flex flex-column ml-2 mr-2">
+                            <Dropdown className="d-flex flex-column ml-2 mr-2">
                                 <Dropdown.Toggle id="dropdown-split-basic" >
                                     <span>
-                                        <p style={{fontWeight:"bold"}}>{userName ? userName : userMobileNumber}</p>
+                                        <p style={{fontWeight:"bold"}}>{userName ? userName : ""}</p>
                                         <p style={{fontWeight:"light"}}>{getRoleAsString()}</p>
                                     </span>
                                 </Dropdown.Toggle>

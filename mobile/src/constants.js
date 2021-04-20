@@ -21,10 +21,6 @@ export const CertificateDetailsPaths = {
         path: ["evidence", "0", "effectiveStart"],
         format: (data) => (formatDate(data))
     },
-    "Valid Until": {
-        path: ["evidence", "0", "effectiveUntil"],
-        format: (data) => (formatDate(data))
-    },
     "Dose": {
         path: ["evidence", "0", "dose"],
         format: (data) => (data)

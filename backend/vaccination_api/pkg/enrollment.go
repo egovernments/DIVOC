@@ -160,6 +160,7 @@ func createEnrollmentFromCertificationRequest(request *models.CertificationReque
 				Certified: true,
 				Dose: fmt.Sprintf("%d", int(*request.Vaccination.Dose)),
 				AppointmentDate: strfmt.Date(*request.Vaccination.Date),
+				Comorbidities: request.Comorbidities,
 			},
 		},
 		Yob:           int64(yob),
