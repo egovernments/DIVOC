@@ -559,7 +559,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	dose := certificate.Evidence[0].Dose
 
 	filter := map[string]interface{}{
-		"certificateId": map[string]interface{}{
+		"previousCertificateId": map[string]interface{}{
 			"eq": certificateId,
 		},
 		"dose": map[string]interface{}{
