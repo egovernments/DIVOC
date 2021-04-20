@@ -6,6 +6,8 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"strconv"
+
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
@@ -21,6 +23,7 @@ type CertificationRequest struct {
 	Comorbidities []string `json:"comorbidities"`
 
 	// enrollment type
+	// Min Length: 1
 	EnrollmentType string `json:"enrollmentType,omitempty"`
 
 	// facility
@@ -35,6 +38,7 @@ type CertificationRequest struct {
 	PreEnrollmentCode *string `json:"preEnrollmentCode"`
 
 	// program Id
+	// Min Length: 1
 	ProgramID string `json:"programId,omitempty"`
 
 	// recipient
@@ -54,11 +58,19 @@ type CertificationRequest struct {
 func (m *CertificationRequest) Validate(formats strfmt.Registry) error {
 	var res []error
 
+	if err := m.validateEnrollmentType(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateFacility(formats); err != nil {
 		res = append(res, err)
 	}
 
 	if err := m.validatePreEnrollmentCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateProgramID(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -77,6 +89,19 @@ func (m *CertificationRequest) Validate(formats strfmt.Registry) error {
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
+	return nil
+}
+
+func (m *CertificationRequest) validateEnrollmentType(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.EnrollmentType) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("enrollmentType", "body", string(m.EnrollmentType), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -101,6 +126,19 @@ func (m *CertificationRequest) validateFacility(formats strfmt.Registry) error {
 func (m *CertificationRequest) validatePreEnrollmentCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("preEnrollmentCode", "body", m.PreEnrollmentCode); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequest) validateProgramID(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.ProgramID) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("programId", "body", string(m.ProgramID), 1); err != nil {
 		return err
 	}
 
@@ -190,6 +228,7 @@ type CertificationRequestFacility struct {
 
 	// name
 	// Required: true
+	// Min Length: 1
 	Name *string `json:"name"`
 }
 
@@ -235,6 +274,10 @@ func (m *CertificationRequestFacility) validateName(formats strfmt.Registry) err
 		return err
 	}
 
+	if err := validate.MinLength("facility"+"."+"name", "body", string(*m.Name), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -263,6 +306,7 @@ type CertificationRequestFacilityAddress struct {
 
 	// address line1
 	// Required: true
+	// Min Length: 1
 	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
@@ -270,14 +314,17 @@ type CertificationRequestFacilityAddress struct {
 
 	// district
 	// Required: true
+	// Min Length: 1
 	District *string `json:"district"`
 
 	// pincode
 	// Required: true
+	// Min Length: 1
 	Pincode *string `json:"pincode"`
 
 	// state
 	// Required: true
+	// Min Length: 1
 	State *string `json:"state"`
 }
 
@@ -313,12 +360,20 @@ func (m *CertificationRequestFacilityAddress) validateAddressLine1(formats strfm
 		return err
 	}
 
+	if err := validate.MinLength("facility"+"."+"address"+"."+"addressLine1", "body", string(*m.AddressLine1), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestFacilityAddress) validateDistrict(formats strfmt.Registry) error {
 
 	if err := validate.Required("facility"+"."+"address"+"."+"district", "body", m.District); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("facility"+"."+"address"+"."+"district", "body", string(*m.District), 1); err != nil {
 		return err
 	}
 
@@ -331,12 +386,20 @@ func (m *CertificationRequestFacilityAddress) validatePincode(formats strfmt.Reg
 		return err
 	}
 
+	if err := validate.MinLength("facility"+"."+"address"+"."+"pincode", "body", string(*m.Pincode), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestFacilityAddress) validateState(formats strfmt.Registry) error {
 
 	if err := validate.Required("facility"+"."+"address"+"."+"state", "body", m.State); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("facility"+"."+"address"+"."+"state", "body", string(*m.State), 1); err != nil {
 		return err
 	}
 
@@ -371,6 +434,7 @@ type CertificationRequestRecipient struct {
 	Address *CertificationRequestRecipientAddress `json:"address"`
 
 	// age
+	// Min Length: 1
 	Age string `json:"age,omitempty"`
 
 	// contact
@@ -383,18 +447,22 @@ type CertificationRequestRecipient struct {
 
 	// gender
 	// Required: true
+	// Min Length: 1
 	Gender *string `json:"gender"`
 
 	// identity
 	// Required: true
+	// Min Length: 1
 	Identity *string `json:"identity"`
 
 	// name
 	// Required: true
+	// Min Length: 1
 	Name *string `json:"name"`
 
 	// nationality
 	// Required: true
+	// Min Length: 1
 	Nationality *string `json:"nationality"`
 }
 
@@ -403,6 +471,10 @@ func (m *CertificationRequestRecipient) Validate(formats strfmt.Registry) error 
 	var res []error
 
 	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateAge(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -454,10 +526,31 @@ func (m *CertificationRequestRecipient) validateAddress(formats strfmt.Registry)
 	return nil
 }
 
+func (m *CertificationRequestRecipient) validateAge(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Age) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("recipient"+"."+"age", "body", string(m.Age), 1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *CertificationRequestRecipient) validateContact(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"contact", "body", m.Contact); err != nil {
 		return err
+	}
+
+	for i := 0; i < len(m.Contact); i++ {
+
+		if err := validate.MinLength("recipient"+"."+"contact"+"."+strconv.Itoa(i), "body", string(m.Contact[i]), 1); err != nil {
+			return err
+		}
+
 	}
 
 	return nil
@@ -482,12 +575,20 @@ func (m *CertificationRequestRecipient) validateGender(formats strfmt.Registry) 
 		return err
 	}
 
+	if err := validate.MinLength("recipient"+"."+"gender", "body", string(*m.Gender), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestRecipient) validateIdentity(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"identity", "body", m.Identity); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("recipient"+"."+"identity", "body", string(*m.Identity), 1); err != nil {
 		return err
 	}
 
@@ -500,12 +601,20 @@ func (m *CertificationRequestRecipient) validateName(formats strfmt.Registry) er
 		return err
 	}
 
+	if err := validate.MinLength("recipient"+"."+"name", "body", string(*m.Name), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestRecipient) validateNationality(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"nationality", "body", m.Nationality); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("recipient"+"."+"nationality", "body", string(*m.Nationality), 1); err != nil {
 		return err
 	}
 
@@ -537,6 +646,7 @@ type CertificationRequestRecipientAddress struct {
 
 	// address line1
 	// Required: true
+	// Min Length: 1
 	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
@@ -544,14 +654,17 @@ type CertificationRequestRecipientAddress struct {
 
 	// district
 	// Required: true
+	// Min Length: 1
 	District *string `json:"district"`
 
 	// pincode
 	// Required: true
+	// Min Length: 1
 	Pincode *string `json:"pincode"`
 
 	// state
 	// Required: true
+	// Min Length: 1
 	State *string `json:"state"`
 }
 
@@ -587,12 +700,20 @@ func (m *CertificationRequestRecipientAddress) validateAddressLine1(formats strf
 		return err
 	}
 
+	if err := validate.MinLength("recipient"+"."+"address"+"."+"addressLine1", "body", string(*m.AddressLine1), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestRecipientAddress) validateDistrict(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"address"+"."+"district", "body", m.District); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("recipient"+"."+"address"+"."+"district", "body", string(*m.District), 1); err != nil {
 		return err
 	}
 
@@ -605,12 +726,20 @@ func (m *CertificationRequestRecipientAddress) validatePincode(formats strfmt.Re
 		return err
 	}
 
+	if err := validate.MinLength("recipient"+"."+"address"+"."+"pincode", "body", string(*m.Pincode), 1); err != nil {
+		return err
+	}
+
 	return nil
 }
 
 func (m *CertificationRequestRecipientAddress) validateState(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"address"+"."+"state", "body", m.State); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("recipient"+"."+"address"+"."+"state", "body", string(*m.State), 1); err != nil {
 		return err
 	}
 
@@ -650,6 +779,7 @@ type CertificationRequestVaccination struct {
 
 	// Dose number for example 1 for first dose of 2 doses
 	// Required: true
+	// Minimum: 1
 	Dose *float64 `json:"dose"`
 
 	// effective start
@@ -672,6 +802,7 @@ type CertificationRequestVaccination struct {
 
 	// Total number of doses required for this vaccination.
 	// Required: true
+	// Minimum: 1
 	TotalDoses *float64 `json:"totalDoses"`
 }
 
@@ -732,6 +863,10 @@ func (m *CertificationRequestVaccination) validateDose(formats strfmt.Registry) 
 		return err
 	}
 
+	if err := validate.Minimum("vaccination"+"."+"dose", "body", float64(*m.Dose), 1, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -785,6 +920,10 @@ func (m *CertificationRequestVaccination) validateTotalDoses(formats strfmt.Regi
 		return err
 	}
 
+	if err := validate.Minimum("vaccination"+"."+"totalDoses", "body", float64(*m.TotalDoses), 1, false); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -813,6 +952,7 @@ type CertificationRequestVaccinator struct {
 
 	// name
 	// Required: true
+	// Min Length: 1
 	Name *string `json:"name"`
 }
 
@@ -833,6 +973,10 @@ func (m *CertificationRequestVaccinator) Validate(formats strfmt.Registry) error
 func (m *CertificationRequestVaccinator) validateName(formats strfmt.Registry) error {
 
 	if err := validate.Required("vaccinator"+"."+"name", "body", m.Name); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("vaccinator"+"."+"name", "body", string(*m.Name), 1); err != nil {
 		return err
 	}
 

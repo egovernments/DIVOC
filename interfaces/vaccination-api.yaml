@@ -404,8 +404,10 @@ definitions:
         type: string
       enrollmentType:
         type: string
+        minLength: 1
       programId:
         type: string
+        minLength: 1
       comorbidities:
         type: array
         items:
@@ -415,35 +417,45 @@ definitions:
         properties:
           name:
             type: string
+            minLength: 1
           dob:
             type: string
             format: date
             x-nullable: true
           age:
             type: string
+            minLength: 1
           gender:
             type: string
+            minLength: 1
           nationality:
             type: string
+            minLength: 1
           identity:
             type: string
+            minLength: 1
           contact:
             type: array
             items:
               type: string
+              minLength: 1
           address:
             type: object
             properties:
               addressLine1:
                 type: string
+                minLength: 1
               addressLine2:
                 type: string
               district:
                 type: string
+                minLength: 1
               state:
                 type: string
+                minLength: 1
               pincode:
                 type: string
+                minLength: 1
             required:
               - addressLine1
               - district
@@ -479,11 +491,13 @@ definitions:
           dose:
             type: number
             description: Dose number for example 1 for first dose of 2 doses
+            minimum: 1
             example:
               1
           totalDoses:
             type: number
             description: Total number of doses required for this vaccination.
+            minimum: 1
             example:
               2
         required:
@@ -499,6 +513,7 @@ definitions:
         properties:
           name:
             type: string
+            minLength: 1
         required:
           - name
       facility:
@@ -506,19 +521,24 @@ definitions:
         properties:
           name:
             type: string
+            minLength: 1
           address:
             type: object
             properties:
               addressLine1:
                 type: string
+                minLength: 1
               addressLine2:
                 type: string
               district:
                 type: string
+                minLength: 1
               state:
                 type: string
+                minLength: 1
               pincode:
                 type: string
+                minLength: 1
             required:
               - addressLine1
               - district
