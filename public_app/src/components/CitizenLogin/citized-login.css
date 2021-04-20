@@ -2,6 +2,7 @@
   padding: 10vh;
 }
 
+
 .citizen-login body {
   font-family: Avenir, serif;
 }
@@ -58,4 +59,10 @@
 
 .citizen-login input:disabled {
   border-color: #FFFFFF;
+}
+
+@media only screen and (max-width: 500px) {
+  .citizen-login {
+    padding: 4vh;
+  }
 }

@@ -99,7 +99,7 @@ export function CitizenLoginComponent(props) {
         const inputs = <>
             <form>
                 <div className="form-row">
-                    <div className="form-group col-sm-3 mr-5">
+                    <div className="form-group col-sm-3">
                         <input placeholder="Mobile number"
                                ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
