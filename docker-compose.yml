@@ -26,6 +26,8 @@ services:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
     image: dockerhub/registry-es
     environment:
