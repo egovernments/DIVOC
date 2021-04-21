@@ -4,11 +4,13 @@ import {Redirect, Route} from 'react-router-dom'
 import {CONSTANT} from "./constants";
 import config from "../config"
 import {useKeycloak} from "@react-keycloak/web";
+import {useOnlineStatus} from "./offlineStatus";
 
 
 export function PrivateRoute({component: Component, ...rest}) {
+    const isOnLine = useOnlineStatus()
     return (
-        navigator.onLine ? <WithKeyCloakRoute component={Component} {...rest}/> :
+        isOnLine ? <WithKeyCloakRoute component={Component} {...rest}/> :
             <WithoutKeyCloakRoute component={Component} {...rest}/>
     )
 }

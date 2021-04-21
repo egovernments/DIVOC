@@ -5,14 +5,15 @@ import {useKeycloak} from "@react-keycloak/web";
 import {Messages} from "../Base/Constants";
 import {appIndexDb} from "../AppDatabase";
 import {ApiServices} from "../Services/ApiServices";
+import {useOnlineStatus} from "./offlineStatus";
 
 const keycloak = Keycloak(config.urlPath + '/keycloak.json');
 
 export default keycloak
 
 export function AuthSafeComponent({children}) {
-    const isOnline = navigator.onLine
-    if (isOnline) {
+    const isOnLine = useOnlineStatus()
+    if (isOnLine) {
         return <WithKeyCloakComponent children={children}/>
     } else {
         return <WithoutKeyCloakComponent children={children}/>
@@ -21,6 +22,7 @@ export function AuthSafeComponent({children}) {
 
 export function WithKeyCloakComponent({children}) {
     const {keycloak, initialized} = useKeycloak()
+    const isOnLine = useOnlineStatus()
     useEffect(() => {
         if (initialized || keycloak.authenticated) {
             keycloak.loadUserProfile()
@@ -39,7 +41,7 @@ export function WithKeyCloakComponent({children}) {
             Loading...
         </div>
     }
-    if (navigator.onLine) {
+    if (isOnLine) {
         return React.cloneElement(
             children,
             {initialized: initialized, keycloak: keycloak}

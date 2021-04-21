@@ -11,8 +11,10 @@ import Col from "react-bootstrap/Col";
 import config from "../../config";
 import {queueDb} from "../../Services/QueueDB";
 import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
+import {useOnlineStatus} from "../../utils/offlineStatus";
 
 function AuthSafeUserProfile({keycloak}) {
+    const isOnLine = useOnlineStatus()
     const [userDetails, setUserDetails] = useState();
     const {getText} = useLocale();
 
@@ -60,7 +62,7 @@ function AuthSafeUserProfile({keycloak}) {
                             const message = getText(LANGUAGE_KEYS.PROFILE_CONFIRM_LOGOUT_MESSAGE)
                             const isConfirmed = window.confirm(message);
                             if (isConfirmed) {
-                                if (navigator.onLine) {
+                                if (isOnLine) {
                                     SyncFacade
                                         .push()
                                         .catch((e) => console.log(e.message))
@@ -69,7 +71,7 @@ function AuthSafeUserProfile({keycloak}) {
                                         .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                                         .catch(e => {
                                             console.log(e.message)
-                                            if (!navigator.onLine) {
+                                            if (!isOnLine) {
                                                 alert(Messages.NO_INTERNET_CONNECTION)
                                             }
                                         })
