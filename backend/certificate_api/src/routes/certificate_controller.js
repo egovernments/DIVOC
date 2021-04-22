@@ -102,10 +102,9 @@ function getVaccineValidDays(start, end) {
     return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 }
 
-async function createCertificatePDF(phone, certificateId, res) {
-    const certificateResp = await registryService.getCertificate(phone, certificateId);
+async function createCertificatePDF(certificateResp, res, source) {
     if (certificateResp.length > 0) {
-        let certificateRaw = certificateResp[0];
+        let certificateRaw = certificateResp[certificateResp.length - 1];
         const zip = new JSZip();
         zip.file("certificate.json", certificateRaw.certificate, {
             compression: "DEFLATE"
@@ -143,7 +142,7 @@ async function createCertificatePDF(phone, certificateId, res) {
         const browser = await puppeteer.launch({
             headless: true,
             //comment to use default
-            executablePath: '/usr/bin/chromium-browser',
+            // executablePath: '/usr/bin/chromium-browser',
             args: [
                 "--no-sandbox",
                 "--disable-gpu",
@@ -167,21 +166,33 @@ async function createCertificatePDF(phone, certificateId, res) {
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
-            source: certificateId,
+            source: source,
             type: "internal-success",
             extra: "Certificate found"
         });
         return pdfBuffer;
     } else {
         res.statusCode = 404;
-        sendEvents({
+        let error = {
             date: new Date(),
-            source: certificateId,
+            source: source,
             type: "internal-failed",
             extra: "Certificate not found"
-        })
+        };
+        sendEvents(error)
+        return  JSON.stringify(error);
     }
     return res;
+}
+
+async function createCertificatePDFByCertificateId(phone, certificateId, res) {
+    const certificateResp = await registryService.getCertificate(phone, certificateId);
+    return await createCertificatePDF(certificateResp, res, certificateId);
+}
+
+async function createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
+    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+    return await createCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
 
 async function getCertificate(req, res) {
@@ -196,7 +207,7 @@ async function getCertificate(req, res) {
             return;
         }
         const certificateId = req.url.replace("/certificate/api/certificate/", "").split("?")[0];
-        res = await createCertificatePDF(claimBody.Phone, certificateId, res);
+        res = await createCertificatePDFByCertificateId(claimBody.Phone, certificateId, res);
         return res
     } catch (err) {
         console.error(err);
@@ -217,7 +228,27 @@ async function getCertificatePDF(req, res) {
             res.statusCode = 403;
             return;
         }
-        res = await createCertificatePDF(claimBody.preferred_username, certificateId, res);
+        res = await createCertificatePDFByCertificateId(claimBody.preferred_username, certificateId, res);
+        return res
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
+async function getCertificatePDFByPreEnrollmentCode(req, res) {
+    try {
+        let claimBody = "";
+        let preEnrollmentCode = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            preEnrollmentCode = req.url.replace("/certificate/api/certificatePDF/", "");
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        res = await createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res);
         return res
     } catch (err) {
         console.error(err);
@@ -227,5 +258,6 @@ async function getCertificatePDF(req, res) {
 
 module.exports = {
     getCertificate,
-    getCertificatePDF
+    getCertificatePDF,
+    getCertificatePDFByPreEnrollmentCode
 };

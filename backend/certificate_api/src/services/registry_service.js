@@ -27,6 +27,28 @@ const getCertificate = (mobileNumber, certificateId) => {
     ).then(res => res.data.result[VaccinationCertificate])
 };
 
+const getCertificateByPreEnrollmentCode = (preEnrollmentCode) => {
+    const certificateRequest = {
+        id:  "open-saber.registry.search",
+        ver: "1.0",
+        ets: "",
+        "request":{
+            "entityType": [VaccinationCertificate],
+            "filters": {
+                preEnrollmentCode: {
+                    eq: preEnrollmentCode
+                }
+            }
+        }
+    };
+
+    return axios.post(
+        config.REGISTRY_URL + "/search",
+        certificateRequest
+    ).then(res => res.data.result[VaccinationCertificate])
+};
+
 module.exports = {
-    getCertificate
+    getCertificate,
+    getCertificateByPreEnrollmentCode
 };

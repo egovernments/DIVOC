@@ -12,6 +12,9 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificate/")) {
         const data = await certificateController.getCertificate(req, res);
         res.end(data)
+    } else if (req.method === 'GET' && req.url.match("/certificate/api/certificatePDF/.+")) {
+        const data = await certificateController.getCertificatePDFByPreEnrollmentCode(req, res);
+        res.end(data)
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificatePDF")) {
         const data = await certificateController.getCertificatePDF(req, res);
         res.end(data)
