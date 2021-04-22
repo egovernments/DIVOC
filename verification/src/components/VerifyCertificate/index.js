@@ -78,6 +78,17 @@ export const VerifyCertificate = () => {
                                 <li>If the certificate is not genuine, “Certificate Invalid” will be displayed</li>
                             </ol>
                             <p>You can view a <a href="https://divoc.egov.org.in/demo-videos/13.-certificate-verification" target="_blank">demo video</a> of ‘how to verify’</p>
+                            <p>
+                                Private Sector Apps can now incorporate the "Certificate verification" service to verify COVID-19 certificates generated from Co-WIN. </p>
+                            <p style={{color:"#646D82"}}>The following steps need to be performed to integrate with Co-WIN and verify the COVID-19 certificate.
+                            </p>
+                            <ol className="verify-steps">
+                                <li>Go to reference code <a href="https://github.com/egovernments/DIVOC/tree/india/verification" target="_blank">here</a></li>
+                                <li>Get code snippet for reference and implement</li>
+                                <li>Consume COWIN verification service into your application</li>
+                                <li>Replace the public key used in code snippet with Public key available <a href="https://verify.cowin.gov.in/did:india" target="_blank">here</a>.</li>
+                            </ol>
+                            <p>Note: Co-WIN uses an open-source component called "DIVOC" for the certificate issuance & verification service.</p>
                         </Container>
                     </>}
                     {showScanner &&
