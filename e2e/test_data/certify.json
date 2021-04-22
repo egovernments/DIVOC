@@ -1,5 +1,7 @@
 [{
 	"preEnrollmentCode": "",
+    "programId": "1234",
+    "enrollmentType": "WALK_IN",
     "facility": {
         "address": {
             "addressLine1": "123, Koramangala",
