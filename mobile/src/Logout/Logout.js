@@ -8,13 +8,15 @@ import * as PropTypes from "prop-types";
 import {AuthSafeComponent} from "../utils/keycloak";
 import {Messages} from "../Base/Constants";
 import config from "../config";
+import {useOnlineStatus} from "../utils/offlineStatus";
 
 function AuthSafeLogout({keycloak}) {
+    const isOnLine = useOnlineStatus()
     return <div className="logout-container">
         <BaseCard>
             <div className="button-center">
                 <Button variant="success" onClick={() => {
-                    if (navigator.onLine) {
+                    if (isOnLine) {
                         SyncFacade
                             .push()
                             .catch((e) => console.log(e.message))
@@ -22,7 +24,7 @@ function AuthSafeLogout({keycloak}) {
                             .then((() => keycloak.logout({redirectUri: window.location.origin + config.urlPath})))
                             .catch(e => {
                                 console.log(e.message)
-                                if (!navigator.onLine) {
+                                if (!isOnLine) {
                                     alert(Messages.NO_INTERNET_CONNECTION)
                                 }
                             })
