@@ -444,7 +444,6 @@ definitions:
             properties:
               addressLine1:
                 type: string
-                minLength: 1
               addressLine2:
                 type: string
               district:
@@ -455,7 +454,6 @@ definitions:
                 minLength: 1
               pincode:
                 type: string
-                minLength: 1
             required:
               - addressLine1
               - district
@@ -527,7 +525,6 @@ definitions:
             properties:
               addressLine1:
                 type: string
-                minLength: 1
               addressLine2:
                 type: string
               district:

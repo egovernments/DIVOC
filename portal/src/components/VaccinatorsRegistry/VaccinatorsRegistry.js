@@ -23,7 +23,11 @@ function VaccinatorsRegistry() {
                 return []
             })
             .then((result) => {
-                return result.map((item, index) => {
+                return result
+                    .sort((a, b) => {
+                        return new Date(b["osCreatedAt"]) - new Date(a["osCreatedAt"]);
+                    })
+                    .map((item, index) => {
                     return {
                         nationalId: maskPersonalDetails(item["nationalIdentifier"]),
                         name: item["name"],

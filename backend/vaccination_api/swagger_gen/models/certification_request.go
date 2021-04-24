@@ -306,7 +306,6 @@ type CertificationRequestFacilityAddress struct {
 
 	// address line1
 	// Required: true
-	// Min Length: 1
 	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
@@ -357,10 +356,6 @@ func (m *CertificationRequestFacilityAddress) Validate(formats strfmt.Registry) 
 func (m *CertificationRequestFacilityAddress) validateAddressLine1(formats strfmt.Registry) error {
 
 	if err := validate.Required("facility"+"."+"address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
-		return err
-	}
-
-	if err := validate.MinLength("facility"+"."+"address"+"."+"addressLine1", "body", string(*m.AddressLine1), 1); err != nil {
 		return err
 	}
 
@@ -646,7 +641,6 @@ type CertificationRequestRecipientAddress struct {
 
 	// address line1
 	// Required: true
-	// Min Length: 1
 	AddressLine1 *string `json:"addressLine1"`
 
 	// address line2
@@ -659,7 +653,6 @@ type CertificationRequestRecipientAddress struct {
 
 	// pincode
 	// Required: true
-	// Min Length: 1
 	Pincode *string `json:"pincode"`
 
 	// state
@@ -700,10 +693,6 @@ func (m *CertificationRequestRecipientAddress) validateAddressLine1(formats strf
 		return err
 	}
 
-	if err := validate.MinLength("recipient"+"."+"address"+"."+"addressLine1", "body", string(*m.AddressLine1), 1); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -723,10 +712,6 @@ func (m *CertificationRequestRecipientAddress) validateDistrict(formats strfmt.R
 func (m *CertificationRequestRecipientAddress) validatePincode(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"address"+"."+"pincode", "body", m.Pincode); err != nil {
-		return err
-	}
-
-	if err := validate.MinLength("recipient"+"."+"address"+"."+"pincode", "body", string(*m.Pincode), 1); err != nil {
 		return err
 	}
 

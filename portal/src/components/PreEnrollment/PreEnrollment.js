@@ -25,7 +25,11 @@ function PreEnrollment() {
                 return []
             })
             .then((result) => {
-                return result.map((item, index) => {
+                return result
+                    .sort((a, b) => {
+                        return new Date(b["osCreatedAt"]) - new Date(a["osCreatedAt"]);
+                    })
+                    .map((item, index) => {
                     return {
                         identity: maskPersonalDetails(item["identity"]),
                         name: item["name"],

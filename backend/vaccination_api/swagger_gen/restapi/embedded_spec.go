@@ -659,8 +659,7 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "addressLine2": {
                   "type": "string"
@@ -718,8 +717,7 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "addressLine2": {
                   "type": "string"
@@ -729,8 +727,7 @@ func init() {
                   "minLength": 1
                 },
                 "pincode": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "state": {
                   "type": "string",
@@ -1650,8 +1647,7 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "addressLine2": {
                   "type": "string"
@@ -1709,8 +1705,7 @@ func init() {
               ],
               "properties": {
                 "addressLine1": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "addressLine2": {
                   "type": "string"
@@ -1720,8 +1715,7 @@ func init() {
                   "minLength": 1
                 },
                 "pincode": {
-                  "type": "string",
-                  "minLength": 1
+                  "type": "string"
                 },
                 "state": {
                   "type": "string",
@@ -1841,8 +1835,7 @@ func init() {
           ],
           "properties": {
             "addressLine1": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "addressLine2": {
               "type": "string"
@@ -1877,8 +1870,7 @@ func init() {
       ],
       "properties": {
         "addressLine1": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "addressLine2": {
           "type": "string"
@@ -1920,8 +1912,7 @@ func init() {
           ],
           "properties": {
             "addressLine1": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "addressLine2": {
               "type": "string"
@@ -1931,8 +1922,7 @@ func init() {
               "minLength": 1
             },
             "pincode": {
-              "type": "string",
-              "minLength": 1
+              "type": "string"
             },
             "state": {
               "type": "string",
@@ -1984,8 +1974,7 @@ func init() {
       ],
       "properties": {
         "addressLine1": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "addressLine2": {
           "type": "string"
@@ -1995,8 +1984,7 @@ func init() {
           "minLength": 1
         },
         "pincode": {
-          "type": "string",
-          "minLength": 1
+          "type": "string"
         },
         "state": {
           "type": "string",
