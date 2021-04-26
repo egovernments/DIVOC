@@ -98,7 +98,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 });
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON)
-                    if (revokedResponse.response.status === 404) {
+                    if (revokedResponse.response.status !== 200) {
                         console.log('Signature verified.');
                         setValid(true);
                         setData(signedJSON);
