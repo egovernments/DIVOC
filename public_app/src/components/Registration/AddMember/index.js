@@ -284,7 +284,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
               </div>
             <div hidden={formData.choice === "no"} className="pt-3">
               <p>If yes, please select (all) applicable comorbidities</p>
-              <Row className={"col-6 ml-0 comorbidities-list-wrapper"}>
+              <div className={"col-12 ml-0 comorbidities-list-wrapper"}>
                 {
                   conditions.map(x =>
                     <div>
@@ -298,7 +298,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
                 <div className="invalid-input">
                   {errors.choice}
                 </div>
-              </Row>
+              </div>
             </div>
           </div>
         </div>
