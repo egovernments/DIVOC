@@ -119,6 +119,9 @@ export class ApiServices {
                         state: facilityDetails.address.state ?? "N/A",
                         pincode: facilityDetails.address.pincode ?? "N/A"
                     }
+                },
+                meta: {
+                    enrollmentOsid: patientDetails.osid ?? ""
                 }
             }
         })
