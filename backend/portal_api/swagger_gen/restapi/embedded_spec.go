@@ -4510,6 +4510,9 @@ func init() {
         "nationalId": {
           "type": "string"
         },
+        "osid": {
+          "type": "string"
+        },
         "phone": {
           "type": "string"
         },
