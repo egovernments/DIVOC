@@ -122,6 +122,7 @@ export const LANGUAGE_KEYS = Object.freeze({
     PRE_ENROLLMENT_CONTINUE: "app.preenrollment.continue",
     PRE_ENROLLMENT_NO_PATIENTS: "app.preenrollment.noPatient",
     PRE_ENROLLMENT_ENTER_OTP: "app.preenrollment.enterOTP",
+    RECIPIENT_SCAN_QR_CODE: "app.preenrollment.scanQrCode",
 
     ENROLLMENT_TITLE: "app.enrollment.title",
     ENROLLMENT_NAME: "app.enrollment.name",

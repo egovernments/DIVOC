@@ -65,7 +65,7 @@ const dbConfigs = [
 const PROGRAM_ID = "programId";
 
 export const QUEUE_STATUS = Object.freeze({IN_QUEUE: "in_queue", COMPLETED: "completed"});
-export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", WALK_IN: "WALK_IN"});
+export const ENROLLMENT_TYPES = Object.freeze({PRE_ENROLLMENT: "PRE_ENRL", SELF_ENROLLMENT: "SELF_ENRL", WALK_IN: "WALK_IN"});
 
 export class AppDatabase {
 

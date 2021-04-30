@@ -13,6 +13,7 @@ const ENROLLMENT_ID = "ENROLLMENT_ID"
 const PROGRAM_ID = "PROGRAM_ID"
 const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/schedule`
 const ENROLLMENT_BY_CODE = `/divoc/api/v1/preEnrollments/${ENROLLMENT_ID}`
+const VERIFY_CERTIFICATE = "/divoc/api/v1/certificate/revoked"
 
 export class ApiServices {
 
@@ -209,5 +210,23 @@ export class ApiServices {
             .then(response => {
                 return response.json()
             })
+    }
+
+    static async checkIfRevokedCertificate(data) {
+        const requestOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json'
+            },
+            body: JSON.stringify(data)
+        };
+        return fetch(VERIFY_CERTIFICATE, requestOptions)
+            .then(response => {
+                return response
+            }).catch((e) => {
+                console.log(e);
+                return e
+            });
     }
 }
