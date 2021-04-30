@@ -75,9 +75,10 @@ export const AddMembersFlow = () => {
         axios.get(PROGRAM_API)
             .then(res => {
                 if (res.status === 200) {
-                    setPrograms(res.data);
-                    setValue({target: {name: "programId", value: res.data[0].osid}})
-                    setValue({target: {name: "programName", value: res.data[0].name}})
+                    let programs = res.data.filter(p => new Date(p.endDate + " 00:00") - new Date() > 0)
+                    setPrograms(programs);
+                    setValue({target: {name: "programId", value: programs[0].osid}})
+                    setValue({target: {name: "programName", value: programs[0].name}})
                 }
             })
             .catch(e => {

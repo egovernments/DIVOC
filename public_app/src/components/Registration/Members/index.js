@@ -125,7 +125,7 @@ export const Members = () => {
     function fetchPrograms() {
         axios.get(PROGRAM_API)
             .then(res => {
-                const programs = res.data.map(obj => ({
+                const programs = res.data.filter(p => new Date(p.endDate+ " 00:00") - new Date() > 0).map(obj => ({
                     name: obj.name,
                     id: obj.osid,
                     osid: obj.osid,
