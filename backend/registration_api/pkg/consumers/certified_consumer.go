@@ -67,10 +67,22 @@ func StartCertifiedConsumer() {
 					consumer.CommitMessage(msg)
 					continue
 				}
+				meta, ok := message["meta"].(map[string]interface{})
+				if !ok {
+					logrus.Error("meta details not found which contains osid of the user to mark as certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
+				enrollmentOsid, ok := meta["enrollmentOsid"].(string)
+				if !ok {
+					logrus.Error("enrollmentOsid not found to mark the user certified %v", message)
+					consumer.CommitMessage(msg)
+					continue
+				}
 				var certificateMsg map[string]interface{}
 				if err := json.Unmarshal([]byte(certificateStr), &certificateMsg); err == nil {
 					if dose, totalDoses, vaccine, err := getVaccineDetails(certificateMsg); err == nil {
-						services.MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name, dose, certificateId, vaccine, programId, totalDoses)
+						services.MarkPreEnrolledUserCertified(preEnrollmentCode, contact, name, dose, certificateId, vaccine, programId, totalDoses, enrollmentOsid)
 					}
 				}
 

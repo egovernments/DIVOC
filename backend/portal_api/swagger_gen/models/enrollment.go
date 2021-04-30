@@ -60,6 +60,9 @@ type Enrollment struct {
 	// national Id
 	NationalID string `json:"nationalId,omitempty"`
 
+	// osid
+	Osid string `json:"osid,omitempty"`
+
 	// phone
 	Phone string `json:"phone,omitempty"`
 

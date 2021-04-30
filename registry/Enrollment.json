@@ -18,6 +18,9 @@
       "type": "object",
       "required": ["identity"],
       "properties": {
+        "osid": {
+          "type": "string"
+        },
         "enrollmentType": {
           "type": "string",
           "enum": ["SELF_ENRL", "PRE_ENRL", "WALK_IN"]

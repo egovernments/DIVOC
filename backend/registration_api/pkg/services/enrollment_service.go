@@ -25,55 +25,39 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 
 const EnrollmentEntity = "Enrollment"
 
-func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64) {
-	filter := map[string]interface{}{
-		"code": map[string]interface{}{
-			"eq": preEnrollmentCode,
-		},
-		"phone": map[string]interface{}{
-			"eq": phone,
-		},
-		"name": map[string]interface{}{
-			"eq": name,
-		},
-	}
-	enrollmentResponse, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64, enrollmentOsid string) {
+	enrollmentResponse, err := kernelService.ReadRegistry(EnrollmentEntity, enrollmentOsid)
 	if err == nil {
-		enrollments := enrollmentResponse[EnrollmentEntity].([]interface{})
-		if len(enrollments) > 0 {
-			enrollmentObj, ok := enrollments[0].(map[string]interface{})
-			if ok {
-				if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
-					for _, appointmentObj := range appointments {
-						appointment := appointmentObj.(map[string]interface{})
-						appointmentProgramId := appointment["programId"].(string)
-						appointmentDose := appointment["dose"].(string)
-						appointmentCertified := appointment["certified"].(bool)
-						if appointmentProgramId == programId && appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) && !appointmentCertified {
-							appointment["certified"] = true
-							appointment["certificateId"] = certificateId
-							appointment["vaccine"] = vaccine
-							break
-						}
+		enrollmentObj := enrollmentResponse[EnrollmentEntity].(map[string]interface{})
+		if enrollmentObj != nil {
+			if appointments, ok := enrollmentObj["appointments"].([]interface{}); ok {
+				for _, appointmentObj := range appointments {
+					appointment := appointmentObj.(map[string]interface{})
+					appointmentProgramId := appointment["programId"].(string)
+					appointmentDose := appointment["dose"].(string)
+					if appointmentProgramId == programId && appointmentDose == strconv.FormatFloat(dose, 'f', -1, 64) {
+						appointment["certified"] = true
+						appointment["certificateId"] = certificateId
+						appointment["vaccine"] = vaccine
+						break
 					}
-					if dose < totalDoses {
-						log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
-						enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
-					}
-					response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
-					if err == nil {
-						log.Debugf("Updated enrollment registry successfully %v", response)
-					} else {
-						log.Error("Failed updating enrollment registry", err)
-					}
+				}
+				if dose < totalDoses {
+					log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
+					enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
+				}
+				response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
+				if err == nil {
+					log.Debugf("Updated enrollment registry successfully %v", response)
+				} else {
+					log.Error("Failed updating enrollment registry", err)
 				}
 			}
 		} else {
-			log.Error("Enrollment not found for query %v", filter)
+			log.Error("Enrollment not found for osid %v", enrollmentOsid)
 		}
-
 	} else {
-		log.Error("Failed querying enrollments registry", filter, err)
+		log.Error("Failed reading enrollments registry for osid", enrollmentOsid)
 	}
 }
 
@@ -110,6 +94,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 
 	if dupEnrollment != nil {
 		enrollmentPayload.OverrideEnrollmentCode(dupEnrollment.Duplicate.Code)
+		enrollmentPayload.OverrideEnrollmentOsid(dupEnrollment.Duplicate.Osid)
 		duplicateErr := fmt.Errorf("enrollment with same %s already exists", dupEnrollment.Criteria)
 		log.Error("Duplicates Found : ", duplicateErr)
 		if enrollmentPayload.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
@@ -150,6 +135,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 		return err
 	}
 	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
+	enrollmentPayload.OverrideEnrollmentOsid(result.(string))
 	cacheEnrollmentInfo(enrollmentPayload.Enrollment, result.(string))
 	if shouldAutoBookAppointment(enrollmentPayload) {
 		return BookAppointment(enrollmentPayload.Phone, enrollmentPayload.Code, enrollmentPayload.Appointments[0])
@@ -399,6 +385,16 @@ func (ep EnrollmentPayload) OverrideEnrollmentCode(code string) {
 	ep.Code = code
 	if len(ep.VaccinationDetails) > 0 && ep.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 		ep.VaccinationDetails["preEnrollmentCode"] = code
+	}
+}
+
+func (ep EnrollmentPayload) OverrideEnrollmentOsid(osid string) {
+	ep.Osid = osid
+	if len(ep.VaccinationDetails) > 0 && ep.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+		enrollmentOsid := map[string]interface{}{
+			"enrollmentOsid": osid,
+		}
+		ep.VaccinationDetails["meta"] = enrollmentOsid
 	}
 }
 
