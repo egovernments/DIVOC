@@ -5,7 +5,7 @@ import {Redirect, useHistory} from "react-router";
 import {SelectVaccinator} from "../components/SelectVaccinator";
 import {CONSTANT} from "../utils/constants";
 import {appIndexDb} from "../AppDatabase";
-import config from "config.json"
+import config from "../config"
 import {programDb} from "../Services/ProgramDB";
 import {getSelectedProgram} from "../components/ProgramSelection";
 import {getVaccinationDetails, saveVaccinationDetails} from "../utils/storage";
