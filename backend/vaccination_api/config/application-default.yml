@@ -27,4 +27,3 @@ clickhouse:
 acknowledgement:
   callbackauthurl: "https://api.sit.co-vin.in/api/v1/auth/guest/login"
   callbackurl: "https://api.sit.co-vin.in/api/v1/registration/certificate/ackCertificate"
-pollingstates: assam,west bengal,tamil nadu,puducherry,kerala

@@ -55,6 +55,7 @@ const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
+const MaxDisplayCharacters = 40
 
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
@@ -252,6 +253,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	offsetNewY := 400.0
 	rowSize := 6
 	displayLabels := showLabelsAsPerTemplateV2(certificate)
+	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
 	for i = 0; i < rowSize; i++ {
@@ -277,6 +279,35 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	var b bytes.Buffer
 	_ = pdf.Write(&b)
 	return b.Bytes(), nil
+}
+
+func wrapLongerText(text string, lineWidth int) []string {
+	words := strings.Fields(strings.TrimSpace(text))
+	if len(words) == 0 {
+		return []string{text}
+	}
+	wrapped := []string{words[0]}
+	spaceLeft := lineWidth - len(wrapped)
+	for _, word := range words[1:] {
+		if len(word)+1 > spaceLeft {
+			wrapped = append(wrapped, word)
+			spaceLeft = lineWidth - len(word)
+		} else {
+			wrapped[len(wrapped) - 1] += " " + word
+			spaceLeft -= 1 + len(word)
+		}
+	}
+
+	return wrapped
+
+}
+
+func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
+	address := displayLabels[len(displayLabels)-1]
+	wrap := wrapLongerText(address, MaxDisplayCharacters)
+	displayLabels = displayLabels[:len(displayLabels)-1]
+	displayLabels = append(displayLabels, wrap...)
+	return displayLabels
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
@@ -727,7 +758,7 @@ func main() {
 	r.HandleFunc("/cert/api/pullUriRequest", timed(uriRequest)).Methods("POST")
 	r.HandleFunc("/cert/api/pullDocRequest", timed(docRequest)).Methods("POST")
 	//internal
-	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(getPDFHandler)).Methods("GET")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
