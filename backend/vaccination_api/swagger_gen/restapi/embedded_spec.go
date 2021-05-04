@@ -2016,8 +2016,15 @@ func init() {
           "type": "boolean",
           "x-omitempty": false
         },
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "dose": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "enrollmentScopeId": {
           "type": "string",
@@ -2027,7 +2034,8 @@ func init() {
           "type": "string"
         },
         "programId": {
-          "type": "string"
+          "type": "string",
+          "x-omitempty": false
         },
         "vaccine": {
           "type": "string"
