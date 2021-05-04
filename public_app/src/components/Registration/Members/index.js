@@ -13,7 +13,7 @@ import {Loader} from "../../Loader";
 import CloseImg from "../../../assets/img/icon-cross.svg";
 import CheckImg from "../../../assets/img/check.svg";
 import {pathOr} from "ramda";
-import appConfig from "../../../config.json";
+import appConfig from "../../../config.js";
 import {EligibilityWarning} from "../../EligibilityWarning";
 import {ContextAwareToggle, CustomAccordion} from "../../CustomAccordion";
 import {SelectComorbidity, SelectProgram} from "../AddMember";
