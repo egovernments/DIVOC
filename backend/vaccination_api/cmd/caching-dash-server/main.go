@@ -8,6 +8,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
+	"github.com/unrolled/secure"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -188,7 +189,22 @@ func main() {
 	r := mux.NewRouter()
 	r.Handle("/metrics", promhttp.Handler())
 	r.HandleFunc("/health", okHandler)
-	http.HandleFunc("/", relayingProxy)
+
 	log.Infof("Running caching support for dashboard on %s", *addr)
-	_ = http.ListenAndServe(*addr, nil)
+	secureMiddleware := secure.New(secure.Options{
+		FrameDeny:               true,
+		CustomFrameOptionsValue: "SAMEORIGIN",
+		BrowserXssFilter:        true,
+		ContentTypeNosniff:      true,
+		ForceSTSHeader:          true,
+		STSPreload:              true,
+		STSIncludeSubdomains:    true,
+		STSSeconds:              31536000,
+	})
+	var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		relayingProxy(w, r)
+	})
+	app := secureMiddleware.Handler(myHandler)
+	//http.HandleFunc("/", app)
+	_ = http.ListenAndServe(*addr, app)
 }

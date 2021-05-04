@@ -25,8 +25,8 @@ require (
 	github.com/signintech/gopdf v0.9.12
 	github.com/sirupsen/logrus v1.7.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/unrolled/secure v1.0.8
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
-	golang.org/x/tools v0.0.0-20201224043029-2b0845dc783e
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
 
