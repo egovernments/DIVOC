@@ -1,15 +1,12 @@
 import React, {useEffect, useState} from "react";
 import {Table} from "react-bootstrap";
-import VaccinationActiveImg from "../../assets/img/vaccination-active-status.svg";
-import VaccinationInActiveImg from "../../assets/img/vacconation-inactive-status.svg";
 import {useHistory} from "react-router";
 import {BaseFormCard} from "../BaseFormCard";
 import {CONSTANT} from "../../utils/constants";
 import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
 import Col from "react-bootstrap/Col";
 import "./index.scss"
-import config from "config.json"
-import {formatDate} from "../../utils/date_utils";
+import config from "../../config"
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {DosesState} from "../DosesState";
 

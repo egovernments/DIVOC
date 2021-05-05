@@ -5,13 +5,12 @@ import {Redirect, useHistory} from "react-router";
 import {appIndexDb, QUEUE_STATUS} from "../../AppDatabase";
 import {PatientInfo, PreEnrollmentDetails} from "../../components/PreEnrollmentDetail";
 import "./PreEnrollmentFlow.scss";
-import config from "config.json"
+import config from "../../config"
 import {
     FORM_WALK_IN_ENROLL_PAYMENTS,
     FORM_WALK_IN_VERIFY_FORM
 } from "../../components/WalkEnrollments/context";
 import {BeneficiaryVerifyPayment} from "./BeneficiaryVerifyPayment";
-import {useOnlineStatus} from "../../utils/offlineStatus";
 
 export const FORM_PRE_ENROLL_CODE = "preEnrollCode";
 export const FORM_PRE_ENROLL_DETAILS = "preEnrollDetails";

@@ -2,7 +2,7 @@ import React, {useEffect} from "react";
 import "./Login.scss"
 import {useHistory} from "react-router";
 import {useKeycloak} from "@react-keycloak/web";
-import config from "config.json"
+import config from "../config"
 
 export function LoginComponent() {
     const {keycloak} = useKeycloak();

@@ -1,7 +1,7 @@
 import React, {createContext, useContext, useMemo, useReducer} from "react";
 import {useHistory} from "react-router";
 import {appIndexDb} from "../../AppDatabase";
-import config from "config.json"
+import config from "../../config"
 
 export const FORM_WALK_IN_ELIGIBILITY_CRITERIA = "eligibility_criteria";
 export const FORM_WALK_IN_VERIFY_MOBILE = "verify_mobile";
