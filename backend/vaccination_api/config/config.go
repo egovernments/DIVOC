@@ -72,7 +72,7 @@ var Config = struct {
 			Columns        string `yaml:"columns"`
 			RequiredFields string `yaml:"required_fields"`
 		}
-		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"1"`
+		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"100"`
 	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`
