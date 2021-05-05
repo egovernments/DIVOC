@@ -1,5 +1,5 @@
 import {useHistory} from "react-router";
-import config from "../../config.json";
+import config from "../../config.js";
 import {BaseFormCard} from "../BaseFormCard";
 import {getMessageComponent, LANGUAGE_KEYS} from "../../lang/LocaleContext";
 import {CustomButton} from "../CustomButton";

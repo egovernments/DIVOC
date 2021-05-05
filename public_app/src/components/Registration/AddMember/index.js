@@ -13,7 +13,7 @@ import {useHistory} from "react-router";
 import "./index.css"
 import Row from "react-bootstrap/Row";
 import {getCookie} from "../../../utils/cookies";
-import appConfig from "../../../config.json";
+import appConfig from "../../../config.js";
 import {INVALID_BENEFICIARY_ERROR_MSG} from "./error-constants";
 
 

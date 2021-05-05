@@ -2,7 +2,11 @@ import React, {useEffect, useState} from "react";
 import "./index.css";
 import CertificateValidImg from "../../assets/img/certificate-valid.svg";
 import CertificateInValidImg from "../../assets/img/certificate-invalid.svg";
-import config from "../../config";
+import config, {CERTIFICATE_CONTROLLER_ID,
+    CERTIFICATE_DID,
+    CERTIFICATE_NAMESPACE,
+    CERTIFICATE_PUBKEY_ID
+} from "../../config";
 import {pathOr} from "ramda";
 import {CertificateDetailsPaths} from "../../constants";
 import Button from "react-bootstrap/Button";
@@ -21,12 +25,12 @@ const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
-        "did:india": config.certificatePublicKey,
-        "https://example.com/i/india": config.certificatePublicKey,
+        CERTIFICATE_DID: config.certificatePublicKey,
+        CERTIFICATE_PUBKEY_ID: config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext,
+        CERTIFICATE_NAMESPACE: vaccinationContext,
     };
     let context = c[url];
     if (context === undefined) {
@@ -60,14 +64,14 @@ export const CertificateStatus = ({certificateData, goBack, onContinue}) => {
                 const signedJSON = JSON.parse(certificateData);
                 const publicKey = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: 'did:india',
+                    id: CERTIFICATE_DID,
                     type: 'RsaVerificationKey2018',
-                    controller: 'https://cowin.gov.in/',
+                    controller: CERTIFICATE_CONTROLLER_ID,
                     publicKeyPem: config.certificatePublicKey
                 };
                 const controller = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: 'https://cowin.gov.in/',
+                    id: CERTIFICATE_CONTROLLER_ID,
                     publicKey: [publicKey],
                     // this authorizes this key to be used for making assertions
                     assertionMethod: [publicKey.id]

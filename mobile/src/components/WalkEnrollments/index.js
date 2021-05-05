@@ -20,7 +20,7 @@ import PropTypes from 'prop-types';
 import schema from '../../jsonSchema/walk_in_form.json';
 import Form from "@rjsf/core/lib/components/Form";
 import {ImgDirect, ImgGovernment, ImgVoucher} from "../../assets/img/ImageComponents";
-import config from "config.json"
+import config from "../../config"
 import {useSelector} from "react-redux";
 import {getMessageComponent, LANGUAGE_KEYS, useLocale} from "../../lang/LocaleContext";
 import {SelectComorbidity} from "../SelectComorbidity";
@@ -30,7 +30,6 @@ import {RegisterBeneficiaryForm} from "../RegisterBeneficiaryForm";
 import {WalkInConfirmation} from "../WalkInConfirmation";
 import {CustomButton} from "../CustomButton";
 import {InvalidEligibilityCriteria} from "../InvalidElgiibilityCriteria";
-
 
 export function WalkEnrollmentFlow(props) {
     return (
