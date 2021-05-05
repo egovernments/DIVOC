@@ -256,8 +256,34 @@ async function getCertificatePDFByPreEnrollmentCode(req, res) {
     }
 }
 
+async function checkIfCertificateGenerated(req, res) {
+    try {
+        let claimBody = "";
+        let preEnrollmentCode = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            preEnrollmentCode = req.url.replace("/certificate/api/certificatePDF/", "");
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+        if (certificateResp.length > 0) {
+            res.statusCode = 200;
+            return;
+        }
+        res.statusCode = 404;
+        return;
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
 module.exports = {
     getCertificate,
     getCertificatePDF,
-    getCertificatePDFByPreEnrollmentCode
+    getCertificatePDFByPreEnrollmentCode,
+    checkIfCertificateGenerated
 };
