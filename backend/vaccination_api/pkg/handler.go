@@ -512,10 +512,14 @@ func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
 	doseWiseCertificateIds := map[int][]string{}
 	for _, certificateObj := range certificates {
 		if certificate, ok := certificateObj.(map[string]interface{}); ok {
-			if doseValue, found := certificate["dose"]; found {
-				if doseValueFloat, ok := doseValue.(float64); ok {
-					if certificateId, found := certificate["certificateId"]; found {
-						doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
+			var res map[string]interface{}
+			json.Unmarshal([]byte(certificate["certificate"].(string)), &res)
+			if evidences,  found := res["evidence"].([]interface{}); found && len(evidences) > 0{
+				if doseValue, found := evidences[0].(map[string]interface{})["dose"]; found {
+					if doseValueFloat, ok := doseValue.(float64); ok {
+						if certificateId, found := certificate["certificateId"]; found {
+							doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
+						}
 					}
 				}
 			}

@@ -61,7 +61,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     setTimeout(()=>{
         try {
             axios
-              .post("/divoc/api/v1/events/", {"date":new Date().toISOString(), "type":"verify"})
+              .post("/divoc/api/v1/events/", [{"date":new Date().toISOString(), "type":"verify"}])
               .catch((e) => {
                 console.log(e);
             });
