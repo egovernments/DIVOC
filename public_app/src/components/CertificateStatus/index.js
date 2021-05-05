@@ -29,12 +29,12 @@ const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
-        CERTIFICATE_DID: config.certificatePublicKey,
-        CERTIFICATE_PUBKEY_ID: config.certificatePublicKey,
+        [CERTIFICATE_DID]: config.certificatePublicKey,
+        [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        CERTIFICATE_NAMESPACE: vaccinationContext,
+        [CERTIFICATE_NAMESPACE]: vaccinationContext,
     };
     let context = c[url];
     if (context === undefined) {
