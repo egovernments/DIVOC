@@ -104,9 +104,9 @@ func getKeycloakUserId(resp *req.Resp, userRequest KeyCloakUserRequest, authHead
 }
 
 func searchAndGetKeyCloakUserId(username string, authHeader string) (string, error) {
-	url := config.Config.Keycloak.Url + "/admin/realms/divoc/users?username=" + username + "&exact=true"
+	url := config.Config.Keycloak.Url + "/admin/realms/divoc/users"
 	log.Info("Checking with keycloak for userid mapping ", url)
-	resp, err := req.Get(url, req.Header{"Authorization": authHeader})
+	resp, err := req.Get(url, req.QueryParam{"username": username, "exact": true}, req.Header{"Authorization": authHeader})
 	if err != nil {
 		return "", err
 	}
