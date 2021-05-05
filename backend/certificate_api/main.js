@@ -18,6 +18,9 @@ const server = http.createServer(async (req, res) => {
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificatePDF")) {
         const data = await certificateController.getCertificatePDF(req, res);
         res.end(data)
+    } else if (req.method === 'HEAD' && req.url.match("/certificate/api/certificatePDF/.+")) {
+        const data = await certificateController.checkIfCertificateGenerated(req, res);
+        res.end(data)
     } else {
         res.end(`{"error": "${http.STATUS_CODES[404]}"}`)
     }
