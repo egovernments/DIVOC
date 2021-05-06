@@ -535,9 +535,12 @@ func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
 	sort.Slice(certificateArr, func(i, j int) bool {
 		certificateA := certificateArr[i].(map[string]interface{})
 		certificateB := certificateArr[j].(map[string]interface{})
-		certificateACreateAt := certificateA["osCreatedAt"].(string)
-		certificateBCreateAt := certificateB["osCreatedAt"].(string)
-		return certificateACreateAt < certificateBCreateAt
+		if certificateACreateAt, ok := certificateA["osCreatedAt"].(string); ok {
+			if certificateBCreateAt, ok := certificateB["osCreatedAt"].(string); ok {
+				return certificateACreateAt < certificateBCreateAt
+			}
+		}
+		return true
 	})
 	return certificateArr
 }
