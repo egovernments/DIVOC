@@ -484,7 +484,10 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	certificates := certificateFromRegistry[CertificateEntity].([]interface{})
 	if err == nil && len(certificates) > 0 {
-		certificates = SortCertificatesByCreateAt(certificates)
+		log.Infof("Certificates: %+v", certificates)
+		if len(certificates) > 1 {
+			certificates = SortCertificatesByCreateAt(certificates)
+		}
 		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
 		// no changes to provisional certificate if final certificate is generated
 		if *request.Vaccination.Dose < *request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
@@ -532,8 +535,8 @@ func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
 	sort.Slice(certificateArr, func(i, j int) bool {
 		certificateA := certificateArr[i].(map[string]interface{})
 		certificateB := certificateArr[j].(map[string]interface{})
-		certificateACreateAt := certificateA["_osCreatedAt"].(string)
-		certificateBCreateAt := certificateB["_osCreatedAt"].(string)
+		certificateACreateAt := certificateA["osCreatedAt"].(string)
+		certificateBCreateAt := certificateB["osCreatedAt"].(string)
 		return certificateACreateAt < certificateBCreateAt
 	})
 	return certificateArr
