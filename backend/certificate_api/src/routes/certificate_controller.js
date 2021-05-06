@@ -104,6 +104,15 @@ function getVaccineValidDays(start, end) {
 
 async function createCertificatePDF(certificateResp, res, source) {
     if (certificateResp.length > 0) {
+        certificateResp = certificateResp.sort(function(a,b){
+            if (a.osUpdatedAt < b.osUpdatedAt) {
+                return 1;
+            }
+            if (a.osUpdatedAt > b.osUpdatedAt) {
+                return -1;
+            }
+            return 0;
+        }).reverse();
         let certificateRaw = certificateResp[certificateResp.length - 1];
         const zip = new JSZip();
         zip.file("certificate.json", certificateRaw.certificate, {
