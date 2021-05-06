@@ -47,7 +47,8 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         }
         const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
         const isSigned = await redis.checkIfKeyExists(key);
-        if (!isSigned) {
+        const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], jsonMessage);
+        if (!isSigned || isUpdateRequest) {
           redis.storeKeyWithExpiry(key, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
           await signer.signAndSave(jsonMessage)
             .then(res => {
