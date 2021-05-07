@@ -71,9 +71,16 @@ paths:
         '200':
           description: OK
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/PublicFacility'
+            type: object
+            properties:
+              facilities:
+                type: array
+                items:
+                  $ref: '#/definitions/PublicFacility'
+              facilitiesSchedule:
+                type: array
+                items:
+                  $ref: '../registry/FacilityProgramSlot.json#/definitions/FacilityProgramSlot'
   /facilities:
     get:
       summary: get facilities

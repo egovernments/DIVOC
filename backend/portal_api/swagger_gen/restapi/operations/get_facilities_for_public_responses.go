@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // GetFacilitiesForPublicOKCode is the HTTP code returned for type GetFacilitiesForPublicOK
@@ -25,7 +23,7 @@ type GetFacilitiesForPublicOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.PublicFacility `json:"body,omitempty"`
+	Payload *GetFacilitiesForPublicOKBody `json:"body,omitempty"`
 }
 
 // NewGetFacilitiesForPublicOK creates GetFacilitiesForPublicOK with default headers values
@@ -35,13 +33,13 @@ func NewGetFacilitiesForPublicOK() *GetFacilitiesForPublicOK {
 }
 
 // WithPayload adds the payload to the get facilities for public o k response
-func (o *GetFacilitiesForPublicOK) WithPayload(payload []*models.PublicFacility) *GetFacilitiesForPublicOK {
+func (o *GetFacilitiesForPublicOK) WithPayload(payload *GetFacilitiesForPublicOKBody) *GetFacilitiesForPublicOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get facilities for public o k response
-func (o *GetFacilitiesForPublicOK) SetPayload(payload []*models.PublicFacility) {
+func (o *GetFacilitiesForPublicOK) SetPayload(payload *GetFacilitiesForPublicOKBody) {
 	o.Payload = payload
 }
 
@@ -49,13 +47,10 @@ func (o *GetFacilitiesForPublicOK) SetPayload(payload []*models.PublicFacility) 
 func (o *GetFacilitiesForPublicOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
 	rw.WriteHeader(200)
-	payload := o.Payload
-	if payload == nil {
-		// return empty array
-		payload = make([]*models.PublicFacility, 0, 50)
-	}
-
-	if err := producer.Produce(rw, payload); err != nil {
-		panic(err) // let the recovery middleware deal with this
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
 	}
 }

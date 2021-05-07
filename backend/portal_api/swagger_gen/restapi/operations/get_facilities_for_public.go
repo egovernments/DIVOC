@@ -7,8 +7,14 @@ package operations
 
 import (
 	"net/http"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+
+	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // GetFacilitiesForPublicHandlerFunc turns a function with the right signature into a get facilities for public handler
@@ -55,4 +61,102 @@ func (o *GetFacilitiesForPublic) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// GetFacilitiesForPublicOKBody get facilities for public o k body
+//
+// swagger:model GetFacilitiesForPublicOKBody
+type GetFacilitiesForPublicOKBody struct {
+
+	// facilities
+	Facilities []*models.PublicFacility `json:"facilities"`
+
+	// facilities schedule
+	FacilitiesSchedule []*models.FacilityProgramSlot `json:"facilitiesSchedule"`
+}
+
+// Validate validates this get facilities for public o k body
+func (o *GetFacilitiesForPublicOKBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateFacilities(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateFacilitiesSchedule(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetFacilitiesForPublicOKBody) validateFacilities(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Facilities) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Facilities); i++ {
+		if swag.IsZero(o.Facilities[i]) { // not required
+			continue
+		}
+
+		if o.Facilities[i] != nil {
+			if err := o.Facilities[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("getFacilitiesForPublicOK" + "." + "facilities" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *GetFacilitiesForPublicOKBody) validateFacilitiesSchedule(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.FacilitiesSchedule) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.FacilitiesSchedule); i++ {
+		if swag.IsZero(o.FacilitiesSchedule[i]) { // not required
+			continue
+		}
+
+		if o.FacilitiesSchedule[i] != nil {
+			if err := o.FacilitiesSchedule[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("getFacilitiesForPublicOK" + "." + "facilitiesSchedule" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetFacilitiesForPublicOKBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetFacilitiesForPublicOKBody) UnmarshalBinary(b []byte) error {
+	var res GetFacilitiesForPublicOKBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

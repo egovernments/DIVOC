@@ -1037,9 +1037,20 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/PublicFacility"
+              "type": "object",
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicFacility"
+                  }
+                },
+                "facilitiesSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "../registry/FacilityProgramSlot.json#/definitions/FacilityProgramSlot"
+                  }
+                }
               }
             }
           }
@@ -3125,9 +3136,20 @@ func init() {
           "200": {
             "description": "OK",
             "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/definitions/PublicFacility"
+              "type": "object",
+              "properties": {
+                "facilities": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PublicFacility"
+                  }
+                },
+                "facilitiesSchedule": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/facilityProgramSlot"
+                  }
+                }
               }
             }
           }
@@ -3426,6 +3448,21 @@ func init() {
           "state": "Karnataka"
         }
       ]
+    },
+    "AppointmentScheduleDaysItems0": {
+      "type": "object",
+      "properties": {
+        "day": {
+          "type": "string",
+          "$comment": "day (mon, tue, wed, thr, fri, sat, sun)",
+          "$id": "#/properties/day"
+        },
+        "maxAppointments": {
+          "type": "integer",
+          "$comment": "ProgramId",
+          "$id": "#/properties/programId"
+        }
+      }
     },
     "EnrollmentAddress": {
       "description": "Indian address format",
@@ -4566,6 +4603,28 @@ func init() {
         }
       }
     },
+    "appointmentSchedule": {
+      "type": "object",
+      "title": "The Appointment Schedule Schema",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AppointmentScheduleDaysItems0"
+          },
+          "$id": "#/properties/days"
+        },
+        "endTime": {
+          "type": "string",
+          "$id": "#/properties/operatingHourEnd"
+        },
+        "startTime": {
+          "type": "string",
+          "$id": "#/properties/startTime"
+        }
+      },
+      "$id": "#/properties/AppointmentSchedule"
+    },
     "enrollment": {
       "type": "object",
       "required": [
@@ -4685,6 +4744,44 @@ func init() {
         }
       }
     },
+    "facilityProgramSlot": {
+      "type": "object",
+      "title": "The Facility Program Slot",
+      "required": [
+        "facilityId",
+        "programId"
+      ],
+      "properties": {
+        "___encryptedFields": {},
+        "appointmentSchedule": {
+          "type": "array",
+          "title": "Appointment Schedule",
+          "items": {
+            "$ref": "#/definitions/appointmentSchedule"
+          },
+          "$id": "#/properties/appointmentSchedule"
+        },
+        "facilityId": {
+          "type": "string",
+          "$comment": "Facility Id",
+          "$id": "#/properties/facilityId"
+        },
+        "programId": {
+          "type": "string",
+          "$comment": "ProgramId",
+          "$id": "#/properties/programId"
+        },
+        "walkInSchedule": {
+          "type": "array",
+          "title": "WalkIn Schedule",
+          "items": {
+            "$ref": "#/definitions/walkInSchedule"
+          },
+          "$id": "#/properties/walkInSchedule"
+        }
+      },
+      "$id": "#/properties/FacilityProgramSlot"
+    },
     "signature": {
       "type": "object",
       "title": "The Signature Schema for the registry",
@@ -4751,6 +4848,29 @@ func init() {
         }
       },
       "$id": "#/properties/Signature"
+    },
+    "walkInSchedule": {
+      "type": "object",
+      "title": "The walkInSchedule Schema",
+      "properties": {
+        "days": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "$comment": "day (mon, tue, wed, thr, fri, sat, sun)"
+          },
+          "$id": "#/properties/days"
+        },
+        "endTime": {
+          "type": "string",
+          "$id": "#/properties/operatingHourEnd"
+        },
+        "startTime": {
+          "type": "string",
+          "$id": "#/properties/startTime"
+        }
+      },
+      "$id": "#/properties/WalkInSchedule"
     }
   },
   "securityDefinitions": {
