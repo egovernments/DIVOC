@@ -6,9 +6,15 @@ package operations
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"encoding/json"
 	"net/http"
+	"strconv"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/divoc/portal-api/swagger_gen/models"
 )
@@ -70,4 +76,527 @@ func (o *GetVaccinators) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// GetVaccinatorsOKBodyItems0 The Vaccinator Schema
+//
+// swagger:model GetVaccinatorsOKBodyItems0
+type GetVaccinatorsOKBodyItems0 struct {
+
+	// encrypted fields
+	EncryptedFields interface{} `json:"___encryptedFields,omitempty"`
+
+	// average rating
+	AverageRating float64 `json:"averageRating,omitempty"`
+
+	// code
+	// Required: true
+	Code *string `json:"code"`
+
+	// email
+	// Required: true
+	Email *string `json:"email"`
+
+	// facility ids
+	// Required: true
+	FacilityIds []string `json:"facilityIds"`
+
+	// mobile number
+	// Required: true
+	// Max Length: 10
+	// Min Length: 10
+	MobileNumber *string `json:"mobileNumber"`
+
+	// Full name
+	// Required: true
+	Name *string `json:"name"`
+
+	// national identifier
+	// Required: true
+	NationalIdentifier *string `json:"nationalIdentifier"`
+
+	// programs
+	Programs []*GetVaccinatorsOKBodyItems0ProgramsItems0 `json:"programs"`
+
+	// signatures
+	Signatures []*GetVaccinatorsOKBodyItems0SignaturesItems0 `json:"signatures"`
+
+	// status
+	// Required: true
+	// Enum: [Active Inactive]
+	Status *string `json:"status"`
+
+	// training certificate
+	TrainingCertificate string `json:"trainingCertificate,omitempty"`
+}
+
+// Validate validates this get vaccinators o k body items0
+func (o *GetVaccinatorsOKBodyItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateEmail(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateFacilityIds(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMobileNumber(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateName(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateNationalIdentifier(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validatePrograms(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateSignatures(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateStatus(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("code", "body", o.Code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateEmail(formats strfmt.Registry) error {
+
+	if err := validate.Required("email", "body", o.Email); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateFacilityIds(formats strfmt.Registry) error {
+
+	if err := validate.Required("facilityIds", "body", o.FacilityIds); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateMobileNumber(formats strfmt.Registry) error {
+
+	if err := validate.Required("mobileNumber", "body", o.MobileNumber); err != nil {
+		return err
+	}
+
+	if err := validate.MinLength("mobileNumber", "body", string(*o.MobileNumber), 10); err != nil {
+		return err
+	}
+
+	if err := validate.MaxLength("mobileNumber", "body", string(*o.MobileNumber), 10); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateName(formats strfmt.Registry) error {
+
+	if err := validate.Required("name", "body", o.Name); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateNationalIdentifier(formats strfmt.Registry) error {
+
+	if err := validate.Required("nationalIdentifier", "body", o.NationalIdentifier); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validatePrograms(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Programs) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Programs); i++ {
+		if swag.IsZero(o.Programs[i]) { // not required
+			continue
+		}
+
+		if o.Programs[i] != nil {
+			if err := o.Programs[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("programs" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateSignatures(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.Signatures) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(o.Signatures); i++ {
+		if swag.IsZero(o.Signatures[i]) { // not required
+			continue
+		}
+
+		if o.Signatures[i] != nil {
+			if err := o.Signatures[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("signatures" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+var getVaccinatorsOKBodyItems0TypeStatusPropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["Active","Inactive"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getVaccinatorsOKBodyItems0TypeStatusPropEnum = append(getVaccinatorsOKBodyItems0TypeStatusPropEnum, v)
+	}
+}
+
+const (
+
+	// GetVaccinatorsOKBodyItems0StatusActive captures enum value "Active"
+	GetVaccinatorsOKBodyItems0StatusActive string = "Active"
+
+	// GetVaccinatorsOKBodyItems0StatusInactive captures enum value "Inactive"
+	GetVaccinatorsOKBodyItems0StatusInactive string = "Inactive"
+)
+
+// prop value enum
+func (o *GetVaccinatorsOKBodyItems0) validateStatusEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, getVaccinatorsOKBodyItems0TypeStatusPropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0) validateStatus(formats strfmt.Registry) error {
+
+	if err := validate.Required("status", "body", o.Status); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := o.validateStatusEnum("status", "body", *o.Status); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0) UnmarshalBinary(b []byte) error {
+	var res GetVaccinatorsOKBodyItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// GetVaccinatorsOKBodyItems0ProgramsItems0 get vaccinators o k body items0 programs items0
+//
+// swagger:model GetVaccinatorsOKBodyItems0ProgramsItems0
+type GetVaccinatorsOKBodyItems0ProgramsItems0 struct {
+
+	// certified
+	Certified bool `json:"certified,omitempty"`
+
+	// certified updated at
+	// Format: date
+	CertifiedUpdatedAt strfmt.Date `json:"certifiedUpdatedAt,omitempty"`
+
+	// id
+	ID string `json:"id,omitempty"`
+
+	// status updated at
+	// Format: date
+	StatusUpdatedAt strfmt.Date `json:"statusUpdatedAt,omitempty"`
+}
+
+// Validate validates this get vaccinators o k body items0 programs items0
+func (o *GetVaccinatorsOKBodyItems0ProgramsItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateCertifiedUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateStatusUpdatedAt(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0ProgramsItems0) validateCertifiedUpdatedAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.CertifiedUpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("certifiedUpdatedAt", "body", "date", o.CertifiedUpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0ProgramsItems0) validateStatusUpdatedAt(formats strfmt.Registry) error {
+
+	if swag.IsZero(o.StatusUpdatedAt) { // not required
+		return nil
+	}
+
+	if err := validate.FormatOf("statusUpdatedAt", "body", "date", o.StatusUpdatedAt.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0ProgramsItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0ProgramsItems0) UnmarshalBinary(b []byte) error {
+	var res GetVaccinatorsOKBodyItems0ProgramsItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
+}
+
+// GetVaccinatorsOKBodyItems0SignaturesItems0 The Signature Schema for the registry
+//
+// swagger:model GetVaccinatorsOKBodyItems0SignaturesItems0
+type GetVaccinatorsOKBodyItems0SignaturesItems0 struct {
+
+	// at type
+	// Required: true
+	// Enum: [sc:LinkedDataSignature2015 sc:GraphSignature2012 sc:RsaSignature2018]
+	AtType *string `json:"@type"`
+
+	// created
+	// Required: true
+	// Format: date-time
+	Created *strfmt.DateTime `json:"created"`
+
+	// creator
+	// Required: true
+	// Format: uri
+	Creator *strfmt.URI `json:"creator"`
+
+	// nonce
+	Nonce string `json:"nonce,omitempty"`
+
+	// signature for
+	// Required: true
+	SignatureFor *string `json:"signatureFor"`
+
+	// signature value
+	// Required: true
+	SignatureValue *string `json:"signatureValue"`
+}
+
+// Validate validates this get vaccinators o k body items0 signatures items0
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateAtType(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateCreated(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateCreator(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateSignatureFor(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateSignatureValue(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+var getVaccinatorsOKBodyItems0SignaturesItems0TypeAtTypePropEnum []interface{}
+
+func init() {
+	var res []string
+	if err := json.Unmarshal([]byte(`["sc:LinkedDataSignature2015","sc:GraphSignature2012","sc:RsaSignature2018"]`), &res); err != nil {
+		panic(err)
+	}
+	for _, v := range res {
+		getVaccinatorsOKBodyItems0SignaturesItems0TypeAtTypePropEnum = append(getVaccinatorsOKBodyItems0SignaturesItems0TypeAtTypePropEnum, v)
+	}
+}
+
+const (
+
+	// GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScLinkedDataSignature2015 captures enum value "sc:LinkedDataSignature2015"
+	GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScLinkedDataSignature2015 string = "sc:LinkedDataSignature2015"
+
+	// GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScGraphSignature2012 captures enum value "sc:GraphSignature2012"
+	GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScGraphSignature2012 string = "sc:GraphSignature2012"
+
+	// GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScRsaSignature2018 captures enum value "sc:RsaSignature2018"
+	GetVaccinatorsOKBodyItems0SignaturesItems0AtTypeScRsaSignature2018 string = "sc:RsaSignature2018"
+)
+
+// prop value enum
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateAtTypeEnum(path, location string, value string) error {
+	if err := validate.EnumCase(path, location, value, getVaccinatorsOKBodyItems0SignaturesItems0TypeAtTypePropEnum, true); err != nil {
+		return err
+	}
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateAtType(formats strfmt.Registry) error {
+
+	if err := validate.Required("@type", "body", o.AtType); err != nil {
+		return err
+	}
+
+	// value enum
+	if err := o.validateAtTypeEnum("@type", "body", *o.AtType); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateCreated(formats strfmt.Registry) error {
+
+	if err := validate.Required("created", "body", o.Created); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("created", "body", "date-time", o.Created.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateCreator(formats strfmt.Registry) error {
+
+	if err := validate.Required("creator", "body", o.Creator); err != nil {
+		return err
+	}
+
+	if err := validate.FormatOf("creator", "body", "uri", o.Creator.String(), formats); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateSignatureFor(formats strfmt.Registry) error {
+
+	if err := validate.Required("signatureFor", "body", o.SignatureFor); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) validateSignatureValue(formats strfmt.Registry) error {
+
+	if err := validate.Required("signatureValue", "body", o.SignatureValue); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *GetVaccinatorsOKBodyItems0SignaturesItems0) UnmarshalBinary(b []byte) error {
+	var res GetVaccinatorsOKBodyItems0SignaturesItems0
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }

@@ -1168,7 +1168,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Vaccinator"
+                "$ref": "../registry/Vaccinator.json#/definitions/Vaccinator"
               }
             }
           }
@@ -3256,7 +3256,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/Vaccinator"
+                "$ref": "#/definitions/GetVaccinatorsOKBodyItems0"
               }
             }
           }
@@ -3886,6 +3886,170 @@ func init() {
           "type": "string"
         }
       }
+    },
+    "GetVaccinatorsOKBodyItems0": {
+      "type": "object",
+      "title": "The Vaccinator Schema",
+      "required": [
+        "code",
+        "nationalIdentifier",
+        "name",
+        "facilityIds",
+        "mobileNumber",
+        "status",
+        "email"
+      ],
+      "properties": {
+        "___encryptedFields": {},
+        "averageRating": {
+          "type": "number"
+        },
+        "code": {
+          "type": "string",
+          "$comment": "Code",
+          "$id": "#/properties/code"
+        },
+        "email": {
+          "type": "string",
+          "$comment": "Email Id",
+          "$id": "#/properties/email"
+        },
+        "facilityIds": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "mobileNumber": {
+          "type": "string",
+          "maxLength": 10,
+          "minLength": 10
+        },
+        "name": {
+          "type": "string",
+          "title": "Full name",
+          "$id": "#/properties/name"
+        },
+        "nationalIdentifier": {
+          "type": "string",
+          "$comment": "Nationality",
+          "$id": "#/properties/nationalIdentifier"
+        },
+        "programs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetVaccinatorsOKBodyItems0ProgramsItems0"
+          },
+          "$id": "#/properties/programs"
+        },
+        "signatures": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/GetVaccinatorsOKBodyItems0SignaturesItems0"
+          },
+          "$comment": "Placeholder for all verifiable claims",
+          "$id": "#/properties/signatures"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "Active",
+            "Inactive"
+          ]
+        },
+        "trainingCertificate": {
+          "type": "string"
+        }
+      },
+      "$id": "#/properties/Vaccinator"
+    },
+    "GetVaccinatorsOKBodyItems0ProgramsItems0": {
+      "type": "object",
+      "properties": {
+        "certified": {
+          "type": "boolean"
+        },
+        "certifiedUpdatedAt": {
+          "type": "string",
+          "format": "date",
+          "$id": "#/properties/certifiedUpdatedAt"
+        },
+        "id": {
+          "type": "string"
+        },
+        "statusUpdatedAt": {
+          "type": "string",
+          "format": "date",
+          "$id": "#/properties/statusUpdatedAt"
+        }
+      }
+    },
+    "GetVaccinatorsOKBodyItems0SignaturesItems0": {
+      "type": "object",
+      "title": "The Signature Schema for the registry",
+      "required": [
+        "@type",
+        "signatureFor",
+        "creator",
+        "created",
+        "signatureValue"
+      ],
+      "properties": {
+        "@type": {
+          "type": "string",
+          "default": "sc:RsaSignature2018",
+          "enum": [
+            "sc:LinkedDataSignature2015",
+            "sc:GraphSignature2012",
+            "sc:RsaSignature2018"
+          ],
+          "$id": "#/properties/@type"
+        },
+        "created": {
+          "type": "string",
+          "format": "date-time",
+          "$comment": "Timestamp",
+          "$id": "#/properties/created",
+          "examples": [
+            "2017-09-23T20:21:34Z"
+          ]
+        },
+        "creator": {
+          "type": "string",
+          "format": "uri",
+          "$comment": "IRI where the public key associated could be retrieved",
+          "$id": "#/properties/creator",
+          "examples": [
+            "https://example.com/i/pat/keys/"
+          ]
+        },
+        "nonce": {
+          "type": "string",
+          "$comment": "Some unique value for tracking",
+          "$id": "#/properties/nonce",
+          "examples": [
+            "guid"
+          ]
+        },
+        "signatureFor": {
+          "type": "string",
+          "$comment": "The attribute name or entity id you for which this is the signature",
+          "$id": "#/properties/signatureFor",
+          "examples": [
+            "http://localhost:8080/serialNum",
+            "http://localhost:8080/9cba6ddd-330c-4a0d-929a-771bb12cb0d3"
+          ]
+        },
+        "signatureValue": {
+          "type": "string",
+          "$comment": "Hash or signed value",
+          "$id": "#/properties/signatureValue",
+          "examples": [
+            "eyiOiJKJeXAasddOEjgFWFXk"
+          ]
+        }
+      },
+      "$id": "#/properties/Signature"
     },
     "Medicine": {
       "type": "object",

@@ -247,7 +247,8 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Vaccinator'
+              $ref: '../registry/Vaccinator.json#/definitions/Vaccinator'
+
     post:
       summary: Upload facility csv for bulk ingestion
       consumes:

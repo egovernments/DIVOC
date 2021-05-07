@@ -9,8 +9,6 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
-
-	"github.com/divoc/portal-api/swagger_gen/models"
 )
 
 // GetVaccinatorsOKCode is the HTTP code returned for type GetVaccinatorsOK
@@ -25,7 +23,7 @@ type GetVaccinatorsOK struct {
 	/*
 	  In: Body
 	*/
-	Payload []*models.Vaccinator `json:"body,omitempty"`
+	Payload []*GetVaccinatorsOKBodyItems0 `json:"body,omitempty"`
 }
 
 // NewGetVaccinatorsOK creates GetVaccinatorsOK with default headers values
@@ -35,13 +33,13 @@ func NewGetVaccinatorsOK() *GetVaccinatorsOK {
 }
 
 // WithPayload adds the payload to the get vaccinators o k response
-func (o *GetVaccinatorsOK) WithPayload(payload []*models.Vaccinator) *GetVaccinatorsOK {
+func (o *GetVaccinatorsOK) WithPayload(payload []*GetVaccinatorsOKBodyItems0) *GetVaccinatorsOK {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the get vaccinators o k response
-func (o *GetVaccinatorsOK) SetPayload(payload []*models.Vaccinator) {
+func (o *GetVaccinatorsOK) SetPayload(payload []*GetVaccinatorsOKBodyItems0) {
 	o.Payload = payload
 }
 
@@ -52,7 +50,7 @@ func (o *GetVaccinatorsOK) WriteResponse(rw http.ResponseWriter, producer runtim
 	payload := o.Payload
 	if payload == nil {
 		// return empty array
-		payload = make([]*models.Vaccinator, 0, 50)
+		payload = make([]*GetVaccinatorsOKBodyItems0, 0, 50)
 	}
 
 	if err := producer.Produce(rw, payload); err != nil {
