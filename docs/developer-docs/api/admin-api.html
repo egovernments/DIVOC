@@ -47,7 +47,12 @@
             plugins: [
                 SwaggerUIBundle.plugins.DownloadUrl
             ],
-            layout: "StandaloneLayout"
+            layout: "StandaloneLayout",
+            requestInterceptor: (req) => {
+                if (req.url.includes(".json")) {
+                    req.url=req.url.replace("registry","../registry")
+                }
+            }
         })
         // End Swagger UI call region
 
