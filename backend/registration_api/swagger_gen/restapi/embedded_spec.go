@@ -145,6 +145,67 @@ func init() {
         }
       }
     },
+    "/beneficiaries/search": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get all beneficiaries",
+        "operationId": "getBeneficiaries",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Program Id",
+            "name": "programId",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "description": "Start Date",
+            "name": "startDate",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "description": "End Date",
+            "name": "endDate",
+            "in": "query",
+            "required": true
+          },
+          {
+            "enum": [
+              "CERTIFIED",
+              "OPEN_APPOINTMENT"
+            ],
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "../registry/Enrollment.json#/definitions/Enrollment"
+              }
+            }
+          }
+        }
+      }
+    },
     "/facility/slots": {
       "get": {
         "security": [
@@ -537,6 +598,15 @@ func init() {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"
+    },
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "scopes": {
+        "facility-admin": "scope of facility admin"
+      }
     }
   }
 }`))
@@ -664,6 +734,67 @@ func init() {
           },
           "401": {
             "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/beneficiaries/search": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "summary": "Get all beneficiaries",
+        "operationId": "getBeneficiaries",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Program Id",
+            "name": "programId",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "description": "Start Date",
+            "name": "startDate",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "string",
+            "format": "date",
+            "description": "End Date",
+            "name": "endDate",
+            "in": "query",
+            "required": true
+          },
+          {
+            "enum": [
+              "CERTIFIED",
+              "OPEN_APPOINTMENT"
+            ],
+            "type": "string",
+            "description": "Facility Type",
+            "name": "type",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "$ref": "#/definitions/enrollment"
+              }
+            }
           }
         }
       }
@@ -1229,6 +1360,15 @@ func init() {
       "type": "apiKey",
       "name": "Authorization",
       "in": "header"
+    },
+    "hasRole": {
+      "type": "oauth2",
+      "flow": "accessCode",
+      "authorizationUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth",
+      "tokenUrl": "https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token",
+      "scopes": {
+        "facility-admin": "scope of facility admin"
+      }
     }
   }
 }`))

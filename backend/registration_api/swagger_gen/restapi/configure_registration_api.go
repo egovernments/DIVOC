@@ -42,6 +42,8 @@ func configureAPI(api *operations.RegistrationAPIAPI) http.Handler {
 
 	api.BearerAuth = services.VerifyRecipientToken
 
+	api.HasRoleAuth = services.RoleAuthorizer
+
 	if api.EnrollRecipientHandler == nil {
 		api.EnrollRecipientHandler = operations.EnrollRecipientHandlerFunc(func(params operations.EnrollRecipientParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation operations.EnrollRecipient has not yet been implemented")
