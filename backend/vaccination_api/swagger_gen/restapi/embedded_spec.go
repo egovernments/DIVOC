@@ -209,6 +209,42 @@ func init() {
         }
       }
     },
+    "/certificates/{certificateId}": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get certificate json for given certificateId",
+        "operationId": "getCertificateByCertificateId",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of certificate",
+            "name": "certificateId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "certificate for given certificateId not found"
+          }
+        }
+      }
+    },
     "/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
@@ -1193,6 +1229,42 @@ func init() {
             "schema": {
               "type": "object"
             }
+          }
+        }
+      }
+    },
+    "/certificates/{certificateId}": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get certificate json for given certificateId",
+        "operationId": "getCertificateByCertificateId",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "Id of certificate",
+            "name": "certificateId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "404": {
+            "description": "certificate for given certificateId not found"
           }
         }
       }
