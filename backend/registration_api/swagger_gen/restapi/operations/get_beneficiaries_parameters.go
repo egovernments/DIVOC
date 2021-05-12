@@ -217,7 +217,7 @@ func (o *GetBeneficiariesParams) bindType(rawData []string, hasKey bool, formats
 // validateType carries on validations for parameter Type
 func (o *GetBeneficiariesParams) validateType(formats strfmt.Registry) error {
 
-	if err := validate.EnumCase("type", "query", o.Type, []interface{}{"CERTIFIED", "OPEN_APPOINTMENT"}, true); err != nil {
+	if err := validate.EnumCase("type", "query", o.Type, []interface{}{"CERTIFIED", "OPEN_APPOINTMENT", "ALL"}, true); err != nil {
 		return err
 	}
 

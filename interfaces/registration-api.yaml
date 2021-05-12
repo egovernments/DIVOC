@@ -298,7 +298,7 @@ paths:
           name: type
           type: string
           required: true
-          enum: ["CERTIFIED", "OPEN_APPOINTMENT"]
+          enum: ["CERTIFIED", "OPEN_APPOINTMENT", "ALL"]
           description: Facility Type
       responses:
         '200':

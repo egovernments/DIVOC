@@ -427,48 +427,83 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 	endDate := time.Date(e.Year(), e.Month(), e.Day()+1, 0, 0, 0, 0, currTime.Location()).Add(-1*time.Nanosecond).Format(time.RFC3339)
 	reqType := params.Type
 
-	filter := map[string]interface{}{
+	openAppointmentFilter := map[string]interface{}{
 		"appointments.programId": map[string]interface{}{
 			"eq": programId,
 		},
 		"appointments.enrollmentScopeId": map[string]interface{}{
 			"eq": facilityCode,
 		},
-	}
-	if reqType == "CERTIFIED" {
-		filter["appointments.osUpdatedAt"] = map[string]interface{}{
+		"appointments.appointmentDate": map[string]interface{}{
 			"gte": startDate,
 			"lte": endDate,
-		}
-		filter["appointments.certified"] = map[string]interface{}{
-			"eq": true,
-		}
-	} else if reqType == "OPEN_APPOINTMENT" {
-		filter["appointments.osCreatedAt"] = map[string]interface{}{
-			"gte": startDate,
-			"lte": endDate,
-		}
-		filter["appointments.certified"] = map[string]interface{}{
+		},
+		"appointments.certified" : map[string]interface{}{
 			"eq": false,
+		},
+	}
+
+	certifiedFilter := map[string]interface{}{
+		"appointments.programId": map[string]interface{}{
+			"eq": programId,
+		},
+		"appointments.enrollmentScopeId": map[string]interface{}{
+			"eq": facilityCode,
+		},
+		"appointments.osUpdatedAt": map[string]interface{}{
+			"gte": startDate,
+			"lte": endDate,
+		},
+		"appointments.certified" : map[string]interface{}{
+			"eq": true,
+		},
+	}
+
+	if reqType == "CERTIFIED" {
+		enrollments, err := services.GetBeneficiariesFromRegistry(certifiedFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	} else if reqType == "OPEN_APPOINTMENT" {
+		enrollments, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	} else if reqType == "ALL" {
+		enrollments, err := getAllBeneficiaries(openAppointmentFilter, certifiedFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	}
+	return model.NewGenericServerError()
+}
+
+func getAllBeneficiaries(openAppointmentFilter map[string]interface{}, certifiedFilter map[string]interface{}) ([]map[string]interface{}, error) {
+
+	response1FromRegistry, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter);
+	if err != nil {
+		return nil, err
+	}
+	var response1BeneficiaryCodes []string
+	for _, b := range response1FromRegistry {
+		response1BeneficiaryCodes = append(response1BeneficiaryCodes, b["code"].(string))
+	}
+
+	response2FromRegistry, err2 := services.GetBeneficiariesFromRegistry(certifiedFilter);
+	if err2 != nil {
+		return nil, err
+	}
+
+	result := response1FromRegistry
+	for _, b := range response2FromRegistry {
+		if !utils.Contains(response1BeneficiaryCodes, b["code"].(string)) {
+			result = append(result, b)
 		}
 	}
 
-	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
-	if err != nil {
-		log.Error("Error occurred while querying Enrollment registry ", err)
-		return model.NewGenericServerError()
-	}
-	if enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]); err == nil {
-		var enrollments []map[string]interface{}
-		err := json.Unmarshal(enrollmentArr, &enrollments)
-		if err != nil {
-			log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-			return model.NewGenericServerError()
-		} else {
-			return model.NewGenericJSONResponse(enrollments)
-		}
-	} else {
-		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
-		return model.NewGenericServerError()
-	}
+	return result, nil
+
 }

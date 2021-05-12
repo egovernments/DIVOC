@@ -183,7 +183,8 @@ func init() {
           {
             "enum": [
               "CERTIFIED",
-              "OPEN_APPOINTMENT"
+              "OPEN_APPOINTMENT",
+              "ALL"
             ],
             "type": "string",
             "description": "Facility Type",
@@ -776,7 +777,8 @@ func init() {
           {
             "enum": [
               "CERTIFIED",
-              "OPEN_APPOINTMENT"
+              "OPEN_APPOINTMENT",
+              "ALL"
             ],
             "type": "string",
             "description": "Facility Type",
