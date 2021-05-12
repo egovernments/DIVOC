@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 **Describe the bug**
-# Please do not enter any personal information, for COWIN issues login to https://www.cowin.gov.in/home and report issue
+# Please do not enter any personal information, for COWIN / registration / certificate related issues login to https://www.cowin.gov.in/home and report issue
 A clear and concise description of what the bug is (only DIVOC api / module).
 
 **To Reproduce**
