@@ -4,6 +4,14 @@
     width: 100%;
 }
 
+.date-picker-container img {
+    height: 38px;
+}
+
+.date-picker-container label {
+    margin-bottom: 0px;
+}
+
 .date-picker{
     width: 100%;
 }

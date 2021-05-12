@@ -12,14 +12,26 @@ export const CustomDateWidget = (props) => {
       return props["options"]["minDate"]
     }
   }
+
+  const getMaxDate = () => {
+    if (props["options"]) {
+      return props["options"]["maxDate"]
+    }
+  }
+
   const [minDate, setMinDate] = useState();
+  const [maxDate, setMaxDate] = useState();
   const [startDate, setStartDate] = useState(new Date(props.value || new Date()));
 
   useEffect(() => {
     const newMinDate = getMinDate();
+    const newMaxDate = getMaxDate();
     setMinDate(newMinDate);
+    setMaxDate(newMaxDate);
     if (newMinDate && (newMinDate > startDate)) {
       setStartDate(newMinDate);
+    } else if (newMaxDate && (newMaxDate) < startDate) {
+      setStartDate(newMaxDate)
     }
   }, [props]);
 
@@ -44,6 +56,7 @@ export const CustomDateWidget = (props) => {
             dateFormat="dd-MM-yyyy"
             id="date-picker"
             minDate={minDate}
+            maxDate={maxDate}
             customInput={<CustomInput />}
         />
     </div>
