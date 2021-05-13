@@ -269,6 +269,27 @@ paths:
           description: OK
           schema:
             type: object
+  /certificates/{certificateId}:
+    get:
+      summary: Get certificate json for given certificateId
+      tags:
+        - certification
+      security:
+        - hasRole: ["facility-admin"]
+      operationId: getCertificateByCertificateId
+      parameters:
+        - name: certificateId
+          in: path
+          required: true
+          type: string
+          description: Id of certificate
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: certificate for given certificateId not found
   /sideEffects:
     get:
       tags:

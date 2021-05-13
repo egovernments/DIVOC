@@ -8,6 +8,7 @@ import {Button, Col, Row} from "react-bootstrap";
 import {RoleSetup} from "../RoleSetup"
 import Vaccinators from "../facility/Vaccinators/Vaccinators";
 import ProgramOverview from "../ProgramOverview";
+import Beneficiaries from "../Beneficiaries/Beneficiaries";
 
 
 export default function FacilityAdmin(props) {
@@ -30,6 +31,7 @@ export default function FacilityAdmin(props) {
             {title: "Role Setup", component: <RoleSetup/>},
             {title: "Vaccinator Details", component: <Vaccinators/>},
             {title: "Program Overview", component: <ProgramOverview/>},
+            {title: "Beneficiaries", component: <Beneficiaries/>},
         ]}
         tabIndex={tabIndex}
         />

@@ -8,6 +8,13 @@ securityDefinitions:
     type: apiKey
     name: Authorization
     in: header
+  hasRole:
+    type: oauth2
+    flow: accessCode
+    authorizationUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/auth'
+    tokenUrl: 'https://divoc.xiv.in/keycloak/auth/realms/divoc/protocol/openid-connect/token'
+    scopes:
+      facility-admin: scope of facility admin
 schemes:
   - https
 basePath: /divoc/api/citizen
@@ -263,7 +270,44 @@ paths:
           description: Invalid token
         '500':
           description: Something went wrong
-
+  /beneficiaries/search:
+    get:
+      summary: Get all beneficiaries
+      operationId: getBeneficiaries
+      security:
+        - hasRole: ['facility-admin']
+      parameters:
+        - in: query
+          name: programId
+          required: true
+          type: string
+          description: Program Id
+        - in: query
+          name: startDate
+          required: true
+          type: string
+          format: date
+          description: Start Date
+        - in: query
+          name: endDate
+          required: true
+          type: string
+          format: date
+          description: End Date
+        - in: query
+          name: type
+          type: string
+          required: true
+          enum: ["CERTIFIED", "OPEN_APPOINTMENT", "ALL"]
+          description: Facility Type
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+              $ref: '../registry/Enrollment.json#/definitions/Enrollment'
   /generateOTP:
    post:
      summary: Generate OTP

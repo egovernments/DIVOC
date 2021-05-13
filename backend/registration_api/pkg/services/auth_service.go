@@ -1,9 +1,9 @@
 package services
 
 import (
-	"github.com/dgrijalva/jwt-go"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/swagger_gen/models"
+	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"strings"
 	"time"
