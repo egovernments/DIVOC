@@ -128,7 +128,7 @@ function BeneficiaryList({programs, type, facilityCode}) {
         if (programs.length > 0) {
             setSelectedProgramId(programs[0].osid)
         }
-    }, [type]);
+    }, [type, programs]);
 
     function onProgramChange(osid) {
         setSelectedProgramId(osid)
@@ -230,7 +230,7 @@ function BeneficiaryList({programs, type, facilityCode}) {
         <div className="ml-4">
             { !showDetails && <>
                 <div className="row">
-                    <div className="mr-5">
+                    <div className="mr-3">
                         <label className="custom-text-label required" htmlFor="program">Program</label>
                         <select style={{minWidth: "200px"}} className="form-control form-control-inline" id="yearSelect"
                                 placeholder="Select"
@@ -243,14 +243,17 @@ function BeneficiaryList({programs, type, facilityCode}) {
                             }
                         </select>
                     </div>
-                    <div className="mr-3">
-                        <label className="custom-text-label required" htmlFor="startDate">Start Date</label>
-                        <CustomDateWidget options={options} value={startDate} onChange={(value) => setStartDate(value)}/>
-                    </div>
-                    <div>
-                        <label className="custom-text-label required" htmlFor="endDate">End Date</label>
-                        <CustomDateWidget options={options} value={endDate} onChange={(value) => setEndDate(value)}/>
-                    </div>
+                    { !(type === BENEFICIARY_TYPE.TODAY) && <>
+                        <div className="mr-3">
+                            <label className="custom-text-label required" htmlFor="startDate">Start Date</label>
+                            <CustomDateWidget options={options} value={startDate} onChange={(value) => setStartDate(value)}/>
+                        </div>
+                        <div>
+                            <label className="custom-text-label required" htmlFor="endDate">End Date</label>
+                            <CustomDateWidget options={options} value={endDate} onChange={(value) => setEndDate(value)}/>
+                        </div>
+                    </>
+                    }
                     <div>
                         <button className='add-vaccinator-button mb-0' style={{marginTop: "34px"}} onClick={onSearch}>
                             SEARCH
