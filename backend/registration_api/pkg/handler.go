@@ -52,6 +52,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingHandler)
 	api.RegisterRecipientToProgramHandler = operations.RegisterRecipientToProgramHandlerFunc(services.RegisterEnrollmentToProgram)
 	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
+	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
@@ -411,4 +412,98 @@ func checkIfCancellationAllowed(enrollmentInfo map[string]string, programId stri
 		return fmt.Sprintf("You have reached the maximum number of times to update appointment")
 	}
 	return ""
+}
+
+func getBeneficiaries(params operations.GetBeneficiariesParams, principal *models3.JWTClaimBody) middleware.Responder {
+	facilityCode := principal.FacilityCode
+
+	programId := params.ProgramID
+	currTime := time.Now()
+	// setting time of start date to 0th hr
+	s := time.Time(params.StartDate)
+	startDate := time.Date(s.Year(), s.Month(), s.Day(), 0, 0, 0, 0, currTime.Location()).Format(time.RFC3339)
+	// setting time of end date to last hr
+	e := time.Time(params.EndDate)
+	endDate := time.Date(e.Year(), e.Month(), e.Day()+1, 0, 0, 0, 0, currTime.Location()).Add(-1*time.Nanosecond).Format(time.RFC3339)
+	reqType := params.Type
+
+	openAppointmentFilter := map[string]interface{}{
+		"appointments.programId": map[string]interface{}{
+			"eq": programId,
+		},
+		"appointments.enrollmentScopeId": map[string]interface{}{
+			"eq": facilityCode,
+		},
+		"appointments.appointmentDate": map[string]interface{}{
+			"gte": startDate,
+			"lte": endDate,
+		},
+		"appointments.certified" : map[string]interface{}{
+			"eq": false,
+		},
+	}
+
+	certifiedFilter := map[string]interface{}{
+		"appointments.programId": map[string]interface{}{
+			"eq": programId,
+		},
+		"appointments.enrollmentScopeId": map[string]interface{}{
+			"eq": facilityCode,
+		},
+		"appointments.osUpdatedAt": map[string]interface{}{
+			"gte": startDate,
+			"lte": endDate,
+		},
+		"appointments.certified" : map[string]interface{}{
+			"eq": true,
+		},
+	}
+
+	if reqType == "CERTIFIED" {
+		enrollments, err := services.GetBeneficiariesFromRegistry(certifiedFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	} else if reqType == "OPEN_APPOINTMENT" {
+		enrollments, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	} else if reqType == "ALL" {
+		enrollments, err := getAllBeneficiaries(openAppointmentFilter, certifiedFilter)
+		if err != nil {
+			return model.NewGenericServerError()
+		}
+		return model.NewGenericJSONResponse(enrollments)
+	}
+	return model.NewGenericServerError()
+}
+
+func getAllBeneficiaries(openAppointmentFilter map[string]interface{}, certifiedFilter map[string]interface{}) ([]map[string]interface{}, error) {
+
+	response1FromRegistry, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter);
+	if err != nil {
+		return nil, err
+	}
+	var response1BeneficiaryCodes []string
+	for _, b := range response1FromRegistry {
+		response1BeneficiaryCodes = append(response1BeneficiaryCodes, b["code"].(string))
+	}
+
+	response2FromRegistry, err2 := services.GetBeneficiariesFromRegistry(certifiedFilter);
+	if err2 != nil {
+		return nil, err
+	}
+
+	result := response1FromRegistry
+	for _, b := range response2FromRegistry {
+		if !utils.Contains(response1BeneficiaryCodes, b["code"].(string)) {
+			result = append(result, b)
+		}
+	}
+
+	return result, nil
+
 }

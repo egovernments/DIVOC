@@ -86,14 +86,14 @@ export const UploadHistoryTable = ({
     return (
         <div className="conatiner">
             <TableContainer component={CustomPaper}>
-                <h5 className="m-2">{title}</h5>
+                { title && <><h5 className="m-2">{title}</h5>
                 <hr
                     color="#CEE5FF"
                     style={{
                         border: 0,
                         borderBottom: "1px solid #CEE5FF",
                     }}
-                />
+                /></>}
                 {data.length === 0 ? (
                     <div className="centered-and-flexed">
                         {emptyListMessage ?? "No Upload history found"}

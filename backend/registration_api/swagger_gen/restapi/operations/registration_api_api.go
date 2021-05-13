@@ -65,6 +65,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		GenerateOTPHandler: GenerateOTPHandlerFunc(func(params GenerateOTPParams) middleware.Responder {
 			return middleware.NotImplemented("operation GenerateOTP has not yet been implemented")
 		}),
+		GetBeneficiariesHandler: GetBeneficiariesHandlerFunc(func(params GetBeneficiariesParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetBeneficiaries has not yet been implemented")
+		}),
 		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
 		}),
@@ -84,6 +87,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		// Applies when the "Authorization" header is set
 		BearerAuth: func(token string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("api key auth (Bearer) Authorization from header param [Authorization] has not yet been implemented")
+		},
+		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
+			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
 		},
 		// default authorizer is authorized meaning no requests are blocked
 		APIAuthorizer: security.Authorized(),
@@ -125,6 +131,10 @@ type RegistrationAPIAPI struct {
 	// it performs authentication based on an api key Authorization provided in the header
 	BearerAuth func(string) (*models.JWTClaimBody, error)
 
+	// HasRoleAuth registers a function that takes an access token and a collection of required scopes and returns a principal
+	// it performs authentication based on an oauth2 bearer token provided in the request
+	HasRoleAuth func(string, []string) (*models.JWTClaimBody, error)
+
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
@@ -142,6 +152,8 @@ type RegistrationAPIAPI struct {
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GenerateOTPHandler sets the operation handler for the generate o t p operation
 	GenerateOTPHandler GenerateOTPHandler
+	// GetBeneficiariesHandler sets the operation handler for the get beneficiaries operation
+	GetBeneficiariesHandler GetBeneficiariesHandler
 	// GetRecipientsHandler sets the operation handler for the get recipients operation
 	GetRecipientsHandler GetRecipientsHandler
 	// GetSlotsForFacilitiesHandler sets the operation handler for the get slots for facilities operation
@@ -231,6 +243,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	if o.BearerAuth == nil {
 		unregistered = append(unregistered, "AuthorizationAuth")
 	}
+	if o.HasRoleAuth == nil {
+		unregistered = append(unregistered, "HasRoleAuth")
+	}
 
 	if o.GetPingHandler == nil {
 		unregistered = append(unregistered, "GetPingHandler")
@@ -252,6 +267,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.GenerateOTPHandler == nil {
 		unregistered = append(unregistered, "GenerateOTPHandler")
+	}
+	if o.GetBeneficiariesHandler == nil {
+		unregistered = append(unregistered, "GetBeneficiariesHandler")
 	}
 	if o.GetRecipientsHandler == nil {
 		unregistered = append(unregistered, "GetRecipientsHandler")
@@ -290,6 +308,11 @@ func (o *RegistrationAPIAPI) AuthenticatorsFor(schemes map[string]spec.SecurityS
 			scheme := schemes[name]
 			result[name] = o.APIKeyAuthenticator(scheme.Name, scheme.In, func(token string) (interface{}, error) {
 				return o.BearerAuth(token)
+			})
+
+		case "hasRole":
+			result[name] = o.BearerAuthenticator(name, func(token string, scopes []string) (interface{}, error) {
+				return o.HasRoleAuth(token, scopes)
 			})
 
 		}
@@ -395,6 +418,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/generateOTP"] = NewGenerateOTP(o.context, o.GenerateOTPHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/beneficiaries/search"] = NewGetBeneficiaries(o.context, o.GetBeneficiariesHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

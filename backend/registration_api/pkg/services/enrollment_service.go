@@ -525,3 +525,24 @@ func removeAppointmentWithProgramId(appointments []*models.EnrollmentAppointment
 	}
 	return appointmentList
 }
+
+func GetBeneficiariesFromRegistry(filter map[string]interface{}) ([]map[string]interface{}, error) {
+	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
+	if err != nil {
+		log.Error("Error occurred while querying Enrollment registry ", err)
+		return nil, errors.New("Error occurred while querying Enrollment registry ")
+	}
+	if enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]); err == nil {
+		var enrollments []map[string]interface{}
+		err := json.Unmarshal(enrollmentArr, &enrollments)
+		if err != nil {
+			log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+			return nil, errors.New("Error occurred while trying to unmarshal the array of enrollments")
+		} else {
+			return enrollments, nil
+		}
+	} else {
+		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
+		return nil, errors.New("Error occurred while trying to marshal the array of enrollments")
+	}
+}

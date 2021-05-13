@@ -1,7 +1,10 @@
 package config
 
 import (
+	"errors"
+	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
+	log "github.com/sirupsen/logrus"
 )
 
 var Config = struct {
@@ -12,7 +15,12 @@ var Config = struct {
 		MAXOtpVerifyAttempts int64  `yaml:"maxotpverifyattempts"`
 		OTPLength            int    `yaml:"otp_length" env:"OTP_LENGTH" default:"6"`
 	}
-
+	Keycloak struct {
+		Pubkey               string `env:"PUBLIC_KEY"`
+		Url                  string `env:"KEYCLOAK_URL"`
+		Realm                string `env:"KEYCLOAK_REALM"`
+		Enable               bool   `env:"ENABLE_KEYCLOAK" default:"true"`
+	}
 	Kafka struct {
 		BootstrapServers          string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapservers"`
 		NotifyTopic               string `default:"notify" yaml:"notifyTopic"`
@@ -50,4 +58,25 @@ func Initialize() {
 	if err != nil {
 		panic("Unable to read configurations")
 	}
+
+	if Config.Keycloak.Enable && Config.Keycloak.Pubkey == "" {
+		updatePublicKeyFromKeycloak()
+	}
+}
+
+func updatePublicKeyFromKeycloak() error {
+	url := Config.Keycloak.Url + "/realms/" + Config.Keycloak.Realm
+	log.Info("Public key url ", url)
+	resp, err := req.Get(url)
+	if err != nil {
+		return err
+	}
+	log.Infof("Got response %+v", resp.String())
+	responseObject := map[string]interface{}{}
+	if err := resp.ToJSON(&responseObject); err == nil {
+		if publicKey, ok := responseObject["public_key"].(string); ok {
+			Config.Keycloak.Pubkey = publicKey
+		}
+	}
+	return errors.New("Unable to get public key from keycloak")
 }

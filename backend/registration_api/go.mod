@@ -20,6 +20,7 @@ require (
 	github.com/google/go-cmp v0.5.4 // indirect
 	github.com/google/uuid v1.1.2 // indirect
 	github.com/gospotcheck/jwt-go v4.0.0+incompatible
+	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
 	github.com/onsi/ginkgo v1.15.0 // indirect

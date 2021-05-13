@@ -61,6 +61,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
 
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
+	api.CertificationGetCertificateByCertificateIDHandler = certification.GetCertificateByCertificateIDHandlerFunc(getCertificateByCertificateId)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -588,4 +589,41 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 		}
 	}
 	return certificate_revoked.NewCertificateRevokedBadRequest()
+}
+
+func getCertificateByCertificateId(params certification.GetCertificateByCertificateIDParams, principal *models.JWTClaimBody) middleware.Responder {
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+
+		"certificateId": map[string]interface{}{
+			"eq": params.CertificateID,
+		},
+	}
+	if response, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
+		log.Infof("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		if listOfCerts, ok := response["VaccinationCertificate"].([]interface{}); ok {
+			log.Infof("list %+v", listOfCerts)
+			if len(listOfCerts) != 0 {
+				v := listOfCerts[0]
+				if body, ok := v.(map[string]interface{}); ok {
+					log.Infof("cert %v", body)
+					if certString, ok := body["certificate"].(string); ok {
+						cert := map[string]interface{}{}
+						if err := json.Unmarshal([]byte(certString), &cert); err == nil {
+							body["certificate"] = cert
+						} else {
+							log.Errorf("Error in getting certificate %+v", err)
+							return NewGenericServerError()
+						}
+					}
+				}
+				return NewGenericJSONResponse(v)
+			}
+			return certification.NewGetCertificateByCertificateIDNotFound()
+		}
+	}
+
+	return NewGenericServerError()
 }
