@@ -83,6 +83,14 @@ export const UploadHistoryTable = ({
         setRowsPerPage(parseInt(event.target.value, 10));
         setPage(0);
     };
+
+    const styles = theme => ({
+        hover: {
+            '&$hover:hover': {
+                backgroundColor: "#888888 !important"
+            }
+        }
+    });
     return (
         <div className="conatiner">
             <TableContainer component={CustomPaper}>
@@ -124,14 +132,14 @@ export const UploadHistoryTable = ({
                                     page * rowsPerPage + rowsPerPage
                                 )
                                 .map((row) => (
-                                    <TableRow
+                                    <TableRow hover
+                                              className={styles.hover}
                                         selected={
                                             selectedHistory &&
                                             selectedHistory.id === row["id"]
                                         }
                                         style={{
                                             cursor: onCellClicked ? "pointer" : "",
-                                            background: "none",
                                         }}
                                         onClick={() => {
                                             setSelectedHistory(row);
