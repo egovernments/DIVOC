@@ -95,10 +95,21 @@ async function signJSON(certificate) {
   return signed;
 }
 
+function getAge(dob) {
+  let today = new Date(), birthDate = new Date(dob);
+  let age = today.getFullYear() - birthDate.getFullYear();
+  let months = today.getMonth() - birthDate.getMonth();
+  let roundedDownAge = age;
+  if (months < 0 || (months === 0 && today.getDate() < birthDate.getDate())) {
+    roundedDownAge--;
+  } 
+  return roundedDownAge;
+}
+
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
   if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return "" + (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
+    return "" + (getAge(recipient.dob))
   return "";
 }
 
