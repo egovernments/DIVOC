@@ -14,7 +14,8 @@ import (
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
-	"github.com/go-openapi/errors"
+	openApiError "github.com/go-openapi/errors"
+	"errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -110,7 +111,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 	if enrollmentPayload.EnrollmentType != models.EnrollmentEnrollmentTypeWALKIN && len(enrollments) >= config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed {
 		errMsg := "Maximum enrollment creation limit is reached"
 		log.Error(errMsg)
-		return errors.New(400, errMsg)
+		return openApiError.New(400, errMsg)
 	}
 
 	// no duplicates, after maxEnrollment check
@@ -530,19 +531,19 @@ func GetBeneficiariesFromRegistry(filter map[string]interface{}) ([]map[string]i
 	responseFromRegistry, err := kernelService.QueryRegistry(EnrollmentEntity, filter, 100, 0)
 	if err != nil {
 		log.Error("Error occurred while querying Enrollment registry ", err)
-		return nil, errors.New("Error occurred while querying Enrollment registry ")
+		return nil, errors.New("error occurred while querying Enrollment registry ")
 	}
 	if enrollmentArr, err := json.Marshal(responseFromRegistry["Enrollment"]); err == nil {
 		var enrollments []map[string]interface{}
 		err := json.Unmarshal(enrollmentArr, &enrollments)
 		if err != nil {
 			log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-			return nil, errors.New("Error occurred while trying to unmarshal the array of enrollments")
+			return nil, errors.New("error occurred while trying to unmarshal the array of enrollments")
 		} else {
 			return enrollments, nil
 		}
 	} else {
 		log.Errorf("Error occurred while trying to marshal the array of enrollments (%v)", err)
-		return nil, errors.New("Error occurred while trying to marshal the array of enrollments")
+		return nil, errors.New("error occurred while trying to marshal the array of enrollments")
 	}
 }
