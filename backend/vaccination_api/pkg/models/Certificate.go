@@ -16,7 +16,7 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 		"to":   42,
 	},
 	"covishield": {
-		"from": 28,
+		"from": 42,
 		"to":   56,
 	},
 }
