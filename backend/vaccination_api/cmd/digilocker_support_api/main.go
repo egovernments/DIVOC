@@ -55,7 +55,7 @@ const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
-const MaxDisplayCharacters = 40
+const MaxDisplayCharacters = 35
 
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
