@@ -134,17 +134,17 @@ func TestCertificate_GetNextDueDateInfo(t *testing.T) {
 		{
 			"Derive next dose due date info for Covishield",
 			covishieldCertificate,
-			"Due on 22 Jun 2021",
+			"Between 22 Jun 2021 and 20 Jul 2021",
 		},
 		{
 			"Derive next dose due date info for Sputnik V",
 			sputnikCertificate,
-			"Due on 30 Mar 2021",
+			"Between 20 Apr 2021 and 28 Jun 2021",
 		},
 		{
 			"Derive next dose due date info for different vaccine",
 			certificate,
-			"Due on 30 Mar 2021",
+			"Due on 19 Apr 2021",
 		},
 
 	}

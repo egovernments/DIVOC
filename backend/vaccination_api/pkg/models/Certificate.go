@@ -9,17 +9,19 @@ import (
 )
 
 const layout = "02 Jan 2006"
-
+const DefaultDueDays = 20
 var vaccineEffectiveDaysInfo = map[string]map[string]int{
 	"covaxin": {
 		"from": 28,
 		"to":   42,
 	},
 	"covishield": {
-		"dueDays": 84,
+		"from": 84,
+		"to": 112,
 	},
-	"Sputnik V": {
-		"dueDays": 21,
+	"sputnik v": {
+		"from": 21,
+		"to": 90,
 	},
 }
 
@@ -143,7 +145,7 @@ func (certificate *Certificate) GetNextDueDateInfo() string {
 				return "Between " + fromDate.Format(layout) + " and " + toDate.Format(layout)
 			}
 		} else {
-			fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineDateRange["from"]) * 24)
+			fromDate := evidence.Date.Add(time.Hour * time.Duration(DefaultDueDays) * 24)
 			return "Due on " + fromDate.Format(layout)
 		}
 	}
