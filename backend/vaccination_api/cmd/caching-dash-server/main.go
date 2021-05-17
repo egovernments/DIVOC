@@ -200,6 +200,7 @@ func main() {
 		STSPreload:              true,
 		STSIncludeSubdomains:    true,
 		STSSeconds:              31536000,
+		ContentSecurityPolicy:   "script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; frame-ancestors 'none'; default-src 'self'; frame-src redash.io; img-src 'self' http: https: data:; object-src 'none'; font-src 'self' data:",
 	})
 	var myHandler = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		relayingProxy(w, r)
