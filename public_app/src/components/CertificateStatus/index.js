@@ -18,6 +18,7 @@ import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
+import {Loader} from "../Loader";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -54,6 +55,7 @@ const customLoader = url => {
 };
 
 export const CertificateStatus = ({certificateData, goBack}) => {
+    const [isLoading, setLoading] = useState(false);
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
@@ -72,6 +74,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {
+        setLoading(true);
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
@@ -108,11 +111,13 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                             type: EVENT_TYPES.VALID_VERIFICATION,
                             extra: signedJSON.credentialSubject
                         }));
+                        setLoading(false);
                         return
                     }
                 }
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
                 setValid(false);
+                setLoading(false);
             } catch (e) {
                 console.log('Invalid data', e);
                 setValid(false);
@@ -139,42 +144,43 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     }
 
     return (
-        <div className="certificate-status-wrapper">
-            <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
-                 className="certificate-status-image"/>
-            <h3 className="certificate-status">
-                {
-                    isValid ? "Successful" : "Invalid Certificate"
-                }
-            </h3>
-            {
-                isValid && <table className="mt-3">
+        isLoading ? <Loader/> :
+                <div className="certificate-status-wrapper">
+                    <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
+                         className="certificate-status-image"/>
+                    <h3 className="certificate-status">
+                        {
+                            isValid ? "Successful" : "Invalid Certificate"
+                        }
+                    </h3>
                     {
-                        Object.keys(CertificateDetailsPaths).map((key, index) => {
-                            const context = CertificateDetailsPaths[key];
-                            return (
-                                <tr key={index}>
-                                    <td className="pr-3">{key}</td>
-                                    <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
-                                </tr>
-                            )
-                        })
-                    }
+                        isValid && <table className="mt-3">
+                            {
+                                Object.keys(CertificateDetailsPaths).map((key, index) => {
+                                    const context = CertificateDetailsPaths[key];
+                                    return (
+                                        <tr key={index}>
+                                            <td className="pr-3">{key}</td>
+                                            <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
+                                        </tr>
+                                    )
+                                })
+                            }
 
-                </table>
-            }
-            <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
-            <SmallInfoCards text={"Provide Feedback"}
-                            onClick={() => {
-                                history.push("/side-effects")
-                            }}
-                            img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
-            <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
-                           onClick={() => {
-                                history.push("/learn")
-                            }}
-                            backgroundColor={"#EFF5FD"}/>
-        </div>
+                        </table>
+                    }
+                    <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
+                    <SmallInfoCards text={"Provide Feedback"}
+                                    onClick={() => {
+                                        history.push("/side-effects")
+                                    }}
+                                    img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
+                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
+                                    onClick={() => {
+                                        history.push("/learn")
+                                    }}
+                                    backgroundColor={"#EFF5FD"}/>
+                </div>
     )
 };
 
