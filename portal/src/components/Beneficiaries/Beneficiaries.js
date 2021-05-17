@@ -3,7 +3,7 @@ import {TabPanels} from "../TabPanel/TabPanel";
 import {useAxios} from "../../utils/useAxios";
 import {CustomDateWidget} from "../CustomDateWidget";
 import {UploadHistoryTable} from "../UploadHistoryTable";
-import {formatDate, formatYYYYMMDDDate, ordinal_suffix_of} from "../../utils/dateutil";
+import {formatDate, formatYYYYMMDDDate, getMeridiemTime, ordinal_suffix_of} from "../../utils/dateutil";
 import {equals, reject} from "ramda";
 import keycloak from "../../utils/keycloak";
 import {API_URL} from "../../utils/constants";
@@ -136,6 +136,9 @@ function BeneficiaryList({programs, type, facilityCode}) {
 
     function convertToRowData(reqBody) {
         let results = [];
+        if (reqBody.length === 0) {
+            setEmptyMessage("No Beneficiaries Found")
+        }
         reqBody.map(beneficiary => {
             beneficiary.appointments.map(appointment => {
                 if (type === BENEFICIARY_TYPE.PAST) {
@@ -186,6 +189,16 @@ function BeneficiaryList({programs, type, facilityCode}) {
                 }
             })
         });
+        // sorting
+        if (type === BENEFICIARY_TYPE.PAST) {
+            results.sort((a, b) => {
+                return new Date(b.vaccinationDate) - new Date(a.vaccinationDate)
+            })
+        } else if (type === BENEFICIARY_TYPE.UPCOMING) {
+            results.sort((a, b) => {
+                return new Date(b.appointmentDate) - new Date(a.appointmentDate)
+            })
+        }
         setTableData(results);
     }
 
@@ -333,7 +346,10 @@ function BeneficiaryDetails({data, onBack}) {
                 {
                     !data.certificateId && <div className="col col-6 m-0">
                         <label className="custom-verify-text-label" htmlFor="endDate">Appointment Slot</label>
-                        <p>{data.appointmentSlot ? data.appointmentSlot : "-"}</p>
+                        <p>{data.appointmentSlot ?
+                            getMeridiemTime(data.appointmentSlot.split("-")[0])+" - "+  getMeridiemTime(data.appointmentSlot.split("-")[1])
+                            : "-"}
+                        </p>
                     </div>
                 }
             </div>

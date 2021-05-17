@@ -418,13 +418,6 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 	facilityCode := principal.FacilityCode
 
 	programId := params.ProgramID
-	currTime := time.Now()
-	// setting time of start date to 0th hr
-	s := time.Time(params.StartDate)
-	startDate := time.Date(s.Year(), s.Month(), s.Day(), 0, 0, 0, 0, currTime.Location()).Format(time.RFC3339)
-	// setting time of end date to last hr
-	e := time.Time(params.EndDate)
-	endDate := time.Date(e.Year(), e.Month(), e.Day()+1, 0, 0, 0, 0, currTime.Location()).Add(-1*time.Nanosecond).Format(time.RFC3339)
 	reqType := params.Type
 
 	openAppointmentFilter := map[string]interface{}{
@@ -435,8 +428,7 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 			"eq": facilityCode,
 		},
 		"appointments.appointmentDate": map[string]interface{}{
-			"gte": startDate,
-			"lte": endDate,
+			"between": []strfmt.Date{params.StartDate, params.EndDate},
 		},
 		"appointments.certified" : map[string]interface{}{
 			"eq": false,
@@ -451,8 +443,7 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 			"eq": facilityCode,
 		},
 		"appointments.osUpdatedAt": map[string]interface{}{
-			"gte": startDate,
-			"lte": endDate,
+			"between": []strfmt.Date{params.StartDate, params.EndDate},
 		},
 		"appointments.certified" : map[string]interface{}{
 			"eq": true,
