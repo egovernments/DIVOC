@@ -55,7 +55,7 @@ const customLoader = url => {
 };
 
 export const CertificateStatus = ({certificateData, goBack}) => {
-    const [isLoading, setLoading] = useState(false);
+    const [isLoading, setLoading] = useState(true);
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
@@ -123,6 +123,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
 
+            } finally {
+                setLoading(false);
             }
 
         }
