@@ -7,6 +7,7 @@ const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
+const fhirCertificate = require("certificate-fhir-convertor")
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -281,9 +282,46 @@ async function checkIfCertificateGenerated(req, res) {
     }
 }
 
+async function certificateAsFHIRJson(req, res) {
+    try {
+        var queryData = url.parse(req.url, true).query;
+        let claimBody = "";
+        let certificateId = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            certificateId = queryData.certificateId;
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        const certificateResp = await registryService.getCertificate(claimBody.preferred_username, certificateId);
+        if (certificateResp.length > 0) {
+            let certificate = JSON.parse(certificateResp[certificateResp.length - 1].certificate);
+            // convert certificate to FHIR Json
+            const fhirJson = fhirCertificate.certificateToFhirJson(certificate);
+            res.setHeader("Content-Type", "application/json");
+            return fhirJson
+        } else {
+            res.statusCode = 404;
+            let error = {
+                date: new Date(),
+                source: certificateId,
+                type: "internal-failed",
+                extra: "Certificate not found"
+            };
+            return JSON.stringify(error);
+        }
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
 module.exports = {
     getCertificate,
     getCertificatePDF,
     getCertificatePDFByPreEnrollmentCode,
-    checkIfCertificateGenerated
+    checkIfCertificateGenerated,
+    certificateAsFHIRJson
 };
