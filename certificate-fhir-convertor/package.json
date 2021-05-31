@@ -17,10 +17,12 @@
     "FHIR"
   ],
   "dependencies": {
-    "jest": "^27.0.1",
     "ramda": "^0.27.1",
     "uuid": "^8.3.2"
   },
   "author": "divoc",
-  "license": "GPL-3.0-or-later"
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "jest": "^27.0.3"
+  }
 }
