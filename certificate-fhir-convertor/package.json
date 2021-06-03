@@ -17,6 +17,7 @@
     "FHIR"
   ],
   "dependencies": {
+    "mustache": "^4.2.0",
     "ramda": "^0.27.1",
     "uuid": "^8.3.2"
   },
