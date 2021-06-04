@@ -1,0 +1,266 @@
+{
+  "resourceType": "Bundle",
+  "id": "{{bundleId}}",
+  "meta": {
+    "versionId": "1",
+    "profile": [
+      "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-bundle"
+    ],
+    "security": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
+        "code": "V",
+        "display": "very restricted"
+      }
+    ]
+  },
+  "identifier": {
+    "system": "http://acme.in",
+    "value": "xxxxxxx"
+  },
+  "type": "document",
+  "timestamp": "{{dateString}}",
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:{{compositionId}}"
+    },
+    {
+      "resource": {
+        "resourceType": "Composition",
+        "id": "{{compositionId}}",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "{{dateString}}",
+          "profile": [
+            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-composition"
+          ]
+        },
+        "language": "en-IN",
+        "status": "final",
+        "type": {
+          "coding": [
+            {
+              "system": "http://snomed.info/sct",
+              "code": "373942005",
+              "display": "SVC Bundle"
+            }
+          ]
+        },
+        "subject": {
+          "reference": "urn:uuid:{{patientId}}"
+        },
+        "date": "{{dateString}}",
+        "author": [
+          {
+            "reference": "urn:uuid:{{practitionerId}}"
+          }
+        ],
+        "title": "SVC Bundle",
+        "confidentiality": "N",
+        "custodian": {
+          "reference": "urn:uuid:{{organisationId}}"
+        }
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:{{practitionerId}}"
+    },
+    {
+      "resource": {
+        "resourceType": "Practitioner",
+        "id": "{{practitionerId}}",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "{{dateString}}",
+          "profile": [
+            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-practitioner"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "MD",
+                  "display": "Medical License number"
+                }
+              ]
+            },
+            "system": "https://doctor.ndhm.gov.in",
+            "value": "xx-xxxx-xxxx-xxxx"
+          }
+        ],
+        "name": [
+          {
+            "text":  "{{practitionerName}}"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:{{organisationId}}"
+    },
+    {
+      "resource": {
+        "resourceType": "Organization",
+        "id": "{{organisationId}}",
+        "meta": {
+          "profile": [
+            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-organization"
+          ]
+        },
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "PRN",
+                  "display": "Provider number"
+                }
+              ]
+            },
+            "system": "https://facility.who",
+            "value": "{{facilityId}}"
+          }
+        ],
+        "name": "{{facilityName}}",
+        "address": [
+          {
+            "city": "{{facilityCity}}"
+          },
+          {
+            "district": "{{facilityDistrict}}"
+          },
+          {
+            "country": "{{facilityCountry}}"
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:{{patientId}}"
+    },
+    {
+      "resource": {
+        "resourceType": "Patient",
+        "id": "{{patientId}}",
+        "meta": {
+          "versionId": "1",
+          "lastUpdated": "{{dateString}}",
+          "profile": [
+            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-patient"
+          ]
+        },
+        "extension": [
+          {
+            "url": "patient-nationality",
+            "valueString": "{{patientNationality}}"
+          }
+        ],
+        "identifier": [
+          {
+            "type": {
+              "coding": [
+                {
+                  "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
+                  "code": "SVC",
+                  "display": "WHO SVC"
+                }
+              ]
+            },
+            "system": "Govt id number",
+            "value": "{{patientGovtId}}"
+          }
+        ],
+        "name": [
+          {
+            "text": "{{patientName}}"
+          }
+        ],
+        "gender": "{{patientGender}}"
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:{{immunizationId}}"
+    },
+    {
+      "resource": {
+        "resourceType": "Immunization",
+        "id": "{{immunizationId}}",
+        "identifier": [
+          {
+            "system": "http://acme.com/MRNs",
+            "value": "xxxxxxx"
+          }
+        ],
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "http://id.who.int/icd11/mms",
+              "code": "{{vaccineCode}}",
+              "display": "{{vaccineName}}"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/{{patientId}}"
+        },
+        "occurrenceDateTime": "{{vaccinationDate}}",
+        "manufacturer": {
+          "reference":  "{{manufacturer}}"
+        },
+        "lotNumber": "{{batchNumber}}",
+        "expirationDate": "{{effectiveUntilDate}}",
+        "doseQuantity": {
+          "value": {{dose}}
+        },
+        "performer": [
+          {
+            "actor": {
+              "reference": "Practitioner/{{practitionerId}}"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "fullUrl": "urn:uuid:{{provenanceId}}"
+    },
+    {
+      "resourceType": "Provenance",
+      "id": "{{provenanceId}}",
+      "target": [
+        {
+          "reference": "DocumentReference/example"
+        }
+      ],
+      "recorded": "{{vaccinationDate}}",
+      "who": {
+        "identifier": {
+          "system": "urn:ietf:rfc:3986",
+          "value": "xxxxxx"
+        }
+      },
+      "signature": [
+        {
+          "type": [
+            {
+              "system": "urn:iso-astm:E1762-95:2013",
+              "code": "1.2.840.10065.1.12.1.5",
+              "display": "Verification Signature"
+            }
+          ],
+          "when": "{{dateString}}",
+          "who": {
+            "reference": "Practitioner/{{practitionerId}}"
+          },
+          "targetFormat": "application/fhir+xml",
+          "sigFormat": "application/signature+xml",
+          "data": "xxxxxx"
+        }
+      ]
+    }
+  ]
+}

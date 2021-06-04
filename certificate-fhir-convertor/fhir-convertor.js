@@ -1,31 +1,39 @@
 const { v4: uuidv4 } = require('uuid');
 const R = require('ramda');
+const Mustache = require("mustache");
+const fs = require('fs');
+const config = require('./configs/config');
 
-const vaccineCodeMapping = {
-    "Covaxin": {
-        "code": "XM1NL1"
-    },
-    "Covishield": {
-        "code": "XM5DF6"
-    }
-};
+const TEMPLATES_FOLDER = __dirname +'/configs/templates/';
+const r4TemplateFile = 'fhir-r4.template';
+
+function render(template, data) {
+    return Mustache.render(JSON.stringify(template), data);
+}
 
 function certificateToFhirJson(certificate) {
     const dateString = new Date().toJSON();
 
-    const patientId = "urn:uuid:" + uuidv4();
-    const organisationId = "urn:uuid:" + uuidv4();
-    const practitionerId = "urn:uuid:" + uuidv4();
-    const bundleId = "urn:uuid:" + uuidv4();
+    const patientId = uuidv4();
+    const organisationId = uuidv4();
+    const practitionerId =  uuidv4();
+    const bundleId = uuidv4();
+    const compositionId = uuidv4();
+    const immunizationId = uuidv4();
+    const provenanceId = uuidv4();
 
     const practitionerName = R.pathOr('', ['evidence', 0, 'verifier', 'name'], certificate);
     const vaccineName = R.pathOr('', ['evidence', 0, 'vaccine'], certificate);
-    const vaccineCode = vaccineCodeMapping[vaccineName].code;
+    if (!Object.keys(config.VACCINE_MAPPINGS).includes(vaccineName)) {
+        throw new Error("unsupported vaccine name "+ vaccineName)
+    }
+    const vaccineCode = config.VACCINE_MAPPINGS[vaccineName].code;
 
     const facilityName = R.pathOr('', ['evidence', 0, 'facility', 'name'], certificate);
     const facilityCity = R.pathOr('', ['evidence', 0, 'facility', 'address', 'city'], certificate);
     const facilityDistrict = R.pathOr('', ['evidence', 0, 'facility', 'address', 'district'], certificate);
     const facilityCountry = R.pathOr('', ['evidence', 0, 'facility', 'address', 'addressCountry'], certificate);
+    const facilityId = facilityName.split(' ').join('-');
 
     const patientNationality = R.pathOr('', ['credentialSubject', 'nationality'], certificate);
     const patientGovtId = R.pathOr('', ['credentialSubject', 'id'], certificate);
@@ -37,247 +45,18 @@ function certificateToFhirJson(certificate) {
     const effectiveUntilDate = R.pathOr('', ['evidence', 0, 'effectiveUntil'], certificate);
     const dose = parseInt(R.pathOr('', ['evidence', 0, 'dose'], certificate));
 
-    const fhirCertificateTemplate = {
-        "resourceType": "Bundle",
-        "id": "1",
-        "meta": {
-            "versionId": "1",
-            "profile": [
-                "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-bundle"
-            ],
-            "security": [
-                {
-                    "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
-                    "code": "V",
-                    "display": "very restricted"
-                }
-            ]
-        },
-        "identifier": {
-            "system": "http://acme.in",
-            "value": bundleId
-        },
-        "type": "document",
-        "timestamp": dateString,
-        "entry": [
-            {
-                "fullUrl": "1"
-            },
-            {
-                "resource": {
-                    "resourceType": "Composition",
-                    "id": "1",
-                    "meta": {
-                        "versionId": "1",
-                        "lastUpdated": dateString,
-                        "profile": [
-                            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-composition"
-                        ]
-                    },
-                    "language": "en-IN",
-                    "status": "final",
-                    "type": {
-                        "coding": [
-                            {
-                                "system": "http://snomed.info/sct",
-                                "code": "373942005",
-                                "display": "SVC Bundle"
-                            }
-                        ]
-                    },
-                    "subject": {
-                        "reference": patientId
-                    },
-                    "date": dateString,
-                    "author": [
-                        {
-                            "reference": practitionerId
-                        }
-                    ],
-                    "title": "SVC Bundle",
-                    "confidentiality": "N",
-                    "custodian": {
-                        "reference": organisationId
-                    }
-                }
-            },
-            {
-                "fullUrl": practitionerId
-            },
-            {
-                "resource": {
-                    "resourceType": "Practitioner",
-                    "id": "1",
-                    "meta": {
-                        "versionId": "1",
-                        "lastUpdated": dateString,
-                        "profile": [
-                            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-practitioner"
-                        ]
-                    },
-                    "identifier": [
-                        {
-                            "type": {
-                                "coding": [
-                                    {
-                                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                        "code": "MD",
-                                        "display": "Medical License number"
-                                    }
-                                ]
-                            },
-                            "system": "https://doctor.ndhm.gov.in",
-                            "value": "21-1521-3828-3227"
-                        }
-                    ],
-                    "name": [
-                        {
-                            "text":  practitionerName
-                        }
-                    ]
-                }
-            },
-            {
-                "fullUrl": organisationId
-            },
-            {
-                "resource": {
-                    "resourceType": "Organization",
-                    "meta": {
-                        "profile": [
-                            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-organization"
-                        ]
-                    },
-                    "identifier": [
-                        {
-                            "type": {
-                                "coding": [
-                                    {
-                                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                        "code": "PRN",
-                                        "display": "Provider number"
-                                    }
-                                ]
-                            },
-                            "system": "https://facility.who",
-                            "value": facilityName.split(' ').join('-')
-                        }
-                    ],
-                    "name": facilityName,
-                    "address": [
-                        {
-                            "city": facilityCity
-                        },
-                        {
-                            "district": facilityDistrict
-                        },
-                        {
-                            "country": facilityCountry
-                        }
-                    ]
-                }
-            },
-            {
-                "fullUrl": patientId
-            },
-            {
-                "resource": {
-                    "resourceType": "Patient",
-                    "meta": {
-                        "versionId": "1",
-                        "lastUpdated": dateString,
-                        "profile": [
-                            "http://fhir.org/guides/who/svc-rc1/StructureDefinition/svc-patient"
-                        ]
-                    },
-                    "extension": [
-                        {
-                            "url": "patient-nationality",
-                            "valueString": patientNationality
-                        }
-                    ],
-                    "identifier": [
-                        {
-                            "type": {
-                                "coding": [
-                                    {
-                                        "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-                                        "code": "SVC",
-                                        "display": "WHO SVC"
-                                    }
-                                ]
-                            },
-                            "system": "Govt id number",
-                            "value": patientGovtId
-                        }
-                    ],
-                    "name": [
-                        {
-                            "text": patientName
-                        }
-                    ],
-                    "gender": patientGender
-                }
-            },
-            {
-                "fullUrl": "1"
-            },
-            {
-                "resource": {
-                    "resourceType": "Immunization",
-                    "id": "1",
-                    "identifier": [
-                        {
-                            "system": "http://acme.com/MRNs",
-                            "value": "7000135"
-                        }
-                    ],
-                    "vaccineCode": {
-                        "coding": [
-                            {
-                                "system": "http://id.who.int/icd11/mms",
-                                "code": vaccineCode,
-                                "display": vaccineName
-                            }
-                        ]
-                    },
-                    "patient": {
-                        "reference": "Patient/"+patientId
-                    },
-                    "occurrenceDateTime": vaccinationDate,
-                    "manufacturer": {
-                        "reference":  manufacturer
-                    },
-                    "lotNumber": batchNumber,
-                    "expirationDate": effectiveUntilDate,
-                    "doseQuantity": {
-                        "value": dose
-                    },
-                    "performer": [
-                        {
-                            "actor": {
-                                "reference": "Practitioner/"+practitionerId
-                            }
-                        }
-                    ]
-                }
-            },
-            {
-                "fullUrl": "1"
-            },
-            {
-                "resource": {
-                    "resourceType": "Provenance",
-                    "id": "1"
-                }
-            }
-        ]
+    const data = {
+        dateString, patientId, organisationId, practitionerId, bundleId, compositionId, immunizationId, provenanceId,
+        practitionerName, vaccineName, vaccineCode,
+        facilityName, facilityCity, facilityDistrict, facilityCountry, facilityId,
+        patientNationality, patientGovtId, patientName, patientGender, vaccinationDate,
+        manufacturer, batchNumber, effectiveUntilDate, dose
     };
 
-    return JSON.stringify(fhirCertificateTemplate)
+    const template = fs.readFileSync(TEMPLATES_FOLDER+r4TemplateFile, 'utf8');
+    return Mustache.render(template, data);
 }
 
 module.exports = {
-    certificateToFhirJson,
-    vaccineCodeMapping
+    certificateToFhirJson
 };

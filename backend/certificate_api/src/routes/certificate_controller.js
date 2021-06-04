@@ -308,9 +308,22 @@ async function certificateAsFHIRJson(req, res) {
         if (certificateResp.length > 0) {
             let certificate = JSON.parse(certificateResp[certificateResp.length - 1].certificate);
             // convert certificate to FHIR Json
-            const fhirJson = fhirCertificate.certificateToFhirJson(certificate);
-            res.setHeader("Content-Type", "application/json");
-            return fhirJson
+            try {
+                const fhirJson = fhirCertificate.certificateToFhirJson(certificate);
+                res.setHeader("Content-Type", "application/json");
+                return fhirJson
+            } catch (e) {
+                console.error(e);
+                res.statusCode = 400;
+                res.setHeader("Content-Type", "application/json");
+                let error = {
+                    date: new Date(),
+                    source: "FhirConvertor",
+                    type: "internal-failed",
+                    extra: e.message
+                };
+                return JSON.stringify(error)
+            }
         } else {
             res.statusCode = 404;
             let error = {

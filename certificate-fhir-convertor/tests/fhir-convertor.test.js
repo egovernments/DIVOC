@@ -1,5 +1,6 @@
 
 const fhirConvertor = require("../fhir-convertor");
+const config = require('../configs/config');
 
 const cert2 = {
     "@context": [
@@ -77,8 +78,19 @@ test('Convert certificate json to fhir json', async () => {
 
     let fhirCert = JSON.parse(await fhirConvertor.certificateToFhirJson(cert2));
     console.log(await fhirConvertor.certificateToFhirJson(cert2));
+    expect(fhirCert.entry[0].fullUrl).toContain('urn:uuid:');
+
+    expect(fhirCert.entry[1].resource.resourceType).toBe('Composition');
+    expect(fhirCert.entry[1].resource.subject.reference).toBe(fhirCert.entry[6].fullUrl);
+    expect(fhirCert.entry[1].resource.author[0].reference).toBe(fhirCert.entry[2].fullUrl);
+    expect(fhirCert.entry[1].resource.custodian.reference).toBe(fhirCert.entry[4].fullUrl);
+
+    expect(fhirCert.entry[2].fullUrl).toContain('urn:uuid:');
+
     expect(fhirCert.entry[3].resource.resourceType).toBe('Practitioner');
     expect(fhirCert.entry[3].resource.name[0].text).toBe(cert2.evidence[0].verifier.name);
+
+    expect(fhirCert.entry[4].fullUrl).toContain('urn:uuid:');
 
     expect(fhirCert.entry[5].resource.resourceType).toBe('Organization');
     expect(fhirCert.entry[5].resource.name).toBe(cert2.evidence[0].facility.name);
@@ -87,19 +99,30 @@ test('Convert certificate json to fhir json', async () => {
     expect(fhirCert.entry[5].resource.address[2].country).toBe(cert2.evidence[0].facility.address.addressCountry);
     expect(fhirCert.entry[5].resource.identifier[0].value).toBe(cert2.evidence[0].facility.name.split(' ').join('-'));
 
+    expect(fhirCert.entry[6].fullUrl).toContain('urn:uuid:');
+
     expect(fhirCert.entry[7].resource.resourceType).toBe('Patient');
     expect(fhirCert.entry[7].resource.extension[0].valueString).toBe(cert2.credentialSubject.nationality);
     expect(fhirCert.entry[7].resource.name[0].text).toBe(cert2.credentialSubject.name);
     expect(fhirCert.entry[7].resource.gender).toBe(cert2.credentialSubject.gender.toLowerCase());
     expect(fhirCert.entry[7].resource.identifier[0].value).toBe(cert2.credentialSubject.id);
 
+    expect(fhirCert.entry[8].fullUrl).toContain('urn:uuid:');
+
     expect(fhirCert.entry[9].resource.resourceType).toBe('Immunization');
     expect(fhirCert.entry[9].resource.vaccineCode.coding[0].display).toBe(cert2.evidence[0].vaccine);
-    expect(fhirCert.entry[9].resource.vaccineCode.coding[0].code).toBe(fhirConvertor.vaccineCodeMapping[cert2.evidence[0].vaccine].code);
+    expect(fhirCert.entry[9].resource.vaccineCode.coding[0].code).toBe(config.VACCINE_MAPPINGS[cert2.evidence[0].vaccine].code);
     expect(fhirCert.entry[9].resource.occurrenceDateTime).toBe(cert2.evidence[0].date);
     expect(fhirCert.entry[9].resource.manufacturer.reference).toBe(cert2.evidence[0].manufacturer);
     expect(fhirCert.entry[9].resource.lotNumber).toBe(cert2.evidence[0].batch);
     expect(fhirCert.entry[9].resource.expirationDate).toBe(cert2.evidence[0].effectiveUntil);
     expect(fhirCert.entry[9].resource.doseQuantity.value).toBe(parseInt(cert2.evidence[0].dose));
+
+});
+
+test('should throw exception when unsupported vaccine name is passed', async () => {
+    let cert = cert2;
+    cert.evidence[0].vaccine = 'vacc1';
+    await expect(() => fhirConvertor.certificateToFhirJson(cert)).toThrow("unsupported vaccine name vacc1");
 
 })
