@@ -1,0 +1,29 @@
+{
+  "name": "certificate-fhir-convertor",
+  "version": "1.0.1",
+  "description": "Vaccination context for verifiable certificate",
+  "main": "fhir-convertor.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egovernments/DIVOC/tree/main/certificate-fhir-convertor"
+  },
+  "keywords": [
+    "vaccination",
+    "certificate",
+    "w3c",
+    "FHIR"
+  ],
+  "dependencies": {
+    "mustache": "^4.2.0",
+    "ramda": "^0.27.1",
+    "uuid": "^8.3.2"
+  },
+  "author": "divoc",
+  "license": "GPL-3.0-or-later",
+  "devDependencies": {
+    "jest": "^27.0.3"
+  }
+}
