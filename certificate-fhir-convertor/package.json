@@ -1,6 +1,6 @@
 {
   "name": "certificate-fhir-convertor",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Vaccination context for verifiable certificate",
   "main": "fhir-convertor.js",
   "scripts": {

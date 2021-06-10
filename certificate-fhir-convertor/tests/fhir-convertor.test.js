@@ -1,5 +1,5 @@
 
-const fhirConvertor = require("../fhir-convertor");
+const {certificateToFhirJson} = require("../fhir-convertor");
 const config = require('../configs/config');
 
 const cert2 = {
@@ -45,8 +45,8 @@ const cert2 = {
             "date": "2020-12-02T19:21:18.646Z",
             "effectiveStart": "2020-12-02",
             "effectiveUntil": "2025-12-02",
-            "dose": "1",
-            "totalDoses": "2",
+            "dose": 1,
+            "totalDoses": 2,
             "verifier": {
                 "name": "Sooraj Singh"
             },
@@ -74,10 +74,10 @@ const cert2 = {
     }
 };
 
-test('Convert certificate json to fhir json', async () => {
+test('Convert certificate json to fhir json', () => {
 
-    let fhirCert = JSON.parse(await fhirConvertor.certificateToFhirJson(cert2));
-    console.log(await fhirConvertor.certificateToFhirJson(cert2));
+    let fhirCert = JSON.parse(certificateToFhirJson(cert2));
+    console.log(certificateToFhirJson(cert2));
     expect(fhirCert.entry[0].fullUrl).toContain('urn:uuid:');
 
     expect(fhirCert.entry[1].resource.resourceType).toBe('Composition');
@@ -120,9 +120,8 @@ test('Convert certificate json to fhir json', async () => {
 
 });
 
-test('should throw exception when unsupported vaccine name is passed', async () => {
+test('should throw exception when unsupported vaccine name is passed', () => {
     let cert = cert2;
     cert.evidence[0].vaccine = 'vacc1';
-    await expect(() => fhirConvertor.certificateToFhirJson(cert)).toThrow("unsupported vaccine name vacc1");
-
-})
+    expect(() => certificateToFhirJson(cert)).toThrow("unsupported vaccine name vacc1");
+});
