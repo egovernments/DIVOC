@@ -446,13 +446,13 @@ func formatId(identity string) string {
 	if strings.Contains(identity, "Voter") {
 		return "Voter ID # " + lastFragment
 	}
-	if strings.Contains(identity, "NPR") {
+	if strings.Contains(strings.ToLower(identity), "npr") {
 		return "NPR Smart Card # " + lastFragment
 	}
-	if strings.Contains(identity, "Disability") {
+	if strings.Contains(strings.ToLower(identity), "disability") {
 		return "Unique Disability # " + lastFragment
 	}
-	if strings.Contains(identity, "Service Identity") {
+	if strings.Contains(strings.ToLower(identity), "identity") {
 		return "Service Identity Card # " + lastFragment
 	}
 	return lastFragment
