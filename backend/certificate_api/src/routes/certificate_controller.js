@@ -7,7 +7,10 @@ const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
-const fhirCertificate = require("certificate-fhir-convertor")
+const fhirCertificate = require("certificate-fhir-convertor");
+const {privateKeyPem} = require('../../configs/keys');
+const jwt = require('jsonwebtoken');
+const { v4: uuidv4 } = require('uuid');
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -282,6 +285,58 @@ async function checkIfCertificateGenerated(req, res) {
     }
 }
 
+function signFhirCert(fhirJson, certificate) {
+    let signedFhirJson = JSON.parse(fhirJson)
+    const token = jwt.sign(fhirJson, privateKeyPem, { algorithm: 'RS256'});
+    const splittedToken = token.split(".");
+    splittedToken[1] = "";
+    const detachedPayloadJWS = splittedToken.join(".");
+
+    const bundleId = signedFhirJson.id;
+    const organisationId = signedFhirJson.entry.filter(r => r["resource"]?.resourceType === "Organization").map(r => r["resource"].id)[0];
+    const provenanceId = uuidv4();
+
+    let provenance = {
+        "resourceType": "Provenance",
+        "id": provenanceId,
+        "target": [
+            {
+                "reference": "Bundle/"+bundleId
+            }
+        ],
+        "recorded": certificate["evidence"][0]["date"],
+        "who": {
+            "identifier": {
+                "system": "urn:ietf:rfc:3986",
+                "value": "xxxxxx"
+            }
+        },
+        "signature": [
+            {
+                "type": [
+                    {
+                        "system": "urn:iso-astm:E1762-95:2013",
+                        "code": "1.2.840.10065.1.12.1.5",
+                        "display": "Verification Signature"
+                    }
+                ],
+                "when": new Date().toJSON(),
+                "who": {
+                    "reference": "Organization/"+organisationId
+                },
+                "targetFormat": "application/fhir+json",
+                "sigFormat": "application/jose",
+                "data": detachedPayloadJWS
+            }
+        ]
+    };
+
+    signedFhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
+    signedFhirJson.entry.push(provenance);
+
+    return JSON.stringify(signedFhirJson);
+}
+
 async function certificateAsFHIRJson(req, res) {
     try {
         var queryData = url.parse(req.url, true).query;
@@ -301,8 +356,11 @@ async function certificateAsFHIRJson(req, res) {
             // convert certificate to FHIR Json
             try {
                 const fhirJson = fhirCertificate.certificateToFhirJson(certificate);
+
+                const signedFhirJson = signFhirCert(fhirJson, certificate);
+
                 res.setHeader("Content-Type", "application/json");
-                return fhirJson
+                return signedFhirJson
             } catch (e) {
                 console.error(e);
                 res.statusCode = 400;

@@ -19,6 +19,7 @@ keycloak/divoc-realm.json
 *.jar
 .eslintcache*
 certificate_processor/config/keys.js
+certificate_api/config/keys.js
 backend/vaccination_api/analytics_feed
 notification-service/notification-service
 keys.js
