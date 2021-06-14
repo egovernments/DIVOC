@@ -20,7 +20,6 @@ function certificateToFhirJson(certificate) {
     const bundleId = uuidv4();
     const compositionId = uuidv4();
     const immunizationId = uuidv4();
-    const provenanceId = uuidv4();
 
     const practitionerName = R.pathOr('', ['evidence', 0, 'verifier', 'name'], certificate);
     const vaccineName = R.pathOr('', ['evidence', 0, 'vaccine'], certificate);
@@ -46,7 +45,7 @@ function certificateToFhirJson(certificate) {
     const dose = parseInt(R.pathOr('', ['evidence', 0, 'dose'], certificate));
 
     const data = {
-        dateString, patientId, organisationId, practitionerId, bundleId, compositionId, immunizationId, provenanceId,
+        dateString, patientId, organisationId, practitionerId, bundleId, compositionId, immunizationId,
         practitionerName, vaccineName, vaccineCode,
         facilityName, facilityCity, facilityDistrict, facilityCountry, facilityId,
         patientNationality, patientGovtId, patientName, patientGender, vaccinationDate,
