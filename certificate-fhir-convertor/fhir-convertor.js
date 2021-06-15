@@ -3,6 +3,7 @@ const R = require('ramda');
 const Mustache = require("mustache");
 const fs = require('fs');
 const config = require('./configs/config');
+const jwt = require('jsonwebtoken');
 
 const TEMPLATES_FOLDER = __dirname +'/configs/templates/';
 const r4TemplateFile = 'fhir-r4.template';
@@ -11,7 +12,7 @@ function render(template, data) {
     return Mustache.render(JSON.stringify(template), data);
 }
 
-function certificateToFhirJson(certificate) {
+function certificateToFhirJson(certificate, privateSigningKeyPem) {
     const dateString = new Date().toJSON();
 
     const patientId = uuidv4();
@@ -53,7 +54,63 @@ function certificateToFhirJson(certificate) {
     };
 
     const template = fs.readFileSync(TEMPLATES_FOLDER+r4TemplateFile, 'utf8');
-    return Mustache.render(template, data);
+    let fhirCertString = Mustache.render(template, data);
+
+    return signFhirCert(fhirCertString, vaccinationDate, privateSigningKeyPem)
+}
+
+function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
+    let signedFhirJson = JSON.parse(fhirJson);
+    const token = jwt.sign(fhirJson, privateKeyPem, { algorithm: 'RS256'});
+    const splittedToken = token.split(".");
+    splittedToken[1] = "";
+    const detachedPayloadJWS = splittedToken.join(".");
+
+    const bundleId = signedFhirJson.id;
+    const organisationId = signedFhirJson.entry.filter(r => r["resource"]?.resourceType === "Organization").map(r => r["resource"].id)[0];
+    const provenanceId = uuidv4();
+
+    let provenance = {
+        "resource": {
+            "resourceType": "Provenance",
+            "id": provenanceId,
+            "target": [
+                {
+                    "reference": "Bundle/"+bundleId
+                }
+            ],
+            "recorded": vaccinationDate,
+            "who": {
+                "identifier": {
+                    "system": "urn:ietf:rfc:3986",
+                    "value": "xxxxxx"
+                }
+            },
+            "signature": [
+                {
+                    "type": [
+                        {
+                            "system": "urn:iso-astm:E1762-95:2013",
+                            "code": "1.2.840.10065.1.12.1.5",
+                            "display": "Verification Signature"
+                        }
+                    ],
+                    "when": new Date().toJSON(),
+                    "who": {
+                        "reference": "Organization/"+organisationId
+                    },
+                    "targetFormat": "application/fhir+json",
+                    "sigFormat": "application/jose",
+                    "data": detachedPayloadJWS
+                }
+            ]
+        }
+    };
+
+    signedFhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
+    signedFhirJson.entry.push(provenance);
+
+    return signedFhirJson;
 }
 
 module.exports = {

@@ -4,7 +4,7 @@ This module is used to convert certificates issued by DIVOC to FHIR compliant js
 
 ## Quickstart
 
-To convert a DIVOC issued certificate to FHIR R4 Json.
+To convert a DIVOC issued W3C certificate to FHIR R4 Json.
 
 **1. Install**
 
@@ -16,8 +16,10 @@ npm install certificate-fhir-convertor
 
 ```javascript
 const {certificateToFhirJson} = require("certificate-fhir-convertor");
+const privateKeyPem = '-----BEGIN RSA PRIVATE KEY-----\nPRIVATE_KEY\n-----END RSA PRIVATE KEY-----\n';
+
 try {
-    const fhirJson = certificateToFhirJson(certificate);
+    const fhirJson = certificateToFhirJson(certificate, privateKeyPem);
     console.log(fhirJson);
 } catch (err) {
     console.error(err);
