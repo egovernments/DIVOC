@@ -9,13 +9,11 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "certificate-fhir-convertor": "^1.1.0",
+    "certificate-fhir-convertor": "^1.2.0",
     "handlebars": "^4.7.7",
-    "jsonwebtoken": "^8.5.1",
     "jszip": "^3.6.0",
     "kafkajs": "^1.15.0",
     "puppeteer": "^8.0.0",
-    "qrcode": "^1.4.4",
-    "uuid": "^8.3.2"
+    "qrcode": "^1.4.4"
   }
 }
