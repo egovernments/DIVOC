@@ -4,6 +4,7 @@ const Mustache = require("mustache");
 const fs = require('fs');
 const config = require('./configs/config');
 const jwt = require('jsonwebtoken');
+const base64url = require('base64url');
 
 const TEMPLATES_FOLDER = __dirname +'/configs/templates/';
 const r4TemplateFile = 'fhir-r4.template';
@@ -54,20 +55,19 @@ function certificateToFhirJson(certificate, privateSigningKeyPem) {
     };
 
     const template = fs.readFileSync(TEMPLATES_FOLDER+r4TemplateFile, 'utf8');
-    let fhirCertString = Mustache.render(template, data);
+    let fhirCert = JSON.parse(Mustache.render(template, data));
 
-    return signFhirCert(fhirCertString, vaccinationDate, privateSigningKeyPem)
+    return signFhirCert(fhirCert, vaccinationDate, privateSigningKeyPem)
 }
 
 function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
-    let signedFhirJson = JSON.parse(fhirJson);
-    const token = jwt.sign(fhirJson, privateKeyPem, { algorithm: 'RS256'});
+    const token = jwt.sign(JSON.stringify(fhirJson), privateKeyPem, { algorithm: 'RS256'});
     const splittedToken = token.split(".");
     splittedToken[1] = "";
     const detachedPayloadJWS = splittedToken.join(".");
 
-    const bundleId = signedFhirJson.id;
-    const organisationId = signedFhirJson.entry.filter(r => r["resource"]?.resourceType === "Organization").map(r => r["resource"].id)[0];
+    const bundleId = fhirJson.id;
+    const organisationId = fhirJson.entry.filter(r => r["resource"]?.resourceType === "Organization").map(r => r["resource"].id)[0];
     const provenanceId = uuidv4();
 
     let provenance = {
@@ -107,12 +107,42 @@ function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
         }
     };
 
-    signedFhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
-    signedFhirJson.entry.push(provenance);
+    fhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
+    fhirJson.entry.push(provenance);
 
-    return signedFhirJson;
+    return fhirJson;
+}
+
+function validateSignedFhirJson(fhirJson, publicSigningKeyPem){
+    const data = fhirJson.entry
+        .filter(r => r["resource"]?.resourceType === "Provenance")
+        .map(r => r["resource"].signature[0].data)[0];
+    const provenanceId = fhirJson.entry
+        .filter(r => r["resource"]?.resourceType === "Provenance")
+        .map(r => r["resource"].id)[0];
+
+    if (!data || data === "") {
+        console.error("signature data is not present in provenance resource");
+        return false
+    }
+
+    // removing the provenance resource
+    let payload = fhirJson;
+    payload.entry = fhirJson.entry.filter(r => r["resource"]?.resourceType !== "Provenance").filter(r => r["fullUrl"] !== "urn:uuid:" + provenanceId);
+
+    let splittedJWS = data.split(".");
+    splittedJWS[1] = base64url(JSON.stringify(payload), "utf8");
+
+    try {
+        const decoded = jwt.verify(splittedJWS.join("."), publicSigningKeyPem);
+        return decoded.resourceType === "Bundle"
+    } catch(err) {
+        console.error(err);
+        return false
+    }
 }
 
 module.exports = {
-    certificateToFhirJson
+    certificateToFhirJson,
+    validateSignedFhirJson
 };
