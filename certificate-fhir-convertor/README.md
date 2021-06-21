@@ -1,6 +1,6 @@
 # Certificate FHIR Converter
 
-This module is used to convert certificates issued by DIVOC to FHIR compliant json
+This module is used to convert certificates issued by DIVOC to signed FHIR compliant json
 
 ## Quickstart
 
@@ -25,5 +25,16 @@ try {
     console.error(err);
     // handle the error case
 }
+```
+
+**3. Verify certificateToFhirJson**
+
+```javascript
+const {validateSignedFhirJson} = require("certificate-fhir-convertor");
+const publicKeyPem = '-----BEGIN PUBLIC KEY-----\nPUBLIC_KEY\n-----END PUBLIC KEY-----';
+
+const valid = validateSignedFhirJson(certificate, publicKeyPem);
+console.log(valid);
+
 ```
 

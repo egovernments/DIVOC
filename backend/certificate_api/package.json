@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "certificate-fhir-convertor": "^1.2.0",
+    "certificate-fhir-convertor": "^1.2.1",
     "handlebars": "^4.7.7",
     "jszip": "^3.6.0",
     "kafkajs": "^1.15.0",
