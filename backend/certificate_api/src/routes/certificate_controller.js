@@ -7,7 +7,8 @@ const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
-const fhirCertificate = require("certificate-fhir-convertor")
+const fhirCertificate = require("certificate-fhir-convertor");
+const {privateKeyPem} = require('../../configs/keys');
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -309,12 +310,12 @@ async function certificateAsFHIRJson(req, res) {
             let certificate = JSON.parse(certificateResp[certificateResp.length - 1].certificate);
             // convert certificate to FHIR Json
             try {
-                const fhirJson = fhirCertificate.certificateToFhirJson(certificate);
+                const fhirJson = fhirCertificate.certificateToFhirJson(certificate, privateKeyPem);
                 res.setHeader("Content-Type", "application/json");
-                return fhirJson
+                return JSON.stringify(fhirJson)
             } catch (e) {
                 console.error(e);
-                res.statusCode = 400;
+                res.statusCode = 500;
                 res.setHeader("Content-Type", "application/json");
                 let error = {
                     date: new Date(),
