@@ -21,7 +21,6 @@ keycloak/divoc-realm.json
 certificate_processor/config/keys.js
 backend/vaccination_api/analytics_feed
 notification-service/notification-service
-keys.js
 dockerdeps
 backend/vaccination_api/analytics_feed
 backend/vaccination_api/certificate_processor
