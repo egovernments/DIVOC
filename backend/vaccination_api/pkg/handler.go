@@ -16,6 +16,7 @@ import (
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
+	models2 "github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -290,16 +291,34 @@ func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
 	doseWiseCertificateIds := map[int][]string{}
 	for _, certificateObj := range certificates {
 		if certificate, ok := certificateObj.(map[string]interface{}); ok {
-			if doseValue, found := certificate["dose"]; found {
-				if doseValueFloat, ok := doseValue.(float64); ok {
-					if certificateId, found := certificate["certificateId"]; found {
-						doseWiseCertificateIds[int(doseValueFloat)] = append(doseWiseCertificateIds[int(doseValueFloat)], certificateId.(string))
-					}
+			if doseValue := getDoseFromCertificate(certificate); doseValue != 0 {
+				if certificateId, found := certificate["certificateId"]; found {
+					doseWiseCertificateIds[doseValue] = append(doseWiseCertificateIds[doseValue], certificateId.(string))
 				}
 			}
 		}
 	}
 	return doseWiseCertificateIds
+}
+
+func getDoseFromCertificate(certificateMap map[string]interface{}) int {
+	if doseValue, found := certificateMap["dose"]; found {
+		if doseValueFloat, ok := doseValue.(float64); ok {
+			return int(doseValueFloat)
+		}
+	}
+	if certificateJson, found := certificateMap["certificate"]; found {
+		var certificate models2.Certificate
+		if certificateString, ok := certificateJson.(string); ok {
+			if err := json.Unmarshal([]byte(certificateString), &certificate); err == nil {
+				return int(certificate.Evidence[0].Dose)
+			} else {
+				log.Errorf("Error in reading certificate json %+v", err)
+			}
+		}
+	}
+
+	return 0
 }
 
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
