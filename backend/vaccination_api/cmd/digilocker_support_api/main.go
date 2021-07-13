@@ -540,6 +540,78 @@ func headCertificateWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
+func getCertificateSignedJsonByDose(preEnrollmentCode string, dose int64) (string, error) {
+	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+		log.Infof("Error while looking up cache %+v", err)
+	} else {
+		if cachedCertificate != "" {
+			log.Infof("Got certificate from cache %s", preEnrollmentCode)
+			var certificate models.Certificate
+			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err == nil {
+				if int64(certificate.Evidence[0].Dose) == dose {
+					return cachedCertificate, nil
+				}
+			}
+		}
+	}
+	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		var doseMatchingCertificates []interface{}
+		for _, cert := range certificateArr {
+			if isCertificateDosePresent(cert, dose) {
+				doseMatchingCertificates = append(doseMatchingCertificates, cert)
+			}
+		}
+		certificateArr = pkg.SortCertificatesByCreateAt(doseMatchingCertificates)
+		log.Infof("Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			signedJson := certificateObj["certificate"].(string)
+			return signedJson, nil
+		} else {
+			return "", nil
+		}
+	} else {
+		log.Errorf("Error in accessing registery %+v", err)
+		return "", errors.New("Internal error")
+	}
+}
+
+func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("get pdf certificate")
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err != nil {
+		w.WriteHeader(400)
+	} else {
+		signedJson, err := getCertificateSignedJsonByDose(preEnrollmentCode, dose)
+
+		if err != nil {
+			log.Infof("Error %+v", err)
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
+			return
+		}
+
+		if signedJson != "" {
+			if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
+				log.Errorf("Error in creating certificate pdf")
+				w.WriteHeader(500)
+				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(pdfBytes)
+				publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", preEnrollmentCode)
+			w.WriteHeader(404)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+		}
+	}
+}
 
 func isCertificatePresent(preEnrollmentCode string, dose int64) (bool, error) {
 	if certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode); err != nil {
@@ -553,24 +625,31 @@ func isCertificatePresent(preEnrollmentCode string, dose int64) (bool, error) {
 
 func isCertificatePresentInCertificatesForGivenDose(certificateArr []interface{}, dose int64) bool {
 	for _, cert := range certificateArr {
-		if certificateMap, ok := cert.(map[string]interface{}); ok {
-			if doseValue, found := certificateMap["dose"]; found {
-				if doseValueFloat, ok := doseValue.(float64); ok {
-					if int64(doseValueFloat) == dose {
-						return true
-					}
+		if isCertificateDosePresent(cert, dose) {
+			return true
+		}
+	}
+	return false
+}
+
+func isCertificateDosePresent(cert interface{}, dose int64) bool {
+	if certificateMap, ok := cert.(map[string]interface{}); ok {
+		if doseValue, found := certificateMap["dose"]; found {
+			if doseValueFloat, ok := doseValue.(float64); ok {
+				if int64(doseValueFloat) == dose {
+					return true
 				}
-			} else { //get from certificate json.
-				if certificateJson, found := certificateMap["certificate"]; found {
-					var certificate models.Certificate
-					if certificateString, ok := certificateJson.(string); ok {
-						if err := json.Unmarshal([]byte(certificateString), &certificate); err == nil {
-							if int64(certificate.Evidence[0].Dose) == dose {
-								return true
-							}
-						} else {
-							log.Errorf("Error in reading certificate json %+v", err)
+			}
+		} else { //get from certificate json.
+			if certificateJson, found := certificateMap["certificate"]; found {
+				var certificate models.Certificate
+				if certificateString, ok := certificateJson.(string); ok {
+					if err := json.Unmarshal([]byte(certificateString), &certificate); err == nil {
+						if int64(certificate.Evidence[0].Dose) == dose {
+							return true
 						}
+					} else {
+						log.Errorf("Error in reading certificate json %+v", err)
 					}
 				}
 			}
@@ -771,6 +850,7 @@ func main() {
 	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
+	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}/{dose}", timed(authorize(getCertificateByDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")
 
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
