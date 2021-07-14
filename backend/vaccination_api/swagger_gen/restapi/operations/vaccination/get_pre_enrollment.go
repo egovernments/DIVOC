@@ -31,7 +31,7 @@ func NewGetPreEnrollment(ctx *middleware.Context, handler GetPreEnrollmentHandle
 	return &GetPreEnrollment{Context: ctx, Handler: handler}
 }
 
-/*GetPreEnrollment swagger:route GET /v1/preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
+/* GetPreEnrollment swagger:route GET /v1/preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
 
 Get pre enrollment information
 
@@ -46,17 +46,16 @@ type GetPreEnrollment struct {
 func (o *GetPreEnrollment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewGetPreEnrollmentParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -69,7 +68,6 @@ func (o *GetPreEnrollment) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

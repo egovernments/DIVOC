@@ -235,12 +235,12 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
-				request.Meta = map[string]interface{}{
-					"previousCertificateId": certificateId,
+				request.Meta = &models.CertificationRequestV2Meta{
+					PreviousCertificateID: *certificateId,
 				}
 			} else {
-				meta := request.Meta.(map[string]interface{})
-				meta["previousCertificateId"] = certificateId
+				meta := request.Meta
+				meta.PreviousCertificateID = *certificateId
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
@@ -253,7 +253,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 	return certification.NewCertifyV2OK()
 }
 
-func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
+func getCertificateIdToBeUpdated(request *models.CertificationRequestV2) *string {
 
 	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
