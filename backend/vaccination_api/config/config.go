@@ -62,7 +62,7 @@ var Config = struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
 		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
-		ErrorCertificateTopic    string `default:"error_certificate" yaml:"ErrorCertificateTopic"`
+		ErrorCertificateTopic    string `default:"error_certificate" env:"ERROR_CERTIFICATE_TOPIC" yaml:"ErrorCertificateTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
