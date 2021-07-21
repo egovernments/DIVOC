@@ -455,6 +455,9 @@ func formatId(identity string) string {
 	if strings.Contains(strings.ToLower(identity), "identity") {
 		return "Service Identity Card # " + lastFragment
 	}
+	if strings.Contains(strings.ToLower(identity), "ration") {
+		return "Ration Card # " + lastFragment
+	}
 	return lastFragment
 }
 
