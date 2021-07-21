@@ -29,7 +29,7 @@ func NewGetV1Ping(ctx *middleware.Context, handler GetV1PingHandler) *GetV1Ping 
 	return &GetV1Ping{Context: ctx, Handler: handler}
 }
 
-/*GetV1Ping swagger:route GET /v1/ping getV1Ping
+/* GetV1Ping swagger:route GET /v1/ping getV1Ping
 
 Server heartbeat operation
 
@@ -44,17 +44,15 @@ type GetV1Ping struct {
 func (o *GetV1Ping) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewGetV1PingParams()
-
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

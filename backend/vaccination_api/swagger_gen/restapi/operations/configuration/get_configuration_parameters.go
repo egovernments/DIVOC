@@ -15,7 +15,8 @@ import (
 )
 
 // NewGetConfigurationParams creates a new GetConfigurationParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetConfigurationParams() GetConfigurationParams {
 
 	return GetConfigurationParams{}
@@ -51,7 +52,6 @@ func (o *GetConfigurationParams) BindRequest(r *http.Request, route *middleware.
 	if err := o.bindLastKnownVersion(qLastKnownVersion, qhkLastKnownVersion, route.Formats); err != nil {
 		res = append(res, err)
 	}
-
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -67,10 +67,10 @@ func (o *GetConfigurationParams) bindLastKnownVersion(rawData []string, hasKey b
 
 	// Required: false
 	// AllowEmptyValue: false
+
 	if raw == "" { // empty values pass all other validations
 		return nil
 	}
-
 	o.LastKnownVersion = &raw
 
 	return nil

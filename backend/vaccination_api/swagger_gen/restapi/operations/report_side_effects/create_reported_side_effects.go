@@ -6,6 +6,7 @@ package report_side_effects
 // Editing this file might prove futile when you re-run the generate command
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -35,7 +36,7 @@ func NewCreateReportedSideEffects(ctx *middleware.Context, handler CreateReporte
 	return &CreateReportedSideEffects{Context: ctx, Handler: handler}
 }
 
-/*CreateReportedSideEffects swagger:route POST /v1/report-side-effects reportSideEffects createReportedSideEffects
+/* CreateReportedSideEffects swagger:route POST /v1/report-side-effects reportSideEffects createReportedSideEffects
 
 Create reported side effects
 
@@ -48,17 +49,16 @@ type CreateReportedSideEffects struct {
 func (o *CreateReportedSideEffects) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewCreateReportedSideEffectsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -71,7 +71,6 @@ func (o *CreateReportedSideEffects) ServeHTTP(rw http.ResponseWriter, r *http.Re
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }
@@ -103,7 +102,6 @@ func (o *CreateReportedSideEffectsBody) Validate(formats strfmt.Registry) error 
 }
 
 func (o *CreateReportedSideEffectsBody) validateSideEffectsResponse(formats strfmt.Registry) error {
-
 	if swag.IsZero(o.SideEffectsResponse) { // not required
 		return nil
 	}
@@ -115,6 +113,38 @@ func (o *CreateReportedSideEffectsBody) validateSideEffectsResponse(formats strf
 
 		if o.SideEffectsResponse[i] != nil {
 			if err := o.SideEffectsResponse[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("body" + "." + "sideEffectsResponse" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this create reported side effects body based on the context it is used
+func (o *CreateReportedSideEffectsBody) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.contextValidateSideEffectsResponse(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *CreateReportedSideEffectsBody) contextValidateSideEffectsResponse(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(o.SideEffectsResponse); i++ {
+
+		if o.SideEffectsResponse[i] != nil {
+			if err := o.SideEffectsResponse[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("body" + "." + "sideEffectsResponse" + "." + strconv.Itoa(i))
 				}

@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetCurrentProgramsParams creates a new GetCurrentProgramsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetCurrentProgramsParams() GetCurrentProgramsParams {
 
 	return GetCurrentProgramsParams{}

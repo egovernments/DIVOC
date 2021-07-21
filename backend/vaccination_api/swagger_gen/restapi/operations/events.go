@@ -29,7 +29,7 @@ func NewEvents(ctx *middleware.Context, handler EventsHandler) *Events {
 	return &Events{Context: ctx, Handler: handler}
 }
 
-/*Events swagger:route POST /v1/events events
+/* Events swagger:route POST /v1/events events
 
 Send events for monitoring / tracking purpose.
 
@@ -42,17 +42,15 @@ type Events struct {
 func (o *Events) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewEventsParams()
-
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

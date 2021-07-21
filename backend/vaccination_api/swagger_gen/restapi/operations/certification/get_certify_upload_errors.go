@@ -31,7 +31,7 @@ func NewGetCertifyUploadErrors(ctx *middleware.Context, handler GetCertifyUpload
 	return &GetCertifyUploadErrors{Context: ctx, Handler: handler}
 }
 
-/*GetCertifyUploadErrors swagger:route GET /v1/certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
+/* GetCertifyUploadErrors swagger:route GET /v1/certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
 
 Get all the error rows associated with given uploadId
 
@@ -44,17 +44,16 @@ type GetCertifyUploadErrors struct {
 func (o *GetCertifyUploadErrors) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewGetCertifyUploadErrorsParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -67,7 +66,6 @@ func (o *GetCertifyUploadErrors) ServeHTTP(rw http.ResponseWriter, r *http.Reque
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

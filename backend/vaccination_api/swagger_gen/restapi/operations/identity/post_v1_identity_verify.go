@@ -31,7 +31,7 @@ func NewPostV1IdentityVerify(ctx *middleware.Context, handler PostV1IdentityVeri
 	return &PostV1IdentityVerify{Context: ctx, Handler: handler}
 }
 
-/*PostV1IdentityVerify swagger:route POST /v1/identity/verify identity postV1IdentityVerify
+/* PostV1IdentityVerify swagger:route POST /v1/identity/verify identity postV1IdentityVerify
 
 Validate identity if the person
 
@@ -44,17 +44,16 @@ type PostV1IdentityVerify struct {
 func (o *PostV1IdentityVerify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewPostV1IdentityVerifyParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -67,7 +66,6 @@ func (o *PostV1IdentityVerify) ServeHTTP(rw http.ResponseWriter, r *http.Request
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

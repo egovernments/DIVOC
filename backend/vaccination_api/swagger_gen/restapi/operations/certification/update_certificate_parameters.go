@@ -17,7 +17,8 @@ import (
 )
 
 // NewUpdateCertificateParams creates a new UpdateCertificateParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewUpdateCertificateParams() UpdateCertificateParams {
 
 	return UpdateCertificateParams{}
@@ -36,7 +37,7 @@ type UpdateCertificateParams struct {
 	  Required: true
 	  In: body
 	*/
-	Body []*models.CertificationRequest
+	Body []*models.CertificationRequestV2
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +51,7 @@ func (o *UpdateCertificateParams) BindRequest(r *http.Request, route *middleware
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body []*models.CertificationRequest
+		var body []*models.CertificationRequestV2
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("body", "body", ""))
@@ -58,6 +59,7 @@ func (o *UpdateCertificateParams) BindRequest(r *http.Request, route *middleware
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
 		} else {
+
 			// validate array of body objects
 			for i := range body {
 				if body[i] == nil {
@@ -68,6 +70,7 @@ func (o *UpdateCertificateParams) BindRequest(r *http.Request, route *middleware
 					break
 				}
 			}
+
 			if len(res) == 0 {
 				o.Body = body
 			}

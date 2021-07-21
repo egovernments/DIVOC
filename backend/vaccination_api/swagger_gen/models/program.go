@@ -6,6 +6,7 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
 	"strconv"
 
@@ -51,7 +52,6 @@ func (m *Program) Validate(formats strfmt.Registry) error {
 }
 
 func (m *Program) validateMedicines(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Medicines) { // not required
 		return nil
 	}
@@ -63,6 +63,38 @@ func (m *Program) validateMedicines(formats strfmt.Registry) error {
 
 		if m.Medicines[i] != nil {
 			if err := m.Medicines[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("medicines" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this program based on the context it is used
+func (m *Program) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateMedicines(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *Program) contextValidateMedicines(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Medicines); i++ {
+
+		if m.Medicines[i] != nil {
+			if err := m.Medicines[i].ContextValidate(ctx, formats); err != nil {
 				if ve, ok := err.(*errors.Validation); ok {
 					return ve.ValidateName("medicines" + "." + strconv.Itoa(i))
 				}
@@ -145,7 +177,6 @@ func (m *ProgramMedicinesItems0) Validate(formats strfmt.Registry) error {
 }
 
 func (m *ProgramMedicinesItems0) validateSchedule(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Schedule) { // not required
 		return nil
 	}
@@ -195,7 +226,6 @@ func (m *ProgramMedicinesItems0) validateStatusEnum(path, location string, value
 }
 
 func (m *ProgramMedicinesItems0) validateStatus(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Status) { // not required
 		return nil
 	}
@@ -241,7 +271,6 @@ func (m *ProgramMedicinesItems0) validateVaccinationModeEnum(path, location stri
 }
 
 func (m *ProgramMedicinesItems0) validateVaccinationMode(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.VaccinationMode) { // not required
 		return nil
 	}
@@ -249,6 +278,34 @@ func (m *ProgramMedicinesItems0) validateVaccinationMode(formats strfmt.Registry
 	// value enum
 	if err := m.validateVaccinationModeEnum("vaccinationMode", "body", m.VaccinationMode); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this program medicines items0 based on the context it is used
+func (m *ProgramMedicinesItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateSchedule(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *ProgramMedicinesItems0) contextValidateSchedule(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Schedule != nil {
+		if err := m.Schedule.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("schedule")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -286,6 +343,11 @@ type ProgramMedicinesItems0Schedule struct {
 
 // Validate validates this program medicines items0 schedule
 func (m *ProgramMedicinesItems0Schedule) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this program medicines items0 schedule based on context it is used
+func (m *ProgramMedicinesItems0Schedule) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

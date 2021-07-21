@@ -17,7 +17,8 @@ import (
 )
 
 // NewCertifyParams creates a new CertifyParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewCertifyParams() CertifyParams {
 
 	return CertifyParams{}
@@ -58,6 +59,7 @@ func (o *CertifyParams) BindRequest(r *http.Request, route *middleware.MatchedRo
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
 		} else {
+
 			// validate array of body objects
 			for i := range body {
 				if body[i] == nil {
@@ -68,6 +70,7 @@ func (o *CertifyParams) BindRequest(r *http.Request, route *middleware.MatchedRo
 					break
 				}
 			}
+
 			if len(res) == 0 {
 				o.Body = body
 			}
