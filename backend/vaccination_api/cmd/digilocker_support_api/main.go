@@ -148,7 +148,7 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 		formatFacilityAddress(certificate),
 	}
 }
-func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
+func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalCertificate *models.Certificate) []string {
 	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
@@ -165,6 +165,10 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 				certificate.Evidence[0].Facility.Address.AddressRegion),
 		}
 	}
+	provisionalDoseDate := ""
+	if provisionalCertificate != nil {
+		provisionalDoseDate = formatDate(provisionalCertificate.Evidence[0].Date) + " (Batch no. " + provisionalCertificate.Evidence[0].Batch + ")"
+	}
 	return []string{certificate.CredentialSubject.Name,
 		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
@@ -172,6 +176,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate) []string {
 		certificate.CredentialSubject.Uhid,
 		certificate.CredentialSubject.RefId,
 		strings.ToUpper(certificate.Evidence[0].Vaccine),
+		provisionalDoseDate,
 		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
 		certificate.Evidence[0].Verifier.Name,
 		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
@@ -218,9 +223,9 @@ func getCertificateVariant(certificate models.Certificate) string {
 	}
 }
 
-func getCertificateAsPdfV2(certificateText string, language string) ([]byte, error) {
+func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson string, language string) ([]byte, error) {
 	var certificate models.Certificate
-	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
+	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
@@ -250,9 +255,16 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 	offsetX := 310.0
 	offsetY := 211.0
 	offsetNewX := 310.0
-	offsetNewY := 400.0
+	offsetNewY := 403.0
 	rowSize := 6
-	displayLabels := showLabelsAsPerTemplateV2(certificate)
+	var provisionalCertificate *models.Certificate = nil
+	if provisionalSignedJson != "" {
+		if err := json.Unmarshal([]byte(provisionalSignedJson), &provisionalCertificate); err != nil {
+			log.Error("Unable to parse certificate string", err)
+			return nil, err
+		}
+	}
+	displayLabels := showLabelsAsPerTemplateV2(certificate, provisionalCertificate)
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
@@ -268,7 +280,7 @@ func getCertificateAsPdfV2(certificateText string, language string) ([]byte, err
 		_ = pdf.Cell(nil, displayLabels[i])
 		j++
 	}
-	e := pasteQrCodeOnPage(certificateText, &pdf, 352, 582)
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 582)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
@@ -543,42 +555,46 @@ func headCertificateWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 }
-func getCertificateSignedJsonByDose(preEnrollmentCode string, dose int64) (string, error) {
-	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
-		log.Infof("Error while looking up cache %+v", err)
-	} else {
-		if cachedCertificate != "" {
-			log.Infof("Got certificate from cache %s", preEnrollmentCode)
-			var certificate models.Certificate
-			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err == nil {
-				if int64(certificate.Evidence[0].Dose) == dose {
-					return cachedCertificate, nil
-				}
-			}
-		}
-	}
+func getCertificateSignedJsonByDose(preEnrollmentCode string, dose int64) (string, string, error) {
+	//if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+	//	log.Infof("Error while looking up cache %+v", err)
+	//} else {
+	//	if cachedCertificate != "" {
+	//		log.Infof("Got certificate from cache %s", preEnrollmentCode)
+	//		var certificate models.Certificate
+	//		if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err == nil {
+	//			if int64(certificate.Evidence[0].Dose) == dose {
+	//				return cachedCertificate, nil
+	//			}
+	//		}
+	//	}
+	//}
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-		var doseMatchingCertificates []interface{}
-		for _, cert := range certificateArr {
-			if isCertificateDosePresent(cert, dose) {
-				doseMatchingCertificates = append(doseMatchingCertificates, cert)
-			}
+		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
+		certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
+		var doseMatchingCertificates []map[string]interface{}
+		if certificates, found := certificatesByDose[int(dose)]; found {
+			doseMatchingCertificates = certificates
 		}
-		certificateArr = pkg.SortCertificatesByCreateAt(doseMatchingCertificates)
-		log.Infof("Certificate query return %d records", len(certificateArr))
-		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+		log.Infof("Certificate query return %d records", len(doseMatchingCertificates))
+		if len(doseMatchingCertificates) > 0 {
+			certificateObj := doseMatchingCertificates[len(doseMatchingCertificates)-1]
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
-			return signedJson, nil
+			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
+			provisionalSignedJson := ""
+			if provisionalCertificate != nil {
+				provisionalSignedJson = provisionalCertificate["certificate"].(string)
+			}
+			return signedJson, provisionalSignedJson, nil
 		} else {
-			return "", nil
+			return "", "", nil
 		}
 	} else {
 		log.Errorf("Error in accessing registery %+v", err)
-		return "", errors.New("Internal error")
+		return "", "", errors.New("Internal error")
 	}
 }
 
@@ -589,7 +605,7 @@ func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
 	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err != nil {
 		w.WriteHeader(400)
 	} else {
-		signedJson, err := getCertificateSignedJsonByDose(preEnrollmentCode, dose)
+		signedJson, provisionalSignedJson, err := getCertificateSignedJsonByDose(preEnrollmentCode, dose)
 
 		if err != nil {
 			log.Infof("Error %+v", err)
@@ -599,7 +615,7 @@ func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if signedJson != "" {
-			if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
+			if pdfBytes, err := getCertificateAsPdfV2(signedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
 				log.Errorf("Error in creating certificate pdf")
 				w.WriteHeader(500)
 				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -664,14 +680,14 @@ func isCertificateDosePresent(cert interface{}, dose int64) bool {
 func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	signedJson, err := getSignedJson(preEnrollmentCode)
+	latestSignedJson, _, err := getSignedJson(preEnrollmentCode)
 	if err != nil {
 		log.Infof("Error %+v", err)
 		w.WriteHeader(500)
 		publishEvent(preEnrollmentCode, EventTagInternalHead+EventTagFailed, "Internal error")
 		return
 	}
-	if signedJson != "" {
+	if latestSignedJson != "" {
 		w.WriteHeader(200)
 	} else {
 		w.WriteHeader(404)
@@ -682,7 +698,7 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("get pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	signedJson, err := getSignedJson(preEnrollmentCode)
+	latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
 
 	if err != nil {
 		log.Infof("Error %+v", err)
@@ -691,8 +707,8 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
+	if latestSignedJson != "" {
+		if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -712,7 +728,7 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 	log.Info("get pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	signedJson, err := getSignedJson(preEnrollmentCode)
+	latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
 
 	if err != nil {
 		log.Infof("Error %+v", err)
@@ -721,8 +737,8 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if signedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
+	if latestSignedJson != "" {
+		if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -756,32 +772,61 @@ func initRedis() {
 	redisClient = redis.NewClient(options)
 }
 
-func getSignedJson(preEnrollmentCode string) (string, error) {
-	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
-		log.Infof("Error while looking up cache %+v", err)
-	} else {
-		if cachedCertificate != "" {
-			log.Infof("Got certificate from cache %s", preEnrollmentCode)
-			return cachedCertificate, nil
-		}
-	}
+func getSignedJson(preEnrollmentCode string) (string, string, error) {
+	//if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+	//	log.Infof("Error while looking up cache %+v", err)
+	//} else {
+	//	if cachedCertificate != "" {
+	//		log.Infof("Got certificate from cache %s", preEnrollmentCode)
+	//		return cachedCertificate, nil
+	//	}
+	//}
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			log.Infof("certificate resp %v", certificateObj)
-			signedJson := certificateObj["certificate"].(string)
-			return signedJson, nil
+			certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
+			latestCertificate := getLatestCertificate(certificatesByDose)
+			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
+			log.Infof("certificate resp %v", latestCertificate)
+			latestSignedJson := latestCertificate["certificate"].(string)
+			provisionalSignedJson := ""
+			if provisionalCertificate != nil {
+				provisionalSignedJson = provisionalCertificate["certificate"].(string)
+			}
+			return latestSignedJson, provisionalSignedJson, nil
 		} else {
-			return "", nil
+			return "", "", nil
 		}
 	} else {
 		log.Errorf("Error in accessing registery %+v", err)
-		return "", errors.New("Internal error")
+		return "", "", errors.New("Internal error")
 	}
+}
+
+func getProvisionalCertificate(certificatesByDose map[int][]map[string]interface{}) map[string]interface{} {
+	if len(certificatesByDose) == 1 {
+		return nil
+	}
+	minDose := 999
+	for key, _ := range certificatesByDose {
+		if key <= minDose {
+			minDose = key
+		}
+	}
+	return certificatesByDose[minDose][len(certificatesByDose[minDose]) - 1]
+}
+
+func getLatestCertificate(certificatesByDose map[int][]map[string]interface{}) map[string]interface{} {
+	maxDose := 0
+	for key, _ := range certificatesByDose {
+		if key >= maxDose {
+			maxDose = key
+		}
+	}
+	return certificatesByDose[maxDose][len(certificatesByDose[maxDose]) - 1]
 }
 
 func publishEvent(preEnrollmentCode string, typeOfEvent string, info string) {
