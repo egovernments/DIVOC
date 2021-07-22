@@ -43,16 +43,22 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
-			log.Infof("certificate resp %v", certificateObj)
-			mobileOnCert := certificateObj["mobile"].(string)
+			certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
+			latestCertificate := getLatestCertificate(certificatesByDose)
+			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
+			log.Infof("certificate resp %v", latestCertificate)
+			mobileOnCert := latestCertificate["mobile"].(string)
 			if mobile != mobileOnCert {
 				writeResponse(w, 404, mobileNumberMismatchError())
 				publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Certificate not found")
 				return
 			} else {
-				signedJson := certificateObj["certificate"].(string)
-				if pdfBytes, err := getCertificateAsPdfV2(signedJson, getLanguageFromQueryParams(r)); err != nil {
+				latestSignedJson := latestCertificate["certificate"].(string)
+				provisionalSignedJson := ""
+				if provisionalCertificate != nil {
+					provisionalSignedJson = provisionalCertificate["certificate"].(string)
+				}
+				if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
 					log.Errorf("Error in creating certificate pdf")
 					publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Unknown "+err.Error())
 					w.WriteHeader(500)

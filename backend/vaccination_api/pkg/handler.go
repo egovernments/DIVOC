@@ -300,6 +300,17 @@ func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
 	}
 	return doseWiseCertificateIds
 }
+func GetDoseWiseCertificates(certificates []interface{}) map[int][]map[string]interface{} {
+	doseWiseCertificates := map[int][]map[string]interface{}{}
+	for _, certificateObj := range certificates {
+		if certificate, ok := certificateObj.(map[string]interface{}); ok {
+			if doseValue := getDoseFromCertificate(certificate); doseValue != 0 {
+				doseWiseCertificates[doseValue] = append(doseWiseCertificates[doseValue], certificate)
+			}
+		}
+	}
+	return doseWiseCertificates
+}
 
 func getDoseFromCertificate(certificateMap map[string]interface{}) int {
 	if doseValue, found := certificateMap["dose"]; found {
