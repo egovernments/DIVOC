@@ -14,6 +14,8 @@ import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
+import {ordinal_suffix_of} from "../../utils/utils";
+import {Loader} from "../Loader";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -52,6 +54,7 @@ const customLoader = url => {
 };
 
 export const CertificateStatus = ({certificateData, goBack}) => {
+    const [isLoading, setLoading] = useState(false);
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
@@ -70,6 +73,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {
+        setLoading(true);
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
@@ -106,21 +110,24 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                             type: EVENT_TYPES.VALID_VERIFICATION,
                             extra: signedJSON.credentialSubject
                         }));
+                        setLoading(false);
                         return;
                     }
                 }
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
                 setValid(false);
+                setLoading(false);
             } catch (e) {
                 console.log('Invalid data', e);
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
-
+                setLoading(false);
             }
 
         }
-
-        verifyData()
+        setTimeout(() => {
+            verifyData()
+        }, 500)
 
     }, []);
 
@@ -147,11 +154,19 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         if (dose === totalDoses) {
             return "Final Certificate for COVID-19 Vaccination"
         } else {
-            return "Provisional Certificate for COVID-19 Vaccination (1st Dose)"
+            return `Provisional Certificate for COVID-19 Vaccination (${getDose(data)} Dose)`
         }
     }
+
+    function getDose(data) {
+        if (!data || !data["evidence"]) {
+            return ""
+        }
+        return ordinal_suffix_of(data["evidence"][0]["dose"])
+    }
+
     return (
-        <div className="certificate-status-wrapper">
+        isLoading ? <Loader/> : <div className="certificate-status-wrapper">
             <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
                  className="certificate-status-image"/>
             <h3 className="certificate-status">
@@ -174,8 +189,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                             const context = CertificateDetailsPaths[key];
                             return (
                                 <tr key={index} style={{fontSize:"smaller", textAlign: "left"}}>
-                                    <td className="pr-3" >{key}</td>
-                                    <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
+                                    <td className="pr-3" >{key.replace("${dose}", getDose(data))}</td>
+                                    <td className="font-weight-bolder value-col">{context.format(pathOr("NA", context.path, data))}</td>
                                 </tr>
                             )
                         })
