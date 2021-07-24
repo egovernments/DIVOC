@@ -7,6 +7,7 @@ docker:
 	for image in $(IMAGES); do\
 		docker build --target $$image .;\
   		echo $$image;\
+  		docker build -t $$image --target $$image . ;\
   		docker tag `docker images --filter=label=name=$$image --format "{{.ID}}"|head -1` dockerhub/$$image;\
 	done
 	$(MAKE) -C certificate_signer
