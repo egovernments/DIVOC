@@ -40,3 +40,13 @@
 .small-card-img {
     height: 5rem;
 }
+
+.certificate-status-wrapper table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.certificate-status-wrapper table .value-col{
+    width: 150px;
+    word-wrap: break-word;
+}

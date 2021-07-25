@@ -6,7 +6,7 @@ const monthNames = [
 
 export function formatDate(givenDate) {
     const dob = new Date(givenDate);
-    let day = dob.getDate();
+    let day = (dob.getDate()).toLocaleString('en-US', {minimumIntegerDigits: 2, useGrouping:false});
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
 
@@ -34,9 +34,23 @@ export const CertificateDetailsPaths = {
         path: ["credentialSubject", "refId"],
         format: (data) => (data)
     },
-    "Date of Dose": {
+    "Vaccine Name": {
+        path: ["evidence", "0", "vaccine"],
+        format: (data) => (data)
+    },
+    "Date of ${dose} Dose": {
         path: ["evidence", "0", "effectiveStart"],
         format: (data) => (formatDate(data))
+    },
+    "Vaccination Status": {
+        path: ["evidence", "0"],
+        format: (data) => {
+            if (data.dose !== data.totalDoses) {
+                return "Partially Vaccinated"
+            } else {
+                return "Fully Vaccinated"
+            }
+        }
     },
     "Vaccination at": {
         path: ["evidence", "0", "facility", "name"],
