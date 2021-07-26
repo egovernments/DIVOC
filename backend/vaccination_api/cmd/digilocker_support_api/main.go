@@ -148,7 +148,7 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 		formatFacilityAddress(certificate),
 	}
 }
-func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalCertificate *models.Certificate) []string {
+func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalDoseDate string) []string {
 	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
@@ -165,10 +165,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalCertif
 				certificate.Evidence[0].Facility.Address.AddressRegion),
 		}
 	}
-	provisionalDoseDate := ""
-	if provisionalCertificate != nil {
-		provisionalDoseDate = formatDate(provisionalCertificate.Evidence[0].Date) + " (Batch no. " + provisionalCertificate.Evidence[0].Batch + ")"
-	}
+
 	return []string{certificate.CredentialSubject.Name,
 		certificate.CredentialSubject.Age,
 		certificate.CredentialSubject.Gender,
@@ -258,13 +255,16 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 	offsetNewY := 403.0
 	rowSize := 6
 	var provisionalCertificate *models.Certificate = nil
+	provisionalDoseDate := ""
 	if provisionalSignedJson != "" {
 		if err := json.Unmarshal([]byte(provisionalSignedJson), &provisionalCertificate); err != nil {
 			log.Error("Unable to parse certificate string", err)
 			return nil, err
+		} else {
+			provisionalDoseDate = formatDate(provisionalCertificate.Evidence[0].Date) + " (Batch no. " + provisionalCertificate.Evidence[0].Batch + ")"
 		}
 	}
-	displayLabels := showLabelsAsPerTemplateV2(certificate, provisionalCertificate)
+	displayLabels := showLabelsAsPerTemplateV2(certificate, provisionalDoseDate)
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
@@ -773,14 +773,24 @@ func initRedis() {
 }
 
 func getSignedJson(preEnrollmentCode string) (string, string, error) {
-	//if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
-	//	log.Infof("Error while looking up cache %+v", err)
-	//} else {
-	//	if cachedCertificate != "" {
-	//		log.Infof("Got certificate from cache %s", preEnrollmentCode)
-	//		return cachedCertificate, nil
-	//	}
-	//}
+	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+		log.Infof("Error while looking up cache %+v", err)
+	} else {
+		if cachedCertificate != "" {
+			log.Infof("Got certificate from cache %s", preEnrollmentCode)
+			//return cachedCertificate, nil
+			var certificate models.Certificate
+			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err != nil {
+				log.Error("Unable to parse certificate string", err)
+			} else {
+				if certificate.Evidence[0].Dose == 1 {
+					latestSignedJson := cachedCertificate
+					provisionalSignedJson := ""
+					return latestSignedJson, provisionalSignedJson, nil
+				}
+			}
+		}
+	}
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
