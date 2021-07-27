@@ -7,15 +7,22 @@ import {useKeycloak} from "@react-keycloak/web";
 import {getUserNumberFromRecipientToken} from "../../utils/reciepientAuth";
 import {removeCookie, setCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
+import {useTranslation} from "react-i18next";
 
 function Header() {
     const {initialized, keycloak} = useKeycloak();
     const [reciepientUser, setReciepientUser] = useState('');
+    const { i18n } = useTranslation();
 
     useEffect(() => {
         const rUser = getUserNumberFromRecipientToken();
         setReciepientUser(rUser);
     }, []);
+
+    const lngs = {
+        en: { nativeName: 'English' },
+        hi: { nativeName: 'Hindi' }
+    };
     
     function logoutRecipient() {
         removeCookie(CITIZEN_TOKEN_COOKIE_NAME);
@@ -48,6 +55,13 @@ function Header() {
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
                     {/*</NavDropdown>*/}
                     {(keycloak.authenticated || reciepientUser) && <Nav.Link onClick={onLogoutClicked}>LOGOUT</Nav.Link>}
+                </Nav>
+                <Nav>
+                    {Object.keys(lngs).map((lng) => (
+                        <button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
+                            {lngs[lng].nativeName}
+                        </button>
+                    ))}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>

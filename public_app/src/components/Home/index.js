@@ -20,6 +20,7 @@ import {CustomButton} from "../CustomButton";
 import {useKeycloak} from "@react-keycloak/web";
 import axios from "axios";
 import {PROGRAM_API} from "../../constants";
+import {useTranslation} from "react-i18next";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
     <Col lg={4}>
@@ -64,6 +65,7 @@ export const Home = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [mobileNumberErr, setMobileNumberErr] = useState('');
     const [programs, setPrograms] = useState([]);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if(keycloak.authenticated) {
@@ -103,7 +105,7 @@ export const Home = () => {
                     <div className="p-4 p-lg-4 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
                             <Col style={{paddingRight:"10vmin", paddingLeft:"08vmin"}}>
-                                <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
+                                <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>{t('home.title')}</h3>
                                 <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
                                 <input placeholder="Enter mobile number"
                                        className="form-control form-control-lg"
