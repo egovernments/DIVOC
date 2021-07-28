@@ -1,3 +1,11 @@
+const {CERTIFICATE_CONTROLLER_ID,
+  CERTIFICATE_DID,
+  CERTIFICATE_NAMESPACE,
+  CERTIFICATE_ISSUER,
+  CERTIFICATE_BASE_URL,
+  CERTIFICATE_FEEDBACK_BASE_URL,
+  CERTIFICATE_INFO_BASE_URL
+} = require ("./config/config");
 const {Kafka} = require('kafkajs');
 const config = require('./config/config');
 const signer = require('./signer');
@@ -21,6 +29,49 @@ const CERTIFICATE_INPROGRESS = "P";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
 
+async function signCertificate(jsonMessage, headers, redisUniqueKey, w3cTransformer, customLoaderMapping = {}) {
+  let uploadId = headers.uploadId ? headers.uploadId.toString() : '';
+  let rowId = headers.rowId ? headers.rowId.toString() : '';
+  const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
+  const isSigned = await redis.checkIfKeyExists(redisUniqueKey);
+  const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], jsonMessage);
+  if (!isSigned || isUpdateRequest) {
+    redis.storeKeyWithExpiry(redisUniqueKey, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
+    await signer.signAndSave(jsonMessage, w3cTransformer, redisUniqueKey, customLoaderMapping)
+        .then(res => {
+          console.log(`${preEnrollmentCode} | statusCode: ${res.status} `);
+          if (process.env.DEBUG) {
+            console.log(res);
+          }
+          let errMsg;
+          if (res.status === 200) {
+            sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
+            producer.send({
+              topic: config.CERTIFIED_TOPIC,
+              messages: [{key: null, value: JSON.stringify(res.signedCertificate)}]
+            });
+          } else {
+            errMsg = "error occurred while signing/saving of certificate - " + res.status;
+            sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
+          }
+        })
+        .catch(error => {
+          console.error(error)
+          sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
+          throw error
+        });
+  } else {
+    console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
+    await producer.send({
+      topic: config.DUPLICATE_CERTIFICATE_TOPIC,
+      messages: [{
+        key: null,
+        value: JSON.stringify({message: message.value.toString(), error: "Duplicate pre-enrollment code"})
+      }]
+    });
+  }
+}
+
 (async function() {
   await consumer.connect();
   await producer.connect();
@@ -34,8 +85,6 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
-      let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
-      let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());
@@ -46,40 +95,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
           throw Error("Required parameters not available")
         }
         const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
-        const isSigned = await redis.checkIfKeyExists(key);
-        const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], jsonMessage);
-        if (!isSigned || isUpdateRequest) {
-          redis.storeKeyWithExpiry(key, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
-          await signer.signAndSave(jsonMessage)
-            .then(res => {
-              console.log(`${preEnrollmentCode} | statusCode: ${res.status} `);
-              if (process.env.DEBUG) {
-                 console.log(res);
-              }
-              let errMsg;
-              if (res.status === 200) {
-                sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
-                producer.send({
-                  topic: config.CERTIFIED_TOPIC,
-                  messages: [{key: null, value: JSON.stringify(res.signedCertificate)}]
-                });
-              } else {
-                errMsg = "error occurred while signing/saving of certificate - " + res.status;
-                sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
-              }
-            })
-            .catch(error => {
-              console.error(error)
-              sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, error.message)
-              throw error
-            });
-        } else {
-          console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
-          await producer.send({
-            topic: config.DUPLICATE_CERTIFICATE_TOPIC,
-            messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: "Duplicate pre-enrollment code"})}]
-          });
-        }
+        await signCertificate(jsonMessage, message.headers, key, transformW3, {});
       } catch (e) {
         // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         // const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
@@ -125,3 +141,76 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   }
 }
 
+function ageOfRecipient(recipient) {
+  if (recipient.age) return recipient.age;
+  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
+    return "" + (Math.floor((new Date() - new Date(recipient.dob))/1000/60/60/24.0/365.25));
+  return "";
+}
+
+function transformW3(cert, certificateId) {
+  const certificateFromTemplate = {
+    "@context": [
+      "https://www.w3.org/2018/credentials/v1",
+      CERTIFICATE_NAMESPACE,
+    ],
+    type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
+    credentialSubject: {
+      type: "Person",
+      id: R.pathOr('', ['recipient', 'identity'], cert),
+      refId: R.pathOr('', ['preEnrollmentCode'], cert),
+      name: R.pathOr('', ['recipient', 'name'], cert),
+      gender: R.pathOr('', ['recipient', 'gender'], cert),
+      age: ageOfRecipient(cert.recipient), //from dob
+      nationality: R.pathOr('', ['recipient', 'nationality'], cert),
+      address: {
+        "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),
+        "streetAddress2": R.pathOr('', ['recipient', 'address', 'addressLine2'], cert),
+        "district": R.pathOr('', ['recipient', 'address', 'district'], cert),
+        "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
+        "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
+        "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
+        "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
+      }
+    },
+    issuer: CERTIFICATE_ISSUER,
+    issuanceDate: new Date().toISOString(),
+    evidence: [{
+      "id": CERTIFICATE_BASE_URL + certificateId,
+      "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId,
+      "infoUrl": CERTIFICATE_INFO_BASE_URL + certificateId,
+      "certificateId": certificateId,
+      "type": ["Vaccination"],
+      "batch": R.pathOr('', ['vaccination', 'batch'], cert),
+      "vaccine": R.pathOr('', ['vaccination', 'name'], cert),
+      "manufacturer": R.pathOr('', ['vaccination', 'manufacturer'], cert),
+      "date": R.pathOr('', ['vaccination', 'date'], cert),
+      "effectiveStart": R.pathOr('', ['vaccination', 'effectiveStart'], cert),
+      "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
+      "dose": R.pathOr('', ['vaccination', 'dose'], cert),
+      "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
+      "verifier": {
+        "name": R.pathOr('', ['vaccinator', 'name'], cert),
+      },
+      "facility": {
+        // "id": CERTIFICATE_BASE_URL + cert.facility.id,
+        "name": R.pathOr('', ['facility', 'name'], cert),
+        "address": {
+          "streetAddress": R.pathOr('', ['facility', 'address', 'addressLine1'], cert),
+          "streetAddress2": R.pathOr('', ['facility', 'address', 'addressLine2'], cert),
+          "district": R.pathOr('', ['facility', 'address', 'district'], cert),
+          "city": R.pathOr('', ['facility', 'address', 'city'], cert),
+          "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
+          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
+        },
+      }
+    }],
+    "nonTransferable": "true"
+  };
+  return certificateFromTemplate;
+}
+
+module.exports = {
+  transformW3
+};

@@ -1,4 +1,5 @@
-const {signJSON, transformW3, customLoader} = require('../signer');
+const {signJSON, customLoader} = require('../signer');
+const {transformW3} = require('../main');
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
 const {RsaSignature2018} = jsigs.suites;

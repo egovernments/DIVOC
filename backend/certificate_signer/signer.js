@@ -1,10 +1,6 @@
 const {CERTIFICATE_CONTROLLER_ID,
   CERTIFICATE_DID,
   CERTIFICATE_NAMESPACE,
-  CERTIFICATE_ISSUER,
-  CERTIFICATE_BASE_URL,
-  CERTIFICATE_FEEDBACK_BASE_URL,
-  CERTIFICATE_INFO_BASE_URL,
   CERTIFICATE_PUBKEY_ID
 } = require ("./config/config");
 
@@ -35,7 +31,7 @@ const publicKey = {
   publicKeyPem
 };
 
-const documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
+let documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
 documentLoaderMapping[CERTIFICATE_DID] = publicKey;
 documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
 documentLoaderMapping['https://www.w3.org/2018/credentials#'] = credentialsv1;
@@ -95,83 +91,13 @@ async function signJSON(certificate) {
   return signed;
 }
 
-function ageOfRecipient(recipient) {
-  if (recipient.age) return recipient.age;
-  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return "" + (Math.floor((new Date() - new Date(recipient.dob))/1000/60/60/24.0/365.25));
-  return "";
-}
-
-function transformW3(cert, certificateId) {
-  const certificateFromTemplate = {
-    "@context": [
-      "https://www.w3.org/2018/credentials/v1",
-      CERTIFICATE_NAMESPACE,
-    ],
-    type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
-    credentialSubject: {
-      type: "Person",
-      id: R.pathOr('', ['recipient', 'identity'], cert),
-      refId: R.pathOr('', ['preEnrollmentCode'], cert),
-      name: R.pathOr('', ['recipient', 'name'], cert),
-      gender: R.pathOr('', ['recipient', 'gender'], cert),
-      age: ageOfRecipient(cert.recipient), //from dob
-      nationality: R.pathOr('', ['recipient', 'nationality'], cert),
-      address: {
-        "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),
-        "streetAddress2": R.pathOr('', ['recipient', 'address', 'addressLine2'], cert),
-        "district": R.pathOr('', ['recipient', 'address', 'district'], cert),
-        "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
-        "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
-        "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
-        "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
-      }
-    },
-    issuer: CERTIFICATE_ISSUER,
-    issuanceDate: new Date().toISOString(),
-    evidence: [{
-      "id": CERTIFICATE_BASE_URL + certificateId,
-      "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId,
-      "infoUrl": CERTIFICATE_INFO_BASE_URL + certificateId,
-      "certificateId": certificateId,
-      "type": ["Vaccination"],
-      "batch": R.pathOr('', ['vaccination', 'batch'], cert),
-      "vaccine": R.pathOr('', ['vaccination', 'name'], cert),
-      "manufacturer": R.pathOr('', ['vaccination', 'manufacturer'], cert),
-      "date": R.pathOr('', ['vaccination', 'date'], cert),
-      "effectiveStart": R.pathOr('', ['vaccination', 'effectiveStart'], cert),
-      "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
-      "dose": R.pathOr('', ['vaccination', 'dose'], cert),
-      "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
-      "verifier": {
-        "name": R.pathOr('', ['vaccinator', 'name'], cert),
-      },
-      "facility": {
-        // "id": CERTIFICATE_BASE_URL + cert.facility.id,
-        "name": R.pathOr('', ['facility', 'name'], cert),
-        "address": {
-          "streetAddress": R.pathOr('', ['facility', 'address', 'addressLine1'], cert),
-          "streetAddress2": R.pathOr('', ['facility', 'address', 'addressLine2'], cert),
-          "district": R.pathOr('', ['facility', 'address', 'district'], cert),
-          "city": R.pathOr('', ['facility', 'address', 'city'], cert),
-          "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
-          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
-          "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
-        },
-      }
-    }],
-    "nonTransferable": "true"
-  };
-  return certificateFromTemplate;
-}
-
-async function signAndSave(certificate, retryCount = 0) {
+async function signAndSave(certificate, transformW3, redisUniqueKey, customLoaderMapping = {}, retryCount = 0) {
+  documentLoaderMapping = {...documentLoaderMapping, ...customLoaderMapping};
   const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
   const preEnrollmentCode = certificate.preEnrollmentCode;
-  const currentDose = certificate.vaccination.dose;
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
   const programId = certificate["programId"];
@@ -189,7 +115,7 @@ async function signAndSave(certificate, retryCount = 0) {
   if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
     if (retryCount <= config.CERTIFICATE_RETRY_COUNT) {
       console.error("Duplicate certificate id found, retrying attempt " + retryCount + " of " + config.CERTIFICATE_RETRY_COUNT);
-      return await signAndSave(certificate, retryCount + 1)
+      return await signAndSave(certificate, transformW3, redisUniqueKey, customLoaderMapping, retryCount + 1)
     } else {
       console.error("Max retry attempted");
       throw new Error(resp.data.params.errmsg)
@@ -197,7 +123,7 @@ async function signAndSave(certificate, retryCount = 0) {
   }
   resp.signedCertificate = signedCertificateForDB;
   if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
-    redis.storeKeyWithExpiry(`${preEnrollmentCode}-${programId}-${currentDose}`, certificateId)
+    redis.storeKeyWithExpiry(redisUniqueKey, certificateId)
   }
   return resp;
 }
@@ -209,6 +135,5 @@ function getContactNumber(contact) {
 module.exports = {
   signAndSave,
   signJSON,
-  transformW3,
   customLoader
 };
