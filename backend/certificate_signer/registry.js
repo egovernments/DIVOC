@@ -1,5 +1,12 @@
-const config = require('./config/config');
 const axios = require('axios');
+
+let registryCertificateSchema = '';
+let regisryURL = '';
+
+const initRegistry = (registryUrl, registrySchema) => {
+  registryCertificateSchema = registrySchema;
+  regisryURL = registryUrl
+};
 
 const saveCertificate = (certificate) => {
   const certificateRequest = {
@@ -7,17 +14,18 @@ const saveCertificate = (certificate) => {
     ver: "1.0",
     ets: "",
     "request":{
-      "VaccinationCertificate": certificate
+      [registryCertificateSchema]: certificate
 
     }
   };
 
   return axios.post(
-    config.REGISTRY_URL + "/add",
+      regisryURL + "/add",
     certificateRequest
   )
 };
 
 module.exports = {
-  saveCertificate
+  saveCertificate,
+  initRegistry
 };

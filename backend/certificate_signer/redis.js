@@ -1,17 +1,23 @@
 const redis = require("redis");
-const config = require('./config/config');
 const {promisify} = require("util");
-const client = redis.createClient(config.REDIS_URL);
-const existsAsync = promisify(client.exists).bind(client);
-client.on("error", function (error) {
-  console.error(error);
-});
+let client;
+let existsAsync;
+let redisKeyExpiry;
+
+async function initRedis(config) {
+  client = redis.createClient(config.REDIS_URL);
+  client.on("error", function (error) {
+    console.error(error);
+  });
+  existsAsync = promisify(client.exists).bind(client);
+  redisKeyExpiry = config.REDIS_KEY_EXPIRE;
+}
 
 async function checkIfKeyExists(key) {
   return existsAsync(key)
 }
 
-function storeKeyWithExpiry(key, value, expiry = config.REDIS_KEY_EXPIRE) {
+function storeKeyWithExpiry(key, value, expiry = redisKeyExpiry) {
   client.set(key, value, "EX", expiry)
 }
 
@@ -21,5 +27,6 @@ function deleteKey(key) {
 module.exports = {
   checkIfKeyExists,
   storeKeyWithExpiry,
-  deleteKey
+  deleteKey,
+  initRedis
 };

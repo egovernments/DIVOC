@@ -9,11 +9,12 @@ const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "http
 
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
-const CERTIFY_TOPIC = 'certify';
+const CERTIFY_TOPIC = process.env.CERTIFY_TOPIC || 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
-const CERTIFIED_TOPIC = 'certified';
-const ERROR_CERTIFICATE_TOPIC = 'error_certificate';
-const DUPLICATE_CERTIFICATE_TOPIC = 'duplicate_certificate';
+const REGISTRY_CERTIFICATE_SCHEMA = process.env.REGISTRY_CERTIFICATE_SCHEMA || 'VaccinationCertificate';
+const CERTIFIED_TOPIC = process.env.CERTIFIED_TOPIC || 'certified';
+const ERROR_CERTIFICATE_TOPIC = process.env.ERROR_CERTIFICATE_TOPIC || 'error_certificate';
+const DUPLICATE_CERTIFICATE_TOPIC = process.env.DUPLICATE_CERTIFICATE_TOPIC || 'duplicate_certificate';
 const SMS_GATEWAY_URL = 'https://api.msg91.com/api/v2/sendsms';
 const ENABLE_SMS_NOTIFICATION = false;
 const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMENT || true;
@@ -43,5 +44,5 @@ module.exports = {
   REDIS_URL,
   REDIS_KEY_EXPIRE,
   DUPLICATE_CERTIFICATE_TOPIC,
-
+  REGISTRY_CERTIFICATE_SCHEMA
 };
