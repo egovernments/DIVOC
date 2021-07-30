@@ -13,7 +13,8 @@ import (
 )
 
 // NewGetVaccinatorsParams creates a new GetVaccinatorsParams object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewGetVaccinatorsParams() GetVaccinatorsParams {
 
 	return GetVaccinatorsParams{}
