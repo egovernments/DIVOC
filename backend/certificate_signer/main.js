@@ -105,7 +105,7 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
     if (status === REGISTRY_SUCCESS_STATUS) {
       producer.send({
-        topic: 'certify_ack',
+        topic: config.CERTIFICATE_ACK_TOPIC,
         messages: [{
           key: null,
           value: JSON.stringify({
@@ -116,7 +116,7 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
           })}]})
     } else if (status === REGISTRY_FAILED_STATUS) {
       producer.send({
-        topic: 'certify_ack',
+        topic: config.CERTIFICATE_ACK_TOPIC,
         messages: [{
           key: null,
           value: JSON.stringify({
@@ -132,6 +132,5 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
 
 module.exports = {
   signCertificate,
-  init_signer,
-  config
+  init_signer
 };
