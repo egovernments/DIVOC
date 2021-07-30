@@ -114,9 +114,10 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 
 func (certificate *Certificate) IsVaccinatedStatePollingOne() bool {
 	isPolling := false
+
 	stateName := certificate.GetStateNameInLowerCaseLetter()
 	for _, state := range config.PollingStates {
-		if state == stateName {
+		if state == stateName && state != "" {
 			isPolling = true
 		}
 	}
