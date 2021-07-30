@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/divoc/api/config"
 	"testing"
+	"time"
 )
 
 const certificateText1 = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:600893441710\",\"refId\":\"1112\",\"name\":\"Master Radon\",\"uhid\":\"\",\"gender\":\"Male\",\"age\":\"21\",\"nationality\":\"India\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":999000}},\"issuer\":\"https://cowin.gov.in/\",\"issuanceDate\":\"2021-04-07T05:27:34.319Z\",\"evidence\":[{\"id\":\"https://cowin.gov.in/vaccine/32630784022\",\"feedbackUrl\":\"https://cowin.gov.in/?32630784022\",\"infoUrl\":\"https://cowin.gov.in/?32630784022\",\"certificateId\":\"32630784022\",\"type\":[\"Vaccination\"],\"batch\":\"10\",\"vaccine\":\"Covaxin\",\"manufacturer\":\"Stark Industries\",\"date\":\"2021-03-30T10:06:02.705Z\",\"effectiveStart\":\"2021-03-30\",\"effectiveUntil\":\"2021-07-08\",\"dose\":1,\"totalDoses\":2,\"verifier\":{\"name\":\"Dr Dhronar\"},\"facility\":{\"name\":\"Madras\",\"address\":{\"streetAddress\":\"Ramachandra multi facility hospital\",\"streetAddress2\":\"Katankulathur, Guduvancherry\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":555000}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-04-07T05:27:34Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EeZPl0x63T7Hc1GmR6NpqGgnNg0wOOmtXq8jLsvs1jSCiO0EH6qpHMNnJ7wbtVzfWlAOGI6JLdx0ZTEFmUf4uYiyGLyyzh7T6QwMs4GT53BRg1eWsWui_wcc5yUdh6Ok00zq-Fv4jHDTeZBKbfPIx8B1MnGZ-SepFlpZxV_Cwh_Tf7aBpaJjscSkJ-BMWOKYlWo_Zf3pJ_lCI6_sWKnyKVmyxwY-oyxoUNyjqyXswoZqVMvHykjo8A7zGaAEP6pwn_her5EFywDJIT1BbMbjnhaHJTraTTSWWBa4yw5yC3B62OKHXt0Qn5maamswOeXobNmbo7Dufxpj1VysuUbu5Q\"}}"
@@ -162,6 +163,150 @@ func TestCertificate_GetNextDueDateInfo(t *testing.T) {
 			}
 			if got := certificate.GetNextDueDateInfo(); got != tt.want {
 				t.Errorf("GetNextDueDateInfo() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestCertificate_IsVaccinatedStatePollingOne(t *testing.T) {
+	type fields struct {
+		Context           []string
+		Type              []string
+		CredentialSubject struct {
+			Type        string `json:"type"`
+			ID          string `json:"id"`
+			RefId       string `json:"refId"`
+			Uhid        string `json:"uhid"`
+			Name        string `json:"name"`
+			Gender      string `json:"gender"`
+			Age         string `json:"age"`
+			Nationality string `json:"nationality"`
+			Address     struct {
+				StreetAddress  string `json:"streetAddress"`
+				StreetAddress2 string `json:"streetAddress2"`
+				District       string `json:"district"`
+				City           string `json:"city"`
+				AddressRegion  string `json:"addressRegion"`
+				AddressCountry string `json:"addressCountry"`
+			} `json:"address"`
+		}
+		Issuer       string
+		IssuanceDate string
+		Evidence     []struct {
+			ID             string      `json:"id"`
+			FeedbackURL    string      `json:"feedbackUrl"`
+			InfoURL        string      `json:"infoUrl"`
+			Type           []string    `json:"type"`
+			Batch          string      `json:"batch"`
+			Vaccine        string      `json:"vaccine"`
+			Manufacturer   string      `json:"manufacturer"`
+			Date           time.Time   `json:"date"`
+			EffectiveStart string      `json:"effectiveStart"`
+			EffectiveUntil string      `json:"effectiveUntil"`
+			CertificateId  string      `json:"certificateId"`
+			Dose           int         `json:"dose"`
+			TotalDoses     interface{} `json:"totalDoses"`
+			Verifier       struct {
+				Name string `json:"name"`
+			} `json:"verifier"`
+			Facility struct {
+				Name    string `json:"name"`
+				Address struct {
+					StreetAddress  string      `json:"streetAddress"`
+					StreetAddress2 string      `json:"streetAddress2"`
+					District       string      `json:"district"`
+					City           string      `json:"city"`
+					AddressRegion  string      `json:"addressRegion"`
+					AddressCountry string      `json:"addressCountry"`
+					PostalCode     interface{} `json:"postalCode"`
+				} `json:"address"`
+			} `json:"facility"`
+		}
+		NonTransferable string
+		Proof           struct {
+			Type               string    `json:"type"`
+			Created            time.Time `json:"created"`
+			VerificationMethod string    `json:"verificationMethod"`
+			ProofPurpose       string    `json:"proofPurpose"`
+			Jws                string    `json:"jws"`
+		}
+	}
+	config.Initialize()
+	ar := fields {Evidence: []struct {
+		ID             string                              `json:"id"`;
+		FeedbackURL    string                              `json:"feedbackUrl"`;
+		InfoURL        string                              `json:"infoUrl"`;
+		Type           []string                            `json:"type"`;
+		Batch          string                              `json:"batch"`;
+		Vaccine        string                              `json:"vaccine"`;
+		Manufacturer   string                              `json:"manufacturer"`;
+		Date           time.Time                           `json:"date"`;
+		EffectiveStart string                              `json:"effectiveStart"`;
+		EffectiveUntil string                              `json:"effectiveUntil"`;
+		CertificateId  string                              `json:"certificateId"`;
+		Dose           int                                 `json:"dose"`;
+		TotalDoses     interface{}                         `json:"totalDoses"`;
+		Verifier       struct{ Name string `json:"name"` } `json:"verifier"`;
+		Facility       struct {
+			Name    string `json:"name"`;
+			Address struct {
+				StreetAddress  string      `json:"streetAddress"`;
+				StreetAddress2 string      `json:"streetAddress2"`;
+				District       string      `json:"district"`;
+				City           string      `json:"city"`;
+				AddressRegion  string      `json:"addressRegion"`;
+				AddressCountry string      `json:"addressCountry"`;
+				PostalCode     interface{} `json:"postalCode"`
+			} `json:"address"`
+		} `json:"facility"`
+	}{{Facility: struct {
+		Name    string `json:"name"`;
+		Address struct {
+			StreetAddress  string      `json:"streetAddress"`;
+			StreetAddress2 string      `json:"streetAddress2"`;
+			District       string      `json:"district"`;
+			City           string      `json:"city"`;
+			AddressRegion  string      `json:"addressRegion"`;
+			AddressCountry string      `json:"addressCountry"`;
+			PostalCode     interface{} `json:"postalCode"`
+		} `json:"address"`
+	}{Address: struct {
+		StreetAddress  string      `json:"streetAddress"`;
+		StreetAddress2 string      `json:"streetAddress2"`;
+		District       string      `json:"district"`;
+		City           string      `json:"city"`;
+		AddressRegion  string      `json:"addressRegion"`;
+		AddressCountry string      `json:"addressCountry"`;
+		PostalCode     interface{} `json:"postalCode"`
+	}{
+		AddressRegion: "",
+	}}}}}
+
+	tests := []struct {
+		name   string
+		fields fields
+		want   bool
+	}{
+		{
+			name:   "one",
+			fields: ar,
+			want:   false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			certificate := &Certificate{
+				Context:           tt.fields.Context,
+				Type:              tt.fields.Type,
+				CredentialSubject: tt.fields.CredentialSubject,
+				Issuer:            tt.fields.Issuer,
+				IssuanceDate:      tt.fields.IssuanceDate,
+				Evidence:          tt.fields.Evidence,
+				NonTransferable:   tt.fields.NonTransferable,
+				Proof:             tt.fields.Proof,
+			}
+			if got := certificate.IsVaccinatedStatePollingOne(); got != tt.want {
+				t.Errorf("IsVaccinatedStatePollingOne() = %v, want %v", got, tt.want)
 			}
 		})
 	}
