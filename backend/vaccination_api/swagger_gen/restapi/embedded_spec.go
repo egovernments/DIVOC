@@ -593,6 +593,40 @@ func init() {
         }
       }
     },
+    "/test/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "testCertify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TestCertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/users/me": {
       "get": {
         "tags": [
@@ -996,6 +1030,196 @@ func init() {
         },
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "TestCertificationRequest": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "testDetails",
+        "facility"
+      ],
+      "properties": {
+        "facility": {
+          "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "gender",
+            "dob",
+            "identity",
+            "contact"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "testDetails": {
+          "type": "object",
+          "required": [
+            "testType",
+            "disease",
+            "sampleCollectionTimestamp",
+            "resultTimestamp",
+            "result"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "disease": {
+              "type": "string"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Negative",
+                "Inconclusive",
+                "Void"
+              ]
+            },
+            "resultTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleCollectionTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleOrigin": {
+              "type": "string"
+            },
+            "testName": {
+              "type": "string"
+            },
+            "testType": {
+              "type": "string"
+            }
+          }
+        },
+        "verifier": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
         }
       }
     },
@@ -1612,6 +1836,40 @@ func init() {
             "description": "OK",
             "schema": {
               "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/test/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "testCertify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TestCertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -2304,6 +2562,422 @@ func init() {
         },
         "min": {
           "type": "integer"
+        }
+      }
+    },
+    "TestCertificationRequest": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "testDetails",
+        "facility"
+      ],
+      "properties": {
+        "facility": {
+          "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "gender",
+            "dob",
+            "identity",
+            "contact"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "testDetails": {
+          "type": "object",
+          "required": [
+            "testType",
+            "disease",
+            "sampleCollectionTimestamp",
+            "resultTimestamp",
+            "result"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "disease": {
+              "type": "string"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Negative",
+                "Inconclusive",
+                "Void"
+              ]
+            },
+            "resultTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleCollectionTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleOrigin": {
+              "type": "string"
+            },
+            "testName": {
+              "type": "string"
+            },
+            "testType": {
+              "type": "string"
+            }
+          }
+        },
+        "verifier": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "TestCertificationRequestFacility": {
+      "type": "object",
+      "required": [
+        "name",
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestFacilityAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestRecipient": {
+      "type": "object",
+      "required": [
+        "name",
+        "gender",
+        "dob",
+        "identity",
+        "contact"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date",
+          "x-nullable": true
+        },
+        "gender": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nationality": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestRecipientAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestTestDetails": {
+      "type": "object",
+      "required": [
+        "testType",
+        "disease",
+        "sampleCollectionTimestamp",
+        "resultTimestamp",
+        "result"
+      ],
+      "properties": {
+        "batch": {
+          "type": "string"
+        },
+        "disease": {
+          "type": "string"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "Positive",
+            "Negative",
+            "Inconclusive",
+            "Void"
+          ]
+        },
+        "resultTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sampleCollectionTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sampleOrigin": {
+          "type": "string"
+        },
+        "testName": {
+          "type": "string"
+        },
+        "testType": {
+          "type": "string"
+        }
+      }
+    },
+    "TestCertificationRequestVerifier": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },
