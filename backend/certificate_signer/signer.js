@@ -90,7 +90,7 @@ async function signAndSave(certificate, transformW3, redisUniqueKey, retryCount 
   const preEnrollmentCode = certificate.preEnrollmentCode;
   const w3cCertificate = transformW3(certificate, certificateId);
   const signedCertificate = await signJSON(w3cCertificate);
-  const programId = certificate["programId"];
+  const programId = certificate["programId"] || "";
   const signedCertificateForDB = {
     name: name,
     contact: contact,
