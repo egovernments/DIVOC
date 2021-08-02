@@ -58,7 +58,6 @@ const testCertificateContext = {
         "sampleCollectionTimestamp": "schema:dateTime",
         "resultTimestamp": "schema:dateTime",
         "result": "schema:id",
-        "expiry": "schema:dateTime",
         "verifier": {
           "@id": "vac:verifier",
           "@context": {
