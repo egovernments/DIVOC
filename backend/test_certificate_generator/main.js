@@ -8,7 +8,7 @@ const {
 const {Kafka} = require('kafkajs');
 const config = require('./config/config');
 const R = require('ramda');
-const {vaccinationContext} = require("vaccination-context");
+const {testCertificateContext} = require("test-certificate-context");
 const signer = require('certificate-signer');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
@@ -54,7 +54,7 @@ let signingConfig = {
 };
 
 const documentLoader = {};
-documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
+documentLoader[CERTIFICATE_NAMESPACE] = testCertificateContext;
 
 (async function() {
   await consumer.connect();
@@ -75,7 +75,7 @@ documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
       try {
         jsonMessage = JSON.parse(message.value.toString());
         const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
-        const sampleCollectionTimestamp = R.pathOr("", ["sampleCollectionTimestamp"], jsonMessage);
+        const sampleCollectionTimestamp = R.pathOr("", ['testDetails', 'sampleCollectionTimestamp'], jsonMessage);
         if (preEnrollmentCode === "" || sampleCollectionTimestamp === "") {
           throw Error("Required parameters not available")
         }
@@ -98,28 +98,19 @@ documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
   })
 })();
 
-function ageOfRecipient(recipient) {
-  if (recipient.age) return recipient.age;
-  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return "" + (Math.floor((new Date() - new Date(recipient.dob))/1000/60/60/24.0/365.25));
-  return "";
-}
-
 function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       CERTIFICATE_NAMESPACE,
     ],
-    type: ['VerifiableCredential', 'ProofOfTestCredential'],
+    type: ['VerifiableCredential', 'ProofOfTestCertificateCredential'],
     credentialSubject: {
       type: "Person",
       id: R.pathOr('', ['recipient', 'identity'], cert),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
-      uhid: R.pathOr('', ['recipient', 'uhid'], cert),
-      // age: ageOfRecipient(cert.recipient), //from dob
       dob: R.pathOr('', ['recipient', 'dob'], cert),
       nationality: R.pathOr('', ['recipient', 'nationality'], cert),
       address: {
@@ -149,9 +140,8 @@ function transformW3(cert, certificateId) {
       "sampleCollectionTimestamp": R.pathOr('', ['testDetails', 'sampleCollectionTimestamp'], cert),
       "resultTimestamp": R.pathOr('', ['testDetails', 'resultTimestamp'], cert),
       "result": R.pathOr('', ['testDetails', 'result'], cert),
-      "expiry": R.pathOr('', ['testDetails', 'expiry'], cert),
       "verifier": {
-        "name": R.pathOr('', ['vaccinator', 'name'], cert),
+        "name": R.pathOr('', ['verifier', 'name'], cert),
       },
       "facility": {
         // "id": CERTIFICATE_BASE_URL + cert.facility.id,
