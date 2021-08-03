@@ -1,5 +1,5 @@
 
-IMAGE:=dockerhub/test_certificate_generator
+IMAGE:=dockerhub/test_certificate_signer
 
 docker:
 	@cp config/keys.js.sample config/keys.js

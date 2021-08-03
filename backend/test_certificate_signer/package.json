@@ -1,11 +1,11 @@
 {
-  "name": "certificate_processor",
+  "name": "test_certificate_signer",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "author": "",
   "license": "GPL",
