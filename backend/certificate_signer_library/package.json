@@ -1,5 +1,5 @@
 {
-  "name": "certificate_processor",
+  "name": "certificate-signer-library",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -7,8 +7,12 @@
     "start": "node main.js",
     "test": "jest"
   },
-  "author": "",
+  "author": "divoc",
   "license": "GPL",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egovernments/DIVOC/tree/main/backend/certificate_signer_library"
+  },
   "dependencies": {
     "axios": "^0.21.1",
     "jsonld-signatures": "^6.0.0",
