@@ -64,6 +64,8 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertificateByCertificateIDHandler = certification.GetCertificateByCertificateIDHandlerFunc(getCertificateByCertificateId)
 	api.CertificationTestCertifyHandler = certification.TestCertifyHandlerFunc(testCertify)
 	api.CertificationTestBulkCertifyHandler = certification.TestBulkCertifyHandlerFunc(testBulkCertify)
+	api.CertificationGetTestCertifyUploadsHandler = certification.GetTestCertifyUploadsHandlerFunc(getTestCertifyUploads)
+	api.CertificationGetTestCertifyUploadErrorsHandler = certification.GetTestCertifyUploadErrorsHandlerFunc(getTestCertifyUploadErrors)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -681,4 +683,71 @@ func testBulkCertify(params certification.TestBulkCertifyParams, principal *mode
 	db.UpdateTestCertifyUpload(&uploadEntry)
 
 	return certification.NewBulkCertifyOK()
+}
+
+func getTestCertifyUploads(params certification.GetTestCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	var result []interface{}
+	preferredUsername := principal.PreferredUsername
+	certifyUploads, err := db.GetTestCertifyUploadsForUser(preferredUsername)
+	if err == nil {
+		// get the error rows associated with it
+		// if present update status as "Failed"
+		for _, c := range certifyUploads {
+			totalErrorRows := 0
+			statuses, err := db.GetTestCertifyUploadErrorsStatusForUploadId(c.ID)
+			if err == nil {
+				for _, status := range statuses {
+					if status == db.CERTIFY_UPLOAD_FAILED_STATUS {
+						totalErrorRows = totalErrorRows + 1
+					}
+				}
+			}
+			overallStatus := getOverallStatus(statuses)
+
+			// construct return value and append
+			var cmap map[string]interface{}
+			if jc, e := json.Marshal(c); e == nil {
+				if e = json.Unmarshal(jc, &cmap); e == nil {
+					cmap["Status"] = overallStatus
+					cmap["TotalErrorRows"] = totalErrorRows
+				}
+			}
+			result = append(result, cmap)
+
+		}
+		return NewGenericJSONResponse(result)
+	}
+	return NewGenericServerError()
+}
+
+func getTestCertifyUploadErrors(params certification.GetTestCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+
+	// check if user has permission to get errors
+	preferredUsername := principal.PreferredUsername
+	certifyUpload, err := db.GetTestCertifyUploadsForID(uint(uploadID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// certifyUpload itself not there
+			// then throw 404 error
+			return certification.NewGetTestCertifyUploadErrorsNotFound()
+		}
+		return NewGenericServerError()
+	}
+
+	// user in certifyUpload doesnt match preferredUsername
+	// then throw 403 error
+	if certifyUpload.UserID != preferredUsername {
+		return certification.NewGetTestCertifyUploadErrorsForbidden()
+	}
+
+	certifyUploadErrors, err := db.GetTestCertifyUploadErrorsForUploadID(uploadID)
+	columnHeaders := strings.Split(config.Config.Testcertificate.Upload.Columns, ",")
+	if err == nil {
+		return NewGenericJSONResponse(map[string]interface{}{
+			"columns":   append(columnHeaders, "errors"),
+			"errorRows": certifyUploadErrors,
+		})
+	}
+	return NewGenericServerError()
 }

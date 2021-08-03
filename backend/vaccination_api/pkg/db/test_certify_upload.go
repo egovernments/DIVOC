@@ -75,27 +75,70 @@ func CreateTestCertifyUpload(data *TestCertifyUploads) error {
 	return nil
 }
 
+// GetCertifyUploadsForUser - Get all certify file uploads for giver user
+func GetTestCertifyUploadsForUser(userID string) ([]*TestCertifyUploads, error) {
+	var certifyUploads []*TestCertifyUploads
+	if result := db.Order("created_at desc").Find(&certifyUploads, "user_id = ?", userID); result.Error != nil {
+		log.Error("Error occurred while retrieving testCertifyUploads for user ", userID)
+		return nil, errors.New("error occurred while retrieving testCertifyUploads")
+	}
+	return certifyUploads, nil
+}
+
 func CreateTestCertifyUploadError(data *TestCertifyUploadErrors) error {
 	if result := db.Create(&data); result.Error != nil {
 		log.Error("Error occurred while creating CertifyUploadErrors for ", data, result.Error)
 		return errors.New("error occurred while saving certifyUpload")
 	}
-	log.Info("Created certifyUploadError for fileUploadID - ", data.CertifyUploadID)
+	log.Info("Created testCertifyUploadError for fileUploadID - ", data.CertifyUploadID)
 	return nil
 }
 
 func UpdateTestCertifyUploadError(data *TestCertifyUploadErrors) error {
 	if result := db.Save(data); result.Error != nil {
 		log.Error("Error occurred while saving testCertifyUploadErrors with ID - ", data.ID)
-		return errors.New("error occurred while saving certifyUploadErrors")
+		return errors.New("error occurred while saving testCertifyUploadErrors")
 	}
 	return nil
 }
 
+func GetTestCertifyUploadsForID(id uint) (*TestCertifyUploads, error) {
+	certifyUpload := &TestCertifyUploads{}
+	if result := db.First(&certifyUpload, "id = ?", id); result.Error != nil {
+		log.Error("Error occurred while retrieving testCertifyUploads for ID ", id, result.Error)
+		return nil, result.Error
+	}
+	return certifyUpload, nil
+
+}
+
+func GetTestCertifyUploadErrorsForUploadID(uploadId int64) ([]*TestCertifyUploadErrors, error) {
+	var certifyUploadErrors []*TestCertifyUploadErrors
+	if result := db.Find(&certifyUploadErrors, "certify_upload_id = ?", uploadId); result.Error != nil {
+		log.Error("Error occurred while retrieving testCertifyUploadErrors for user ", uploadId)
+		return nil, errors.New("error occurred while retrieving testCertifyUploadErrors")
+	}
+	return certifyUploadErrors, nil
+}
+
+func GetTestCertifyUploadErrorsStatusForUploadId(uploadId uint) ([]string, error) {
+	var statuses []string
+	var certifyUploadErrors []*TestCertifyUploadErrors
+	if result := db.Model(&TestCertifyUploadErrors{}).Select("status").Find(&certifyUploadErrors, "certify_upload_id = ?", uploadId); result.Error != nil {
+		log.Error("Error occurred while retrieving testCertifyUploadErrors for user ", uploadId)
+		return statuses, errors.New("error occurred while retrieving testCertifyUploadErrors")
+	}
+	for _, c := range certifyUploadErrors {
+		statuses = append(statuses, c.Status)
+	}
+
+	return statuses, nil
+}
+
 func UpdateTestCertifyUpload(data *TestCertifyUploads) error {
 	if result := db.Save(data); result.Error != nil {
-		log.Error("Error occurred while saving tcertifyUploads with ID - ", data.ID)
-		return errors.New("error occurred while saving certifyUploads")
+		log.Error("Error occurred while saving testCertifyUploads with ID - ", data.ID)
+		return errors.New("error occurred while saving testCertifyUploads")
 	}
 	return nil
 }

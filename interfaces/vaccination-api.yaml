@@ -451,6 +451,44 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+  /test/certify/uploads:
+    get:
+      tags:
+        - certification
+      summary: Get all file uploads for test certification for given facility admin
+      operationId: getTestCertifyUploads
+      security:
+        - hasRole: ['facility-admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /test/certify/uploads/{uploadId}/errors:
+    get:
+      tags:
+        - certification
+      summary: Get all the error rows associated with given uploadId
+      operationId: getTestCertifyUploadErrors
+      security:
+        - hasRole: ['facility-admin']
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: test certify upload for given uploadID not found
+        '403':
+          description: Forbidden for user
 definitions:
   LoginRequest:
     type: object
