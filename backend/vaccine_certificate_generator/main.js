@@ -9,7 +9,7 @@ const {Kafka} = require('kafkajs');
 const config = require('./config/config');
 const R = require('ramda');
 const {vaccinationContext} = require("vaccination-context");
-const signer = require('certificate-signer');
+const signer = require('certificate-signer-library');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);

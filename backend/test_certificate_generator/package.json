@@ -10,7 +10,7 @@
   "author": "",
   "license": "GPL",
   "dependencies": {
-    "certificate-signer": "file:../certificate_signer",
+    "certificate-signer-library": "file:../certificate_signer_library",
     "kafkajs": "^1.15.0",
     "ramda": "^0.27.1",
     "test-certificate-context": "^1.0.0"
