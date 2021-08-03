@@ -243,7 +243,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         const browser = await puppeteer.launch({
             headless: true,
             //comment to use default
-            executablePath: '/Applications/Chromium.app/Contents/MacOS/Chromium',
+            executablePath: '/usr/bin/chromium-browser',
             args: [
                 "--no-sandbox",
                 "--disable-gpu",

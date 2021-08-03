@@ -1,5 +1,5 @@
 
-IMAGE:=dockerhub/vaccine_certificate_generator
+IMAGE:=dockerhub/certificate_signer
 
 docker:
 	@cp config/keys.js.sample config/keys.js
