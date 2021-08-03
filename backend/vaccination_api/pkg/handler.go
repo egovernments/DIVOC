@@ -63,6 +63,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 	api.CertificationGetCertificateByCertificateIDHandler = certification.GetCertificateByCertificateIDHandlerFunc(getCertificateByCertificateId)
 	api.CertificationTestCertifyHandler = certification.TestCertifyHandlerFunc(testCertify)
+	api.CertificationTestBulkCertifyHandler = certification.TestBulkCertifyHandlerFunc(testBulkCertify)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -639,4 +640,45 @@ func getCertificateByCertificateId(params certification.GetCertificateByCertific
 	}
 
 	return NewGenericServerError()
+}
+
+func testBulkCertify(params certification.TestBulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	data := NewScanner(params.File)
+	if err := validateTestBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
+		log.Error("Invalid template", err.Error());
+		code := "INVALID_TEMPLATE"
+		message := err.Error()
+		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
+	}
+
+	// Initializing CertifyUpload entity
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	uploadEntry := db.TestCertifyUploads{}
+	uploadEntry.Filename = fileName
+	uploadEntry.UserID = preferredUsername
+	uploadEntry.TotalRecords = 0
+	if err := db.CreateTestCertifyUpload(&uploadEntry); err != nil {
+		code := "DATABASE_ERROR"
+		message := err.Error()
+		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
+	}
+
+	// Creating Certificates
+	for data.Scan() {
+		createTestCertificate(&data, &uploadEntry)
+		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
+	}
+	defer params.File.Close()
+
+	db.UpdateTestCertifyUpload(&uploadEntry)
+
+	return certification.NewBulkCertifyOK()
 }

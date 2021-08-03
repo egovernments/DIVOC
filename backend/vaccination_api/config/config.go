@@ -75,6 +75,12 @@ var Config = struct {
 		}
 		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"100"`
 	}
+	Testcertificate struct {
+		Upload struct {
+			Columns        string `yaml:"columns"`
+			RequiredFields string `yaml:"required_fields"`
+		}
+	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`
 	}

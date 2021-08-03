@@ -152,7 +152,7 @@ function transformW3(cert, certificateId) {
           "district": R.pathOr('', ['facility', 'address', 'district'], cert),
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
-          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "addressCountry": R.pathOr('IND', ['facility', 'address', 'country'], cert),
           "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
       }

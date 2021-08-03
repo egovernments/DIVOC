@@ -593,6 +593,48 @@ func init() {
         }
       }
     },
+    "/test/bulkCertify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload test certification csv for bulk ingestion",
+        "operationId": "testBulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/test/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization.",
@@ -1837,6 +1879,48 @@ func init() {
             "schema": {
               "type": "object"
             }
+          }
+        }
+      }
+    },
+    "/test/bulkCertify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload test certification csv for bulk ingestion",
+        "operationId": "testBulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

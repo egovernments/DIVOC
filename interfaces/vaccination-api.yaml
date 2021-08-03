@@ -426,6 +426,31 @@ paths:
           description: Invalid input
           schema:
             $ref: '#/definitions/Error'
+  /test/bulkCertify:
+    post:
+      tags:
+        - certification
+      summary: Upload test certification csv for bulk ingestion
+      description: certify all the data in uploaded csv
+      operationId: testBulkCertify
+      security:
+        - hasRole: ['facility-admin']
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Certification data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
 definitions:
   LoginRequest:
     type: object
