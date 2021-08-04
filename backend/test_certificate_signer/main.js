@@ -8,7 +8,7 @@ const {
 const {Kafka} = require('kafkajs');
 const config = require('./config/config');
 const R = require('ramda');
-const {vaccinationContext} = require("vaccination-context");
+const {testCertificateContext} = require("test-certificate-context");
 const signer = require('certificate-signer-library');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
@@ -20,7 +20,7 @@ const kafka = new Kafka({
   brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
 });
 
-const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
+const consumer = kafka.consumer({ groupId: 'test_certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
 let signingConfig = {
@@ -49,12 +49,12 @@ let signingConfig = {
   ERROR_CERTIFICATE_TOPIC: config.ERROR_CERTIFICATE_TOPIC,
   CERTIFICATE_RETRY_COUNT: config.CERTIFICATE_RETRY_COUNT,
   DUPLICATE_CERTIFICATE_TOPIC: config.DUPLICATE_CERTIFICATE_TOPIC,
-  CERTIFICATE_ACK_TOPIC: config.CERTIFICATE_ACK_TOPIC,
+  CERTIFICATE_ACK_TOPIC: config.CERTIFICATE_ACK_TOPIC
 
 };
 
 const documentLoader = {};
-documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
+documentLoader[CERTIFICATE_NAMESPACE] = testCertificateContext;
 
 (async function() {
   await consumer.connect();
@@ -75,12 +75,11 @@ documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
       try {
         jsonMessage = JSON.parse(message.value.toString());
         const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
-        const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
-        const programId = R.pathOr("", ["programId"], jsonMessage);
-        if (preEnrollmentCode === "" || currentDose === "" || programId === "") {
+        const sampleCollectionTimestamp = R.pathOr("", ['testDetails', 'sampleCollectionTimestamp'], jsonMessage);
+        if (preEnrollmentCode === "" || sampleCollectionTimestamp === "") {
           throw Error("Required parameters not available")
         }
-        const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
+        const key = `${preEnrollmentCode}-${sampleCollectionTimestamp}`;
         await signer.signCertificate(jsonMessage, message.headers, key);
       } catch (e) {
         // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
@@ -99,27 +98,20 @@ documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
   })
 })();
 
-function ageOfRecipient(recipient) {
-  if (recipient.age) return recipient.age;
-  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return "" + (Math.floor((new Date() - new Date(recipient.dob))/1000/60/60/24.0/365.25));
-  return "";
-}
-
 function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       CERTIFICATE_NAMESPACE,
     ],
-    type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
+    type: ['VerifiableCredential', 'ProofOfTestCertificateCredential'],
     credentialSubject: {
       type: "Person",
       id: R.pathOr('', ['recipient', 'identity'], cert),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
-      age: ageOfRecipient(cert.recipient), //from dob
+      dob: R.pathOr('', ['recipient', 'dob'], cert),
       nationality: R.pathOr('', ['recipient', 'nationality'], cert),
       address: {
         "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),
@@ -138,17 +130,18 @@ function transformW3(cert, certificateId) {
       "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId,
       "infoUrl": CERTIFICATE_INFO_BASE_URL + certificateId,
       "certificateId": certificateId,
-      "type": ["Vaccination"],
-      "batch": R.pathOr('', ['vaccination', 'batch'], cert),
-      "vaccine": R.pathOr('', ['vaccination', 'name'], cert),
-      "manufacturer": R.pathOr('', ['vaccination', 'manufacturer'], cert),
-      "date": R.pathOr('', ['vaccination', 'date'], cert),
-      "effectiveStart": R.pathOr('', ['vaccination', 'effectiveStart'], cert),
-      "effectiveUntil": R.pathOr('', ['vaccination', 'effectiveUntil'], cert),
-      "dose": R.pathOr('', ['vaccination', 'dose'], cert),
-      "totalDoses": R.pathOr('', ['vaccination', 'totalDoses'], cert),
+      "type": ["TestDetails"],
+      "batch": R.pathOr('', ['testDetails', 'batch'], cert),
+      "testName": R.pathOr('', ['testDetails', 'testName'], cert),
+      "testType": R.pathOr('', ['testDetails', 'testType'], cert),
+      "manufacturer": R.pathOr('', ['testDetails', 'manufacturer'], cert),
+      "disease": R.pathOr('', ['testDetails', 'disease'], cert),
+      "sampleOrigin": R.pathOr('', ['testDetails', 'sampleOrigin'], cert),
+      "sampleCollectionTimestamp": R.pathOr('', ['testDetails', 'sampleCollectionTimestamp'], cert),
+      "resultTimestamp": R.pathOr('', ['testDetails', 'resultTimestamp'], cert),
+      "result": R.pathOr('', ['testDetails', 'result'], cert),
       "verifier": {
-        "name": R.pathOr('', ['vaccinator', 'name'], cert),
+        "name": R.pathOr('', ['verifier', 'name'], cert),
       },
       "facility": {
         // "id": CERTIFICATE_BASE_URL + cert.facility.id,
@@ -159,7 +152,7 @@ function transformW3(cert, certificateId) {
           "district": R.pathOr('', ['facility', 'address', 'district'], cert),
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
-          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "addressCountry": R.pathOr('IND', ['facility', 'address', 'country'], cert),
           "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
       }
