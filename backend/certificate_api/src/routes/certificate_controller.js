@@ -241,8 +241,8 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             recipientAddress: formatRecipientAddress(credentialSubject.address),
             disease: evidence[0].disease,
             testType: evidence[0].testType,
-            sampleDate: formatDateTime(evidence[0].sampleCollectionTimestamp, true),
-            resultDate: formatDateTime(evidence[0].resultTimestamp, true),
+            sampleDate: formatDateTime(evidence[0].sampleCollectionTimestamp),
+            resultDate: formatDateTime(evidence[0].resultTimestamp),
             result: evidence[0].result,
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
