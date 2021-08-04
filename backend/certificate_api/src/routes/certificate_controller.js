@@ -86,10 +86,20 @@ function formatDate(givenDate) {
     let day = dob.getDate();
     let monthName = monthNames[dob.getMonth()];
     let year = dob.getFullYear();
+
+    return `${padDigit(day)}-${monthName}-${year}`;
+}
+
+function formatDateTime(givenDateTime) {
+    const dob = new Date(givenDateTime);
+    let day = dob.getDate();
+    let monthName = monthNames[dob.getMonth()];
+    let year = dob.getFullYear();
     let hour = dob.getHours();
     let minutes = dob.getMinutes();
 
     return `${padDigit(day)}-${monthName}-${year} ${hour}:${minutes}`;
+
 }
 
 function padDigit(digit, totalDigits = 2) {
@@ -225,14 +235,14 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         const {certificate: {credentialSubject, evidence}} = certificateRaw;
         const certificateData = {
             name: credentialSubject.name,
-            dob: credentialSubject.dob,
+            dob: formatDate(credentialSubject.dob),
             gender: credentialSubject.gender,
             identity: formatId(credentialSubject.id),
             recipientAddress: formatRecipientAddress(credentialSubject.address),
             disease: evidence[0].disease,
             testType: evidence[0].testType,
-            sampleDate: formatDate(evidence[0].sampleCollectionTimestamp),
-            resultDate: formatDate(evidence[0].resultTimestamp),
+            sampleDate: formatDateTime(evidence[0].sampleCollectionTimestamp),
+            resultDate: formatDateTime(evidence[0].resultTimestamp),
             result: evidence[0].result,
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
