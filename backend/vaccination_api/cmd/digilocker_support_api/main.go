@@ -130,7 +130,7 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 			certificate.CredentialSubject.RefId,
 			formatRecipientAddress(certificate),
 			certificate.Evidence[0].Vaccine,
-			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+			formatDateWithBatchNumber(certificate.Evidence[0].Date, certificate.Evidence[0].Batch),
 			getVaccineValidDays(certificate.Evidence[0].EffectiveStart, certificate.Evidence[0].EffectiveUntil),
 			certificate.Evidence[0].Verifier.Name,
 			formatFacilityAddress(certificate),
@@ -143,7 +143,7 @@ func showLabelsAsPerTemplate(certificate models.Certificate) []string {
 		certificate.CredentialSubject.RefId,
 		formatRecipientAddress(certificate),
 		certificate.Evidence[0].Vaccine,
-		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+		formatDateWithBatchNumber(certificate.Evidence[0].Date, certificate.Evidence[0].Batch),
 		certificate.Evidence[0].Verifier.Name,
 		formatFacilityAddress(certificate),
 	}
@@ -157,7 +157,7 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalDoseDa
 			certificate.CredentialSubject.Uhid,
 			certificate.CredentialSubject.RefId,
 			strings.ToUpper(certificate.Evidence[0].Vaccine),
-			formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+			formatDateWithBatchNumber(certificate.Evidence[0].Date, certificate.Evidence[0].Batch),
 			certificate.GetNextDueDateInfo(),
 			certificate.Evidence[0].Verifier.Name,
 			concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
@@ -174,12 +174,19 @@ func showLabelsAsPerTemplateV2(certificate models.Certificate, provisionalDoseDa
 		certificate.CredentialSubject.RefId,
 		strings.ToUpper(certificate.Evidence[0].Vaccine),
 		provisionalDoseDate,
-		formatDate(certificate.Evidence[0].Date) + " (Batch no. " + certificate.Evidence[0].Batch + ")",
+		formatDateWithBatchNumber(certificate.Evidence[0].Date, certificate.Evidence[0].Batch),
 		certificate.Evidence[0].Verifier.Name,
 		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
 			certificate.Evidence[0].Facility.Address.District),
 			certificate.Evidence[0].Facility.Address.AddressRegion),
 	}
+}
+
+func formatDateWithBatchNumber(date time.Time, batch string) string {
+	if len(batch) != 0 {
+		return formatDate(date) + " (Batch no. " + batch + ")"
+	}
+	return formatDate(date)
 }
 
 func isFinal(certificate models.Certificate) bool {
@@ -261,7 +268,7 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 			log.Error("Unable to parse certificate string", err)
 			return nil, err
 		} else {
-			provisionalDoseDate = formatDate(provisionalCertificate.Evidence[0].Date) + " (Batch no. " + provisionalCertificate.Evidence[0].Batch + ")"
+			provisionalDoseDate = formatDateWithBatchNumber(provisionalCertificate.Evidence[0].Date, provisionalCertificate.Evidence[0].Batch)
 		}
 	}
 	displayLabels := showLabelsAsPerTemplateV2(certificate, provisionalDoseDate)
