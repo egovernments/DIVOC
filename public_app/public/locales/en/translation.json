@@ -1,5 +1,48 @@
 {
   "home": {
-    "title": "Register for vaccination program"
+    "registrationTitle": "Register for vaccination program",
+    "registrationSubTitle": "Enter your mobile number and book an appointment at your nearest facility center",
+    "registrationInfo": "An OTP will be sent to you for verification",
+    "mobPlaceholder": "Enter mobile number",
+    "login": "Log In",
+    "infoCard": [
+      {
+        "title": "Enter Mobile",
+        "subTitle": "Verify your mobile number"
+      },
+      {
+        "title": "Verify ID Details",
+        "subTitle": "Add Beneficiaries"
+      },
+      {
+        "title": "Add Beneficiaries",
+        "subTitle": "Get enrollment number"
+      },
+      {
+        "title": "Book Appointment or Walkin",
+        "subTitle": "Search for the nearest facility center"
+      }
+    ],
+    "homeCard": [
+      {
+        "title": "Download your Vaccination Certificate",
+        "subTitle": "You would need your unique id and Mobile number to verify OTP in order to access your digital certificate.",
+        "button": "Download"
+      },
+      {
+        "title": "Verify your Vaccination Certificate",
+        "subTitle": "Ensure that your vaccination certificate is a authentic by digitally verifying it here.",
+        "button": "Verify"
+      },
+      {
+        "title": "Report symptoms",
+        "subTitle": "By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.",
+        "button": "Report Side-effects"
+      }
+    ],
+    "onGoingProgramTitle": "Ongoing Vaccination Programs"
+  },
+  "errors": {
+    "invalidMobileNumber": "* Invalid mobile number"
   }
 }
