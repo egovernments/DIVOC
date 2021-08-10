@@ -196,8 +196,8 @@ func Test_showLabelsAsPerTemplateV2(t *testing.T) {
 	_ = json.Unmarshal([]byte(certificateText3), &provisionalCertificateWithoutUHID)
 
 	type args struct {
-		certificate            models.Certificate
-		provisionalCertificate *models.Certificate
+		certificate                models.Certificate
+		provisionalCertificateDate string
 	}
 	tests := []struct {
 		name string
@@ -207,8 +207,8 @@ func Test_showLabelsAsPerTemplateV2(t *testing.T) {
 		{
 			"Data to show for Provisional cert",
 			args{
-				certificate:            provisionalCertificate,
-				provisionalCertificate: &provisionalCertificate1,
+				certificate:                provisionalCertificate,
+				provisionalCertificateDate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -227,8 +227,8 @@ func Test_showLabelsAsPerTemplateV2(t *testing.T) {
 		{
 			"Data to show for Final cert",
 			args{
-				certificate:            finalCertificate,
-				provisionalCertificate: &provisionalCertificate1,
+				certificate:                finalCertificate,
+				provisionalCertificateDate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -247,8 +247,8 @@ func Test_showLabelsAsPerTemplateV2(t *testing.T) {
 		{
 			"Data to show for Final cert",
 			args{
-				certificate:            finalCertificate,
-				provisionalCertificate: nil,
+				certificate:                finalCertificate,
+				provisionalCertificateDate: "",
 			},
 			[]string{
 				"Master Radon",
@@ -286,7 +286,7 @@ func Test_showLabelsAsPerTemplateV2(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := showLabelsAsPerTemplateV2(tt.args.certificate, tt.args.provisionalCertificate); !reflect.DeepEqual(got, tt.want) {
+			if got := showLabelsAsPerTemplateV2(tt.args.certificate, tt.args.provisionalCertificateDate); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("showLabelsAsPerTemplateV2() = %v, want %v", got, tt.want)
 			}
 		})
@@ -314,9 +314,17 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 	var provisionalCertificateWithRationCardId models.Certificate
 	_ = json.Unmarshal([]byte(certificateText4), &provisionalCertificateWithRationCardId)
 
+	provisionalCertificateTextWithoutBatch := "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:600893441710\",\"refId\":\"1112\",\"name\":\"Master Radon\",\"uhid\":\"12345\",\"gender\":\"Male\",\"age\":\"21\",\"nationality\":\"India\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":999000}},\"issuer\":\"https://cowin.gov.in/\",\"issuanceDate\":\"2021-04-07T05:27:34.319Z\",\"evidence\":[{\"id\":\"https://cowin.gov.in/vaccine/32630784022\",\"feedbackUrl\":\"https://cowin.gov.in/?32630784022\",\"infoUrl\":\"https://cowin.gov.in/?32630784022\",\"certificateId\":\"32630784022\",\"type\":[\"Vaccination\"],\"batch\":\"\",\"vaccine\":\"Covaxin\",\"manufacturer\":\"Stark Industries\",\"date\":\"2021-03-30T10:06:02.705Z\",\"effectiveStart\":\"2021-03-30\",\"effectiveUntil\":\"2021-07-08\",\"dose\":1,\"totalDoses\":2,\"verifier\":{\"name\":\"Dr Dhronar\"},\"facility\":{\"name\":\"Madras\",\"address\":{\"streetAddress\":\"Ramachandra multi facility hospital\",\"streetAddress2\":\"Katankulathur, Guduvancherry\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":555000}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-04-07T05:27:34Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EeZPl0x63T7Hc1GmR6NpqGgnNg0wOOmtXq8jLsvs1jSCiO0EH6qpHMNnJ7wbtVzfWlAOGI6JLdx0ZTEFmUf4uYiyGLyyzh7T6QwMs4GT53BRg1eWsWui_wcc5yUdh6Ok00zq-Fv4jHDTeZBKbfPIx8B1MnGZ-SepFlpZxV_Cwh_Tf7aBpaJjscSkJ-BMWOKYlWo_Zf3pJ_lCI6_sWKnyKVmyxwY-oyxoUNyjqyXswoZqVMvHykjo8A7zGaAEP6pwn_her5EFywDJIT1BbMbjnhaHJTraTTSWWBa4yw5yC3B62OKHXt0Qn5maamswOeXobNmbo7Dufxpj1VysuUbu5Q\"}}"
+	var provisionalCertificateWithoutBatch models.Certificate
+	_ = json.Unmarshal([]byte(provisionalCertificateTextWithoutBatch), &provisionalCertificateWithoutBatch)
+
+	certificateText5 := "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.disabilityId:600893441710\",\"refId\":\"1112\",\"name\":\"Master Radon\",\"uhid\":\"12345\",\"gender\":\"Male\",\"age\":\"21\",\"nationality\":\"India\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":999000}},\"issuer\":\"https://cowin.gov.in/\",\"issuanceDate\":\"2021-04-07T05:27:34.319Z\",\"evidence\":[{\"id\":\"https://cowin.gov.in/vaccine/32630784022\",\"feedbackUrl\":\"https://cowin.gov.in/?32630784022\",\"infoUrl\":\"https://cowin.gov.in/?32630784022\",\"certificateId\":\"32630784022\",\"type\":[\"Vaccination\"],\"batch\":\"\",\"vaccine\":\"Covaxin\",\"manufacturer\":\"Stark Industries\",\"date\":\"2021-03-30T10:06:02.705Z\",\"effectiveStart\":\"2021-03-30\",\"effectiveUntil\":\"2021-07-08\",\"dose\":2,\"totalDoses\":2,\"verifier\":{\"name\":\"Dr Dhronar\"},\"facility\":{\"name\":\"Madras\",\"address\":{\"streetAddress\":\"Ramachandra multi facility hospital\",\"streetAddress2\":\"Katankulathur, Guduvancherry\",\"district\":\"Chennai\",\"city\":\"\",\"addressRegion\":\"Tamil Nadu\",\"addressCountry\":\"IN\",\"postalCode\":555000}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-04-07T05:27:34Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EeZPl0x63T7Hc1GmR6NpqGgnNg0wOOmtXq8jLsvs1jSCiO0EH6qpHMNnJ7wbtVzfWlAOGI6JLdx0ZTEFmUf4uYiyGLyyzh7T6QwMs4GT53BRg1eWsWui_wcc5yUdh6Ok00zq-Fv4jHDTeZBKbfPIx8B1MnGZ-SepFlpZxV_Cwh_Tf7aBpaJjscSkJ-BMWOKYlWo_Zf3pJ_lCI6_sWKnyKVmyxwY-oyxoUNyjqyXswoZqVMvHykjo8A7zGaAEP6pwn_her5EFywDJIT1BbMbjnhaHJTraTTSWWBa4yw5yC3B62OKHXt0Qn5maamswOeXobNmbo7Dufxpj1VysuUbu5Q\"}}"
+	var finalCertificateWithoutBatch models.Certificate
+	_ = json.Unmarshal([]byte(certificateText5), &finalCertificateWithoutBatch)
+
 	type args struct {
 		certificate            models.Certificate
-		provisionalCertificate *models.Certificate
+		provisionalCertificate string
 	}
 	tests := []struct {
 		name string
@@ -327,7 +335,7 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 			"Should populate identity if NPR Smart Card number is present ",
 			args{
 				certificate: provisionalCertificateWithNprId,
-				provisionalCertificate: &provisionalCertificate1,
+				provisionalCertificate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -347,7 +355,7 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 			"Should populate identity if unique disability number is present ",
 			args{
 				certificate: finalCertificateWithDisabilityId,
-				provisionalCertificate: &provisionalCertificate1,
+				provisionalCertificate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -367,7 +375,7 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 			"Should populate identity if service identity card is present",
 			args{
 				certificate: provisionalCertificateWithServiceIdentityCardId,
-				provisionalCertificate: &provisionalCertificate1,
+				provisionalCertificate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -387,7 +395,7 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 			"Should populate identity if ration card is present",
 			args{
 				certificate: provisionalCertificateWithRationCardId,
-				provisionalCertificate: &provisionalCertificate1,
+				provisionalCertificate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, provisionalCertificate1.Evidence[0].Batch),
 			},
 			[]string{
 				"Master Radon",
@@ -399,6 +407,26 @@ func Test_showIdLabelsAsPerTemplateV2(t *testing.T) {
 				"COVAXIN",
 				"30 Mar 2021 (Batch no. 10)",
 				"Between 27 Apr 2021 and 11 May 2021",
+				"Dr Dhronar",
+				"Madras, Chennai, Tamil Nadu",
+			},
+		},
+		{
+			"Should populate date without batch if batch is empty ",
+			args{
+				certificate: finalCertificateWithoutBatch,
+				provisionalCertificate: formatDateWithBatchNumber(provisionalCertificate1.Evidence[0].Date, ""),
+			},
+			[]string{
+				"Master Radon",
+				"21",
+				"Male",
+				"Unique Disability # 600893441710",
+				"12345",
+				"1112",
+				"COVAXIN",
+				"30 Mar 2021",
+				"30 Mar 2021",
 				"Dr Dhronar",
 				"Madras, Chennai, Tamil Nadu",
 			},
