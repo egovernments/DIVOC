@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
+	"strings"
 )
 
 type TestCertifyUploads struct {
@@ -141,4 +142,24 @@ func UpdateTestCertifyUpload(data *TestCertifyUploads) error {
 		return errors.New("error occurred while saving testCertifyUploads")
 	}
 	return nil
+}
+
+func DeleteTestCertifyUploadError(id uint) error {
+	if result := db.Unscoped().Delete(&TestCertifyUploadErrors{}, id); result.Error != nil {
+		log.Error("Error occurred while deleting CertifyUploadErrors with id ", id, result.Error)
+		return errors.New("error occurred while deleting certifyUploadErrors")
+	}
+	log.Info("Deleted certifyUploadError for ID - ", id)
+	return nil
+}
+
+func UpdateTestCertifyUploadErrorStatusAndErrorMsg(id uint, status string, errorMsg string) error {
+	certifyUploadErrors := &TestCertifyUploadErrors{}
+	if result := db.First(&certifyUploadErrors, id); result.Error != nil {
+		log.Error("Error occurred while retrieving certifyUploads for user ", id, result.Error)
+		return errors.New("error occurred while retrieving certifyUploads")
+	}
+	certifyUploadErrors.Status = status
+	certifyUploadErrors.Errors = strings.Join([]string{certifyUploadErrors.Errors, errorMsg}, ",")
+	return UpdateTestCertifyUploadError(certifyUploadErrors)
 }
