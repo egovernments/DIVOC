@@ -42,7 +42,17 @@
     ],
     "onGoingProgramTitle": "Ongoing Vaccination Programs"
   },
+  "login": {
+    "title": "Registration and Appointment Portal",
+    "subTitle": "Get started by entering your mobile number",
+    "mobPlaceholder": "Mobile number",
+    "otpPlaceholder": "OTP",
+    "otpButton": "Get OTP ",
+    "verifyButton": "Verify ",
+    "backButton": "Back"
+  },
   "errors": {
-    "invalidMobileNumber": "* Invalid mobile number"
+    "invalidMobileNumber": "* Invalid mobile number",
+    "invalidOTP": "* Invalid OTP"
   }
 }
