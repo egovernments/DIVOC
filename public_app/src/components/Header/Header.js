@@ -8,6 +8,7 @@ import {getUserNumberFromRecipientToken} from "../../utils/reciepientAuth";
 import {removeCookie, setCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 import {useTranslation} from "react-i18next";
+import {NavDropdown} from "react-bootstrap";
 
 function Header() {
     const {initialized, keycloak} = useKeycloak();
@@ -49,19 +50,19 @@ function Header() {
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
+                <NavDropdown title={lngs[i18n.language].nativeName} id="basic-nav-dropdown">
+                    {Object.keys(lngs).map((lng) => (
+                      <NavDropdown.Item key={lng} onClick={() => i18n.changeLanguage(lng)}>
+                          {lngs[lng].nativeName}
+                      </NavDropdown.Item>
+                    ))}
+                </NavDropdown>
                 <Nav className="">
                     {/*<Nav.Link href="/">HOME</Nav.Link>*/}
                     {/*<NavDropdown title="ENG" id="basic-nav-dropdown">*/}
                     {/*    <NavDropdown.Item href="#action/3.1">ENG</NavDropdown.Item>*/}
                     {/*</NavDropdown>*/}
                     {(keycloak.authenticated || reciepientUser) && <Nav.Link onClick={onLogoutClicked}>LOGOUT</Nav.Link>}
-                </Nav>
-                <Nav>
-                    {Object.keys(lngs).map((lng) => (
-                        <button key={lng} style={{ fontWeight: i18n.language === lng ? 'bold' : 'normal' }} type="submit" onClick={() => i18n.changeLanguage(lng)}>
-                            {lngs[lng].nativeName}
-                        </button>
-                    ))}
                 </Nav>
             </Navbar.Collapse>
         </Navbar>
