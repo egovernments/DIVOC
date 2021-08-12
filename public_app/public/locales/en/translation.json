@@ -51,8 +51,105 @@
     "verifyButton": "Verify ",
     "backButton": "Back"
   },
+  "button": {
+    "continue": "Continue",
+    "ok": "Ok",
+    "back": "Back",
+    "confirm": "Confirm",
+    "yesDelete": "Yes, Delete"
+  },
+  "common": {
+    "select": "Select",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "registration": {
+    "title": "Registered Beneficiaries",
+    "titleSpan": "You can add upto 4 members",
+    "emptyMembers": "No members have enrolled yet.",
+    "delete": "delete",
+    "bookAppointment": "book appointment",
+    "cancelAppointment": "cancel appointment",
+    "deleteRegistration": "Delete Registration",
+    "programDeleteForBeneficiaryInfo": "'{{program}}' program registration will be deleted for {{beneficiaryName}}",
+    "downloadCertificate": "Download Certificate",
+    "newProgram": "New Program",
+    "selectProgram": {
+      "title": "Please select vaccination program"
+    },
+    "checkEligibility": {
+      "title": "Check beneficiary's eligibility for {{program}}",
+      "yobTitle": "Enter beneficiary's year of birth",
+      "yob": "Year of birth",
+      "comorbiditiesTitle": "Does the beneficiary have any of the following comorbidities?",
+      "comorbiditiesSelectInfo": "If yes, please select (all) applicable comorbidities"
+    },
+    "formDetails": {
+      "verifyBeneficiaryTitle": "Verify beneficiary details",
+      "addBeneficiaryTitle": "Add details to register beneficiary",
+      "idDetails": "ID details",
+      "idTypeLabel": "ID Type",
+      "selectIdType": "Select ID Type",
+      "idNumberLabel": "ID Number",
+      "idNumberPlaceholder": "Enter ID Number",
+      "nameLabel": "Name  (As per ID card)",
+      "namePlaceholder": "Enter Name",
+      "ageLabel": "Age",
+      "genderLabel": "Gender",
+      "genderPlaceholder": "Select Gender",
+      "residenceDetails": "Residence Details",
+      "stateLabel": "State",
+      "statePlaceholder": "Select State",
+      "districtLabel": "District",
+      "districtPlaceholder": "Select District",
+      "nationalityLabel": "Nationality",
+      "nationalityPlaceholder": "Select Nationality",
+      "localityLabel": "Locality",
+      "localityPlaceholder": "Enter your locality",
+      "pincodeLabel": "Pin code",
+      "pincodePlaceholder": "Enter your pin code",
+      "contactInfoTitle": "Contact information for vaccination certificate",
+      "mobileLabel": "Mobile",
+      "emailLabel": "Beneficiary Email ID",
+      "emailPlaceholder": "Enter Email ID",
+      "verifyEmailLabel": "Verify Beneficiary Email ID",
+      "confirmEmailPlaceholder": "Confirm Email ID"
+    },
+    "success": {
+      "title": "Successfully registered for {{program}}",
+      "enrollmentDetails": "Enrolment details will be sent to",
+      "vaccinationInfo": "On the day of vaccination, please carry your original {{identity}} for verification"
+    },
+    "beneficiaryName": "Beneficiary Name"
+  },
+  "entity": {
+    "program": "program",
+    "enrollmentNumber": "Enrolment number",
+    "registration": "Registered",
+    "scheduled": "scheduled",
+    "dose": "dose",
+    "vaccinated": "vaccinated"
+  },
   "errors": {
     "invalidMobileNumber": "* Invalid mobile number",
-    "invalidOTP": "* Invalid OTP"
+    "invalidOTP": "* Invalid OTP",
+    "selectComorbidity": "* Please select at least one comorbidity",
+    "selectYob": "Please select year of birth",
+    "invalidBeneficiary": "Sorry, the beneficiary is currently not eligible to register for the {{program}} program",
+    "nationalIdTypeErr": "* ID Type is require",
+    "nationalIdNumberErr": "* ID Number is required",
+    "aadhaarErr": "* Invalid Aadhaar number",
+    "duplicateNationalIdErr": "* Beneficiary with this ID already exists",
+    "beneficiaryNameRequired": "* Beneficiary Name is required",
+    "nameMinLength": "* Name should have at least 1 characters",
+    "nameMaxLength": "* Name should have maximum 99 characters",
+    "nameAlphabetOnly": "* Beneficiary Name should have only alphabets",
+    "nameDuplicate": "* Beneficiary with same Name and Age already exists",
+    "stateRequired": "* State is required",
+    "districtRequired": "* District is required",
+    "nationalityRequired": "* Nationality is required",
+    "pincodeInvalid": "* Invalid pin code",
+    "genderRequired": "* Gender is required",
+    "emailMismatch": "* Email ID is not matching"
   }
 }
