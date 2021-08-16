@@ -402,6 +402,93 @@ paths:
           description: certificate not found in revocation list
         '400':
           description: Invalid input
+  /test/certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        authorization.
+      operationId: testCertify
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TestCertificationRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+  /test/bulkCertify:
+    post:
+      tags:
+        - certification
+      summary: Upload test certification csv for bulk ingestion
+      description: certify all the data in uploaded csv
+      operationId: testBulkCertify
+      security:
+        - hasRole: ['facility-admin']
+      consumes:
+        - multipart/form-data
+      parameters:
+        - in: formData
+          name: file
+          type: file
+          description: Certification data in the form of csv
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+  /test/certify/uploads:
+    get:
+      tags:
+        - certification
+      summary: Get all file uploads for test certification for given facility admin
+      operationId: getTestCertifyUploads
+      security:
+        - hasRole: ['facility-admin']
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: array
+            items:
+              type: object
+  /test/certify/uploads/{uploadId}/errors:
+    get:
+      tags:
+        - certification
+      summary: Get all the error rows associated with given uploadId
+      operationId: getTestCertifyUploadErrors
+      security:
+        - hasRole: ['facility-admin']
+      parameters:
+        - name: uploadId
+          in: path
+          required: true
+          type: integer
+          description: Id of uploaded csv file
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '404':
+          description: test certify upload for given uploadID not found
+        '403':
+          description: Forbidden for user
 definitions:
   LoginRequest:
     type: object
@@ -572,6 +659,139 @@ definitions:
       - recipient
       - vaccination
       - vaccinator
+      - facility
+  TestCertificationRequest:
+    type: object
+    properties:
+      preEnrollmentCode:
+        type: string
+      programId:
+        type: string
+        minLength: 1
+      recipient:
+        type: object
+        properties:
+          name:
+            type: string
+            minLength: 1
+          dob:
+            type: string
+            format: date
+            x-nullable: true
+          gender:
+            type: string
+            minLength: 1
+          nationality:
+            type: string
+            minLength: 1
+          identity:
+            type: string
+            minLength: 1
+          contact:
+            type: array
+            items:
+              type: string
+              minLength: 1
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+                minLength: 1
+              state:
+                type: string
+                minLength: 1
+              pincode:
+                type: string
+            required:
+              - addressLine1
+              - district
+              - state
+              - pincode
+        required:
+          - name
+          - gender
+          - dob
+          - identity
+          - contact
+      testDetails:
+        type: object
+        properties:
+          testName:
+            type: string
+          testType:
+            type: string
+          disease:
+            type: string
+          batch:
+            type: string
+          manufacturer:
+            type: string
+          sampleOrigin:
+            type: string
+          sampleCollectionTimestamp:
+            type: string
+            format: date-time
+          resultTimestamp:
+            type: string
+            format: date-time
+          result:
+            type: string
+            enum: ["Positive", "Negative", "Inconclusive", "Void"]
+        required:
+          - testType
+          - disease
+          - sampleCollectionTimestamp
+          - resultTimestamp
+          - result
+      verifier:
+        type: object
+        properties:
+          name:
+            type: string
+            minLength: 1
+        required:
+          - name
+      facility:
+        type: object
+        properties:
+          name:
+            type: string
+            minLength: 1
+          address:
+            type: object
+            properties:
+              addressLine1:
+                type: string
+              addressLine2:
+                type: string
+              district:
+                type: string
+                minLength: 1
+              state:
+                type: string
+                minLength: 1
+              pincode:
+                type: string
+                minLength: 1
+            required:
+              - addressLine1
+              - district
+              - state
+              - pincode
+        required:
+          - name
+          - address
+      meta:
+        type: object
+    required:
+      - preEnrollmentCode
+      - recipient
+      - testDetails
       - facility
   Program:
     type: object

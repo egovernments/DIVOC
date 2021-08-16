@@ -90,6 +90,18 @@ function formatDate(givenDate) {
     return `${padDigit(day)}-${monthName}-${year}`;
 }
 
+function formatDateTime(givenDateTime) {
+    const dob = new Date(givenDateTime);
+    let day = dob.getDate();
+    let monthName = monthNames[dob.getMonth()];
+    let year = dob.getFullYear();
+    let hour = dob.getHours();
+    let minutes = dob.getMinutes();
+
+    return `${padDigit(day)}-${monthName}-${year} ${hour}:${minutes}`;
+
+}
+
 function padDigit(digit, totalDigits = 2) {
     return String(digit).padStart(totalDigits, '0')
 }
@@ -196,6 +208,90 @@ async function createCertificatePDF(certificateResp, res, source) {
     return res;
 }
 
+async function createTestCertificatePDF(certificateResp, res, source) {
+    if (certificateResp.length > 0) {
+        certificateResp = certificateResp.sort(function(a,b){
+            if (a.osUpdatedAt < b.osUpdatedAt) {
+                return 1;
+            }
+            if (a.osUpdatedAt > b.osUpdatedAt) {
+                return -1;
+            }
+            return 0;
+        }).reverse();
+        let certificateRaw = certificateResp[certificateResp.length - 1];
+        const zip = new JSZip();
+        zip.file("certificate.json", certificateRaw.certificate, {
+            compression: "DEFLATE"
+        });
+        const zippedData = await zip.generateAsync({type: "string", compression: "DEFLATE"})
+          .then(function (content) {
+              // console.log(content)
+              return content;
+          });
+
+        const dataURL = await QRCode.toDataURL(zippedData, {scale: 2});
+        certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
+        const {certificate: {credentialSubject, evidence}} = certificateRaw;
+        const certificateData = {
+            name: credentialSubject.name,
+            dob: formatDate(credentialSubject.dob),
+            gender: credentialSubject.gender,
+            identity: formatId(credentialSubject.id),
+            recipientAddress: formatRecipientAddress(credentialSubject.address),
+            disease: evidence[0].disease,
+            testType: evidence[0].testType,
+            sampleDate: formatDateTime(evidence[0].sampleCollectionTimestamp),
+            resultDate: formatDateTime(evidence[0].resultTimestamp),
+            result: evidence[0].result,
+            qrCode: dataURL,
+            country: evidence[0].facility.address.addressCountry
+        };
+        const htmlData = fs.readFileSync(`${__dirname}/../../configs/templates/test_certificate_template.html`, 'utf8');
+        const template = Handlebars.compile(htmlData);
+        let certificate = template(certificateData);
+        const browser = await puppeteer.launch({
+            headless: true,
+            //comment to use default
+            executablePath: '/usr/bin/chromium-browser',
+            args: [
+                "--no-sandbox",
+                "--disable-gpu",
+            ]
+        });
+        const page = await browser.newPage();
+        await page.evaluateHandle('document.fonts.ready');
+        await page.setContent(certificate, {
+            waitUntil: 'domcontentloaded'
+        });
+        const pdfBuffer = await page.pdf({
+            format: 'A4'
+        });
+
+        // close the browser
+        await browser.close();
+        res.statusCode = 200;
+        sendEvents({
+            date: new Date(),
+            source: source,
+            type: "internal-success",
+            extra: "Certificate found"
+        });
+        return pdfBuffer;
+    } else {
+        res.statusCode = 404;
+        let error = {
+            date: new Date(),
+            source: source,
+            type: "internal-failed",
+            extra: "Certificate not found"
+        };
+        sendEvents(error)
+        return JSON.stringify(error);
+    }
+    return res;
+}
+
 async function createCertificatePDFByCertificateId(phone, certificateId, res) {
     const certificateResp = await registryService.getCertificate(phone, certificateId);
     return await createCertificatePDF(certificateResp, res, certificateId);
@@ -204,6 +300,11 @@ async function createCertificatePDFByCertificateId(phone, certificateId, res) {
 async function createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
     const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
     return await createCertificatePDF(certificateResp, res, preEnrollmentCode);
+}
+
+async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
+    const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode);
+    return await createTestCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
 
 async function getCertificate(req, res) {
@@ -260,6 +361,26 @@ async function getCertificatePDFByPreEnrollmentCode(req, res) {
             return;
         }
         res = await createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res);
+        return res
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
+async function getTestCertificatePDFByPreEnrollmentCode(req, res) {
+    try {
+        let claimBody = "";
+        let preEnrollmentCode = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            preEnrollmentCode = req.url.replace("/certificate/api/test/certificatePDF/", "");
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        res = await createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res);
         return res
     } catch (err) {
         console.error(err);
@@ -346,5 +467,6 @@ module.exports = {
     getCertificatePDF,
     getCertificatePDFByPreEnrollmentCode,
     checkIfCertificateGenerated,
-    certificateAsFHIRJson
+    certificateAsFHIRJson,
+    getTestCertificatePDFByPreEnrollmentCode
 };

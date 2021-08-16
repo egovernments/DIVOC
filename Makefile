@@ -1,4 +1,4 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/registration_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry-es dockerhub/keycloak dockerhub/certificate_api
+IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/registration_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/test_certificate_signer dockerhub/registry-es dockerhub/keycloak dockerhub/certificate_api
 ifeq ($(RELEASE_VERSION), )
 RELEASE_VERSION := 1.23.3-generic
 endif
