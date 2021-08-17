@@ -191,7 +191,7 @@ export default class QRScanner extends Component {
 
     render() {
         return (
-            <div id='videoview'>
+            <div id='videoview' style={{maxWidth:"900px"}}>
                 <video
                     autoPlay
                     width={"100%"}

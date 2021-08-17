@@ -20,6 +20,7 @@ import {CustomButton} from "../CustomButton";
 import {useKeycloak} from "@react-keycloak/web";
 import axios from "axios";
 import {PROGRAM_API} from "../../constants";
+import {useTranslation} from "react-i18next";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
     <Col lg={4}>
@@ -64,6 +65,7 @@ export const Home = () => {
     const [mobileNumber, setMobileNumber] = useState('');
     const [mobileNumberErr, setMobileNumberErr] = useState('');
     const [programs, setPrograms] = useState([]);
+    const { t } = useTranslation();
 
     useEffect(() => {
         if(keycloak.authenticated) {
@@ -87,7 +89,7 @@ export const Home = () => {
 
     function buttonLoginOnClick() {
         if (mobileNumber.length < 10 || isNaN(mobileNumber)) {
-            setMobileNumberErr("* Invalid mobile number")
+            setMobileNumberErr(t('errors.invalidMobileNumber'))
         } else {
             history.push({
                 pathname: '/citizen',
@@ -103,21 +105,21 @@ export const Home = () => {
                     <div className="p-4 p-lg-4 d-flex flex-column justify-content-center align-items-center">
                         <Row className="d-flex justify-content-center mb-3">
                             <Col style={{paddingRight:"10vmin", paddingLeft:"08vmin"}}>
-                                <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>Register for vaccination program</h3>
-                                <p className="mb-5" style={{fontSize:"large"}}>Enter your mobile number and book an appointment at your nearest facility center</p>
-                                <input placeholder="Enter mobile number"
+                                <h3 className="mb-5 mt-5" style={{fontWeight:"bold"}}>{t('home.registrationTitle')}</h3>
+                                <p className="mb-5" style={{fontSize:"large"}}>{t('home.registrationSubTitle')}</p>
+                                <input placeholder={t('home.mobPlaceholder')}
                                        className="form-control form-control-lg"
                                        onChange={(e) => {setMobileNumber(e.target.value)}}
                                        value={mobileNumber}
                                        maxLength={10}
                                 />
                                 <div hidden={mobileNumberErr} className="info-input">
-                                    <p>An OTP will be sent to you for verification</p>
+                                    <p>{t('home.registrationInfo')}</p>
                                 </div>
                                 <div className="invalid-input">
                                     <p>{mobileNumberErr}</p>
                                 </div>
-                                <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>Log In</CustomButton>
+                                <CustomButton className={"blue-btn"} style={{width: "100%"}} onClick={() => buttonLoginOnClick()}>{t('home.login')}</CustomButton>
                             </Col>
                             <Col>
                                 <img className="vaccinate-img" src={GetVaccinatedImg} alt={""} />
@@ -131,20 +133,20 @@ export const Home = () => {
                     <div className="pr-4 pl-4 pr-lg-5 pl-lg-5 d-flex flex-column justify-content-center" style={{margin:"auto"}}>
                         <Row className="d-flex justify-content-center">
                             <InfoCard img={<img src={enterMobileImg} alt={""}/>}
-                                      title={"Enter Mobile"}
-                                      subtitle={"Verify your mobile number"}
+                                      title={t('home.infoCard.0.title')}
+                                      subtitle={t('home.infoCard.0.subTitle')}
                             />
                             <InfoCard img={<img src={verifyIdImg} alt={""}/>}
-                                      title={"Verify ID Details"}
-                                      subtitle={"Add Beneficiaries"}
+                                      title={t('home.infoCard.1.title')}
+                                      subtitle={t('home.infoCard.1.subTitle')}
                             />
                             <InfoCard img={<img src={enrollmentNumberImg} alt={""}/>}
-                                      title={"Get enrollment number"}
-                                      subtitle={"Carry this enrollment number to the facility center"}
+                                      title={t('home.infoCard.2.title')}
+                                      subtitle={t('home.infoCard.2.subTitle')}
                             />
                             <InfoCard img={<img src={appointmentImg} alt={""}/>}
-                                      title={"Book Appointment or Walkin"}
-                                      subtitle={"Search for the nearest facility center"}
+                                      title={t('home.infoCard.3.title')}
+                                      subtitle={t('home.infoCard.3.subTitle')}
                             />
                         </Row>
                     </div>
@@ -155,9 +157,9 @@ export const Home = () => {
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center" style={{margin:"20px"}}>
                         <Row className="d-flex justify-content-center mb-3">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
-                                      title={"Download your Vaccination Certificate"}
-                                      subtitle={"You would need your unique id and Mobile number to verify OTP in order to access your digital certificate."}
-                                      buttonText={"Download"}
+                                      title={t('home.homeCard.0.title')}
+                                      subtitle={t('home.homeCard.0.subTitle')}
+                                      buttonText={t('home.homeCard.0.button')}
                                       buttonOnClick={() => {
                                           history.push("/certificate/")
                                       }}
@@ -165,9 +167,9 @@ export const Home = () => {
                                       backgroundColor={"#F8FBFF"}
                             />
                             <HomeCard img={<img src={VerifyCertificateImg} alt={""} width={"80%"}/>}
-                                      title={"Verify your Vaccination Certificate"}
-                                      subtitle={"Ensure that your vaccination certificate is a authentic by digitally verifying it here."}
-                                      buttonText={"Verify"}
+                                      title={t('home.homeCard.1.title')}
+                                      subtitle={t('home.homeCard.1.subTitle')}
+                                      buttonText={t('home.homeCard.1.button')}
                                       buttonOnClick={() => {
                                           history.push("/verify-certificate/")
                                       }}
@@ -176,9 +178,9 @@ export const Home = () => {
                             />
 
                             <HomeCard img={<img src={SideEffectsBannerImg} alt={""} width={"60%"}/>}
-                                      title={"Report symptoms"}
-                                      subtitle={"By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively."}
-                                      buttonText={"Report Side-effects"}
+                                      title={t('home.homeCard.2.title')}
+                                      subtitle={t('home.homeCard.2.subTitle')}
+                                      buttonText={t('home.homeCard.2.button')}
                                       buttonOnClick={() => {
                                           history.push("/side-effects")
                                       }}
@@ -192,7 +194,7 @@ export const Home = () => {
             <div hidden={!programs || programs.length === 0} className="section ">
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="ml-3 pb-4 pb-lg-5 d-flex flex-column justify-content-center align-items-center">
-                        <h3 style={{fontWeight:"bold"}}>Ongoing Vaccination Programs</h3>
+                        <h3 style={{fontWeight:"bold"}}>{t('home.onGoingProgramTitle')}</h3>
                     </div>
                 </div>
             </div>

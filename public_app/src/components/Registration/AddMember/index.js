@@ -14,7 +14,7 @@ import "./index.css"
 import Row from "react-bootstrap/Row";
 import {getCookie} from "../../../utils/cookies";
 import appConfig from "../../../config.js";
-import {INVALID_BENEFICIARY_ERROR_MSG} from "./error-constants";
+import {useTranslation} from "react-i18next";
 
 
 export const FORM_SELECT_PROGRAM = "selectProgram";
@@ -142,6 +142,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
 
   const [minAge, setMinAge] = useState(0);
   const [maxAge, setMaxAge] = useState(MINIMUM_SUPPORT_AGE);
+  const {t} = useTranslation();
 
   useEffect(() => {
     const data = {
@@ -184,7 +185,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
     }
 
     if(hasConditions() && formData.choice === "yes" && formData.comorbidities.length === 0) {
-      setErrors({...errors, "choice":"* Please select at least one comorbidity"});
+      setErrors({...errors, "choice":t('errors.selectComorbidity')});
     }
     else if (formData.yob && formData.yob >= (curYear - maxAge) && formData.choice === "yes" &&
       (isValidAge() || formData.comorbidities.length>0)) {
@@ -200,7 +201,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
     }
     else {
       // errors.yob = "Please select year of birth";
-      setErrors({...errors, "yob":"Please select year of birth"});
+      setErrors({...errors, "yob":t('errors.selectYob')});
     }
   }
   function handleClose() {
@@ -237,28 +238,28 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
     <Container fluid>
         <Modal show={invalidCondition} centered onHide={handleClose}>
             <Modal.Header>
-                <strong className="text-center">{INVALID_BENEFICIARY_ERROR_MSG.replace('PROGRAM_NAME', formData.programName)}</strong>
+                <strong className="text-center">{t('errors.invalidBeneficiary',{ program: formData.programName})}</strong>
             </Modal.Header>
             <Modal.Footer>
-                <CustomButton onClick = {handleClose} style={{margin: "auto"}} className="blue-btn" >Ok</CustomButton>
+                <CustomButton onClick = {handleClose} style={{margin: "auto"}} className="blue-btn" >{t('button.ok')}</CustomButton>
             </Modal.Footer>
         </Modal>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Check beneficiary's eligibility for {formData.programName}</h3>
+          <h3>{t('registration.checkEligibility.title', { program: formData.programName})}</h3>
         </div>
         <div className="shadow-sm bg-white p-4">
             {!hideYOB &&
             <>
                 <div className="p-2">
-                    <h5>Enter beneficiary's year of birth</h5>
+                    <h5>{t('registration.checkEligibility.yobTitle')}</h5>
                 </div>
                 <div className={"col-sm-4"}>
-                    <label className="custom-text-label required" for="yearSelect">Year of birth</label>
+                    <label className="custom-text-label required" for="yearSelect">{t('registration.checkEligibility.yob')}</label>
                     <select className="form-control form-control-inline" id="yearSelect" disabled={hideYOB}
                             placeholder="Select"
                             onChange={(t) => onYOBChange(t.target && t.target.value)}>
-                        <option>Select</option>
+                        <option>{t('common.select')}</option>
                         {
                             years.map(x => {
                                 return <option selected={formData.yob === x} value={x}>{x}</option>
@@ -271,19 +272,19 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
                 </div>
             </>}
           <div className="pt-5 comorbidities-wrapper" hidden={!conditions || conditions.length === 0}>
-              <p style={{fontSize:"1.1rem"}}>Does the beneficiary have any of the following comorbidities?</p>
+              <p style={{fontSize:"1.1rem"}}>{t('registration.checkEligibility.comorbiditiesTitle')}</p>
               <div className="pl-2 form-check form-check-inline">
                 <input className="form-check-input" type="radio" onChange={showComorbiditiesHandler}
                        id="yes" name="choice" value="yes" checked={formData.choice === "yes"}/>
-                <label className="form-check-label" htmlFor="yes">Yes</label>
+                <label className="form-check-label" htmlFor="yes">{t('common.yes')}</label>
               </div>
               <div className="pl-2 form-check form-check-inline">
                 <input className="form-check-input" type="radio"  onChange={showComorbiditiesHandler}
                        id="no" name="choice" value="no" checked={formData.choice === "no"}/>
-                <label className="form-check-label" htmlFor="no">No</label>
+                <label className="form-check-label" htmlFor="no">{t('common.no')}</label>
               </div>
             <div hidden={formData.choice === "no"} className="pt-3">
-              <p>If yes, please select (all) applicable comorbidities</p>
+              <p>{t('registration.checkEligibility.comorbiditiesSelectInfo')}</p>
               <div className={"col-12 ml-0 comorbidities-list-wrapper"}>
                 {
                   conditions.map(x =>
@@ -304,10 +305,10 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
         </div>
         <div className="pt-3">
           <CustomButton isLink={true} type="submit" onClick={previous}>
-            <span>Back</span>
+            <span>{t('button.back')}</span>
           </CustomButton>
           <CustomButton className="blue-btn" type="submit" onClick={() => onNext()}>
-            <span>Continue &#8594;</span>
+            <span>{t('button.continue')} &#8594;</span>
           </CustomButton>
         </div>
       </div>
@@ -318,6 +319,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
 export const SelectProgram = ({setValue, formData, navigation, programs, showBack=true}) => {
   const history = useHistory();
   const {next} = navigation;
+  const {t} = useTranslation();
 
   function onProgramSelect(osid, name) {
     setValue({target: {name: "programId", value: osid}})
@@ -330,7 +332,7 @@ export const SelectProgram = ({setValue, formData, navigation, programs, showBac
     <Container fluid>
       <div className="select-program-container">
         <div className="d-flex justify-content-between align-items-center">
-          <h3>Please select vaccination program</h3>
+          <h3>{t('registration.selectProgram.title')}</h3>
         </div>
         <CardGroup className="mt-5">
           {
@@ -340,10 +342,10 @@ export const SelectProgram = ({setValue, formData, navigation, programs, showBac
           }
         </CardGroup>
           {showBack && <CustomButton isLink={true} type="submit" onClick={() => {history.goBack()}}>
-          <span>Back</span>
+          <span>{t('login.backButton')}</span>
         </CustomButton>}
           {programs.length>0 && <CustomButton className="blue-btn" type="submit" onClick={next}>
-          <span>Continue &#8594;</span>
+          <span>{t('button.continue')} &#8594;</span>
         </CustomButton>}
       </div>
     </Container>

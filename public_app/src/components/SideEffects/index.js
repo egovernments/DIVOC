@@ -12,11 +12,13 @@ import LearnMoreImg from '../../assets/img/leanr_more_small.png'
 import {useKeycloak} from "@react-keycloak/web";
 import {RECIPIENT_CLIENT_ID, RECIPIENT_ROLE, SIDE_EFFECTS_DATA} from "../../constants";
 import axios from "axios";
+import {useTranslation} from "react-i18next";
 
 export const SideEffects = () => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
     const [formSchema, setFormSchema] = useState({schema:{}, uiSchema: {}});
+    const {t} = useTranslation();
     useEffect(() => {
         axios
             .get("/divoc/api/v1/sideEffects")
@@ -50,19 +52,19 @@ export const SideEffects = () => {
         <div className="main-container">
             <Container fluid>
                 <div className="side-effect-container">
-                    <h3 className="text-center">Report symptoms</h3>
-                    <span className="text-center d-block">By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.</span>
+                    <h3 className="text-center">{t('sideEffect.title')}</h3>
+                    <span className="text-center d-block">{t('sideEffect.subTitle')}</span>
                     <Container className="pt-5">
                         <Row>
                             <Col>
-                                <h4 align="">Report Side-effects</h4>
-                                <h5 align="">Select Symptoms</h5>
+                                <h4 align="">{t('sideEffect.formTitle')}</h4>
+                                <h5 align="">{t('sideEffect.formSubTitle')}</h5>
                                 <Form schema={formSchema.schema}
                                       uiSchema={formSchema.uiSchema} widgets={widgets} onSubmit={onSideEffectsSubmit}>
                                     <div className="d-flex justify-content-center">
                                         <CustomButton className="green-btn" type="submit" onClick={() => {
                                         }}>
-                                            <span>Confirm Symptoms</span>
+                                            <span>{t('sideEffect.confirmSymptom')}</span>
                                         </CustomButton>
                                     </div>
                                 </Form>
@@ -70,7 +72,7 @@ export const SideEffects = () => {
                         </Row>
                     </Container>
                     <SmallInfoCards
-                        text={"Verify Certificate"}
+                        text={t('sideEffect.infoCard.0.text')}
                         img={VerifyCertificateImg}
                         onClick={() => {
                             history.push("/verify-certificate/")
@@ -78,7 +80,7 @@ export const SideEffects = () => {
                         backgroundColor={"#F2FAF6"}
                     />
                     <br/>
-                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnMoreImg}
+                    <SmallInfoCards text={t('sideEffect.infoCard.1.text')} img={LearnMoreImg}
                                     onClick={() => {
                                         history.push("/learn/")
                                     }}

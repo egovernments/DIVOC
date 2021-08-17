@@ -1,0 +1,44 @@
+{
+  "home": {
+    "registrationTitle": "टीकाकरण कार्यक्रम के लिए रजिस्टर करें",
+    "registrationSubTitle": "अपना मोबाइल नंबर दर्ज करें और अपने निकटतम सुविधा केंद्र पर एक नियुक्ति बुक करें",
+    "registrationInfo": "सत्यापन के लिए आपको एक ओटीपी भेजा जाएगा",
+    "mobPlaceholder": "मोबाइल नंबर दर्ज करें",
+    "login": "लॉग इन करो",
+    "infoCard": [
+      {
+        "title": "Enter Mobile",
+        "subTitle": "Verify your mobile number"
+      },
+      {
+        "title": "Verify ID Details",
+        "subTitle": "Add Beneficiaries"
+      },
+      {
+        "title": "Add Beneficiaries",
+        "subTitle": "Get enrollment number"
+      },
+      {
+        "title": "Book Appointment or Walkin",
+        "subTitle": "Search for the nearest facility center"
+      }
+    ],
+    "homeCard": [
+      {
+        "title": "अपना टीकाकरण प्रमाण पत्र डाउनलोड करें",
+        "subTitle": "You would need your unique id and Mobile number to verify OTP in order to access your digital certificate."
+      }
+    ]
+  },
+  "button": {
+    "continue": "Continue",
+    "ok": "Ok",
+    "back": "Back",
+    "confirm": "Confirm",
+    "yesDelete": "Yes, Delete",
+    "cancel": "रद्द करना"
+  },
+  "errors": {
+    "invalidMobileNumber": "* अमान्य मोबाइल नंबर"
+  }
+}

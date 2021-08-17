@@ -19,6 +19,7 @@ import {ContextAwareToggle, CustomAccordion} from "../../CustomAccordion";
 import {SelectComorbidity, SelectProgram} from "../AddMember";
 import {ordinal_suffix_of} from "../../../utils/dateUtils";
 import {CustomModal} from "../../CustomModal";
+import {useTranslation} from "react-i18next";
 
 const DELETE_MEMBER = "DELETE_MEMBER";
 const DELETE_REGISTERED_PROGRAM = "DELETE_REGISTERED_PROGRAM";
@@ -36,6 +37,7 @@ export const Members = () => {
     const [selectedAppointmentIndex, setSelectedAppointmentIndex] = useState("");
     const [memberAction, setMemberAction] = useState(CANCEL_APPOINTMENT);
     const [programEligibility, setProgramEligibility] = useState([]);
+    const { t } = useTranslation();
 
     function fetchRecipients() {
         setIsLoading(true);
@@ -271,7 +273,7 @@ export const Members = () => {
                     {/*<marquee style={{color: ""}}>{marqueeMsg}</marquee>*/}
                     <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
                         <div className="d-flex flex-wrap align-items-center">
-                            <h3>Registered Beneficiaries</h3> <span className="font-italic" style={{fontSize: "small"}}>(You can add upto 4 members)</span>
+                            <h3>{t('registration.title')}</h3> <span className="font-italic" style={{fontSize: "small"}}>({t('registration.titleSpan')})</span>
                         </div>
                         {members.length < appConfig.registerMemberLimit &&
                         <CustomButton className="blue-outline-btn" onClick={() => {
@@ -291,7 +293,7 @@ export const Members = () => {
                                 width: "100%"
                             }}>
                                 <Card.Body className="p-5">
-                                    <span>No members have enrolled yet.</span>
+                                    <span>{t('registration.emptyMembers')}</span>
                                 </Card.Body>
                             </Card>
                         </Row>
@@ -376,6 +378,8 @@ export const Members = () => {
 
 const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, callDeleteRecipient,
                                     callCancelAppointment, selectedAppointmentIndex, onDeleteRecipientProgram, programsById}) => {
+    const {t} = useTranslation();
+
     member.appointments.sort((a, b) => {
         if (a.programId < b.programId) {
             return -1;
@@ -387,18 +391,23 @@ const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, 
     })
     return (
         <>
-            <CustomModal title={memberAction === CANCEL_APPOINTMENT ? "Cancel Appointment" : "Delete Registration"}
+            <CustomModal className="text-capitalize" title={memberAction === CANCEL_APPOINTMENT ? t('registration.cancelAppointment') : t('registration.deleteRegistration')}
                          showModal={true} onClose={() => {
                 setShowModal(false)
             }} onPrimaryBtnClick={() => {
                 memberAction === CANCEL_APPOINTMENT ? callCancelAppointment() : onDeleteRecipientProgram()
-            }} primaryBtnText={memberAction === CANCEL_APPOINTMENT ? "Continue" : "Yes, Delete"}>
+            }} primaryBtnText={memberAction === CANCEL_APPOINTMENT ? t('button.continue') : t('button.yesDelete')}>
                 <div className="d-flex flex-column ">
-                    {memberAction === DELETE_REGISTERED_PROGRAM && <spam>{`'${programsById[member["appointments"][selectedAppointmentIndex].programId].name}' program registration will be deleted for ${member.name}`}</spam>}
+                    {memberAction === DELETE_REGISTERED_PROGRAM && <spam>
+                        {t('registration.programDeleteForBeneficiaryInfo', {
+                            program: programsById[member["appointments"][selectedAppointmentIndex].programId].name,
+                            beneficiaryName: member.name
+                        })}
+                    </spam>}
                     {memberAction === CANCEL_APPOINTMENT &&
                     <>
                         <span>For {member.name}</span>
-                        <span className="mt-1">Enrollment number: {member.code}</span>
+                        <span className="mt-1">{t('entity.enrollmentNumber')}: {member.code}</span>
                         <span
                             className="mt-1 ">At {`${member["appointments"][selectedAppointmentIndex].facilityDetails.facilityName}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.district}, \n ${member["appointments"][selectedAppointmentIndex].facilityDetails.state}, ${member["appointments"][selectedAppointmentIndex].facilityDetails.pincode}`}</span>
                         <span
@@ -415,6 +424,7 @@ const CancelAppointmentModal = ({showModal, setShowModal, memberAction, member, 
 const MemberCard = (props) => {
     const history = useHistory();
     const member = props.member;
+    const { t } = useTranslation();
 
     function isAppointmentCancellationAllowed(appointment) {
         const currentDate = new Date();
@@ -466,11 +476,11 @@ const MemberCard = (props) => {
             return (
                 <div className="appointment-wrapper">
                     <div className="appointment-details">
-                        <span className="appointment-title">Program</span>
+                        <span className="appointment-title text-capitalize">{t('entity.program')}</span>
                         <span className="font-weight-bold">{props.programsById[programId]?.name}</span>
                     </div>
                     <div className="appointment-details">
-                        <span className="appointment-title">Enrolment Number</span>
+                            <span className="appointment-title text-capitalize">{t('entity.enrollmentNumber')}</span>
                         <span className="font-weight-bold">{member.code}</span>
                     </div>
                     <div className="appointment-schedule">
@@ -536,7 +546,7 @@ const MemberCard = (props) => {
                                 registeredProgramIds.length < Object.keys(props.programsById).length &&
                                 <CustomButton CustomButton isLink onClick={() => props.onRegisterProgram(props.index)}
                                               className="appointment-link-btn d-flex align-items-center">
-                                    <span className="appointment-add-program mr-2">+</span><span> New Program</span>
+                                    <span className="appointment-add-program mr-2">+</span><span> {t('registration.newProgram')}</span>
                                 </CustomButton>
                             }
                         </Card.Body>
@@ -552,6 +562,8 @@ const AppointmentTimeline = ({
                                  onBookAppointment, showCancelAppointment, onCancelAppointment, isAppointmentScheduled,
                                  appointmentDate, appointmentSlot, facilityDetails, certified, certificateId, dose
                              }) => {
+    const { t } = useTranslation();
+
     function onDownloadCertificate() {
         const bearerToken = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const token = bearerToken.split(" ")[1];
@@ -568,10 +580,10 @@ const AppointmentTimeline = ({
             {!isAppointmentScheduled && dose === "1" && <div className="timeline-node" style={{zIndex: 1}}>
                 <img src={CheckImg} className="appointment-active-circle"/>
                 <div className="timeline-node-text">
-                    <span className="appointment-active-title font-weight-bold">Registered</span>
+                    <span className="appointment-active-title font-weight-bold">{t('entity.registration')}</span>
                     <span className="appointment-active-title">{registeredDate}</span>
                     {showDeleteRecipientProgram && <CustomButton isLink onClick={onDeleteRecipientProgram}
-                                                                 className="appointment-link-btn">Delete</CustomButton>}
+                                                                 className="appointment-link-btn text-capitalize">{t('registration.delete')}</CustomButton>}
                 </div>
             </div>}
             {!certified && <div className="timeline-node" style={{zIndex: 1}}>
@@ -581,18 +593,16 @@ const AppointmentTimeline = ({
                 }
                 <div className="timeline-node-text">
                 <span
-                    className={`${isAppointmentScheduled ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"}`}>Scheduled ({ordinal_suffix_of(dose)} Dose)</span>
+                    className={`${isAppointmentScheduled ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"} text-capitalize`}>{t('entity.scheduled')} ({ordinal_suffix_of(dose)} {t('entity.dose')})</span>
                     {isAppointmentScheduled &&
                     <span className="appointment-active-title">{formatDate(appointmentDate)} {appointmentSlot}</span>}
                     {isAppointmentScheduled && <span
                         className="appointment-active-title">{facilityDetails.facilityName}, {facilityDetails.district}, {facilityDetails.state}, {facilityDetails.pincode}</span>}
                     {showBookAppointment &&
-                    <CustomButton isLink onClick={onBookAppointment} className="appointment-link-btn">Book
-                        Appointment</CustomButton>}
+                    <CustomButton isLink onClick={onBookAppointment} className="appointment-link-btn text-capitalize">{t('registration.bookAppointment')}</CustomButton>}
                     {
                         showCancelAppointment &&
-                        <CustomButton isLink onClick={onCancelAppointment} className="appointment-link-btn">Cancel
-                            Appointment</CustomButton>
+                        <CustomButton isLink onClick={onCancelAppointment} className="appointment-link-btn text-capitalize">{t('registration.cancelAppointment')}</CustomButton>
                     }
                 </div>
             </div>}
@@ -603,14 +613,16 @@ const AppointmentTimeline = ({
                 }
                 <div className="timeline-node-text">
                 <span
-                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"} d-flex flex-wrap`}>Vaccinated <span className="ml-1 ml-lg-0"> ({ordinal_suffix_of(dose)} Dose)</span>
+                    className={`${certified ? "appointment-active-title font-weight-bold" : "appointment-inactive-title"} text-capitalize d-flex flex-wrap`}>
+                    {t('entity.vaccinated')} <span className="ml-1 ml-lg-0"> ({ordinal_suffix_of(dose)} {t('entity.dose')})</span>
                     {certified &&
                     <span className="appointment-active-title font-weight-normal ml-1">{formatDate(registeredDate)}</span>}
                 </span>
                     {
                         certified && <>
-                            <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">Download
-                                Certificate</CustomButton>
+                            <CustomButton isLink onClick={onDownloadCertificate} className="appointment-link-btn">
+                                {t('registration.downloadCertificate')}
+                            </CustomButton>
                         </>
                     }
                 </div>

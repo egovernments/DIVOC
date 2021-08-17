@@ -18,6 +18,7 @@ import {getCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
 import {getMeridiemTime} from "../../utils/dateUtils";
 import {CustomModal} from "../CustomModal";
+import {useTranslation} from "react-i18next";
 
 export const Appointment = (props) => {
     const {enrollment_code, program_id: programId} = props.match.params;
@@ -32,6 +33,7 @@ export const Appointment = (props) => {
     const [facilitySlots, setFacilitySlots] = useState({});
     const [facilitiesSchedule, setFacilitiesSchedule] = useState({});
     const [searchLabel, setSearchLabel] = useState("");
+    const {t} = useTranslation();
 
     function triggerSearchFacilityAPI() {
         if (searchText && searchText.length <= 3) {
@@ -59,8 +61,8 @@ export const Appointment = (props) => {
                     });
                     setFacilities(facilities.filter(d => d.osid in schedule));
 
-                    let s = facilities.filter(d => d.osid in schedule).length > 0 ? "Availability for next few days" :
-                        "No results found";
+                    let s = facilities.filter(d => d.osid in schedule).length > 0 ? t('appointment.availableSearchTitle') :
+                        t('appointment.noResultSearchTitle');
                     setSearchLabel(s)
                     setFacilitiesSchedule(schedule);
                     setIsLoading(false);
@@ -81,7 +83,7 @@ export const Appointment = (props) => {
         return (
             facility && <div className="p-3 allotment-wrapper" style={{border: "1px solid #d3d3d3"}}>
                 <div className="d-flex justify-content-between align-items-center">
-                    <h5>Available Time Slots for {facility?.facilityName}</h5>
+                    <h5>{t('appointment.timeSlotTitle', {facility: facility?.facilityName})}</h5>
                     <img src={CloseImg} className="cursor-pointer" alt={""}
                          onClick={() => setSelectedFacilityIndex(-1)}/>
                 </div>
@@ -188,15 +190,15 @@ export const Appointment = (props) => {
             {isLoading && <Loader/>}
             <div className="card-container">
                 <div className="header-group mb-2">
-                    <h3>Book Appointment</h3>
+                    <h3>{t('appointment.title')}</h3>
                     <span className="appointment-back-btn cursor-pointer" onClick={() => {
                         history.push("/registration")
-                    }}>Back</span>
+                    }}>{t('button.back')}</span>
                 </div>
-                <p>Select Facility center to book appointment for {state.name}</p>
+                <p>{t('appointment.subTitle', {state: state.name})}</p>
                 <Row>
                     <Col lg={6}>
-                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={"Search by Pincode"}
+                        <TextInputWithIcon onClick={triggerSearchFacilityAPI} title={t('appointment.pincodePlaceholder')}
                                            value={searchText} onChange={setSearchText}
                                            img={Img}/>
                     </Col>
@@ -246,7 +248,7 @@ export const Appointment = (props) => {
                     </Col>}
                 </Row>
             </div>
-            <CustomModal title={"Confirm Appointment"} onClose={() => {setShowModal(false)}} showModal={showModal} onPrimaryBtnClick={bookSlot}>
+            <CustomModal title={t("appointment.confirmAppointment")} onClose={() => {setShowModal(false)}} showModal={showModal} onPrimaryBtnClick={bookSlot}>
                 <div className="d-flex flex-column">
                     <span>For {state && state.name}</span>
                     <span className="mt-1">{getFacilityDetails()}</span>
