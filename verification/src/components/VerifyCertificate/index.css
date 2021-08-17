@@ -40,6 +40,18 @@ ol.verify-steps {
   counter-increment: item;
   margin-bottom: 20px;
 }
+
+.verify-steps img {
+  margin-bottom: 20px;
+  margin-left: 20px;
+  height: 40vh;
+  border: 1px solid gainsboro;
+}
+
+.verify-steps > ul {
+  counter-increment: item;
+  margin-bottom: 20px;
+}
 .verify-steps > li:before {
   margin-right: 10px;
   content: counter(item);
