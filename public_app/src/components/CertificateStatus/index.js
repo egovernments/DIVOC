@@ -19,6 +19,7 @@ import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {Loader} from "../Loader";
+import {useTranslation} from "react-i18next";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -59,6 +60,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
+    const {t} = useTranslation();
 
     setTimeout(()=>{
         try {
@@ -152,7 +154,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                          className="certificate-status-image"/>
                     <h3 className="certificate-status">
                         {
-                            isValid ? "Successful" : "Invalid Certificate"
+                            isValid ? t('verifyCertificate.validStatus') : t('verifyCertificate.invalidStatus')
                         }
                     </h3>
                     {
@@ -162,7 +164,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                                     const context = CertificateDetailsPaths[key];
                                     return (
                                         <tr key={index}>
-                                            <td className="pr-3">{key}</td>
+                                            <td className="pr-3">{t('certificate.'+key)}</td>
                                             <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
                                         </tr>
                                     )
@@ -171,13 +173,13 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
                         </table>
                     }
-                    <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
-                    <SmallInfoCards text={"Provide Feedback"}
+                    <CustomButton className="blue-btn m-3" onClick={goBack}>{t('verifyCertificate.verifyAnotherCertificate')}</CustomButton>
+                    <SmallInfoCards text={t('verifyCertificate.infoCard.0.text')}
                                     onClick={() => {
                                         history.push("/side-effects")
                                     }}
                                     img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
-                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
+                    <SmallInfoCards text={t('verifyCertificate.infoCard.1.text')} img={LearnProcessImg}
                                     onClick={() => {
                                         history.push("/learn")
                                     }}

@@ -56,7 +56,11 @@
     "ok": "Ok",
     "back": "Back",
     "confirm": "Confirm",
-    "yesDelete": "Yes, Delete"
+    "yesDelete": "Yes, Delete",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "download": "Download",
+    "print": "Print"
   },
   "common": {
     "select": "Select",
@@ -121,6 +125,79 @@
       "vaccinationInfo": "On the day of vaccination, please carry your original {{identity}} for verification"
     },
     "beneficiaryName": "Beneficiary Name"
+  },
+  "appointment": {
+    "title": "Book Appointment",
+    "subTitle": "Select Facility center to book appointment for {{state}}",
+    "pincodePlaceholder": "Search by Pincode",
+    "availableSearchTitle": "Availability for next few days",
+    "noResultSearchTitle": "No results found",
+    "timeSlotTitle": "Available Time Slots for {{facility}}",
+    "confirmAppointment": "Confirm Appointment",
+    "success": {
+      "title": "Successfully booked appointment for {{program}}",
+      "enrollmentCode": "Enrolment number: {{enrollmentCode}}",
+      "enrollmentDetails": "Appointment details will be sent to the registered mobile number and/or email."
+    }
+  },
+  "sideEffect": {
+    "title": "Report symptoms",
+    "subTitle": "By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.",
+    "formTitle": "Report Side-effects",
+    "formSubTitle": "Select Symptoms",
+    "confirmSymptom": "Confirm Symptoms",
+    "infoCard": [
+      {
+        "text": "Verify Certificate"
+      },
+      {
+        "text": "Learn about the Vaccination process"
+      }
+    ],
+    "submitSymptom": {
+      "title": "Can you help us identify the patient with these symptoms",
+      "choosePatient": "Please choose the patient",
+      "confirmationMsg": "I confirm that this patient is having the identified symptoms",
+      "confirmPatient": "Confirm Patient",
+      "completeMsgTitle": "The healthcare facility has been notified. You will receive a call back soon.",
+      "completeMsgTitle2": "If the symptoms worsen, please visit the facility so that the doctors can attend to at the earliest.",
+      "completeMsgSubTitle": "If you need to contact the facility immediately"
+
+    }
+  },
+  "certificate": {
+    "Name": "Name",
+    "Age": "Age",
+    "Gender": "Gender",
+    "Certificate ID": "Certificate ID",
+    "Date of Issue": "Date of Issue",
+    "Valid Until": "Valid Until",
+    "Dose": "Dose",
+    "Total Doses": "Total Doses",
+    "Vaccination Facility": "Vaccination Facility"
+  },
+  "certificateView": {
+    "title": "Vaccination certificate",
+    "subTitle": "There are multiple certificates associated with phone : {{mobileNumber}}",
+    "chooseCertificate": "Please choose the certificate for ",
+    "asImg": "As Image",
+    "asSvg": "As SVG",
+    "asVerifiableCertificate": "As Verifiable Certificate"
+  },
+  "verifyCertificate": {
+    "title": "Verify a vaccination certificate",
+    "scanWithQR": "SCAN WITH QR",
+    "validStatus": "Successful",
+    "invalidStatus": "Invalid Certificate",
+    "verifyAnotherCertificate": "Verify Another Certificate",
+    "infoCard": [
+      {
+        "text": "Provide Feedback"
+      },
+      {
+        "text": "Learn about the Vaccination process"
+      }
+    ]
   },
   "entity": {
     "program": "program",

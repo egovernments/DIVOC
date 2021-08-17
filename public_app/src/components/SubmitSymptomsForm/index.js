@@ -5,41 +5,33 @@ import {pathOr} from "ramda";
 import {CertificateDetailsPaths, SIDE_EFFECTS_DATA} from "../../constants";
 import {useKeycloak} from "@react-keycloak/web";
 import {useHistory} from "react-router-dom";
+import {useTranslation} from "react-i18next";
 
 const state = {
-    GenerateOTP: "GenerateOTP",
-    VerifyOTP: "VerifyOTP",
     ChoosePatient: "ChoosePatient",
     ShowPatientDetails: "ShowPatientDetails",
     CompletedMessage: "CompletedMessage"
-};
-const stateDetails = {
-    [state.GenerateOTP]: {
-        subTitle: "Please enter the mobile number provided during vaccination"
-    },
-    [state.VerifyOTP]: {
-        subTitle: "Please enter the otp received to your mobile number"
-    },
-    [state.ChoosePatient]: {
-        subTitle: "Please choose the patient"
-    },
-    [state.ShowPatientDetails]: {
-        subTitle: ""
-    },
-    [state.CompletedMessage]: {
-        subTitle: ""
-    }
 };
 
 export const SubmitSymptomsForm = (props) => {
     const history = useHistory();
     const {keycloak} = useKeycloak();
-    const [mobileNumber, setMobileNumber] = useState("");
     const [patientSelected, setPatientSelected] = useState(-1);
     const [recipients, setRecipients] = useState([]);
-    const [otp, setOTP] = useState("");
     const [currentState, setCurrentState] = useState(state.ChoosePatient);
     const [confirmDetails, setConfirmDetails] = useState(false);
+    const {t} = useTranslation();
+    const stateDetails = {
+        [state.ChoosePatient]: {
+            subTitle: t('sideEffect.submitSymptom.choosePatient')
+        },
+        [state.ShowPatientDetails]: {
+            subTitle: ""
+        },
+        [state.CompletedMessage]: {
+            subTitle: ""
+        }
+    };
     useEffect(() => {
         let sideEffectsData = localStorage.getItem(SIDE_EFFECTS_DATA);
         if (sideEffectsData == null) {
@@ -121,10 +113,9 @@ export const SubmitSymptomsForm = (props) => {
         <div className="submit-symptoms-form">
             {
                 currentState === state.CompletedMessage && <div>
-                    <h5>The healthcare facility has been notified. You will receive a call back soon.</h5>
-                    <h5>If the symptoms worsen, please visit the facility so that the doctors can attend to at the
-                        earliest.</h5>
-                    <h6 className="mt-5" style={{color: "#5C9EF8"}}>If you need to contact the facility immediately</h6>
+                    <h5>{t('sideEffect.submitSymptom.completeMsgTitle')}</h5>
+                    <h5>{t('sideEffect.submitSymptom.completeMsgTitle2')}</h5>
+                    <h6 className="mt-5" style={{color: "#5C9EF8"}}>{t('sideEffect.submitSymptom.completeMsgSubTitle')}</h6>
                     <span className="mt-3 d-inline-block" style={{fontSize: '14px'}}>
                         {pathOr("NA", CertificateDetailsPaths["Vaccination Facility"].path, recipients[patientSelected].certificate)}
                         <br/>
@@ -139,12 +130,12 @@ export const SubmitSymptomsForm = (props) => {
                     <br/>
                     {/*<span style={{fontSize: '14px'}}>{pathOr("NA", ["certificate", "facility", "contact"], recipients[patientSelected])}</span>*/}
                     <br/>
-                    <button className="form-btn mt-5" onClick={moveToNextState}>Continue</button>
+                    <button className="form-btn mt-5" onClick={moveToNextState}>{t('button.continue')}</button>
                 </div>
             }
             {
                 currentState !== state.CompletedMessage && <>
-                    <h5 className="form-title">Can you help us identify the patient with these symptoms</h5>
+                    <h5 className="form-title">{t('sideEffect.submitSymptom.title')}</h5>
                     <span className="form-subtitle">{stateDetails[currentState].subTitle}</span>
                     {
                         currentState === state.ChoosePatient && <div>
@@ -163,7 +154,7 @@ export const SubmitSymptomsForm = (props) => {
                                     </div>
                                 ))
                             }
-                            <button className="form-btn mt-3" onClick={moveToNextState}>Submit</button>
+                            <button className="form-btn mt-3" onClick={moveToNextState}>{t('button.submit')}</button>
                         </div>
                     }
                     {
@@ -174,7 +165,7 @@ export const SubmitSymptomsForm = (props) => {
                                     Object.keys(CertificateDetailsPaths).map((item, index) => {
                                         return (
                                             <tr>
-                                                <td className="table-title">{item}</td>
+                                                <td className="table-title">{t('certificate.'+item)}</td>
                                                 <td className="table-value">{pathOr("NA", CertificateDetailsPaths[item].path, recipients[patientSelected].certificate)}</td>
                                             </tr>
                                         )
@@ -186,11 +177,12 @@ export const SubmitSymptomsForm = (props) => {
                                        checked={confirmDetails} onChange={() => {
                                     setConfirmDetails(!confirmDetails)
                                 }}/>
-                                <label for={"confirm-wrapper"} className="confirmation-msg">I confirm that this patient
-                                    is having the identified symptoms</label>
+                                <label for={"confirm-wrapper"} className="confirmation-msg">
+                                    {t('sideEffect.submitSymptom.confirmationMsg')}
+                                </label>
                             </div>
-                            <button className="form-btn" onClick={moveToNextState} disabled={!confirmDetails}>Confirm
-                                Patient
+                            <button className="form-btn" onClick={moveToNextState} disabled={!confirmDetails}>
+                                {t('sideEffect.submitSymptom.confirmPatient')}
                             </button>
                         </>
                     }

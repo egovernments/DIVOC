@@ -30,6 +30,14 @@
       }
     ]
   },
+  "button": {
+    "continue": "Continue",
+    "ok": "Ok",
+    "back": "Back",
+    "confirm": "Confirm",
+    "yesDelete": "Yes, Delete",
+    "cancel": "रद्द करना"
+  },
   "errors": {
     "invalidMobileNumber": "* अमान्य मोबाइल नंबर"
   }

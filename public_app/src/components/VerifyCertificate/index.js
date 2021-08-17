@@ -7,10 +7,12 @@ import {CustomButton} from "../CustomButton";
 import QRScanner from "../QRScanner";
 import JSZip from "jszip";
 import {CERTIFICATE_FILE} from "../../constants";
+import {useTranslation} from "react-i18next";
 
 export const VerifyCertificate = () => {
     const [result, setResult] = useState("");
     const [showScanner, setShowScanner] = useState(false);
+    const {t} = useTranslation();
     const handleScan = data => {
         if (data) {
             const zip = new JSZip();
@@ -36,9 +38,9 @@ export const VerifyCertificate = () => {
                     {!showScanner &&
                     <>
                         <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
-                        <h3 className="text-center">Verify a vaccination certificate</h3>
+                        <h3 className="text-center">{t('verifyCertificate.title')}</h3>
                         <CustomButton className="green-btn" onClick={() => setShowScanner(true)}>
-                            <span>SCAN WITH QR</span>
+                            <span>{t('verifyCertificate.scanWithQR')}</span>
                             <img className="ml-3" src={QRCodeImg} alt={""}/>
                         </CustomButton>
                     </>}
@@ -46,7 +48,7 @@ export const VerifyCertificate = () => {
                     <>
                         <QRScanner onError={handleError}
                                    onScan={handleScan}/>
-                        <CustomButton className="green-btn" onClick={() => setShowScanner(false)}>BACK</CustomButton>
+                        <CustomButton className="green-btn text-uppercase" onClick={() => setShowScanner(false)}>{t('button.back')}</CustomButton>
                     </>
                     }
                 </>
