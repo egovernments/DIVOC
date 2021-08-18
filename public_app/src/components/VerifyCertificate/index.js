@@ -8,10 +8,12 @@ import QRScanner from "../QRScanner";
 import JSZip from "jszip";
 import {CERTIFICATE_FILE} from "../../constants";
 import {useTranslation} from "react-i18next";
+import config from "../../config"
 
 export const VerifyCertificate = () => {
     const [result, setResult] = useState("");
     const [showScanner, setShowScanner] = useState(false);
+    const [showTimeout, setShowTimeout] = useState(false);
     const {t} = useTranslation();
     const handleScan = data => {
         if (data) {
@@ -30,16 +32,30 @@ export const VerifyCertificate = () => {
     const handleError = err => {
         console.error(err)
     };
+
+    const onScanWithQR = () => {
+        setShowScanner(true);
+        setTimeout(() => {
+            if(!result) {
+                setShowTimeout(true);
+            }
+        }, config.CERTIFICATE_SCAN_TIMEOUT);
+    };
+
+    const onTryAgain = () => {
+        setShowTimeout(false);
+        setShowScanner(false)
+    };
     return (
         <div className="container-fluid verify-certificate-wrapper">
             {
-                !result &&
+                (!result && !showTimeout) &&
                 <>
                     {!showScanner &&
                     <>
                         <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
                         <h3 className="text-center">{t('verifyCertificate.title')}</h3>
-                        <CustomButton className="green-btn" onClick={() => setShowScanner(true)}>
+                        <CustomButton className="green-btn" onClick={() => onScanWithQR()}>
                             <span>{t('verifyCertificate.scanWithQR')}</span>
                             <img className="ml-3" src={QRCodeImg} alt={""}/>
                         </CustomButton>
@@ -56,9 +72,20 @@ export const VerifyCertificate = () => {
             {
                 result && <CertificateStatus certificateData={result} goBack={() => {
                     setShowScanner(false);
+                    setShowTimeout(false);
                     setResult("");
                 }
                 }/>
+            }
+            {
+                showTimeout &&
+                  <>
+                      <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
+                      <h3 className="text-center">{t('verifyCertificate.timeoutTitle')}</h3>
+                      <CustomButton className="green-btn" onClick={() => onTryAgain()}>
+                          <span>{t('verifyCertificate.tryAgain')}</span>
+                      </CustomButton>
+                  </>
             }
 
 

@@ -197,7 +197,9 @@
       {
         "text": "Learn about the Vaccination process"
       }
-    ]
+    ],
+    "timeoutTitle": "Camera is not able to read the QR code, please try again",
+    "tryAgain": "Try Again"
   },
   "entity": {
     "program": "program",
