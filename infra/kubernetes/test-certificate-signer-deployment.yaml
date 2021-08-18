@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: test-certificate-signer
+  name: test-certificate-signer
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      k8s-app: test-certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: test-certificate-signer
+    spec:
+      containers:
+        - image: dockerhub/test_certificate_signer:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "400m"
+          name: test-certificate-signer
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+          env:
+            - name: CERTIFICATE_NAMESPACE
+              value: "https://cowin.gov.in/credentials/testCertificate/v1"
+            - name: CERTIFICATE_BASE_URL
+              value: "https://cowin.gov.in/test/"
+      restartPolicy: Always
+status: {}
