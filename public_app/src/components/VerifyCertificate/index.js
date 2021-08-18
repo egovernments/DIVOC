@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "./index.css";
 import VerifyCertificateImg from "../../assets/img/verify-certificate.png"
+import LoadingImg from "../../assets/img/loading-buffering.gif"
 import QRCodeImg from "../../assets/img/qr-code.svg"
 import {CertificateStatus} from "../CertificateStatus";
 import {CustomButton} from "../CustomButton";
@@ -64,6 +65,7 @@ export const VerifyCertificate = () => {
                     <>
                         <QRScanner onError={handleError}
                                    onScan={handleScan}/>
+                        <span className="mt-2"><img style={{height: "20px"}} className="mr-1" src={LoadingImg} />Detecting QR code</span>
                         <CustomButton className="green-btn text-uppercase" onClick={() => setShowScanner(false)}>{t('button.back')}</CustomButton>
                     </>
                     }
@@ -80,8 +82,14 @@ export const VerifyCertificate = () => {
             {
                 showTimeout &&
                   <>
-                      <img src={VerifyCertificateImg} className="banner-img" alt="banner-img"/>
-                      <h3 className="text-center">{t('verifyCertificate.timeoutTitle')}</h3>
+                      <h4 className="mt-5 text-center">{t('verifyCertificate.timeoutTitle')}</h4>
+                      <p className="font-weight-bold mt-5">{t('verifyCertificate.timeoutInfo')}</p>
+                      <ul className="mr-4">
+                          <li className="pb-2">{t('verifyCertificate.timeoutInfoList.0')}</li>
+                          <li className="pb-2">{t('verifyCertificate.timeoutInfoList.1')}</li>
+                          <li className="pb-2">{t('verifyCertificate.timeoutInfoList.2')}</li>
+                          <li className="pb-2">{t('verifyCertificate.timeoutInfoList.3')}</li>
+                      </ul>
                       <CustomButton className="green-btn" onClick={() => onTryAgain()}>
                           <span>{t('verifyCertificate.tryAgain')}</span>
                       </CustomButton>
