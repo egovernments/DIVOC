@@ -9,7 +9,7 @@ module.exports = {
 };
 
 /*
-// openssl genrsa -out key.pem; cat key.pem;
-// openssl rsa -in key.pem -pubout -out pubkey.pem;
-// cat pubkey.pem; rm key.pem pubkey.pem
+js library to generate ed25519 keys.
+run: should round-trip load exported keys tests
+https://github.com/digitalbazaar/ed25519-verification-key-2018
 */
