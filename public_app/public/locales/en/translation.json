@@ -197,7 +197,16 @@
       {
         "text": "Learn about the Vaccination process"
       }
-    ]
+    ],
+    "timeoutTitle": "Camera could not read QR Code, Please try again.",
+    "timeoutInfo": "Note to scan the QR code",
+    "timeoutInfoList": [
+      "QR code should cover at-lease 70%-80% of screen",
+      "Complete QR code should be part of camera frame",
+      "QR code should be parallel to the camera",
+      "Camera should be hold steady for at-least 5 sec"
+    ],
+    "tryAgain": "Try Again"
   },
   "entity": {
     "program": "program",

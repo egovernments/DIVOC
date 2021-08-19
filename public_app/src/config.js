@@ -6,6 +6,7 @@ const CERTIFICATE_CONTROLLER_ID = process.env.REACT_APP_CERTIFICATE_CONTROLLER_I
 const CERTIFICATE_NAMESPACE = process.env.REACT_APP_CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
 const CERTIFICATE_PUBKEY_ID = process.env.REACT_APP_CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
 const CERTIFICATE_DID = process.env.REACT_APP_CERTIFICATE_DID || 'did:india';
+const CERTIFICATE_SCAN_TIMEOUT = process.env.REACT_APP_CERTIFICATE_SCAN_TIMEOUT || '45000';
 
 module.exports = {
     urlPath,
@@ -14,5 +15,6 @@ module.exports = {
     CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
     CERTIFICATE_NAMESPACE,
-    CERTIFICATE_PUBKEY_ID
+    CERTIFICATE_PUBKEY_ID,
+    CERTIFICATE_SCAN_TIMEOUT
 };
