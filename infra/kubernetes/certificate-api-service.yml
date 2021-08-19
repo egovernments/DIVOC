@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    k8s-app: certificate-api
+  name: certificate-api
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: "tcp-4321"
+      port: 4321
+      protocol: TCP
+      targetPort: 4321
+  selector:
+    k8s-app: certificate-api
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer: {}
