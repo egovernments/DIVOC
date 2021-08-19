@@ -3,6 +3,7 @@ import './citized-login.css'
 import axios from "axios";
 import {setCookie} from "../../utils/cookies";
 import {CITIZEN_TOKEN_COOKIE_NAME} from "../../constants";
+import {useTranslation} from "react-i18next";
 
 export function CitizenLoginComponent(props) {
     const [state, setState] = useState({
@@ -12,6 +13,7 @@ export function CitizenLoginComponent(props) {
         invalidOTP: "",
         invalidMobileNumber: ""
     });
+    const { t } = useTranslation();
 
     useEffect(() => {
         if (props.location.state && props.location.state.mobileNumber) {
@@ -40,7 +42,7 @@ export function CitizenLoginComponent(props) {
             setState((prevState) => {
                 return {
                     ...prevState,
-                    invalidMobileNumber: "* Invalid mobile number"
+                    invalidMobileNumber: t('errors.invalidMobileNumber')
                 }
             })
         } else {
@@ -71,7 +73,7 @@ export function CitizenLoginComponent(props) {
             setState((prevState) => {
                 return {
                     ...prevState,
-                    invalidOTP: "* Invalid OTP"
+                    invalidOTP:  t('errors.invalidOTP')
                 }
             })
         })
@@ -90,17 +92,17 @@ export function CitizenLoginComponent(props) {
     {
         const infoText = <>
             <label style={{fontWeight: 500, fontSize: "40px"}} className="mb-5">
-                Registration and Appointment Portal
+                {t('login.title')}
             </label>
             <h5 style={{fontWeight: 600}} className="mb-5">
-                Get started by entering your mobile number
+                {t('login.subTitle')}
             </h5>
         </>
         const inputs = <>
             <form>
                 <div className="form-row">
                     <div className="form-group col-sm-3">
-                        <input placeholder="Mobile number"
+                        <input placeholder={t('login.mobPlaceholder')}
                                ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
                                onChange={setMobileNumber}
@@ -113,7 +115,7 @@ export function CitizenLoginComponent(props) {
                         </div>
                     </div>
                     <div className="form-group col-sm-3 login-otp" >
-                        <label htmlFor="otp"  hidden={state.showOnlyOTP} >OTP</label>
+                        <label htmlFor="otp"  hidden={state.showOnlyOTP} >{t('login.otpPlaceholder')}</label>
                         <input id="otp" maxLength={6}
                                ref={ref => ref && ref.focus()}
                                className="form-control form-control-lg"
@@ -131,12 +133,12 @@ export function CitizenLoginComponent(props) {
 
         const getOTPButton = <button disabled={state.phoneNumber.length === 0}
                                      className={"custom-button purple-btn"}
-                                     onClick={getOTPHandler}><span>Get OTP &#8594;</span></button>;
+                                     onClick={getOTPHandler}><span>{t('login.otpButton')} &#8594;</span></button>;
         const verifyButton = <button disabled={state.otp.length === 0}
                                      className={"custom-button purple-btn"}
-                                     onClick={verifyHandler}><span>Verify &#8594;</span></button>;
+                                     onClick={verifyHandler}><span>{t('login.verifyButton')} &#8594;</span></button>;
         const backButton = <button style={{paddingLeft: "0px"}} className="btn btn-link transparent-button"
-                                   onClick={backBtnHandler}>Back</button>;
+                                   onClick={backBtnHandler}>{t('login.backButton')}</button>;
 
         return <div className="citizen-login">
             {infoText}

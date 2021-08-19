@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Suspense} from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
@@ -6,13 +6,17 @@ import 'bootstrap/dist/css/bootstrap.css';
 import reportWebVitals from './reportWebVitals';
 import {ReactKeycloakProvider} from '@react-keycloak/web';
 import keycloak from "./utils/keycloak";
+import './i18n';
 
 ReactDOM.render(
   <React.StrictMode>
     <ReactKeycloakProvider
       authClient={keycloak}
     >
-      <App />
+        <Suspense fallback="loading...">
+            <App />
+        </Suspense>
+
     </ReactKeycloakProvider>
   </React.StrictMode>,
   document.getElementById('root')
