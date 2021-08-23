@@ -29,5 +29,5 @@ sansible_zookeeper_max_open_files: 4098
 sansible_zookeeper_sync_limit: 25
 sansible_zookeeper_tick_time: 2000
 sansible_zookeeper_user: zookeeper
-sansible_zookeeper_version: 3.6.2
+sansible_zookeeper_version: 3.6.3
 sansible_zookeeper_wait_for_server: 60

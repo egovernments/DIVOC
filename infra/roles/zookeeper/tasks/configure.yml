@@ -68,8 +68,8 @@
     - sansible_zookeeper_aws_cluster_assigned_id_enabled == true
 
 - name: Setup Zookeeper environment config
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   template:
     dest: "{{ sansible_zookeeper_conf_dir }}/environment"
     mode: 0644
@@ -78,8 +78,8 @@
     - restart zookeeper
 
 - name: Setup myid
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   template:
     dest: "{{ sansible_zookeeper_data_dir }}/myid"
     src: myid.j2
@@ -87,8 +87,8 @@
     - restart zookeeper
 
 - name: Setup zoo.cfg file
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   template:
     dest: "{{ sansible_zookeeper_conf_dir }}/zoo.cfg"
     mode: 0644
@@ -97,8 +97,8 @@
     - restart zookeeper
 
 - name: Create Zookeeper log4j config
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   template:
     dest: "{{ sansible_zookeeper_conf_dir }}/log4j.properties"
     mode: 0644
@@ -123,8 +123,8 @@
     timeout: 60
 
 - name: Copy zookeeper check script
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   copy:
     src: zookeeper_check
     dest: "/home/{{ sansible_zookeeper_user }}/bin/zookeeper_check"
@@ -133,8 +133,8 @@
     mode: 0750
 
 - name: Run zookeeper check script
-  become: yes
-  become_user: "{{ sansible_zookeeper_user }}"
+  #become: yes
+  #become_user: "{{ sansible_zookeeper_user }}"
   command: "/home/{{ sansible_zookeeper_user }}/bin/zookeeper_check"
   async: 7200
   poll: 0
