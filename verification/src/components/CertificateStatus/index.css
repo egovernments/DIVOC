@@ -1,0 +1,52 @@
+.certificate-status-wrapper {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 0 1rem;
+
+}
+.certificate-status-wrapper .certificate-status-image {
+    margin: 1rem 0rem;
+}
+
+.certificate-status-wrapper .certificate-status {
+    text-align: center;
+}
+.certificate-status-wrapper .valid {
+    color: #4CA07A
+}
+.certificate-status-wrapper .invalid {
+    color: #FC573B
+}
+
+.certificate-status-wrapper .verify-another-btn {
+    background: transparent linear-gradient(90deg, #59BCF9 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
+    border-radius: 4px;
+    color: white;
+    border: none;
+    padding: 0.5rem 3rem;
+    margin-top: 1rem
+}
+
+.small-info-card-wrapper {
+    display: flex;
+    width: 100%;
+    box-shadow: 0px 6px 20px #C1CFD933;
+    border-radius: 10px;
+    min-height: 82px;
+}
+.small-card-img {
+    height: 5rem;
+}
+
+.certificate-status-wrapper table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.certificate-status-wrapper table .value-col{
+    width: 150px;
+    word-wrap: break-word;
+}
