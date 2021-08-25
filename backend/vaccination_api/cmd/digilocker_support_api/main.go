@@ -922,6 +922,7 @@ func main() {
 	//external
 	r.HandleFunc("/cert/external/api/certificates", timed(authorize(getCertificates, []string{ArogyaSetuRole}, EventTagExternal))).Methods("POST")
 	r.HandleFunc("/cert/external/pdf/certificate", timed(authorize(getCertificatePDFExternalApiHandler, []string{ArogyaSetuRole}, EventTagExternal))).Methods("POST")
+	r.HandleFunc("/cert/external/kyc/{preEnrollmentCode}", timed(authorize(getCertificateKYCDetailsExternalApiHandler, []string{ApiRole}, EventTagExternal))).Methods("GET")
 
 	http.Handle("/", r)
 	_ = http.ListenAndServe(*addr, nil)
