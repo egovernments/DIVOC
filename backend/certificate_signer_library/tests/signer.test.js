@@ -139,7 +139,7 @@ let documentLoaderMapping = {};
 documentLoaderMapping[CERTIFICATE_DID] = publicKey;
 documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
 documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
-setDocumentLoader(documentLoaderMapping, {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, publicKeyPem, privateKeyPem})
+setDocumentLoader(documentLoaderMapping, {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, publicKeyPem, privateKeyPem, publicKeyBase58: "DaipNW4xaH2bh1XGNNdqjnSYyru3hLnUgTBSfSvmZ2hi", privateKeyBase58: '41WN3qJL5Agwg8MERbEmMLKnkNstv5iSD8oJ8sRnDyBUegeGKgjqgKm9qZTmhcLQSWCdTkSN3Cd1tPqMn1rjM3BJ'})
 
 test('Sign the json', async () => {
   sign = await signJSON(transformW3(cert2));
@@ -169,3 +169,7 @@ test('Signed json to include certificate id', async () => {
     expect(sign.evidence[0].id).toBe("https://divoc.dev/vaccine/" + certificateId);
     expect(sign.evidence[0].certificateId).toBe(certificateId);
 });
+
+module.exports = {
+  transformW3
+};

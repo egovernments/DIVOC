@@ -3,12 +3,15 @@ const registry = require('./registry');
 const R = require('ramda');
 const {RsaSignature2018} = jsigs.suites;
 const {AssertionProofPurpose} = jsigs.purposes;
+const {Ed25519Signature2018} = jsigs.suites;
+const {Ed25519KeyPair} = require('crypto-ld');
 const {RSAKeyPair} = require('crypto-ld');
 const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('./credentials.json');
 const redis = require('./redis');
+const vc = require('vc-js');
 
 const UNSUCCESSFUL = "UNSUCCESSFUL";
 const SUCCESSFUL = "SUCCESSFUL";
@@ -22,6 +25,9 @@ let publicKey = {};
 let controller = {};
 let privateKeyPem = '';
 let maxRetrycount = 0;
+let certificateDID = '';
+let publicKeyBase58 = '';
+let privateKeyBase58 = '';
 
 const setDocumentLoader = (customLoaderMapping, config) => {
     privateKeyPem = config.privateKeyPem;
@@ -29,9 +35,8 @@ const setDocumentLoader = (customLoaderMapping, config) => {
     publicKey = {
         '@context': jsigs.SECURITY_CONTEXT_URL,
         id: config.CERTIFICATE_DID,
-        type: 'RsaVerificationKey2018',
-        controller: config.CERTIFICATE_PUBKEY_ID,
-        publicKeyPem: config.publicKeyPem
+        type: 'Ed25519VerificationKey2018',
+        controller: config.CERTIFICATE_PUBKEY_ID
     };
     controller = {
         '@context': jsigs.SECURITY_CONTEXT_URL,
@@ -43,6 +48,9 @@ const setDocumentLoader = (customLoaderMapping, config) => {
     documentLoaderMapping[config.CERTIFICATE_DID] = publicKey;
     documentLoaderMapping[config.CERTIFICATE_PUBKEY_ID] = publicKey;
     documentLoaderMapping = {...documentLoaderMapping, ...customLoaderMapping}
+    certificateDID = config.CERTIFICATE_DID;
+    publicKeyBase58 = config.publicKeyBase58;
+    privateKeyBase58 = config.privateKeyBase58;
 };
 
 const customLoader = url => {
@@ -67,14 +75,21 @@ const customLoader = url => {
 
 
 async function signJSON(certificate) {
-  const key = new RSAKeyPair({...publicKey, privateKeyPem});
+  const key = new Ed25519KeyPair(
+      {
+          publicKeyBase58: publicKeyBase58,
+          privateKeyBase58: privateKeyBase58,
+          id: certificateDID
+      }
+  );
+  const purpose = new AssertionProofPurpose({
+    controller: controller
+  });
 
-  const signed = await jsigs.sign(certificate, {
+  const signed = await vc.issue({credential: certificate,
+    suite: new Ed25519Signature2018({key}),
+    purpose: purpose,
     documentLoader: customLoader,
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({
-      controller: controller
-    }),
     compactProof: false
   });
 
