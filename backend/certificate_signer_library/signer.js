@@ -28,16 +28,37 @@ let maxRetrycount = 0;
 let certificateDID = '';
 let publicKeyBase58 = '';
 let privateKeyBase58 = '';
+const KeyType = {
+  RSA: "RSA",
+  ED25519: "ED25519"
+};
+let signingKeyType = KeyType.RSA;
+
+const getPublicKey = (config) => {
+    switch (config.keyType) {
+        case KeyType.RSA:
+            return {
+                '@context': jsigs.SECURITY_CONTEXT_URL,
+                id: config.CERTIFICATE_DID,
+                type: 'RsaVerificationKey2018',
+                controller: config.CERTIFICATE_PUBKEY_ID,
+                publicKeyPem: config.publicKeyPem
+            }
+        case KeyType.ED25519:
+            return {
+                '@context': jsigs.SECURITY_CONTEXT_URL,
+                id: config.CERTIFICATE_DID,
+                type: 'Ed25519VerificationKey2018',
+                controller: config.CERTIFICATE_PUBKEY_ID
+            };
+    }
+};
 
 const setDocumentLoader = (customLoaderMapping, config) => {
     privateKeyPem = config.privateKeyPem;
     maxRetrycount = config.CERTIFICATE_RETRY_COUNT;
-    publicKey = {
-        '@context': jsigs.SECURITY_CONTEXT_URL,
-        id: config.CERTIFICATE_DID,
-        type: 'Ed25519VerificationKey2018',
-        controller: config.CERTIFICATE_PUBKEY_ID
-    };
+    signingKeyType = config?.keyType || KeyType.RSA;
+    publicKey = getPublicKey(config);
     controller = {
         '@context': jsigs.SECURITY_CONTEXT_URL,
         id: config.CERTIFICATE_CONTROLLER_ID,
@@ -49,8 +70,8 @@ const setDocumentLoader = (customLoaderMapping, config) => {
     documentLoaderMapping[config.CERTIFICATE_PUBKEY_ID] = publicKey;
     documentLoaderMapping = {...documentLoaderMapping, ...customLoaderMapping}
     certificateDID = config.CERTIFICATE_DID;
-    publicKeyBase58 = config.publicKeyBase58;
-    privateKeyBase58 = config.privateKeyBase58;
+    publicKeyBase58 = config?.publicKeyBase58 || "";
+    privateKeyBase58 = config?.privateKeyBase58 || "";
 };
 
 const customLoader = url => {
@@ -75,23 +96,38 @@ const customLoader = url => {
 
 
 async function signJSON(certificate) {
-  const key = new Ed25519KeyPair(
-      {
-          publicKeyBase58: publicKeyBase58,
-          privateKeyBase58: privateKeyBase58,
-          id: certificateDID
-      }
-  );
-  const purpose = new AssertionProofPurpose({
-    controller: controller
-  });
+  let signed = "";
+  if (signingKeyType === KeyType.RSA) {
+      const key = new RSAKeyPair({...publicKey, privateKeyPem});
 
-  const signed = await vc.issue({credential: certificate,
-    suite: new Ed25519Signature2018({key}),
-    purpose: purpose,
-    documentLoader: customLoader,
-    compactProof: false
-  });
+      signed = await jsigs.sign(certificate, {
+          documentLoader: customLoader,
+          suite: new RsaSignature2018({key}),
+          purpose: new AssertionProofPurpose({
+              controller: controller
+          }),
+          compactProof: false
+      });
+  } else if (signingKeyType === KeyType.ED25519) {
+      const key = new Ed25519KeyPair(
+          {
+              publicKeyBase58: publicKeyBase58,
+              privateKeyBase58: privateKeyBase58,
+              id: certificateDID
+          }
+      );
+      const purpose = new AssertionProofPurpose({
+          controller: controller
+      });
+
+      signed = await vc.issue({
+          credential: certificate,
+          suite: new Ed25519Signature2018({key}),
+          purpose: purpose,
+          documentLoader: customLoader,
+          compactProof: false
+      });
+  }
 
   console.info("Signed cert " + JSON.stringify(signed));
   return signed;
@@ -141,5 +177,6 @@ module.exports = {
   signAndSave,
   signJSON,
   customLoader,
-  setDocumentLoader
+  setDocumentLoader,
+  KeyType
 };

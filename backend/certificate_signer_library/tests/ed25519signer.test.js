@@ -2,7 +2,7 @@
 const {vaccinationContext} = require("vaccination-context");
 
 const vc = require('vc-js');
-const {setDocumentLoader,signJSON, customLoader} = require('../signer');
+const {setDocumentLoader,signJSON, customLoader, KeyType} = require('../signer');
 const {transformW3} = require('./signer.test');
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -60,7 +60,7 @@ const key = new Ed25519KeyPair(
 );
 let documentLoaderMapping = {};
 documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
-setDocumentLoader(documentLoaderMapping, {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, publicKeyBase58: "DaipNW4xaH2bh1XGNNdqjnSYyru3hLnUgTBSfSvmZ2hi", privateKeyBase58: '41WN3qJL5Agwg8MERbEmMLKnkNstv5iSD8oJ8sRnDyBUegeGKgjqgKm9qZTmhcLQSWCdTkSN3Cd1tPqMn1rjM3BJ'})
+setDocumentLoader(documentLoaderMapping, {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, keyType: KeyType.ED25519, publicKeyBase58: "DaipNW4xaH2bh1XGNNdqjnSYyru3hLnUgTBSfSvmZ2hi", privateKeyBase58: '41WN3qJL5Agwg8MERbEmMLKnkNstv5iSD8oJ8sRnDyBUegeGKgjqgKm9qZTmhcLQSWCdTkSN3Cd1tPqMn1rjM3BJ'})
 
 test('Sign the json', async () => {
   sign = await signJSON(transformW3(cert2, "123321"));
