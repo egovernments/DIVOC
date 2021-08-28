@@ -7,7 +7,7 @@ const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://divoc.
 const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://divoc.dev/?";
 const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "https://divoc.dev/?";
 
-const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
+const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || '0.0.0.0:9092';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
 const CERTIFY_TOPIC = process.env.CERTIFY_TOPIC || 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
