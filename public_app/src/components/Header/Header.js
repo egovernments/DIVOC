@@ -50,7 +50,7 @@ function Header() {
             </Navbar.Brand>
             <Navbar.Toggle aria-controls="basic-navbar-nav"/>
             <Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
-                <NavDropdown title={lngs[i18n.language].nativeName} id="basic-nav-dropdown">
+                <NavDropdown title={lngs[i18n.language]?.nativeName} id="basic-nav-dropdown">
                     {Object.keys(lngs).map((lng) => (
                       <NavDropdown.Item key={lng} onClick={() => i18n.changeLanguage(lng)}>
                           {lngs[lng].nativeName}
