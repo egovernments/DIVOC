@@ -1,0 +1,63 @@
+.verify-certificate-wrapper{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow: auto;
+}
+.verify-certificate-wrapper .qr-camera {
+    width: 95%;
+}
+
+.verify-certificate-wrapper .scan-btn{
+  background: transparent linear-gradient(90deg, #2CD889 0%, #4CA07A 100%) 0% 0% no-repeat padding-box;
+  border-radius: 4px;
+  color: white;
+  border: none;
+  padding: 0.5rem 3rem;
+  margin-top: 1rem
+}
+
+@media (min-width:961px) {
+  .verify-certificate-wrapper .qr-camera {
+    width: 25%;
+  }
+}
+
+.container{
+  color: #4D4F5C;
+  box-shadow: 0px 6px 20px #C1CFD933;
+  border-radius: 10px;
+  border: none;
+  text-align: left;
+}
+
+ol.verify-steps {
+  list-style: none;
+  counter-reset: item;
+  padding: 0;
+}
+.verify-steps > li {
+  counter-increment: item;
+  margin-bottom: 20px;
+}
+.verify-steps > li:before {
+  margin-right: 10px;
+  content: counter(item);
+  background: #dce0e0;
+  border-radius: 100%;
+  border-color: #E6E6E6;
+  box-shadow: 0px 6px 20px #C1CFD933;
+  width: 1.5em;
+  text-align: center;
+  display: inline-block;
+}
+
+ul.success-verify {
+  list-style: none;
+}
+.success-verify > li {
+  margin-bottom: 10px;
+}
+.success-verify > li:before {
+  content: "- ";
+}
