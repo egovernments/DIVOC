@@ -10,6 +10,7 @@ keycloak:
 kafka:
   bootstrapServers: localhost:9092
   certifyTopic: certify
+  certifiedTopic: certified
   testCertifyTopic: test_certify
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects

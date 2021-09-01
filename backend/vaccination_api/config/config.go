@@ -55,6 +55,7 @@ var Config = struct {
 	Kafka struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
 		TestCertifyTopic         string `default:"test_certify" yaml:"testCertifyTopic"`
 		TestCertifyACKTopic      string `default:"test_certify_ack" yaml:"testCertifyAckTopic"`
 		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`

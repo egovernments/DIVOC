@@ -24,7 +24,7 @@ type CertifyMessage struct {
 			AddressLine1 string `json:"addressLine1"`
 			District     string `json:"district"`
 			State        string `json:"state"`
-			Pincode      int32  `json:"pincode"`
+			Pincode      string  `json:"pincode"`
 		} `json:"address"`
 		Name string `json:"name"`
 	} `json:"facility"`
@@ -78,6 +78,60 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	_, err = connect.Exec(`
+		CREATE TABLE IF NOT EXISTS certifiedv1 (
+  certificateId String,
+  preEnrollmentCode String,
+  dt DateTime,
+  
+  age UInt8,
+  gender String,
+  district String,
+  state String,
+  
+  batch String,
+  vaccine String,
+  manufacturer String,
+  vaccinationDate DateTime,
+  effectiveStart Date,
+  effectiveUntil Date,
+  dose UInt8,
+  totalDoses UInt8,
+  
+  facilityName String,
+  facilityCountryCode FixedString(2),
+  facilityState String,
+  facilityDistrict String,
+  facilityPostalCode String,
+  vaccinatorName String,
+  
+  vaccinationAppName String,
+  vaccinationAppVersion String,
+  vaccinationAppType FixedString(2),
+  vaccinationAppDevice FixedString(2),
+  vaccinationAppDeviceOs FixedString(2),
+  vaccinationAppOSVersion String,
+  vaccinationAppMode String,
+  vaccinationAppConnectionType FixedString(2),
+  
+  facilityType FixedString(2),
+  paymentType FixedString(2),
+  registrationCategory FixedString(2),
+  registrationDataMode FixedString(2),
+  sessionDurationInMinutes UInt32,
+  uploadTimestamp DateTime,
+  verificationAttempts UInt8,
+  verificationDurationInSeconds UInt32,
+  waitForVaccinationInMinutes UInt32,
+  
+  updatedCertificate UInt8,
+  previousCertificateId String
+  
+) engine = MergeTree() order by dt
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
 	_, err = connect.Exec(fmt.Sprintf(`
 CREATE TABLE IF NOT EXISTS %s (
 dt DateTime,
@@ -108,9 +162,10 @@ dt Date
 //	}
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
-	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic)
-	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic)
+	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic, "latest")
+	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
 	wg.Wait()
 }
 
@@ -137,11 +192,11 @@ func initClickhouse() *sql.DB {
 
 type MessageCallback func(*sql.DB, string) error
 
-func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string) {
+func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string, resetOption string) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "analytics_feed",
-		"auto.offset.reset":  "earliest",
+		"auto.offset.reset":  resetOption,
 		"enable.auto.commit": "false",
 	})
 
@@ -173,6 +228,101 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 	}
 
 	c.Close()
+}
+
+func saveCertifiedEventV1(connect *sql.DB, msg string) error {
+	var certifiedMessage models.CertifiedMessage
+	if err := json.Unmarshal([]byte(msg), &certifiedMessage); err != nil {
+		log.Errorf("Kafka message unmarshalling error %+v", err)
+		return errors.New("kafka message unmarshalling failed")
+	}
+	if certifiedMessage.Certificate == nil {
+		log.Infof("Ignoring invalid message %+v", msg)
+		return nil
+	}
+
+	updatedCertificate := 0
+	if certifiedMessage.Meta.PreviousCertificateID != "" {
+		updatedCertificate = 1
+	}
+
+	// push to click house - todo: batch it
+	var (
+		tx, _     = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO certifiedv1 
+	(  certificateId,
+  preEnrollmentCode,
+  dt,
+
+  age,
+  gender,
+  district,
+  state,
+  
+  batch,
+  vaccine,
+  manufacturer,
+  vaccinationDate,
+  effectiveStart,
+  effectiveUntil,
+  dose,
+  totalDoses,
+  
+  facilityName,
+  facilityCountryCode,
+  facilityState,
+  facilityDistrict,
+  facilityPostalCode,
+  vaccinatorName,
+  
+  updatedCertificate,
+  previousCertificateId) 
+	VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+	)
+
+	if err != nil {
+		log.Infof("Error in preparing stmt %+v", err)
+	}
+	//todo collect n messages and batch write to analytics db.
+	credentialSubject := certifiedMessage.Certificate.CredentialSubject
+	age, _ := strconv.Atoi(credentialSubject.Age)
+	evidence := certifiedMessage.Certificate.Evidence[0]
+	if _, err := stmt.Exec(
+		certifiedMessage.CertificateId,
+		certifiedMessage.PreEnrollmentCode,
+		time.Now(),
+
+		age,
+		credentialSubject.Gender,
+		credentialSubject.Address.District,
+		credentialSubject.Address.AddressRegion,
+
+		evidence.Batch,
+		evidence.Vaccine,
+		evidence.Manufacturer,
+		evidence.Date,
+		evidence.EffectiveStart,
+		evidence.EffectiveUntil,
+		evidence.Dose,
+		evidence.TotalDoses,
+
+		evidence.Facility.Name,
+		evidence.Facility.Address.AddressCountry,
+		evidence.Facility.Address.AddressRegion,
+		evidence.Facility.Address.District,
+		certifiedMessage.Certificate.GetFacilityPostalCode(),
+		evidence.Verifier.Name,
+
+		updatedCertificate,
+		certifiedMessage.Meta.PreviousCertificateID,
+	); err != nil {
+		log.Fatal(err)
+	}
+	defer stmt.Close()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
 }
 
 func saveAnalyticsEvent(connect *sql.DB, msg string) error {
@@ -305,7 +455,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		"IN",
 		certifyMessage.Facility.Address.State,
 		certifyMessage.Facility.Address.District,
-		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
+		certifyMessage.Facility.Address.Pincode,
 		certifyMessage.Vaccinator.Name,
 	); err != nil {
 		log.Fatal(err)
