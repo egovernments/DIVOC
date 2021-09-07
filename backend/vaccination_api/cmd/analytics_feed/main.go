@@ -105,25 +105,6 @@ func main() {
   facilityPostalCode String,
   vaccinatorName String,
   
-  vaccinationAppName String,
-  vaccinationAppVersion String,
-  vaccinationAppType FixedString(2),
-  vaccinationAppDevice FixedString(2),
-  vaccinationAppDeviceOs FixedString(2),
-  vaccinationAppOSVersion String,
-  vaccinationAppMode String,
-  vaccinationAppConnectionType FixedString(2),
-  
-  facilityType FixedString(2),
-  paymentType FixedString(2),
-  registrationCategory FixedString(2),
-  registrationDataMode FixedString(2),
-  sessionDurationInMinutes UInt32,
-  uploadTimestamp DateTime,
-  verificationAttempts UInt8,
-  verificationDurationInSeconds UInt32,
-  waitForVaccinationInMinutes UInt32,
-  
   updatedCertificate UInt8,
   previousCertificateId String
   
@@ -236,9 +217,15 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
 		return errors.New("kafka message unmarshalling failed")
 	}
-	if certifiedMessage.Certificate == nil {
+	if certifiedMessage.Certificate == "" {
 		log.Infof("Ignoring invalid message %+v", msg)
 		return nil
+	}
+
+	var certificate models.Certificate
+	if err := json.Unmarshal([]byte(certifiedMessage.Certificate), &certificate); err != nil {
+		log.Errorf("certificate string unmarshalling error %+v", err)
+		return errors.New("certificate string unmarshalling failed")
 	}
 
 	updatedCertificate := 0
@@ -284,9 +271,9 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		log.Infof("Error in preparing stmt %+v", err)
 	}
 	//todo collect n messages and batch write to analytics db.
-	credentialSubject := certifiedMessage.Certificate.CredentialSubject
+	credentialSubject := certificate.CredentialSubject
 	age, _ := strconv.Atoi(credentialSubject.Age)
-	evidence := certifiedMessage.Certificate.Evidence[0]
+	evidence := certificate.Evidence[0]
 	if _, err := stmt.Exec(
 		certifiedMessage.CertificateId,
 		certifiedMessage.PreEnrollmentCode,
@@ -310,7 +297,7 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		evidence.Facility.Address.AddressCountry,
 		evidence.Facility.Address.AddressRegion,
 		evidence.Facility.Address.District,
-		certifiedMessage.Certificate.GetFacilityPostalCode(),
+		certificate.GetFacilityPostalCode(),
 		evidence.Verifier.Name,
 
 		updatedCertificate,
