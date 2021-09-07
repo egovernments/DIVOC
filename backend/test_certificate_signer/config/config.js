@@ -1,4 +1,4 @@
-const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/testCertificate/v1";
+const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cvstatus.icmr.gov.in/credentials/testCertificate/v1";
 const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://divoc.dev/';
 const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
 const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:india';
