@@ -27,7 +27,7 @@ const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
 const {testCertificateContext} = require('test-certificate-context');
-const testCertificateContextUrl = "https://cowin.gov.in/credentials/testCertificate/v1";
+const testCertificateContextUrl = "https://cvstatus.icmr.gov.in/credentials/testCertificate/v1";
 
 const customLoader = url => {
     console.log("checking " + url);

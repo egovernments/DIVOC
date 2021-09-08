@@ -5,7 +5,7 @@ const testCertificateContext = {
     "id": "@id",
     "type": "@type",
     "schema": "https://schema.org/",
-    "vac": "https://cowin.gov.in/credentials/testCertificate/v1",
+    "vac": "https://cvstatus.icmr.gov.in/credentials/testCertificate/v1",
     "ProofOfTestCertificateCredential":{
       "@id": "schema:ProofOfTestCredential",
       "@context": {
