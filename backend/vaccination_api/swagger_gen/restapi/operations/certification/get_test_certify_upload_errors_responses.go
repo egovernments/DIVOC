@@ -80,7 +80,7 @@ func (o *GetTestCertifyUploadErrorsForbidden) WriteResponse(rw http.ResponseWrit
 // GetTestCertifyUploadErrorsNotFoundCode is the HTTP code returned for type GetTestCertifyUploadErrorsNotFound
 const GetTestCertifyUploadErrorsNotFoundCode int = 404
 
-/*GetTestCertifyUploadErrorsNotFound certify upload for given uploadID not found
+/*GetTestCertifyUploadErrorsNotFound test certify upload for given uploadID not found
 
 swagger:response getTestCertifyUploadErrorsNotFound
 */

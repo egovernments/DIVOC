@@ -275,7 +275,7 @@ func startCertificateRevocationConsumer(servers string) {
 			panic(err)
 		}
 
-		consumer.SubscribeTopics([]string{"certified"}, nil)
+		consumer.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
 
 		for {
 			msg, err := consumer.ReadMessage(-1)

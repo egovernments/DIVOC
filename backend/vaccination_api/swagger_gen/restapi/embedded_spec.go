@@ -681,7 +681,7 @@ func init() {
         "tags": [
           "certification"
         ],
-        "summary": "Get all file uploads for certification for given facility admin",
+        "summary": "Get all file uploads for test certification for given facility admin",
         "operationId": "getTestCertifyUploads",
         "responses": {
           "200": {
@@ -730,7 +730,7 @@ func init() {
             "description": "Forbidden for user"
           },
           "404": {
-            "description": "certify upload for given uploadID not found"
+            "description": "test certify upload for given uploadID not found"
           }
         }
       }
@@ -2037,7 +2037,7 @@ func init() {
         "tags": [
           "certification"
         ],
-        "summary": "Get all file uploads for certification for given facility admin",
+        "summary": "Get all file uploads for test certification for given facility admin",
         "operationId": "getTestCertifyUploads",
         "responses": {
           "200": {
@@ -2086,7 +2086,7 @@ func init() {
             "description": "Forbidden for user"
           },
           "404": {
-            "description": "certify upload for given uploadID not found"
+            "description": "test certify upload for given uploadID not found"
           }
         }
       }
