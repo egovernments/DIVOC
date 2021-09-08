@@ -57,7 +57,7 @@ func createTestCertificate(data *Scanner, uploadDetails *db.TestCertifyUploads) 
 			AddressLine1: &certifyData.RecipientAddressLine1,
 			AddressLine2: certifyData.RecipientAddressLine2,
 			District:     &certifyData.RecipientDistrict,
-			Pincode:      &certifyData.RecipientPincode,
+			Pincode:      certifyData.RecipientPincode,
 			State:        &certifyData.RecipientState,
 		},
 		Contact:     contact,
@@ -98,7 +98,7 @@ func createTestCertificate(data *Scanner, uploadDetails *db.TestCertifyUploads) 
 			AddressLine2: certifyData.FacilityAddressLine2,
 			District:     &certifyData.FacilityDistrict,
 			State:        &certifyData.FacilityState,
-			Pincode:      &certifyData.FacilityPincode,
+			Pincode:      certifyData.FacilityPincode,
 		},
 	}
 

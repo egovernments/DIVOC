@@ -115,6 +115,7 @@ function transformW3(cert, certificateId) {
       name: R.pathOr('', ['recipient', 'name'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
       dob: R.pathOr('', ['recipient', 'dob'], cert),
+      age: R.pathOr('', ['recipient', 'age'], cert),
       nationality: R.pathOr('', ['recipient', 'nationality'], cert),
       address: {
         "streetAddress": R.pathOr('', ['recipient', 'address', 'addressLine1'], cert),

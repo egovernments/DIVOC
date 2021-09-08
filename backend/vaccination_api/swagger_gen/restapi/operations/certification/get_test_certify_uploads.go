@@ -33,7 +33,7 @@ func NewGetTestCertifyUploads(ctx *middleware.Context, handler GetTestCertifyUpl
 
 /*GetTestCertifyUploads swagger:route GET /test/certify/uploads certification getTestCertifyUploads
 
-Get all file uploads for certification for given facility admin
+Get all file uploads for test certification for given facility admin
 
 */
 type GetTestCertifyUploads struct {

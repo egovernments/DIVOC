@@ -1,6 +1,6 @@
 {
   "name": "test-certificate-context",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "medical test context for verifiable certificate",
   "main": "test-certificate-context.js",
   "scripts": {
