@@ -678,6 +678,11 @@ definitions:
             type: string
             format: date
             x-nullable: true
+          age:
+            type: string
+            pattern: '^[0-9]+ (year|month|day)s?$'
+            example:
+              "10 years"
           gender:
             type: string
             minLength: 1
@@ -711,11 +716,10 @@ definitions:
               - addressLine1
               - district
               - state
-              - pincode
         required:
           - name
           - gender
-          - dob
+          - age
           - identity
           - contact
       testDetails:
@@ -782,7 +786,6 @@ definitions:
               - addressLine1
               - district
               - state
-              - pincode
         required:
           - name
           - address

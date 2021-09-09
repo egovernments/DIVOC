@@ -293,9 +293,8 @@ type TestCertificationRequestFacilityAddress struct {
 	District *string `json:"district"`
 
 	// pincode
-	// Required: true
 	// Min Length: 1
-	Pincode *string `json:"pincode"`
+	Pincode string `json:"pincode,omitempty"`
 
 	// state
 	// Required: true
@@ -353,11 +352,11 @@ func (m *TestCertificationRequestFacilityAddress) validateDistrict(formats strfm
 
 func (m *TestCertificationRequestFacilityAddress) validatePincode(formats strfmt.Registry) error {
 
-	if err := validate.Required("facility"+"."+"address"+"."+"pincode", "body", m.Pincode); err != nil {
-		return err
+	if swag.IsZero(m.Pincode) { // not required
+		return nil
 	}
 
-	if err := validate.MinLength("facility"+"."+"address"+"."+"pincode", "body", string(*m.Pincode), 1); err != nil {
+	if err := validate.MinLength("facility"+"."+"address"+"."+"pincode", "body", string(m.Pincode), 1); err != nil {
 		return err
 	}
 
@@ -403,14 +402,18 @@ type TestCertificationRequestRecipient struct {
 	// address
 	Address *TestCertificationRequestRecipientAddress `json:"address,omitempty"`
 
+	// age
+	// Required: true
+	// Pattern: ^[0-9]+ (year|month|day)s?$
+	Age *string `json:"age"`
+
 	// contact
 	// Required: true
 	Contact []string `json:"contact"`
 
 	// dob
-	// Required: true
 	// Format: date
-	Dob *strfmt.Date `json:"dob"`
+	Dob *strfmt.Date `json:"dob,omitempty"`
 
 	// gender
 	// Required: true
@@ -437,6 +440,10 @@ func (m *TestCertificationRequestRecipient) Validate(formats strfmt.Registry) er
 	var res []error
 
 	if err := m.validateAddress(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateAge(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -488,6 +495,19 @@ func (m *TestCertificationRequestRecipient) validateAddress(formats strfmt.Regis
 	return nil
 }
 
+func (m *TestCertificationRequestRecipient) validateAge(formats strfmt.Registry) error {
+
+	if err := validate.Required("recipient"+"."+"age", "body", m.Age); err != nil {
+		return err
+	}
+
+	if err := validate.Pattern("recipient"+"."+"age", "body", string(*m.Age), `^[0-9]+ (year|month|day)s?$`); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (m *TestCertificationRequestRecipient) validateContact(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"contact", "body", m.Contact); err != nil {
@@ -507,8 +527,8 @@ func (m *TestCertificationRequestRecipient) validateContact(formats strfmt.Regis
 
 func (m *TestCertificationRequestRecipient) validateDob(formats strfmt.Registry) error {
 
-	if err := validate.Required("recipient"+"."+"dob", "body", m.Dob); err != nil {
-		return err
+	if swag.IsZero(m.Dob) { // not required
+		return nil
 	}
 
 	if err := validate.FormatOf("recipient"+"."+"dob", "body", "date", m.Dob.String(), formats); err != nil {
@@ -606,8 +626,7 @@ type TestCertificationRequestRecipientAddress struct {
 	District *string `json:"district"`
 
 	// pincode
-	// Required: true
-	Pincode *string `json:"pincode"`
+	Pincode string `json:"pincode,omitempty"`
 
 	// state
 	// Required: true
@@ -624,10 +643,6 @@ func (m *TestCertificationRequestRecipientAddress) Validate(formats strfmt.Regis
 	}
 
 	if err := m.validateDistrict(formats); err != nil {
-		res = append(res, err)
-	}
-
-	if err := m.validatePincode(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -657,15 +672,6 @@ func (m *TestCertificationRequestRecipientAddress) validateDistrict(formats strf
 	}
 
 	if err := validate.MinLength("recipient"+"."+"address"+"."+"district", "body", string(*m.District), 1); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func (m *TestCertificationRequestRecipientAddress) validatePincode(formats strfmt.Registry) error {
-
-	if err := validate.Required("recipient"+"."+"address"+"."+"pincode", "body", m.Pincode); err != nil {
 		return err
 	}
 

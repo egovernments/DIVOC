@@ -681,7 +681,7 @@ func init() {
         "tags": [
           "certification"
         ],
-        "summary": "Get all file uploads for certification for given facility admin",
+        "summary": "Get all file uploads for test certification for given facility admin",
         "operationId": "getTestCertifyUploads",
         "responses": {
           "200": {
@@ -730,7 +730,7 @@ func init() {
             "description": "Forbidden for user"
           },
           "404": {
-            "description": "certify upload for given uploadID not found"
+            "description": "test certify upload for given uploadID not found"
           }
         }
       }
@@ -1162,8 +1162,7 @@ func init() {
               "required": [
                 "addressLine1",
                 "district",
-                "state",
-                "pincode"
+                "state"
               ],
               "properties": {
                 "addressLine1": {
@@ -1207,7 +1206,7 @@ func init() {
           "required": [
             "name",
             "gender",
-            "dob",
+            "age",
             "identity",
             "contact"
           ],
@@ -1217,8 +1216,7 @@ func init() {
               "required": [
                 "addressLine1",
                 "district",
-                "state",
-                "pincode"
+                "state"
               ],
               "properties": {
                 "addressLine1": {
@@ -1239,6 +1237,11 @@ func init() {
                   "minLength": 1
                 }
               }
+            },
+            "age": {
+              "type": "string",
+              "pattern": "^[0-9]+ (year|month|day)s?$",
+              "example": "10 years"
             },
             "contact": {
               "type": "array",
@@ -2037,7 +2040,7 @@ func init() {
         "tags": [
           "certification"
         ],
-        "summary": "Get all file uploads for certification for given facility admin",
+        "summary": "Get all file uploads for test certification for given facility admin",
         "operationId": "getTestCertifyUploads",
         "responses": {
           "200": {
@@ -2086,7 +2089,7 @@ func init() {
             "description": "Forbidden for user"
           },
           "404": {
-            "description": "certify upload for given uploadID not found"
+            "description": "test certify upload for given uploadID not found"
           }
         }
       }
@@ -2802,8 +2805,7 @@ func init() {
               "required": [
                 "addressLine1",
                 "district",
-                "state",
-                "pincode"
+                "state"
               ],
               "properties": {
                 "addressLine1": {
@@ -2847,7 +2849,7 @@ func init() {
           "required": [
             "name",
             "gender",
-            "dob",
+            "age",
             "identity",
             "contact"
           ],
@@ -2857,8 +2859,7 @@ func init() {
               "required": [
                 "addressLine1",
                 "district",
-                "state",
-                "pincode"
+                "state"
               ],
               "properties": {
                 "addressLine1": {
@@ -2879,6 +2880,11 @@ func init() {
                   "minLength": 1
                 }
               }
+            },
+            "age": {
+              "type": "string",
+              "pattern": "^[0-9]+ (year|month|day)s?$",
+              "example": "10 years"
             },
             "contact": {
               "type": "array",
@@ -2983,8 +2989,7 @@ func init() {
           "required": [
             "addressLine1",
             "district",
-            "state",
-            "pincode"
+            "state"
           ],
           "properties": {
             "addressLine1": {
@@ -3018,8 +3023,7 @@ func init() {
       "required": [
         "addressLine1",
         "district",
-        "state",
-        "pincode"
+        "state"
       ],
       "properties": {
         "addressLine1": {
@@ -3047,7 +3051,7 @@ func init() {
       "required": [
         "name",
         "gender",
-        "dob",
+        "age",
         "identity",
         "contact"
       ],
@@ -3057,8 +3061,7 @@ func init() {
           "required": [
             "addressLine1",
             "district",
-            "state",
-            "pincode"
+            "state"
           ],
           "properties": {
             "addressLine1": {
@@ -3079,6 +3082,11 @@ func init() {
               "minLength": 1
             }
           }
+        },
+        "age": {
+          "type": "string",
+          "pattern": "^[0-9]+ (year|month|day)s?$",
+          "example": "10 years"
         },
         "contact": {
           "type": "array",
@@ -3115,8 +3123,7 @@ func init() {
       "required": [
         "addressLine1",
         "district",
-        "state",
-        "pincode"
+        "state"
       ],
       "properties": {
         "addressLine1": {

@@ -23,6 +23,7 @@ const testCertificateContext = {
         "uhid": "schema:id",
         "name": "schema:name",
         "dob": "schema:date",
+        "age": "schema:text",
         "gender": "schema:gender",
         "nationality": "schema:nationality",
         "address": {
