@@ -63,8 +63,8 @@ export const TestCertificateDetailsPaths = {
         path: ["credentialSubject", "name"],
         format: (data) => (data)
     },
-    "DOB": {
-        path: ["credentialSubject", "dob"],
+    "Age": {
+        path: ["credentialSubject", "age"],
         format: (data) => (data)
     },
     "Gender": {
