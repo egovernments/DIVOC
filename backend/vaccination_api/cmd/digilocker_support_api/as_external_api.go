@@ -4,15 +4,109 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/divoc/api/pkg"
+	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/kernel_library/services"
+	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 	"net/http"
+	"strings"
 )
 
 type ErrorResponse struct {
 	Status    string `json:"status"`
 	ErrorCode int    `json:"errorCode"`
 	Message   string `json:"message"`
+}
+
+type CertificateKYCResponse struct {
+	Name        string 		`json:"name"`
+	Age         string 		`json:"age"`
+	Gender      string 		`json:"gender"`
+	Identity    string 		`json:"identity"`
+	RefId       string 		`json:"refId"`
+	Vaccine     string 		`json:"vaccine"`
+	Status    	string 		`json:"status"`
+	DateOfDose1 string 	`json:"dateOfDose1"`
+	DateOfDose2 string 	`json:"dateOfDose2"`
+}
+
+const NOT_VACCINATED = "NOT_VACCINATED"
+const PARTIALLY_VACCINATED = "PARTIALLY_VACCINATED"
+const FULLY_VACCINATED = "FULLY_VACCINATED"
+
+func getCertificateKYCDetailsExternalApiHandler(w http.ResponseWriter, r *http.Request) {
+	eventTag := EventTagExternal
+	log.Infof("kyc request %s", eventTag)
+
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
+	if err != nil {
+		log.Infof("Error %+v", err)
+		publishEvent(pkg.ToString(preEnrollmentCode), eventTag+EventTagFailed, "Unknown "+err.Error())
+		w.WriteHeader(500)
+		return
+	}
+	if latestSignedJson != "" {
+		if kycResponse, err := getKYCDetailsFromCertificate(latestSignedJson, provisionalSignedJson); err != nil {
+			log.Errorf("Error in getting KYC Details from certificate %s", err.Error())
+			publishEvent(pkg.ToString(preEnrollmentCode), eventTag+EventTagFailed, "Unknown "+err.Error())
+			w.WriteHeader(500)
+			return
+		} else {
+			log.Infof("%v", kycResponse)
+			writeResponse(w, 200, kycResponse)
+			w.WriteHeader(200)
+			publishEvent(pkg.ToString(preEnrollmentCode), eventTag+EventTagSuccess, "Certificate found")
+		}
+
+	} else {
+		log.Errorf("No certificates found for BeneficiaryId %v", preEnrollmentCode)
+		writeResponse(w, 404, certificateNotFoundForBeneficiaryId(pkg.ToString(preEnrollmentCode)))
+		publishEvent(pkg.ToString(preEnrollmentCode), eventTag+EventTagFailed, "Certificate not found")
+	}
+}
+
+func getKYCDetailsFromCertificate(latestCertificateText string, provisionalSignedJson string) (CertificateKYCResponse, error) {
+	var certificate models.Certificate
+	var status = NOT_VACCINATED
+	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
+		log.Error("Unable to parse certificate string", err)
+		return CertificateKYCResponse{}, err
+	}
+	var provisionalDoseDate string
+	var finalDoseDate string
+
+	if !isFinal(certificate) {
+		status = PARTIALLY_VACCINATED
+		provisionalDoseDate = certificate.Evidence[0].Date.Format("02-01-2006")
+	} else {
+		status = FULLY_VACCINATED
+		finalDoseDate = certificate.Evidence[0].Date.Format("02-01-2006")
+		var provisionalCertificate *models.Certificate
+		if provisionalSignedJson != "" {
+			if err := json.Unmarshal([]byte(provisionalSignedJson), &provisionalCertificate); err != nil {
+				log.Error("Unable to parse provisional certificate string", err)
+				return CertificateKYCResponse{}, err
+			} else {
+				provisionalDoseDate = provisionalCertificate.Evidence[0].Date.Format("02-01-2006")
+			}
+		}
+	}
+
+	response := CertificateKYCResponse{
+		Name:        certificate.CredentialSubject.Name,
+		Gender:      certificate.CredentialSubject.Gender,
+		Age:         certificate.CredentialSubject.Age,
+		RefId:       certificate.CredentialSubject.RefId,
+		Identity:    formatId(certificate.CredentialSubject.ID),
+		Status:      status,
+		Vaccine:     strings.ToUpper(certificate.Evidence[0].Vaccine),
+		DateOfDose1: provisionalDoseDate,
+		DateOfDose2: finalDoseDate,
+	}
+	return response, nil
+
 }
 
 func getCertificatePDFExternalApiHandler(w http.ResponseWriter, r *http.Request) {
@@ -161,7 +255,7 @@ func certificateNotFoundForBeneficiaryId(beneficiaryId string) ErrorResponse {
 	return errorResponse
 }
 
-func writeResponse(w http.ResponseWriter, statusCode int, payload ErrorResponse) {
+func writeResponse(w http.ResponseWriter, statusCode int, payload interface{}) {
 
 	if payloadBytes, err := json.Marshal(payload); err == nil {
 		w.Header().Set("Content-Type", "application/json")
