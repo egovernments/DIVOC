@@ -18,7 +18,7 @@
     "react-router-dom": "^5.2.0",
     "react-scripts": "4.0.3",
     "redux": "^4.0.5",
-    "test-certificate-context": "^1.0.1",
+    "test-certificate-context": "^1.0.2",
     "vc-js": "^0.6.4",
     "web-vitals": "^1.0.1",
     "zbar.wasm": "^2.0.3"
