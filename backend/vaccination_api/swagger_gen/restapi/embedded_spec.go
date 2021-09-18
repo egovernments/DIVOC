@@ -206,6 +206,43 @@ func init() {
         }
       }
     },
+    "/v1/certificates/revoke": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "number",
+            "description": "dose for which certificate needs to be revoked",
+            "name": "dose",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found for given beneficiary, dose"
+          }
+        }
+      }
+    },
     "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
@@ -1409,6 +1446,43 @@ func init() {
         }
       }
     },
+    "/v1/certificates/revoke": {
+      "post": {
+        "security": [],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "number",
+            "description": "dose for which certificate needs to be revoked",
+            "name": "dose",
+            "in": "query",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found for given beneficiary, dose"
+          }
+        }
+      }
+    },
     "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator athorization and vaccinator should be trained for the vaccination that is being certified.",
@@ -1788,7 +1862,19 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
             }
           }
         }

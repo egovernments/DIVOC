@@ -29,7 +29,7 @@ func NewPostAuthorize(ctx *middleware.Context, handler PostAuthorizeHandler) *Po
 	return &PostAuthorize{Context: ctx, Handler: handler}
 }
 
-/* PostAuthorize swagger:route POST /authorize login postAuthorize
+/*PostAuthorize swagger:route POST /authorize login postAuthorize
 
 Establish token
 
@@ -42,15 +42,17 @@ type PostAuthorize struct {
 func (o *PostAuthorize) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		*r = *rCtx
+		r = rCtx
 	}
 	var Params = NewPostAuthorizeParams()
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
 	res := o.Handler.Handle(Params) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

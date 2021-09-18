@@ -110,6 +110,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
 		}),
+		CertificationRevokeCertificateHandler: certification.RevokeCertificateHandlerFunc(func(params certification.RevokeCertificateParams) middleware.Responder {
+			return middleware.NotImplemented("operation certification.RevokeCertificate has not yet been implemented")
+		}),
 		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
 		}),
@@ -138,11 +141,9 @@ type DivocAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -203,9 +204,10 @@ type DivocAPI struct {
 	SideEffectsGetSideEffectsMetadataHandler side_effects.GetSideEffectsMetadataHandler
 	// ConfigurationGetVaccinatorsHandler sets the operation handler for the get vaccinators operation
 	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
+	// CertificationRevokeCertificateHandler sets the operation handler for the revoke certificate operation
+	CertificationRevokeCertificateHandler certification.RevokeCertificateHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
-
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -345,6 +347,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.ConfigurationGetVaccinatorsHandler == nil {
 		unregistered = append(unregistered, "configuration.GetVaccinatorsHandler")
+	}
+	if o.CertificationRevokeCertificateHandler == nil {
+		unregistered = append(unregistered, "certification.RevokeCertificateHandler")
 	}
 	if o.CertificationUpdateCertificateHandler == nil {
 		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
@@ -525,6 +530,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/v1/vaccinators"] = configuration.NewGetVaccinators(o.context, o.ConfigurationGetVaccinatorsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v1/certificates/revoke"] = certification.NewRevokeCertificate(o.context, o.CertificationRevokeCertificateHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}

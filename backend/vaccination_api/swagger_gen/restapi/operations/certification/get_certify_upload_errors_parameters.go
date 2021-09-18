@@ -15,8 +15,7 @@ import (
 )
 
 // NewGetCertifyUploadErrorsParams creates a new GetCertifyUploadErrorsParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetCertifyUploadErrorsParams() GetCertifyUploadErrorsParams {
 
 	return GetCertifyUploadErrorsParams{}
@@ -51,6 +50,7 @@ func (o *GetCertifyUploadErrorsParams) BindRequest(r *http.Request, route *middl
 	if err := o.bindUploadID(rUploadID, rhkUploadID, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}

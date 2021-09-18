@@ -142,6 +142,31 @@ paths:
           description: certificate not found in revocation list
         '400':
           description: Invalid input
+  /v1/certificates/revoke:
+    post:
+      tags:
+        - certification
+      summary: Revoke certificates for given preEnrollmentCode and dose
+      operationId: revokeCertificate
+      security: []
+      parameters:
+        - name: preEnrollmentCode
+          in: query
+          required: true
+          type: string
+          description: refId for which certificate needs to be revoked
+        - name: dose
+          in: query
+          type: number
+          required: true
+          description: dose for which certificate needs to be revoked
+      responses:
+        '200':
+          description: OK
+        '404':
+          description: certificate not found for given beneficiary, dose
+        '400':
+          description: Invalid input
   /v1/bulkCertify:
     post:
       tags:

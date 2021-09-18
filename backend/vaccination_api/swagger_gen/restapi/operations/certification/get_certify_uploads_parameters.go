@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetCertifyUploadsParams creates a new GetCertifyUploadsParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetCertifyUploadsParams() GetCertifyUploadsParams {
 
 	return GetCertifyUploadsParams{}

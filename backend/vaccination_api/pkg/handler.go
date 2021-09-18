@@ -60,6 +60,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
+	api.CertificationRevokeCertificateHandler = certification.RevokeCertificateHandlerFunc(revokeCertificate)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -559,6 +560,112 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 		}
 	}
 	return certificate_revoked.NewCertificateRevokedBadRequest()
+}
+
+func revokeCertificate(params certification.RevokeCertificateParams) middleware.Responder {
+
+	if params.PreEnrollmentCode == "" || params.Dose < 0 {
+		return certification.NewRevokeCertificateBadRequest()
+	}
+	preEnrollCode := params.PreEnrollmentCode
+	dose := params.Dose
+
+	// get associated certificates
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollCode,
+		},
+		"dose": map[string]interface{}{
+			"eq": params.Dose,
+		},
+	}
+
+	var certificateFailedToAddToRevocationList []string
+	var certificateFailedToDeleteFromVaccCertRegistry []string
+	if response, err := services.QueryRegistry(typeId, filter); err != nil {
+		log.Infof("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		if listOfCerts, ok := response["VaccinationCertificate"].([]interface{}); ok {
+			if len(listOfCerts) == 0 {
+				return certification.NewRevokeCertificateNotFound()
+			}
+			for _, v := range listOfCerts {
+				if body, ok := v.(map[string]interface{}); ok {
+					certificateId := body["certificateId"].(string)
+					if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
+						log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
+						certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
+					} else {
+						err = addCertificateToRevocationList(preEnrollCode, int(dose), certificateId)
+						if err != nil {
+							log.Errorf("Failed to add certificate %v to revocation list", certificateId)
+							certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
+						}
+					}
+				}
+			}
+			if len(certificateFailedToAddToRevocationList) > 0 || len(certificateFailedToDeleteFromVaccCertRegistry) > 0 {
+				return NewGenericServerError()
+			}
+			return certification.NewRevokeCertificateOK()
+		} else {
+			log.Errorf("Error occurred while extracting the certificates from registry response")
+			return NewGenericServerError()
+		}
+	}
+}
+
+func deleteVaccineCertificate(osid string) error {
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+		"osid": osid,
+	}
+	if _, err := services.DeleteRegistry(typeId, filter); err != nil {
+		log.Errorf("Error in deleting vaccination certificate %+v", err)
+		return errors.New("error in deleting vaccination certificate")
+	} else {
+		return nil
+	}
+}
+
+func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) error{
+	typeId := "RevokedCertificate"
+
+	revokedCertificate := map[string]interface{}{
+		"preEnrollmentCode":     preEnrollmentCode,
+		"dose":                  dose,
+		"previousCertificateId": certificateId,
+	}
+	filter := map[string]interface{}{
+		"previousCertificateId": map[string]interface{}{
+			"eq": certificateId,
+		},
+		"dose": map[string]interface{}{
+			"eq": dose,
+		},
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if resp, err := services.QueryRegistry(typeId, filter); err == nil {
+		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+			if len(revokedCertificates) > 0 {
+				log.Infof("%v certificateId already exist in revocation", certificateId)
+				return nil
+			}
+			err := services.CreateNewRegistry(revokedCertificate, typeId)
+			if err != nil {
+				log.Errorf("Failed saving revoked certificate %+v", err)
+				return err
+			}
+			log.Infof("%v certificateId added to revocation", certificateId)
+			return nil
+		}
+	}
+	return errors.New("Error occurred while adding certificate to revocation list")
 }
 
 func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {

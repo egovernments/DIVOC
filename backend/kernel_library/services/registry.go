@@ -199,6 +199,36 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 	return responseObject.Result, nil
 }
 
+func DeleteRegistry(typeId string, update map[string]interface{}) (map[string]interface{}, error) {
+
+	queryRequest := RegistryRequest{
+		"open-saber.registry.read",
+		"1.0",
+		map[string]interface{}{
+			typeId: update,
+		},
+	}
+	log.Info("Registry query ", queryRequest)
+	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.DeleteOperationId, req.BodyJSON(queryRequest))
+	if err != nil {
+		return nil, errors.Errorf("Error while deleting registry", err)
+	}
+	if response.Response().StatusCode != 200 {
+		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
+	}
+	responseObject := RegistryResponse{}
+	err = response.ToJSON(&responseObject)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to parse response from registry.")
+	}
+	log.Infof("Response %+v", responseObject)
+	if responseObject.Params.Status != "SUCCESSFUL" {
+		log.Infof("Response from registry %+v", responseObject)
+		return nil, errors.New("Failed while querying from registry")
+	}
+	return responseObject.Result, nil
+}
+
 func GetVaccinatorsForTheFacility(facilityCode string) (interface{}, error) {
 	filter := map[string]interface{}{
 		"facilityIds": map[string]interface{}{
