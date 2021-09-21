@@ -79,7 +79,7 @@ const cert2 = {
 test('should convert W3C certificate json to fhir json', () => {
 
     let fhirCert = certificateToFhirJson(cert2, privateKeyPem);
-    console.log(fhirCert);
+    console.log(JSON.stringify(fhirCert));
 
     expect(fhirCert.entry[0].fullUrl).toContain('urn:uuid:');
 

@@ -45,13 +45,14 @@ function certificateToFhirJson(certificate, privateSigningKeyPem) {
     const batchNumber = R.pathOr('', ['evidence', 0, 'batch'], certificate);
     const effectiveUntilDate = R.pathOr('', ['evidence', 0, 'effectiveUntil'], certificate);
     const dose = parseInt(R.pathOr('', ['evidence', 0, 'dose'], certificate));
+    const totalDoses = parseInt(R.pathOr('', ['evidence', 0, 'totalDoses'], certificate));
 
     const data = {
         dateString, patientId, organisationId, practitionerId, bundleId, compositionId, immunizationId,
         practitionerName, vaccineName, vaccineCode,
         facilityName, facilityCity, facilityDistrict, facilityCountry, facilityId,
         patientNationality, patientGovtId, patientName, patientGender, vaccinationDate,
-        manufacturer, batchNumber, effectiveUntilDate, dose
+        manufacturer, batchNumber, effectiveUntilDate, dose, totalDoses
     };
 
     const template = fs.readFileSync(TEMPLATES_FOLDER+r4TemplateFile, 'utf8');
@@ -107,8 +108,27 @@ function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
         }
     };
 
-    fhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
-    fhirJson.entry.push(provenance);
+    let signature = [
+        {
+            "type": [
+                {
+                    "system": "urn:iso-astm:E1762-95:2013",
+                    "code": "1.2.840.10065.1.12.1.5",
+                    "display": "Verification Signature"
+                }
+            ],
+            "when": new Date().toJSON(),
+            "who": {
+                "reference": "Organization/"+organisationId
+            },
+            "targetFormat": "application/fhir+json",
+            "sigFormat": "application/jose",
+            "data": detachedPayloadJWS
+        }
+    ]
+
+    // fhirJson.entry.push({"fullUrl": "urn:uuid:"+provenanceId});
+    fhirJson["signature"] = signature;
 
     return fhirJson;
 }
