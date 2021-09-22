@@ -256,6 +256,16 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		return nil, err
 	}
 
+	// header dose	
+	doffsetX := 300.0
+	doffsetY := 159.0
+	pdf.SetTextColor(41,73,121) // blue
+	pdf.SetX(doffsetX)
+	pdf.SetY(doffsetY)
+	dText := formatDose(certificate.Evidence[0].Dose)
+	_ = pdf.Cell(nil, dText)
+	pdf.SetTextColor(0, 0, 0)
+
 	offsetX := 310.0
 	offsetY := 211.0
 	offsetNewX := 310.0
@@ -426,6 +436,25 @@ func appendCommaIfNotEmpty(address string, suffix string) string {
 
 func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
+}
+
+func formatDose(dose int) string {
+	return ordinalSuffixOf(dose) + " Dose"
+}
+
+func ordinalSuffixOf(i int) string {
+	j := i % 10
+	k := i % 100
+	if j == 1 && k != 11 {
+		return pkg.ToString(i) + "st"
+	}
+	if j == 2 && k != 12 {
+		return pkg.ToString(i) + "nd"
+	}
+	if j == 3 && k != 13 {
+		return pkg.ToString(i) + "rd"
+	}
+	return pkg.ToString(i) + "th"
 }
 
 func maskId(id string) string {
