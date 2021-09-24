@@ -36,6 +36,7 @@ type Certificate struct {
 		Name        string `json:"name"`
 		Gender      string `json:"gender"`
 		Age         string `json:"age"`
+		Dob         string `json:"dob"`
 		Nationality string `json:"nationality"`
 		Address     struct {
 			StreetAddress  string `json:"streetAddress"`
@@ -77,6 +78,7 @@ type Certificate struct {
 				PostalCode     interface{} `json:"postalCode"`
 			} `json:"address"`
 		} `json:"facility"`
+		Prophylaxis string `json:"prophylaxis"`
 	} `json:"evidence"`
 	NonTransferable string `json:"nonTransferable"`
 	Proof           struct {
