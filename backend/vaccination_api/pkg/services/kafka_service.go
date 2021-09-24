@@ -17,10 +17,18 @@ var messages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
+const CERTIFICATE_TYPE_V2 = "certifyV2"
+const CERTIFICATE_TYPE_V3 = "certifyV3"
+
 type Message struct {
 	UploadId []byte
 	rowId    []byte
+	header   MessageHeader
 	payload  string
+}
+
+type MessageHeader struct {
+	CertificateType string
 }
 
 func InitializeKafka() {
@@ -58,6 +66,7 @@ func StartCertifyProducer(producer *kafka.Producer) {
 				Headers: []kafka.Header{
 					{Key: "uploadId", Value: msg.UploadId},
 					{Key: "rowId", Value: msg.rowId},
+					{Key: "certificateType", Value: []byte(msg.header.CertificateType)},
 				},
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
@@ -163,10 +172,11 @@ func StartEventProducer(producerClient *kafka.Producer) {
 	}()
 }
 
-func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
+func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte, header MessageHeader) {
 	messages <- Message{
 		UploadId: uploadId,
 		rowId:    rowId,
+		header:   header,
 		payload:  string(message),
 	}
 }

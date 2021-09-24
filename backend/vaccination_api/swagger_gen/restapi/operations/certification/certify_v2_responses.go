@@ -49,7 +49,7 @@ type CertifyV2BadRequest struct {
 	/*
 	  In: Body
 	*/
-	Payload *models.Error `json:"body,omitempty"`
+	Payload *models.CertifyV2BadRequestBody `json:"body,omitempty"`
 }
 
 // NewCertifyV2BadRequest creates CertifyV2BadRequest with default headers values
@@ -59,13 +59,13 @@ func NewCertifyV2BadRequest() *CertifyV2BadRequest {
 }
 
 // WithPayload adds the payload to the certify v2 bad request response
-func (o *CertifyV2BadRequest) WithPayload(payload *models.Error) *CertifyV2BadRequest {
+func (o *CertifyV2BadRequest) WithPayload(payload *models.CertifyV2BadRequestBody) *CertifyV2BadRequest {
 	o.Payload = payload
 	return o
 }
 
 // SetPayload sets the payload to the certify v2 bad request response
-func (o *CertifyV2BadRequest) SetPayload(payload *models.Error) {
+func (o *CertifyV2BadRequest) SetPayload(payload *models.CertifyV2BadRequestBody) {
 	o.Payload = payload
 }
 

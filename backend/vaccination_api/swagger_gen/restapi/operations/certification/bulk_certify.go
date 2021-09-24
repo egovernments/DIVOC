@@ -31,7 +31,7 @@ func NewBulkCertify(ctx *middleware.Context, handler BulkCertifyHandler) *BulkCe
 	return &BulkCertify{Context: ctx, Handler: handler}
 }
 
-/* BulkCertify swagger:route POST /v1/bulkCertify certification bulkCertify
+/*BulkCertify swagger:route POST /v1/bulkCertify certification bulkCertify
 
 Upload certification csv for bulk ingestion
 
@@ -46,16 +46,17 @@ type BulkCertify struct {
 func (o *BulkCertify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		*r = *rCtx
+		r = rCtx
 	}
 	var Params = NewBulkCertifyParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		*r = *aCtx
+		r = aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -68,6 +69,7 @@ func (o *BulkCertify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

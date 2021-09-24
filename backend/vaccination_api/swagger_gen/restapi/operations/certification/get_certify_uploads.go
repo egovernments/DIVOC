@@ -31,7 +31,7 @@ func NewGetCertifyUploads(ctx *middleware.Context, handler GetCertifyUploadsHand
 	return &GetCertifyUploads{Context: ctx, Handler: handler}
 }
 
-/* GetCertifyUploads swagger:route GET /v1/certify/uploads certification getCertifyUploads
+/*GetCertifyUploads swagger:route GET /v1/certify/uploads certification getCertifyUploads
 
 Get all file uploads for certification for given facility admin
 
@@ -44,16 +44,17 @@ type GetCertifyUploads struct {
 func (o *GetCertifyUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		*r = *rCtx
+		r = rCtx
 	}
 	var Params = NewGetCertifyUploadsParams()
+
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		*r = *aCtx
+		r = aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -66,6 +67,7 @@ func (o *GetCertifyUploads) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
+
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

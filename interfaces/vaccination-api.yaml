@@ -351,6 +351,33 @@ paths:
           description: Update not allowed
           schema:
             $ref: '#/definitions/Error'
+  /v3/certificate:
+    put:
+      tags:
+        - certification
+      summary: Update existing certificate request
+      description: >-
+        Update existing certificate if all checks are passed
+      operationId: updateCertificateV3
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequestV2'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Update not allowed
+          schema:
+            $ref: '#/definitions/Error'
   /v2/certify:
     post:
       tags:
@@ -361,6 +388,31 @@ paths:
         athorization and vaccinator should be trained for the vaccination that
         is being certified.
       operationId: certifyV2
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequestV2'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: './vaccination-api.yaml#/definitions/Error'
+  /v3/certify:
+    post: 
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        authorization and vaccinator should be trained for the vaccination that
+        is being certified.
+      operationId: certifyV3
       parameters:
         - in: body
           name: body

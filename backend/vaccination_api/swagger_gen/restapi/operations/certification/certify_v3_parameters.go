@@ -16,18 +16,18 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 )
 
-// NewCertifyV2Params creates a new CertifyV2Params object
+// NewCertifyV3Params creates a new CertifyV3Params object
 // no default values defined in spec.
-func NewCertifyV2Params() CertifyV2Params {
+func NewCertifyV3Params() CertifyV3Params {
 
-	return CertifyV2Params{}
+	return CertifyV3Params{}
 }
 
-// CertifyV2Params contains all the bound params for the certify v2 operation
+// CertifyV3Params contains all the bound params for the certify v3 operation
 // typically these are obtained from a http.Request
 //
-// swagger:parameters certifyV2
-type CertifyV2Params struct {
+// swagger:parameters certifyV3
+type CertifyV3Params struct {
 
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
@@ -42,8 +42,8 @@ type CertifyV2Params struct {
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
 // for simple values it will use straight method calls.
 //
-// To ensure default values, the struct must have been initialized with NewCertifyV2Params() beforehand.
-func (o *CertifyV2Params) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
+// To ensure default values, the struct must have been initialized with NewCertifyV3Params() beforehand.
+func (o *CertifyV3Params) BindRequest(r *http.Request, route *middleware.MatchedRoute) error {
 	var res []error
 
 	o.HTTPRequest = r

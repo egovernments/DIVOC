@@ -125,7 +125,7 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
 		uploadId, _ := json.Marshal(uploadDetails.ID)
 		jrowId, _ := json.Marshal(certifyUploadErrors.ID)
-		services.PublishCertifyMessage(jsonRequestString, uploadId, jrowId)
+		services.PublishCertifyMessage(jsonRequestString, uploadId, jrowId, services.MessageHeader{CertificateType: services.CERTIFICATE_TYPE_V2})
 	} else {
 		return err
 	}

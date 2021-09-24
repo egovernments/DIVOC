@@ -74,6 +74,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationCertifyV2Handler: certification.CertifyV2HandlerFunc(func(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.CertifyV2 has not yet been implemented")
 		}),
+		CertificationCertifyV3Handler: certification.CertifyV3HandlerFunc(func(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.CertifyV3 has not yet been implemented")
+		}),
 		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
 		}),
@@ -113,6 +116,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
 		}),
+		CertificationUpdateCertificateV3Handler: certification.UpdateCertificateV3HandlerFunc(func(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.UpdateCertificateV3 has not yet been implemented")
+		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
@@ -138,11 +144,9 @@ type DivocAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -179,6 +183,8 @@ type DivocAPI struct {
 	CertificationCertifyHandler certification.CertifyHandler
 	// CertificationCertifyV2Handler sets the operation handler for the certify v2 operation
 	CertificationCertifyV2Handler certification.CertifyV2Handler
+	// CertificationCertifyV3Handler sets the operation handler for the certify v3 operation
+	CertificationCertifyV3Handler certification.CertifyV3Handler
 	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
 	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// EventsHandler sets the operation handler for the events operation
@@ -205,7 +211,8 @@ type DivocAPI struct {
 	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
-
+	// CertificationUpdateCertificateV3Handler sets the operation handler for the update certificate v3 operation
+	CertificationUpdateCertificateV3Handler certification.UpdateCertificateV3Handler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -310,6 +317,9 @@ func (o *DivocAPI) Validate() error {
 	if o.CertificationCertifyV2Handler == nil {
 		unregistered = append(unregistered, "certification.CertifyV2Handler")
 	}
+	if o.CertificationCertifyV3Handler == nil {
+		unregistered = append(unregistered, "certification.CertifyV3Handler")
+	}
 	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
 		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
 	}
@@ -348,6 +358,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationUpdateCertificateHandler == nil {
 		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
+	}
+	if o.CertificationUpdateCertificateV3Handler == nil {
+		unregistered = append(unregistered, "certification.UpdateCertificateV3Handler")
 	}
 
 	if len(unregistered) > 0 {
@@ -480,6 +493,10 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/v3/certify"] = certification.NewCertifyV3(o.context, o.CertificationCertifyV3Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/v1/report-side-effects"] = report_side_effects.NewCreateReportedSideEffects(o.context, o.ReportSideEffectsCreateReportedSideEffectsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -529,6 +546,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/v1/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v3/certificate"] = certification.NewUpdateCertificateV3(o.context, o.CertificationUpdateCertificateV3Handler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

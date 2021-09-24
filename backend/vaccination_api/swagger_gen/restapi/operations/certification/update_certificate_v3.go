@@ -13,42 +13,42 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 )
 
-// UpdateCertificateHandlerFunc turns a function with the right signature into a update certificate handler
-type UpdateCertificateHandlerFunc func(UpdateCertificateParams, *models.JWTClaimBody) middleware.Responder
+// UpdateCertificateV3HandlerFunc turns a function with the right signature into a update certificate v3 handler
+type UpdateCertificateV3HandlerFunc func(UpdateCertificateV3Params, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn UpdateCertificateHandlerFunc) Handle(params UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+func (fn UpdateCertificateV3HandlerFunc) Handle(params UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
 	return fn(params, principal)
 }
 
-// UpdateCertificateHandler interface for that can handle valid update certificate params
-type UpdateCertificateHandler interface {
-	Handle(UpdateCertificateParams, *models.JWTClaimBody) middleware.Responder
+// UpdateCertificateV3Handler interface for that can handle valid update certificate v3 params
+type UpdateCertificateV3Handler interface {
+	Handle(UpdateCertificateV3Params, *models.JWTClaimBody) middleware.Responder
 }
 
-// NewUpdateCertificate creates a new http.Handler for the update certificate operation
-func NewUpdateCertificate(ctx *middleware.Context, handler UpdateCertificateHandler) *UpdateCertificate {
-	return &UpdateCertificate{Context: ctx, Handler: handler}
+// NewUpdateCertificateV3 creates a new http.Handler for the update certificate v3 operation
+func NewUpdateCertificateV3(ctx *middleware.Context, handler UpdateCertificateV3Handler) *UpdateCertificateV3 {
+	return &UpdateCertificateV3{Context: ctx, Handler: handler}
 }
 
-/*UpdateCertificate swagger:route PUT /v1/certificate certification updateCertificate
+/*UpdateCertificateV3 swagger:route PUT /v3/certificate certification updateCertificateV3
 
 Update existing certificate request
 
 Update existing certificate if all checks are passed
 
 */
-type UpdateCertificate struct {
+type UpdateCertificateV3 struct {
 	Context *middleware.Context
-	Handler UpdateCertificateHandler
+	Handler UpdateCertificateV3Handler
 }
 
-func (o *UpdateCertificate) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (o *UpdateCertificateV3) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
 		r = rCtx
 	}
-	var Params = NewUpdateCertificateParams()
+	var Params = NewUpdateCertificateV3Params()
 
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {

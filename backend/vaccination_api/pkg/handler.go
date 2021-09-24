@@ -58,7 +58,9 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
+	api.CertificationCertifyV3Handler = certification.CertifyV3HandlerFunc(certifyV3)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
+	api.CertificationUpdateCertificateV3Handler = certification.UpdateCertificateV3HandlerFunc(updateCertificateV3)
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 }
 
@@ -243,7 +245,11 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 				meta.PreviousCertificateID = *certificateId
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				kafkaService.PublishCertifyMessage(
+					jsonRequestString,
+					nil,
+					nil,
+					kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V2})
 			}
 		} else {
 			log.Infof("Certificate update request rejected %+v", request)
@@ -251,6 +257,36 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 		}
 	}
 	return certification.NewCertifyV2OK()
+}
+
+func updateCertificateV3(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	log.Debugf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
+			log.Infof("Certificate update request V3 approved %+v", request)
+			if request.Meta == nil {
+				request.Meta = &models.CertificationRequestV2Meta{
+					PreviousCertificateID: *certificateId,
+				}
+			} else {
+				meta := request.Meta
+				meta.PreviousCertificateID = *certificateId
+			}
+			if jsonRequestString, err := json.Marshal(request); err == nil {
+				kafkaService.PublishCertifyMessage(
+					jsonRequestString,
+					nil,
+					nil,
+					kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3})
+			}
+		} else {
+			log.Infof("Certificate update request rejected %+v", request)
+			return certification.NewUpdateCertificatePreconditionFailed()
+		}
+	}
+	return certification.NewCertifyV3OK()
 }
 
 func getCertificateIdToBeUpdated(request *models.CertificationRequestV2) *string {
@@ -332,13 +368,33 @@ func getDoseFromCertificate(certificateMap map[string]interface{}) int {
 	return 0
 }
 
+func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	fmt.Printf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3,})
+		}
+	}
+	return certification.NewCertifyV3OK()
+}
+
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
 	// this api can be moved to separate deployment unit if someone wants to use certification alone then
 	// sign verification can be disabled and use vaccination certification generation
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyV2OK()
@@ -355,7 +411,11 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyOK()

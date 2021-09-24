@@ -14,8 +14,7 @@ import (
 )
 
 // NewGetPreEnrollmentParams creates a new GetPreEnrollmentParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetPreEnrollmentParams() GetPreEnrollmentParams {
 
 	return GetPreEnrollmentParams{}
@@ -50,6 +49,7 @@ func (o *GetPreEnrollmentParams) BindRequest(r *http.Request, route *middleware.
 	if err := o.bindPreEnrollmentCode(rPreEnrollmentCode, rhkPreEnrollmentCode, route.Formats); err != nil {
 		res = append(res, err)
 	}
+
 	if len(res) > 0 {
 		return errors.CompositeValidationError(res...)
 	}
@@ -65,6 +65,7 @@ func (o *GetPreEnrollmentParams) bindPreEnrollmentCode(rawData []string, hasKey 
 
 	// Required: true
 	// Parameter is provided by construction from the route
+
 	o.PreEnrollmentCode = raw
 
 	return nil

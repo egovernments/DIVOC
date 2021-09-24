@@ -13,8 +13,7 @@ import (
 )
 
 // NewGetPreEnrollmentsForFacilityParams creates a new GetPreEnrollmentsForFacilityParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewGetPreEnrollmentsForFacilityParams() GetPreEnrollmentsForFacilityParams {
 
 	return GetPreEnrollmentsForFacilityParams{}
