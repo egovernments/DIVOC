@@ -591,6 +591,46 @@ func init() {
         }
       }
     },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
     "/v3/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
@@ -1823,6 +1863,46 @@ func init() {
             "description": "Invalid input",
             "schema": {
               "$ref": "#/definitions/certifyV2BadRequestBody"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }

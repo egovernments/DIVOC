@@ -116,6 +116,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
 		}),
+		CertificationUpdateCertificateV3Handler: certification.UpdateCertificateV3HandlerFunc(func(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.UpdateCertificateV3 has not yet been implemented")
+		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
@@ -208,6 +211,8 @@ type DivocAPI struct {
 	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
+	// CertificationUpdateCertificateV3Handler sets the operation handler for the update certificate v3 operation
+	CertificationUpdateCertificateV3Handler certification.UpdateCertificateV3Handler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -353,6 +358,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationUpdateCertificateHandler == nil {
 		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
+	}
+	if o.CertificationUpdateCertificateV3Handler == nil {
+		unregistered = append(unregistered, "certification.UpdateCertificateV3Handler")
 	}
 
 	if len(unregistered) > 0 {
@@ -538,6 +546,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/v1/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v3/certificate"] = certification.NewUpdateCertificateV3(o.context, o.CertificationUpdateCertificateV3Handler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

@@ -60,14 +60,13 @@ func StartCertifyProducer(producer *kafka.Producer) {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
 			msg := <-messages
-			certType, _ := json.Marshal(msg.header.CertificateType)
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          []byte(msg.payload),
 				Headers: []kafka.Header{
 					{Key: "uploadId", Value: msg.UploadId},
 					{Key: "rowId", Value: msg.rowId},
-					{Key: "certificateType", Value: certType},
+					{Key: "certificateType", Value: []byte(msg.header.CertificateType)},
 				},
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic %+v", topic, msg)

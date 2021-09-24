@@ -166,7 +166,7 @@ function transformW3(cert, certificateId, certificateType) {
   };
   if (certificateType === CERTIFICATE_TYPE_V3) {
     const vaccineName = R.pathOr('', ['vaccination', 'name'], cert);
-    const icd11Code = vaccineName ? constants.VACCINE_ICD11_MAPPINGS[vaccineName.toUpperCase().replaceAll(" ", "_")].icd11Code: '';
+    const icd11Code = vaccineName ? constants.VACCINE_ICD11_MAPPINGS[vaccineName.toUpperCase().replace(/ /g, "_")].icd11Code: '';
     const prophylaxis = icd11Code ? constants.ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
     // update context
     certificateFromTemplate["@context"] = [
@@ -207,7 +207,7 @@ async function signAndSave(certificate, certificateType, retryCount = 0) {
   const mobile = getContactNumber(contact);
   const preEnrollmentCode = certificate.preEnrollmentCode;
   const currentDose = certificate.vaccination.dose;
-  const w3cCertificate = transformW3(certificate, certificateId);
+  const w3cCertificate = transformW3(certificate, certificateId, certificateType);
   const signedCertificate = await signJSON(w3cCertificate);
   const signedCertificateForDB = {
     name: name,
