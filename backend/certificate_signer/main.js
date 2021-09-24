@@ -46,9 +46,11 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         value: message.value.toString(),
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
+        certificateType: message.headers.certificateType ? message.headers.certificateType.toString():'',
       });
       let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
       let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
+      let certificateType = message.headers.certificateType ? message.headers.certificateType.toString() : '';
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());
@@ -61,7 +63,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
         const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], jsonMessage);
         if (!isSigned || isUpdateRequest) {
           redis.storeKeyWithExpiry(`${preEnrollmentCode}-${currentDose}`, CERTIFICATE_INPROGRESS, INPROGRESS_KEY_EXPIRY_SECS);
-          await signer.signAndSave(jsonMessage)
+          await signer.signAndSave(jsonMessage, certificateType)
             .then(res => {
               console.log(`${preEnrollmentCode} | statusCode: ${res.status} `);
               if (process.env.DEBUG) {

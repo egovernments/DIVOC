@@ -1,49 +1,61 @@
-const {signJSON, transformW3, customLoader} = require('../signer');
+const {signJSON, transformW3, customLoader, CERTIFICATE_TYPE_V3, CERTIFICATE_TYPE_V2} = require('../signer');
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
 const {RsaSignature2018} = jsigs.suites;
 
 const cert2 = {
-  "preEnrollmentCode": "12346",
+  "facility": {
+    "address": {
+      "addressLine1": "kundrathur upgraded phc",
+      "district": "South 24 Parganas",
+      "state": ""
+    },
+    "name": "RAJATJUBLEE GP SC"
+  },
+  "preEnrollmentCode": "42655211223324",
   "recipient": {
-    "name": "Bhaya Mitra",
-    "dob": "1994-11-30",
-    "gender": "Male",
+    "address": {
+      "state": ""
+    },
+    "age": "77",
+    "contact": [
+      "tel:9460942221"
+    ],
+    "dob": "1944-05-21",
+    "gender": "Female",
+    "identity": "did:Ration Card:1524",
+    "name": "Savteri Devi Gupta",
     "nationality": "Indian",
-    "identity": "did:in.gov.uidai.aadhaar:2342343334",
-    "contact": ["tel:9880414888"]
+    "uhid":"1232"
   },
   "vaccination": {
-    "name": "CoVax",
-    "batch": "MB3428BX",
-    "manufacturer": "COVPharma",
-    "date": "2020-12-02T19:21:18.646Z",
-    "effectiveStart": "2020-12-02",
-    "effectiveUntil": "2025-12-02"
+    "batch": "12345",
+    "date": "2021-05-02T17:32:54.602Z",
+    "dose": 1,
+    "effectiveStart": "2021-08-02",
+    "effectiveUntil": "2021-09-02",
+    "manufacturer": "Serum Institute of India",
+    "name": "Covaxin",
+    "totalDoses": 2
   },
   "vaccinator": {
-    "name": "Sooraj Singh"
-  },
-  "facility": {
-    "name": "ABC Medical Center",
-    "address": {
-      "addressLine1": "123, Koramangala",
-      "addressLine2": "",
-      "district": "Bengaluru South",
-      "city": "Bengaluru",
-      "state": "Karnataka",
-      "pin": 560034
-    }
+    "name": "Dr. abc"
   }
 };
 
-signJSON(transformW3(cert2))
+signJSON(transformW3(cert2, 123, CERTIFICATE_TYPE_V2))
   .then(d => {
     console.log(d)
   });
 
 test('Sign the json', async () => {
-  sign = await signJSON(transformW3(cert2));
+  sign = await signJSON(transformW3(cert2, 123, CERTIFICATE_TYPE_V2));
+  console.log(JSON.stringify(sign))
+  expect(sign).not.toBe(null);
+});
+
+test('Sign the json for certificate v3 type', async () => {
+  sign = await signJSON(transformW3(cert2, 123, CERTIFICATE_TYPE_V3));
   console.log(JSON.stringify(sign))
   expect(sign).not.toBe(null);
 });

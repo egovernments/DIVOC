@@ -244,7 +244,11 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 				meta.PreviousCertificateID = *certificateId
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				kafkaService.PublishCertifyMessage(
+					jsonRequestString,
+					nil,
+					nil,
+					kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V2})
 			}
 		} else {
 			log.Infof("Certificate update request rejected %+v", request)
@@ -339,10 +343,14 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3,})
 		}
 	}
-	return certification.NewCertifyV2OK()
+	return certification.NewCertifyV3OK()
 }
 
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
@@ -351,7 +359,11 @@ func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimB
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyV2OK()
@@ -368,7 +380,11 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 	fmt.Printf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			kafkaService.PublishCertifyMessage(
+				jsonRequestString,
+				nil,
+				nil,
+				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyOK()
