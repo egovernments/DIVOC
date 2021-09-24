@@ -6,7 +6,6 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
-	"context"
 	"encoding/json"
 
 	"github.com/go-openapi/errors"
@@ -69,6 +68,7 @@ func (m *PreEnrollment) Validate(formats strfmt.Registry) error {
 }
 
 func (m *PreEnrollment) validateDob(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
@@ -113,6 +113,7 @@ func (m *PreEnrollment) validateGenderEnum(path, location string, value string) 
 }
 
 func (m *PreEnrollment) validateGender(formats strfmt.Registry) error {
+
 	if swag.IsZero(m.Gender) { // not required
 		return nil
 	}
@@ -122,11 +123,6 @@ func (m *PreEnrollment) validateGender(formats strfmt.Registry) error {
 		return err
 	}
 
-	return nil
-}
-
-// ContextValidate validates this pre enrollment based on context it is used
-func (m *PreEnrollment) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

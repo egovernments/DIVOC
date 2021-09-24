@@ -74,6 +74,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationCertifyV2Handler: certification.CertifyV2HandlerFunc(func(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.CertifyV2 has not yet been implemented")
 		}),
+		CertificationCertifyV3Handler: certification.CertifyV3HandlerFunc(func(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.CertifyV3 has not yet been implemented")
+		}),
 		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
 		}),
@@ -138,11 +141,9 @@ type DivocAPI struct {
 	// BasicAuthenticator generates a runtime.Authenticator from the supplied basic auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BasicAuthenticator func(security.UserPassAuthentication) runtime.Authenticator
-
 	// APIKeyAuthenticator generates a runtime.Authenticator from the supplied token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	APIKeyAuthenticator func(string, string, security.TokenAuthentication) runtime.Authenticator
-
 	// BearerAuthenticator generates a runtime.Authenticator from the supplied bearer token auth function.
 	// It has a default implementation in the security package, however you can replace it for your particular usage.
 	BearerAuthenticator func(string, security.ScopedTokenAuthentication) runtime.Authenticator
@@ -179,6 +180,8 @@ type DivocAPI struct {
 	CertificationCertifyHandler certification.CertifyHandler
 	// CertificationCertifyV2Handler sets the operation handler for the certify v2 operation
 	CertificationCertifyV2Handler certification.CertifyV2Handler
+	// CertificationCertifyV3Handler sets the operation handler for the certify v3 operation
+	CertificationCertifyV3Handler certification.CertifyV3Handler
 	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
 	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// EventsHandler sets the operation handler for the events operation
@@ -205,7 +208,6 @@ type DivocAPI struct {
 	ConfigurationGetVaccinatorsHandler configuration.GetVaccinatorsHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
-
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -309,6 +311,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationCertifyV2Handler == nil {
 		unregistered = append(unregistered, "certification.CertifyV2Handler")
+	}
+	if o.CertificationCertifyV3Handler == nil {
+		unregistered = append(unregistered, "certification.CertifyV3Handler")
 	}
 	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
 		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
@@ -477,6 +482,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/v2/certify"] = certification.NewCertifyV2(o.context, o.CertificationCertifyV2Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v3/certify"] = certification.NewCertifyV3(o.context, o.CertificationCertifyV3Handler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

@@ -58,6 +58,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 
 	api.CertificationCertifyV2Handler = certification.CertifyV2HandlerFunc(certifyV2)
+	api.CertificationCertifyV3Handler = certification.CertifyV3HandlerFunc(certifyV3)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 }
@@ -330,6 +331,18 @@ func getDoseFromCertificate(certificateMap map[string]interface{}) int {
 	}
 
 	return 0
+}
+
+func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	fmt.Printf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+		}
+	}
+	return certification.NewCertifyV2OK()
 }
 
 func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimBody) middleware.Responder {

@@ -376,6 +376,31 @@ paths:
           description: Invalid input
           schema:
             $ref: './vaccination-api.yaml#/definitions/Error'
+  /v3/certify:
+    post: 
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        authorization and vaccinator should be trained for the vaccination that
+        is being certified.
+      operationId: certifyV3
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequestV2'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: './vaccination-api.yaml#/definitions/Error'
 definitions:
   CertificationRequestV2:
     type: object

@@ -12,10 +12,10 @@ import (
 	"github.com/go-openapi/validate"
 )
 
-// Error error
+// CertifyV2BadRequestBody certify v2 bad request body
 //
-// swagger:model Error
-type Error struct {
+// swagger:model certifyV2BadRequestBody
+type CertifyV2BadRequestBody struct {
 
 	// code
 	// Required: true
@@ -26,8 +26,8 @@ type Error struct {
 	Message *string `json:"message"`
 }
 
-// Validate validates this error
-func (m *Error) Validate(formats strfmt.Registry) error {
+// Validate validates this certify v2 bad request body
+func (m *CertifyV2BadRequestBody) Validate(formats strfmt.Registry) error {
 	var res []error
 
 	if err := m.validateCode(formats); err != nil {
@@ -44,7 +44,7 @@ func (m *Error) Validate(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Error) validateCode(formats strfmt.Registry) error {
+func (m *CertifyV2BadRequestBody) validateCode(formats strfmt.Registry) error {
 
 	if err := validate.Required("code", "body", m.Code); err != nil {
 		return err
@@ -53,7 +53,7 @@ func (m *Error) validateCode(formats strfmt.Registry) error {
 	return nil
 }
 
-func (m *Error) validateMessage(formats strfmt.Registry) error {
+func (m *CertifyV2BadRequestBody) validateMessage(formats strfmt.Registry) error {
 
 	if err := validate.Required("message", "body", m.Message); err != nil {
 		return err
@@ -63,7 +63,7 @@ func (m *Error) validateMessage(formats strfmt.Registry) error {
 }
 
 // MarshalBinary interface implementation
-func (m *Error) MarshalBinary() ([]byte, error) {
+func (m *CertifyV2BadRequestBody) MarshalBinary() ([]byte, error) {
 	if m == nil {
 		return nil, nil
 	}
@@ -71,8 +71,8 @@ func (m *Error) MarshalBinary() ([]byte, error) {
 }
 
 // UnmarshalBinary interface implementation
-func (m *Error) UnmarshalBinary(b []byte) error {
-	var res Error
+func (m *CertifyV2BadRequestBody) UnmarshalBinary(b []byte) error {
+	var res CertifyV2BadRequestBody
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}

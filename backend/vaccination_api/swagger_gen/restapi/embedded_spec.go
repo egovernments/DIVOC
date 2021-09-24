@@ -590,6 +590,40 @@ func init() {
           }
         }
       }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "./vaccination-api.yaml#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -1788,7 +1822,41 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "$ref": "#/definitions/certifyV2BadRequestBody"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/certifyV2BadRequestBody"
             }
           }
         }
@@ -2937,6 +3005,22 @@ func init() {
           }
         }
       }
+    },
+    "certifyV2BadRequestBody": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "x-go-gen-location": "operations"
     },
     "sideEffectsResponse": {
       "description": "Indian address format",

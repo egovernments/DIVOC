@@ -15,8 +15,7 @@ import (
 )
 
 // NewCertificateRevokedParams creates a new CertificateRevokedParams object
-//
-// There are no default values defined in the spec.
+// no default values defined in spec.
 func NewCertificateRevokedParams() CertificateRevokedParams {
 
 	return CertificateRevokedParams{}
