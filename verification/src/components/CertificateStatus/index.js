@@ -23,7 +23,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
-const {vaccinationContext} = require('vaccination-context');
+const {vaccinationContext, vaccinationContextV2} = require('vaccination-context');
 
 const customLoader = url => {
     console.log("checking " + url);
@@ -34,6 +34,7 @@ const customLoader = url => {
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
         "https://cowin.gov.in/credentials/vaccination/v1": vaccinationContext,
+        "https://cowin.gov.in/credentials/vaccination/v2": vaccinationContextV2,
     };
     let context = c[url];
     if (context === undefined) {
@@ -187,10 +188,12 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     {
                         Object.keys(CertificateDetailsPaths).map((key, index) => {
                             const context = CertificateDetailsPaths[key];
+                            const value = context.format(pathOr("NA", context.path, data));
+                            const show = value !== "NA" || (value === "NA" && !context.optional)
                             return (
-                                <tr key={index} style={{fontSize:"smaller", textAlign: "left"}}>
+                              show && <tr key={index} style={{fontSize:"smaller", textAlign: "left"}}>
                                     <td className="pr-3" >{key.replace("${dose}", getDose(data))}</td>
-                                    <td className="font-weight-bolder value-col">{context.format(pathOr("NA", context.path, data))}</td>
+                                    <td className="font-weight-bolder value-col">{value}</td>
                                 </tr>
                             )
                         })
