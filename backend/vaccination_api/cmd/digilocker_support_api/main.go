@@ -248,7 +248,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
 			dose:        dose,
-			doseDate:    formatDate(certificate.Evidence[0].Date),
+			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
 			batchNumber: certificate.Evidence[0].Batch,
 			country:     certificate.Evidence[0].Facility.Address.AddressCountry,
 		})
@@ -294,7 +294,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		certificate.CredentialSubject.Name,
 		certificate.CredentialSubject.Dob,
 		certificate.CredentialSubject.Gender,
-		formatId(certificate.CredentialSubject.ID),
+		getPassportIdValue(certificate.CredentialSubject.ID),
 		"Fully Vaccinated",
 		latestCertificate["certificateId"].(string),
 	}
@@ -569,6 +569,10 @@ func formatDate(date time.Time) string {
 	return date.Format("02 Jan 2006")
 }
 
+func formatDateYYYYMMDD(date time.Time) string {
+	return date.Format("2006-01-02")
+}
+
 func formatDose(dose int) string {
 	return ordinalSuffixOf(dose) + " Dose"
 }
@@ -592,6 +596,15 @@ func maskId(id string) string {
 	reg, _ := regexp.Compile(".")
 	limit := int(math.Ceil(float64(len(id)) * .6))
 	return reg.ReplaceAllString(id[:limit], "X") + id[limit:]
+}
+
+func getPassportIdValue(identity string) string {
+	split := strings.Split(identity, ":")
+	lastFragment := split[len(split)-1]
+	if strings.Contains(identity, "Passport") {
+		return lastFragment
+	}
+	return ""
 }
 
 func formatId(identity string) string {
