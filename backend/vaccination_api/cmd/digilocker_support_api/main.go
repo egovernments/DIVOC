@@ -236,8 +236,7 @@ func getCertificateVariant(certificate models.Certificate) string {
 }
 func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) ([]byte, error) {
 	var certificate models.Certificate
-	latestCertificateByDose := certificateByDoses[len(certificateByDoses)-1]
-	latestCertificate := latestCertificateByDose[len(latestCertificateByDose)-1]
+	latestCertificate := getLatestCertificate(certificateByDoses)
 	var doseWiseData []DoseWiseData
 	for dose, certificates := range certificateByDoses {
 		latestDoseCertificate := certificates[len(certificates)-1]
@@ -345,7 +344,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 	pdf.SetX(offsetNewX)
 	pdf.SetY(offsetNewY+15)
 	_ = pdf.Cell(nil,"Government of India")
-	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 582)
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
