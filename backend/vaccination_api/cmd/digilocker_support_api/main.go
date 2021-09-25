@@ -294,9 +294,9 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		certificate.CredentialSubject.Name,
 		certificate.CredentialSubject.Dob,
 		certificate.CredentialSubject.Gender,
-		certificate.CredentialSubject.ID,
+		formatId(certificate.CredentialSubject.ID),
 		"Fully Vaccinated",
-		certificate.CredentialSubject.RefId,
+		latestCertificate["certificateId"].(string),
 	}
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
@@ -862,32 +862,36 @@ func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
-	log.Info("get pdf certificate")
-	vars := mux.Vars(r)
-	preEnrollmentCode := vars[PreEnrollmentCode]
-	latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
-
-	if err != nil {
-		log.Infof("Error %+v", err)
-		w.WriteHeader(500)
-		publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
-		return
-	}
-
-	if latestSignedJson != "" {
-		if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
-			log.Errorf("Error in creating certificate pdf")
-			w.WriteHeader(500)
-			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
-		} else {
-			w.WriteHeader(200)
-			_, _ = w.Write(pdfBytes)
-			publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
-		}
+	if getCertificateTypeFromQueryParams(r) == "ddcc" {
+		getPDFHandlerV3(w,r)
 	} else {
-		log.Errorf("No certificates found for request %v", preEnrollmentCode)
-		w.WriteHeader(404)
-		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+		log.Info("get pdf certificate")
+		vars := mux.Vars(r)
+		preEnrollmentCode := vars[PreEnrollmentCode]
+		latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
+
+		if err != nil {
+			log.Infof("Error %+v", err)
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
+			return
+		}
+
+		if latestSignedJson != "" {
+			if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
+				log.Errorf("Error in creating certificate pdf")
+				w.WriteHeader(500)
+				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
+			} else {
+				w.WriteHeader(200)
+				_, _ = w.Write(pdfBytes)
+				publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
+			}
+		} else {
+			log.Errorf("No certificates found for request %v", preEnrollmentCode)
+			w.WriteHeader(404)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+		}
 	}
 }
 
@@ -904,7 +908,7 @@ func verifyIfLatestCertificateIsDDCCCompliant(certificates []map[string]interfac
 	return false
 }
 func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
-	log.Info("get pdf certificate")
+	log.Info("get ddcc pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificatesByDoses :=  getCertificatesByDoses(preEnrollmentCode)
@@ -954,6 +958,14 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 		log.Errorf("No certificates found for request %v", preEnrollmentCode)
 		w.WriteHeader(404)
 		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+	}
+}
+
+func getCertificateTypeFromQueryParams(r *http.Request) string {
+	if language := r.URL.Query().Get("type"); language != "" {
+		return language
+	} else {
+		return ""
 	}
 }
 
