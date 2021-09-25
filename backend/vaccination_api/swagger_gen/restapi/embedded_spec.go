@@ -1896,7 +1896,19 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "$ref": "#/definitions/Error"
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "message": {
+                  "type": "string"
+                }
+              }
             }
           },
           "412": {

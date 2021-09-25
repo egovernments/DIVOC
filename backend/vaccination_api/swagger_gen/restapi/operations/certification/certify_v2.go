@@ -8,7 +8,11 @@ package certification
 import (
 	"net/http"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/go-openapi/strfmt"
+	"github.com/go-openapi/swag"
+	"github.com/go-openapi/validate"
 
 	"github.com/divoc/api/swagger_gen/models"
 )
@@ -72,4 +76,72 @@ func (o *CertifyV2) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
+}
+
+// CertifyV2BadRequestBody certify v2 bad request body
+//
+// swagger:model CertifyV2BadRequestBody
+type CertifyV2BadRequestBody struct {
+
+	// code
+	// Required: true
+	Code *string `json:"code"`
+
+	// message
+	// Required: true
+	Message *string `json:"message"`
+}
+
+// Validate validates this certify v2 bad request body
+func (o *CertifyV2BadRequestBody) Validate(formats strfmt.Registry) error {
+	var res []error
+
+	if err := o.validateCode(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := o.validateMessage(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (o *CertifyV2BadRequestBody) validateCode(formats strfmt.Registry) error {
+
+	if err := validate.Required("certifyV2BadRequest"+"."+"code", "body", o.Code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (o *CertifyV2BadRequestBody) validateMessage(formats strfmt.Registry) error {
+
+	if err := validate.Required("certifyV2BadRequest"+"."+"message", "body", o.Message); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (o *CertifyV2BadRequestBody) MarshalBinary() ([]byte, error) {
+	if o == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(o)
+}
+
+// UnmarshalBinary interface implementation
+func (o *CertifyV2BadRequestBody) UnmarshalBinary(b []byte) error {
+	var res CertifyV2BadRequestBody
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*o = res
+	return nil
 }
