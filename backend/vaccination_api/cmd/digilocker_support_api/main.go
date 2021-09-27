@@ -245,11 +245,15 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Error("Unable to parse certificate string", err)
 			return nil, err
 		}
+		country := certificate.Evidence[0].Facility.Address.AddressCountry
+		if country == "IN" {
+			country = "IND"
+		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
 			dose:        dose,
 			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
 			batchNumber: certificate.Evidence[0].Batch,
-			country:     certificate.Evidence[0].Facility.Address.AddressCountry,
+			country:     country,
 		})
 	}
 	latestCertificateText := latestCertificate["certificate"].(string)
@@ -907,8 +911,8 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func verifyIfLatestCertificateIsDDCCCompliant(certificates []map[string]interface{}) bool {
-	latestCertificate := certificates[len(certificates)-1]
+func verifyIfLatestCertificateIsDDCCCompliant(certificateByDoses map[int][]map[string]interface{}) bool {
+	latestCertificate := getLatestCertificate(certificateByDoses)
 	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(latestCertificate["certificate"].(string)), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
@@ -924,7 +928,7 @@ func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificatesByDoses :=  getCertificatesByDoses(preEnrollmentCode)
-	if len(certificatesByDoses) >= 2 && verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses[len(certificatesByDoses)-1]) {
+	if len(certificatesByDoses) >= 2 && verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses) {
 		if pdfBytes, err := getDDCCCertificateAsPdfV3(certificatesByDoses); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
