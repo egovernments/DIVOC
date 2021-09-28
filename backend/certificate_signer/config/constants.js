@@ -41,20 +41,24 @@ const ICD11_MAPPINGS = {
   }
 };
 
-const VACCINE_ICD11_MAPPINGS = {
-  "COVAXIN": {
+const VACCINE_ICD11_MAPPINGS = [
+  {
+    "vaccineName": "covaxin",
     "icd11Code" :"XM1NL1"
   },
-  "COVISHIELD": {
-    "icd11Code" :"XM5DF6"
+  {
+    "vaccineName": "covishield",
+    "icd11Code" :"XM9QW8"
   },
-  "SPUTNIK_V": {
-    "icd11Code" :"XM5DF6"
+  {
+    "vaccineName": "sputnik",
+    "icd11Code" :"XM9QW8"
   },
-  "ZYCOV-D": {
+  {
+    "vaccineName": "zycov",
     "icd11Code": "XM6AT1"
   }
-}
+]
 
 module.exports = {
   ICD11_MAPPINGS,
