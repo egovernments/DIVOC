@@ -443,7 +443,7 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		_ = pdf.Cell(nil, displayLabels[i])
 		j++
 	}
-	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 582)
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
