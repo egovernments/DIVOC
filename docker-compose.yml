@@ -231,6 +231,7 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
       CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
+      CERTIFICATE_NAMESPACE_V2: "https://cowin.gov.in/credentials/vaccination/v2"
       CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
       CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
       CERTIFICATE_DID: "did:india"

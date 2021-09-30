@@ -71,6 +71,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
 		}),
+		CertificationCertifyV3Handler: certification.CertifyV3HandlerFunc(func(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.CertifyV3 has not yet been implemented")
+		}),
 		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
 		}),
@@ -124,6 +127,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
+		}),
+		CertificationUpdateCertificateV3Handler: certification.UpdateCertificateV3HandlerFunc(func(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.UpdateCertificateV3 has not yet been implemented")
 		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
@@ -187,6 +193,8 @@ type DivocAPI struct {
 	CertificateRevokedCertificateRevokedHandler certificate_revoked.CertificateRevokedHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
+	// CertificationCertifyV3Handler sets the operation handler for the certify v3 operation
+	CertificationCertifyV3Handler certification.CertifyV3Handler
 	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
 	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// EventsHandler sets the operation handler for the events operation
@@ -223,6 +231,8 @@ type DivocAPI struct {
 	CertificationTestCertifyHandler certification.TestCertifyHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
+	// CertificationUpdateCertificateV3Handler sets the operation handler for the update certificate v3 operation
+	CertificationUpdateCertificateV3Handler certification.UpdateCertificateV3Handler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -324,6 +334,9 @@ func (o *DivocAPI) Validate() error {
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
 	}
+	if o.CertificationCertifyV3Handler == nil {
+		unregistered = append(unregistered, "certification.CertifyV3Handler")
+	}
 	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
 		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
 	}
@@ -377,6 +390,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationUpdateCertificateHandler == nil {
 		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
+	}
+	if o.CertificationUpdateCertificateV3Handler == nil {
+		unregistered = append(unregistered, "certification.UpdateCertificateV3Handler")
 	}
 
 	if len(unregistered) > 0 {
@@ -505,6 +521,10 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
+	o.handlers["POST"]["/v3/certify"] = certification.NewCertifyV3(o.context, o.CertificationCertifyV3Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
 	o.handlers["POST"]["/report-side-effects"] = report_side_effects.NewCreateReportedSideEffects(o.context, o.ReportSideEffectsCreateReportedSideEffectsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
@@ -574,6 +594,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
 	o.handlers["PUT"]["/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v3/certificate"] = certification.NewUpdateCertificateV3(o.context, o.CertificationUpdateCertificateV3Handler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

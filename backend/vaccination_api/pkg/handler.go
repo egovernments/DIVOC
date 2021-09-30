@@ -35,6 +35,9 @@ import (
 
 const FacilityEntity = "Facility"
 
+const CERTIFICATE_TYPE_V2 = "certifyV2"
+const CERTIFICATE_TYPE_V3 = "certifyV3"
+
 func SetupHandlers(api *operations.DivocAPI) {
 	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
 
@@ -48,6 +51,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.VaccinationGetPreEnrollmentsForFacilityHandler = vaccination.GetPreEnrollmentsForFacilityHandlerFunc(getPreEnrollmentForFacility)
 
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
+	api.CertificationCertifyV3Handler = certification.CertifyV3HandlerFunc(certifyV3)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
@@ -59,6 +63,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
+	api.CertificationUpdateCertificateV3Handler = certification.UpdateCertificateV3HandlerFunc(updateCertificateV3)
 
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 	api.CertificationGetCertificateByCertificateIDHandler = certification.GetCertificateByCertificateIDHandlerFunc(getCertificateByCertificateId)
@@ -303,6 +308,63 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 			})
 		}
 
+		// adding certificateType
+		if request.Meta == nil {
+			request.Meta = map[string]interface{}{
+				"certificateType": CERTIFICATE_TYPE_V2,
+			}
+		} else {
+			meta := request.Meta.(map[string]interface{})
+			meta["certificateType"] = CERTIFICATE_TYPE_V2
+		}
+
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
+				kafkaService.PublishWalkEnrollment(enrollmentMsg)
+			} else {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
+		}
+	}
+	return certification.NewCertifyOK()
+}
+
+func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	for _, request := range params.Body {
+		log.Infof("CertificationRequest: %+v\n", request)
+		if request.Recipient.Age == "" && request.Recipient.Dob == nil {
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Age and DOB both are missing. Atleast one should be present"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code:    &errorCode,
+				Message: &errorMsg,
+			})
+		}
+		if request.Recipient.Age == "" {
+			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
+		}
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Invalid Age or DOB. Should be less than current date"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code:    &errorCode,
+				Message: &errorMsg,
+			})
+		}
+
+		// adding certificateType
+		if request.Meta == nil {
+			request.Meta = map[string]interface{}{
+				"certificateType": CERTIFICATE_TYPE_V3,
+			}
+		} else {
+			meta := request.Meta.(map[string]interface{})
+			meta["certificateType"] = CERTIFICATE_TYPE_V3
+		}
+
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
@@ -475,10 +537,12 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
 					"previousCertificateId": certificateId,
+					"certificateType":       CERTIFICATE_TYPE_V2,
 				}
 			} else {
 				meta := request.Meta.(map[string]interface{})
 				meta["previousCertificateId"] = certificateId
+				meta["certificateType"] = CERTIFICATE_TYPE_V2
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
@@ -489,6 +553,34 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 		}
 	}
 	return certification.NewUpdateCertificateOK()
+}
+
+func updateCertificateV3(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	log.Debugf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+			log.Infof("Certificate update request approved %+v", request)
+			if request.Meta == nil {
+				request.Meta = map[string]interface{}{
+					"previousCertificateId": certificateId,
+					"certificateType":       CERTIFICATE_TYPE_V3,
+				}
+			} else {
+				meta := request.Meta.(map[string]interface{})
+				meta["previousCertificateId"] = certificateId
+				meta["certificateType"] = CERTIFICATE_TYPE_V3
+			}
+			if jsonRequestString, err := json.Marshal(request); err == nil {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
+		} else {
+			log.Infof("Certificate update request rejected %+v", request)
+			return certification.NewUpdateCertificateV3PreconditionFailed()
+		}
+	}
+	return certification.NewUpdateCertificateV3OK()
 }
 
 func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
