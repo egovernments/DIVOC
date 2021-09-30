@@ -59,6 +59,10 @@ export const CertificateDetailsPaths = {
 };
 
 export const TestCertificateDetailsPaths = {
+    "Certificate ID": {
+        path: ["evidence", "0", "certificateId"],
+        format: (data) => (data)
+    },
     "Name": {
         path: ["credentialSubject", "name"],
         format: (data) => (data)
@@ -71,11 +75,7 @@ export const TestCertificateDetailsPaths = {
         path: ["credentialSubject", "gender"],
         format: (data) => (data)
     },
-    "Certificate ID": {
-        path: ["evidence", "0", "certificateId"],
-        format: (data) => (data)
-    },
-    "Beneficiary ID": {
+    "Covid-19 Test ID": {
         path: ["credentialSubject", "refId"],
         format: (data) => (data)
     },
@@ -91,7 +91,7 @@ export const TestCertificateDetailsPaths = {
         path: ["evidence", "0", "result"],
         format: (data) => (data)
     },
-    "Verified at": {
+    "Tested At": {
         path: ["evidence", "0", "facility", "name"],
         format: (data) => (data)
     }
