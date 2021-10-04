@@ -35,11 +35,11 @@ func (o *GetCertificateURL) SetBasePath(bp string) {
 func (o *GetCertificateURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/certificates"
+	var _path = "/v1/certificates"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

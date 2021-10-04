@@ -31,7 +31,7 @@ func NewGetCertificateByCertificateID(ctx *middleware.Context, handler GetCertif
 	return &GetCertificateByCertificateID{Context: ctx, Handler: handler}
 }
 
-/*GetCertificateByCertificateID swagger:route GET /certificates/{certificateId} certification getCertificateByCertificateId
+/*GetCertificateByCertificateID swagger:route GET /v1/certificates/{certificateId} certification getCertificateByCertificateId
 
 Get certificate json for given certificateId
 

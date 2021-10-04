@@ -31,7 +31,7 @@ func NewGetVaccinators(ctx *middleware.Context, handler GetVaccinatorsHandler) *
 	return &GetVaccinators{Context: ctx, Handler: handler}
 }
 
-/*GetVaccinators swagger:route GET /vaccinators configuration getVaccinators
+/*GetVaccinators swagger:route GET /v1/vaccinators configuration getVaccinators
 
 Get active vaccinators mapped for the facility
 

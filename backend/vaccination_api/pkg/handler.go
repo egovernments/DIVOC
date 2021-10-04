@@ -39,14 +39,14 @@ const CERTIFICATE_TYPE_V2 = "certifyV2"
 const CERTIFICATE_TYPE_V3 = "certifyV3"
 
 func SetupHandlers(api *operations.DivocAPI) {
-	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
+	api.GetV1PingHandler = operations.GetV1PingHandlerFunc(pingResponder)
 
-	api.LoginPostAuthorizeHandler = login.PostAuthorizeHandlerFunc(loginHandler)
+	api.LoginPostV1AuthorizeHandler = login.PostV1AuthorizeHandlerFunc(loginHandler)
 
 	api.ConfigurationGetCurrentProgramsHandler = configuration.GetCurrentProgramsHandlerFunc(getCurrentProgramsResponder)
 	api.ConfigurationGetConfigurationHandler = configuration.GetConfigurationHandlerFunc(getConfigurationResponder)
 
-	api.IdentityPostIdentityVerifyHandler = identity.PostIdentityVerifyHandlerFunc(postIdentityHandler)
+	api.IdentityPostV1IdentityVerifyHandler = identity.PostV1IdentityVerifyHandlerFunc(postIdentityHandler)
 	api.VaccinationGetPreEnrollmentHandler = vaccination.GetPreEnrollmentHandlerFunc(getPreEnrollment)
 	api.VaccinationGetPreEnrollmentsForFacilityHandler = vaccination.GetPreEnrollmentsForFacilityHandlerFunc(getPreEnrollmentForFacility)
 
@@ -154,7 +154,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 	return NewGenericServerError()
 }
 
-func pingResponder(params operations.GetPingParams) middleware.Responder {
+func pingResponder(params operations.GetV1PingParams) middleware.Responder {
 	return operations.NewGetPingOK()
 }
 
@@ -168,15 +168,15 @@ func getLoggedInUserInfo(params vaccination.GetLoggedInUserInfoParams, principal
 	return vaccination.NewGetLoggedInUserInfoOK().WithPayload(payload)
 }
 
-func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
+func loginHandler(params login.PostV1AuthorizeParams) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token2fa) == "1231" {
 		payload := &models.LoginResponse{
 			RefreshToken: "234klj23lkj.asklsadf",
 			Token:        "123456789923234234",
 		}
-		return login.NewPostAuthorizeOK().WithPayload(payload)
+		return login.NewPostV1AuthorizeOK().WithPayload(payload)
 	}
-	return login.NewPostAuthorizeUnauthorized()
+	return login.NewPostV1AuthorizeUnauthorized()
 }
 
 func getVaccinators(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -244,11 +244,11 @@ func getConfigurationResponder(params configuration.GetConfigurationParams, prin
 	return configuration.NewGetConfigurationOK().WithPayload(payload)
 }
 
-func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
+func postIdentityHandler(params identity.PostV1IdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token) != "" {
-		return identity.NewPostIdentityVerifyOK()
+		return identity.NewPostV1IdentityVerifyOK()
 	}
-	return identity.NewPostIdentityVerifyPartialContent()
+	return identity.NewPostV1IdentityVerifyPartialContent()
 }
 
 func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
