@@ -168,8 +168,11 @@
   "certificate": {
     "Name": "Name",
     "Age": "Age",
+    "DOB": "DOB",
     "Gender": "Gender",
     "Certificate ID": "Certificate ID",
+    "Vaccine Name": "Vaccine Name",
+    "Vaccine Type": "Vaccine Type",
     "Date of Issue": "Date of Issue",
     "Valid Until": "Valid Until",
     "Dose": "Dose",

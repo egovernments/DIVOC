@@ -2,9 +2,10 @@ import React, {useEffect, useState} from "react";
 import "./index.css";
 import CertificateValidImg from "../../assets/img/certificate-valid.svg";
 import CertificateInValidImg from "../../assets/img/certificate-invalid.svg";
-import config, {CERTIFICATE_CONTROLLER_ID,
+import config, {
+    CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
-    CERTIFICATE_NAMESPACE,
+    CERTIFICATE_NAMESPACE, CERTIFICATE_NAMESPACE_V2,
     CERTIFICATE_PUBKEY_ID
 } from "../../config";
 import {pathOr} from "ramda";
@@ -21,7 +22,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
-const {vaccinationContext} = require('vaccination-context');
+const {vaccinationContext, vaccinationContextV2} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
@@ -31,6 +32,7 @@ const customLoader = url => {
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
         [CERTIFICATE_NAMESPACE]: vaccinationContext,
+        [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
     };
     let context = c[url];
     if (context === undefined) {
@@ -163,11 +165,13 @@ export const CertificateStatus = ({certificateData, goBack, onContinue}) => {
                     {
                         Object.keys(CertificateDetailsPaths).map((key, index) => {
                             const context = CertificateDetailsPaths[key];
+                            const value = context.format(pathOr("NA", context.path, data));
+                            const show = value !== "NA" || (value === "NA" && !context.optional)
                             return (
-                                <tr key={index} style={{fontSize:"small"}}>
-                                    <td className="pr-3">{key}</td>
-                                    <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
-                                </tr>
+                              show && <tr key={index} style={{fontSize:"small"}}>
+                                  <td className="pr-3">{key}</td>
+                                  <td className="font-weight-bolder value-col">{value}</td>
+                              </tr>
                             )
                         })
                     }
