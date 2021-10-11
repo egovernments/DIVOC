@@ -267,7 +267,7 @@ paths:
             type: array
             items:
               $ref: "../registry/Vaccinator.json#/definitions/Vaccinator"
-  /identity/verify:
+  /v1/identity/verify:
     post:
       tags:
         - identity
