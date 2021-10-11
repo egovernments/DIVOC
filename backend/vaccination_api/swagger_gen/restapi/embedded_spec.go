@@ -36,18 +36,6 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/api",
   "paths": {
-    "/ping": {
-      "get": {
-        "security": [],
-        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
-        "summary": "Server heartbeat operation",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/v1/authorize": {
       "post": {
         "security": [],
@@ -430,6 +418,18 @@ func init() {
           },
           "206": {
             "description": "Need OTP"
+          }
+        }
+      }
+    },
+    "/v1/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -1466,18 +1466,6 @@ func init() {
   "host": "divoc.xiv.in",
   "basePath": "/divoc/api",
   "paths": {
-    "/ping": {
-      "get": {
-        "security": [],
-        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
-        "summary": "Server heartbeat operation",
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
     "/v1/authorize": {
       "post": {
         "security": [],
@@ -1860,6 +1848,18 @@ func init() {
           },
           "206": {
             "description": "Need OTP"
+          }
+        }
+      }
+    },
+    "/v1/ping": {
+      "get": {
+        "security": [],
+        "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
+        "summary": "Server heartbeat operation",
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }

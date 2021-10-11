@@ -371,7 +371,7 @@ paths:
       responses:
         '200':
           description: OK
-  /ping:
+  /v1/ping:
     get:
       summary: Server heartbeat operation
       description: >-

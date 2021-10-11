@@ -53,8 +53,8 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetPing has not yet been implemented")
+		GetV1PingHandler: GetV1PingHandlerFunc(func(params GetV1PingParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetV1Ping has not yet been implemented")
 		}),
 		LoginPostV1AuthorizeHandler: login.PostV1AuthorizeHandlerFunc(func(params login.PostV1AuthorizeParams) middleware.Responder {
 			return middleware.NotImplemented("operation login.PostV1Authorize has not yet been implemented")
@@ -181,8 +181,8 @@ type DivocAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
-	// GetPingHandler sets the operation handler for the get ping operation
-	GetPingHandler GetPingHandler
+	// GetV1PingHandler sets the operation handler for the get v1 ping operation
+	GetV1PingHandler GetV1PingHandler
 	// LoginPostV1AuthorizeHandler sets the operation handler for the post v1 authorize operation
 	LoginPostV1AuthorizeHandler login.PostV1AuthorizeHandler
 	// IdentityPostV1IdentityVerifyHandler sets the operation handler for the post v1 identity verify operation
@@ -316,8 +316,8 @@ func (o *DivocAPI) Validate() error {
 		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
-	if o.GetPingHandler == nil {
-		unregistered = append(unregistered, "GetPingHandler")
+	if o.GetV1PingHandler == nil {
+		unregistered = append(unregistered, "GetV1PingHandler")
 	}
 	if o.LoginPostV1AuthorizeHandler == nil {
 		unregistered = append(unregistered, "login.PostV1AuthorizeHandler")
@@ -497,7 +497,7 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
+	o.handlers["GET"]["/v1/ping"] = NewGetV1Ping(o.context, o.GetV1PingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
