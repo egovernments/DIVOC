@@ -108,7 +108,7 @@ function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
     splittedToken[1] = "";
     const detachedPayloadJWS = splittedToken.join(".");
 
-    const organisationId = fhirJson.entry.filter(r => r["resource"]?.resourceType === "Organization").map(r => r["resource"].id)[0];
+    const organisationId = fhirJson.entry.filter(r => r.resourceType === "Organization").map(r => r.id)[0];
 
     let signature = {
         "type": [
