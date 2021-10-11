@@ -1,0 +1,143 @@
+{
+    "resourceType": "QuestionnaireResponse",
+    "id": "urn:uuid:{{questionnaireResponseId}}",
+    "meta": {
+      "versionId": "1",
+      "lastUpdated": "{{dateString}}",
+      "source": "#KkWVzmGHRV76T9qY",
+      "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCQuestionnaireResponse" ]
+    },
+    "questionnaire": "http://worldhealthorganization.github.io/ddcc/DDCCVSCoreDataSetQuestionnaire",
+    "status": "completed",
+    "subject": {
+      "reference": "urn:uuid:{{patientId}}"
+    },
+    "authored": "{{dateString}}",
+    "item": [ {
+      "linkId": "name",
+      "answer": [ {
+        "valueString": "{{patientName}}"
+      } ]
+    }, {
+      "linkId": "birthDate",
+      "answer": [ {
+        "valueDate": "{{dob}}"
+      } ]
+    }, {
+      "linkId": "identifier",
+      "answer": [ {
+        "valueString": "{{refId}}"
+      } ]
+    }, {
+      "linkId": "sex",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://hl7.org/fhir/administrative-gender",
+          "code": "{{patientGender}}"
+        }
+      } ]
+    }, {
+      "linkId": "vaccine",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://id.who.int/icd11/mms",
+          "code": "{{vaccineCode}}"
+        }
+      } ]
+    }, {
+      "linkId": "brand",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem",
+          "code": "{{vaccineName}}"
+        }
+      } ]
+    }, {
+      "linkId": "manufacturer",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem",
+          "code": "{{manufacturer}}"
+        }
+      } ]
+    }, {
+      "linkId": "ma_holder",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem",
+          "code": "TEST"
+        }
+      } ]
+    }, {
+      "linkId": "lot",
+      "answer": [ {
+        "valueString": "{{batchNumber}}"
+      } ]
+    }, {
+      "linkId": "date",
+      "answer": [ {
+        "valueDate": "{{vaccinationDate}}"
+      } ]
+    }, {
+      "linkId": "vaccine_valid",
+      "answer": [ {
+        "valueDate": "{{effectiveUntilDate}}"
+      } ]
+    }, {
+      "linkId": "dose",
+      "answer": [ {
+        "valueInteger": "{{dose}}"
+      } ]
+    }, {
+      "linkId": "total_doses",
+      "answer": [ {
+        "valueInteger": "{{totalDoses}}"
+      } ]
+    }, {
+      "linkId": "country",
+      "answer": [ {
+        "valueCoding": {
+          "system": "urn:iso:std:iso:3166",
+          "code": "{{facilityCountry}}"
+        }
+      } ]
+    }, {
+      "linkId": "centre",
+      "answer": [ {
+        "valueString": "{{facilityName}}"
+      } ]
+    }, {
+      "linkId": "hw",
+      "answer": [ {
+        "valueString": "{{practitionerName}}"
+      } ]
+    }, {
+      "linkId": "disease",
+      "answer": [ {
+        "valueCoding": {
+          "system": "http://id.who.int/icd11/mms",
+          "code": "{{diseaseCode}}"
+        }
+      } ]
+    }, {
+      "linkId": "due_date",
+      "answer": [ {
+        "valueDate": "{{effectiveUntilDate}}"
+      } ]
+    }, {
+      "linkId": "pha",
+      "answer": [ {
+        "valueString": "{{publicHealthAuthority}}"
+      } ]
+    }, {
+      "linkId": "hcid",
+      "answer": [ {
+        "valueString": "{{certificateId}}"
+      } ]
+    }, {
+      "linkId": "valid_from",
+      "answer": [ {
+        "valueDate": "{{effectiveStartDate}}"
+      } ]
+    } ]
+}

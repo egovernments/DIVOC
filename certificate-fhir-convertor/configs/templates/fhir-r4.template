@@ -4,257 +4,234 @@
   "meta": {
     "versionId": "1",
     "lastUpdated": "{{dateString}}",
-    "source": "#J6nNwZ1ZBfadtHHD",
-    "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCDocument" ],
-    "security": [ {
-      "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
-      "code": "V"
-    } ]
+    "profile": [
+      "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCDocument"
+    ],
+    "security": [
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/v3-Confidentiality",
+        "code": "V",
+        "display": "very restricted"
+      }
+    ]
+  },
+  "identifier": {
+    "system": "urn:EXAMPLE-who-:ddcc:bundle:ids",
+    "value": "{{bundleId}}"
   },
   "type": "document",
   "timestamp": "{{dateString}}",
-  "entry": [ {
-    "fullUrl": "urn:uuid:{{compositionId}}",
-    "resource": {
+  "link": [
+    {
+      "relation": "publication",
+      "url": "urn:HCID:{{certificateId}}"
+    }
+  ],
+  "entry": [
+    {
+      "fullUrl": "urn:uuid:{{compositionId}}",
       "resourceType": "Composition",
       "id": "{{compositionId}}",
       "meta": {
-        "versionId": "1",
-        "lastUpdated": "{{dateString}}",
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCComposition" ]
+        "profile": [
+          "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCComposition"
+        ]
       },
-      "language": "en-IN",
       "text": {
         "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p/></div>"
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>identifier</b>: id: {{compositionId}} (OFFICIAL)</p><p><b>status</b>: final</p><p><b>type</b>: <span title=\"Codes: {http://loinc.org 82593-5}\">Immunization summary report</span></p><p><b>date</b>: {{dateString}}</p><p><b>author</b>: <a href=\"Organization-DDCC-Organization-English.html\">Generated Summary: name: {{facilityName}}</a></p><p><b>title</b>: Digital Documentation of COVID-19 Certificate (DDCC)</p><h3>Attesters</h3><table class=\"grid\"><tr><td>-</td><td><b>Mode</b></td><td><b>Party</b></td></tr><tr><td>*</td><td>official</td><td><a href=\"Organization-DDCC-Organization-English.html\">Generated Summary: name: {{facilityName}}</a></td></tr></table></div>"
+      },
+      "identifier": {
+        "use": "official",
+        "system": "urn:EXAMPLE-who-:ddcc:composition:ids",
+        "value": "{{compositionId}}"
       },
       "status": "final",
+      "type": {
+        "coding": [
+          {
+            "system": "http://loinc.org",
+            "code": "82593-5"
+          }
+        ]
+      },
       "subject": {
         "reference": "urn:uuid:{{patientId}}"
       },
       "date": "{{dateString}}",
-      "author": [ {
-        "reference": "urn:uuid:{{practitionerId}}"
-      } ],
-      "title": "WHO Digital Documentation of COVID-19 Certificates",
-      "confidentiality": "N",
-      "custodian": {
-        "reference": "urn:uuid:{{organisationId}}"
-      },
-      "section": [ {
-        "title": "Immunization",
-        "entry": [ {
-          "reference": "urn:uuid:{{immunizationId}}"
-        } ]
-      }, {
-        "title": "ImmunizationRecommendation",
-        "entry": [ {
-          "reference": "ImmunizationRecommendation/ImmunizationRecommendation-01"
-        } ]
-      }, {
-        "title": "Organization",
-        "entry": [ {
-          "reference": "urn:uuid:{{organisationId}}"
-        } ]
-      }, {
-        "title": "Practitioner",
-        "entry": [ {
-          "reference": "urn:uuid:{{practitionerId}}"
-        } ]
-      }, {
-        "title": "Patient",
-        "entry": [ {
-          "reference": "urn:uuid:{{patientId}}"
-        } ]
-      }, {
-        "title": "QR",
-        "entry": [ {
-          "reference": "QR/QR-01"
-        } ]
-      } ]
-    }
-  }, {
-    "fullUrl": "urn:uuid:{{practitionerId}}",
-    "resource": {
-      "resourceType": "Practitioner",
-      "id": "{{practitionerId}}",
-      "meta": {
-        "versionId": "1",
-        "lastUpdated": "{{dateString}}",
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCPractitioner" ]
-      },
-      "name": [ {
-        "use": "official"
-      }, {
-        "text": "{{practitionerName}}"
-      } ]
-    }
-  }, {
-    "fullUrl": "urn:uuid:{{organisationId}}",
-    "resource": {
+      "title": "Digital Documentation of COVID-19 Certificate (DDCC)",
+      "attester": [
+        {
+          "mode": "official",
+          "party": {
+            "reference": "urn:uuid:{{organisationId}}"
+          }
+        }
+      ],
+      "section": [
+        {
+          "code": {
+            "coding": [
+              {
+                "system": "http://loinc.org",
+                "code": "11369-6"
+              }
+            ]
+          },
+          "focus": {
+            "reference": "urn:uuid:{{immunizationId}}"
+          },
+          "entry": [
+            {
+              "reference": "urn:uuid:{{immunizationId}}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "fullUrl": "urn:uuid:{{organisationId}}",
       "resourceType": "Organization",
       "id": "{{organisationId}}",
       "meta": {
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCOrganization" ]
+        "profile": [
+          "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCOrganization"
+        ]
       },
-      "name": "{{facilityName}}",
-      "address": [
-        {
-          "city": "{{facilityCity}}"
-        },
-        {
-          "district": "{{facilityDistrict}}"
-        },
-        {
-          "country": "{{facilityCountry}}"
-        }
-      ]
-    }
-  }, {
-    "fullUrl": "urn:uuid:{{patientId}}",
-    "resource": {
+      "text": {
+        "status": "generated",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>name</b>: {{facilityName}}</p></div>"
+      },
+      "name": "{{facilityName}}"
+    },
+    {
+      "fullUrl": "urn:uuid:{{patientId}}",
       "resourceType": "Patient",
       "id": "{{patientId}}",
       "meta": {
-        "versionId": "1",
-        "lastUpdated": "{{dateString}}",
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCPatient" ]
+        "profile": [
+          "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCPatient"
+        ]
       },
       "text": {
         "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">ABC, 41 year, Male</div>"
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>name</b>: {{patientName}}(OFFICIAL)</p><p><b>birthDate</b>: {{dob}}</p></div>"
       },
-      "identifier": [ {
-        "type": {
-          "coding": [ {
-            "system": "http://terminology.hl7.org/CodeSystem/v2-0203",
-            "code": "MR",
-            "display": "Medical record number"
-          } ]
-        },
-        "system": "Govt id number",
-        "value": "{{patientGovtId}}"
-      } ],
-      "name": [ {
-        "text": "{{patientName}}"
-      }, {
-        "use": "official"
-      } ],
+      "name": [
+        {
+          "use": "official",
+          "text": "{{patientName}}"
+        }
+      ],
       "gender": "{{patientGender}}",
-      "birthDate": "1985-01-12"
-    }
-  }, {
-    "fullUrl": "urn:uuid:{{immunizationId}}",
-    "resource": {
+      "birthDate": "{{dob}}"
+    },
+    {
+      "fullUrl": "urn:uuid:{{immunizationId}}",
       "resourceType": "Immunization",
       "id": "{{immunizationId}}",
       "meta": {
-        "versionId": "1",
-        "lastUpdated": "{{dateString}}",
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCImmunization" ]
+        "profile": [
+          "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCImmunization"
+        ]
       },
       "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p/></div>"
+        "status": "extensions",
+        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"><p><b>Generated Narrative</b></p><p><b>DDCC Vaccine Brand for Immunization</b>: <span title=\"{http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem {{vaccineName}}}\">{{vaccineName}}</span></p><p><b>DDCC Country Of Vaccination for Immunization</b>: {{facilityCountry}}</p><p><b>DDCC Vaccine Market Authorization for Immunization</b>: <span title=\"{http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem TEST}\">Test</span></p><p><b>DDCC Vaccine Valid From</b>: {{effectiveStartDate}}</p><p><b>status</b>: completed</p><p><b>vaccineCode</b>: <span title=\"Codes: {http://id.who.int/icd11/mms {{vaccineCode}}}\">{{vaccineCode}}</span></p><p><b>patient</b>: <a href=\"Patient-DDCC-Patient-English.html\">Generated Summary: {{patientName}}(OFFICIAL); birthDate: {{dob}}</a></p><p><b>occurrence</b>: {{vaccinationDate}}</p><p><b>location</b>: <span>Vaccination Site</span></p><p><b>lotNumber</b>: {{batchNumber}}</p><p><b>expirationDate</b>: {{effectiveUntilDate}}</p><h3>Performers</h3><table class=\"grid\"><tr><td>-</td><td><b>Actor</b></td></tr><tr><td>*</td><td><a href=\"Organization-DDCC-Organization-English.html\">Generated Summary: name: {{facilityName}}</a></td></tr></table><h3>ProtocolApplieds</h3><table class=\"grid\"><tr><td>-</td><td><b>Authority</b></td><td><b>TargetDisease</b></td><td><b>DoseNumber[x]</b></td><td><b>SeriesDoses[x]</b></td></tr><tr><td>*</td><td><a href=\"Organization-DDCC-Organization-English.html\">Generated Summary: name: {{facilityName}}</a></td><td><span title=\"Codes: {http://id.who.int/icd11/mms {{diseaseCode}} }\">{{diseaseCode}}</span></td><td>1</td><td>2</td></tr></table></div>"
       },
+      "extension": [
+        {
+          "url": "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCVaccineBrand",
+          "valueCoding": {
+            "system": "http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem",
+            "code": "{{vaccineName}}"
+          }
+        },
+        {
+          "url": "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCCountryOfVaccination",
+          "valueCode": "{{facilityCountry}}"
+        },
+        {
+          "url": "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCVaccineMarketAuthorization",
+          "valueCoding": {
+            "system": "http://worldhealthorganization.github.io/ddcc/CodeSystem/DDCC-Example-Test-CodeSystem",
+            "code": "TEST"
+          }
+        },
+        {
+          "url": "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCVaccineValidFrom",
+          "valueDateTime": "{{effectiveUntilDate}}"
+        }
+      ],
       "status": "completed",
       "vaccineCode": {
-        "coding": [ {
-          "system": "http://snomed.info/sct",
-          "code": "{{vaccineCode}}",
-          "display": "{{vaccineName}}"
-        } ]
+        "coding": [
+          {
+            "system": "http://id.who.int/icd11/mms",
+            "code": "{{vaccineCode}}"
+          }
+        ]
       },
       "patient": {
         "reference": "urn:uuid:{{patientId}}"
-      },
-      "manufacturer": {
-        "reference":  "{{manufacturer}}"
       },
       "occurrenceDateTime": "{{vaccinationDate}}",
-      "primarySource": true,
+      "location": {
+        "display": "{{facilityCountry}}"
+      },
       "lotNumber": "{{batchNumber}}",
-      "performer": [ {
-        "actor": {
-          "reference": "urn:uuid:{{practitionerId}}"
-        }
-      } ]
-    }
-  }, {
-    "fullUrl": "ImmunizationRecommendation/ImmunizationRecommendation-01",
-    "resource": {
-      "resourceType": "ImmunizationRecommendation",
-      "id": "ImmunizationRecommendation-01",
-      "meta": {
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCImmunizationRecommendation" ]
-      },
-      "text": {
-        "status": "generated",
-        "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\"/>"
-      },
-      "patient": {
-        "reference": "urn:uuid:{{patientId}}"
-      },
-      "date": "{{dateString}}",
-      "authority": {
-        "reference": "urn:uuid:{{organisationId}}"
-      },
-      "recommendation": [ {
-        "vaccineCode": [ {
-          "coding": [ {
-            "system": "http://snomed.info/sct"
-          } ]
-        } ],
-        "forecastStatus": {
-          "coding": [ {
-            "system": "http://terminology.hl7.org/CodeSystem/immunization-recommendation-status",
-            "code": "due",
-            "display": "Due"
-          } ]
-        },
-        "dateCriterion": [ {
-          "code": {
-            "coding": [ {
-              "system": "http://loinc.org",
-              "code": "30980-7",
-              "display": "Date vaccine due"
-            } ]
+      "expirationDate": "{{effectiveUntilDate}}",
+      "protocolApplied": [
+        {
+          "authority": {
+            "reference": "{{organisationId}}"
           },
-          "value": "{{effectiveUntilDate}}"
-        } ],
-        "description": "First sequence in protocol",
-        "series": "Vaccination Series 1",
-        "doseNumberPositiveInt": "{{dose}}",
-        "seriesDosesPositiveInt": "{{totalDoses}}",
-        "supportingImmunization": [ {
-          "reference": "urn:uuid:{{immunizationId}}"
-        } ]
-      } ]
+          "targetDisease": [
+            {
+              "coding": [
+                {
+                  "system": "http://id.who.int/icd11/mms",
+                  "code": "{{diseaseCode}}"
+                }
+              ]
+            }
+          ],
+          "doseNumberPositiveInt": {{dose}},
+          "seriesDosesPositiveInt": {{totalDoses}}
+        }
+      ]
+    },
+    {
+      "fullUrl": "urn:uuid:{{qrId}}",
+      "resource": {
+        "resourceType": "DocumentReference",
+        "meta": {
+          "profile": [
+            "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCDocumentReferenceQR"
+          ]
+        },
+        "authenticator": {
+          "reference": "urn:uuid:{{organisationId}}"
+        },
+        "content": [
+          {
+            "attachment": {
+              "id": "{{{qrImage}}}"
+            },
+            "format": {
+              "system": "https://worldhealthorganization.github.io/ddcc/CodeSystem-DDCC-QR-Format-CodeSystem.html "
+            }
+          },
+          {
+            "attachment": {
+              "id": "{{qrContent}}"
+            },
+            "format": {
+              "system": "https://worldhealthorganization.github.io/ddcc/CodeSystem-DDCC-QR-Format-CodeSystem.html "
+            }
+          }
+        ]
+      }
     }
-  }, {
-    "fullUrl": "QR/QR-01",
-    "resource": {
-      "resourceType": "DocumentReference",
-      "id": "QR-01",
-      "meta": {
-        "profile": [ "http://worldhealthorganization.github.io/ddcc/StructureDefinition/DDCCDocumentReferenceQR" ]
-      },
-      "authenticator": {
-        "reference": "urn:uuid:{{organisationId}}"
-      },
-      "content": [ {
-        "attachment": {
-          "id": "qrImage"
-        }
-      }, {
-        "attachment": {
-          "id": "qrContent"
-        }
-      }, {
-        "attachment": {
-          "id": "pdf"
-        }
-      } ]
-    }
-  } ]
+  ]
 }
