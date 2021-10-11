@@ -9,6 +9,9 @@ const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 const fhirCertificate = require("certificate-fhir-convertor");
 const {privateKeyPem} = require('../../configs/keys');
+const config = require('../../configs/config');
+
+
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -417,21 +420,36 @@ async function certificateAsFHIRJson(req, res) {
     try {
         var queryData = url.parse(req.url, true).query;
         let claimBody = "";
-        let certificateId = "";
+        let refId = "";
         try {
             claimBody = await verifyKeycloakToken(req.headers.authorization);
-            certificateId = queryData.certificateId;
+            refId = queryData.refId;
         } catch (e) {
             console.error(e);
             res.statusCode = 403;
             return;
         }
-        const certificateResp = await registryService.getCertificate(claimBody.preferred_username, certificateId);
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+
+        const meta = {
+            "diseaseCode": config.FHIR_DISEASE_CODE,
+            "publicHealthAuthority": config.FHIR_PUBLIC_HEALTH_AUTHORITY
+        };
         if (certificateResp.length > 0) {
-            let certificate = JSON.parse(certificateResp[certificateResp.length - 1].certificate);
+            certificateResp = certificateResp.sort(function(a,b){
+                if (a.osUpdatedAt < b.osUpdatedAt) {
+                    return 1;
+                }
+                if (a.osUpdatedAt > b.osUpdatedAt) {
+                    return -1;
+                }
+                return 0;
+            }).reverse();
+            let certificateRaw = certificateResp[certificateResp.length - 1];
+            let certificate = JSON.parse(certificateRaw.certificate);
             // convert certificate to FHIR Json
             try {
-                const fhirJson = fhirCertificate.certificateToFhirJson(certificate, privateKeyPem);
+                const fhirJson = await fhirCertificate.certificateToFhirJson(certificate, privateKeyPem, meta);
                 res.setHeader("Content-Type", "application/json");
                 return JSON.stringify(fhirJson)
             } catch (e) {
@@ -450,9 +468,9 @@ async function certificateAsFHIRJson(req, res) {
             res.statusCode = 404;
             let error = {
                 date: new Date(),
-                source: certificateId,
+                source: refId,
                 type: "internal-failed",
-                extra: "Certificate not found"
+                extra: "Certificate not found for refId"
             };
             return JSON.stringify(error);
         }
