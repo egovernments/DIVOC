@@ -39,7 +39,7 @@ const CERTIFICATE_TYPE_V2 = "certifyV2"
 const CERTIFICATE_TYPE_V3 = "certifyV3"
 
 func SetupHandlers(api *operations.DivocAPI) {
-	api.GetV1PingHandler = operations.GetV1PingHandlerFunc(pingResponder)
+	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
 
 	api.LoginPostV1AuthorizeHandler = login.PostV1AuthorizeHandlerFunc(loginHandler)
 
@@ -154,7 +154,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 	return NewGenericServerError()
 }
 
-func pingResponder(params operations.GetV1PingParams) middleware.Responder {
+func pingResponder(params operations.GetPingParams) middleware.Responder {
 	return operations.NewGetPingOK()
 }
 
