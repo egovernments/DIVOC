@@ -13,14 +13,11 @@ const config = require('../configs/config');
 // get public key in pem format
 // openssl ec -in /Users/USER_NAME/.ssh/id_ecdsa -pubout
 var k1PubP8PEM = "-----BEGIN PUBLIC KEY-----\n" +
-  "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEftkMDoidplcHjVwxbggb8/xdXJQX\n" +
-  "2S1hib34pFzu1EyifUNAAhcQCQOEkbjaiLSps4GGF+pH4t1GD3rAf3F67g==" +
+  "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEftkMDoidplcHjVwxbggb8/xdXJQX2S1hib34pFzu1EyifUNAAhcQCQOEkbjaiLSps4GGF+pH4t1GD3rAf3F67g==" +
   "-----END PUBLIC KEY-----";
 
 var k1PrvP8PPEM = "-----BEGIN EC PRIVATE KEY-----\n" +
-  "MHcCAQEEIDMzz0wbs+8IB3EC7ymiwevUyeA0NQyWCaX2A6k3s/y5oAoGCCqGSM49\n" +
-  "AwEHoUQDQgAEftkMDoidplcHjVwxbggb8/xdXJQX2S1hib34pFzu1EyifUNAAhcQ\n" +
-  "CQOEkbjaiLSps4GGF+pH4t1GD3rAf3F67g==\n" +
+  "MHcCAQEEIDMzz0wbs+8IB3EC7ymiwevUyeA0NQyWCaX2A6k3s/y5oAoGCCqGSM49AwEHoUQDQgAEftkMDoidplcHjVwxbggb8/xdXJQX2S1hib34pFzu1EyifUNAAhcQCQOEkbjaiLSps4GGF+pH4t1GD3rAf3F67g==\n" +
   "-----END EC PRIVATE KEY-----";
 
 const cert2 = {
@@ -66,6 +63,7 @@ const cert2 = {
             "date": "2020-12-02T19:21:18.646Z",
             "effectiveStart": "2020-12-02",
             "effectiveUntil": "2025-12-02",
+            "certificateId": "1234796",
             "dose": 1,
             "totalDoses": 2,
             "verifier": {

@@ -65,7 +65,7 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
     const effectiveStartDate = R.pathOr('', ['evidence', 0, 'effectiveStart'], certificate);
     const dose = parseInt(R.pathOr('', ['evidence', 0, 'dose'], certificate));
     const totalDoses = parseInt(R.pathOr('', ['evidence', 0, 'totalDoses'], certificate));
-    const certificateId = parseInt(R.pathOr('', ['evidence', 0, 'certificateId'], certificate));
+    const certificateId = R.pathOr('', ['evidence', 0, 'certificateId'], certificate);
 
     const diseaseCode = R.pathOr('', ['diseaseCode'], meta);
     const publicHealthAuthority = R.pathOr('', ['publicHealthAuthority'], meta);
