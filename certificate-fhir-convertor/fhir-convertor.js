@@ -37,6 +37,7 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
     const bundleId = uuidv4();
     const compositionId = uuidv4();
     const immunizationId = uuidv4();
+    const questionnaireResponseId = uuidv4();
 
     const practitionerName = R.pathOr('', ['evidence', 0, 'verifier', 'name'], certificate);
     const vaccineName = R.pathOr('', ['evidence', 0, 'vaccine'], certificate);
@@ -76,7 +77,7 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
         facilityName, facilityCity, facilityDistrict, facilityCountry, facilityId,
         patientNationality, patientGovtId, patientName, dob, patientGender, vaccinationDate,
         manufacturer, batchNumber, effectiveUntilDate, effectiveStartDate, dose, totalDoses,
-        diseaseCode, refId, publicHealthAuthority, certificateId
+        diseaseCode, refId, publicHealthAuthority, certificateId, questionnaireResponseId
     };
 
     // build QR data and img

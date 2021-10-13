@@ -86,12 +86,12 @@
     }, {
       "linkId": "dose",
       "answer": [ {
-        "valueInteger": "{{dose}}"
+        "valueInteger": {{dose}}
       } ]
     }, {
       "linkId": "total_doses",
       "answer": [ {
-        "valueInteger": "{{totalDoses}}"
+        "valueInteger": {{totalDoses}}
       } ]
     }, {
       "linkId": "country",
