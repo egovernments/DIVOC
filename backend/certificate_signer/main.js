@@ -1,19 +1,25 @@
 const {
   CERTIFICATE_NAMESPACE,
+  CERTIFICATE_NAMESPACE_V2,
   CERTIFICATE_ISSUER,
   CERTIFICATE_BASE_URL,
   CERTIFICATE_FEEDBACK_BASE_URL,
-  CERTIFICATE_INFO_BASE_URL
+  CERTIFICATE_INFO_BASE_URL,
+  ENABLE_FEEDBACK_URL
 } = require ("./config/config");
 const {Kafka} = require('kafkajs');
 const config = require('./config/config');
+const constants = require("./config/constants");
 const R = require('ramda');
-const {vaccinationContext} = require("vaccination-context");
+const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
+
+const CERTIFICATE_TYPE_V2 = "certifyV2";
+const CERTIFICATE_TYPE_V3 = "certifyV3";
 
 const kafka = new Kafka({
   clientId: 'divoc-cert',
@@ -55,6 +61,7 @@ let signingConfig = {
 
 const documentLoader = {};
 documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
+documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
 
 (async function() {
   await consumer.connect();
@@ -106,8 +113,18 @@ function ageOfRecipient(recipient) {
   return "";
 }
 
+function dobOfRecipient(recipient) {
+  if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900) return recipient.dob;
+  // administrative dob
+  if (recipient.age && recipient.age > 0)
+    return (new Date().getFullYear() - recipient.age) + "-01-01";
+  return "";
+}
+
 function transformW3(cert, certificateId) {
-  const certificateFromTemplate = {
+  const certificateType = R.pathOr('', ['meta', 'certificateType'], cert)
+
+  let certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
       CERTIFICATE_NAMESPACE,
@@ -127,7 +144,7 @@ function transformW3(cert, certificateId) {
         "district": R.pathOr('', ['recipient', 'address', 'district'], cert),
         "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
         "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
-        "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
+        "addressCountry": R.pathOr('IND', ['recipient', 'address', 'country'], cert),
         "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
       }
     },
@@ -135,7 +152,6 @@ function transformW3(cert, certificateId) {
     issuanceDate: new Date().toISOString(),
     evidence: [{
       "id": CERTIFICATE_BASE_URL + certificateId,
-      "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId,
       "infoUrl": CERTIFICATE_INFO_BASE_URL + certificateId,
       "certificateId": certificateId,
       "type": ["Vaccination"],
@@ -159,12 +175,45 @@ function transformW3(cert, certificateId) {
           "district": R.pathOr('', ['facility', 'address', 'district'], cert),
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
-          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "addressCountry": R.pathOr('IND', ['facility', 'address', 'country'], cert),
           "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
       }
     }],
     "nonTransferable": "true"
   };
+
+  if (ENABLE_FEEDBACK_URL) {
+    certificateFromTemplate["evidence"][0] = {
+      ...certificateFromTemplate["evidence"][0],
+      "feedbackUrl": CERTIFICATE_FEEDBACK_BASE_URL + certificateId
+    };
+
+  }
+
+  if (certificateType === CERTIFICATE_TYPE_V3) {
+    const vaccineName = R.pathOr('', ['vaccination', 'name'], cert);
+    const icd11Code = vaccineName ? constants.VACCINE_ICD11_MAPPINGS.filter(a => vaccineName.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
+    const prophylaxis = icd11Code ? constants.ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
+    // update context
+    certificateFromTemplate["@context"] = [
+      "https://www.w3.org/2018/credentials/v1",
+      "https://cowin.gov.in/credentials/vaccination/v2"
+    ];
+
+    // dob
+    certificateFromTemplate["credentialSubject"] = {
+      ...certificateFromTemplate["credentialSubject"],
+      "dob": dobOfRecipient(cert.recipient),
+    };
+
+    // icd11code
+    certificateFromTemplate["evidence"][0] = {
+      ...certificateFromTemplate["evidence"][0],
+      "icd11Code": icd11Code ? icd11Code: '',
+      "prophylaxis": prophylaxis ? prophylaxis: '',
+    };
+
+  }
   return certificateFromTemplate;
 }

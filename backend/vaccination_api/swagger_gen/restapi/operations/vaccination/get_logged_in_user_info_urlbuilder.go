@@ -35,11 +35,11 @@ func (o *GetLoggedInUserInfoURL) SetBasePath(bp string) {
 func (o *GetLoggedInUserInfoURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/users/me"
+	var _path = "/v1/users/me"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

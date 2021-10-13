@@ -34,9 +34,9 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
-    "/authorize": {
+    "/v1/authorize": {
       "post": {
         "security": [],
         "consumes": [
@@ -75,7 +75,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -117,7 +117,7 @@ func init() {
         }
       }
     },
-    "/certificate": {
+    "/v1/certificate": {
       "put": {
         "description": "Update existing certificate if all checks are passed",
         "tags": [
@@ -157,7 +157,7 @@ func init() {
         }
       }
     },
-    "/certificate/revoked": {
+    "/v1/certificate/revoked": {
       "post": {
         "security": [],
         "tags": [
@@ -188,7 +188,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -209,7 +209,7 @@ func init() {
         }
       }
     },
-    "/certificates/{certificateId}": {
+    "/v1/certificates/{certificateId}": {
       "get": {
         "security": [
           {
@@ -245,7 +245,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -279,7 +279,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -306,7 +306,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -345,7 +345,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -369,7 +369,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -394,7 +394,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -422,7 +422,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -434,7 +434,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -472,7 +472,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -508,7 +508,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -528,7 +528,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -575,7 +575,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -593,7 +593,7 @@ func init() {
         }
       }
     },
-    "/test/bulkCertify": {
+    "/v1/test/bulkCertify": {
       "post": {
         "security": [
           {
@@ -635,7 +635,7 @@ func init() {
         }
       }
     },
-    "/test/certify": {
+    "/v1/test/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization.",
         "tags": [
@@ -669,7 +669,7 @@ func init() {
         }
       }
     },
-    "/test/certify/uploads": {
+    "/v1/test/certify/uploads": {
       "get": {
         "security": [
           {
@@ -696,7 +696,7 @@ func init() {
         }
       }
     },
-    "/test/certify/uploads/{uploadId}/errors": {
+    "/v1/test/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -735,7 +735,7 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -752,7 +752,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -779,6 +779,80 @@ func init() {
               "items": {
                 "$ref": "../registry/Vaccinator.json#/definitions/Vaccinator"
               }
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified. The payload for this API is compliant with DDCC core data set prescribed by WHO",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -1390,9 +1464,9 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
-    "/authorize": {
+    "/v1/authorize": {
       "post": {
         "security": [],
         "consumes": [
@@ -1431,7 +1505,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -1473,7 +1547,7 @@ func init() {
         }
       }
     },
-    "/certificate": {
+    "/v1/certificate": {
       "put": {
         "description": "Update existing certificate if all checks are passed",
         "tags": [
@@ -1513,7 +1587,7 @@ func init() {
         }
       }
     },
-    "/certificate/revoked": {
+    "/v1/certificate/revoked": {
       "post": {
         "security": [],
         "tags": [
@@ -1544,7 +1618,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -1565,7 +1639,7 @@ func init() {
         }
       }
     },
-    "/certificates/{certificateId}": {
+    "/v1/certificates/{certificateId}": {
       "get": {
         "security": [
           {
@@ -1601,7 +1675,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -1635,7 +1709,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -1662,7 +1736,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -1701,7 +1775,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -1725,7 +1799,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -1750,7 +1824,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -1778,7 +1852,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -1790,7 +1864,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -1828,7 +1902,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -1864,7 +1938,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -1884,7 +1958,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -1931,7 +2005,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -1949,7 +2023,7 @@ func init() {
         }
       }
     },
-    "/test/bulkCertify": {
+    "/v1/test/bulkCertify": {
       "post": {
         "security": [
           {
@@ -1991,7 +2065,7 @@ func init() {
         }
       }
     },
-    "/test/certify": {
+    "/v1/test/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization.",
         "tags": [
@@ -2025,7 +2099,7 @@ func init() {
         }
       }
     },
-    "/test/certify/uploads": {
+    "/v1/test/certify/uploads": {
       "get": {
         "security": [
           {
@@ -2052,7 +2126,7 @@ func init() {
         }
       }
     },
-    "/test/certify/uploads/{uploadId}/errors": {
+    "/v1/test/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -2091,7 +2165,7 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -2108,7 +2182,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -2135,6 +2209,80 @@ func init() {
               "items": {
                 "$ref": "#/definitions/vaccinator"
               }
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified. The payload for this API is compliant with DDCC core data set prescribed by WHO",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }

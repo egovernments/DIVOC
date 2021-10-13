@@ -29,7 +29,7 @@ func NewGetSideEffectsMetadata(ctx *middleware.Context, handler GetSideEffectsMe
 	return &GetSideEffectsMetadata{Context: ctx, Handler: handler}
 }
 
-/*GetSideEffectsMetadata swagger:route GET /sideEffects sideEffects getSideEffectsMetadata
+/*GetSideEffectsMetadata swagger:route GET /v1/sideEffects sideEffects getSideEffectsMetadata
 
 Get Side Effects Metadata
 

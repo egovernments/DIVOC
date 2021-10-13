@@ -53,14 +53,14 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 
 		JSONProducer: runtime.JSONProducer(),
 
-		GetPingHandler: GetPingHandlerFunc(func(params GetPingParams) middleware.Responder {
-			return middleware.NotImplemented("operation GetPing has not yet been implemented")
+		GetV1PingHandler: GetV1PingHandlerFunc(func(params GetV1PingParams) middleware.Responder {
+			return middleware.NotImplemented("operation GetV1Ping has not yet been implemented")
 		}),
-		LoginPostAuthorizeHandler: login.PostAuthorizeHandlerFunc(func(params login.PostAuthorizeParams) middleware.Responder {
-			return middleware.NotImplemented("operation login.PostAuthorize has not yet been implemented")
+		LoginPostV1AuthorizeHandler: login.PostV1AuthorizeHandlerFunc(func(params login.PostV1AuthorizeParams) middleware.Responder {
+			return middleware.NotImplemented("operation login.PostV1Authorize has not yet been implemented")
 		}),
-		IdentityPostIdentityVerifyHandler: identity.PostIdentityVerifyHandlerFunc(func(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
-			return middleware.NotImplemented("operation identity.PostIdentityVerify has not yet been implemented")
+		IdentityPostV1IdentityVerifyHandler: identity.PostV1IdentityVerifyHandlerFunc(func(params identity.PostV1IdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation identity.PostV1IdentityVerify has not yet been implemented")
 		}),
 		CertificationBulkCertifyHandler: certification.BulkCertifyHandlerFunc(func(params certification.BulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.BulkCertify has not yet been implemented")
@@ -70,6 +70,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		}),
 		CertificationCertifyHandler: certification.CertifyHandlerFunc(func(params certification.CertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.Certify has not yet been implemented")
+		}),
+		CertificationCertifyV3Handler: certification.CertifyV3HandlerFunc(func(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.CertifyV3 has not yet been implemented")
 		}),
 		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
@@ -125,6 +128,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationUpdateCertificateHandler: certification.UpdateCertificateHandlerFunc(func(params certification.UpdateCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.UpdateCertificate has not yet been implemented")
 		}),
+		CertificationUpdateCertificateV3Handler: certification.UpdateCertificateV3HandlerFunc(func(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.UpdateCertificateV3 has not yet been implemented")
+		}),
 
 		HasRoleAuth: func(token string, scopes []string) (*models.JWTClaimBody, error) {
 			return nil, errors.NotImplemented("oauth2 bearer auth (hasRole) has not yet been implemented")
@@ -175,18 +181,20 @@ type DivocAPI struct {
 	// APIAuthorizer provides access control (ACL/RBAC/ABAC) by providing access to the request and authenticated principal
 	APIAuthorizer runtime.Authorizer
 
-	// GetPingHandler sets the operation handler for the get ping operation
-	GetPingHandler GetPingHandler
-	// LoginPostAuthorizeHandler sets the operation handler for the post authorize operation
-	LoginPostAuthorizeHandler login.PostAuthorizeHandler
-	// IdentityPostIdentityVerifyHandler sets the operation handler for the post identity verify operation
-	IdentityPostIdentityVerifyHandler identity.PostIdentityVerifyHandler
+	// GetV1PingHandler sets the operation handler for the get v1 ping operation
+	GetV1PingHandler GetV1PingHandler
+	// LoginPostV1AuthorizeHandler sets the operation handler for the post v1 authorize operation
+	LoginPostV1AuthorizeHandler login.PostV1AuthorizeHandler
+	// IdentityPostV1IdentityVerifyHandler sets the operation handler for the post v1 identity verify operation
+	IdentityPostV1IdentityVerifyHandler identity.PostV1IdentityVerifyHandler
 	// CertificationBulkCertifyHandler sets the operation handler for the bulk certify operation
 	CertificationBulkCertifyHandler certification.BulkCertifyHandler
 	// CertificateRevokedCertificateRevokedHandler sets the operation handler for the certificate revoked operation
 	CertificateRevokedCertificateRevokedHandler certificate_revoked.CertificateRevokedHandler
 	// CertificationCertifyHandler sets the operation handler for the certify operation
 	CertificationCertifyHandler certification.CertifyHandler
+	// CertificationCertifyV3Handler sets the operation handler for the certify v3 operation
+	CertificationCertifyV3Handler certification.CertifyV3Handler
 	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
 	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// EventsHandler sets the operation handler for the events operation
@@ -223,6 +231,8 @@ type DivocAPI struct {
 	CertificationTestCertifyHandler certification.TestCertifyHandler
 	// CertificationUpdateCertificateHandler sets the operation handler for the update certificate operation
 	CertificationUpdateCertificateHandler certification.UpdateCertificateHandler
+	// CertificationUpdateCertificateV3Handler sets the operation handler for the update certificate v3 operation
+	CertificationUpdateCertificateV3Handler certification.UpdateCertificateV3Handler
 	// ServeError is called when an error is received, there is a default handler
 	// but you can set your own with this
 	ServeError func(http.ResponseWriter, *http.Request, error)
@@ -306,14 +316,14 @@ func (o *DivocAPI) Validate() error {
 		unregistered = append(unregistered, "HasRoleAuth")
 	}
 
-	if o.GetPingHandler == nil {
-		unregistered = append(unregistered, "GetPingHandler")
+	if o.GetV1PingHandler == nil {
+		unregistered = append(unregistered, "GetV1PingHandler")
 	}
-	if o.LoginPostAuthorizeHandler == nil {
-		unregistered = append(unregistered, "login.PostAuthorizeHandler")
+	if o.LoginPostV1AuthorizeHandler == nil {
+		unregistered = append(unregistered, "login.PostV1AuthorizeHandler")
 	}
-	if o.IdentityPostIdentityVerifyHandler == nil {
-		unregistered = append(unregistered, "identity.PostIdentityVerifyHandler")
+	if o.IdentityPostV1IdentityVerifyHandler == nil {
+		unregistered = append(unregistered, "identity.PostV1IdentityVerifyHandler")
 	}
 	if o.CertificationBulkCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.BulkCertifyHandler")
@@ -323,6 +333,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationCertifyHandler == nil {
 		unregistered = append(unregistered, "certification.CertifyHandler")
+	}
+	if o.CertificationCertifyV3Handler == nil {
+		unregistered = append(unregistered, "certification.CertifyV3Handler")
 	}
 	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
 		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
@@ -377,6 +390,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationUpdateCertificateHandler == nil {
 		unregistered = append(unregistered, "certification.UpdateCertificateHandler")
+	}
+	if o.CertificationUpdateCertificateV3Handler == nil {
+		unregistered = append(unregistered, "certification.UpdateCertificateV3Handler")
 	}
 
 	if len(unregistered) > 0 {
@@ -481,99 +497,107 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
-	o.handlers["GET"]["/ping"] = NewGetPing(o.context, o.GetPingHandler)
+	o.handlers["GET"]["/v1/ping"] = NewGetV1Ping(o.context, o.GetV1PingHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/authorize"] = login.NewPostAuthorize(o.context, o.LoginPostAuthorizeHandler)
+	o.handlers["POST"]["/v1/authorize"] = login.NewPostV1Authorize(o.context, o.LoginPostV1AuthorizeHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/identity/verify"] = identity.NewPostIdentityVerify(o.context, o.IdentityPostIdentityVerifyHandler)
+	o.handlers["POST"]["/v1/identity/verify"] = identity.NewPostV1IdentityVerify(o.context, o.IdentityPostV1IdentityVerifyHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/bulkCertify"] = certification.NewBulkCertify(o.context, o.CertificationBulkCertifyHandler)
+	o.handlers["POST"]["/v1/bulkCertify"] = certification.NewBulkCertify(o.context, o.CertificationBulkCertifyHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/certificate/revoked"] = certificate_revoked.NewCertificateRevoked(o.context, o.CertificateRevokedCertificateRevokedHandler)
+	o.handlers["POST"]["/v1/certificate/revoked"] = certificate_revoked.NewCertificateRevoked(o.context, o.CertificateRevokedCertificateRevokedHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/certify"] = certification.NewCertify(o.context, o.CertificationCertifyHandler)
+	o.handlers["POST"]["/v1/certify"] = certification.NewCertify(o.context, o.CertificationCertifyHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/report-side-effects"] = report_side_effects.NewCreateReportedSideEffects(o.context, o.ReportSideEffectsCreateReportedSideEffectsHandler)
+	o.handlers["POST"]["/v3/certify"] = certification.NewCertifyV3(o.context, o.CertificationCertifyV3Handler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/events"] = NewEvents(o.context, o.EventsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/certificates"] = NewGetCertificate(o.context, o.GetCertificateHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/certificates/{certificateId}"] = certification.NewGetCertificateByCertificateID(o.context, o.CertificationGetCertificateByCertificateIDHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/certify/uploads/{uploadId}/errors"] = certification.NewGetCertifyUploadErrors(o.context, o.CertificationGetCertifyUploadErrorsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/certify/uploads"] = certification.NewGetCertifyUploads(o.context, o.CertificationGetCertifyUploadsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/divoc/configuration"] = configuration.NewGetConfiguration(o.context, o.ConfigurationGetConfigurationHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/programs/current"] = configuration.NewGetCurrentPrograms(o.context, o.ConfigurationGetCurrentProgramsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/users/me"] = vaccination.NewGetLoggedInUserInfo(o.context, o.VaccinationGetLoggedInUserInfoHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/preEnrollments/{preEnrollmentCode}"] = vaccination.NewGetPreEnrollment(o.context, o.VaccinationGetPreEnrollmentHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/preEnrollments"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/sideEffects"] = side_effects.NewGetSideEffectsMetadata(o.context, o.SideEffectsGetSideEffectsMetadataHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/test/certify/uploads/{uploadId}/errors"] = certification.NewGetTestCertifyUploadErrors(o.context, o.CertificationGetTestCertifyUploadErrorsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/test/certify/uploads"] = certification.NewGetTestCertifyUploads(o.context, o.CertificationGetTestCertifyUploadsHandler)
-	if o.handlers["GET"] == nil {
-		o.handlers["GET"] = make(map[string]http.Handler)
-	}
-	o.handlers["GET"]["/vaccinators"] = configuration.NewGetVaccinators(o.context, o.ConfigurationGetVaccinatorsHandler)
+	o.handlers["POST"]["/v1/report-side-effects"] = report_side_effects.NewCreateReportedSideEffects(o.context, o.ReportSideEffectsCreateReportedSideEffectsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/test/bulkCertify"] = certification.NewTestBulkCertify(o.context, o.CertificationTestBulkCertifyHandler)
+	o.handlers["POST"]["/v1/events"] = NewEvents(o.context, o.EventsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/certificates"] = NewGetCertificate(o.context, o.GetCertificateHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/certificates/{certificateId}"] = certification.NewGetCertificateByCertificateID(o.context, o.CertificationGetCertificateByCertificateIDHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/certify/uploads/{uploadId}/errors"] = certification.NewGetCertifyUploadErrors(o.context, o.CertificationGetCertifyUploadErrorsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/certify/uploads"] = certification.NewGetCertifyUploads(o.context, o.CertificationGetCertifyUploadsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/divoc/configuration"] = configuration.NewGetConfiguration(o.context, o.ConfigurationGetConfigurationHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/programs/current"] = configuration.NewGetCurrentPrograms(o.context, o.ConfigurationGetCurrentProgramsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/users/me"] = vaccination.NewGetLoggedInUserInfo(o.context, o.VaccinationGetLoggedInUserInfoHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/preEnrollments/{preEnrollmentCode}"] = vaccination.NewGetPreEnrollment(o.context, o.VaccinationGetPreEnrollmentHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/preEnrollments"] = vaccination.NewGetPreEnrollmentsForFacility(o.context, o.VaccinationGetPreEnrollmentsForFacilityHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/sideEffects"] = side_effects.NewGetSideEffectsMetadata(o.context, o.SideEffectsGetSideEffectsMetadataHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/test/certify/uploads/{uploadId}/errors"] = certification.NewGetTestCertifyUploadErrors(o.context, o.CertificationGetTestCertifyUploadErrorsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/test/certify/uploads"] = certification.NewGetTestCertifyUploads(o.context, o.CertificationGetTestCertifyUploadsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/v1/vaccinators"] = configuration.NewGetVaccinators(o.context, o.ConfigurationGetVaccinatorsHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
-	o.handlers["POST"]["/test/certify"] = certification.NewTestCertify(o.context, o.CertificationTestCertifyHandler)
+	o.handlers["POST"]["/v1/test/bulkCertify"] = certification.NewTestBulkCertify(o.context, o.CertificationTestBulkCertifyHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v1/test/certify"] = certification.NewTestCertify(o.context, o.CertificationTestCertifyHandler)
 	if o.handlers["PUT"] == nil {
 		o.handlers["PUT"] = make(map[string]http.Handler)
 	}
-	o.handlers["PUT"]["/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
+	o.handlers["PUT"]["/v1/certificate"] = certification.NewUpdateCertificate(o.context, o.CertificationUpdateCertificateHandler)
+	if o.handlers["PUT"] == nil {
+		o.handlers["PUT"] = make(map[string]http.Handler)
+	}
+	o.handlers["PUT"]["/v3/certificate"] = certification.NewUpdateCertificateV3(o.context, o.CertificationUpdateCertificateV3Handler)
 }
 
 // Serve creates a http handler to serve the API over HTTP

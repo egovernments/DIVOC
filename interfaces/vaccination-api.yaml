@@ -20,7 +20,7 @@ consumes:
 produces:
   - application/json
 paths:
-  /authorize:
+  /v1/authorize:
     post:
       tags:
         - login
@@ -46,7 +46,7 @@ paths:
         '401':
           description: Unauthorized
 
-  /divoc/configuration:
+  /v1/divoc/configuration:
     get:
       tags:
         - configuration
@@ -62,7 +62,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/ApplicationConfiguration'
-  /users/me:
+  /v1/users/me:
     get:
       tags:
         - vaccination
@@ -73,7 +73,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/UserInfo'
-  '/preEnrollments/{preEnrollmentCode}':
+  '/v1/preEnrollments/{preEnrollmentCode}':
     get:
       tags:
         - vaccination
@@ -96,7 +96,7 @@ paths:
           description: OK
           schema:
             $ref: '../registry/Enrollment.json#/definitions/Enrollment'
-  '/preEnrollments':
+  '/v1/preEnrollments':
     get:
       tags:
         - vaccination
@@ -120,7 +120,7 @@ paths:
             type: array
             items:
               $ref: '../registry/Enrollment.json#/definitions/Enrollment'
-  /certify:
+  /v1/certify:
     post:
       tags:
         - certification
@@ -145,7 +145,33 @@ paths:
           description: Invalid input
           schema:
             $ref: '#/definitions/Error'
-  /bulkCertify:
+  /v3/certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more vaccination
+      description: >-
+        Certification happens asynchronously, this requires vaccinator
+        authorization and vaccinator should be trained for the vaccination that
+        is being certified. The payload for this API is compliant with DDCC core
+        data set prescribed by WHO
+      operationId: certifyV3
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/bulkCertify:
     post:
       tags:
         - certification
@@ -170,7 +196,7 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
-  /certify/uploads:
+  /v1/certify/uploads:
     get:
       tags:
         - certification
@@ -185,7 +211,7 @@ paths:
             type: array
             items:
               type: object
-  /certify/uploads/{uploadId}/errors:
+  /v1/certify/uploads/{uploadId}/errors:
     get:
       tags:
         - certification
@@ -208,7 +234,7 @@ paths:
           description: certify upload for given uploadID not found
         '403':
           description: Forbidden for user
-  /programs/current:
+  /v1/programs/current:
     get:
       tags:
         - configuration
@@ -221,7 +247,7 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Program'
-  /vaccinators:
+  /v1/vaccinators:
     get:
       tags:
         - configuration
@@ -241,7 +267,7 @@ paths:
             type: array
             items:
               $ref: "../registry/Vaccinator.json#/definitions/Vaccinator"
-  /identity/verify:
+  /v1/identity/verify:
     post:
       tags:
         - identity
@@ -258,7 +284,7 @@ paths:
           description: OK
         '206':
           description: Need OTP
-  /certificates:
+  /v1/certificates:
     get:
       summary: Get certificate json
       security:
@@ -269,7 +295,7 @@ paths:
           description: OK
           schema:
             type: object
-  /certificates/{certificateId}:
+  /v1/certificates/{certificateId}:
     get:
       summary: Get certificate json for given certificateId
       tags:
@@ -290,7 +316,7 @@ paths:
             type: object
         '404':
           description: certificate for given certificateId not found
-  /sideEffects:
+  /v1/sideEffects:
     get:
       tags:
         - sideEffects
@@ -302,7 +328,7 @@ paths:
           description: OK
           schema:
             type: object
-  /report-side-effects:
+  /v1/report-side-effects:
     post:
       tags:
         - reportSideEffects
@@ -329,7 +355,7 @@ paths:
           description: Invalid input
         '401':
           description: Unauthorized
-  /events:
+  /v1/events:
     post:
       summary: Send events for monitoring / tracking purpose.
       operationId: events
@@ -345,7 +371,7 @@ paths:
       responses:
         '200':
           description: OK
-  /ping:
+  /v1/ping:
     get:
       summary: Server heartbeat operation
       description: >-
@@ -355,7 +381,7 @@ paths:
       responses:
         '200':
           description: OK
-  /certificate:
+  /v1/certificate:
     put:
       tags:
         - certification
@@ -382,7 +408,34 @@ paths:
           description: Update not allowed
           schema:
             $ref: '#/definitions/Error'
-  /certificate/revoked:
+  /v3/certificate:
+    put:
+      tags:
+        - certification
+      summary: Update existing certificate request
+      description: >-
+        Update existing certificate if all checks are passed
+      operationId: updateCertificateV3
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/CertificationRequest'
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '412':
+          description: Update not allowed
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/certificate/revoked:
     post:
       tags:
         - certificateRevoked
@@ -402,7 +455,7 @@ paths:
           description: certificate not found in revocation list
         '400':
           description: Invalid input
-  /test/certify:
+  /v1/test/certify:
     post:
       tags:
         - certification
@@ -426,7 +479,7 @@ paths:
           description: Invalid input
           schema:
             $ref: '#/definitions/Error'
-  /test/bulkCertify:
+  /v1/test/bulkCertify:
     post:
       tags:
         - certification
@@ -451,7 +504,7 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
-  /test/certify/uploads:
+  /v1/test/certify/uploads:
     get:
       tags:
         - certification
@@ -466,7 +519,7 @@ paths:
             type: array
             items:
               type: object
-  /test/certify/uploads/{uploadId}/errors:
+  /v1/test/certify/uploads/{uploadId}/errors:
     get:
       tags:
         - certification
@@ -886,4 +939,4 @@ definitions:
 host: divoc.xiv.in
 schemes:
   - https
-basePath: /divoc/api/v1
+basePath: /divoc/api

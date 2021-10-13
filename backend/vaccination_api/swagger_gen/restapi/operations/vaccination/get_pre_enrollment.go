@@ -31,7 +31,7 @@ func NewGetPreEnrollment(ctx *middleware.Context, handler GetPreEnrollmentHandle
 	return &GetPreEnrollment{Context: ctx, Handler: handler}
 }
 
-/*GetPreEnrollment swagger:route GET /preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
+/*GetPreEnrollment swagger:route GET /v1/preEnrollments/{preEnrollmentCode} vaccination getPreEnrollment
 
 Get pre enrollment information
 

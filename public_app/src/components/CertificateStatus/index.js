@@ -6,9 +6,10 @@ import NextArrowImg from "../../assets/img/next-arrow.svg";
 import LearnProcessImg from "../../assets/img/leanr_more_small.png";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
 import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
-import config, {CERTIFICATE_CONTROLLER_ID,
+import config, {
+    CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
-    CERTIFICATE_NAMESPACE,
+    CERTIFICATE_NAMESPACE, CERTIFICATE_NAMESPACE_V2,
     CERTIFICATE_PUBKEY_ID
 } from "../../config";
 import {pathOr} from "ramda";
@@ -27,7 +28,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
-const {vaccinationContext} = require('vaccination-context');
+const {vaccinationContext, vaccinationContextV2} = require('vaccination-context');
 
 const customLoader = url => {
     const c = {
@@ -37,6 +38,7 @@ const customLoader = url => {
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
         [CERTIFICATE_NAMESPACE]: vaccinationContext,
+        [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
     };
     let context = c[url];
     if (context === undefined) {

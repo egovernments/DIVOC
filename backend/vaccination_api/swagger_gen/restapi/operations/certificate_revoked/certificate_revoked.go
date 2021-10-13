@@ -29,7 +29,7 @@ func NewCertificateRevoked(ctx *middleware.Context, handler CertificateRevokedHa
 	return &CertificateRevoked{Context: ctx, Handler: handler}
 }
 
-/*CertificateRevoked swagger:route POST /certificate/revoked certificateRevoked certificateRevoked
+/*CertificateRevoked swagger:route POST /v1/certificate/revoked certificateRevoked certificateRevoked
 
 Check if given certificate is revoked
 

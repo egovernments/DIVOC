@@ -35,11 +35,11 @@ func (o *CreateReportedSideEffectsURL) SetBasePath(bp string) {
 func (o *CreateReportedSideEffectsURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/report-side-effects"
+	var _path = "/v1/report-side-effects"
 
 	_basePath := o._basePath
 	if _basePath == "" {
-		_basePath = "/divoc/api/v1"
+		_basePath = "/divoc/api"
 	}
 	_result.Path = golangswaggerpaths.Join(_basePath, _path)
 

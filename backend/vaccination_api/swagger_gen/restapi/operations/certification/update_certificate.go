@@ -31,7 +31,7 @@ func NewUpdateCertificate(ctx *middleware.Context, handler UpdateCertificateHand
 	return &UpdateCertificate{Context: ctx, Handler: handler}
 }
 
-/*UpdateCertificate swagger:route PUT /certificate certification updateCertificate
+/*UpdateCertificate swagger:route PUT /v1/certificate certification updateCertificate
 
 Update existing certificate request
 

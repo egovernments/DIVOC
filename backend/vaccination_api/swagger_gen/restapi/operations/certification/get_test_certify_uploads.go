@@ -31,7 +31,7 @@ func NewGetTestCertifyUploads(ctx *middleware.Context, handler GetTestCertifyUpl
 	return &GetTestCertifyUploads{Context: ctx, Handler: handler}
 }
 
-/*GetTestCertifyUploads swagger:route GET /test/certify/uploads certification getTestCertifyUploads
+/*GetTestCertifyUploads swagger:route GET /v1/test/certify/uploads certification getTestCertifyUploads
 
 Get all file uploads for test certification for given facility admin
 

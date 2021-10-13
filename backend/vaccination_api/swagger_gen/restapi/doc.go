@@ -6,7 +6,7 @@
 //  Schemes:
 //    https
 //  Host: divoc.xiv.in
-//  BasePath: /divoc/api/v1
+//  BasePath: /divoc/api
 //  Version: 1.0.0
 //
 //  Consumes:
