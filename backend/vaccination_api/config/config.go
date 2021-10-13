@@ -84,6 +84,7 @@ var Config = struct {
 			Columns string `yaml:"columns"`
 		}
 		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"1"`
+		CacheRecentThreshold int `env:"CERTIFICATE_CACHE_RECENT_THRESHOLD_DAYS" default:"2"`
 	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`

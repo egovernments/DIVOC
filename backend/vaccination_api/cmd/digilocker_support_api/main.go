@@ -716,6 +716,40 @@ func handleFetchPDFPostRequest(w http.ResponseWriter, r *http.Request) {
 	getCertificatePDFHandler(w, r, EventTagInternal)
 }
 
+func getCertificateIdWithDoseHandler(w http.ResponseWriter, r *http.Request) {
+	log.Info("get certificate id ")
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err != nil {
+		w.WriteHeader(400)
+	} else {
+		signedJson, _, err := getCertificateSignedJsonByDose(preEnrollmentCode, dose)
+
+		if err != nil {
+			log.Infof("Error %+v", err)
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Certificate id fetch internal error")
+			return
+		}
+
+		if signedJson != "" {
+			var certificate models.Certificate
+			if err := json.Unmarshal([]byte(signedJson), &certificate); err == nil {
+				log.Errorf("Error in converting json %+v", err)
+				w.WriteHeader(500)
+			} else {
+				response := map[string]string {"certificateId": certificate.Evidence[0].CertificateId}
+				writeResponse(w, 200, response)
+			}
+
+		} else {
+			log.Errorf("No certificates found for request %v", preEnrollmentCode)
+			w.WriteHeader(404)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+		}
+	}
+}
+
 func headCertificateWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
@@ -1024,7 +1058,7 @@ func getSignedJson(preEnrollmentCode string) (string, string, error) {
 			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err != nil {
 				log.Error("Unable to parse certificate string", err)
 			} else {
-				if certificate.Evidence[0].Dose == 1 {
+				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold){
 					latestSignedJson := cachedCertificate
 					provisionalSignedJson := ""
 					return latestSignedJson, provisionalSignedJson, nil
@@ -1055,6 +1089,11 @@ func getSignedJson(preEnrollmentCode string) (string, string, error) {
 		log.Errorf("Error in accessing registery %+v", err)
 		return "", "", errors.New("Internal error")
 	}
+}
+
+func vaccinatedRecently(vaccinationDate time.Time, recentThreshold int) bool {
+	threshold := time.Now().AddDate(0, 0, -recentThreshold)
+	return vaccinationDate.After(threshold)
 }
 
 func getProvisionalCertificate(certificatesByDose map[int][]map[string]interface{}) map[string]interface{} {
@@ -1149,6 +1188,7 @@ func main() {
 	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/v3/ddcc/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV3, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
+	r.HandleFunc("/cert/api/certificateId/{preEnrollmentCode}/{dose}", timed(authorize(getCertificateIdWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}/{dose}", timed(authorize(getCertificateByDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")
