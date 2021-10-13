@@ -63,8 +63,8 @@
   when: sansible_kafka_interface_advertise is not none
 
 - name: Setup environment config
-  become: yes
-  become_user: "{{ sansible_kafka_user }}"
+  #become: yes
+  #become_user: "{{ sansible_kafka_user }}"
   template:
     dest: "/home/{{ sansible_kafka_user }}/etc/environment"
     mode: 0644
@@ -73,8 +73,8 @@
     - restart kafka
 
 - name: Create log4j.properties
-  become: yes
-  become_user: "{{ sansible_kafka_user }}"
+  #become: yes
+  #become_user: "{{ sansible_kafka_user }}"
   template:
     dest: "/home/{{ sansible_kafka_user }}/etc/log4j.properties"
     mode: 0644
@@ -83,8 +83,8 @@
     - restart kafka
 
 - name: Create server.properties
-  become: yes
-  become_user: "{{ sansible_kafka_user }}"
+  #become: yes
+  #become_user: "{{ sansible_kafka_user }}"
   template:
     dest: "/home/{{ sansible_kafka_user }}/etc/server.properties"
     mode: 0640
@@ -101,7 +101,7 @@
   meta: flush_handlers
 
 - name: Ensure Kafka is running
-  become: yes
+  #become: yes
   service:
     enabled: yes
     name: kafka

@@ -3,8 +3,6 @@
   become: yes
   vars_files:
     - vars/main.yml
-  pre_tasks:
-    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python-minimal python-zipstream)
   roles:
     - role: geerlingguy.postgresql
       become: yes
