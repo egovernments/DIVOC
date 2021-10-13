@@ -6,12 +6,14 @@ const QRCode = require('qrcode');
 const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
+const certificateService = require("../services/certificate_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 const fhirCertificate = require("certificate-fhir-convertor");
-const {privateKeyPem} = require('../../configs/keys');
+const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8} = require('../../configs/keys');
 const config = require('../../configs/config');
 
-
+const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
+const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -121,16 +123,8 @@ function getVaccineValidDays(start, end) {
 
 async function createCertificatePDF(certificateResp, res, source) {
     if (certificateResp.length > 0) {
-        certificateResp = certificateResp.sort(function(a,b){
-            if (a.osUpdatedAt < b.osUpdatedAt) {
-                return 1;
-            }
-            if (a.osUpdatedAt > b.osUpdatedAt) {
-                return -1;
-            }
-            return 0;
-        }).reverse();
-        let certificateRaw = certificateResp[certificateResp.length - 1];
+        let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+
         const zip = new JSZip();
         zip.file("certificate.json", certificateRaw.certificate, {
             compression: "DEFLATE"
@@ -142,53 +136,8 @@ async function createCertificatePDF(certificateResp, res, source) {
             });
 
         const dataURL = await QRCode.toDataURL(zippedData, {scale: 2});
-        certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
-        const {certificate: {credentialSubject, evidence}} = certificateRaw;
-        const certificateData = {
-            name: credentialSubject.name,
-            age: credentialSubject.age,
-            gender: credentialSubject.gender,
-            identity: formatId(credentialSubject.id),
-            beneficiaryId: credentialSubject.refId,
-            recipientAddress: formatRecipientAddress(credentialSubject.address),
-            vaccine: evidence[0].vaccine,
-            vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
-            vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
-            vaccinatedBy: evidence[0].verifier.name,
-            vaccinatedAt: formatFacilityAddress(evidence[0]),
-            qrCode: dataURL,
-            dose: evidence[0].dose,
-            totalDoses: evidence[0].totalDoses,
-            isFinalDose: evidence[0].dose === evidence[0].totalDoses,
-            currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`
-        };
-        const htmlData = fs.readFileSync(`${__dirname}/../../configs/templates/certificate_template.html`, 'utf8');
-        const template = Handlebars.compile(htmlData);
-        let certificate = template(certificateData);
-        const browser = await puppeteer.launch({
-            headless: true,
-            //comment to use default
-            executablePath: '/usr/bin/chromium-browser',
-            args: [
-                "--no-sandbox",
-                "--disable-gpu",
-            ]
-        });
-        const page = await browser.newPage();
-        await page.evaluateHandle('document.fonts.ready');
-        await page.setContent(certificate, {
-            waitUntil: 'domcontentloaded'
-        });
-        // await page.pdf({
-        //     format: 'A4',
-        //     path: `${__dirname}/divoc-invoice.pdf`
-        // });
-        const pdfBuffer = await page.pdf({
-            format: 'A4'
-        });
-
-        // close the browser
-        await browser.close();
+        const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
+        const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -250,29 +199,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
         };
-        const htmlData = fs.readFileSync(`${__dirname}/../../configs/templates/test_certificate_template.html`, 'utf8');
-        const template = Handlebars.compile(htmlData);
-        let certificate = template(certificateData);
-        const browser = await puppeteer.launch({
-            headless: true,
-            //comment to use default
-            executablePath: '/usr/bin/chromium-browser',
-            args: [
-                "--no-sandbox",
-                "--disable-gpu",
-            ]
-        });
-        const page = await browser.newPage();
-        await page.evaluateHandle('document.fonts.ready');
-        await page.setContent(certificate, {
-            waitUntil: 'domcontentloaded'
-        });
-        const pdfBuffer = await page.pdf({
-            format: 'A4'
-        });
-
-        // close the browser
-        await browser.close();
+        const pdfBuffer = await createPDF(testCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -432,20 +359,11 @@ async function certificateAsFHIRJson(req, res) {
         let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
 
         const meta = {
-            "diseaseCode": config.FHIR_DISEASE_CODE,
-            "publicHealthAuthority": config.FHIR_PUBLIC_HEALTH_AUTHORITY
+            "diseaseCode": config.DISEASE_CODE,
+            "publicHealthAuthority": config.PUBLIC_HEALTH_AUTHORITY
         };
         if (certificateResp.length > 0) {
-            certificateResp = certificateResp.sort(function(a,b){
-                if (a.osUpdatedAt < b.osUpdatedAt) {
-                    return 1;
-                }
-                if (a.osUpdatedAt > b.osUpdatedAt) {
-                    return -1;
-                }
-                return 0;
-            }).reverse();
-            let certificateRaw = certificateResp[certificateResp.length - 1];
+            let certificateRaw = certificateService.getLatestCertificate(certificateResp);
             let certificate = JSON.parse(certificateRaw.certificate);
             // convert certificate to FHIR Json
             try {
@@ -480,11 +398,111 @@ async function certificateAsFHIRJson(req, res) {
     }
 }
 
+async function certificateAsEUPayload(req, res) {
+    try {
+        var queryData = url.parse(req.url, true).query;
+        let claimBody = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            refId = queryData.refId;
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+        if (certificateResp.length > 0) {
+            let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+            // convert certificate to EU Json
+            const qrUri = await certificateService.convertCertificateToDCCPayload(certificateRaw, euPublicKeyP8, euPrivateKeyPem);
+            const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
+            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
+            const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+
+            res.statusCode = 200;
+            sendEvents({
+                date: new Date(),
+                source: refId,
+                type: "eu-cert-success",
+                extra: "Certificate found"
+            });
+            return pdfBuffer
+
+        } else {
+            res.statusCode = 404;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "Certificate not found"
+            };
+            return JSON.stringify(error);
+        }
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
+async function createPDF(templateFile, data) {
+    const htmlData = fs.readFileSync(templateFile, 'utf8');
+    const template = Handlebars.compile(htmlData);
+    let certificate = template(data);
+    const browser = await puppeteer.launch({
+        headless: true,
+        //comment to use default
+        executablePath: '/usr/bin/chromium-browser',
+        args: [
+            "--no-sandbox",
+            "--disable-gpu",
+        ]
+    });
+    const page = await browser.newPage();
+    await page.evaluateHandle('document.fonts.ready');
+    await page.setContent(certificate, {
+        waitUntil: 'domcontentloaded'
+    });
+    const pdfBuffer = await page.pdf({
+        format: 'A4'
+    });
+
+    // close the browser
+    await browser.close();
+
+    return pdfBuffer
+}
+
+function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL) {
+    certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
+    const {certificate: {credentialSubject, evidence}} = certificateRaw;
+    const certificateData = {
+        name: credentialSubject.name,
+        age: credentialSubject.age,
+        gender: credentialSubject.gender,
+        identity: formatId(credentialSubject.id),
+        beneficiaryId: credentialSubject.refId,
+        recipientAddress: formatRecipientAddress(credentialSubject.address),
+        vaccine: evidence[0].vaccine,
+        vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
+        vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
+        vaccinatedBy: evidence[0].verifier.name,
+        vaccinatedAt: formatFacilityAddress(evidence[0]),
+        qrCode: dataURL,
+        dose: evidence[0].dose,
+        totalDoses: evidence[0].totalDoses,
+        isFinalDose: evidence[0].dose === evidence[0].totalDoses,
+        currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`
+    };
+
+    return certificateData;
+}
+
 module.exports = {
     getCertificate,
     getCertificatePDF,
     getCertificatePDFByPreEnrollmentCode,
     checkIfCertificateGenerated,
     certificateAsFHIRJson,
-    getTestCertificatePDFByPreEnrollmentCode
+    getTestCertificatePDFByPreEnrollmentCode,
+    certificateAsEUPayload
 };

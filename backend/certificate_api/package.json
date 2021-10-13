@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@pathcheck/dcc-sdk": "^0.0.22",
     "axios": "^0.21.1",
     "certificate-fhir-convertor": "^1.3.2",
     "handlebars": "^4.7.7",
