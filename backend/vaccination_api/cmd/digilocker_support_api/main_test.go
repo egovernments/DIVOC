@@ -5,9 +5,22 @@ import (
 	"fmt"
 	"github.com/divoc/api/pkg/models"
 	"os"
+	"path"
 	"reflect"
+	"runtime"
 	"testing"
 )
+
+func init() {
+	_, filename, _, _ := runtime.Caller(0)
+	// The ".." may change depending on you folder structure
+	dir := path.Join(path.Dir(filename), "../../")
+	err := os.Chdir(dir)
+	fmt.Printf("Using directory %s %s\n", dir, filename)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func Test_getVaccineValidDays(t *testing.T) {
 	type args struct {
@@ -68,7 +81,9 @@ func Test_maskId(t *testing.T) {
 	}
 }
 
+
 func Test_blank(t *testing.T) {
+	t.Skip("blank json not supported!")
 	var certificate models.Certificate
 	certificateText := "{}"
 	if err := json.Unmarshal([]byte(certificateText), &certificate); err != nil {
@@ -84,6 +99,7 @@ func Test_isCertificatePresent(t *testing.T) {
 		certs []interface{}
 		dose  int64
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -93,7 +109,7 @@ func Test_isCertificatePresent(t *testing.T) {
 		{
 			name: "select by dose 1",
 			args: args{
-				certs: []interface{}{map[string]interface{}{"dose": 1}},
+				certs: getArrayOfMapsFromJson(`[{"dose":1}]`), //[]interface{}{map[string]interface{}{"dose": 1.0}},
 				dose:  1,
 			},
 			want:    true,
@@ -102,7 +118,7 @@ func Test_isCertificatePresent(t *testing.T) {
 		{
 			name: "select by dose 2",
 			args: args{
-				certs: []interface{}{map[string]interface{}{"dose": 1}},
+				certs: []interface{}{map[string]interface{}{"dose": 1.0}},
 				dose:  2,
 			},
 			want:    false,
@@ -153,6 +169,16 @@ func Test_isCertificatePresent(t *testing.T) {
 				t.Errorf("isCertificatePresent() got = %v, want %v", got, tt.want)
 			}
 		})
+	}
+}
+
+func getArrayOfMapsFromJson(jsonString string) []interface{} {
+	var holder []interface{}
+	if err := json.Unmarshal([]byte(jsonString), &holder); err != nil {
+		fmt.Printf("Error while parsing json %+v", err )
+		return nil
+	} else {
+		return holder
 	}
 }
 
@@ -507,15 +533,17 @@ func Test_getPdfCertificate(t *testing.T) {
 	provisionalCertificateText := `{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:in.gov.uidai.aadhaar:111122223344","refId":"02008131216487","name":"Sneha Jain updated","uhid":"","gender":"Female","age":"34","nationality":"Indian","dob":"1987-01-30"},"issuer":"https://cowin.gov.in/","issuanceDate":"2021-09-25T06:06:32.733Z","evidence":[{"id":"24296748524","type":["Vaccination"],"batch":"MB3428BX","vaccine":"COVAXIN","manufacturer":"Bharat Biotech","date":"2020-12-02T19:21:19.646Z","effectiveStart":"2020-12-15","effectiveUntil":"2021-01-15","dose":1,"totalDoses":2,"verifier":{"name":"Sooraj Singh"},"facility":{"name":"ABC Medical Center","address":{"streetAddress":"123, Koramangala","streetAddress2":"3rd cross","district":"Trivandrum","city":"","addressRegion":"Kerala","addressCountry":"IND","postalCode":560034}},"icd11Code":"XM1NL1","prophylaxis":"COVID-19 vaccine, inactivated virus"}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2021-09-25T06:06:32Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EaAek_SglotPsib8sVZhp0u58hHvE1hqbHjVOUPJn_IjjeKlyz9UAR6prpOrHCz4o1u4PwQ3fWjOMubIEEPmTOQxJuSI90ERRCR-1BX7H7lXRFwk5S0wH14MrEQQqMqCMDIAq-UP6DH3P3-1IwG6q1OtLIACwRVkT67DzSMT9FdM9K8knSKCE8rNVbf2leHOfhB7tZT0clEfz3cH0LP7vPa3izO4L0SHVaVPG_lek4rwJvQk1wz6WSdRplCoxgFAItBj6jG2gJeYZI9UTXj9UKzP3wheGp_1-FhzAqh9cvu6oKKORNMGEhOXl-xYb3R0NQgKpoG4hvu10sn_6gIsDg"}}`
 
 	latestCertificateText := `{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:in.gov.uidai.aadhaar:111122223344","refId":"02008131216487","name":"Sneha Jain updated","uhid":"","gender":"Female","age":"34","nationality":"Indian","dob":"1987-01-30"},"issuer":"https://cowin.gov.in/","issuanceDate":"2021-09-25T06:06:32.733Z","evidence":[{"id":"24296748524","type":["Vaccination"],"batch":"MB3428BX","vaccine":"COVAXIN","manufacturer":"Bharat Biotech","date":"2020-12-02T19:21:19.646Z","effectiveStart":"2020-12-15","effectiveUntil":"2021-01-15","dose":2,"totalDoses":2,"verifier":{"name":"Sooraj Singh"},"facility":{"name":"ABC Medical Center","address":{"streetAddress":"123, Koramangala","streetAddress2":"3rd cross","district":"Trivandrum","city":"","addressRegion":"Kerala","addressCountry":"IND","postalCode":560034}},"icd11Code":"XM1NL1","prophylaxis":"COVID-19 vaccine, inactivated virus"}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2021-09-25T06:06:32Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EaAek_SglotPsib8sVZhp0u58hHvE1hqbHjVOUPJn_IjjeKlyz9UAR6prpOrHCz4o1u4PwQ3fWjOMubIEEPmTOQxJuSI90ERRCR-1BX7H7lXRFwk5S0wH14MrEQQqMqCMDIAq-UP6DH3P3-1IwG6q1OtLIACwRVkT67DzSMT9FdM9K8knSKCE8rNVbf2leHOfhB7tZT0clEfz3cH0LP7vPa3izO4L0SHVaVPG_lek4rwJvQk1wz6WSdRplCoxgFAItBj6jG2gJeYZI9UTXj9UKzP3wheGp_1-FhzAqh9cvu6oKKORNMGEhOXl-xYb3R0NQgKpoG4hvu10sn_6gIsDg"}}`
+	t.Run("Certificate generation", func(t *testing.T){
+		if bytes, e := getCertificateAsPdfV2(latestCertificateText, provisionalCertificateText, "ENG"); e!= nil {
+			t.Fail() //Unable to parse certificate stringunexpected end of JSON input
+		} else {
 
-	if bytes, e := getCertificateAsPdfV2(latestCertificateText, provisionalCertificateText, "ENG"); e!= nil {
-		t.Fail() //Unable to parse certificate stringunexpected end of JSON input
-	} else {
-		fmt.Printf("Pdf generated with size %d", len(bytes))
-		if err := os.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
-			fmt.Printf("Error while writing the pdf")
+			t.Logf("Pdf generated with size %d", len(bytes))
+			if err := os.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
+				t.Error("Error while writing the pdf")
+			}
 		}
-	}
+	})
 }
 
 func Test_getPdfCertificateDDCC(t *testing.T) {
@@ -528,9 +556,9 @@ func Test_getPdfCertificateDDCC(t *testing.T) {
 	if bytes, e := getDDCCCertificateAsPdfV3(certs); e!= nil {
 		t.Fail() //Unable to parse certificate stringunexpected end of JSON input
 	} else {
-		fmt.Printf("DDCC certificate Pdf generated with size %d", len(bytes))
+		t.Logf("DDCC certificate Pdf generated with size %d", len(bytes))
 		if err := os.WriteFile("certificate_ddcc_sample.pdf", bytes, 0644); err != nil {
-			fmt.Printf("Error while writing the pdf")
+			t.Error("Error while writing the pdf")
 		}
 	}
 }

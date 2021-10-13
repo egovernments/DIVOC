@@ -302,10 +302,10 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequestV2) *string
 		certificates = SortCertificatesByCreateAt(certificates)
 		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
 		// no changes to provisional certificate if final certificate is generated
-		if request.Vaccination.Dose < request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
-			log.Error("Updating provisional certificate restricted")
-			return nil
-		}
+		//if request.Vaccination.Dose < request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
+		//	log.Error("Updating provisional certificate restricted")
+		//	return nil
+		//}
 		// check if certificate exists for a dose
 		if certificateIds, ok := doseWiseCertificateIds[int(request.Vaccination.Dose)]; ok && len(certificateIds) > 0 {
 			// check if maximum time of correction is reached
