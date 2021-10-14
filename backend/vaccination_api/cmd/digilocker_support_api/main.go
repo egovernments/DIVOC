@@ -734,7 +734,7 @@ func getCertificateIdWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 
 		if signedJson != "" {
 			var certificate models.Certificate
-			if err := json.Unmarshal([]byte(signedJson), &certificate); err == nil {
+			if err := json.Unmarshal([]byte(signedJson), &certificate); err != nil {
 				log.Errorf("Error in converting json %+v", err)
 				w.WriteHeader(500)
 			} else {
