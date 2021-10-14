@@ -9,6 +9,7 @@ import (
 	"reflect"
 	"runtime"
 	"testing"
+	"time"
 )
 
 func init() {
@@ -560,5 +561,28 @@ func Test_getPdfCertificateDDCC(t *testing.T) {
 		if err := os.WriteFile("certificate_ddcc_sample.pdf", bytes, 0644); err != nil {
 			t.Error("Error while writing the pdf")
 		}
+	}
+}
+
+func Test_vaccinatedRecently(t *testing.T) {
+	type args struct {
+		vaccinationDate time.Time
+	}
+	tests := []struct {
+		name string
+		args args
+		expected bool
+	}{
+		{name:"today", args:args{vaccinationDate:time.Now()}, expected:true},
+		{name:"today", args:args{vaccinationDate:time.Now().AddDate(0,0,-3)}, expected:false},
+		{name:"today", args:args{vaccinationDate:time.Now().AddDate(0,0,1)}, expected:true},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := vaccinatedRecently(tt.args.vaccinationDate, 2)
+			if result!=tt.expected {
+				t.Fail()
+			}
+		})
 	}
 }
