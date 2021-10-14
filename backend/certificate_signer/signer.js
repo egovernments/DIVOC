@@ -166,7 +166,7 @@ function transformW3(cert, certificateId, certificateType) {
   };
   if (certificateType === CERTIFICATE_TYPE_V3) {
     const vaccineName = R.pathOr('', ['vaccination', 'name'], cert);
-    const icd11Code = vaccineName ? constants.VACCINE_ICD11_MAPPINGS[vaccineName.toUpperCase().replace(/ /g, "_")].icd11Code: '';
+    const icd11Code = vaccineName ? constants.VACCINE_ICD11_MAPPINGS.filter(a => vaccineName.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
     const prophylaxis = icd11Code ? constants.ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
     // update context
     certificateFromTemplate["@context"] = [

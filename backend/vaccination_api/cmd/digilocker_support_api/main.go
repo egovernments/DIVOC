@@ -245,11 +245,15 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Error("Unable to parse certificate string", err)
 			return nil, err
 		}
+		country := certificate.Evidence[0].Facility.Address.AddressCountry
+		if country == "IN" {
+			country = "IND"
+		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
 			dose:        dose,
 			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
 			batchNumber: certificate.Evidence[0].Batch,
-			country:     certificate.Evidence[0].Facility.Address.AddressCountry,
+			country:     country,
 		})
 	}
 	latestCertificateText := latestCertificate["certificate"].(string)
@@ -270,23 +274,28 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 9); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	// header certificateId
+	doffsetX := 300.0
+	doffsetY := 174.0
+	pdf.SetX(doffsetX)
+	pdf.SetY(doffsetY)
+	dText := latestCertificate["certificateId"].(string)
+	_ = pdf.Cell(nil, dText)
+
 	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
 
-	// header dose
-	doffsetX := 300.0
-	doffsetY := 159.0
-	pdf.SetTextColor(41,73,121) // blue
-	pdf.SetX(doffsetX)
-	pdf.SetY(doffsetY)
-	pdf.SetTextColor(0, 0, 0)
-
 	offsetX := 290.0
-	offsetY := 195.0
+	offsetY := 220.0
 	offsetNewX := 290.0
-	offsetNewY := 373.0
+	offsetNewY := 390.0
 	rowSize := 6
 
 	displayLabels := []string{
@@ -294,8 +303,8 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		certificate.CredentialSubject.Dob,
 		certificate.CredentialSubject.Gender,
 		getPassportIdValue(certificate.CredentialSubject.ID),
-		"Fully Vaccinated",
-		latestCertificate["certificateId"].(string),
+		"Fully Vaccinated ("+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses)",
+		certificate.CredentialSubject.RefId,
 	}
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
@@ -306,8 +315,8 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	displayLabels = []string{
-		certificate.Evidence[0].Prophylaxis,
 		certificate.Evidence[0].Vaccine,
+		certificate.Evidence[0].Prophylaxis,
 		certificate.Evidence[0].Manufacturer,
 	}
 	for i = 0; i < len(displayLabels); i++ {
@@ -318,32 +327,24 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 	offsetNewY = offsetNewY + float64(3)*24
 	previousOffsetNewY := offsetNewY
 	for i = 0; i < len(doseWiseData); i++ {
+		data, _ := getDataForDose(doseWiseData, i+1)
 		offsetNewY = previousOffsetNewY
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, ordinalSuffixOf(doseWiseData[i].dose))
+		_ = pdf.Cell(nil, ordinalSuffixOf(data.dose))
 		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 20
+		offsetNewY = offsetNewY + 23
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, doseWiseData[i].doseDate)
+		_ = pdf.Cell(nil, data.doseDate)
 		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 20
+		offsetNewY = offsetNewY + 23
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, doseWiseData[i].batchNumber)
+		_ = pdf.Cell(nil, data.batchNumber)
 		pdf.SetX(offsetNewX)
 		offsetNewY = offsetNewY + 24
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, doseWiseData[i].country)
 		offsetNewX = offsetNewX + 100
 	}
-	offsetNewX = 290.0
-	offsetNewY = offsetNewY + 24
-	pdf.SetX(offsetNewX)
-	pdf.SetY(offsetNewY)
-	_ = pdf.Cell(nil,"Ministry of Health & Family Welfare,")
-	pdf.SetX(offsetNewX)
-	pdf.SetY(offsetNewY+15)
-	_ = pdf.Cell(nil,"Government of India")
 	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
@@ -355,6 +356,21 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 	var b bytes.Buffer
 	_ = pdf.Write(&b)
 	return b.Bytes(), nil
+}
+
+func getDataForDose(doseWiseData []DoseWiseData, dose int) (DoseWiseData, error) {
+	for i:=0; i < len(doseWiseData); i++ {
+		if dose == doseWiseData[i].dose {
+			return doseWiseData[i], nil
+		}
+	}
+	log.Errorf("Dose data doesn't exist %v", dose)
+	return DoseWiseData{
+		dose:        dose,
+		doseDate:    "-",
+		batchNumber: "-",
+		country:     "-",
+	}, errors.New("dose data doesn't exist")
 }
 
 func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson string, language string) ([]byte, error) {
@@ -427,7 +443,7 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		_ = pdf.Cell(nil, displayLabels[i])
 		j++
 	}
-	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 582)
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
 		log.Errorf("error in pasting qr code %v", e)
 		return nil, e
@@ -941,8 +957,8 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func verifyIfLatestCertificateIsDDCCCompliant(certificates []map[string]interface{}) bool {
-	latestCertificate := certificates[len(certificates)-1]
+func verifyIfLatestCertificateIsDDCCCompliant(certificateByDoses map[int][]map[string]interface{}) bool {
+	latestCertificate := getLatestCertificate(certificateByDoses)
 	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(latestCertificate["certificate"].(string)), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
@@ -958,7 +974,7 @@ func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
 	certificatesByDoses :=  getCertificatesByDoses(preEnrollmentCode)
-	if len(certificatesByDoses) >= 2 && verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses[len(certificatesByDoses)-1]) {
+	if len(certificatesByDoses) >= 2 && verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses) {
 		if pdfBytes, err := getDDCCCertificateAsPdfV3(certificatesByDoses); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
