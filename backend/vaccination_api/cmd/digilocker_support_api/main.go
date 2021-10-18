@@ -609,44 +609,45 @@ func getPassportIdValue(identity string) string {
 func formatId(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "adhaar") {
+	identityLowerCase := strings.ToLower(identity)
+	if strings.Contains(identityLowerCase, "adhaar") {
 		if len(lastFragment) > 0 {
 			return "Aadhaar # " + maskId(lastFragment)
 		} else {
 			return "Aadhaar"
 		}
 	}
-	if strings.Contains(identity, "Driving") {
+	if strings.Contains(identityLowerCase, "driving") {
 		return "Driver’s License # " + lastFragment
 	}
-	if strings.Contains(identity, "MNREGA") {
+	if strings.Contains(identityLowerCase, "mnrega") {
 		return "MNREGA Job Card # " + lastFragment
 	}
-	if strings.Contains(identity, "PAN") {
+	if strings.Contains(identityLowerCase, "pan") {
 		return "PAN Card # " + lastFragment
 	}
-	if strings.Contains(identity, "Passbooks") {
+	if strings.Contains(identityLowerCase, "passbooks") {
 		return "Passbook # " + lastFragment
 	}
-	if strings.Contains(identity, "Passport") {
+	if strings.Contains(identityLowerCase, "passport") {
 		return "Passport # " + lastFragment
 	}
-	if strings.Contains(identity, "Pension") {
+	if strings.Contains(identityLowerCase, "pension") {
 		return "Pension Document # " + lastFragment
 	}
-	if strings.Contains(identity, "Voter") {
+	if strings.Contains(identityLowerCase, "voter") {
 		return "Voter ID # " + lastFragment
 	}
-	if strings.Contains(strings.ToLower(identity), "npr") {
+	if strings.Contains(strings.ToLower(identityLowerCase), "npr") {
 		return "NPR Smart Card # " + lastFragment
 	}
-	if strings.Contains(strings.ToLower(identity), "disability") {
+	if strings.Contains(strings.ToLower(identityLowerCase), "disability") {
 		return "Unique Disability # " + lastFragment
 	}
-	if strings.Contains(strings.ToLower(identity), "identity") {
+	if strings.Contains(strings.ToLower(identityLowerCase), "identity") {
 		return "Service Identity Card # " + lastFragment
 	}
-	if strings.Contains(strings.ToLower(identity), "ration") {
+	if strings.Contains(strings.ToLower(identityLowerCase), "ration") {
 		return "Ration Card # " + lastFragment
 	}
 	return lastFragment
