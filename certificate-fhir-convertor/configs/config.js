@@ -1,14 +1,21 @@
-const VACCINE_MAPPINGS = {
-    "Covaxin": {
-        "code": "XM1NL1"
+const VACCINE_MAPPINGS = [
+    {
+        "vaccineName": "covaxin",
+        "icd11Code" :"XM1NL1"
     },
-    "Covishield": {
-        "code": "XM5DF6"
+    {
+        "vaccineName": "covishield",
+        "icd11Code" :"XM9QW8"
     },
-    "Sputnik V": {
-        "code": "XM5DF6"
+    {
+        "vaccineName": "sputnik",
+        "icd11Code" :"XM9QW8"
+    },
+    {
+        "vaccineName": "zycov",
+        "icd11Code": "XM6AT1"
     }
-};
+];
 
 module.exports = {
     VACCINE_MAPPINGS
