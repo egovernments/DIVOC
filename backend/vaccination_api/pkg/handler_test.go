@@ -5,12 +5,24 @@ import (
 	"fmt"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
+	"os"
+	"path"
 	"reflect"
+	"runtime"
 	"testing"
 )
+func init() {
+	_, filename, _, _ := runtime.Caller(0)
+	// The ".." may change depending on you folder structure
+	dir := path.Join(path.Dir(filename), "../")
+	err := os.Chdir(dir)
+	fmt.Printf("Using directory %s %s\n", dir, filename)
+	if err != nil {
+		panic(err)
+	}
+}
 
-func
-Test_certify(t *testing.T) {
+func Test_certify(t *testing.T) {
 
 	type args struct {
 		params    certification.CertifyParams

@@ -112,7 +112,7 @@ func notifyWebhook(beneficiaryId string, dose int, certificateStatus string, err
 			postRequest.Header.Set("Authorization", getToken(config.Config.Acknowledgement.CallbackAuthKey))
 			postRequest.Header.Set("Content-Type", "application/json")
 			if resp, err := client.Do(postRequest); err != nil {
-				log.Errorf("Error in sending the ack for the certificate to %s : %+v", url)
+				log.Errorf("Error in sending the ack for the certificate to %s : %+v", url, err)
 			} else {
 				log.Infof("Ack %+v ", resp)
 				if (resp.StatusCode == 200) {
