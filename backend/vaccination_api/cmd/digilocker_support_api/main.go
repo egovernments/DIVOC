@@ -431,7 +431,25 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
-	for i = 0; i < rowSize; i++ {
+	wrappedNames := splitNameIfLengthIsLonger(pdf, displayLabels)
+	if len(wrappedNames) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		for k := 0; k < len(wrappedNames); k++ {
+			pdf.SetX(offsetX)
+			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			_ = pdf.Cell(nil, wrappedNames[k])
+		}
+		i +=1
+	}
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	for ; i < rowSize; i++ {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*24.7)
 		_ = pdf.Cell(nil, displayLabels[i])
@@ -462,7 +480,7 @@ func wrapLongerText(text string, lineWidth int) []string {
 		return []string{text}
 	}
 	wrapped := []string{words[0]}
-	spaceLeft := lineWidth - len(wrapped)
+	spaceLeft := lineWidth - len(words[0])
 	for _, word := range words[1:] {
 		if len(word)+1 > spaceLeft {
 			wrapped = append(wrapped, word)
@@ -483,6 +501,12 @@ func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) [
 	displayLabels = displayLabels[:len(displayLabels)-1]
 	displayLabels = append(displayLabels, wrap...)
 	return displayLabels
+}
+
+func splitNameIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
+	name := displayLabels[0]
+	wrap := wrapLongerText(name, 45)
+	return wrap
 }
 
 func getCertificateAsPdf(certificateText string) ([]byte, error) {
