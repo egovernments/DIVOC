@@ -5,7 +5,7 @@
   overflow: auto;
 }
 .verify-certificate-wrapper .qr-camera {
-    width: 95%;
+  width: 95%;
 }
 
 .verify-certificate-wrapper .scan-btn{
@@ -37,6 +37,18 @@ ol.verify-steps {
   padding: 0;
 }
 .verify-steps > li {
+  counter-increment: item;
+  margin-bottom: 20px;
+}
+
+.verify-steps img {
+  margin-bottom: 20px;
+  margin-left: 20px;
+  height: 40vh;
+  border: 1px solid gainsboro;
+}
+
+.verify-steps > ul {
   counter-increment: item;
   margin-bottom: 20px;
 }
