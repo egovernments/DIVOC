@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/divoc/api/pkg/models"
+	"io/ioutil"
 	"os"
 	"path"
 	"reflect"
@@ -540,7 +541,33 @@ func Test_getPdfCertificate(t *testing.T) {
 		} else {
 
 			t.Logf("Pdf generated with size %d", len(bytes))
-			if err := os.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
+			if err := ioutil.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
+				t.Error("Error while writing the pdf")
+			}
+		}
+	})
+	longerNameCertificateText := `{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:in.gov.uidai.aadhaar:111122223344","refId":"02008131216487",
+"name":"Anigoundanpudur Thirumalaisamy Son Gaiyan Kartikeyan","uhid":"","gender":"Female","age":"34","nationality":"Indian","dob":"1987-01-30"},"issuer":"https://cowin.gov.in/","issuanceDate":"2021-09-25T06:06:32.733Z","evidence":[{"id":"24296748524","type":["Vaccination"],"batch":"MB3428BX","vaccine":"COVAXIN","manufacturer":"Bharat Biotech","date":"2020-12-02T19:21:19.646Z","effectiveStart":"2020-12-15","effectiveUntil":"2021-01-15","dose":2,"totalDoses":2,"verifier":{"name":"Sooraj Singh"},"facility":{"name":"ABC Medical Center","address":{"streetAddress":"123, Koramangala","streetAddress2":"3rd cross","district":"Trivandrum","city":"","addressRegion":"Kerala","addressCountry":"IND","postalCode":560034}},"icd11Code":"XM1NL1","prophylaxis":"COVID-19 vaccine, inactivated virus"}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2021-09-25T06:06:32Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EaAek_SglotPsib8sVZhp0u58hHvE1hqbHjVOUPJn_IjjeKlyz9UAR6prpOrHCz4o1u4PwQ3fWjOMubIEEPmTOQxJuSI90ERRCR-1BX7H7lXRFwk5S0wH14MrEQQqMqCMDIAq-UP6DH3P3-1IwG6q1OtLIACwRVkT67DzSMT9FdM9K8knSKCE8rNVbf2leHOfhB7tZT0clEfz3cH0LP7vPa3izO4L0SHVaVPG_lek4rwJvQk1wz6WSdRplCoxgFAItBj6jG2gJeYZI9UTXj9UKzP3wheGp_1-FhzAqh9cvu6oKKORNMGEhOXl-xYb3R0NQgKpoG4hvu10sn_6gIsDg"}}`
+	t.Run("Generate certificate with longer names", func(t *testing.T){
+		if bytes, e := getCertificateAsPdfV2(longerNameCertificateText, provisionalCertificateText, "ENG"); e!= nil {
+			t.Fail() //Unable to parse certificate stringunexpected end of JSON input
+		} else {
+
+			t.Logf("Pdf generated with size %d", len(bytes))
+			if err := ioutil.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
+				t.Error("Error while writing the pdf")
+			}
+		}
+	})
+	longerNameCertificateText2 := `{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:in.gov.uidai.aadhaar:111122223344","refId":"02008131216487",
+"name":"Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean","uhid":"","gender":"Female","age":"34","nationality":"Indian","dob":"1987-01-30"},"issuer":"https://cowin.gov.in/","issuanceDate":"2021-09-25T06:06:32.733Z","evidence":[{"id":"24296748524","type":["Vaccination"],"batch":"MB3428BX","vaccine":"COVAXIN","manufacturer":"Bharat Biotech","date":"2020-12-02T19:21:19.646Z","effectiveStart":"2020-12-15","effectiveUntil":"2021-01-15","dose":2,"totalDoses":2,"verifier":{"name":"Sooraj Singh"},"facility":{"name":"ABC Medical Center","address":{"streetAddress":"123, Koramangala","streetAddress2":"3rd cross","district":"Trivandrum","city":"","addressRegion":"Kerala","addressCountry":"IND","postalCode":560034}},"icd11Code":"XM1NL1","prophylaxis":"COVID-19 vaccine, inactivated virus"}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2021-09-25T06:06:32Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..EaAek_SglotPsib8sVZhp0u58hHvE1hqbHjVOUPJn_IjjeKlyz9UAR6prpOrHCz4o1u4PwQ3fWjOMubIEEPmTOQxJuSI90ERRCR-1BX7H7lXRFwk5S0wH14MrEQQqMqCMDIAq-UP6DH3P3-1IwG6q1OtLIACwRVkT67DzSMT9FdM9K8knSKCE8rNVbf2leHOfhB7tZT0clEfz3cH0LP7vPa3izO4L0SHVaVPG_lek4rwJvQk1wz6WSdRplCoxgFAItBj6jG2gJeYZI9UTXj9UKzP3wheGp_1-FhzAqh9cvu6oKKORNMGEhOXl-xYb3R0NQgKpoG4hvu10sn_6gIsDg"}}`
+	t.Run("Generate certificate with names with 100 characters", func(t *testing.T){
+		if bytes, e := getCertificateAsPdfV2(longerNameCertificateText2, provisionalCertificateText, "ENG"); e!= nil {
+			t.Fail() //Unable to parse certificate stringunexpected end of JSON input
+		} else {
+
+			t.Logf("Pdf generated with size %d", len(bytes))
+			if err := ioutil.WriteFile("certificate_sample.pdf", bytes, 0644); err != nil {
 				t.Error("Error while writing the pdf")
 			}
 		}
@@ -558,7 +585,7 @@ func Test_getPdfCertificateDDCC(t *testing.T) {
 		t.Fail() //Unable to parse certificate stringunexpected end of JSON input
 	} else {
 		t.Logf("DDCC certificate Pdf generated with size %d", len(bytes))
-		if err := os.WriteFile("certificate_ddcc_sample.pdf", bytes, 0644); err != nil {
+		if err := ioutil.WriteFile("certificate_ddcc_sample.pdf", bytes, 0644); err != nil {
 			t.Error("Error while writing the pdf")
 		}
 	}
