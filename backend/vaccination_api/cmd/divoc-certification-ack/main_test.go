@@ -4,9 +4,23 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/divoc/api/config"
+	"os"
+	"path"
+	"runtime"
 	"strings"
 	"testing"
 )
+
+func init() {
+	_, filename, _, _ := runtime.Caller(0)
+	// The ".." may change depending on you folder structure
+	dir := path.Join(path.Dir(filename), "../../")
+	err := os.Chdir(dir)
+	fmt.Printf("Using directory %s %s\n", dir, filename)
+	if err != nil {
+		panic(err)
+	}
+}
 
 func Test_getToken(t *testing.T) {
 	config.Initialize()

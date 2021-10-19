@@ -99,6 +99,10 @@ function ageOfRecipient(recipient) {
   return "";
 }
 
+function identityOfSubject(cert) {
+  return R.pathOr('', ['recipient', 'identity'], cert).replaceAll(" ", "").toLowerCase();
+}
+
 function transformW3(cert, certificateId, certificateType) {
   let certificateFromTemplate = {
     "@context": [
@@ -108,7 +112,7 @@ function transformW3(cert, certificateId, certificateType) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: R.pathOr('', ['recipient', 'identity'], cert),
+      id: identityOfSubject(cert),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
       uhid: R.pathOr('', ['recipient', 'uhid'], cert),

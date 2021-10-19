@@ -613,3 +613,27 @@ func Test_vaccinatedRecently(t *testing.T) {
 		})
 	}
 }
+
+func Test_formatId(t *testing.T) {
+	type args struct {
+		identity string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name:"voter", args: args{identity:"did:voter:123",}, want: "Voter ID # 123",},
+		{name:"aadhaar", args: args{identity:"did:aadhaar:123",}, want: "Aadhaar # XX3",},
+		{name:"did:in.gov.uidai.aadhaar:123", args: args{identity:"did:in.gov.uidai.aadhaar:123",}, want: "Aadhaar # XX3",},
+		{name:"Aadhaar Card", args: args{identity:"did:Aadhaar Card:123",}, want: "Aadhaar # XX3",},
+		{name:"aadhaarcard", args: args{identity:"did:aadhaarcard:123",}, want: "Aadhaar # XX3",},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := formatId(tt.args.identity); got != tt.want {
+				t.Errorf("formatId() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

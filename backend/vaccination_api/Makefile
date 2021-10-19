@@ -24,6 +24,7 @@ api_docs:
 divoc-server: $(source) swagger_gen/restapi/server.go
 	@echo "Building Server to $(PWD)/divoc-server ..."
 	@CGO_ENABLED=1 GO111MODULE=on go build $(OTHER_FLAGS) github.com/divoc/api/cmd/divoc-server
+	@CGO_ENABLED=1 GO111MODULE=on go test github.com/divoc/api/cmd/digilocker_support_api
 
 certificate_processor: $(source)
 	@echo "Building certificate processor $(PWD)/certificate_processor"
