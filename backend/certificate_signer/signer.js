@@ -100,7 +100,13 @@ function ageOfRecipient(recipient) {
 }
 
 function identityOfSubject(cert) {
-  return R.pathOr('', ['recipient', 'identity'], cert).replaceAll(" ", "").toLowerCase();
+  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+  let parts = identity.split(":");
+  if (parts.length >= 2 && parts[0] === "did") {
+    parts[1] = parts[1].replaceAll(" ", "").toLowerCase();
+    return parts.join(":")
+  }
+  return identity;
 }
 
 function transformW3(cert, certificateId, certificateType) {
@@ -253,6 +259,7 @@ module.exports = {
   signJSON,
   transformW3,
   customLoader,
+  identityOfSubject,
   CERTIFICATE_TYPE_V2,
   CERTIFICATE_TYPE_V3
 };
