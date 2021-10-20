@@ -637,3 +637,24 @@ func Test_formatId(t *testing.T) {
 		})
 	}
 }
+
+func Test_getPassportIdValue(t *testing.T) {
+	type args struct {
+		identity string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		{name:"oldFormatId", args: args{identity:"did:Passport:123",}, want: "123",},
+		{name:"newFormatId", args: args{identity:"did:passport:123",}, want: "123",},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getPassportIdValue(tt.args.identity); got != tt.want {
+				t.Errorf("formatId() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

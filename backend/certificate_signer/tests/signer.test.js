@@ -92,7 +92,6 @@ test('Verify the signed json', async () => {
 test('Signed json to include certificate id', async () => {
     const certificateId = "123";
     sign = await signJSON(transformW3(cert2, certificateId));
-    expect(sign.credentialSubject.id).toBe(cert2.recipient.identity);
     expect(sign.evidence[0].id).toBe("https://cowin.gov.in/vaccine/" + certificateId);
     expect(sign.evidence[0].certificateId).toBe(certificateId);
 });
