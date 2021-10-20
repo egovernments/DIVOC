@@ -103,7 +103,7 @@ function identityOfSubject(cert) {
   let identity = R.pathOr('', ['recipient', 'identity'], cert);
   let parts = identity.split(":");
   if (parts.length >= 2 && parts[0] === "did") {
-    parts[1] = parts[1].replaceAll(" ", "").toLowerCase();
+    parts[1] = parts[1].replace(/[" "]+/g, "").toLowerCase();
     return parts.join(":")
   }
   return identity;
