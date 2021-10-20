@@ -309,7 +309,25 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
-	for i = 0; i < rowSize; i++ {
+	wrappedNames := splitNameIfLengthIsLonger(pdf, displayLabels)
+	if len(wrappedNames) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		for k := 0; k < len(wrappedNames); k++ {
+			pdf.SetX(offsetX)
+			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			_ = pdf.Cell(nil, wrappedNames[k])
+		}
+		i +=1
+	}
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	for ; i < rowSize; i++ {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*24)
 		_ = pdf.Cell(nil, displayLabels[i])
@@ -640,7 +658,7 @@ func maskId(id string) string {
 func getPassportIdValue(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "Passport") {
+	if strings.Contains(identity, "passport") {
 		return lastFragment
 	}
 	return ""
