@@ -658,7 +658,8 @@ func maskId(id string) string {
 func getPassportIdValue(identity string) string {
 	split := strings.Split(identity, ":")
 	lastFragment := split[len(split)-1]
-	if strings.Contains(identity, "passport") {
+	identityLowerCase := strings.ToLower(identity)
+	if strings.Contains(identityLowerCase, "passport") {
 		return lastFragment
 	}
 	return ""
