@@ -5,13 +5,14 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strconv"
-	"sync"
-	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
 )
@@ -24,7 +25,7 @@ type CertifyMessage struct {
 			AddressLine1 string `json:"addressLine1"`
 			District     string `json:"district"`
 			State        string `json:"state"`
-			Pincode      int32  `json:"pincode"`
+			Pincode      string `json:"pincode"`
 		} `json:"address"`
 		Name string `json:"name"`
 	} `json:"facility"`
@@ -100,12 +101,12 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
-//	_, err = connect.Exec(`
-//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
-//`)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
+	//	_, err = connect.Exec(`
+	//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
+	//`)
+	//	if err != nil {
+	//		log.Fatal(err)
+	//	}
 	var wg sync.WaitGroup
 	wg.Add(2)
 	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic)
@@ -285,7 +286,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	age, _ := strconv.Atoi(certifyMessage.Recipient.Age)
 	if age == 0 {
 		if dobTime, err := time.Parse("2006-01-02", certifyMessage.Recipient.Dob); err == nil {
-			if (dobTime.Year() > 1900) {
+			if dobTime.Year() > 1900 {
 				age = time.Now().Year() - dobTime.Year()
 			}
 		}
@@ -305,7 +306,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 		"IN",
 		certifyMessage.Facility.Address.State,
 		certifyMessage.Facility.Address.District,
-		strconv.Itoa(int(certifyMessage.Facility.Address.Pincode)),
+		certifyMessage.Facility.Address.Pincode,
 		certifyMessage.Vaccinator.Name,
 	); err != nil {
 		log.Fatal(err)
