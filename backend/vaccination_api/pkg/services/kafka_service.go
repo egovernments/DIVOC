@@ -2,13 +2,14 @@ package services
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strconv"
 )
 
 var producer *kafka.Producer
@@ -233,8 +234,10 @@ func startCertificateRevocationConsumer(servers string) {
 							log.Error("Failed saving revoked certificate %+v", err)
 						}
 					}
+					consumer.CommitMessage(msg)
+				} else {
+					log.Errorf("Kafka message unmarshalling error %+v", err)
 				}
-				consumer.CommitMessage(msg)
 			} else {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
