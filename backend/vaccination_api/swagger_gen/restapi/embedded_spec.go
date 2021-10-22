@@ -916,6 +916,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -973,6 +977,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -1246,6 +1254,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -1300,6 +1312,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -2346,6 +2362,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -2403,6 +2423,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -2534,6 +2558,10 @@ func init() {
             "addressLine2": {
               "type": "string"
             },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
             "district": {
               "type": "string",
               "minLength": 1
@@ -2568,6 +2596,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",
@@ -2610,6 +2642,10 @@ func init() {
             },
             "addressLine2": {
               "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
             },
             "district": {
               "type": "string",
@@ -2672,6 +2708,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",
@@ -2960,6 +3000,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -3014,6 +3058,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -3141,6 +3189,10 @@ func init() {
             "addressLine2": {
               "type": "string"
             },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
             "district": {
               "type": "string",
               "minLength": 1
@@ -3175,6 +3227,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",
@@ -3214,6 +3270,10 @@ func init() {
             },
             "addressLine2": {
               "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
             },
             "district": {
               "type": "string",
@@ -3272,6 +3332,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",

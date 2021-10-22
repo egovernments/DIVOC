@@ -1,6 +1,7 @@
 const constants = require('../../configs/constants');
 const dcc = require("@pathcheck/dcc-sdk");
 const config = require('../../configs/config');
+const countries = require('i18n-iso-countries')
 
 const getLatestCertificate = (certificates) => {
   if (certificates.length > 0) {
@@ -25,6 +26,8 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
     Object.entries(constants.VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
   const prophylaxisCode = Object.keys(constants.EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
+  const addressCountry = countries.alpha3ToAlpha2(evidence[0].facility.address.addressCountry)
+  const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
   const euPayload = {
     "ver": "1.0.0",
     "nam": {
@@ -40,9 +43,9 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
         "dn": evidence[0].dose,                                                 // Dose Number
         "sd": evidence[0].totalDoses,                                           // Total Series of Doses
         "dt": evidence[0].date.split("T")[0],                                   // ISO8601 complete date: Date of Vaccination
-        "co": evidence[0].facility.address.addressCountry,                      // Country of Vaccination
+        "co": addressCountry,                                                   // Country of Vaccination
         "is": config.PUBLIC_HEALTH_AUTHORITY,                                   // Certificate Issuer
-        "ci": evidence[0].certificateId                                         // Unique Certificate Identifier
+        "ci": certificateId                                                     // Unique Certificate Identifier
       }
     ]
   };

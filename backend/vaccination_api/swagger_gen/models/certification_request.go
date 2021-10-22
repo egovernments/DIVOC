@@ -311,6 +311,10 @@ type CertificationRequestFacilityAddress struct {
 	// address line2
 	AddressLine2 string `json:"addressLine2,omitempty"`
 
+	// country
+	// Min Length: 2
+	Country string `json:"country,omitempty"`
+
 	// district
 	// Required: true
 	// Min Length: 1
@@ -335,6 +339,10 @@ func (m *CertificationRequestFacilityAddress) Validate(formats strfmt.Registry) 
 		res = append(res, err)
 	}
 
+	if err := m.validateCountry(formats); err != nil {
+		res = append(res, err)
+	}
+
 	if err := m.validateDistrict(formats); err != nil {
 		res = append(res, err)
 	}
@@ -356,6 +364,19 @@ func (m *CertificationRequestFacilityAddress) Validate(formats strfmt.Registry) 
 func (m *CertificationRequestFacilityAddress) validateAddressLine1(formats strfmt.Registry) error {
 
 	if err := validate.Required("facility"+"."+"address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestFacilityAddress) validateCountry(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Country) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("facility"+"."+"address"+"."+"country", "body", string(m.Country), 2); err != nil {
 		return err
 	}
 
@@ -646,6 +667,10 @@ type CertificationRequestRecipientAddress struct {
 	// address line2
 	AddressLine2 string `json:"addressLine2,omitempty"`
 
+	// country
+	// Min Length: 2
+	Country string `json:"country,omitempty"`
+
 	// district
 	// Required: true
 	// Min Length: 1
@@ -666,6 +691,10 @@ func (m *CertificationRequestRecipientAddress) Validate(formats strfmt.Registry)
 	var res []error
 
 	if err := m.validateAddressLine1(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateCountry(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -690,6 +719,19 @@ func (m *CertificationRequestRecipientAddress) Validate(formats strfmt.Registry)
 func (m *CertificationRequestRecipientAddress) validateAddressLine1(formats strfmt.Registry) error {
 
 	if err := validate.Required("recipient"+"."+"address"+"."+"addressLine1", "body", m.AddressLine1); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestRecipientAddress) validateCountry(formats strfmt.Registry) error {
+
+	if swag.IsZero(m.Country) { // not required
+		return nil
+	}
+
+	if err := validate.MinLength("recipient"+"."+"address"+"."+"country", "body", string(m.Country), 2); err != nil {
 		return err
 	}
 
