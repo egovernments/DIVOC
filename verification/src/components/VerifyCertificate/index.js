@@ -92,15 +92,15 @@ export const VerifyCertificate = () => {
                                 <img src={InvalidCertificateImg} alt=""/>
                             </ol>
                             {/*<p>You can view a <a href="https://divoc.egov.org.in/demo-videos/13.-certificate-verification" target="_blank">demo video</a> of 'how to verify’</p>*/}
-                            {/*<hr style={{marginTop: "3rem", marginBottom: "3rem"}}/>*/}
-                            {/*<h6 style={{color:"#646D82"}}>Option 2 – Offline verification through third party verifier app</h6>*/}
-                            {/*<p style={{color:"#646D82"}}>Steps for offline verification:</p>*/}
-                            {/*<ol className="verify-steps">*/}
-                            {/*    <li>Access the Co-WIN verification service and code for set up <a href="https://github.com/egovernments/DIVOC/tree/india/verification" target="_blank">here</a></li>*/}
-                            {/*    <li>Get code snippet for reference and implement</li>*/}
-                            {/*    <li>Replace the public key used in code snippet with Public key available <a href="https://verify.cowin.gov.in/did:india" target="_blank">here</a>.</li>*/}
-                            {/*    <li>Implement the verification service in your apps to scan, read and validate Co-WIN certificates</li>*/}
-                            {/*</ol>*/}
+                            <hr style={{marginTop: "3rem", marginBottom: "3rem"}}/>
+                            <h6 style={{color:"#646D82"}}>Option 2 – Offline verification through third party verifier app</h6>
+                            <p style={{color:"#646D82"}}>Steps for offline verification:</p>
+                            <ol className="verify-steps">
+                                <li>Access the verification service and code for set up <a href="https://github.com/egovernments/DIVOC/tree/icmr/verification" target="_blank">here</a></li>
+                                <li>Get code snippet for reference and implement</li>
+                                <li>Replace the public key used in code snippet with Public key available <a href="https://verify.icmr.org.in/did:india" target="_blank">here</a>.</li>
+                                <li>Implement the verification service in your apps to scan, read and validate test certificates</li>
+                            </ol>
                             {/*<p>In case you need any clarification or support in implementing the verifier app, contact <a href="mailto:divoc-support@egov.org.in">divoc-support@egov.org.in</a> or <a href="mailto:partner@cowin.gov.in">partner@cowin.gov.in</a></p>*/}
                         </Container>
                     </>}
