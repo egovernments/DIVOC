@@ -26,7 +26,7 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
     Object.entries(constants.VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
   const prophylaxisCode = Object.keys(constants.EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
-  const addressCountry = countries.alpha3ToAlpha2(evidence[0].facility.address.addressCountry)
+  const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
   return {
     "ver": "1.0.0",
@@ -49,6 +49,10 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
       }
     ]
   };
+}
+
+function getAlpha2CodeForCountry(addressCountry) {
+  return addressCountry.length === 3 && countries.isValid(addressCountry) ? countries.alpha3ToAlpha2(addressCountry) : 'IN';
 }
 
 const signAndPackPayload = async (dccPayload, publicKeyPem, privateKeyPem) => {
