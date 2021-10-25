@@ -220,7 +220,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
 			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB, xmlRequest.DocDetails.Mobile)
-			if certBundle != nil && certBundle.mobile == xmlRequest.DocDetails.Mobile {
+			if certBundle != nil && (certBundle.mobile == xmlRequest.DocDetails.Mobile || strings.TrimSpace(certBundle.name) == strings.TrimSpace(xmlRequest.DocDetails.FullName)) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
@@ -310,12 +310,36 @@ type VaccinationCertificateBundle struct {
 	signedJson            string
 	provisionalSignedJson string
 	mobile                string
+	name                  string
 }
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 	slice := strings.Split(uri, "-")
 	certificateId := slice[len(slice)-1]
 	certificateFromRegistry, err := getCertificateFromRegistryByCertificateId(certificateId)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
+		if len(certificateArr) > 0 {
+			latestCertificate := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			log.Infof("certificate resp %v", latestCertificate)
+			if pkg.GetDoseFromCertificate(latestCertificate) > 1 {
+				// fetch latest provisional cert
+				preEnrollmentCode := latestCertificate["preEnrollmentCode"].(string)
+				latestSignedJson := latestCertificate["certificate"].(string)
+				provisionalSignedJson := getProvisionalCertificateForPreEnrollmentCode(preEnrollmentCode)
+
+				var cert VaccinationCertificateBundle
+				cert.certificateId = latestCertificate["certificateId"].(string)
+				cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
+				cert.signedJson = latestSignedJson
+				cert.mobile = latestCertificate["mobile"].(string)
+				cert.provisionalSignedJson = provisionalSignedJson
+				cert.name = latestCertificate["name"].(string)
+				return &cert
+			}
+		}
+	}
 	return returnLatestCertificate(err, certificateFromRegistry, certificateId)
 }
 
@@ -344,10 +368,31 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 			cert.signedJson = latestSignedJson
 			cert.mobile = latestCertificate["mobile"].(string)
 			cert.provisionalSignedJson = provisionalSignedJson
+			cert.name = latestCertificate["name"].(string)
 			return &cert
 		} else {
 			log.Errorf("No certificates found for req %v", referenceId)
 		}
 	}
 	return nil
+}
+
+func getProvisionalCertificateForPreEnrollmentCode(preEnrollmentCode string) string {
+	log.Infof("Fetching provisional certificate for preEnrollmentCode %v", preEnrollmentCode)
+	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
+	if err == nil {
+		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
+		if len(certificateArr) > 0 {
+			certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
+			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
+			log.Infof("certificate resp %v", provisionalCertificate)
+			provisionalSignedJson := ""
+			if provisionalCertificate != nil {
+				provisionalSignedJson = provisionalCertificate["certificate"].(string)
+			}
+			return provisionalSignedJson
+		}
+	}
+	return ""
 }

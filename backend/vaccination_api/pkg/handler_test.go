@@ -85,8 +85,8 @@ func Test_getDoseFromCertificate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getDoseFromCertificate(tt.args.certificateMap); got != tt.want {
-				t.Errorf("getDoseFromCertificate() = %v, want %v", got, tt.want)
+			if got := GetDoseFromCertificate(tt.args.certificateMap); got != tt.want {
+				t.Errorf("GetDoseFromCertificate() = %v, want %v", got, tt.want)
 			}
 		})
 	}
