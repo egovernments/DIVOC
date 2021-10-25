@@ -414,7 +414,8 @@ async function certificateAsEUPayload(req, res) {
         if (certificateResp.length > 0) {
             let certificateRaw = certificateService.getLatestCertificate(certificateResp);
             // convert certificate to EU Json
-            const qrUri = await certificateService.convertCertificateToDCCPayload(certificateRaw, euPublicKeyP8, euPrivateKeyPem);
+            const dccPayload = certificateService.convertCertificateToDCCPayload(certificateRaw);
+            const qrUri = await certificateService.signAndPackPayload(dccPayload, euPublicKeyP8, euPrivateKeyPem);
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
             const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
             const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);

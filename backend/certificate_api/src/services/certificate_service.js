@@ -18,7 +18,7 @@ const getLatestCertificate = (certificates) => {
   }
 };
 
-const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, privateKeyP8) => {
+const convertCertificateToDCCPayload = (certificateRaw) => {
   let certificate = JSON.parse(certificateRaw.certificate);
 
   const {credentialSubject, evidence} = certificate;
@@ -28,7 +28,7 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
   const addressCountry = countries.alpha3ToAlpha2(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
-  const euPayload = {
+  return {
     "ver": "1.0.0",
     "nam": {
       "fn": credentialSubject.name
@@ -49,11 +49,10 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
       }
     ]
   };
+}
 
-  const qrUri = await dcc.signAndPack(await dcc.makeCWT(euPayload), publicKeyPem, privateKeyP8);
-
-  return qrUri;
-
+const signAndPackPayload = async (dccPayload, publicKeyPem, privateKeyPem) => {
+  return await dcc.signAndPack(await dcc.makeCWT(dccPayload), publicKeyPem, privateKeyPem);
 }
 
 function dobOfRecipient(credentialSubject) {
@@ -68,5 +67,6 @@ function dobOfRecipient(credentialSubject) {
 
 module.exports = {
   getLatestCertificate,
-  convertCertificateToDCCPayload
+  convertCertificateToDCCPayload,
+  signAndPackPayload
 };
