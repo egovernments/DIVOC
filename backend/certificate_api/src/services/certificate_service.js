@@ -52,7 +52,19 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
 }
 
 function getAlpha2CodeForCountry(addressCountry) {
-  return addressCountry.length === 3 && countries.isValid(addressCountry) ? countries.alpha3ToAlpha2(addressCountry) : 'IN';
+  return getAlpha2CodeFromAlpha3(addressCountry) || getAlpha2CodeFromName(addressCountry) || getAlpha2CodeIfValid(addressCountry) || 'IN';
+}
+
+function getAlpha2CodeFromAlpha3(addressCountry) {
+  return addressCountry.length === 3 && countries.isValid(addressCountry) ? countries.alpha3ToAlpha2(addressCountry) : undefined;
+}
+
+function getAlpha2CodeFromName(addressCountry) {
+  return countries.getAlpha2Code(addressCountry, 'en');
+}
+
+function getAlpha2CodeIfValid(addressCountry) {
+  return countries.isValid(addressCountry) ? addressCountry: undefined;
 }
 
 const signAndPackPayload = async (dccPayload, publicKeyPem, privateKeyPem) => {
