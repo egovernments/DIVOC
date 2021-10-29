@@ -1,4 +1,5 @@
 const certificate_service = require('../src/services/certificate_service');
+const dcc = require('@pathcheck/dcc-sdk');
 
 test('should convert certificate in eu specified payload if all fields are provided in correct format', () => {
     const certificateRaw = {
@@ -28,7 +29,8 @@ test('should convert certificate in eu specified payload if all fields are provi
     const expectedDccPayload = {
         "ver": "1.0.0",
         "nam": {
-        "fn": "D V Chanaka Dinushan"
+        "fn": "Dinushan",
+        "gn": "D V Chanaka"
         },
         "dob": "1986-10-12",
         "v": [
@@ -78,7 +80,8 @@ test('should convert certificate in eu specified payload if country field is ful
     const expectedDccPayload = {
         "ver": "1.0.0",
         "nam": {
-        "fn": "D V Chanaka Dinushan"
+            "fn": "Dinushan",
+            "gn": "D V Chanaka"
         },
         "dob": "1986-10-12",
         "v": [
@@ -128,7 +131,8 @@ test('should convert certificate in eu specified payload if country field is 2 l
     const expectedDccPayload = {
         "ver": "1.0.0",
         "nam": {
-        "fn": "D V Chanaka Dinushan"
+            "fn": "Dinushan",
+            "gn": "D V Chanaka"
         },
         "dob": "1986-10-12",
         "v": [
@@ -178,7 +182,8 @@ test('should convert certificate in eu specified payload if country field is inv
     const expectedDccPayload = {
         "ver": "1.0.0",
         "nam": {
-        "fn": "D V Chanaka Dinushan"
+            "fn": "Dinushan",
+            "gn": "D V Chanaka"
         },
         "dob": "1986-10-12",
         "v": [

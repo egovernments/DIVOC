@@ -1,5 +1,4 @@
 const constants = require('../../configs/constants');
-const dcc = require("@pathcheck/dcc-sdk");
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
@@ -28,10 +27,12 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
   const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
+  const fullNameSplitArr = credentialSubject.name.split(' ');
   return {
     "ver": "1.0.0",
     "nam": {
-      "fn": credentialSubject.name
+      "fn": fullNameSplitArr[fullNameSplitArr.length - 1],
+      "gn": firstNameOfRecipient(fullNameSplitArr)
     },
     "dob": dobOfRecipient(credentialSubject),
     "v": [
@@ -51,6 +52,14 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
   };
 }
 
+function firstNameOfRecipient(nameArr) {
+  let firstName = '';
+  for(let i=0; i<nameArr.length - 1; i++) {
+    firstName += nameArr[i] + " ";
+  }
+  return firstName.trim();
+}
+
 function getAlpha2CodeForCountry(addressCountry) {
   return getAlpha2CodeFromAlpha3(addressCountry) || getAlpha2CodeFromName(addressCountry) || getAlpha2CodeIfValid(addressCountry) || 'IN';
 }
@@ -67,10 +76,6 @@ function getAlpha2CodeIfValid(addressCountry) {
   return countries.isValid(addressCountry) ? addressCountry: undefined;
 }
 
-const signAndPackPayload = async (dccPayload, publicKeyPem, privateKeyPem) => {
-  return await dcc.signAndPack(await dcc.makeCWT(dccPayload), publicKeyPem, privateKeyPem);
-}
-
 function dobOfRecipient(credentialSubject) {
   const dob = credentialSubject.dob;
   const age = credentialSubject.age;
@@ -83,6 +88,5 @@ function dobOfRecipient(credentialSubject) {
 
 module.exports = {
   getLatestCertificate,
-  convertCertificateToDCCPayload,
-  signAndPackPayload
+  convertCertificateToDCCPayload
 };
