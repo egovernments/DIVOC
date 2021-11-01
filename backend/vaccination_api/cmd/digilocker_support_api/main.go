@@ -234,6 +234,164 @@ func getCertificateVariant(certificate models.Certificate) string {
 		return ""
 	}
 }
+
+func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) ([]byte, error) {
+	var certificate models.Certificate
+	latestCertificate := getLatestCertificate(certificateByDoses)
+	var doseWiseData []DoseWiseData
+	for dose, certificates := range certificateByDoses {
+		latestDoseCertificate := certificates[len(certificates)-1]
+		var certificate models.Certificate
+		if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
+			log.Error("Unable to parse certificate string", err)
+			return nil, err
+		}
+		country := certificate.Evidence[0].Facility.Address.AddressCountry
+		if country == "IN" {
+			country = "IND"
+		}
+		doseWiseData = append(doseWiseData, DoseWiseData{
+			dose:        dose,
+			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
+			batchNumber: certificate.Evidence[0].Batch,
+			country:     country,
+		})
+	}
+	latestCertificateText := latestCertificate["certificate"].(string)
+	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
+		log.Error("Unable to parse certificate string", err)
+		return nil, err
+	}
+	pdf := gopdf.GoPdf{}
+	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
+	pdf.AddPage()
+
+	if err := pdf.AddTTFFont("Proxima-Nova-Bold", "config/FontsFree-Net-proxima_nova_bold-webfont.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	// TODO: update based on language
+	tpl1 := pdf.ImportPage("config/Partially-Vaccinated-v3.pdf", 1, "/MediaBox")
+	if isFinal(certificate) {
+		tpl1 = pdf.ImportPage("config/Fully-Vaccinated-v3.pdf", 1, "/MediaBox")
+	}
+	// Draw pdf onto page
+	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
+
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	// header certificateId
+	doffsetX := 300.0
+	doffsetY := 156.0
+	pdf.SetX(doffsetX)
+	pdf.SetY(doffsetY)
+	dText := latestCertificate["certificateId"].(string)
+	_ = pdf.Cell(nil, dText)
+
+	offsetX := 290.0
+	offsetY := 203.0
+	offsetNewX := 290.0
+	offsetNewY := 367.0
+	rowSize := 7
+
+	displayLabels := []string{
+		certificate.CredentialSubject.Name,
+		certificate.CredentialSubject.Age,
+		certificate.CredentialSubject.Gender,
+		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.Uhid,
+		certificate.CredentialSubject.RefId,
+	}
+	if isFinal(certificate) {
+		displayLabels = append(displayLabels, "Fully Vaccinated ("+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses)")
+	} else {
+		dose := "Dose"
+		if certificate.Evidence[0].Dose > 1 {
+			dose = "Doses"
+		}
+		displayLabels = append(displayLabels, "Partially Vaccinated ("+pkg.ToString(certificate.Evidence[0].Dose)+" "+ dose+ ")")
+	}
+	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
+	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
+	i := 0
+	wrappedNames := splitNameIfLengthIsLonger(pdf, displayLabels)
+	if len(wrappedNames) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		for k := 0; k < len(wrappedNames); k++ {
+			pdf.SetX(offsetX)
+			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			_ = pdf.Cell(nil, wrappedNames[k])
+		}
+		i +=1
+	}
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	for ; i < rowSize; i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*20)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	displayLabels = []string{
+		certificate.Evidence[0].Vaccine,
+		certificate.Evidence[0].Prophylaxis,
+		certificate.Evidence[0].Manufacturer,
+		certificate.Evidence[0].Verifier.Name,
+		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+			certificate.Evidence[0].Facility.Address.District),
+			certificate.Evidence[0].Facility.Address.AddressRegion),
+	}
+	for i = 0; i < len(displayLabels); i++ {
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY + float64(i)*20)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	offsetNewY = offsetNewY + float64(len(displayLabels))*20
+	previousOffsetNewY := offsetNewY
+	for i = 0; i < len(doseWiseData); i++ {
+		data, _ := getDataForDose(doseWiseData, i+1)
+		offsetNewY = previousOffsetNewY
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, ordinalSuffixOf(data.dose))
+		pdf.SetX(offsetNewX)
+		offsetNewY = offsetNewY + 20
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.doseDate)
+		pdf.SetX(offsetNewX)
+		offsetNewY = offsetNewY + 20
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.batchNumber)
+		pdf.SetX(offsetNewX)
+		offsetNewY = offsetNewY + 21
+		pdf.SetY(offsetNewY)
+		offsetNewX = offsetNewX + 100
+	}
+	if !isFinal(certificate) {
+		pdf.SetX(offsetX)
+		//offsetNewY = offsetNewY + 20
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, certificate.GetNextDueDateInfo())
+	}
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
+	if e != nil {
+		log.Errorf("error in pasting qr code %v", e)
+		return nil, e
+	}
+
+	var b bytes.Buffer
+	_ = pdf.Write(&b)
+	return b.Bytes(), nil
+}
+
 func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) ([]byte, error) {
 	var certificate models.Certificate
 	latestCertificate := getLatestCertificate(certificateByDoses)
@@ -969,35 +1127,36 @@ func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	if getCertificateTypeFromQueryParams(r) == "ddcc" {
-		getPDFHandlerV3(w,r)
+		getDDCCPDFHandlerV3(w,r)
 	} else {
-		log.Info("get pdf certificate")
-		vars := mux.Vars(r)
-		preEnrollmentCode := vars[PreEnrollmentCode]
-		latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
-
-		if err != nil {
-			log.Infof("Error %+v", err)
-			w.WriteHeader(500)
-			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
-			return
-		}
-
-		if latestSignedJson != "" {
-			if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
-				log.Errorf("Error in creating certificate pdf")
-				w.WriteHeader(500)
-				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
-			} else {
-				w.WriteHeader(200)
-				_, _ = w.Write(pdfBytes)
-				publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
-			}
-		} else {
-			log.Errorf("No certificates found for request %v", preEnrollmentCode)
-			w.WriteHeader(404)
-			publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
-		}
+		getPDFHandlerV3(w, r)
+		//log.Info("get pdf certificate")
+		//vars := mux.Vars(r)
+		//preEnrollmentCode := vars[PreEnrollmentCode]
+		//latestSignedJson, provisionalSignedJson, err := getSignedJson(preEnrollmentCode)
+		//
+		//if err != nil {
+		//	log.Infof("Error %+v", err)
+		//	w.WriteHeader(500)
+		//	publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Internal error")
+		//	return
+		//}
+		//
+		//if latestSignedJson != "" {
+		//	if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
+		//		log.Errorf("Error in creating certificate pdf")
+		//		w.WriteHeader(500)
+		//		publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
+		//	} else {
+		//		w.WriteHeader(200)
+		//		_, _ = w.Write(pdfBytes)
+		//		publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
+		//	}
+		//} else {
+		//	log.Errorf("No certificates found for request %v", preEnrollmentCode)
+		//	w.WriteHeader(404)
+		//	publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+		//}
 	}
 }
 
@@ -1013,7 +1172,7 @@ func verifyIfLatestCertificateIsDDCCCompliant(certificateByDoses map[int][]map[s
 	}
 	return false
 }
-func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
+func getDDCCPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	log.Info("get ddcc pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
@@ -1034,6 +1193,29 @@ func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
+}
+
+func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
+	log.Info("get pdf certificate")
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	certificatesByDoses :=  getCertificatesByDoses(preEnrollmentCode)
+	if certificatesByDoses != nil {
+		if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses); err != nil {
+			log.Errorf("Error in creating certificate pdf")
+			w.WriteHeader(500)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
+		} else {
+			w.WriteHeader(200)
+			_, _ = w.Write(pdfBytes)
+			publishEvent(preEnrollmentCode, EventTagInternal+EventTagSuccess, "Certificate found")
+		}
+	} else {
+		log.Errorf("No certificates found for request %v", preEnrollmentCode)
+		w.WriteHeader(404)
+		publishEvent(preEnrollmentCode, EventTagInternal+EventTagFailed, "Certificate not found")
+	}
 
 }
 
@@ -1246,7 +1428,7 @@ func main() {
 	//internal
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/v2/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV2, []string{ApiRole}, EventTagInternal))).Methods("GET")
-	r.HandleFunc("/cert/api/v3/ddcc/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandlerV3, []string{ApiRole}, EventTagInternal))).Methods("GET")
+	r.HandleFunc("/cert/api/v3/ddcc/certificatePDF/{preEnrollmentCode}", timed(authorize(getDDCCPDFHandlerV3, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}", timed(authorize(headPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificateId/{preEnrollmentCode}/{dose}", timed(authorize(getCertificateIdWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
