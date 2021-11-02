@@ -613,6 +613,9 @@ definitions:
               state:
                 type: string
                 minLength: 1
+              country:
+                type: string
+                minLength: 2
               pincode:
                 type: string
             required:
@@ -694,6 +697,9 @@ definitions:
               state:
                 type: string
                 minLength: 1
+              country:
+                type: string
+                minLength: 2
               pincode:
                 type: string
                 minLength: 1
@@ -758,6 +764,9 @@ definitions:
               state:
                 type: string
                 minLength: 1
+              country:
+                type: string
+                minLength: 2
               pincode:
                 type: string
             required:
@@ -828,6 +837,9 @@ definitions:
               state:
                 type: string
                 minLength: 1
+              country:
+                type: string
+                minLength: 2
               pincode:
                 type: string
                 minLength: 1

@@ -11,6 +11,7 @@ const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 const fhirCertificate = require("certificate-fhir-convertor");
 const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8} = require('../../configs/keys');
 const config = require('../../configs/config');
+const dcc = require("@pathcheck/dcc-sdk");
 
 const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
 const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
@@ -414,7 +415,8 @@ async function certificateAsEUPayload(req, res) {
         if (certificateResp.length > 0) {
             let certificateRaw = certificateService.getLatestCertificate(certificateResp);
             // convert certificate to EU Json
-            const qrUri = await certificateService.convertCertificateToDCCPayload(certificateRaw, euPublicKeyP8, euPrivateKeyPem);
+            const dccPayload = certificateService.convertCertificateToDCCPayload(certificateRaw);
+            const qrUri = await dcc.signAndPack(await dcc.makeCWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, dccPayload.v[0].co), euPublicKeyP8, euPrivateKeyPem);
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
             const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
             const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);

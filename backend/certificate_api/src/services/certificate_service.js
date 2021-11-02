@@ -1,6 +1,6 @@
 const constants = require('../../configs/constants');
-const dcc = require("@pathcheck/dcc-sdk");
 const config = require('../../configs/config');
+const countries = require('i18n-iso-countries')
 
 const getLatestCertificate = (certificates) => {
   if (certificates.length > 0) {
@@ -17,7 +17,7 @@ const getLatestCertificate = (certificates) => {
   }
 };
 
-const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, privateKeyP8) => {
+const convertCertificateToDCCPayload = (certificateRaw) => {
   let certificate = JSON.parse(certificateRaw.certificate);
 
   const {credentialSubject, evidence} = certificate;
@@ -25,10 +25,14 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
     Object.entries(constants.VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
   const prophylaxisCode = Object.keys(constants.EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
-  const euPayload = {
+  const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
+  const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
+  const fullNameSplitArr = credentialSubject.name.split(' ');
+  return {
     "ver": "1.0.0",
     "nam": {
-      "fn": credentialSubject.name
+      "fn": fullNameSplitArr[fullNameSplitArr.length - 1],
+      "gn": firstNameOfRecipient(fullNameSplitArr)
     },
     "dob": dobOfRecipient(credentialSubject),
     "v": [
@@ -40,17 +44,36 @@ const convertCertificateToDCCPayload = async (certificateRaw, publicKeyPem, priv
         "dn": evidence[0].dose,                                                 // Dose Number
         "sd": evidence[0].totalDoses,                                           // Total Series of Doses
         "dt": evidence[0].date.split("T")[0],                                   // ISO8601 complete date: Date of Vaccination
-        "co": evidence[0].facility.address.addressCountry,                      // Country of Vaccination
+        "co": addressCountry,                                                   // Country of Vaccination
         "is": config.PUBLIC_HEALTH_AUTHORITY,                                   // Certificate Issuer
-        "ci": evidence[0].certificateId                                         // Unique Certificate Identifier
+        "ci": certificateId                                                     // Unique Certificate Identifier
       }
     ]
   };
+}
 
-  const qrUri = await dcc.signAndPack(await dcc.makeCWT(euPayload), publicKeyPem, privateKeyP8);
+function firstNameOfRecipient(nameArr) {
+  let firstName = '';
+  for(let i=0; i<nameArr.length - 1; i++) {
+    firstName += nameArr[i] + " ";
+  }
+  return firstName.trim();
+}
 
-  return qrUri;
+function getAlpha2CodeForCountry(addressCountry) {
+  return getAlpha2CodeFromAlpha3(addressCountry) || getAlpha2CodeFromName(addressCountry) || getAlpha2CodeIfValid(addressCountry) || 'IN';
+}
 
+function getAlpha2CodeFromAlpha3(addressCountry) {
+  return addressCountry.length === 3 && countries.isValid(addressCountry) ? countries.alpha3ToAlpha2(addressCountry) : undefined;
+}
+
+function getAlpha2CodeFromName(addressCountry) {
+  return countries.getAlpha2Code(addressCountry, 'en');
+}
+
+function getAlpha2CodeIfValid(addressCountry) {
+  return countries.isValid(addressCountry) ? addressCountry: undefined;
 }
 
 function dobOfRecipient(credentialSubject) {
