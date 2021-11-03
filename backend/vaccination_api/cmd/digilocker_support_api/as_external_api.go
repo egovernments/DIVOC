@@ -139,7 +139,6 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 		if len(certificateArr) > 0 {
 			certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
 			latestCertificate := getLatestCertificate(certificatesByDose)
-			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
 			log.Infof("certificate resp %v", latestCertificate)
 			mobileOnCert := latestCertificate["mobile"].(string)
 			if mobile != mobileOnCert {
@@ -147,12 +146,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 				publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Certificate not found")
 				return
 			} else {
-				latestSignedJson := latestCertificate["certificate"].(string)
-				provisionalSignedJson := ""
-				if provisionalCertificate != nil {
-					provisionalSignedJson = provisionalCertificate["certificate"].(string)
-				}
-				if pdfBytes, err := getCertificateAsPdfV2(latestSignedJson, provisionalSignedJson, getLanguageFromQueryParams(r)); err != nil {
+				if pdfBytes, err := getCertificateAsPdfV3(certificatesByDose); err != nil {
 					log.Errorf("Error in creating certificate pdf")
 					publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Unknown "+err.Error())
 					w.WriteHeader(500)

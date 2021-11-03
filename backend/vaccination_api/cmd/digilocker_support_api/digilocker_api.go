@@ -140,7 +140,7 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 			if certBundle != nil {
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdfV2(certBundle.signedJson, certBundle.provisionalSignedJson, getLanguageFromQueryParams(req)); err != nil {
+					if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
 						log.Errorf("Error in creating certificate pdf %+v", err)
 						go kafkaService.PublishEvent(models.Event{
 							Date:          time.Time{},
@@ -155,7 +155,9 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
 					certificateId := certBundle.certificateId
-					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
+					latestCertificate := getLatestCertificate(certBundle.certificatesByDoses)
+					latestSignedJson := latestCertificate["certificate"].(string)
+					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + latestSignedJson + "]]></certificate>"
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
 
@@ -224,7 +226,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdfV2(certBundle.signedJson, certBundle.provisionalSignedJson, getLanguageFromQueryParams(req)); err != nil {
+					if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
 						log.Errorf("Error in creating certificate pdf")
 					} else {
 						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
@@ -232,7 +234,9 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
 					certificateId := certBundle.certificateId
-					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + certBundle.signedJson + "]]></certificate>"
+					latestCertificate := getLatestCertificate(certBundle.certificatesByDoses)
+					latestSignedJson := latestCertificate["certificate"].(string)
+					xmlCert := "<certificate id=\"" + certificateId + "\"><![CDATA[" + latestSignedJson + "]]></certificate>"
 					response.DocDetails.DataContent = base64.StdEncoding.EncodeToString([]byte(xmlCert))
 				}
 
@@ -307,10 +311,9 @@ func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string
 type VaccinationCertificateBundle struct {
 	certificateId         string
 	Uri                   string
-	signedJson            string
-	provisionalSignedJson string
 	mobile                string
 	name                  string
+	certificatesByDoses   map[int][]map[string]interface{}
 }
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
@@ -323,19 +326,28 @@ func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 		if len(certificateArr) > 0 {
 			latestCertificate := certificateArr[len(certificateArr)-1].(map[string]interface{})
 			log.Infof("certificate resp %v", latestCertificate)
-			if pkg.GetDoseFromCertificate(latestCertificate) > 1 {
-				// fetch latest provisional cert
+			dose := pkg.GetDoseFromCertificate(latestCertificate)
+			if dose > 1 {
+				certificatesByDoses := map[int][]map[string]interface{}{
+					dose: {latestCertificate},
+				}
+				// fetch provisional certs
 				preEnrollmentCode := latestCertificate["preEnrollmentCode"].(string)
-				latestSignedJson := latestCertificate["certificate"].(string)
-				provisionalSignedJson := getProvisionalCertificateForPreEnrollmentCode(preEnrollmentCode)
+				prevCertificatesByDoses, err :=  getCertificatesByDosesForDose(preEnrollmentCode, int64(dose-1))
+				if err == nil {
+					for d, v := range prevCertificatesByDoses {
+						certificatesByDoses[d] = v
+					}
+				} else {
+					log.Errorf("Error while querying for previous certificates %+v", err)
+				}
 
 				var cert VaccinationCertificateBundle
 				cert.certificateId = latestCertificate["certificateId"].(string)
 				cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
-				cert.signedJson = latestSignedJson
 				cert.mobile = latestCertificate["mobile"].(string)
-				cert.provisionalSignedJson = provisionalSignedJson
 				cert.name = latestCertificate["name"].(string)
+				cert.certificatesByDoses = certificatesByDoses
 				return &cert
 			}
 		}
@@ -355,20 +367,13 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 		if len(certificateArr) > 0 {
 			certificatesByDose := pkg.GetDoseWiseCertificates(certificateArr)
 			latestCertificate := getLatestCertificate(certificatesByDose)
-			provisionalCertificate := getProvisionalCertificate(certificatesByDose)
 			log.Infof("certificate resp %v", latestCertificate)
-			latestSignedJson := latestCertificate["certificate"].(string)
-			provisionalSignedJson := ""
-			if provisionalCertificate != nil {
-				provisionalSignedJson = provisionalCertificate["certificate"].(string)
-			}
 			var cert VaccinationCertificateBundle
 			cert.certificateId = latestCertificate["certificateId"].(string)
 			cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
-			cert.signedJson = latestSignedJson
 			cert.mobile = latestCertificate["mobile"].(string)
-			cert.provisionalSignedJson = provisionalSignedJson
 			cert.name = latestCertificate["name"].(string)
+			cert.certificatesByDoses = certificatesByDose
 			return &cert
 		} else {
 			log.Errorf("No certificates found for req %v", referenceId)
