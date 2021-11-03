@@ -296,7 +296,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 	// header certificateId
 	pdf.SetX(300.0)
 	pdf.SetY(156.0)
-	dText := latestCertificate["certificateId"].(string)
+	dText := certificate.Evidence[0].CertificateId
 	_ = pdf.Cell(nil, dText)
 
 	offsetX := 290.0
@@ -1273,6 +1273,25 @@ func initRedis() {
 }
 
 func getCertificatesByDoses(preEnrollmentCode string) (map[int][]map[string]interface{}, error) {
+	if cachedCertificate, err := redisClient.Get(ctx, preEnrollmentCode+"-cert").Result(); err != nil {
+		log.Infof("Error while looking up cache %+v", err)
+	} else {
+		if cachedCertificate != "" {
+			log.Infof("Got certificate from cache %s", preEnrollmentCode)
+			var certificate models.Certificate
+			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err != nil {
+				log.Error("Unable to parse certificate string", err)
+			} else {
+				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold){
+					// converting cert string to certificatesByDoses
+					result := map[string]interface{}{"certificate": cachedCertificate}
+					return map[int][]map[string]interface{}{
+						1: {result},
+					}, nil
+				}
+			}
+		}
+	}
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
