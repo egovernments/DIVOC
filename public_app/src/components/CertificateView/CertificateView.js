@@ -1,20 +1,13 @@
 import React, {useEffect, useState} from "react";
 import axios from "axios";
-import ReactDOM from 'react-dom';
 import {useKeycloak} from "@react-keycloak/web";
 import styles from "./CertificateView.module.css";
-import QRCode from 'qrcode.react';
-import {toPng, toSvg} from 'html-to-image';
+import {toSvg} from 'html-to-image';
 import download from 'downloadjs'
 import {Container, Dropdown,DropdownButton, Row} from "react-bootstrap"
-import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CERTIFICATE_FILE, CertificateDetailsPaths} from "../../constants";
-import {FinalCertificate} from "../Certificate/finalCertificate";
-import {ProvisionalCertificate} from "../Certificate/provisionalCertificate";
 import {useDispatch} from "react-redux";
-import digilocker from "../../assets/img/digilocker.png"
-import commonPass from "../../assets/img/CommonPass.png"
 import JSZip from "jszip";
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
 import {useTranslation} from "react-i18next";
