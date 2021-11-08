@@ -5,7 +5,6 @@ import CertificateInValidImg from "../../assets/img/certificate-invalid.svg";
 import NextArrowImg from "../../assets/img/next-arrow.svg";
 import LearnProcessImg from "../../assets/img/leanr_more_small.png";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
-import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
 import config, {
     CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
