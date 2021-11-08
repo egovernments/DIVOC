@@ -47,7 +47,7 @@ paths:
   '/certificatePDF/{preEnrollmentCode}':
     get:
       tags:
-        - certificate
+        - certificate 
       summary: Get certificate
       parameters:
         - name: preEnrollmentCode
