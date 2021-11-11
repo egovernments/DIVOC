@@ -122,12 +122,9 @@ function getVaccineValidDays(start, end) {
     return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 }
 
-async function createCertificatePDF(certificateResp, res, source) {
-    if (certificateResp.length > 0) {
-        let certificateRaw = certificateService.getLatestCertificate(certificateResp);
-
-        const zip = new JSZip();
-        zip.file("certificate.json", certificateRaw.certificate, {
+async function getQRCodeData(certificate, isDataURL) {
+    const zip = new JSZip();
+        zip.file("certificate.json", certificate, {
             compression: "DEFLATE"
         });
         const zippedData = await zip.generateAsync({type: "string", compression: "DEFLATE"})
@@ -135,8 +132,41 @@ async function createCertificatePDF(certificateResp, res, source) {
                 // console.log(content)
                 return content;
             });
+        if(isDataURL)
+            return await QRCode.toDataURL(zippedData, {scale: 2});
+        return await QRCode.toBuffer(zippedData, {scale: 2});
+}
 
-        const dataURL = await QRCode.toDataURL(zippedData, {scale: 2});
+async function createCertificateQRCode(certificateResp, res, source) {
+    if (certificateResp.length > 0) {
+        let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+        const qrCode = await getQRCodeData(certificateRaw.certificate, false);
+        res.statusCode = 200;
+        sendEvents({
+            date: new Date(),
+            source: source,
+            type: "internal-success",
+            extra: "Certificate found"
+        });
+        return qrCode;
+    } else {
+        res.statusCode = 404;
+        let error = {
+            date: new Date(),
+            source: source,
+            type: "internal-failed",
+            extra: "Certificate not found"
+        };
+        sendEvents(error)
+        return  JSON.stringify(error);
+    }
+    return res;
+}
+
+async function createCertificatePDF(certificateResp, res, source) {
+    if (certificateResp.length > 0) {
+        let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+        const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
         const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
@@ -233,6 +263,11 @@ async function createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
     return await createCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
 
+async function createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res) {
+    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+    return await createCertificateQRCode(certificateResp, res, preEnrollmentCode);
+}
+
 async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
     const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode);
     return await createTestCertificatePDF(certificateResp, res, preEnrollmentCode);
@@ -272,6 +307,26 @@ async function getCertificatePDF(req, res) {
             return;
         }
         res = await createCertificatePDFByCertificateId(claimBody.preferred_username, certificateId, res);
+        return res
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
+async function getCertificateQRCodeByPreEnrollmentCode(req, res) {
+    try {
+        let claimBody = "";
+        let preEnrollmentCode = "";
+        try {
+            claimBody = await verifyKeycloakToken(req.headers.authorization);
+            preEnrollmentCode = req.url.replace("/certificate/api/certificateQRCode/", "");
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        res = await createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res);
         return res
     } catch (err) {
         console.error(err);
@@ -502,6 +557,7 @@ function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL) {
 module.exports = {
     getCertificate,
     getCertificatePDF,
+    getCertificateQRCodeByPreEnrollmentCode,
     getCertificatePDFByPreEnrollmentCode,
     checkIfCertificateGenerated,
     certificateAsFHIRJson,
