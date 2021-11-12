@@ -25,7 +25,7 @@ var pubChannel = null;
 console.log('Using ' + RABBITMQ_SERVER);
 console.log('Using ' + publicKeyPem);
 
-function initRabbitmq() {
+function initRabbitmqCertSigner() {
   if (isConnecting)
     return;
   isConnecting = true;
@@ -76,13 +76,11 @@ function publish(exchange, routingKey, content) {
          function(err, ok) {
            if (err) {
              console.error("[AMQP] publish", err);
-             offlinePubQueue.push([exchange, routingKey, content]);
              pubChannel.connection.close();
            }
          });
   } catch (e) {
     console.error("[AMQP] publish", e.message);
-    offlinePubQueue.push([exchange, routingKey, content]);
   }
 }
 
@@ -122,7 +120,7 @@ function startConsumer() {
     });
 
     function processMsg(msg) {
-      work(msg, function(ok) {
+      signCert(msg, function(ok) {
         try {
           if (ok)
             ch.ack(msg);
@@ -136,7 +134,7 @@ function startConsumer() {
   });
 }
 
-async function work(message, cb) {
+async function signCert(message, cb) {
   console.time("certify");
   let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
   let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
@@ -209,5 +207,5 @@ function closeOnErr(err) {
 }
 
 module.exports = {
-    initRabbitmq
+    initRabbitmqCertSigner
 };
