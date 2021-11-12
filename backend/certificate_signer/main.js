@@ -21,7 +21,7 @@ const CERTIFICATE_INPROGRESS = "P";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
 
-(async function() {
+async function initKafkaCertSigner() {
   await consumer.connect();
   await producer.connect();
   await consumer.subscribe({topic: config.CERTIFY_TOPIC, fromBeginning: true});
@@ -95,7 +95,7 @@ const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
       console.timeEnd("certify");
     },
   })
-})();
+}
 
 async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
@@ -125,3 +125,6 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   }
 }
 
+module.exports = {
+    initKafkaCertSigner
+};
