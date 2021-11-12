@@ -16,7 +16,7 @@ async function initKafa() {
     console.log("Kafka connected to: " + KAFKA_BOOTSTRAP_SERVER)
 };
 
-function sendEvents(event) {
+function sendEventsViaKafka(event) {
     if (producer) {
         console.log("Sending event to kafka")
         producer.send({
@@ -30,5 +30,5 @@ function sendEvents(event) {
 
 module.exports = {
     initKafa,
-    sendEvents
+    sendEventsViaKafka
 };

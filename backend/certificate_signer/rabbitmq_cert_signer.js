@@ -22,10 +22,9 @@ var isConnecting = false;
 var amqpConn = null;
 var pubChannel = null;
 
-console.log('Using ' + RABBITMQ_SERVER);
-console.log('Using ' + publicKeyPem);
-
 function initRabbitmqCertSigner() {
+  console.log('Using ' + RABBITMQ_SERVER);
+  console.log('Using ' + publicKeyPem);
   if (isConnecting)
     return;
   isConnecting = true;

@@ -29,8 +29,22 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, async () => {
-    await initKafa();
-    await initRabbitmq();
+    switch (config.COMMUNICATION_MODE) {
+      case config.COMMUNICATION_MODE_RABBITMQ:
+        console.log('Choosen mode is RabbitMQ');
+        await initRabbitmq();
+        break;
+      case config.COMMUNICATION_MODE_KAFKA:
+        console.log('Choosen mode is Kafka');
+        await initKafa();
+        break;
+      case config.COMMUNICATION_MODE_RESTAPI:
+        console.log('Choosen mode is Rest-APIs');
+        console.error('Rest-API communication mode isn\'t supported yet');
+        break;
+      default:
+        console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
+    }
     await KeycloakFactory.getPublicKey();
     console.log(`Server listening on port ${port}`);
 });
