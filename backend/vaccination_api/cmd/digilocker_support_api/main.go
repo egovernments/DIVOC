@@ -55,7 +55,7 @@ const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
-const MaxDisplayCharacters = 35
+const MaxDisplayCharacters = 40
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
 
 type DoseWiseData struct {
@@ -249,7 +249,7 @@ func getCertificateVariant(certificate models.Certificate) string {
 	}
 }
 
-func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) ([]byte, error) {
+func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, language string) ([]byte, error) {
 	var certificate models.Certificate
 	latestCertificate := getLatestCertificate(certificateByDoses)
 	var doseWiseData []DoseWiseData
@@ -272,6 +272,12 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
+	if len(language) == 0 {
+		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
+	}
+	if len(language) == 0 {
+		language = "ENG"
+	}
 	pdf := gopdf.GoPdf{}
 	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
 	pdf.AddPage()
@@ -280,11 +286,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		log.Print(err.Error())
 		return nil, err
 	}
-	// TODO: update based on language
-	tpl1 := pdf.ImportPage("config/Partially-Vaccinated-v3.pdf", 1, "/MediaBox")
-	if isFinal(certificate) {
-		tpl1 = pdf.ImportPage("config/Fully-Vaccinated-v3.pdf", 1, "/MediaBox")
-	}
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
@@ -322,7 +324,6 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		}
 		displayLabels = append(displayLabels, "Partially Vaccinated ("+pkg.ToString(certificate.Evidence[0].Dose)+" "+ dose+ ")")
 	}
-	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
 	wrappedNames := splitNameIfLengthIsLonger(pdf, displayLabels)
@@ -339,7 +340,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		}
 		i +=1
 	}
-	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
@@ -352,10 +353,6 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		certificate.Evidence[0].Vaccine,
 		certificate.Evidence[0].Prophylaxis,
 		certificate.Evidence[0].Manufacturer,
-		certificate.Evidence[0].Verifier.Name,
-		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
-			certificate.Evidence[0].Facility.Address.District),
-			certificate.Evidence[0].Facility.Address.AddressRegion),
 	}
 	for i = 0; i < len(displayLabels); i++ {
 		pdf.SetX(offsetNewX)
@@ -369,7 +366,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		offsetNewY = previousOffsetNewY
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, ordinalSuffixOf(data.dose))
+		_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
 		pdf.SetX(offsetNewX)
 		offsetNewY = offsetNewY + 20
 		pdf.SetY(offsetNewY)
@@ -384,10 +381,22 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}) 
 		offsetNewX = offsetNewX + 100
 	}
 	if !isFinal(certificate) {
-		pdf.SetX(offsetNewX-100)
-		//offsetNewY = offsetNewY + 20
+		pdf.SetX(offsetX)
 		pdf.SetY(offsetNewY)
+		offsetNewY = offsetNewY + 20
 		_ = pdf.Cell(nil, certificate.GetNextDueDateInfo())
+	}
+	displayLabels = []string{
+		certificate.Evidence[0].Verifier.Name,
+		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+			certificate.Evidence[0].Facility.Address.District),
+			certificate.Evidence[0].Facility.Address.AddressRegion),
+	}
+	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
+	for i = 0; i < len(displayLabels); i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetNewY + float64(i)*20)
+		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
@@ -1054,7 +1063,7 @@ func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if certificatesByDoses != nil {
-			if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses); err != nil {
+			if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
 				log.Errorf("Error in creating certificate pdf")
 				w.WriteHeader(500)
 				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -1199,7 +1208,7 @@ func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if certificatesByDoses != nil {
-		if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses); err != nil {
+		if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")

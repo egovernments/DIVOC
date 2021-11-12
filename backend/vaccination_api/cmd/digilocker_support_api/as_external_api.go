@@ -146,7 +146,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 				publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Certificate not found")
 				return
 			} else {
-				if pdfBytes, err := getCertificateAsPdfV3(certificatesByDose); err != nil {
+				if pdfBytes, err := getCertificateAsPdfV3(certificatesByDose, getLanguageFromQueryParams(r)); err != nil {
 					log.Errorf("Error in creating certificate pdf")
 					publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Unknown "+err.Error())
 					w.WriteHeader(500)
