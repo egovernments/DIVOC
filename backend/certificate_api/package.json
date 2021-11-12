@@ -13,6 +13,7 @@
     "jsonwebtoken": "^8.5.1",
     "jszip": "^3.6.0",
     "kafkajs": "^1.15.0",
+    "amqplib": "^0.8.0",
     "puppeteer": "^8.0.0",
     "qrcode": "^1.4.4"
   }

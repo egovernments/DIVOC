@@ -12,10 +12,14 @@ Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
 OQIDAQAB
 -----END PUBLIC KEY-----`;
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
+const RABBITMQ_SERVER = process.env.RABBITMQ_SERVER || 'localhost:5672';
+const EVENTS_TOPIC = 'events';
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
     KAFKA_BOOTSTRAP_SERVER,
+    RABBITMQ_SERVER,
+    EVENTS_TOPIC,
     KEYCLOAK_URL,
     KEYCLOAK_REALM
 };

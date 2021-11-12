@@ -1,5 +1,6 @@
 const certificateController = require("./src/routes/certificate_controller");
 const {initKafa} = require("./src/services/kafka_service");
+const {initRabbitmq} = require("./src/services/rabbitmq_service");
 
 const http = require('http');
 const {KeycloakFactory} = require("./src/services/keycloak_service");
@@ -29,6 +30,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(port, async () => {
     await initKafa();
+    await initRabbitmq();
     await KeycloakFactory.getPublicKey();
     console.log(`Server listening on port ${port}`);
 });

@@ -1,5 +1,7 @@
 const {Kafka} = require('kafkajs');
+const config = require('./config/config');
 const {KAFKA_BOOTSTRAP_SERVER} = require('../../configs/config');
+const EVENTS_TOPIC = config.EVENTS_TOPIC;
 
 const kafka = new Kafka({
     clientId: 'certificate_api',
@@ -18,7 +20,7 @@ function sendEvents(event) {
     if (producer) {
         console.log("Sending event to kafka")
         producer.send({
-            topic: "events",
+            topic: EVENTS_TOPIC,
             messages: [{key: null, value: JSON.stringify(event)}]
         });
     } else {

@@ -5,6 +5,7 @@ const puppeteer = require('puppeteer');
 const QRCode = require('qrcode');
 const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
+const {sendEvents} = require("../services/rabbitmq_service");
 const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 
