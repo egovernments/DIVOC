@@ -1156,7 +1156,7 @@ func verifyIfLatestCertificateIsDDCCCompliant(certificateByDoses map[int][]map[s
 	if err := json.Unmarshal([]byte(latestCertificate["certificate"].(string)), &certificate); err != nil {
 		log.Error("Unable to parse certificate string", err)
 	} else {
-		if certificate.Context[1] == VaccinationContextV2 {
+		if isFinal(certificate) && certificate.Context[1] == VaccinationContextV2 {
 			return true
 		}
 	}
@@ -1175,7 +1175,7 @@ func getDDCCPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(certificatesByDoses) >= 2 && verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses) {
+	if verifyIfLatestCertificateIsDDCCCompliant(certificatesByDoses) {
 		if pdfBytes, err := getDDCCCertificateAsPdfV3(certificatesByDoses); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
