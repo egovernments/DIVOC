@@ -23,6 +23,9 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 		"from": 21,
 		"to": 90,
 	},
+	"zycov": {
+		"dueDays": 28,
+	},
 }
 
 type Certificate struct {
@@ -138,19 +141,20 @@ func (certificate *Certificate) GetNextDueDateInfo() string {
 	if len(certificate.Evidence) > 0 {
 		evidence := certificate.Evidence[0]
 		vaccine := strings.ToLower(evidence.Vaccine)
-		if vaccineDateRange, found := vaccineEffectiveDaysInfo[vaccine]; found {
-			if dueDays, ok := vaccineDateRange["dueDays"]; ok {
-				fromDate := evidence.Date.Add(time.Hour * time.Duration(dueDays) * 24)
-				return "Due on " + fromDate.Format(layout)
-			} else {
-				fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineDateRange["from"]) * 24)
-				toDate := evidence.Date.Add(time.Hour * time.Duration(vaccineDateRange["to"]) * 24)
-				return "Between " + fromDate.Format(layout) + " and " + toDate.Format(layout)
+		for vaccName, vaccineDateRange := range vaccineEffectiveDaysInfo {
+			if strings.Contains(vaccine, vaccName) {
+				if dueDays, ok := vaccineDateRange["dueDays"]; ok {
+					fromDate := evidence.Date.Add(time.Hour * time.Duration(dueDays) * 24)
+					return "Due on " + fromDate.Format(layout)
+				} else {
+					fromDate := evidence.Date.Add(time.Hour * time.Duration(vaccineDateRange["from"]) * 24)
+					toDate := evidence.Date.Add(time.Hour * time.Duration(vaccineDateRange["to"]) * 24)
+					return "Between " + fromDate.Format(layout) + " and " + toDate.Format(layout)
+				}
 			}
-		} else {
-			fromDate := evidence.Date.Add(time.Hour * time.Duration(DefaultDueDays) * 24)
-			return "Due on " + fromDate.Format(layout)
 		}
+		fromDate := evidence.Date.Add(time.Hour * time.Duration(DefaultDueDays) * 24)
+		return "Due on " + fromDate.Format(layout)
 	}
 	return ""
 }
