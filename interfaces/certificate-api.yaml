@@ -47,7 +47,7 @@ paths:
   '/certificatePDF/{preEnrollmentCode}':
     get:
       tags:
-        - certificate
+        - certificate 
       summary: Get certificate
       parameters:
         - name: preEnrollmentCode
@@ -90,6 +90,74 @@ paths:
       parameters:
         - in: query
           name: certificateId
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found
+        '403':
+          description: Forbidden
+  '/fhir-certificate':
+    get:
+      tags:
+        - certificate
+      summary: Get FHIR bundle json for given beneficiary
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: refId
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            schema:
+              type: object
+        '404':
+          description: Not found
+        '403':
+          description: Forbidden
+  '/eu-certificate':
+    get:
+      tags:
+        - certificate
+      summary: Get certificate in EU format
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: refId
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found
+        '403':
+          description: Forbidden
+  '/test/certificatePDF/{preEnrollmentCode}':
+    get:
+      tags:
+        - certificate
+      summary: Get test certificate
+      parameters:
+        - name: preEnrollmentCode
+          in: path
+          required: true
           type: string
       responses:
         '200':

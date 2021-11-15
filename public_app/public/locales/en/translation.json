@@ -185,7 +185,9 @@
     "chooseCertificate": "Please choose the certificate for ",
     "asImg": "As Image",
     "asSvg": "As SVG",
-    "asVerifiableCertificate": "As Verifiable Certificate"
+    "asVerifiableCertificate": "As Verifiable Certificate",
+    "asEuCertificate": "As EU Certificate",
+    "asFhirCertificate": "As Fhir Certificate"
   },
   "verifyCertificate": {
     "title": "Verify a vaccination certificate",
