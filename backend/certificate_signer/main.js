@@ -13,7 +13,7 @@ const constants = require("./config/constants");
 const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
-const {publicKeyPem, privateKeyPem} = require('./config/keys');
+const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -32,7 +32,9 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
 let signingConfig = {
   publicKeyPem: publicKeyPem,
   privateKeyPem: privateKeyPem,
-
+  publicKeyBase58: publicKeyPem,
+  privateKeyBase58: privateKeyPem,
+  keyType: signingKeyType,
   KAFKA_BOOTSTRAP_SERVER: config.KAFKA_BOOTSTRAP_SERVER,
   KAFKA_CONSUMER_SESSION_TIMEOUT: config.KAFKA_CONSUMER_SESSION_TIMEOUT,
   REGISTRY_URL: config.REGISTRY_URL,
