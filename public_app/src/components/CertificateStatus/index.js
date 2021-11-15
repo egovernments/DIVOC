@@ -10,7 +10,7 @@ import config, {
     CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
     CERTIFICATE_NAMESPACE, CERTIFICATE_NAMESPACE_V2,
-    CERTIFICATE_PUBKEY_ID
+    CERTIFICATE_PUBKEY_ID, CERTIFICATE_SIGNED_KEY_TYPE, certificatePublicKeyBase58
 } from "../../config";
 import {pathOr} from "ramda";
 import {CustomButton} from "../CustomButton";
@@ -21,9 +21,10 @@ import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {Loader} from "../Loader";
 import {useTranslation} from "react-i18next";
+import * as vc from "vc-js";
 
 const jsigs = require('jsonld-signatures');
-const {RSAKeyPair} = require('crypto-ld');
+const {RSAKeyPair, Ed25519KeyPair} = require('crypto-ld');
 const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
@@ -82,29 +83,65 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
-                const publicKey = {
-                    '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: 'did:india',
-                    type: 'RsaVerificationKey2018',
-                    controller: CERTIFICATE_CONTROLLER_ID,
-                    publicKeyPem: config.certificatePublicKey
-                };
-                const controller = {
-                    '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: CERTIFICATE_CONTROLLER_ID,
-                    publicKey: [publicKey],
-                    // this authorizes this key to be used for making assertions
-                    assertionMethod: [publicKey.id]
-                };
-                const key = new RSAKeyPair({...publicKey});
                 const {AssertionProofPurpose} = jsigs.purposes;
-                const {RsaSignature2018} = jsigs.suites;
-                const result = await jsigs.verify(signedJSON, {
-                    suite: new RsaSignature2018({key}),
-                    purpose: new AssertionProofPurpose({controller}),
-                    documentLoader: customLoader,
-                    compactProof: false
-                });
+                let result;
+                if(CERTIFICATE_SIGNED_KEY_TYPE === "RSA") {
+                    const publicKey = {
+                        '@context': jsigs.SECURITY_CONTEXT_URL,
+                        id: 'did:india',
+                        type: 'RsaVerificationKey2018',
+                        controller: CERTIFICATE_CONTROLLER_ID,
+                        publicKeyPem: config.certificatePublicKey
+                    };
+                    const controller = {
+                        '@context': jsigs.SECURITY_CONTEXT_URL,
+                        id: CERTIFICATE_CONTROLLER_ID,
+                        publicKey: [publicKey],
+                        // this authorizes this key to be used for making assertions
+                        assertionMethod: [publicKey.id]
+                    };
+                    const key = new RSAKeyPair({...publicKey});
+                    const {RsaSignature2018} = jsigs.suites;
+                    result = await jsigs.verify(signedJSON, {
+                        suite: new RsaSignature2018({key}),
+                        purpose: new AssertionProofPurpose({controller}),
+                        documentLoader: customLoader,
+                        compactProof: false
+                    });
+                } else if (CERTIFICATE_SIGNED_KEY_TYPE === "ED25519") {
+                    const publicKey = {
+                        '@context': jsigs.SECURITY_CONTEXT_URL,
+                        id: CERTIFICATE_DID,
+                        type: 'Ed25519VerificationKey2018',
+                        controller: CERTIFICATE_CONTROLLER_ID,
+                    };
+
+                    const controller = {
+                        '@context': jsigs.SECURITY_CONTEXT_URL,
+                        id: CERTIFICATE_CONTROLLER_ID,
+                        publicKey: [publicKey],
+                        // this authorizes this key to be used for making assertions
+                        assertionMethod: [publicKey.id]
+                    };
+
+                    const purpose = new AssertionProofPurpose({
+                        controller: controller
+                    });
+                    const {Ed25519Signature2018} = jsigs.suites;
+                    const key = new Ed25519KeyPair(
+                        {
+                            publicKeyBase58: certificatePublicKeyBase58,
+                            id: CERTIFICATE_DID
+                        }
+                    );
+                    result = await vc.verifyCredential({
+                        credential: signedJSON,
+                        suite: new Ed25519Signature2018({key}),
+                        purpose: purpose,
+                        documentLoader: customLoader,
+                        compactProof: false
+                    });
+                }
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON);
                     if (revokedResponse.response.status === 404) {

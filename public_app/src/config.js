@@ -8,6 +8,8 @@ const CERTIFICATE_NAMESPACE_V2 = process.env.REACT_APP_CERTIFICATE_NAMESPACE_V2 
 const CERTIFICATE_PUBKEY_ID = process.env.REACT_APP_CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
 const CERTIFICATE_DID = process.env.REACT_APP_CERTIFICATE_DID || 'did:india';
 const CERTIFICATE_SCAN_TIMEOUT = process.env.REACT_APP_CERTIFICATE_SCAN_TIMEOUT || '45000';
+const CERTIFICATE_SIGNED_KEY_TYPE = process.env.CERTIFICATE_SIGNED_KEY_TYPE || 'RSA';
+const certificatePublicKeyBase58 = "DaipNW4xaH2bh1XGNNdqjnSYyru3hLnUgTBSfSvmZ2hi";
 
 module.exports = {
     urlPath,
@@ -18,5 +20,7 @@ module.exports = {
     CERTIFICATE_NAMESPACE,
     CERTIFICATE_NAMESPACE_V2,
     CERTIFICATE_PUBKEY_ID,
-    CERTIFICATE_SCAN_TIMEOUT
+    CERTIFICATE_SCAN_TIMEOUT,
+    CERTIFICATE_SIGNED_KEY_TYPE,
+    certificatePublicKeyBase58
 };
