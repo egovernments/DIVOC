@@ -67,6 +67,23 @@ func InitializeKafka() {
 		}
 	}()
 
+	go func() {
+		topic := config.Config.Kafka.TestCertifyTopic
+		for {
+			msg := <-testMessages
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          []byte(msg.payload),
+				Headers: []kafka.Header{
+					{Key: "uploadId", Value: msg.UploadId},
+					{Key: "rowId", Value: msg.rowId},
+				},
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
 	StartEventProducer(producer)
 
 	go func() {
@@ -109,6 +126,44 @@ func InitializeKafka() {
 							// if certificate creation fails
 							// update the status of the row to Failed
 							db.UpdateCertifyUploadErrorStatusAndErrorMsg(uint(rowId), db.CERTIFY_UPLOAD_FAILED_STATUS, message["errorMsg"])
+						}
+						consumer.CommitMessage(msg)
+					}
+				}
+			} else {
+				// The client will automatically try to recover from all errors.
+				log.Infof("Consumer error: %v \n", err)
+			}
+		}
+	}()
+
+	go func() {
+		consumer.SubscribeTopics([]string{config.Config.Kafka.TestCertifyACKTopic}, nil)
+
+		for {
+			msg, err := consumer.ReadMessage(-1)
+			if err == nil {
+				var message map[string]string
+				json.Unmarshal(msg.Value, &message)
+				// check the status
+				// update that status to certifyErrorRows db
+				log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
+				if message["rowId"] == "" {
+					// ignoring rows which doesnt have rowId
+					consumer.CommitMessage(msg)
+				} else {
+					rowId, e := strconv.ParseUint(message["rowId"], 10, 64)
+					if e != nil {
+						log.Errorf("Error occurred wile parsing rowId as int - %s", message["rowId"])
+					} else {
+						if message["status"] == "SUCCESS" {
+							// if certificate created successfully
+							// delete that row => as we no longer require that row
+							db.DeleteTestCertifyUploadError(uint(rowId))
+						} else if message["status"] == "FAILED" {
+							// if certificate creation fails
+							// update the status of the row to Failed
+							db.UpdateTestCertifyUploadErrorStatusAndErrorMsg(uint(rowId), db.CERTIFY_UPLOAD_FAILED_STATUS, message["errorMsg"])
 						}
 						consumer.CommitMessage(msg)
 					}
@@ -167,7 +222,7 @@ func startCertificateRevocationConsumer(servers string) {
 			panic(err)
 		}
 
-		consumer.SubscribeTopics([]string{"certified"}, nil)
+		consumer.SubscribeTopics([]string{config.Config.Kafka.CertifiedTopic}, nil)
 
 		for {
 			msg, err := consumer.ReadMessage(-1)

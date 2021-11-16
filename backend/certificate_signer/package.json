@@ -5,19 +5,17 @@
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "jest"
+    "test": "jest --passWithNoTests"
   },
   "author": "",
   "license": "GPL",
   "dependencies": {
-    "axios": "^0.21.1",
-    "jsonld-signatures": "^6.0.0",
+    "certificate-signer-library": "^1.0.0",
     "kafkajs": "^1.15.0",
     "amqplib": "^0.8.0",
     "nodemailer": "^6.4.17",
     "ramda": "^0.27.1",
-    "redis": "^3.0.2",
-    "vaccination-context": "^1.0.7"
+    "vaccination-context": "^1.1.0"
   },
   "devDependencies": {
     "jest": "^26.6.3"

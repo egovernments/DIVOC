@@ -31,7 +31,7 @@ func NewGetLoggedInUserInfo(ctx *middleware.Context, handler GetLoggedInUserInfo
 	return &GetLoggedInUserInfo{Context: ctx, Handler: handler}
 }
 
-/*GetLoggedInUserInfo swagger:route GET /users/me vaccination getLoggedInUserInfo
+/*GetLoggedInUserInfo swagger:route GET /v1/users/me vaccination getLoggedInUserInfo
 
 Get User information
 

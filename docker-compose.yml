@@ -97,7 +97,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: "2181"
       ZOOKEEPER_TICK_TIME: "2000"
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:5.2.5-10
     depends_on:
       zookeeper:
         condition: service_started
@@ -243,11 +243,30 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
       CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
+      CERTIFICATE_NAMESPACE_V2: "https://cowin.gov.in/credentials/vaccination/v2"
       CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
       CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
       CERTIFICATE_DID: "did:india"
       CERTIFICATE_ISSUER: "https://cowin.gov.in/"
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
+      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
+      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+    depends_on:
+      kafka:
+        condition: service_healthy
+  test_certificate_signer:
+    image: dockerhub/test_certificate_signer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+      REDIS_URL: redis://redis:6379
+      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/testCertificate/v1"
+      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+      CERTIFICATE_BASE_URL: "https://cowin.gov.in/test/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
     depends_on:

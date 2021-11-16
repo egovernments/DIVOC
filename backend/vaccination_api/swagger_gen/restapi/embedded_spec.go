@@ -34,9 +34,9 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
-    "/authorize": {
+    "/v1/authorize": {
       "post": {
         "security": [],
         "consumes": [
@@ -75,7 +75,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -117,7 +117,7 @@ func init() {
         }
       }
     },
-    "/certificate": {
+    "/v1/certificate": {
       "put": {
         "description": "Update existing certificate if all checks are passed",
         "tags": [
@@ -157,7 +157,7 @@ func init() {
         }
       }
     },
-    "/certificate/revoked": {
+    "/v1/certificate/revoked": {
       "post": {
         "security": [],
         "tags": [
@@ -188,7 +188,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -209,7 +209,7 @@ func init() {
         }
       }
     },
-    "/certificates/{certificateId}": {
+    "/v1/certificates/{certificateId}": {
       "get": {
         "security": [
           {
@@ -245,7 +245,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -279,7 +279,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -306,7 +306,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -345,7 +345,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -369,7 +369,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -394,7 +394,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -422,7 +422,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -434,7 +434,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -472,7 +472,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -508,7 +508,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -528,7 +528,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -575,7 +575,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -593,7 +593,149 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/test/bulkCertify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload test certification csv for bulk ingestion",
+        "operationId": "testBulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/test/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "testCertify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TestCertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/test/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for test certification for given facility admin",
+        "operationId": "getTestCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/test/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getTestCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "test certify upload for given uploadID not found"
+          }
+        }
+      }
+    },
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -610,7 +752,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -637,6 +779,80 @@ func init() {
               "items": {
                 "$ref": "../registry/Vaccinator.json#/definitions/Vaccinator"
               }
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified. The payload for this API is compliant with DDCC core data set prescribed by WHO",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -700,6 +916,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -757,6 +977,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -999,6 +1223,204 @@ func init() {
         }
       }
     },
+    "TestCertificationRequest": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "testDetails",
+        "facility"
+      ],
+      "properties": {
+        "facility": {
+          "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "gender",
+            "dob",
+            "identity",
+            "contact"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "testDetails": {
+          "type": "object",
+          "required": [
+            "testType",
+            "disease",
+            "sampleCollectionTimestamp",
+            "resultTimestamp",
+            "result"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "disease": {
+              "type": "string"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Negative",
+                "Inconclusive",
+                "Void"
+              ]
+            },
+            "resultTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleCollectionTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleOrigin": {
+              "type": "string"
+            },
+            "testName": {
+              "type": "string"
+            },
+            "testType": {
+              "type": "string"
+            }
+          }
+        },
+        "verifier": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
     "UserInfo": {
       "type": "object",
       "properties": {
@@ -1058,9 +1480,9 @@ func init() {
     "version": "1.0.0"
   },
   "host": "divoc.xiv.in",
-  "basePath": "/divoc/api/v1",
+  "basePath": "/divoc/api",
   "paths": {
-    "/authorize": {
+    "/v1/authorize": {
       "post": {
         "security": [],
         "consumes": [
@@ -1099,7 +1521,7 @@ func init() {
         }
       }
     },
-    "/bulkCertify": {
+    "/v1/bulkCertify": {
       "post": {
         "security": [
           {
@@ -1141,7 +1563,7 @@ func init() {
         }
       }
     },
-    "/certificate": {
+    "/v1/certificate": {
       "put": {
         "description": "Update existing certificate if all checks are passed",
         "tags": [
@@ -1181,7 +1603,7 @@ func init() {
         }
       }
     },
-    "/certificate/revoked": {
+    "/v1/certificate/revoked": {
       "post": {
         "security": [],
         "tags": [
@@ -1212,7 +1634,7 @@ func init() {
         }
       }
     },
-    "/certificates": {
+    "/v1/certificates": {
       "get": {
         "security": [
           {
@@ -1233,7 +1655,7 @@ func init() {
         }
       }
     },
-    "/certificates/{certificateId}": {
+    "/v1/certificates/{certificateId}": {
       "get": {
         "security": [
           {
@@ -1269,7 +1691,7 @@ func init() {
         }
       }
     },
-    "/certify": {
+    "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
         "tags": [
@@ -1303,7 +1725,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads": {
+    "/v1/certify/uploads": {
       "get": {
         "security": [
           {
@@ -1330,7 +1752,7 @@ func init() {
         }
       }
     },
-    "/certify/uploads/{uploadId}/errors": {
+    "/v1/certify/uploads/{uploadId}/errors": {
       "get": {
         "security": [
           {
@@ -1369,7 +1791,7 @@ func init() {
         }
       }
     },
-    "/divoc/configuration": {
+    "/v1/divoc/configuration": {
       "get": {
         "tags": [
           "configuration"
@@ -1393,7 +1815,7 @@ func init() {
         }
       }
     },
-    "/events": {
+    "/v1/events": {
       "post": {
         "security": [],
         "summary": "Send events for monitoring / tracking purpose.",
@@ -1418,7 +1840,7 @@ func init() {
         }
       }
     },
-    "/identity/verify": {
+    "/v1/identity/verify": {
       "post": {
         "consumes": [
           "application/json"
@@ -1446,7 +1868,7 @@ func init() {
         }
       }
     },
-    "/ping": {
+    "/v1/ping": {
       "get": {
         "security": [],
         "description": "This operation shows how to override the global security defined above, as we want to open it up for all users.",
@@ -1458,7 +1880,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments": {
+    "/v1/preEnrollments": {
       "get": {
         "tags": [
           "vaccination"
@@ -1496,7 +1918,7 @@ func init() {
         }
       }
     },
-    "/preEnrollments/{preEnrollmentCode}": {
+    "/v1/preEnrollments/{preEnrollmentCode}": {
       "get": {
         "description": "Get pre enrollment data from api for vaccination",
         "tags": [
@@ -1532,7 +1954,7 @@ func init() {
         }
       }
     },
-    "/programs/current": {
+    "/v1/programs/current": {
       "get": {
         "tags": [
           "configuration"
@@ -1552,7 +1974,7 @@ func init() {
         }
       }
     },
-    "/report-side-effects": {
+    "/v1/report-side-effects": {
       "post": {
         "security": [
           {
@@ -1599,7 +2021,7 @@ func init() {
         }
       }
     },
-    "/sideEffects": {
+    "/v1/sideEffects": {
       "get": {
         "security": [],
         "tags": [
@@ -1617,7 +2039,149 @@ func init() {
         }
       }
     },
-    "/users/me": {
+    "/v1/test/bulkCertify": {
+      "post": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "description": "certify all the data in uploaded csv",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Upload test certification csv for bulk ingestion",
+        "operationId": "testBulkCertify",
+        "parameters": [
+          {
+            "type": "file",
+            "description": "Certification data in the form of csv",
+            "name": "file",
+            "in": "formData"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/v1/test/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization.",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "testCertify",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/TestCertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v1/test/certify/uploads": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all file uploads for test certification for given facility admin",
+        "operationId": "getTestCertifyUploads",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/test/certify/uploads/{uploadId}/errors": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin"
+            ]
+          }
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Get all the error rows associated with given uploadId",
+        "operationId": "getTestCertifyUploadErrors",
+        "parameters": [
+          {
+            "type": "integer",
+            "description": "Id of uploaded csv file",
+            "name": "uploadId",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "403": {
+            "description": "Forbidden for user"
+          },
+          "404": {
+            "description": "test certify upload for given uploadID not found"
+          }
+        }
+      }
+    },
+    "/v1/users/me": {
       "get": {
         "tags": [
           "vaccination"
@@ -1634,7 +2198,7 @@ func init() {
         }
       }
     },
-    "/vaccinators": {
+    "/v1/vaccinators": {
       "get": {
         "tags": [
           "configuration"
@@ -1661,6 +2225,80 @@ func init() {
               "items": {
                 "$ref": "#/definitions/vaccinator"
               }
+            }
+          }
+        }
+      }
+    },
+    "/v3/certificate": {
+      "put": {
+        "description": "Update existing certificate if all checks are passed",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Update existing certificate request",
+        "operationId": "updateCertificateV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          },
+          "412": {
+            "description": "Update not allowed",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
+    },
+    "/v3/certify": {
+      "post": {
+        "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified. The payload for this API is compliant with DDCC core data set prescribed by WHO",
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more vaccination",
+        "operationId": "certifyV3",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequest"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -1724,6 +2362,10 @@ func init() {
                 "addressLine2": {
                   "type": "string"
                 },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
                 "district": {
                   "type": "string",
                   "minLength": 1
@@ -1781,6 +2423,10 @@ func init() {
                 },
                 "addressLine2": {
                   "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
                 },
                 "district": {
                   "type": "string",
@@ -1912,6 +2558,10 @@ func init() {
             "addressLine2": {
               "type": "string"
             },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
             "district": {
               "type": "string",
               "minLength": 1
@@ -1946,6 +2596,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",
@@ -1988,6 +2642,10 @@ func init() {
             },
             "addressLine2": {
               "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
             },
             "district": {
               "type": "string",
@@ -2050,6 +2708,10 @@ func init() {
         },
         "addressLine2": {
           "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
         },
         "district": {
           "type": "string",
@@ -2304,6 +2966,446 @@ func init() {
         },
         "min": {
           "type": "integer"
+        }
+      }
+    },
+    "TestCertificationRequest": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "testDetails",
+        "facility"
+      ],
+      "properties": {
+        "facility": {
+          "type": "object",
+          "required": [
+            "name",
+            "address"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "gender",
+            "dob",
+            "identity",
+            "contact"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "testDetails": {
+          "type": "object",
+          "required": [
+            "testType",
+            "disease",
+            "sampleCollectionTimestamp",
+            "resultTimestamp",
+            "result"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "disease": {
+              "type": "string"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "result": {
+              "type": "string",
+              "enum": [
+                "Positive",
+                "Negative",
+                "Inconclusive",
+                "Void"
+              ]
+            },
+            "resultTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleCollectionTimestamp": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "sampleOrigin": {
+              "type": "string"
+            },
+            "testName": {
+              "type": "string"
+            },
+            "testType": {
+              "type": "string"
+            }
+          }
+        },
+        "verifier": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "TestCertificationRequestFacility": {
+      "type": "object",
+      "required": [
+        "name",
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestFacilityAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestRecipient": {
+      "type": "object",
+      "required": [
+        "name",
+        "gender",
+        "dob",
+        "identity",
+        "contact"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date",
+          "x-nullable": true
+        },
+        "gender": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nationality": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestRecipientAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "TestCertificationRequestTestDetails": {
+      "type": "object",
+      "required": [
+        "testType",
+        "disease",
+        "sampleCollectionTimestamp",
+        "resultTimestamp",
+        "result"
+      ],
+      "properties": {
+        "batch": {
+          "type": "string"
+        },
+        "disease": {
+          "type": "string"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "Positive",
+            "Negative",
+            "Inconclusive",
+            "Void"
+          ]
+        },
+        "resultTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sampleCollectionTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "sampleOrigin": {
+          "type": "string"
+        },
+        "testName": {
+          "type": "string"
+        },
+        "testType": {
+          "type": "string"
+        }
+      }
+    },
+    "TestCertificationRequestVerifier": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
         }
       }
     },

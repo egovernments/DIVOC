@@ -9,6 +9,11 @@ export const CertificateDetailsPaths = {
         path: ["credentialSubject", "age"],
         format: (data) => (data)
     },
+    "DOB": {
+        path: ["credentialSubject", "dob"],
+        format: (data) => (data),
+        optional: true
+    },
     "Gender": {
         path: ["credentialSubject", "gender"],
         format: (data) => (data)
@@ -16,6 +21,15 @@ export const CertificateDetailsPaths = {
     "Certificate ID": {
         path: ["evidence", "0", "certificateId"],
         format: (data) => (data)
+    },
+    "Vaccine Name": {
+        path: ["evidence", "0", "vaccine"],
+        format: (data) => (data)
+    },
+    "Vaccine Type": {
+        path: ["evidence", "0", "prophylaxis"],
+        format: (data) => (data),
+        optional: true
     },
     "Date of Dose": {
         path: ["evidence", "0", "effectiveStart"],

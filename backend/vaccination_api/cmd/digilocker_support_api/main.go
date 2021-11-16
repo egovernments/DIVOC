@@ -33,6 +33,7 @@ const ApiRole = "api"
 const ArogyaSetuRole = "arogyasetu"
 const Recipient = "recipient"
 const CertificateEntity = "VaccinationCertificate"
+const TestCertificateEntity = "TestCertificate"
 const PreEnrollmentCode = "preEnrollmentCode"
 const CertificateId = "certificateId"
 const Mobile = "mobile"
@@ -40,6 +41,8 @@ const BeneficiaryId = "beneficiaryId"
 const DigilockerSuccessEvent = "digilocker-success"
 const DigilockerFailedEvent = "digilocker-failed"
 const InternalSuccessEvent = "internal-success"
+const TestCertInternalSuccessEvent = "test-cert-internal-success"
+const TestCertInternalFailedEvent = "test-cert-internal-failed"
 const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
@@ -311,23 +314,30 @@ func formatId(identity string) string {
 }
 
 func pasteQrCodeOnPage(certificateText string, pdf *gopdf.GoPdf) error {
-	buf, err := compress(certificateText)
-	if err != nil {
-		log.Error("Error compressing certificate data", err)
-		return err
+	imageBytes, e := getQRCodeImageBytes(certificateText)
+	if e != nil {
+		return e
 	}
-	qrCode, err := qrcode.New(buf.String(), qrcode.Medium)
-	if err != nil {
-		return err
-	}
-
-	imageBytes, err := qrCode.PNG(-3)
 	holder, err := gopdf.ImageHolderByBytes(imageBytes)
 	err = pdf.ImageByHolder(holder, 290, 30, nil)
 	if err != nil {
 		log.Errorf("Error while creating QR code")
 	}
 	return nil
+}
+
+func getQRCodeImageBytes(certificateText string) ([]byte, error) {
+	buf, err := compress(certificateText)
+	if err != nil {
+		log.Error("Error compressing certificate data", err)
+		return nil, err
+	}
+	qrCode, err := qrcode.New(buf.String(), qrcode.Medium)
+	if err != nil {
+		return nil, err
+	}
+	imageBytes, err := qrCode.PNG(-3)
+	return imageBytes, err
 }
 
 func decompress(buf *bytes.Buffer, err error) {
@@ -422,6 +432,48 @@ func getCertificateList(w http.ResponseWriter, request *http.Request) {
 		}
 		writeResponse(w, http.StatusForbidden, payload)
 	}
+}
+func getCertificateQRCode(w http.ResponseWriter, r *http.Request) {
+	log.Info("Get Test cert QR code handler")
+	vars := mux.Vars(r)
+	preEnrollmentCode := vars[PreEnrollmentCode]
+	certificateFromRegistry, err := getTestCertificateFromRegistry(preEnrollmentCode)
+	if err == nil {
+		certificateArr := certificateFromRegistry[TestCertificateEntity].([]interface{})
+		log.Infof("Test Certificate query return %d records", len(certificateArr))
+		if len(certificateArr) > 0 {
+			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			log.Infof("certificate resp %v", certificateObj)
+			signedJson := certificateObj["certificate"].(string)
+			if imageBytes, err := getQRCodeImageBytes(signedJson); err != nil {
+				log.Errorf("Error in creating certificate qr code image")
+			} else {
+				//w.Header().Set("Content-Disposition", "attachment; filename=certificate.pdf")
+				//w.Header().Set("Content-Type", resp.Header.Get("Content-Type"))
+				//w.Header().Set("Content-Length", string(len(pdfBytes)))
+				w.WriteHeader(200)
+				_, _ = w.Write(imageBytes)
+				go kafkaService.PublishEvent(models.Event{
+					Date:          time.Now(),
+					Source:        preEnrollmentCode,
+					TypeOfMessage: TestCertInternalSuccessEvent,
+					ExtraInfo:     "Certificate found",
+				})
+				return
+			}
+		} else {
+			log.Errorf("No test certificate found for request %v", preEnrollmentCode)
+			w.WriteHeader(404)
+		}
+	} else {
+		log.Infof("Test certificate access Error %+v", err)
+	}
+	go kafkaService.PublishEvent(models.Event{
+		Date:          time.Now(),
+		Source:        preEnrollmentCode,
+		TypeOfMessage: TestCertInternalFailedEvent,
+		ExtraInfo:     "Certificate not found",
+	})
 }
 
 func getCertificatePDF(w http.ResponseWriter, r *http.Request) {
@@ -613,6 +665,16 @@ func getCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{
 	return certificateFromRegistry, err
 }
 
+func getTestCertificateFromRegistry(preEnrollmentCode string) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		PreEnrollmentCode: map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	certificateFromRegistry, err := services.QueryRegistry(TestCertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
+	return certificateFromRegistry, err
+}
+
 func timed(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		startTime := time.Now()
@@ -658,6 +720,7 @@ func main() {
 	r.HandleFunc("/cert/api/certificatePDF", timed(authorize(getCertificatePDF, []string{Recipient}, InternalFailedEvent))).
 		Methods("GET").
 		Queries("certificateId", "{certificateId}")
+	r.HandleFunc("/cert/api/certificateQRCode/{preEnrollmentCode}", authorize(getCertificateQRCode, []string{ApiRole}, InternalFailedEvent)).Methods("GET")
 	r.HandleFunc("/cert/api/certificate/{certificateId}", timed(getRecipientCertificatePDF)).
 		Methods("GET").
 		Queries("authToken", "{authToken}")

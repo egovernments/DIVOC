@@ -22,6 +22,18 @@ const server = http.createServer(async (req, res) => {
     } else if (req.method === 'HEAD' && req.url.match("/certificate/api/certificatePDF/.+")) {
         const data = await certificateController.checkIfCertificateGenerated(req, res);
         res.end(data)
+    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/fhir-certificate")) {
+        const data = await certificateController.certificateAsFHIRJson(req, res);
+        res.end(data)
+    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/eu-certificate")) {
+        const data = await certificateController.certificateAsEUPayload(req, res);
+        res.end(data)
+    } else if (req.method === 'GET' && req.url.match("/certificate/api/test/certificatePDF/.+")) {
+        const data = await certificateController.getTestCertificatePDFByPreEnrollmentCode(req, res);
+        res.end(data)
+    } else if (req.method === 'GET' && req.url.match("/certificate/api/certificateQRCode/.+")) {
+        const data = await certificateController.getCertificateQRCodeByPreEnrollmentCode(req, res);
+        res.end(data)
     } else {
         res.end(`{"error": "${http.STATUS_CODES[404]}"}`)
     }

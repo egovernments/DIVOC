@@ -56,6 +56,9 @@ var Config = struct {
 	Kafka struct {
 		BootstrapServers         string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
+		TestCertifyTopic         string `default:"test_certify" yaml:"testCertifyTopic"`
+		TestCertifyACKTopic      string `default:"test_certify_ack" yaml:"testCertifyAckTopic"`
 		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
@@ -84,6 +87,12 @@ var Config = struct {
 			RequiredFields string `yaml:"required_fields"`
 		}
 		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"100"`
+	}
+	Testcertificate struct {
+		Upload struct {
+			Columns        string `yaml:"columns"`
+			RequiredFields string `yaml:"required_fields"`
+		}
 	}
 	Clickhouse struct {
 		Dsn string `env:"CLICK_HOUSE_URL"`

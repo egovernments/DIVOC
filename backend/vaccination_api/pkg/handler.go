@@ -35,19 +35,23 @@ import (
 
 const FacilityEntity = "Facility"
 
-func SetupHandlers(api *operations.DivocAPI) {
-	api.GetPingHandler = operations.GetPingHandlerFunc(pingResponder)
+const CERTIFICATE_TYPE_V2 = "certifyV2"
+const CERTIFICATE_TYPE_V3 = "certifyV3"
 
-	api.LoginPostAuthorizeHandler = login.PostAuthorizeHandlerFunc(loginHandler)
+func SetupHandlers(api *operations.DivocAPI) {
+	api.GetV1PingHandler = operations.GetV1PingHandlerFunc(pingResponder)
+
+	api.LoginPostV1AuthorizeHandler = login.PostV1AuthorizeHandlerFunc(loginHandler)
 
 	api.ConfigurationGetCurrentProgramsHandler = configuration.GetCurrentProgramsHandlerFunc(getCurrentProgramsResponder)
 	api.ConfigurationGetConfigurationHandler = configuration.GetConfigurationHandlerFunc(getConfigurationResponder)
 
-	api.IdentityPostIdentityVerifyHandler = identity.PostIdentityVerifyHandlerFunc(postIdentityHandler)
+	api.IdentityPostV1IdentityVerifyHandler = identity.PostV1IdentityVerifyHandlerFunc(postIdentityHandler)
 	api.VaccinationGetPreEnrollmentHandler = vaccination.GetPreEnrollmentHandlerFunc(getPreEnrollment)
 	api.VaccinationGetPreEnrollmentsForFacilityHandler = vaccination.GetPreEnrollmentsForFacilityHandlerFunc(getPreEnrollmentForFacility)
 
 	api.CertificationCertifyHandler = certification.CertifyHandlerFunc(certify)
+	api.CertificationCertifyV3Handler = certification.CertifyV3HandlerFunc(certifyV3)
 	api.VaccinationGetLoggedInUserInfoHandler = vaccination.GetLoggedInUserInfoHandlerFunc(getLoggedInUserInfo)
 	api.ConfigurationGetVaccinatorsHandler = configuration.GetVaccinatorsHandlerFunc(getVaccinators)
 	api.GetCertificateHandler = operations.GetCertificateHandlerFunc(getCertificate)
@@ -59,9 +63,14 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.ReportSideEffectsCreateReportedSideEffectsHandler = report_side_effects.CreateReportedSideEffectsHandlerFunc(createReportedSideEffects)
 	api.CertificationGetCertifyUploadErrorsHandler = certification.GetCertifyUploadErrorsHandlerFunc(getCertifyUploadErrors)
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
+	api.CertificationUpdateCertificateV3Handler = certification.UpdateCertificateV3HandlerFunc(updateCertificateV3)
 
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
 	api.CertificationGetCertificateByCertificateIDHandler = certification.GetCertificateByCertificateIDHandlerFunc(getCertificateByCertificateId)
+	api.CertificationTestCertifyHandler = certification.TestCertifyHandlerFunc(testCertify)
+	api.CertificationTestBulkCertifyHandler = certification.TestBulkCertifyHandlerFunc(testBulkCertify)
+	api.CertificationGetTestCertifyUploadsHandler = certification.GetTestCertifyUploadsHandlerFunc(getTestCertifyUploads)
+	api.CertificationGetTestCertifyUploadErrorsHandler = certification.GetTestCertifyUploadErrorsHandlerFunc(getTestCertifyUploadErrors)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -145,7 +154,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 	return NewGenericServerError()
 }
 
-func pingResponder(params operations.GetPingParams) middleware.Responder {
+func pingResponder(params operations.GetV1PingParams) middleware.Responder {
 	return operations.NewGetPingOK()
 }
 
@@ -159,15 +168,15 @@ func getLoggedInUserInfo(params vaccination.GetLoggedInUserInfoParams, principal
 	return vaccination.NewGetLoggedInUserInfoOK().WithPayload(payload)
 }
 
-func loginHandler(params login.PostAuthorizeParams) middleware.Responder {
+func loginHandler(params login.PostV1AuthorizeParams) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token2fa) == "1231" {
 		payload := &models.LoginResponse{
 			RefreshToken: "234klj23lkj.asklsadf",
 			Token:        "123456789923234234",
 		}
-		return login.NewPostAuthorizeOK().WithPayload(payload)
+		return login.NewPostV1AuthorizeOK().WithPayload(payload)
 	}
-	return login.NewPostAuthorizeUnauthorized()
+	return login.NewPostV1AuthorizeUnauthorized()
 }
 
 func getVaccinators(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
@@ -235,11 +244,11 @@ func getConfigurationResponder(params configuration.GetConfigurationParams, prin
 	return configuration.NewGetConfigurationOK().WithPayload(payload)
 }
 
-func postIdentityHandler(params identity.PostIdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
+func postIdentityHandler(params identity.PostV1IdentityVerifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	if strings.TrimSpace(params.Body.Token) != "" {
-		return identity.NewPostIdentityVerifyOK()
+		return identity.NewPostV1IdentityVerifyOK()
 	}
-	return identity.NewPostIdentityVerifyPartialContent()
+	return identity.NewPostV1IdentityVerifyPartialContent()
 }
 
 func getLimitAndOffset(limitValue *float64, offsetValue *float64) (int, int) {
@@ -299,6 +308,16 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 			})
 		}
 
+		// adding certificateType
+		if request.Meta == nil {
+			request.Meta = map[string]interface{}{
+				"certificateType": CERTIFICATE_TYPE_V2,
+			}
+		} else {
+			meta := request.Meta.(map[string]interface{})
+			meta["certificateType"] = CERTIFICATE_TYPE_V2
+		}
+
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
@@ -306,6 +325,65 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 			} else {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
 			}
+		}
+	}
+	return certification.NewCertifyOK()
+}
+
+func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	for _, request := range params.Body {
+		log.Infof("CertificationRequest: %+v\n", request)
+		if request.Recipient.Age == "" && request.Recipient.Dob == nil {
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Age and DOB both are missing. Atleast one should be present"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code:    &errorCode,
+				Message: &errorMsg,
+			})
+		}
+		if request.Recipient.Age == "" {
+			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
+		}
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+			errorCode := "MISSING_FIELDS"
+			errorMsg := "Invalid Age or DOB. Should be less than current date"
+			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
+				Code:    &errorCode,
+				Message: &errorMsg,
+			})
+		}
+
+		// adding certificateType
+		if request.Meta == nil {
+			request.Meta = map[string]interface{}{
+				"certificateType": CERTIFICATE_TYPE_V3,
+			}
+		} else {
+			meta := request.Meta.(map[string]interface{})
+			meta["certificateType"] = CERTIFICATE_TYPE_V3
+		}
+
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
+				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
+				kafkaService.PublishWalkEnrollment(enrollmentMsg)
+			} else {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
+		}
+	}
+	return certification.NewCertifyOK()
+}
+
+func testCertify(params certification.TestCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	for _, request := range params.Body {
+		log.Infof("CertificationRequest: %+v\n", request)
+		if jsonRequestString, err := json.Marshal(request); err == nil {
+			kafkaService.PublishTestCertifyMessage(jsonRequestString, nil, nil)
 		}
 	}
 	return certification.NewCertifyOK()
@@ -459,10 +537,12 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
 					"previousCertificateId": certificateId,
+					"certificateType":       CERTIFICATE_TYPE_V2,
 				}
 			} else {
 				meta := request.Meta.(map[string]interface{})
 				meta["previousCertificateId"] = certificateId
+				meta["certificateType"] = CERTIFICATE_TYPE_V2
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
@@ -473,6 +553,34 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 		}
 	}
 	return certification.NewUpdateCertificateOK()
+}
+
+func updateCertificateV3(params certification.UpdateCertificateV3Params, principal *models.JWTClaimBody) middleware.Responder {
+	// this api can be moved to separate deployment unit if someone wants to use certification alone then
+	// sign verification can be disabled and use vaccination certification generation
+	log.Debugf("%+v\n", params.Body[0])
+	for _, request := range params.Body {
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+			log.Infof("Certificate update request approved %+v", request)
+			if request.Meta == nil {
+				request.Meta = map[string]interface{}{
+					"previousCertificateId": certificateId,
+					"certificateType":       CERTIFICATE_TYPE_V3,
+				}
+			} else {
+				meta := request.Meta.(map[string]interface{})
+				meta["previousCertificateId"] = certificateId
+				meta["certificateType"] = CERTIFICATE_TYPE_V3
+			}
+			if jsonRequestString, err := json.Marshal(request); err == nil {
+				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+			}
+		} else {
+			log.Infof("Certificate update request rejected %+v", request)
+			return certification.NewUpdateCertificateV3PreconditionFailed()
+		}
+	}
+	return certification.NewUpdateCertificateV3OK()
 }
 
 func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
@@ -625,5 +733,113 @@ func getCertificateByCertificateId(params certification.GetCertificateByCertific
 		}
 	}
 
+	return NewGenericServerError()
+}
+
+func testBulkCertify(params certification.TestBulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
+	data := NewScanner(params.File)
+	if err := validateTestBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
+		log.Error("Invalid template", err.Error());
+		code := "INVALID_TEMPLATE"
+		message := err.Error()
+		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
+	}
+
+	// Initializing CertifyUpload entity
+	_, fileHeader, _ := params.HTTPRequest.FormFile("file")
+	fileName := fileHeader.Filename
+	preferredUsername := getUserName(params.HTTPRequest)
+	uploadEntry := db.TestCertifyUploads{}
+	uploadEntry.Filename = fileName
+	uploadEntry.UserID = preferredUsername
+	uploadEntry.TotalRecords = 0
+	if err := db.CreateTestCertifyUpload(&uploadEntry); err != nil {
+		code := "DATABASE_ERROR"
+		message := err.Error()
+		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{
+			Code:    &code,
+			Message: &message,
+		})
+	}
+
+	// Creating Certificates
+	for data.Scan() {
+		createTestCertificate(&data, &uploadEntry)
+		log.Info(data.Text("recipientName"), " - ", data.Text("facilityName"))
+	}
+	defer params.File.Close()
+
+	db.UpdateTestCertifyUpload(&uploadEntry)
+
+	return certification.NewBulkCertifyOK()
+}
+
+func getTestCertifyUploads(params certification.GetTestCertifyUploadsParams, principal *models.JWTClaimBody) middleware.Responder {
+	var result []interface{}
+	preferredUsername := principal.PreferredUsername
+	certifyUploads, err := db.GetTestCertifyUploadsForUser(preferredUsername)
+	if err == nil {
+		// get the error rows associated with it
+		// if present update status as "Failed"
+		for _, c := range certifyUploads {
+			totalErrorRows := 0
+			statuses, err := db.GetTestCertifyUploadErrorsStatusForUploadId(c.ID)
+			if err == nil {
+				for _, status := range statuses {
+					if status == db.CERTIFY_UPLOAD_FAILED_STATUS {
+						totalErrorRows = totalErrorRows + 1
+					}
+				}
+			}
+			overallStatus := getOverallStatus(statuses)
+
+			// construct return value and append
+			var cmap map[string]interface{}
+			if jc, e := json.Marshal(c); e == nil {
+				if e = json.Unmarshal(jc, &cmap); e == nil {
+					cmap["Status"] = overallStatus
+					cmap["TotalErrorRows"] = totalErrorRows
+				}
+			}
+			result = append(result, cmap)
+
+		}
+		return NewGenericJSONResponse(result)
+	}
+	return NewGenericServerError()
+}
+
+func getTestCertifyUploadErrors(params certification.GetTestCertifyUploadErrorsParams, principal *models.JWTClaimBody) middleware.Responder {
+	uploadID := params.UploadID
+
+	// check if user has permission to get errors
+	preferredUsername := principal.PreferredUsername
+	certifyUpload, err := db.GetTestCertifyUploadsForID(uint(uploadID))
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// certifyUpload itself not there
+			// then throw 404 error
+			return certification.NewGetTestCertifyUploadErrorsNotFound()
+		}
+		return NewGenericServerError()
+	}
+
+	// user in certifyUpload doesnt match preferredUsername
+	// then throw 403 error
+	if certifyUpload.UserID != preferredUsername {
+		return certification.NewGetTestCertifyUploadErrorsForbidden()
+	}
+
+	certifyUploadErrors, err := db.GetTestCertifyUploadErrorsForUploadID(uploadID)
+	columnHeaders := strings.Split(config.Config.Testcertificate.Upload.Columns, ",")
+	if err == nil {
+		return NewGenericJSONResponse(map[string]interface{}{
+			"columns":   append(columnHeaders, "errors"),
+			"errorRows": certifyUploadErrors,
+		})
+	}
 	return NewGenericServerError()
 }

@@ -2,20 +2,15 @@ import React, {useEffect, useState} from "react";
 import axios from "axios";
 import {useKeycloak} from "@react-keycloak/web";
 import styles from "./CertificateView.module.css";
-import QRCode from 'qrcode.react';
-import {toPng, toSvg} from 'html-to-image';
+import {toSvg} from 'html-to-image';
 import download from 'downloadjs'
 import {Container, Dropdown,DropdownButton, Row} from "react-bootstrap"
-import {formatDate} from "../../utils/CustomDate";
 import {pathOr} from "ramda";
 import {CERTIFICATE_FILE, CertificateDetailsPaths} from "../../constants";
-import {FinalCertificate} from "../Certificate/finalCertificate";
-import {ProvisionalCertificate} from "../Certificate/provisionalCertificate";
 import {useDispatch} from "react-redux";
-import digilocker from "../../assets/img/digilocker.png"
-import commonPass from "../../assets/img/CommonPass.png"
 import JSZip from "jszip";
 import { Document, Page } from 'react-pdf/dist/esm/entry.webpack';
+import {useTranslation} from "react-i18next";
 
 const certificateDetailsPaths = {
     ...CertificateDetailsPaths,
@@ -48,6 +43,7 @@ function CertificateView() {
         },
     };
     const [width, setWidth] = useState(window.innerWidth);
+    const {t} = useTranslation();
     function handleWindowSizeChange() {
         setWidth(window.innerWidth);
     }
@@ -151,6 +147,30 @@ function CertificateView() {
         );
     };
 
+    function downloadAsFhirCertificate() {
+        axios.get(`/certificate/api/fhir-certificate?refId=${certificateData.preEnrollmentCode}`, {...config, responseType: 'blob'})
+        .then((response) => {
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            var dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute('href', url);
+            dlAnchorElem.setAttribute('download', 'Vaccination_Certificate.json');
+            dlAnchorElem.click();
+        }).catch(err => console.log(err));
+    }
+
+    function downloadAsEUCertificate() {
+        axios.get(`/certificate/api/eu-certificate?refId=${certificateData.preEnrollmentCode}`, {...config, responseType: 'blob'})
+        .then((blob) => {
+            const file = new Blob([blob.data], {type: 'application/pdf'});
+            var url = URL.createObjectURL(file);
+            var dlAnchorElem = document.createElement('a');
+            dlAnchorElem.setAttribute("href", url);
+            dlAnchorElem.setAttribute("download", "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + ".pdf");
+            dlAnchorElem.click();
+            dlAnchorElem.remove();
+        }).catch(err => console.log(err));
+    }
+
     const handleClick = () => {
         console.log(certificateData);
         var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(certificateData));
@@ -158,6 +178,7 @@ function CertificateView() {
         dlAnchorElem.setAttribute("href", dataStr);
         dlAnchorElem.setAttribute("download", "Vaccination_Certificate_" + certificateData.name.replaceAll(" ", "_") + ".id");
         dlAnchorElem.click();
+        dlAnchorElem.remove();
     };
 
     const downloadAsSvg = () => {
@@ -222,10 +243,12 @@ function CertificateView() {
                     {/*    Download Image <img src={DownloadLogo} alt="download"/>*/}
                     {/*</button>*/}
 
-                    <DropdownButton id="dropdown-item-button" variant="success" title="Download" className={styles["btn-success"]}>
-                        <Dropdown.Item href="" onClick={downloadAsImage}>As Image</Dropdown.Item>
-                        <Dropdown.Item href="" onClick={downloadAsSvg}>As SVG</Dropdown.Item>
-                        <Dropdown.Item href="" onClick={handleClick}>As Verifiable Certificate</Dropdown.Item>
+                    <DropdownButton id="dropdown-item-button" variant="success" title={t('button.download')} className={styles["btn-success"]}>
+                        <Dropdown.Item href="" onClick={downloadAsImage}>{t('certificateView.asImg')}</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={downloadAsSvg}>{t('certificateView.asSvg')}</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={handleClick}>{t('certificateView.asVerifiableCertificate')}</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={downloadAsEUCertificate}>{t('certificateView.asEuCertificate')}</Dropdown.Item>
+                        <Dropdown.Item href="" onClick={downloadAsFhirCertificate}>{t('certificateView.asFhirCertificate')}</Dropdown.Item>
                     </DropdownButton>
                 </div>
                 {/*<div >*/}
@@ -243,7 +266,7 @@ function CertificateView() {
                 {/*    */}
                 {/*</div>*/}
                 <div>
-                    <button className={styles["button"]} onClick={printCanvas}>Print</button>
+                    <button className={styles["button"]} onClick={printCanvas}>{t('button.print')}</button>
                 </div>
                 <br/>
                 <br/>
@@ -258,10 +281,10 @@ function CertificateView() {
             <Container>
                 <Container className={styles["no-print"] + " " + styles["center-align"]}>
                     <Row>
-                        <p>There are multiple certificates associated with phone : {userMobileNumber + "\n"}</p>
+                        <p>{t('certificateView.subTitle', {mobileNumber: userMobileNumber})}</p>
                     </Row>
                     <Row>
-                        <b>Please choose the certificate for </b>
+                        <b>{t('certificateView.chooseCertificate')}</b>
                     </Row>
                     <div>{getListOfCertificateBearers()}</div>
                 </Container>
@@ -277,7 +300,7 @@ function CertificateView() {
             <div className="justify-content-center">
                 <div>
                     <div className={styles["no-print"] + " " + styles["center-align"]}>
-                        <h4>Vaccination certificate</h4>
+                        <h4>{t('certificateView.title')}</h4>
                     </div>
                     {(certificateList.length > 1) ? multiCertificateView() : singleCertificateView()}
                 </div>

@@ -31,7 +31,7 @@ func NewGetCertifyUploadErrors(ctx *middleware.Context, handler GetCertifyUpload
 	return &GetCertifyUploadErrors{Context: ctx, Handler: handler}
 }
 
-/*GetCertifyUploadErrors swagger:route GET /certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
+/*GetCertifyUploadErrors swagger:route GET /v1/certify/uploads/{uploadId}/errors certification getCertifyUploadErrors
 
 Get all the error rows associated with given uploadId
 

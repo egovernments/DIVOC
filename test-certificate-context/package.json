@@ -1,0 +1,21 @@
+{
+  "name": "test-certificate-context",
+  "version": "1.0.0",
+  "description": "medical test context for verifiable certificate",
+  "main": "test-certificate-context.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/egovernments/DIVOC/tree/main/test-certificate-context"
+  },
+  "keywords": [
+    "medical testing",
+    "w3c",
+    "certificate",
+    "context"
+  ],
+  "author": "divoc",
+  "license": "GPL-3.0-or-later"
+}

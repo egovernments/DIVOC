@@ -96,6 +96,8 @@ func Init() {
 
 	db.AutoMigrate(&CertifyUploads{})
 	db.AutoMigrate(&CertifyUploadErrors{})
+	db.AutoMigrate(&TestCertifyUploads{})
+	db.AutoMigrate(&TestCertifyUploadErrors{})
 }
 
 // CreateCertifyUpload - Create new certify upload entry in DB

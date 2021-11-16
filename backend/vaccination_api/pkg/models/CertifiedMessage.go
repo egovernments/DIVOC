@@ -6,7 +6,7 @@ type CertifiedMessage struct {
 	Mobile            string       `json:"mobile"`
 	PreEnrollmentCode string       `json:"preEnrollmentCode"`
 	CertificateId     string       `json:"certificateId"`
-	Certificate       *Certificate `json:"certificate"`
+	Certificate       string	   `json:"certificate"`
 	Meta              struct {
 		PreviousCertificateID string `json:"previousCertificateId,omitempty"`
 	} `json:"meta"`

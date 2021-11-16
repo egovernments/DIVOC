@@ -137,6 +137,7 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 		Recipient:   recipient,
 		Vaccination: vaccination,
 		Vaccinator:  vaccinator,
+		Meta:        map[string]interface{}{"certificateType": CERTIFICATE_TYPE_V2},
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
