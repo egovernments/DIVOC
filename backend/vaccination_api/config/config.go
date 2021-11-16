@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -62,6 +63,8 @@ var Config = struct {
 	}
 	Rabbitmq struct {
 		RabbitmqServers          string `env:"RABBITMQ_SERVER" yaml:"rabbitmqServers"`
+		Certified                string `default:"certified" yaml:"certifiedtopic"`
+		CertifyAck               string `default:"certify_ack" yaml:"certifyacktopic"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
 		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`

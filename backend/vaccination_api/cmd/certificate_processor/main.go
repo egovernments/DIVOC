@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -70,7 +69,7 @@ const COMMUNICATION_MODE_KAFKA = "kafka"
 const COMMUNICATION_MODE_RESTAPI = "restapi"
 
 func main() {
-	switch config.Config.CommunicationMode {
+	switch config.Config.CommunicationMode.Mode {
 	case COMMUNICATION_MODE_RABBITMQ:
 		initAndConsumeFromRabbitmq()
 	case COMMUNICATION_MODE_KAFKA:

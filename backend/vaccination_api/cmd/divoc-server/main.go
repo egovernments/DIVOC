@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/divoc/api/pkg/services"
-	"log"
 	"os"
+
+	"github.com/divoc/api/pkg/services"
 
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/auth"
@@ -12,12 +12,17 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/loads"
 	"github.com/jessevdk/go-flags"
+	log "github.com/sirupsen/logrus"
 )
+
+const COMMUNICATION_MODE_RABBITMQ = "rabbitmq"
+const COMMUNICATION_MODE_KAFKA = "kafka"
+const COMMUNICATION_MODE_RESTAPI = "restapi"
 
 func main() {
 	config.Initialize()
 	auth.Init()
-	services.InitializeKafka()
+	initCommunication()
 	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
@@ -56,4 +61,17 @@ func main() {
 		log.Fatalln(err)
 	}
 
+}
+
+func initCommunication() {
+	switch config.Config.CommunicationMode.Mode {
+	case COMMUNICATION_MODE_RABBITMQ:
+		services.InitializeRabbitmq()
+	case COMMUNICATION_MODE_KAFKA:
+		services.InitializeKafka()
+	case COMMUNICATION_MODE_RESTAPI:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+	}
 }

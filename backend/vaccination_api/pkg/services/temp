@@ -1,0 +1,13 @@
+
+type interface messagePassing {
+	byte[] consume(exchange, topic)
+	void produce(exchange, topic, channel)
+}
+
+rabbitMq
+
+
+kafka
+
+messagePassing = (cond) ? rabbitMq: kafka;
+commonService(messagePassing)

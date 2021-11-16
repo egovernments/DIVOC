@@ -1,19 +1,14 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
-	"strings"
-	"time"
 
 	"github.com/divoc/api/config"
-	"github.com/divoc/api/pkg"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
 
-func initAndConsumeFromRabbitmq(pcmFunc) {
+func initAndConsumeFromRabbitmq() {
 	config.Initialize()
 	log.Infof("Starting certificate processor")
 	log.Infof("Using Rabbitmq %s", config.Config.Rabbitmq.RabbitmqServers)

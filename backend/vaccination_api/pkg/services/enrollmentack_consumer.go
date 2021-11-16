@@ -7,6 +7,7 @@ import (
 	"github.com/divoc/api/swagger_gen/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
+	"github.com/streadway/amqp"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
@@ -34,24 +35,57 @@ func StartEnrollmentACKConsumer() {
 				log.Infof("Consumer error: %v \n", err)
 				continue
 			}
-
-			var message struct {
-				Err                *string `json:"errMsg"`
-				EnrollmentType     string  `json:"enrollmentType"`
-				VaccinationDetails models.CertificationRequest  `json:"vaccinationDetails"`
-			}
-			if err := json.Unmarshal(msg.Value, &message); err != nil {
-				log.Error("Error unmarshalling to expected format : ", err)
-				continue
-			}
-			log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
-
-			if message.EnrollmentType == models2.EnrollmentEnrollmentTypeWALKIN {
-				certifyMsg, _ := json.Marshal(message.VaccinationDetails)
-				log.Infof("Certifying recepient[preEnrollmentCode: %s]", *message.VaccinationDetails.PreEnrollmentCode)
-				PublishCertifyMessage(certifyMsg, nil, nil)
-			}
+			processEnrollmentAckMsg(msg.Value, *msg.TopicPartition.Topic)
 			consumer.CommitMessage(msg)
 		}
 	}()
+}
+
+func StartEnrollmentACKConsumerOnChannel() {
+	servers := config.Config.Rabbitmq.RabbitmqServers
+	log.Infof("Using Rabbitmq %s", servers)
+	c, err := amqp.Dial(servers + "?heartbeat=60")
+	failOnError(err, "Failed to connect to RabbitMQ")
+	defer c.Close()
+
+	ch, err := c.Channel()
+	failOnError(err, "Failed to open a channel")
+	defer ch.Close()
+
+	go func() {
+		msgs, err := ch.Consume(
+			config.Config.Rabbitmq.EnrollmentACKTopic, // queue
+			"",    // consumer
+			true,  // auto-ack
+			false, // exclusive
+			false, // no-local
+			false, // no-wait
+			nil,   // args
+		)
+		failOnError(err, "Failed to register a consumer for EnrollmentACKTopic")
+
+		for msg := range msgs {
+			processEnrollmentAckMsg(msg.Body, msg.Exchange)
+			ch.Ack(msg.DeliveryTag, false)
+		}
+	}()
+}
+
+func processEnrollmentAckMsg(content []byte, exchange string) {
+	var message struct {
+		Err                *string                     `json:"errMsg"`
+		EnrollmentType     string                      `json:"enrollmentType"`
+		VaccinationDetails models.CertificationRequest `json:"vaccinationDetails"`
+	}
+	if err := json.Unmarshal(content, &message); err != nil {
+		log.Error("Error unmarshalling to expected format : ", err)
+		return
+	}
+	log.Infof("Message on %s: %v \n", exchange, message)
+
+	if message.EnrollmentType == models2.EnrollmentEnrollmentTypeWALKIN {
+		certifyMsg, _ := json.Marshal(message.VaccinationDetails)
+		log.Infof("Certifying recepient[preEnrollmentCode: %s]", *message.VaccinationDetails.PreEnrollmentCode)
+		PublishCertifyMessage(certifyMsg, nil, nil)
+	}
 }
