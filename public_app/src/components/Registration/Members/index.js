@@ -568,9 +568,6 @@ const AppointmentTimeline = ({
         const bearerToken = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
         const token = bearerToken.split(" ")[1];
         let certificateURL = "";
-        if (window.location.host.split(":")[0] === "localhost") {
-            certificateURL = "https://divoc.xiv.in"
-        }
         window.open(`${certificateURL}/certificate/api/certificate/${certificateId}?authToken=${token}`, '_blank').focus();
     }
 

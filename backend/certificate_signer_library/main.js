@@ -129,8 +129,13 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   }
 }
 
+async function signJSON(certificate) {
+  return signer.signJSON(certificate)
+}
+
 
 module.exports = {
   signCertificate,
-  init_signer
+  init_signer,
+  signJSON
 };
