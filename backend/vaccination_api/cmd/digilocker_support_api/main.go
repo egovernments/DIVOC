@@ -57,6 +57,12 @@ const YYYYMMDD = "2006-01-02"
 const DEFAULT_DUE_DATE_N_DAYS = 28
 const MaxDisplayCharacters = 40
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
+var vaccineProphylaxis = map[string]string{
+	"covaxin": "COVID-19 vaccine, inactivated virus",
+	"covishield": "COVID-19 vaccine, non-replicating viral vector",
+	"sputnik": "COVID-19 vaccine, non-replicating viral vector",
+	"zycov": "COVID-19 vaccine, DNA based",
+}
 
 type DoseWiseData struct {
 	dose        int
@@ -349,9 +355,19 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
+	// older certificates doesnt have prophylaxis
+	prophylaxis := certificate.Evidence[0].Prophylaxis
+	if prophylaxis == "" {
+		vaccine := strings.ToLower(certificate.Evidence[0].Vaccine)
+		for vaccName, proph := range vaccineProphylaxis {
+			if strings.Contains(vaccine, vaccName) {
+				prophylaxis = proph
+			}
+		}
+	}
 	displayLabels = []string{
 		certificate.Evidence[0].Vaccine,
-		certificate.Evidence[0].Prophylaxis,
+		prophylaxis,
 		certificate.Evidence[0].Manufacturer,
 	}
 	for i = 0; i < len(displayLabels); i++ {
