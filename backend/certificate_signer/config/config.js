@@ -12,6 +12,7 @@ const ENABLE_FEEDBACK_URL = process.env.ENABLE_FEEDBACK_URL || true;
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const RABBITMQ_SERVER = process.env.RABBITMQ_SERVER || 'localhost:5672';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
+const CERTIFY_TOPIC_QUEUE = process.env.CERTIFY_TOPIC_QUEUE || 'certify_queue';
 const CERTIFY_TOPIC = process.env.CERTIFY_TOPIC || 'certify';
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081';
 const REGISTRY_CERTIFICATE_SCHEMA = process.env.REGISTRY_CERTIFICATE_SCHEMA || 'VaccinationCertificate';
@@ -41,6 +42,7 @@ module.exports = {
   CERTIFICATE_INFO_BASE_URL,
   KAFKA_BOOTSTRAP_SERVER,
   RABBITMQ_SERVER,
+  CERTIFY_TOPIC_QUEUE,
   CERTIFY_TOPIC,
   REGISTRY_URL,
   CERTIFIED_TOPIC,

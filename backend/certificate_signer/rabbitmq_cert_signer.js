@@ -13,6 +13,10 @@ const constants = require("./config/constants");
 const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
+const {RABBITMQ_SERVER} = require("../certificate_api/configs/config");
+const {ERROR_CERTIFICATE_TOPIC} = require("../test_certificate_signer/config/config");
+const {CERTIFY_TOPIC} = require("../test_certificate_signer/config/config");
+const {CERTIFY_TOPIC_QUEUE} = require("./config/config");
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 
 const CERTIFICATE_TYPE_V2 = "certifyV2";
@@ -25,6 +29,7 @@ var isConnecting = false;
 
 var amqpConn = null;
 var pubChannel = null;
+var lisChannel = null;
 // TODO: Move code common between this rabbitmq_cert_signer.js and kafka_cert_signer.js to a third js file
 let signingConfig = {
   publicKeyPem: publicKeyPem,
@@ -46,6 +51,7 @@ let signingConfig = {
   CERTIFICATE_FEEDBACK_BASE_URL: config.CERTIFICATE_FEEDBACK_BASE_URL,
   CERTIFICATE_INFO_BASE_URL: config.CERTIFICATE_INFO_BASE_URL,
 
+  CERTIFY_TOPIC_QUEUE: config.CERTIFY_TOPIC_QUEUE,
   CERTIFY_TOPIC: config.CERTIFY_TOPIC,
   CERTIFIED_TOPIC: config.CERTIFIED_TOPIC,
   ENABLE_CERTIFY_ACKNOWLEDGEMENT: config.ENABLE_CERTIFY_ACKNOWLEDGEMENT,
@@ -97,12 +103,6 @@ function whenConnected() {
 function startPublisher() {
   amqpConn.createConfirmChannel(function(err, ch) {
     if (closeOnErr(err)) return;
-    ch.on("error", function(err) {
-      console.error("[AMQP] channel error", err.message);
-    });
-    ch.on("close", function() {
-      console.log("[AMQP] channel closed");
-    });
     pubChannel = ch;
   });
 }
@@ -113,7 +113,7 @@ function publish(exchange, routingKey, content) {
     pubChannel.publish(exchange, routingKey, content,
       { persistent: true },
          function(err, ok) {
-           closeOnErr(err);
+           if (closeOnErr(err)) return;
          });
   } catch (e) {
     console.error("[AMQP] publish", e.message);
@@ -122,27 +122,28 @@ function publish(exchange, routingKey, content) {
 
 // A worker that acks messages only if processed succesfully
 function startConsumer() {
-  amqpConn.createChannel(function(err, ch) {
+  amqpConn.createConfirmChannel(function(err, ch) {
     if (closeOnErr(err)) return;
-    ch.on("error", function(err) {
-      console.error("[AMQP] channel error", err.message);
-    });
-    ch.on("close", function() {
-      console.log("[AMQP] channel closed");
-    });
-    ch.prefetch(PREFETCH_MSGS_VALUE);
-    ch.assertQueue(CERTIFY_TOPIC, { durable: true }, function(err, _ok) {
+
+    lisChannel = ch;
+    var exchange = CERTIFY_TOPIC;
+    var queueName = CERTIFY_TOPIC_QUEUE;
+
+    lisChannel.assertExchange(CERTIFY_TOPIC_QUEUE, 'fanout', { durable: true });
+    lisChannel.prefetch(PREFETCH_MSGS_VALUE);
+    lisChannel.assertQueue(queueName, { durable: true }, function(err, q) {
       if (closeOnErr(err)) return;
-      ch.consume(CERTIFY_TOPIC, processMsg, { noAck: false });
+      lisChannel.bindQueue(q.queue, exchange, '');
+      lisChannel.consume(q.queue, processMsg, { noAck: false });
     });
 
     function processMsg(msg) {
       signCert(msg, function(ok) {
         try {
           if (ok)
-            ch.ack(msg);
+            lisChannel.ack(msg);
           else
-            ch.reject(msg, true);
+            lisChannel.reject(msg, true);
         } catch (e) {
           closeOnErr(e);
         }

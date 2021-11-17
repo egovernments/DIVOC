@@ -2,7 +2,7 @@ package services
 
 import (
 	"encoding/json"
-
+	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/swagger_gen/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
@@ -52,21 +52,19 @@ func StartEnrollmentACKConsumerOnChannel() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	go func() {
-		msgs, err := ch.Consume(
-			config.Config.Rabbitmq.EnrollmentACKTopic, // queue
-			"",    // consumer
-			true,  // auto-ack
-			false, // exclusive
-			false, // no-local
-			false, // no-wait
-			nil,   // args
-		)
-		failOnError(err, "Failed to register a consumer for EnrollmentACKTopic")
 
-		for msg := range msgs {
-			processEnrollmentAckMsg(msg.Body, msg.Exchange)
-			ch.Ack(msg.DeliveryTag, false)
+	go func() {
+
+		msgs, err := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.EnrollmentACKTopic,
+			"enrollment_ack_certify")
+		if err != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", err)
+		} else {
+			for msg := range msgs {
+				processEnrollmentAckMsg(msg.Body, msg.Exchange)
+				ch.Ack(msg.DeliveryTag, false)
+			}
 		}
 	}()
 }

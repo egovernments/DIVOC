@@ -2,6 +2,7 @@ package services
 
 import (
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/divoc/api/config"
@@ -57,19 +58,13 @@ func InitializeRabbitmq() {
 	}()
 
 	go func() {
-		msgs, err := ch.Consume(
-			config.Config.Rabbitmq.CertifyAck, // queue
-			"",                                // consumer
-			true,                              // auto-ack
-			false,                             // exclusive
-			false,                             // no-local
-			false,                             // no-wait
-			nil,                               // args
-		)
-		failOnError(err, "Failed to register a consumer for CertifyAck")
-
-		if err == nil {
-			for msg := range msgs {
+		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifyAck,
+			"certify_ack")
+		if cErr != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", cErr)
+		} else {
+			for msg := range certifyAckMsgs {
 				var message map[string]string
 				json.Unmarshal(msg.Body, &message)
 				// check the status
@@ -97,9 +92,6 @@ func InitializeRabbitmq() {
 					}
 				}
 			}
-		} else {
-			// The client will automatically try to recover from all errors.
-			log.Infof("Consumer error: %v \n", err)
 		}
 	}()
 	//Unlike kafka_service, we'll not be logging producer events
@@ -118,19 +110,12 @@ func StartEventProducerOnChannel(ch *amqp.Channel) {
 
 func startCertificateRevocationConsumerOnChannel(ch *amqp.Channel) {
 	go func() {
-
-		certifiedMsgs, err := ch.Consume(
-			config.Config.Rabbitmq.Certified, // queue
-			"",                               // consumer
-			true,                             // auto-ack
-			false,                            // exclusive
-			false,                            // no-local
-			false,                            // no-wait
-			nil,                              // args
-		)
-		failOnError(err, "Failed to register a consumer for Certified")
-
-		if err == nil {
+		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.Certified,
+			"certificate_revocation")
+		if cErr != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", cErr)
+		} else {
 			for msg := range certifiedMsgs {
 				var message models.CertifiedMessage
 				if err := json.Unmarshal(msg.Body, &message); err == nil {
@@ -152,9 +137,6 @@ func startCertificateRevocationConsumerOnChannel(ch *amqp.Channel) {
 				}
 				ch.Ack(msg.DeliveryTag, false)
 			}
-		} else {
-			// The client will automatically try to recover from all errors.
-			log.Infof("Consumer error: %v \n", err)
 		}
 	}()
 }
@@ -193,4 +175,49 @@ func failOnError(err error, msg string) {
 		log.Fatalf("%s: %s", msg, err)
 		panic(err)
 	}
+}
+
+func ConsumeFromExchangeUsingQueue(ch *amqp.Channel,
+	exchange string, queue string) (<-chan amqp.Delivery, error) {
+	err := ch.ExchangeDeclare(
+		exchange, // name
+		"fanout",                                  // type
+		true,                                      // durable
+		false,                                     // auto-deleted
+		false,                                     // internal
+		false,                                     // no-wait
+		nil,                                       // arguments
+	)
+	failOnError(err, "Failed to declare exchange "+ exchange)
+
+	q, err := ch.QueueDeclare(
+		queue, // name
+		true,                     // durable
+		false,                    // delete when unused
+		false,                     // exclusive
+		false,                    // no-wait
+		nil,                      // arguments
+	)
+	failOnError(err, "Failed to declare Queue "+ queue)
+
+	err = ch.QueueBind(
+		q.Name,                                    // queue name
+		"",                                        // routing key
+		exchange, // exchange
+		false,
+		nil,
+	)
+	failOnError(err, "Failed to declare Queue "+queue+" Binding with Exchange "+exchange)
+
+	msgs, err := ch.Consume(
+		q.Name, // queue
+		"",     // consumer
+		false,  // auto-ack
+		false,  // exclusive
+		false,  // no-local
+		false,  // no-wait
+		nil,    // args
+	)
+	failOnError(err, "Failed to register a consumer on queue "+queue)
+	return msgs, err
 }

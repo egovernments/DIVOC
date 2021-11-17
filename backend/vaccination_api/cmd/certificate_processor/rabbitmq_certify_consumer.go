@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
 )
@@ -20,19 +21,13 @@ func initAndConsumeFromRabbitmq() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	msgs, err := ch.Consume(
-		config.Config.Rabbitmq.CertifyTopic, // queue
-		"",                                  // consumer
-		true,                                // auto-ack
-		false,                               // exclusive
-		false,                               // no-local
-		false,                               // no-wait
-		nil,                                 // args
-	)
-	failOnError(err, "Failed to register a consumer")
-
-	for msg := range msgs {
-		if err == nil {
+	msgs, cErr := services.ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifyTopic,
+		"certificate_signer")
+	if cErr != nil {
+		// The client will automatically try to recover from all errors.
+		fmt.Printf("Consumer error: %v \n", cErr)
+	} else {
+		for msg := range msgs {
 			fmt.Printf("Message on %s: %s\n", msg.Exchange, string(msg.Body))
 			//valid := validate.AgainstSchema()
 			//if !valid {
@@ -45,9 +40,6 @@ func initAndConsumeFromRabbitmq() {
 				ch.Reject(msg.DeliveryTag, true)
 				log.Errorf("Error in processing the certificate %+v", err)
 			}
-		} else {
-			// The client will automatically try to recover from all errors.
-			fmt.Printf("Consumer error: %v \n", err)
 		}
 	}
 }
