@@ -581,5 +581,4 @@ module.exports = {
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
     certificateAsEUPayload
-    checkIfCertificateGenerated
 };
