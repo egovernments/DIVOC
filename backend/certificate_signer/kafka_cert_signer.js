@@ -25,7 +25,7 @@ const kafka = new Kafka({
 
 const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
-
+// TODO: Move code common between this kafka_cert_signer.js and rabbitmq_cert_signer.js to a third js file
 let signingConfig = {
   publicKeyPem: publicKeyPem,
   privateKeyPem: privateKeyPem,

@@ -57,10 +57,7 @@ function publish(exchange, routingKey, content) {
     pubChannel.publish(exchange, routingKey, content,
        { persistent: true },
          function(err, ok) {
-           if (err) {
-             console.error("[AMQP] publish", err);
-             pubChannel.connection.close();
-           }
+           closeOnErr(err);
          });
   } catch (e) {
     console.error("[AMQP] publish", e.message);

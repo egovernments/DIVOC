@@ -25,7 +25,7 @@ var isConnecting = false;
 
 var amqpConn = null;
 var pubChannel = null;
-
+// TODO: Move code common between this rabbitmq_cert_signer.js and kafka_cert_signer.js to a third js file
 let signingConfig = {
   publicKeyPem: publicKeyPem,
   privateKeyPem: privateKeyPem,
@@ -112,10 +112,7 @@ function publish(exchange, routingKey, content) {
     pubChannel.publish(exchange, routingKey, content,
       { persistent: true },
          function(err, ok) {
-           if (err) {
-             console.error("[AMQP] publish", err);
-             pubChannel.connection.close();
-           }
+           closeOnErr(err);
          });
   } catch (e) {
     console.error("[AMQP] publish", e.message);

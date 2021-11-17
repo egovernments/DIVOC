@@ -15,7 +15,7 @@ import (
 const DEFAULT_ROUTING_KEY = ""
 
 func InitializeRabbitmq() {
-
+	// TODO: Standardize the rabbitmq connection and channel creation from standard url, user and pwd config
 	servers := config.Config.Rabbitmq.RabbitmqServers
 	log.Infof("Using Rabbitmq %s", servers)
 	c, err := amqp.Dial(servers + "?heartbeat=60")
@@ -26,7 +26,7 @@ func InitializeRabbitmq() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	StartEnrollmentACKConsumerOnChannel() //Need to be edited in enrollmentack_consumer.go
+	StartEnrollmentACKConsumerOnChannel()
 	startCertificateRevocationConsumerOnChannel(ch)
 
 	go func() {

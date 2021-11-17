@@ -29,7 +29,7 @@ func InitializeKafka() {
 	if err != nil {
 		panic(err)
 	}
-	StartEnrollmentACKConsumer() //Need to be edited in enrollmentack_consumer.go
+	StartEnrollmentACKConsumer()
 	startCertificateRevocationConsumer(servers)
 	log.Infof("Connected to kafka on %s", servers)
 

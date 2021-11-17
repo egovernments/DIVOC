@@ -81,13 +81,10 @@ services:
         condition: service_started
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: 'rabbitmq'
     ports:
-      - 5672:5672
-      - 15672:15672
-    networks:
-      - rabbitmq_go_net
-    volumes: 
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
       - rabbitmq:/var/lib/rabbitmq/mnesia
   zookeeper:
     image: confluentinc/cp-zookeeper:latest
@@ -127,7 +124,7 @@ services:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: XXX.XX.XX.XX:5672
+      RABBITMQ_SERVER: rabbitmq:5672
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
     healthcheck:
@@ -140,6 +137,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       keycloak:
         condition: service_healthy
   portal_api:
@@ -151,7 +150,7 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: f94b340f-dc2a-4117-b837-9599478058d3
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
@@ -220,7 +219,7 @@ services:
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: XXX.XX.XX.XX:5672
+      RABBITMQ_SERVER: rabbitmq:5672
     depends_on:
       clickhouse-server:
         condition: service_started
@@ -228,10 +227,11 @@ services:
     image: dockerhub/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: rabbitmq:5672
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: f94b340f-dc2a-4117-b837-9599478058d3
+      ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
     depends_on:
       registry:
         condition: service_started
@@ -239,6 +239,7 @@ services:
     image: dockerhub/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: rabbitmq:5672
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
@@ -254,10 +255,13 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
   test_certificate_signer:
     image: dockerhub/test_certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: rabbitmq:5672
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
@@ -271,6 +275,8 @@ services:
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
     depends_on:
       kafka:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
   nginx:
     image: dockerhub/nginx
@@ -291,17 +297,20 @@ services:
       - "8765:8765"
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: XXX.XX.XX.XX:5672
+      RABBITMQ_SERVER: rabbitmq:5672
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
     depends_on:
       kafka:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
   digilocker_support_api:
     image: dockerhub/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: rabbitmq:5672
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
@@ -319,6 +328,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       keycloak:
         condition: service_healthy
   certificate_api:
@@ -328,6 +339,7 @@ services:
     environment:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: rabbitmq:5672
       REGISTRY_URL: "http://registry:8081"
       AUTH_PUBLIC_KEY: |
         -----BEGIN PUBLIC KEY-----
@@ -342,9 +354,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-networks:
-  rabbitmq_go_net:
-    driver: bridge
+      rabbitmq:
+        condition: service_healthy
 volumes:
   rabbitmq:
     driver: local
