@@ -70,7 +70,7 @@ async function initRabbitmqCertSigner() {
     isConnecting = false;
     if (err) {
       console.error("[AMQP]", err.message);
-      return setTimeout(initRabbitmq, 1000);
+      return setTimeout(initRabbitmqCertSigner, 1000);
     }
     conn.on("error", function(err) {
       if (err.message !== "Connection closing") {
@@ -79,7 +79,7 @@ async function initRabbitmqCertSigner() {
     });
     conn.on("close", function() {
       console.error("[AMQP] reconnecting");
-      return setTimeout(initRabbitmq, 1000);
+      return setTimeout(initRabbitmqCertSigner, 1000);
     });
     console.log("[AMQP] connected");
     amqpConn = conn;
@@ -88,9 +88,10 @@ async function initRabbitmqCertSigner() {
 }
 
 function whenConnected() {
-  await signer.init_signer(signingConfig, transformW3, documentLoader);
-  startPublisher();
-  startConsumer();
+  signer.init_signer(signingConfig, transformW3, documentLoader).then(r => {
+    startPublisher();
+    startConsumer();
+  } );
 }
 
 function startPublisher() {
@@ -154,16 +155,16 @@ async function signCert(message, cb) {
   console.time("certify");
   let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
   let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
-  let msg = message.value.toString();
+  let msgVal = message.value.toString();
 
   console.log({
-    value: msg,
+    value: msgVal,
     uploadId: uploadId,
     rowId: rowId,
   });
   let jsonMessage = {};
   try {
-    jsonMessage = JSON.parse(msg);
+    jsonMessage = JSON.parse(msgVal);
     const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
     const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
     const programId = R.pathOr("", ["programId"], jsonMessage);

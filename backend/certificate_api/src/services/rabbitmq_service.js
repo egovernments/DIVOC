@@ -1,4 +1,3 @@
-# Access the callback-based API
 const amqp = require('amqplib/callback_api');
 const config = require('./config/config');
 const {RABBITMQ_SERVER} = require('../../configs/config');
@@ -17,7 +16,7 @@ async function initRabbitmq() {
     isConnecting = false;
     if (err) {
       console.error("[AMQP]", err.message);
-      return setTimeout(start, 1000);
+      return setTimeout(initRabbitmq, 1000);
     }
     conn.on("error", function(err) {
       if (err.message !== "Connection closing") {
@@ -26,7 +25,7 @@ async function initRabbitmq() {
     });
     conn.on("close", function() {
       console.error("[AMQP] reconnecting");
-      return setTimeout(start, 1000);
+      return setTimeout(initRabbitmq, 1000);
     });
     console.log("[AMQP] connected");
     amqpConn = conn;

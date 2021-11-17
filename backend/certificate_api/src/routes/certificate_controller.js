@@ -32,7 +32,7 @@ const sendEvents =(() => {
     default:
       console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
       return null;
-  })();
+  }})();
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],

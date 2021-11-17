@@ -10,6 +10,7 @@ import (
 
 var messages = make(chan Message)
 var enrollmentMessages = make(chan Message)
+var testMessages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
@@ -38,6 +39,14 @@ func InitializeCommunication() {
 
 func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
 	messages <- Message{
+		UploadId: uploadId,
+		rowId:    rowId,
+		payload:  string(message),
+	}
+}
+
+func PublishTestCertifyMessage(message []byte, uploadId []byte, rowId []byte) {
+	testMessages <- Message{
 		UploadId: uploadId,
 		rowId:    rowId,
 		payload:  string(message),
