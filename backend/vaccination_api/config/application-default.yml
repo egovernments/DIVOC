@@ -15,7 +15,7 @@ kafka:
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
 rabbitmq:
-  rabbitmqServers: amqp://guest:guest@localhost:5672/
+  rabbitmqServers: amqp://guest:guest@rabbitmq:5672/
   certifyTopic: certify
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
@@ -46,3 +46,6 @@ auth:
     57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
     OQIDAQAB
     -----END PUBLIC KEY-----
+  communicationMode:
+    mode:
+      communicationMode: "rabbitmq"

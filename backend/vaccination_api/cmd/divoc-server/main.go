@@ -67,10 +67,13 @@ func initCommunication() {
 	switch config.Config.CommunicationMode.Mode {
 	case CommunicationModeRabbitmq:
 		services.InitializeRabbitmq()
+		break
 	case CommunicationModeKafka:
 		services.InitializeKafka()
+		break
 	case CommunicationModeRestapi:
 		log.Errorf("Rest-API communication mode isn not supported yet")
+		break
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
 	}

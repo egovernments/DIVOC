@@ -20,18 +20,21 @@ type Message struct {
 	payload  string
 }
 
-const COMMUNICATION_MODE_RABBITMQ = "rabbitmq"
-const COMMUNICATION_MODE_KAFKA = "kafka"
-const COMMUNICATION_MODE_RESTAPI = "restapi"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
 
 func InitializeCommunication() {
 	switch config.Config.CommunicationMode.Mode {
-	case COMMUNICATION_MODE_RABBITMQ:
+	case CommunicationModeRabbitmq:
 		InitializeRabbitmq()
-	case COMMUNICATION_MODE_KAFKA:
+		break
+	case CommunicationModeKafka:
 		InitializeKafka()
-	case COMMUNICATION_MODE_RESTAPI:
+		break
+	case CommunicationModeRestapi:
 		log.Errorf("Rest-API communication mode isn not supported yet")
+		break
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
 	}

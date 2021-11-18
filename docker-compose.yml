@@ -81,6 +81,11 @@ services:
         condition: service_started
   rabbitmq:
     image: rabbitmq:3-management-alpine
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -124,7 +129,7 @@ services:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
     healthcheck:
@@ -219,7 +224,7 @@ services:
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
     depends_on:
       clickhouse-server:
         condition: service_started
@@ -227,7 +232,7 @@ services:
     image: dockerhub/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
@@ -239,7 +244,7 @@ services:
     image: dockerhub/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
@@ -261,7 +266,7 @@ services:
     image: dockerhub/test_certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       REDIS_URL: redis://redis:6379
@@ -297,7 +302,7 @@ services:
       - "8765:8765"
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
@@ -310,7 +315,7 @@ services:
     image: dockerhub/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
@@ -339,7 +344,7 @@ services:
     environment:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      RABBITMQ_SERVER: rabbitmq:5672
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       REGISTRY_URL: "http://registry:8081"
       AUTH_PUBLIC_KEY: |
         -----BEGIN PUBLIC KEY-----

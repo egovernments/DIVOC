@@ -64,20 +64,24 @@ type CertifyMessage struct {
 	} `json:"vaccinator"`
 }
 
-const COMMUNICATION_MODE_RABBITMQ = "rabbitmq"
-const COMMUNICATION_MODE_KAFKA = "kafka"
-const COMMUNICATION_MODE_RESTAPI = "restapi"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
 
 func main() {
 	switch config.Config.CommunicationMode.Mode {
-	case COMMUNICATION_MODE_RABBITMQ:
+	case CommunicationModeRabbitmq:
 		initAndConsumeFromRabbitmq()
-	case COMMUNICATION_MODE_KAFKA:
+		break
+	case CommunicationModeKafka:
 		initAndConsumeFromKafka()
-	case COMMUNICATION_MODE_RESTAPI:
+		break
+	case CommunicationModeRestapi:
 		log.Errorf("Rest-API communication mode isn not supported yet")
+		break
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+		break
 	}
 }
 

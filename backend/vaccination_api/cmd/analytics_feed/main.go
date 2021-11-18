@@ -465,14 +465,14 @@ func initCommunication() bool {
 	switch config.Config.CommunicationMode.Mode {
 	case CommunicationModeRabbitmq:
 		log.Errorf("RabbitMQ communication mode for analytics_feed is not supported yet")
-		return false;
+		return false
 	case CommunicationModeKafka:
-		return true;
+		return true
 	case CommunicationModeRestapi:
 		log.Errorf("Rest-API communication mode isn not supported yet")
-		return false;
+		return false
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
-		return false;
+		return false
 	}
 }

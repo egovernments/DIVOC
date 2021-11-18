@@ -42,18 +42,17 @@ func StartEnrollmentACKConsumer() {
 }
 
 func StartEnrollmentACKConsumerOnChannel() {
-	servers := config.Config.Rabbitmq.RabbitmqServers
-	log.Infof("Using Rabbitmq %s", servers)
-	c, err := amqp.Dial(servers + "?heartbeat=60")
-	failOnError(err, "Failed to connect to RabbitMQ")
-	defer c.Close()
-
-	ch, err := c.Channel()
-	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
-
-
 	go func() {
+
+		servers := config.Config.Rabbitmq.RabbitmqServers
+		log.Infof("Using Rabbitmq %s", servers)
+		c, err := amqp.Dial(servers + "?heartbeat=60")
+		failOnError(err, "Failed to connect to RabbitMQ")
+		defer c.Close()
+
+		ch, err := c.Channel()
+		failOnError(err, "Failed to open a channel")
+		defer ch.Close()
 
 		msgs, err := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.EnrollmentACKTopic,
 			"enrollment_ack_certify", DEFAULT_EXCHANGE_KIND)

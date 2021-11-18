@@ -3,6 +3,7 @@ const {initKafa} = require("./src/services/kafka_service");
 const {initRabbitmq} = require("./src/services/rabbitmq_service");
 
 const http = require('http');
+const config = require("../certificate_signer/config/config");
 const {KeycloakFactory} = require("./src/services/keycloak_service");
 
 const port = process.env.PORT || 4321;
@@ -41,21 +42,15 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(port, async () => {
-    switch (config.COMMUNICATION_MODE) {
-      case config.COMMUNICATION_MODE_RABBITMQ:
-        console.log('Choosen mode is RabbitMQ');
+    if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_RABBITMQ) {
+        console.log('Chosen mode is RabbitMQ');
         await initRabbitmq();
-        break;
-      case config.COMMUNICATION_MODE_KAFKA:
-        console.log('Choosen mode is Kafka');
+    } else if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_KAFKA) {
+        console.log('Chosen mode is Kafka');
         await initKafa();
-        break;
-      case config.COMMUNICATION_MODE_RESTAPI:
-        console.log('Choosen mode is Rest-APIs');
-        console.error('Rest-API communication mode isn\'t supported yet');
-        break;
-      default:
+    } else {
         console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
+        return null;
     }
     await KeycloakFactory.getPublicKey();
     console.log(`Server listening on port ${port}`);
