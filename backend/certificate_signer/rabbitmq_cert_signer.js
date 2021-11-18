@@ -14,8 +14,8 @@ const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
 const {RABBITMQ_SERVER} = require("./config/config");
-const {ERROR_CERTIFICATE_TOPIC} = require("../test_certificate_signer/config/config");
-const {CERTIFY_TOPIC} = require("../test_certificate_signer/config/config");
+const {ERROR_CERTIFICATE_TOPIC} = require("./config/config");
+const {CERTIFY_TOPIC} = require("./config/config");
 const {CERTIFY_TOPIC_QUEUE} = require("./config/config");
 const {publicKeyPem, privateKeyPem} = require('./config/keys');
 

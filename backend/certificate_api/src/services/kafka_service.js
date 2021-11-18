@@ -1,5 +1,5 @@
 const {Kafka} = require('kafkajs');
-const config = require('./config/config');
+const config = require('../../configs/config');
 const {KAFKA_BOOTSTRAP_SERVER} = require('../../configs/config');
 const EVENTS_TOPIC = config.EVENTS_TOPIC;
 
