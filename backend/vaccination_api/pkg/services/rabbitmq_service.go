@@ -14,6 +14,7 @@ import (
 )
 
 const DEFAULT_ROUTING_KEY = ""
+const DEFAULT_EXCHANGE_KIND = "fanout"
 
 func InitializeRabbitmq() {
 	// TODO: Standardize the rabbitmq connection and channel creation from standard url, user and pwd config
@@ -59,7 +60,7 @@ func InitializeRabbitmq() {
 
 	go func() {
 		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifyAck,
-			"certify_ack")
+			"certify_ack", DEFAULT_EXCHANGE_KIND)
 		if cErr != nil {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", cErr)
@@ -111,7 +112,7 @@ func StartEventProducerOnChannel(ch *amqp.Channel) {
 func startCertificateRevocationConsumerOnChannel(ch *amqp.Channel) {
 	go func() {
 		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.Certified,
-			"certificate_revocation")
+			"certificate_revocation", DEFAULT_EXCHANGE_KIND)
 		if cErr != nil {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", cErr)
@@ -178,10 +179,10 @@ func failOnError(err error, msg string) {
 }
 
 func ConsumeFromExchangeUsingQueue(ch *amqp.Channel,
-	exchange string, queue string) (<-chan amqp.Delivery, error) {
+	exchange string, queue string, exchangeKind string) (<-chan amqp.Delivery, error) {
 	err := ch.ExchangeDeclare(
 		exchange, // name
-		"fanout",                                  // type
+		exchangeKind,                                  // type
 		true,                                      // durable
 		false,                                     // auto-deleted
 		false,                                     // internal

@@ -56,7 +56,7 @@ func StartEnrollmentACKConsumerOnChannel() {
 	go func() {
 
 		msgs, err := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.EnrollmentACKTopic,
-			"enrollment_ack_certify")
+			"enrollment_ack_certify", DEFAULT_EXCHANGE_KIND)
 		if err != nil {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)

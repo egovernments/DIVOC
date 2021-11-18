@@ -22,7 +22,7 @@ func initAndConsumeFromRabbitmq() {
 	defer ch.Close()
 
 	msgs, cErr := services.ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifyTopic,
-		"certificate_signer")
+		"certificate_signer", services.DEFAULT_EXCHANGE_KIND)
 	if cErr != nil {
 		// The client will automatically try to recover from all errors.
 		fmt.Printf("Consumer error: %v \n", cErr)
