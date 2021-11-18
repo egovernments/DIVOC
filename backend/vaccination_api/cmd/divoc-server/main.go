@@ -15,9 +15,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const COMMUNICATION_MODE_RABBITMQ = "rabbitmq"
-const COMMUNICATION_MODE_KAFKA = "kafka"
-const COMMUNICATION_MODE_RESTAPI = "restapi"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
 
 func main() {
 	config.Initialize()
@@ -65,11 +65,11 @@ func main() {
 
 func initCommunication() {
 	switch config.Config.CommunicationMode.Mode {
-	case COMMUNICATION_MODE_RABBITMQ:
+	case CommunicationModeRabbitmq:
 		services.InitializeRabbitmq()
-	case COMMUNICATION_MODE_KAFKA:
+	case CommunicationModeKafka:
 		services.InitializeKafka()
-	case COMMUNICATION_MODE_RESTAPI:
+	case CommunicationModeRestapi:
 		log.Errorf("Rest-API communication mode isn not supported yet")
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)

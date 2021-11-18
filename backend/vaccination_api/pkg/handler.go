@@ -17,7 +17,7 @@ import (
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
-	kafkaService "github.com/divoc/api/pkg/services"
+	communicationService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
 	"github.com/divoc/api/swagger_gen/restapi/operations/certification"
@@ -321,9 +321,9 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
-				kafkaService.PublishWalkEnrollment(enrollmentMsg)
+				communicationService.PublishWalkEnrollment(enrollmentMsg)
 			} else {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				communicationService.PublishCertifyMessage(jsonRequestString, nil, nil)
 			}
 		}
 	}
@@ -368,9 +368,9 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
 				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
-				kafkaService.PublishWalkEnrollment(enrollmentMsg)
+				communicationService.PublishWalkEnrollment(enrollmentMsg)
 			} else {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				communicationService.PublishCertifyMessage(jsonRequestString, nil, nil)
 			}
 		}
 	}
@@ -383,7 +383,7 @@ func testCertify(params certification.TestCertifyParams, principal *models.JWTCl
 	for _, request := range params.Body {
 		log.Infof("CertificationRequest: %+v\n", request)
 		if jsonRequestString, err := json.Marshal(request); err == nil {
-			kafkaService.PublishTestCertifyMessage(jsonRequestString, nil, nil)
+			communicationService.PublishTestCertifyMessage(jsonRequestString, nil, nil)
 		}
 	}
 	return certification.NewCertifyOK()
@@ -432,7 +432,7 @@ func bulkCertify(params certification.BulkCertifyParams, principal *models.JWTCl
 func eventsHandler(params operations.EventsParams) middleware.Responder {
 	preferredUsername := getUserName(params.HTTPRequest)
 	for _, e := range params.Body {
-		kafkaService.PublishEvent(eventsModel.Event{
+		communicationService.PublishEvent(eventsModel.Event{
 			Date:          time.Time(e.Date),
 			Source:        preferredUsername,
 			TypeOfMessage: e.Type,
@@ -545,7 +545,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 				meta["certificateType"] = CERTIFICATE_TYPE_V2
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				communicationService.PublishCertifyMessage(jsonRequestString, nil, nil)
 			}
 		} else {
 			log.Infof("Certificate update request rejected %+v", request)
@@ -573,7 +573,7 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 				meta["certificateType"] = CERTIFICATE_TYPE_V3
 			}
 			if jsonRequestString, err := json.Marshal(request); err == nil {
-				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
+				communicationService.PublishCertifyMessage(jsonRequestString, nil, nil)
 			}
 		} else {
 			log.Infof("Certificate update request rejected %+v", request)

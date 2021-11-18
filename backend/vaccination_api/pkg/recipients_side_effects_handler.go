@@ -2,7 +2,7 @@ package pkg
 
 import (
 	eventModels "github.com/divoc/api/pkg/models"
-	kafkaService "github.com/divoc/api/pkg/services"
+	communicationService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/kernel_library/services"
@@ -33,7 +33,7 @@ func createReportedSideEffects(params report_side_effects.CreateReportedSideEffe
 			RecipientCertificateId: params.Body.CertificateID,
 			Date:                   time.Now(),
 		}
-		kafkaService.PublishReportedSideEffects(event)
+		communicationService.PublishReportedSideEffects(event)
 	}
 	return report_side_effects.NewCreateReportedSideEffectsOK()
 }

@@ -17,6 +17,9 @@ import (
 )
 
 const tableNameEvents = "eventsv2"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
 
 type CertifyMessage struct {
 	Facility struct {
@@ -53,6 +56,9 @@ type CertifyMessage struct {
 
 func main() {
 	config.Initialize()
+	if !initCommunication() {
+		return
+	}
 	log.Infof("Starting analytics collector")
 	connect := initClickhouse()
 	_, err := connect.Exec(`
@@ -453,4 +459,20 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	}
 
 	return nil
+}
+
+func initCommunication() bool {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		log.Errorf("RabbitMQ communication mode for analytics_feed is not supported yet")
+		return false;
+	case CommunicationModeKafka:
+		return true;
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+		return false;
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+		return false;
+	}
 }
