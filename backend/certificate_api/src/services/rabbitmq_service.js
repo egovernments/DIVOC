@@ -1,5 +1,5 @@
 const amqp = require('amqplib/callback_api');
-const config = require('./config/config');
+const config = require('../../configs/config');
 const {RABBITMQ_SERVER} = require('../../configs/config');
 const EVENTS_TOPIC = config.EVENTS_TOPIC;
 const DEFAULT_ROUTING_KEY = "";

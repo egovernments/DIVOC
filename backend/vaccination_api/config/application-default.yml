@@ -47,5 +47,4 @@ auth:
     OQIDAQAB
     -----END PUBLIC KEY-----
   communicationMode:
-    mode:
-      communicationMode: "rabbitmq"
+    mode: "rabbitmq"

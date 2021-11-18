@@ -110,6 +110,6 @@ var Config = struct {
 		RegistrationAPIPublicKey string `yaml:"registrationAPIPublickey" env:"REGISTRATION_API_PUBLIC_KEY"`
 	}
 	CommunicationMode struct {
-		Mode string `default:"rabbitmq" yaml:"communicationMode" env:"COMMUNICATION_MODE"`
+		Mode string `default:"rabbitmq" yaml:"mode" env:"COMMUNICATION_MODE"`
 	}
 }{}
