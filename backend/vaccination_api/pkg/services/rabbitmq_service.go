@@ -3,21 +3,19 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
-
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"github.com/streadway/amqp"
+	"strconv"
 )
 
 const DEFAULT_ROUTING_KEY = ""
 const DEFAULT_EXCHANGE_KIND = "fanout"
 
-func InitializeRabbitmq() {
-	// TODO: Standardize the rabbitmq connection and channel creation from standard url, user and pwd config
+func createNewChannel() *amqp.Channel {
 	servers := config.Config.Rabbitmq.RabbitmqServers
 	log.Infof("Using Rabbitmq %s", servers)
 	c, err := amqp.Dial(servers + "?heartbeat=60")
@@ -28,9 +26,24 @@ func InitializeRabbitmq() {
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
 
-	StartEnrollmentACKConsumerOnChannel()
-	startCertificateRevocationConsumerOnChannel(ch)
+	return ch
+}
 
+func InitializeRabbitmq() {
+	// TODO: Standardize the rabbitmq connection and channel creation from standard url, user and pwd config
+
+	StartEnrollmentACKConsumerOnChannel()
+	startCertificateRevocationConsumerOnChannel(createNewChannel())
+	startCertifyAckConsumerOnChannel(createNewChannel())
+
+	startCertifyTopicProducerOnChannel(createNewChannel())
+	startEnrollmentProducerOnChannel(createNewChannel())
+	StartEventProducerOnChannel(createNewChannel())
+	startReportedSideEffectsTopicProducer(createNewChannel())
+	//Unlike kafka_service, we'll not be logging producer events
+}
+
+func startCertifyTopicProducerOnChannel(ch *amqp.Channel ) {
 	go func() {
 		topic := config.Config.Rabbitmq.CertifyTopic
 		for {
@@ -38,7 +51,9 @@ func InitializeRabbitmq() {
 			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
 		}
 	}()
+}
 
+func startEnrollmentProducerOnChannel(ch *amqp.Channel) {
 	go func() {
 		topic := config.Config.Rabbitmq.EnrollmentTopic
 		for {
@@ -46,9 +61,9 @@ func InitializeRabbitmq() {
 			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
 		}
 	}()
+}
 
-	StartEventProducerOnChannel(ch)
-
+func startReportedSideEffectsTopicProducer(ch *amqp.Channel) {
 	go func() {
 		topic := config.Config.Rabbitmq.ReportedSideEffectsTopic
 		for {
@@ -57,9 +72,11 @@ func InitializeRabbitmq() {
 				amqp.Table(make(map[string]interface{})))
 		}
 	}()
+}
 
+func startCertifyAckConsumerOnChannel(ch *amqp.Channel) {
 	go func() {
-		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifyAck,
+		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue(ch, config.Config.Rabbitmq.CertifyAck,
 			"certify_ack", DEFAULT_EXCHANGE_KIND)
 		if cErr != nil {
 			// The client will automatically try to recover from all errors.
@@ -95,7 +112,6 @@ func InitializeRabbitmq() {
 			}
 		}
 	}()
-	//Unlike kafka_service, we'll not be logging producer events
 }
 
 func StartEventProducerOnChannel(ch *amqp.Channel) {
