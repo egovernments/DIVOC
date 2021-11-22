@@ -15,14 +15,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const CommunicationModeRabbitmq = "rabbitmq"
-const CommunicationModeKafka = "kafka"
-const CommunicationModeRestapi = "restapi"
-
 func main() {
 	config.Initialize()
 	auth.Init()
-	initCommunication()
+	services.InitializeCommunication()
 	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
@@ -61,20 +57,4 @@ func main() {
 		log.Fatalln(err)
 	}
 
-}
-
-func initCommunication() {
-	switch config.Config.CommunicationMode.Mode {
-	case CommunicationModeRabbitmq:
-		services.InitializeRabbitmq()
-		break
-	case CommunicationModeKafka:
-		services.InitializeKafka()
-		break
-	case CommunicationModeRestapi:
-		log.Errorf("Rest-API communication mode isn not supported yet")
-		break
-	default:
-		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
-	}
 }

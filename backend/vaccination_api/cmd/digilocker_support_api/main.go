@@ -750,13 +750,13 @@ func initializeKafka() {
 func initCommunication() bool {
 	switch config.Config.CommunicationMode.Mode {
 	case CommunicationModeRabbitmq:
-		log.Errorf("RabbitMQ communication mode for digilocker isn not supported yet")
+		log.Errorf("RabbitMQ communication mode for digilocker is not supported yet")
 		return false
 	case CommunicationModeKafka:
 		initializeKafka()
 		return true
 	case CommunicationModeRestapi:
-		log.Errorf("Rest-API communication mode isn not supported yet")
+		log.Errorf("Rest-API communication mode is not supported yet")
 		return false
 	default:
 		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)

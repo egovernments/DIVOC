@@ -30,8 +30,6 @@ func createNewChannel() *amqp.Channel {
 }
 
 func InitializeRabbitmq() {
-	// TODO: Standardize the rabbitmq connection and channel creation from standard url, user and pwd config
-
 	StartEnrollmentACKConsumerOnChannel()
 	startCertificateRevocationConsumerOnChannel(createNewChannel())
 	startCertifyAckConsumerOnChannel(createNewChannel())
