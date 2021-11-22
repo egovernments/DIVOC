@@ -69,6 +69,7 @@ const CommunicationModeKafka = "kafka"
 const CommunicationModeRestapi = "restapi"
 
 func main() {
+	config.Initialize()
 	switch config.Config.CommunicationMode.Mode {
 	case CommunicationModeRabbitmq:
 		initAndConsumeFromRabbitmq()

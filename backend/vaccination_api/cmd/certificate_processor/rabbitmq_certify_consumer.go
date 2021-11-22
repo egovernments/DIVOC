@@ -10,7 +10,6 @@ import (
 )
 
 func initAndConsumeFromRabbitmq() {
-	config.Initialize()
 	log.Infof("Starting certificate processor")
 	log.Infof("Using Rabbitmq %s", config.Config.Rabbitmq.RabbitmqServers)
 	c, err := amqp.Dial(config.Config.Rabbitmq.RabbitmqServers + "?heartbeat=60")

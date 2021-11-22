@@ -9,7 +9,6 @@ import (
 )
 
 func initAndConsumeFromKafka() {
-	config.Initialize()
 	log.Infof("Starting certificate processor")
 	log.Infof("Using kafka %s", config.Config.Kafka.BootstrapServers)
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
