@@ -17,7 +17,7 @@ const {RABBITMQ_SERVER} = require("./config/config");
 const {ERROR_CERTIFICATE_TOPIC} = require("./config/config");
 const {CERTIFY_TOPIC} = require("./config/config");
 const {CERTIFY_TOPIC_QUEUE} = require("./config/config");
-const {publicKeyPem, privateKeyPem} = require('./config/keys');
+const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 
 const CERTIFICATE_TYPE_V2 = "certifyV2";
 const CERTIFICATE_TYPE_V3 = "certifyV3";
@@ -34,6 +34,11 @@ var lisChannel = null;
 let signingConfig = {
   publicKeyPem: publicKeyPem,
   privateKeyPem: privateKeyPem,
+
+
+  publicKeyBase58: publicKeyPem,
+  privateKeyBase58: privateKeyPem,
+  keyType: signingKeyType,
 
   RABBITMQ_SERVER: config.RABBITMQ_SERVER,
 
