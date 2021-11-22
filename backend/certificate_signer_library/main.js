@@ -1,4 +1,5 @@
 const {Kafka} = require('kafkajs');
+const amqp = require('amqplib/callback_api');
 const signer = require('./signer');
 const redis = require('./redis');
 const R = require('ramda');
@@ -10,6 +11,8 @@ const INPROGRESS_KEY_EXPIRY_SECS = 5 * 60;
 const CERTIFICATE_INPROGRESS = "P";
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
+const PREFETCH_MSGS_VALUE = 1;
+const DEFAULT_ROUTING_KEY = "";
 
 let config = {
   // publicKeyPem: publicKeyPem,
@@ -39,6 +42,10 @@ let config = {
   // duplicateCertificateTopic: config.DUPLICATE_CERTIFICATE_TOPIC
 };
 
+let isConnecting = false;
+let amqpConn;
+let pubChannel;
+let publish;
 let signingPayloadTransformerFunc;
 
 async function init_signer(conf, signingPayloadTransformer, documentLoader) {
@@ -46,15 +53,60 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
   signingPayloadTransformerFunc = signingPayloadTransformer;
   signer.setDocumentLoader(documentLoader, conf);
   await redis.initRedis(conf);
+  initRegistry(conf.REGISTRY_URL, conf.REGISTRY_CERTIFICATE_SCHEMA)
 
+  if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_RABBITMQ) {
+    console.log('Chosen mode is RabbitMQ');
+    publish = publishToRabbitmq();
+    await initRabbitmqProducer();
+  } else if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_KAFKA) {
+    console.log('Chosen mode is Kafka');
+    publish = publishToKafka();
+    await initKafkaProducer();
+  } else {
+    console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
+    return null;
+  }
+}
+
+async function initRabbitmqProducer() {
+  if (isConnecting)
+    return;
+  isConnecting = true;
+  amqp.connect(config.RABBITMQ_SERVER + "?heartbeat=60", function(err, conn) {
+    isConnecting = false;
+    if (err) {
+      console.error("[AMQP]", err.message);
+      return setTimeout(initRabbitmqProducer, 1000);
+    }
+    conn.on("error", function(err) {
+      if (err.message !== "Connection closing") {
+        console.error("[AMQP] conn error", err.message);
+      }
+    });
+    conn.on("close", function() {
+      console.error("[AMQP] reconnecting");
+      return setTimeout(initRabbitmqProducer, 1000);
+    });
+    console.log("[AMQP] connected");
+    amqpConn = conn;
+    startRabbitmqPublisher();
+  });
+}
+
+function startRabbitmqPublisher() {
+  amqpConn.createConfirmChannel(function(err, ch) {
+    if (closeOnErr(err)) return;
+    pubChannel = ch;
+  });
+}
+
+async function initKafkaProducer() {
   const kafka = new Kafka({
     clientId: 'divoc-cert',
     brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
   });
   producer = kafka.producer({allowAutoTopicCreation: true});
-
-  initRegistry(conf.REGISTRY_URL, conf.REGISTRY_CERTIFICATE_SCHEMA)
-
   await producer.connect();
 }
 
@@ -75,10 +127,8 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
           let errMsg;
           if (res.status === 200) {
             sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
-            producer.send({
-              topic: config.CERTIFIED_TOPIC,
-              messages: [{key: null, value: JSON.stringify(res.signedCertificate)}]
-            });
+            publishToKafka(config.CERTIFIED_TOPIC, null,
+                [{key: null, value: JSON.stringify(res.signedCertificate)}])
           } else {
             errMsg = "error occurred while signing/saving of certificate - " + res.status;
             sendCertifyAck(REGISTRY_FAILED_STATUS, uploadId, rowId, errMsg)
@@ -91,41 +141,10 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
         });
   } else {
     console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
-    await producer.send({
-      topic: config.DUPLICATE_CERTIFICATE_TOPIC,
-      messages: [{
-        key: null,
-        value: JSON.stringify({message: certificateJson.toString(), error: "Duplicate pre-enrollment code"})
-      }]
-    });
-  }
-}
-
-async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
-  if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
-    if (status === REGISTRY_SUCCESS_STATUS) {
-      producer.send({
-        topic: config.CERTIFICATE_ACK_TOPIC,
-        messages: [{
-          key: null,
-          value: JSON.stringify({
-            uploadId: uploadId,
-            rowId: rowId,
-            status: 'SUCCESS',
-            errorMsg: ''
-          })}]})
-    } else if (status === REGISTRY_FAILED_STATUS) {
-      producer.send({
-        topic: config.CERTIFICATE_ACK_TOPIC,
-        messages: [{
-          key: null,
-          value: JSON.stringify({
-            uploadId: uploadId,
-            rowId: rowId,
-            status: 'FAILED',
-            errorMsg: errMsg
-          })}]})
-    }
+    await publishToKafka(config.DUPLICATE_CERTIFICATE_TOPIC, null, [{
+      key: null,
+      value: JSON.stringify({message: certificateJson.toString(), error: "Duplicate pre-enrollment code"})
+    }])
   }
 }
 
@@ -133,6 +152,58 @@ async function signJSON(certificate) {
   return signer.signJSON(certificate)
 }
 
+async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
+  if (config.ENABLE_CERTIFY_ACKNOWLEDGEMENT) {
+    if (status === REGISTRY_SUCCESS_STATUS) {
+      await sendCertAckEvents(config.CERTIFICATE_ACK_TOPIC, DEFAULT_ROUTING_KEY, uploadId, rowId, 'SUCCESS', '');
+    } else if (status === REGISTRY_FAILED_STATUS) {
+      await sendCertAckEvents(config.CERTIFICATE_ACK_TOPIC, DEFAULT_ROUTING_KEY, uploadId, rowId, 'FAILED', errMsg);
+    }
+  }
+}
+
+async function sendCertAckEvents(exchange, routingKey, uploadId, rowId, status, errMsg = "") {
+  let msg = [{
+    key: null, value: JSON.stringify({
+      uploadId: uploadId,
+      rowId: rowId,
+      status: status,
+      errorMsg: errMsg
+    })
+  }];
+
+  await publish(exchange, routingKey, msg);
+}
+
+// method to publish a message, will queue messages internally if the connection is down and resend later
+async function publishToRabbitmq(exchange, routingKey, content) {
+  try {
+    pubChannel.publish(exchange, routingKey, Buffer.from(content),
+        { persistent: true },
+        function(err, ok) {
+          if (closeOnErr(err)) return;
+        });
+  } catch (e) {
+    console.error("[AMQP] publish", e.message);
+  }
+}
+
+async function publishToKafka(topic, routingKey, content) {
+  try {
+    producer.send({
+      topic: topic,
+      messages: content})
+  } catch (e) {
+    console.error("Kafka publish", e.message);
+  }
+}
+
+function closeOnErr(err) {
+  if (!err) return false;
+  console.error("[AMQP] error", err);
+  amqpConn.close();
+  return true;
+}
 
 module.exports = {
   signCertificate,
