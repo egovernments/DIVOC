@@ -222,7 +222,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
 			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB, xmlRequest.DocDetails.Mobile)
-			if certBundle != nil && (certBundle.mobile == xmlRequest.DocDetails.Mobile || strings.TrimSpace(certBundle.name) == strings.TrimSpace(xmlRequest.DocDetails.FullName)) {
+			if certBundle != nil && (certBundle.mobile == xmlRequest.DocDetails.Mobile || strings.TrimSpace(strings.ToLower(certBundle.name)) == strings.TrimSpace(strings.ToLower(xmlRequest.DocDetails.FullName))) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
