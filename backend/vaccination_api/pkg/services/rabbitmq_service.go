@@ -15,35 +15,35 @@ import (
 const DEFAULT_ROUTING_KEY = ""
 const DEFAULT_EXCHANGE_KIND = "fanout"
 
-func createNewChannel() *amqp.Channel {
+func createNewConnectionAndChannel()  (*amqp.Connection, *amqp.Channel) {
 	servers := config.Config.Rabbitmq.RabbitmqServers
 	log.Infof("Using Rabbitmq %s", servers)
 	c, err := amqp.Dial(servers + "?heartbeat=60")
 	failOnError(err, "Failed to connect to RabbitMQ")
-	defer c.Close()
 
 	ch, err := c.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
 
-	return ch
+	return c, ch
 }
 
 func InitializeRabbitmq() {
 	StartEnrollmentACKConsumerOnChannel()
-	startCertificateRevocationConsumerOnChannel(createNewChannel())
-	startCertifyAckConsumerOnChannel(createNewChannel())
+	startCertificateRevocationConsumerOnChannel(createNewConnectionAndChannel())
+	startCertifyAckConsumerOnChannel(createNewConnectionAndChannel())
 
-	startCertifyTopicProducerOnChannel(createNewChannel())
-	startEnrollmentProducerOnChannel(createNewChannel())
-	StartEventProducerOnChannel(createNewChannel())
-	startReportedSideEffectsTopicProducer(createNewChannel())
+	startCertifyTopicProducerOnChannel(createNewConnectionAndChannel())
+	startEnrollmentProducerOnChannel(createNewConnectionAndChannel())
+	StartEventProducerOnChannel(createNewConnectionAndChannel())
+	startReportedSideEffectsTopicProducer(createNewConnectionAndChannel())
 	//Unlike kafka_service, we'll not be logging producer events
 }
 
-func startCertifyTopicProducerOnChannel(ch *amqp.Channel ) {
+func startCertifyTopicProducerOnChannel(c *amqp.Connection, ch *amqp.Channel ) {
 	go func() {
 		topic := config.Config.Rabbitmq.CertifyTopic
+		defer c.Close()
+		defer ch.Close()
 		for {
 			msg := <-messages
 			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
@@ -51,9 +51,11 @@ func startCertifyTopicProducerOnChannel(ch *amqp.Channel ) {
 	}()
 }
 
-func startEnrollmentProducerOnChannel(ch *amqp.Channel) {
+func startEnrollmentProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		topic := config.Config.Rabbitmq.EnrollmentTopic
+		defer c.Close()
+		defer ch.Close()
 		for {
 			msg := <-enrollmentMessages
 			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
@@ -61,9 +63,11 @@ func startEnrollmentProducerOnChannel(ch *amqp.Channel) {
 	}()
 }
 
-func startReportedSideEffectsTopicProducer(ch *amqp.Channel) {
+func startReportedSideEffectsTopicProducer(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		topic := config.Config.Rabbitmq.ReportedSideEffectsTopic
+		defer c.Close()
+		defer ch.Close()
 		for {
 			msg := <-reportedSideEffects
 			publishMsgContent(ch, topic, DEFAULT_ROUTING_KEY, msg,
@@ -72,10 +76,12 @@ func startReportedSideEffectsTopicProducer(ch *amqp.Channel) {
 	}()
 }
 
-func startCertifyAckConsumerOnChannel(ch *amqp.Channel) {
+func startCertifyAckConsumerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue(ch, config.Config.Rabbitmq.CertifyAck,
 			"certify_ack", DEFAULT_EXCHANGE_KIND)
+		defer c.Close()
+		defer ch.Close()
 		if cErr != nil {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", cErr)
@@ -112,9 +118,11 @@ func startCertifyAckConsumerOnChannel(ch *amqp.Channel) {
 	}()
 }
 
-func StartEventProducerOnChannel(ch *amqp.Channel) {
+func StartEventProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		topic := config.Config.Rabbitmq.EventsTopic
+		defer c.Close()
+		defer ch.Close()
 		for {
 			msg := <-events
 			publishMsgContent(ch, topic, DEFAULT_ROUTING_KEY, msg,
@@ -123,10 +131,12 @@ func StartEventProducerOnChannel(ch *amqp.Channel) {
 	}()
 }
 
-func startCertificateRevocationConsumerOnChannel(ch *amqp.Channel) {
+func startCertificateRevocationConsumerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.Certified,
 			"certificate_revocation", DEFAULT_EXCHANGE_KIND)
+		defer c.Close()
+		defer ch.Close()
 		if cErr != nil {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", cErr)
