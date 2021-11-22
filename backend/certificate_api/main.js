@@ -3,7 +3,7 @@ const {initKafa} = require("./src/services/kafka_service");
 const {initRabbitmq} = require("./src/services/rabbitmq_service");
 
 const http = require('http');
-const config = require("../certificate_signer/config/config");
+const config = require("./configs/config");
 const {KeycloakFactory} = require("./src/services/keycloak_service");
 
 const port = process.env.PORT || 4321;
