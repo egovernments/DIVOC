@@ -58,6 +58,7 @@ const setDocumentLoader = (customLoaderMapping, config) => {
     privateKeyPem = config.privateKeyPem;
     maxRetrycount = config.CERTIFICATE_RETRY_COUNT;
     signingKeyType = config?.keyType || KeyType.RSA;
+    config.keyType = signingKeyType;
     publicKey = getPublicKey(config);
     controller = {
         '@context': jsigs.SECURITY_CONTEXT_URL,

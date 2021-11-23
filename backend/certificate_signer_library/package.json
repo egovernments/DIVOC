@@ -14,6 +14,7 @@
     "url": "https://github.com/egovernments/DIVOC/tree/main/backend/certificate_signer_library"
   },
   "dependencies": {
+    "amqplib": "^0.8.0",
     "axios": "^0.21.1",
     "jsonld-signatures": "^6.0.0",
     "kafkajs": "^1.15.0",

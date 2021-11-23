@@ -127,7 +127,7 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
           let errMsg;
           if (res.status === 200) {
             sendCertifyAck(res.data.params.status, uploadId, rowId, res.data.params.errmsg);
-            publishToKafka(config.CERTIFIED_TOPIC, null,
+            publish(config.CERTIFIED_TOPIC, null,
                 [{key: null, value: JSON.stringify(res.signedCertificate)}])
           } else {
             errMsg = "error occurred while signing/saving of certificate - " + res.status;
@@ -141,7 +141,7 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
         });
   } else {
     console.error("Duplicate pre-enrollment code received for certification :" + preEnrollmentCode)
-    await publishToKafka(config.DUPLICATE_CERTIFICATE_TOPIC, null, [{
+    await publish(config.DUPLICATE_CERTIFICATE_TOPIC, null, [{
       key: null,
       value: JSON.stringify({message: certificateJson.toString(), error: "Duplicate pre-enrollment code"})
     }])
