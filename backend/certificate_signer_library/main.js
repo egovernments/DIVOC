@@ -57,12 +57,12 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
 
   if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_RABBITMQ) {
     console.log('Chosen mode is RabbitMQ');
-    publish = publishToRabbitmq();
     await initRabbitmqProducer();
+    publish = publishToRabbitmq;
   } else if (config.COMMUNICATION_MODE === config.COMMUNICATION_MODE_KAFKA) {
     console.log('Chosen mode is Kafka');
-    publish = publishToKafka();
     await initKafkaProducer();
+    publish = publishToKafka;
   } else {
     console.error(`Invalid COMMUNICATION_MODE, ${config.COMMUNICATION_MODE}.`);
     return null;
