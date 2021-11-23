@@ -10,7 +10,7 @@ const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "http
 const ENABLE_FEEDBACK_URL = process.env.ENABLE_FEEDBACK_URL || true;
 
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
-const RABBITMQ_SERVER = process.env.RABBITMQ_SERVER || 'localhost:5672';
+const RABBITMQ_SERVER = process.env.RABBITMQ_SERVER || 'amqp://guest:guest@rabbitmq:5672/';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms
 const CERTIFY_TOPIC_QUEUE = process.env.CERTIFY_TOPIC_QUEUE || 'certify_queue';
 const CERTIFY_TOPIC = process.env.CERTIFY_TOPIC || 'certify';
