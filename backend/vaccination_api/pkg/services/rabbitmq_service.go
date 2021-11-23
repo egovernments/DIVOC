@@ -183,15 +183,13 @@ func publishMsg(pubChannel *amqp.Channel, exchange string, routingKey string,
 func publishMsgContent(pubChannel *amqp.Channel, exchange string, routingKey string,
 	content []byte, headers amqp.Table) (err error) {
 
-	if err := pubChannel.Publish(exchange, routingKey, false, false,
+	pubErr := pubChannel.Publish(exchange, routingKey, false, false,
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(content),
 			Headers:     headers,
-		}); err != nil {
-		log.Errorf("Error while publishing message to %s", exchange)
-	}
-
+		});
+	failOnError(pubErr, "Error while publishing message to "+ exchange)
 	return err
 }
 
