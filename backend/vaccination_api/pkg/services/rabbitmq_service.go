@@ -12,10 +12,10 @@ import (
 	"strconv"
 )
 
-const DEFAULT_ROUTING_KEY = ""
-const DEFAULT_EXCHANGE_KIND = "fanout"
+const DefaultRoutingKey = ""
+const DefaultExchangeKind = "fanout"
 
-func createNewConnectionAndChannel()  (*amqp.Connection, *amqp.Channel) {
+func CreateNewConnectionAndChannel()  (*amqp.Connection, *amqp.Channel) {
 	servers := config.Config.Rabbitmq.RabbitmqServers
 	log.Infof("Using Rabbitmq %s", servers)
 	c, err := amqp.Dial(servers + "?heartbeat=60")
@@ -29,13 +29,13 @@ func createNewConnectionAndChannel()  (*amqp.Connection, *amqp.Channel) {
 
 func InitializeRabbitmq() {
 	StartEnrollmentACKConsumerOnChannel()
-	startCertificateRevocationConsumerOnChannel(createNewConnectionAndChannel())
-	startCertifyAckConsumerOnChannel(createNewConnectionAndChannel())
+	startCertificateRevocationConsumerOnChannel(CreateNewConnectionAndChannel())
+	startCertifyAckConsumerOnChannel(CreateNewConnectionAndChannel())
 
-	startCertifyTopicProducerOnChannel(createNewConnectionAndChannel())
-	startEnrollmentProducerOnChannel(createNewConnectionAndChannel())
-	StartEventProducerOnChannel(createNewConnectionAndChannel())
-	startReportedSideEffectsTopicProducer(createNewConnectionAndChannel())
+	startCertifyTopicProducerOnChannel(CreateNewConnectionAndChannel())
+	startEnrollmentProducerOnChannel(CreateNewConnectionAndChannel())
+	StartEventProducerOnChannel(CreateNewConnectionAndChannel())
+	startReportedSideEffectsTopicProducer(CreateNewConnectionAndChannel())
 	//Unlike kafka_service, we'll not be logging producer events
 }
 
@@ -46,7 +46,7 @@ func startCertifyTopicProducerOnChannel(c *amqp.Connection, ch *amqp.Channel ) {
 		defer ch.Close()
 		for {
 			msg := <-messages
-			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
+			publishMsg(ch, topic, DefaultRoutingKey, msg)
 		}
 	}()
 }
@@ -58,7 +58,7 @@ func startEnrollmentProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 		defer ch.Close()
 		for {
 			msg := <-enrollmentMessages
-			publishMsg(ch, topic, DEFAULT_ROUTING_KEY, msg)
+			publishMsg(ch, topic, DefaultRoutingKey, msg)
 		}
 	}()
 }
@@ -70,7 +70,7 @@ func startReportedSideEffectsTopicProducer(c *amqp.Connection, ch *amqp.Channel)
 		defer ch.Close()
 		for {
 			msg := <-reportedSideEffects
-			publishMsgContent(ch, topic, DEFAULT_ROUTING_KEY, msg,
+			publishMsgContent(ch, topic, DefaultRoutingKey, msg,
 				amqp.Table(make(map[string]interface{})))
 		}
 	}()
@@ -79,7 +79,7 @@ func startReportedSideEffectsTopicProducer(c *amqp.Connection, ch *amqp.Channel)
 func startCertifyAckConsumerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		certifyAckMsgs, cErr := ConsumeFromExchangeUsingQueue(ch, config.Config.Rabbitmq.CertifyAck,
-			"certify_ack", DEFAULT_EXCHANGE_KIND)
+			"certify_ack", DefaultExchangeKind)
 		defer c.Close()
 		defer ch.Close()
 		if cErr != nil {
@@ -125,7 +125,7 @@ func StartEventProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 		defer ch.Close()
 		for {
 			msg := <-events
-			publishMsgContent(ch, topic, DEFAULT_ROUTING_KEY, msg,
+			publishMsgContent(ch, topic, DefaultRoutingKey, msg,
 				amqp.Table(make(map[string]interface{})))
 		}
 	}()
@@ -134,7 +134,7 @@ func StartEventProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 func startCertificateRevocationConsumerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
 		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.Certified,
-			"certificate_revocation", DEFAULT_EXCHANGE_KIND)
+			"certificate_revocation", DefaultExchangeKind)
 		defer c.Close()
 		defer ch.Close()
 		if cErr != nil {

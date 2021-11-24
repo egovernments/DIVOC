@@ -178,7 +178,7 @@ async function sendCertAckEvents(exchange, routingKey, uploadId, rowId, status, 
 // method to publish a message, will queue messages internally if the connection is down and resend later
 async function publishToRabbitmq(exchange, routingKey, content) {
   try {
-    pubChannel.publish(exchange, routingKey, Buffer.from(content),
+    pubChannel.publish(exchange, routingKey, Buffer.from(JSON.stringify(content)),
         { persistent: true },
         function(err, ok) {
           if (closeOnErr(err)) return;

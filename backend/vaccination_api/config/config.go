@@ -66,9 +66,11 @@ var Config = struct {
 	}
 	Rabbitmq struct {
 		RabbitmqServers          string `env:"RABBITMQ_SERVER" yaml:"rabbitmqServers"`
-		Certified                string `default:"certified" yaml:"certifiedtopic"`
+		CertifiedTopic           string `default:"certified" yaml:"certifiedTopic"`
 		CertifyAck               string `default:"certify_ack" yaml:"certifyacktopic"`
 		CertifyTopic             string `default:"certify" yaml:"certifyTopic"`
+		TestCertifyTopic         string `default:"test_certify" yaml:"testCertifyTopic"`
+		TestCertifyACKTopic      string `default:"test_certify_ack" yaml:"testCertifyAckTopic"`
 		EnrollmentTopic          string `default:"enrollment" yaml:"enrollmenttopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`

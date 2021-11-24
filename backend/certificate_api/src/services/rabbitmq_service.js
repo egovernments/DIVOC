@@ -65,7 +65,7 @@ function publish(exchange, routingKey, content) {
 
 function sendEventsViaRabbitmq(event) {
   var msg = [{key: null, value: JSON.stringify(event)}];
-  publish(EVENTS_TOPIC, DEFAULT_ROUTING_KEY, Buffer.from(msg));
+  publish(EVENTS_TOPIC, DEFAULT_ROUTING_KEY, Buffer.from(JSON.stringify(msg)));
 }
 
 function closeOnErr(err) {

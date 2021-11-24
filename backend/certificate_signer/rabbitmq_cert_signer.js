@@ -191,7 +191,7 @@ async function signCert(message, cb) {
     // }
     console.error("ERROR: " + e.message)
     var msg = {key: null, value: JSON.stringify({message: message.value.toString(), error: e.message})};
-    publish(ERROR_CERTIFICATE_TOPIC, DEFAULT_ROUTING_KEY, Buffer.from(msg));
+    publish(ERROR_CERTIFICATE_TOPIC, DEFAULT_ROUTING_KEY, Buffer.from(JSON.stringify(msg)));
   }
   console.timeEnd("certify");
   cb(true);
