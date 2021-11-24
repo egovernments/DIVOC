@@ -170,11 +170,8 @@ func publishMsg(pubChannel *amqp.Channel, exchange string, routingKey string,
 	msg Message) (err error) {
 
 	headers := make(map[string]interface{})
-	//TODO : push below entries into header
-	// headers := {
-	// 	"UploadId": msg.UploadId,
-	// 	"rowId":    msg.rowId,
-	// }
+	headers["UploadId"] = msg.UploadId
+	headers["rowId"] = msg.rowId
 
 	return publishMsgContent(pubChannel, exchange, routingKey, []byte(msg.payload),
 		amqp.Table(headers))
