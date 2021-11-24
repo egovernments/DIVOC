@@ -30,7 +30,15 @@ var Config = struct {
 		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
 		CertifiedTopic            string `default:"certified" yaml:"certifiedtopic"`
 	}
-
+	Rabbitmq struct {
+		RabbitmqServers          string `env:"RABBITMQ_SERVER" yaml:"rabbitmqServers"`
+		NotifyTopic               string `default:"notify" yaml:"notifyTopic"`
+		EnrollmentTopic           string `default:"enrollment" yaml:"enrollmenttopic"`
+		EnrollmentACKTopic        string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
+		AppointmentAckTopic       string `default:"appointment_ack" yaml:"appointmentacktopic"`
+		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
+		CertifiedTopic            string `default:"certified" yaml:"certifiedtopic"`
+	}
 	EnrollmentCreation struct {
 		MaxRetryCount                    int `default:"10" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode   int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
@@ -45,6 +53,9 @@ var Config = struct {
 		ChannelSize    int `default:"100"`
 		ChannelWorkers int `default:"10"`
 		ScheduleDays   int `default:"100"`
+	}
+	CommunicationMode struct {
+		Mode string `yaml:"mode" env:"COMMUNICATION_MODE" default:"rabbitmq" `
 	}
 	MockOtp                      bool   `default:"true" env:"MOCK_OTP"`
 	MinCancellationHours         int    `default:"24"`
