@@ -24,6 +24,7 @@ require (
 	github.com/mitchellh/mapstructure v1.3.2
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/sirupsen/logrus v1.7.0
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/net v0.0.0-20200602114024-627f9648deb9
 	golang.org/x/sys v0.0.0-20201116194326-cc9327a14d48 // indirect
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2

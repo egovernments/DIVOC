@@ -15,9 +15,13 @@ import (
 	"github.com/jessevdk/go-flags"
 )
 
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
+
 func main() {
 	config.Initialize()
-	services.InitializeKafka()
+	initializeCommunication()
 	pkg.InitClickHouseConnection()
 	kernelServices.InitializeFlagr()
 	db.Init()
@@ -58,4 +62,20 @@ func main() {
 		log.Fatalln(err)
 	}
 
+}
+
+func initializeCommunication() {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		services.InitializeRabbitmq()
+		break
+	case CommunicationModeKafka:
+		services.InitializeKafka()
+		break
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+		break
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+	}
 }
