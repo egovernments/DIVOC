@@ -133,7 +133,7 @@ func StartEventProducerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 
 func startCertificateRevocationConsumerOnChannel(c *amqp.Connection, ch *amqp.Channel) {
 	go func() {
-		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.Certified,
+		certifiedMsgs, cErr := ConsumeFromExchangeUsingQueue( ch, config.Config.Rabbitmq.CertifiedTopic,
 			"certificate_revocation", DefaultExchangeKind)
 		defer c.Close()
 		defer ch.Close()
