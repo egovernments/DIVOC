@@ -158,8 +158,11 @@ services:
       ADMIN_API_CLIENT_SECRET: 20dc0bc2-1aa4-4ca3-9808-aabfc50b1d6c
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
     depends_on:
       kafka:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
       keycloak:
         condition: service_healthy
@@ -174,6 +177,7 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
       # in min
       CACHE_TTL: 60
       AUTH_PRIVATE_KEY: |
@@ -217,6 +221,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
       keycloak:
         condition: service_healthy
   analytics_feed:
@@ -227,6 +233,10 @@ services:
       RABBITMQ_SERVER: amqp://guest:guest@rabbitmq:5672/
     depends_on:
       clickhouse-server:
+        condition: service_started
+      kafka:
+        condition: service_started
+      rabbitmq:
         condition: service_started
   certificate_processor:
     image: dockerhub/certificate_processor

@@ -14,7 +14,7 @@ const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
 const {RABBITMQ_SERVER} = require("./config/config");
-const {ERROR_CERTIFICATE_TOPIC} = require("./config/config");
+const {DUPLICATE_CERTIFICATE_TOPIC, ERROR_CERTIFICATE_TOPIC} = require("./config/config");
 const {CERTIFY_TOPIC} = require("./config/config");
 const {CERTIFY_TOPIC_QUEUE} = require("./config/config");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
@@ -135,10 +135,13 @@ function startConsumer() {
     if (closeOnErr(err)) return;
 
     lisChannel = ch;
+
+    lisChannel.assertExchange(DUPLICATE_CERTIFICATE_TOPIC, 'fanout', { durable: true });
+    lisChannel.assertExchange(ERROR_CERTIFICATE_TOPIC, 'fanout', { durable: true });
+
     var exchange = CERTIFY_TOPIC;
     var queueName = CERTIFY_TOPIC_QUEUE;
-
-    lisChannel.assertExchange(CERTIFY_TOPIC_QUEUE, 'fanout', { durable: true });
+    lisChannel.assertExchange(exchange, 'fanout', { durable: true });
     lisChannel.prefetch(PREFETCH_MSGS_VALUE);
     lisChannel.assertQueue(queueName, { durable: true }, function(err, q) {
       if (closeOnErr(err)) return;
@@ -163,9 +166,9 @@ function startConsumer() {
 
 async function signCert(message, cb) {
   console.time("certify");
-  let uploadId = message.headers.uploadId ? message.headers.uploadId.toString() : '';
-  let rowId = message.headers.rowId ? message.headers.rowId.toString() : '';
-  let msgVal = message.value.toString();
+  let uploadId = message.properties.headers.uploadId ? message.properties.headers.uploadId.toString() : '';
+  let rowId = message.properties.headers.rowId ? message.properties.headers.rowId.toString() : '';
+  let msgVal = message.content.toString();
 
   console.log({
     value: msgVal,
@@ -182,7 +185,7 @@ async function signCert(message, cb) {
       throw Error("Required parameters not available")
     }
     const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
-    await signer.signCertificate(jsonMessage, message.headers, key);
+    await signer.signCertificate(jsonMessage, message.properties.headers, key);
   } catch (e) {
     // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
     // const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
@@ -190,7 +193,7 @@ async function signCert(message, cb) {
     //   redis.deleteKey(`${preEnrollmentCode}-${currentDose}`) //if retry fails it clears the key -
     // }
     console.error("ERROR: " + e.message)
-    var msg = {key: null, value: JSON.stringify({message: message.value.toString(), error: e.message})};
+    var msg = {key: null, value: JSON.stringify({message: message.content.toString(), error: e.message})};
     publish(ERROR_CERTIFICATE_TOPIC, DEFAULT_ROUTING_KEY, Buffer.from(JSON.stringify(msg)));
   }
   console.timeEnd("certify");

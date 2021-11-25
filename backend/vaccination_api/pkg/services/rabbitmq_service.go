@@ -169,8 +169,8 @@ func startCertificateRevocationConsumerOnChannel(c *amqp.Connection, ch *amqp.Ch
 func publishMsg(pubChannel *amqp.Channel, exchange string, routingKey string,
 	msg Message) (err error) {
 
-	headers := make(map[string]interface{})
-	headers["UploadId"] = msg.UploadId
+	headers := amqp.Table{}
+	headers["uploadId"] = msg.UploadId
 	headers["rowId"] = msg.rowId
 
 	return publishMsgContent(pubChannel, exchange, routingKey, []byte(msg.payload),
@@ -185,7 +185,7 @@ func publishMsgContent(pubChannel *amqp.Channel, exchange string, routingKey str
 			ContentType: "text/plain",
 			Body:        []byte(content),
 			Headers:     headers,
-		});
+		})
 	failOnError(pubErr, "Error while publishing message to "+ exchange)
 	return err
 }
