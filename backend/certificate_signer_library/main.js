@@ -104,7 +104,7 @@ function startRabbitmqPublisher() {
 async function initKafkaProducer() {
   const kafka = new Kafka({
     clientId: 'divoc-cert',
-    brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
+    brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
   });
   producer = kafka.producer({allowAutoTopicCreation: true});
   await producer.connect();
