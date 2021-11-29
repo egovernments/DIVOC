@@ -43,7 +43,7 @@ func StartEnrollmentACKConsumer() {
 	}
 	go func() {
 		topic := config.Config.Kafka.EnrollmentACKTopic
-		err := consumer.SubscribeTopics([]string{}, nil)
+		err := consumer.SubscribeTopics([]string{topic}, nil)
 		if err != nil {
 			panic(err)
 		}
