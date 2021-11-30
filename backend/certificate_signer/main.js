@@ -86,10 +86,11 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
         const programId = R.pathOr("", ["programId"], jsonMessage);
-        if (preEnrollmentCode === "" || currentDose === "" || programId === "") {
+        const enablePid = JSON.parse(config.ENABLE_PROGRAM_ID_CACHING_KEY)
+        if (preEnrollmentCode === "" || currentDose === "" || (enablePid && programId === "")) {
           throw Error("Required parameters not available")
         }
-        const key = `${preEnrollmentCode}-${programId}-${currentDose}`;
+        const key = enablePid ? `${preEnrollmentCode}-${programId}-${currentDose}` : `${preEnrollmentCode}-${currentDose}`;
         await signer.signCertificate(jsonMessage, message.headers, key);
       } catch (e) {
         // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
