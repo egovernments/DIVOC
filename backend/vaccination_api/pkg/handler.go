@@ -367,7 +367,8 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 
 		if jsonRequestString, err := json.Marshal(request); err == nil {
 			if request.EnrollmentType == models.EnrollmentEnrollmentTypeWALKIN {
-				enrollmentMsg := createEnrollmentFromCertificationRequest(request, principal.FacilityCode)
+				req := convertCertRequestV2ToCertificationRequest(request)
+				enrollmentMsg := createEnrollmentFromCertificationRequest(&req, principal.FacilityCode)
 				kafkaService.PublishWalkEnrollment(enrollmentMsg)
 			} else {
 				kafkaService.PublishCertifyMessage(jsonRequestString, nil, nil)
@@ -375,6 +376,55 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		}
 	}
 	return certification.NewCertifyOK()
+}
+
+func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
+	return models.CertificationRequest{
+		Comorbidities:     requestV2.Comorbidities,
+		EnrollmentType:    requestV2.EnrollmentType,
+		Facility:          &models.CertificationRequestFacility{
+			Address: &models.CertificationRequestFacilityAddress{
+				AddressLine1: requestV2.Facility.Address.AddressLine1,
+				AddressLine2: requestV2.Facility.Address.AddressLine2,
+				Country:      requestV2.Facility.Address.Country,
+				District:     requestV2.Facility.Address.District,
+				Pincode:      requestV2.Facility.Address.Pincode,
+				State:        requestV2.Facility.Address.State,
+			},
+			Name:    requestV2.Facility.Name,
+		},
+		Meta:              requestV2.Meta,
+		PreEnrollmentCode: requestV2.PreEnrollmentCode,
+		ProgramID:         requestV2.ProgramID,
+		Recipient:         &models.CertificationRequestRecipient{
+			Address:     &models.CertificationRequestRecipientAddress{
+				AddressLine1: requestV2.Recipient.Address.AddressLine1,
+				AddressLine2: requestV2.Recipient.Address.AddressLine2,
+				Country:      requestV2.Recipient.Address.Country,
+				District:     requestV2.Recipient.Address.District,
+				Pincode:      requestV2.Recipient.Address.Pincode,
+				State:        requestV2.Recipient.Address.State,
+			},
+			Age:         requestV2.Recipient.Age,
+			Contact:     requestV2.Recipient.Contact,
+			Dob:         requestV2.Recipient.Dob,
+			Gender:      &requestV2.Recipient.Gender,
+			Identity:    requestV2.Recipient.Identity,
+			Name:        requestV2.Recipient.Name,
+			Nationality: requestV2.Recipient.Nationality,
+		},
+		Vaccination:       &models.CertificationRequestVaccination{
+			Batch:          requestV2.Vaccination.Batch,
+			Date:           requestV2.Vaccination.Date,
+			Dose:           requestV2.Vaccination.Dose,
+			EffectiveStart: requestV2.Vaccination.EffectiveStart,
+			EffectiveUntil: requestV2.Vaccination.EffectiveUntil,
+			Manufacturer:   requestV2.Vaccination.Manufacturer,
+			Name:           requestV2.Vaccination.Name,
+			TotalDoses:     requestV2.Vaccination.TotalDoses,
+		},
+		Vaccinator:        &models.CertificationRequestVaccinator{Name:requestV2.Vaccinator.Name},
+	}
 }
 
 func testCertify(params certification.TestCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
