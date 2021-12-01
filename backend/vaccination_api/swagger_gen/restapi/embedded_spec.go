@@ -207,6 +207,40 @@ func init() {
             }
           }
         }
+      },
+      "delete": {
+        "security": [],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "number",
+            "description": "dose for which certificate needs to be revoked",
+            "name": "dose",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found for given beneficiary, dose"
+          }
+        }
       }
     },
     "/v1/certificates/{certificateId}": {
@@ -1651,6 +1685,40 @@ func init() {
             "schema": {
               "type": "object"
             }
+          }
+        }
+      },
+      "delete": {
+        "security": [],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "query",
+            "required": true
+          },
+          {
+            "type": "number",
+            "description": "dose for which certificate needs to be revoked",
+            "name": "dose",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "certificate not found for given beneficiary, dose"
           }
         }
       }

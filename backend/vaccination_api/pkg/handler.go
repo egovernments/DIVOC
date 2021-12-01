@@ -3,12 +3,13 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 
 	eventsModel "github.com/divoc/api/pkg/models"
 
@@ -71,6 +72,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationTestBulkCertifyHandler = certification.TestBulkCertifyHandlerFunc(testBulkCertify)
 	api.CertificationGetTestCertifyUploadsHandler = certification.GetTestCertifyUploadsHandlerFunc(getTestCertifyUploads)
 	api.CertificationGetTestCertifyUploadErrorsHandler = certification.GetTestCertifyUploadErrorsHandlerFunc(getTestCertifyUploadErrors)
+	api.CertificationRevokeCertificateHandler = certification.RevokeCertificateHandlerFunc(revokeCertificate)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -299,7 +301,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
-		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil {
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Invalid Age or DOB. Should be less than current date"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
@@ -346,7 +348,7 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
-		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil {
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Invalid Age or DOB. Should be less than current date"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
@@ -532,7 +534,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -560,7 +562,7 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -586,7 +588,7 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 
 	filter := map[string]interface{}{
-		"preEnrollmentCode":  map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
 			"eq": request.PreEnrollmentCode,
 		},
 	}
@@ -626,7 +628,7 @@ func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
 		if certificate, ok := certificateObj.(map[string]interface{}); ok {
 			var res map[string]interface{}
 			json.Unmarshal([]byte(certificate["certificate"].(string)), &res)
-			if evidences,  found := res["evidence"].([]interface{}); found && len(evidences) > 0{
+			if evidences, found := res["evidence"].([]interface{}); found && len(evidences) > 0 {
 				if doseValue, found := evidences[0].(map[string]interface{})["dose"]; found {
 					if doseValueFloat, ok := doseValue.(float64); ok {
 						if certificateId, found := certificate["certificateId"]; found {
@@ -699,6 +701,120 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
 
+func revokeCertificate(params certification.RevokeCertificateParams) middleware.Responder {
+	if params.PreEnrollmentCode == "" {
+		return certification.NewRevokeCertificateBadRequest()
+	}
+	preEnrollmentCode := params.PreEnrollmentCode
+	dose := params.Dose
+
+	var filter map[string]interface{}
+	filter = map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if dose != nil {
+		filter = map[string]interface{}{
+			"preEnrollmentCode": map[string]interface{}{
+				"eq": preEnrollmentCode,
+			},
+			"dose": map[string]interface{}{
+				"eq": dose,
+			},
+		}
+	}
+	var certificateFailedToAddToRevocationList []string
+	var certificateFailedToDeleteFromVaccCertRegistry []string
+	if response, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
+		log.Printf("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		if listOfCerts, ok := response[CertificateEntity].([]interface{}); ok {
+			if len(listOfCerts) == 0 {
+				return certification.NewRevokeCertificateNotFound()
+			}
+			for _, v := range listOfCerts {
+				if body, ok := v.(map[string]interface{}); ok {
+					certificateId := body["certificateId"].(string)
+					if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
+						log.Printf("Failed to delete vaccination certificate %+v", certificateId)
+						certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
+					} else {
+						var cert map[string]interface{}
+						if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
+							log.Printf("%v", err)
+						}
+						certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
+						log.Printf("dose value : %v, Dose Type : %T", certificateDose["dose"], certificateDose["dose"])
+						err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
+						if err != nil {
+							log.Printf("Failed to add certificate %v to revocation list", certificateId)
+							certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
+						}
+					}
+				}
+			}
+			if len(certificateFailedToAddToRevocationList) > 0 || len(certificateFailedToDeleteFromVaccCertRegistry) > 0 {
+				return NewGenericServerError()
+			}
+			return certification.NewRevokeCertificateOK()
+		} else {
+			log.Printf("Error occurred while extracting the certificates from registry response")
+			return NewGenericServerError()
+		}
+	}
+}
+
+func deleteVaccineCertificate(osid string) error {
+	typeId := "VaccinationCertificate"
+	filter := map[string]interface{}{
+		"osid": osid,
+	}
+	if _, err := services.DeleteRegistry(typeId, filter); err != nil {
+		log.Errorf("Error in deleting vaccination certificate %+v", err)
+		return errors.New("error in deleting vaccination certificate")
+	} else {
+		return nil
+	}
+}
+
+func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) error {
+	typeId := "RevokedCertificate"
+	revokeCertificate := map[string]interface{}{
+		"preEnrollmentCode":     preEnrollmentCode,
+		"dose":                  dose,
+		"previousCertificateId": certificateId,
+	}
+	filter := map[string]interface{}{
+		"previousCertificateId": map[string]interface{}{
+			"eq": certificateId,
+		},
+		"dose": map[string]interface{}{
+			"eq": dose,
+		},
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if resp, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
+		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
+			if len(revokedCertificate) > 0 {
+				log.Infof("%v certificateId already exists in revocation", certificateId)
+				return nil
+			}
+			_, err = services.CreateNewRegistry(revokeCertificate, typeId)
+			if err != nil {
+				log.Infof("Failed saving revoked Certificate %+v", err)
+				return err
+			}
+			log.Infof("%v certificateId added to revocation", certificateId)
+			return nil
+		}
+	}
+	return errors.New("error occurred while adding certificate to revocation list")
+}
+
 func getCertificateByCertificateId(params certification.GetCertificateByCertificateIDParams, principal *models.JWTClaimBody) middleware.Responder {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
@@ -739,7 +855,7 @@ func getCertificateByCertificateId(params certification.GetCertificateByCertific
 func testBulkCertify(params certification.TestBulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	if err := validateTestBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
-		log.Error("Invalid template", err.Error());
+		log.Error("Invalid template", err.Error())
 		code := "INVALID_TEMPLATE"
 		message := err.Error()
 		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{
