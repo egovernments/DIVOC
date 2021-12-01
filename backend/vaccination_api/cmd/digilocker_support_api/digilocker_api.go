@@ -140,17 +140,36 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 			if certBundle != nil {
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
-						log.Errorf("Error in creating certificate pdf %+v", err)
-						go kafkaService.PublishEvent(models.Event{
-							Date:          time.Time{},
-							Source:        "" + xmlRequest.DocDetails.URI,
-							TypeOfMessage: "internal_error",
-							ExtraInfo:     nil,
-						})
-						w.WriteHeader(500)
+					slice := strings.Split(xmlRequest.DocDetails.URI, "-")
+					docType := slice[len(slice)-2]
+					if docType == "IVACR" && verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
+						if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
+							log.Errorf("Error in creating international certificate pdf")
+							go kafkaService.PublishEvent(models.Event{
+								Date:          time.Time{},
+								Source:        "" + xmlRequest.DocDetails.URI,
+								TypeOfMessage: "internal_error",
+								ExtraInfo:     nil,
+							})
+							w.WriteHeader(500)
+						} else {
+							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						}
+					} else if docType == "VACER" {
+						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
+							log.Errorf("Error in creating domestic certificate pdf")
+							go kafkaService.PublishEvent(models.Event{
+								Date:          time.Time{},
+								Source:        "" + xmlRequest.DocDetails.URI,
+								TypeOfMessage: "internal_error",
+								ExtraInfo:     nil,
+							})
+							w.WriteHeader(500)
+						} else {
+							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						}
 					} else {
-						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						log.Errorf("No valid docType present")
 					}
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
@@ -216,20 +235,30 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 			response.ResponseStatus.Ts = xmlRequest.Ts
 			response.ResponseStatus.Txn = xmlRequest.Txn
 			response.ResponseStatus.Status = "0"
-			response.DocDetails.DocType = config.Config.Digilocker.DocType
+			response.DocDetails.DocType = xmlRequest.DocDetails.DocType
 			response.DocDetails.DigiLockerId = xmlRequest.DocDetails.DigiLockerId
 			response.DocDetails.FullName = xmlRequest.DocDetails.FullName
 			response.DocDetails.DOB = xmlRequest.DocDetails.DOB
 
-			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB, xmlRequest.DocDetails.Mobile)
+			certBundle := getCertificate(xmlRequest.DocDetails.TrackingId, xmlRequest.DocDetails.DOB, xmlRequest.DocDetails.Mobile, xmlRequest.DocDetails.DocType)
 			if certBundle != nil && (certBundle.mobile == xmlRequest.DocDetails.Mobile || strings.TrimSpace(strings.ToLower(certBundle.name)) == strings.TrimSpace(strings.ToLower(xmlRequest.DocDetails.FullName))) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
-						log.Errorf("Error in creating certificate pdf")
+					if xmlRequest.DocDetails.DocType == "IVACR" && verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
+						if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
+							log.Errorf("Error in creating international certificate pdf")
+						} else {
+							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						}
+					} else if xmlRequest.DocDetails.DocType == "VACER" {
+						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
+							log.Errorf("Error in creating domastic certificate pdf")
+						} else {
+							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						}
 					} else {
-						response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						log.Errorf("No valid docType present")
 					}
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
@@ -318,6 +347,7 @@ type VaccinationCertificateBundle struct {
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 	slice := strings.Split(uri, "-")
+	docType := slice[len(slice)-2]
 	certificateId := slice[len(slice)-1]
 	certificateFromRegistry, err := getCertificateFromRegistryByCertificateId(certificateId)
 	if err == nil {
@@ -344,7 +374,7 @@ func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 
 				var cert VaccinationCertificateBundle
 				cert.certificateId = latestCertificate["certificateId"].(string)
-				cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
+				cert.Uri = "in.gov.covin-" + docType + "-" + cert.certificateId
 				cert.mobile = latestCertificate["mobile"].(string)
 				cert.name = latestCertificate["name"].(string)
 				cert.certificatesByDoses = certificatesByDoses
@@ -352,15 +382,15 @@ func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 			}
 		}
 	}
-	return returnLatestCertificate(err, certificateFromRegistry, certificateId)
+	return returnLatestCertificate(err, certificateFromRegistry, certificateId, docType)
 }
 
-func getCertificate(preEnrollmentCode string, dob string, mobile string) *VaccinationCertificateBundle {
+func getCertificate(preEnrollmentCode string, dob string, mobile string, docType string) *VaccinationCertificateBundle {
 	certificateFromRegistry, err := getCertificateFromRegistry(preEnrollmentCode)
-	return returnLatestCertificate(err, certificateFromRegistry, preEnrollmentCode)
+	return returnLatestCertificate(err, certificateFromRegistry, preEnrollmentCode, docType)
 }
 
-func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
+func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string, docType string) *VaccinationCertificateBundle {
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		certificateArr = pkg.SortCertificatesByCreateAt(certificateArr)
@@ -370,7 +400,7 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 			log.Infof("certificate resp %v", latestCertificate)
 			var cert VaccinationCertificateBundle
 			cert.certificateId = latestCertificate["certificateId"].(string)
-			cert.Uri = "in.gov.covin-" + "VACER" + "-" + cert.certificateId
+			cert.Uri = "in.gov.covin-" + docType + "-" + cert.certificateId
 			cert.mobile = latestCertificate["mobile"].(string)
 			cert.name = latestCertificate["name"].(string)
 			cert.certificatesByDoses = certificatesByDose
