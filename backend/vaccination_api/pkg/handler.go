@@ -708,21 +708,10 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 	preEnrollmentCode := params.PreEnrollmentCode
 	dose := params.Dose
 
-	var filter map[string]interface{}
-	filter = map[string]interface{}{
+	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
 			"eq": preEnrollmentCode,
 		},
-	}
-	if dose != nil {
-		filter = map[string]interface{}{
-			"preEnrollmentCode": map[string]interface{}{
-				"eq": preEnrollmentCode,
-			},
-			"dose": map[string]interface{}{
-				"eq": dose,
-			},
-		}
 	}
 	var certificateFailedToAddToRevocationList []string
 	var certificateFailedToDeleteFromVaccCertRegistry []string
@@ -734,26 +723,33 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 			if len(listOfCerts) == 0 {
 				return certification.NewRevokeCertificateNotFound()
 			}
+			isCertificateFound := false
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
 					certificateId := body["certificateId"].(string)
-					if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
-						log.Printf("Failed to delete vaccination certificate %+v", certificateId)
-						certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
-					} else {
-						var cert map[string]interface{}
-						if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
-							log.Printf("%v", err)
-						}
-						certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
-						log.Printf("dose value : %v, Dose Type : %T", certificateDose["dose"], certificateDose["dose"])
-						err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
-						if err != nil {
-							log.Printf("Failed to add certificate %v to revocation list", certificateId)
-							certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
+					var cert map[string]interface{}
+					if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
+						log.Printf("%v", err)
+						continue
+					}
+					certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
+					if (dose != nil && *dose == certificateDose["dose"]) || dose == nil {
+						isCertificateFound = true
+						if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
+							log.Printf("Failed to delete vaccination certificate %+v", certificateId)
+							certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
+						} else {
+							err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
+							if err != nil {
+								log.Printf("Failed to add certificate %v to revocation list", certificateId)
+								certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
+							}
 						}
 					}
 				}
+			}
+			if !isCertificateFound {
+				return certification.NewRevokeCertificateNotFound()
 			}
 			if len(certificateFailedToAddToRevocationList) > 0 || len(certificateFailedToDeleteFromVaccCertRegistry) > 0 {
 				return NewGenericServerError()
