@@ -2,8 +2,9 @@ package consumers
 
 import (
 	"encoding/json"
-
+	"fmt"
 	kernelService "github.com/divoc/kernel_library/services"
+
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/services"
@@ -13,7 +14,29 @@ import (
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-func StartRecipientsAppointmentBookingConsumer() {
+func StartRecipientsAppointmentBookingConsumerWithRabbitmq() {
+	c, ch := services.CreateNewConnectionAndChannel()
+	topic := config.Config.Rabbitmq.AppointmentAckTopic
+	queue := topic + services.DefaultQueueSuffix
+	go func() {
+		msgs, cErr := services.ConsumeFromExchangeUsingQueue(ch, topic,
+			queue, services.DefaultExchangeKind)
+		if cErr != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", cErr)
+		} else {
+			defer c.Close()
+			defer ch.Close()
+			for msg := range msgs {
+				processRecipientsAppointmentMessage(topic, msg.Body)
+				processEnrollmentTopicMessage(topic, msg.Body)
+				ch.Ack(msg.DeliveryTag, false)
+			}
+		}
+	}()
+}
+
+func StartRecipientsAppointmentBookingConsumerWithKafka() {
 	servers := config.Config.Kafka.BootstrapServers
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  servers,
@@ -27,7 +50,8 @@ func StartRecipientsAppointmentBookingConsumer() {
 	}
 
 	go func() {
-		err := consumer.SubscribeTopics([]string{config.Config.Kafka.AppointmentAckTopic}, nil)
+		topic := config.Config.Rabbitmq.AppointmentAckTopic
+		err := consumer.SubscribeTopics([]string{topic}, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -38,59 +62,57 @@ func StartRecipientsAppointmentBookingConsumer() {
 				log.Infof("Consumer error: %v \n", err)
 				continue
 			}
-			log.Info("Got the message to book an appointment")
-			var appointmentAckMessage models2.AppointmentAck
-			if err = json.Unmarshal(msg.Value, &appointmentAckMessage); err != nil {
-				log.Info("Unable to serialize the ack message body", err)
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-
-			responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", appointmentAckMessage.EnrollmentOsid)
-			if err != nil {
-				log.Errorf("Error reading osid : %s from registry", appointmentAckMessage.EnrollmentOsid)
-				continue
-			}
-			enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
-			if !ok {
-				log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode)
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-			enrollmentStr, err := json.Marshal(enrollmentResp)
-			if err != nil {
-				log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-
-			var enrollment struct{
-				Osid	string	`json:"osid"`
-				models.Enrollment
-			}
-			if err := json.Unmarshal(enrollmentStr, &enrollment); err != nil {
-				log.Errorf("Error parsing Enrollment to expected format. Enrollment [%s], error [%s]", enrollmentStr, err.Error())
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-
-			if err := findAndUpdateAppointment(&enrollment.Enrollment, appointmentAckMessage); err != nil {
-				log.Error(err.Error())
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-			if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
-				"osid": enrollment.Osid,
-				"appointments": services.DRefAppointments(enrollment.Appointments),
-			}); err != nil {
-				log.Error("Booking appointment failed ", err)
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-			notify(enrollment.Enrollment, appointmentAckMessage)
+			processRecipientsAppointmentMessage(topic, msg.Value)
 			_, _ = consumer.CommitMessage(msg)
 		}
 	}()
+}
+
+func processRecipientsAppointmentMessage(topic string, msgValue []byte) {
+	log.Info("Got the message to book an appointment")
+	var appointmentAckMessage models2.AppointmentAck
+	if err := json.Unmarshal(msgValue, &appointmentAckMessage); err != nil {
+		log.Info("Unable to serialize the ack message body", err)
+		return
+	}
+
+	responseFromRegistry, err := kernelService.ReadRegistry("Enrollment", appointmentAckMessage.EnrollmentOsid)
+	if err != nil {
+		log.Errorf("Error reading osid : %s from registry", appointmentAckMessage.EnrollmentOsid)
+		return
+	}
+	enrollmentResp, ok := responseFromRegistry["Enrollment"].(map[string]interface{})
+	if !ok {
+		log.Errorf("Unable to fetch the Enrollment details for the recipient (%v) ", appointmentAckMessage.EnrollmentCode)
+		return
+	}
+	enrollmentStr, err := json.Marshal(enrollmentResp)
+	if err != nil {
+		log.Errorf("Unable to parse Enrollment details from Entity : %v, error: [%s]", enrollmentResp, err.Error())
+		return
+	}
+
+	var enrollment struct{
+		Osid	string	`json:"osid"`
+		models.Enrollment
+	}
+	if err := json.Unmarshal(enrollmentStr, &enrollment); err != nil {
+		log.Errorf("Error parsing Enrollment to expected format. Enrollment [%s], error [%s]", enrollmentStr, err.Error())
+		return
+	}
+
+	if err := findAndUpdateAppointment(&enrollment.Enrollment, appointmentAckMessage); err != nil {
+		log.Error(err.Error())
+		return
+	}
+	if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
+		"osid": enrollment.Osid,
+		"appointments": services.DRefAppointments(enrollment.Appointments),
+	}); err != nil {
+		log.Error("Booking appointment failed ", err)
+		return
+	}
+	notify(enrollment.Enrollment, appointmentAckMessage)
 }
 
 func findAndUpdateAppointment(enrollment *models.Enrollment, msg models2.AppointmentAck) error {

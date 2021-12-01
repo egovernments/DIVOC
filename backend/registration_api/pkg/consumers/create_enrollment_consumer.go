@@ -2,14 +2,35 @@ package consumers
 
 import (
 	"encoding/json"
-
+	"fmt"
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
 
-func StartEnrollmentConsumer() {
+func StartEnrollmentConsumerWithRabbitmq() {
+	c, ch := services.CreateNewConnectionAndChannel()
+	topic := config.Config.Rabbitmq.EnrollmentTopic
+	queue := topic + services.DefaultQueueSuffix
+	go func() {
+		msgs, cErr := services.ConsumeFromExchangeUsingQueue(ch, topic,
+			queue, services.DefaultExchangeKind)
+		if cErr != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", cErr)
+		} else {
+			defer c.Close()
+			defer ch.Close()
+			for msg := range msgs {
+				processEnrollmentTopicMessage(topic, msg.Body)
+				ch.Ack(msg.DeliveryTag, false)
+			}
+		}
+	}()
+}
+
+func StartEnrollmentConsumerWithKafka() {
 	servers := config.Config.Kafka.BootstrapServers
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  servers,
@@ -21,7 +42,8 @@ func StartEnrollmentConsumer() {
 		log.Errorf("Failed connecting to kafka %+v", err)
 	}
 	go func() {
-		err := consumer.SubscribeTopics([]string{config.Config.Kafka.EnrollmentTopic}, nil)
+		topic := config.Config.Kafka.EnrollmentTopic
+		err := consumer.SubscribeTopics([]string{topic}, nil)
 		if err != nil {
 			panic(err)
 		}
@@ -35,31 +57,33 @@ func StartEnrollmentConsumer() {
 				}
 				continue
 			}
-			log.Info("Got the message to create new enrollment")
-			var enrollment = services.EnrollmentPayload{}
-			if err := json.Unmarshal(msg.Value, &enrollment); err != nil {
-				// Push to error topic
-				log.Info("Unable to serialize the request body", err)
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-			
-			err = services.CreateEnrollment(&enrollment)
-			services.PublishEnrollmentACK(enrollment,err)
-			if err != nil {
-				// Push to error topic
-				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
-				_, _ = consumer.CommitMessage(msg)
-				continue
-			}
-			if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
-				log.Error("Unable to send notification to the enrolled user", err)
-			}
+			processEnrollmentTopicMessage(topic, msg.Value)
 			_, _ = consumer.CommitMessage(msg)
-
 		}
 	}()
+}
+
+func processEnrollmentTopicMessage(topic string, msg []byte) {
+	log.Info("Got the message to create new enrollment")
+	var enrollment = services.EnrollmentPayload{}
+	if err := json.Unmarshal(msg, &enrollment); err != nil {
+		// Push to error topic
+		log.Info("Unable to serialize the request body", err)
+		return
+	}
+	log.Infof("Message on %s: %s \n", topic, string(msg))
+
+	err := services.CreateEnrollment(&enrollment)
+	services.PublishEnrollmentACK(enrollment, err)
+	if err != nil {
+		// Push to error topic
+		log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
+		return
+	}
+	if err := services.NotifyRecipient(enrollment.Enrollment); err != nil {
+		log.Error("Unable to send notification to the enrolled user", err)
+	}
+	return
 }
 
 

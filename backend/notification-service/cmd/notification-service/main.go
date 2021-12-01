@@ -12,10 +12,19 @@ import (
 	"os"
 )
 
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
+
 func main() {
 	services.InitializeFlagr()
 	config.Initialize()
-	consumers.Init()
+	if initComm := initializeCommunication(); initComm == nil {
+		log.Fatalln("Invalid Communication mode specified, shutting down notification service.")
+		return
+	} else {
+		initComm()
+	}
 	log.Infof("Starting certificate processor")
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
@@ -51,5 +60,20 @@ func main() {
 
 	if err := server.Serve(); err != nil {
 		log.Fatalln(err)
+	}
+}
+
+func initializeCommunication() func() {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		return consumers.InitWithRabbitmq
+	case CommunicationModeKafka:
+		return consumers.InitWithKafka
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+		return nil
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+		return nil
 	}
 }

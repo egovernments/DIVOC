@@ -14,6 +14,11 @@ kafka:
   testCertifyTopic: test_certify
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
+rabbitmq:
+  rabbitmqServers: amqp://guest:guest@rabbitmq:5672/
+  certifyTopic: certify
+  eventsTopic: events
+  reportedSideEffectsTopic: reported_side_effects
 database:
   host: localhost
   port: 5432
@@ -41,3 +46,5 @@ auth:
     57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
     OQIDAQAB
     -----END PUBLIC KEY-----
+  communicationMode:
+    mode: "rabbitmq"

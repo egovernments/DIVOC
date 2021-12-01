@@ -1,7 +1,13 @@
 package consumers
 
-func Init() {
-	go certifiedSMSNotificationConsumer()
-	go certifiedEmailNotificationConsumer()
-	go notifyConsumer()
+func InitWithKafka() {
+	go certifiedSMSNotificationConsumerWithKafka()
+	go certifiedEmailNotificationConsumerWithKafka()
+	go notifyConsumerWithKafka()
+}
+
+func InitWithRabbitmq() {
+	go certifiedSMSNotificationConsumerWithRabbitmq()
+	go certifiedEmailNotificationConsumerWithRabbitmq()
+	go notifyConsumerWithRabbitmq()
 }

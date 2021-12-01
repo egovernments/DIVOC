@@ -1,5 +1,7 @@
 const {Kafka} = require('kafkajs');
+const config = require('../../configs/config');
 const {KAFKA_BOOTSTRAP_SERVER} = require('../../configs/config');
+const EVENTS_TOPIC = config.EVENTS_TOPIC;
 
 const kafka = new Kafka({
     clientId: 'certificate_api',
@@ -14,11 +16,11 @@ async function initKafa() {
     console.log("Kafka connected to: " + KAFKA_BOOTSTRAP_SERVER)
 };
 
-function sendEvents(event) {
+function sendEventsViaKafka(event) {
     if (producer) {
         console.log("Sending event to kafka")
         producer.send({
-            topic: "events",
+            topic: EVENTS_TOPIC,
             messages: [{key: null, value: JSON.stringify(event)}]
         });
     } else {
@@ -28,5 +30,5 @@ function sendEvents(event) {
 
 module.exports = {
     initKafa,
-    sendEvents
+    sendEventsViaKafka
 };

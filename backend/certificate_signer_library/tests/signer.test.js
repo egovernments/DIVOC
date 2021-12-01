@@ -1,4 +1,4 @@
-const {signJSON, customLoader, setDocumentLoader} = require('../signer');
+const {signJSON, customLoader, setDocumentLoader, KeyType} = require('../signer');
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
 const {RsaSignature2018} = jsigs.suites;
@@ -139,7 +139,8 @@ let documentLoaderMapping = {};
 documentLoaderMapping[CERTIFICATE_DID] = publicKey;
 documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
 documentLoaderMapping[CERTIFICATE_NAMESPACE] = vaccinationContext;
-setDocumentLoader(documentLoaderMapping, {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, publicKeyPem, privateKeyPem})
+setDocumentLoader(documentLoaderMapping,
+    {CERTIFICATE_DID, CERTIFICATE_PUBKEY_ID, publicKeyPem, privateKeyPem, KeyType})
 
 test('Sign the json', async () => {
   sign = await signJSON(transformW3(cert2));

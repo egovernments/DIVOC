@@ -13,12 +13,16 @@ import (
 	"os"
 )
 
+
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
+
 func main() {
 	config.Initialize()
-	services.InitializeKafka()
+	initializeCommunication()
 	kernelServices.InitializeFlagr()
 	services.InitRedis()
-	consumers.Init()
 
 	services.InitializeAppointmentScheduler()
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
@@ -57,4 +61,22 @@ func main() {
 		log.Fatalln(err)
 	}
 
+}
+
+func initializeCommunication() {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		services.InitializeRabbitmq()
+		consumers.InitWithRabbitmq()
+		break
+	case CommunicationModeKafka:
+		services.InitializeKafka()
+		consumers.InitWithKafka()
+		break
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+		break
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+	}
 }

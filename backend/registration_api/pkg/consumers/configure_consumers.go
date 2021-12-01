@@ -1,7 +1,14 @@
 package consumers
 
-func Init() {
-	StartEnrollmentConsumer()
-	StartRecipientsAppointmentBookingConsumer()
-	StartCertifiedConsumer()
+func InitWithKafka() {
+	StartEnrollmentConsumerWithKafka()
+	StartRecipientsAppointmentBookingConsumerWithKafka()
+	StartCertifiedConsumerWithKafka()
 }
+
+func InitWithRabbitmq() {
+	StartEnrollmentConsumerWithRabbitmq()
+	StartRecipientsAppointmentBookingConsumerWithRabbitmq()
+	StartCertifiedConsumerWithRabbitmq()
+}
+

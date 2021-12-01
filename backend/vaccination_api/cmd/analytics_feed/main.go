@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
+	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"strconv"
@@ -17,6 +18,10 @@ import (
 )
 
 const tableNameEvents = "eventsv2"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
+const DefaultAnalyticsFeedQueueSuffix = "_aly"
 
 type CertifyMessage struct {
 	Facility struct {
@@ -53,6 +58,10 @@ type CertifyMessage struct {
 
 func main() {
 	config.Initialize()
+	invokeConsumers := initCommunication()
+	if invokeConsumers == nil {
+		return
+	}
 	log.Infof("Starting analytics collector")
 	connect := initClickhouse()
 	_, err := connect.Exec(`
@@ -143,11 +152,22 @@ dt Date
 //	}
 	var wg sync.WaitGroup
 	wg.Add(2)
-	go startCertificateEventConsumer(err, connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic, "earliest")
-	go startCertificateEventConsumer(err, connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic, "latest")
-	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
-	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
+	invokeConsumers(connect)
 	wg.Wait()
+}
+
+func invokeKafkaConsumers( connect *sql.DB) {
+	go startCertificateEventConsumer(connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic, "latest")
+	go startCertificateEventConsumer(connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
+	go startCertificateEventConsumer(connect, saveCertificateEvent, config.Config.Kafka.CertifyTopic, "earliest")
+	go startCertificateEventConsumer(connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
+}
+
+func invokeRabbitmqConsumers( connect *sql.DB) {
+	go startCertificateEventConsumerOnChannel(connect, saveCertifiedEventV1, config.Config.Rabbitmq.CertifiedTopic, "latest")
+	go startCertificateEventConsumerOnChannel(connect, saveAnalyticsEvent, config.Config.Rabbitmq.EventsTopic, "earliest")
+	go startCertificateEventConsumerOnChannel(connect, saveCertificateEvent, config.Config.Rabbitmq.CertifyTopic, "earliest")
+	go startCertificateEventConsumerOnChannel(connect, saveReportedSideEffects, config.Config.Rabbitmq.ReportedSideEffectsTopic, "earliest")
 }
 
 func initClickhouse() *sql.DB {
@@ -173,7 +193,7 @@ func initClickhouse() *sql.DB {
 
 type MessageCallback func(*sql.DB, string) error
 
-func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string, resetOption string) {
+func startCertificateEventConsumer(connect *sql.DB, callback MessageCallback, topic string, resetOption string) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "analytics_feed",
@@ -209,6 +229,36 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 	}
 
 	c.Close()
+}
+
+func startCertificateEventConsumerOnChannel(connect *sql.DB, callback MessageCallback, exchange string, resetOption string) {
+	c, ch := services.CreateNewConnectionAndChannel()
+	topic := exchange
+	queue := topic + DefaultAnalyticsFeedQueueSuffix
+	go func() {
+		defer c.Close()
+		defer ch.Close()
+		msgs, cErr := services.ConsumeFromExchangeUsingQueue(ch, topic,
+			queue, services.DefaultExchangeKind)
+		if cErr != nil {
+			// The client will automatically try to recover from all errors.
+			fmt.Printf("Consumer error: %v \n", cErr)
+		} else {
+			for msg := range msgs {
+				if connect == nil {
+					connect = initClickhouse()
+					if connect == nil {
+						log.Fatal("Unable to get clickhouse connection")
+					}
+				}
+				if err := callback(connect, string(msg.Body)); err == nil {
+					ch.Ack(msg.DeliveryTag, false)
+				} else {
+					log.Errorf("Error in processing the certificate %+v", err)
+				}
+			}
+		}
+	}()
 }
 
 func saveCertifiedEventV1(connect *sql.DB, msg string) error {
@@ -453,4 +503,19 @@ func saveCertificateEvent(connect *sql.DB, msg string) error {
 	}
 
 	return nil
+}
+
+func initCommunication() func(connect *sql.DB) {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		return invokeRabbitmqConsumers
+	case CommunicationModeKafka:
+		return invokeKafkaConsumers
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode isn not supported yet")
+		return nil
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+		return nil
+	}
 }

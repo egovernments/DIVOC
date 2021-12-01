@@ -27,6 +27,7 @@ require (
 	github.com/onsi/gomega v1.10.5 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.7.0
+	github.com/streadway/amqp v1.0.0
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2

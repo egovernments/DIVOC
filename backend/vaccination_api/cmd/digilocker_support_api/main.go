@@ -47,6 +47,9 @@ const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
 const YYYYMMDD = "2006-01-02"
+const CommunicationModeRabbitmq = "rabbitmq"
+const CommunicationModeKafka = "kafka"
+const CommunicationModeRestapi = "restapi"
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "http_request_duration_milliseconds",
@@ -706,7 +709,9 @@ var addr = flag.String("listen-address", ":8003", "The address to listen on for 
 
 func main() {
 	config.Initialize()
-	initializeKafka()
+	if !initCommunication() {
+		return
+	}
 	log.Info("Running digilocker support api")
 	r := mux.NewRouter()
 	r.Handle("/metrics", promhttp.Handler())
@@ -740,4 +745,21 @@ func initializeKafka() {
 	}
 	kafkaService.StartEventProducer(producer)
 	kafkaService.LogProducerEvents(producer)
+}
+
+func initCommunication() bool {
+	switch config.Config.CommunicationMode.Mode {
+	case CommunicationModeRabbitmq:
+		log.Errorf("RabbitMQ communication mode for digilocker is not supported yet")
+		return false
+	case CommunicationModeKafka:
+		initializeKafka()
+		return true
+	case CommunicationModeRestapi:
+		log.Errorf("Rest-API communication mode is not supported yet")
+		return false
+	default:
+		log.Errorf("Invalid CommunicationMode %s", config.Config.CommunicationMode)
+		return false
+	}
 }

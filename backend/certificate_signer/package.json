@@ -1,5 +1,5 @@
 {
-  "name": "certificate_processor",
+  "name": "certificate_signer",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -12,6 +12,8 @@
   "dependencies": {
     "certificate-signer-library": "^2.0.1",
     "kafkajs": "^1.15.0",
+    "amqplib": "^0.8.0",
+    "nodemailer": "^6.4.17",
     "ramda": "^0.27.1",
     "vaccination-context": "^1.1.0"
   },
