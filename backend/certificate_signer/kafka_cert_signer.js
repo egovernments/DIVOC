@@ -203,7 +203,7 @@ function transformW3(cert, certificateId) {
     // update context
     certificateFromTemplate["@context"] = [
       "https://www.w3.org/2018/credentials/v1",
-      "https://cowin.gov.in/credentials/vaccination/v2"
+      CERTIFICATE_NAMESPACE_V2
     ];
 
     // dob
