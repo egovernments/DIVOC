@@ -11,13 +11,10 @@ import (
 
 	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 
-	eventsModel "github.com/divoc/api/pkg/models"
-
 	"github.com/divoc/api/config"
-	"github.com/jinzhu/gorm"
-
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
+	eventsModel "github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/api/swagger_gen/restapi/operations"
@@ -31,6 +28,7 @@ import (
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
+	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -382,9 +380,9 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
 	return models.CertificationRequest{
-		Comorbidities:     requestV2.Comorbidities,
-		EnrollmentType:    requestV2.EnrollmentType,
-		Facility:          &models.CertificationRequestFacility{
+		Comorbidities:  requestV2.Comorbidities,
+		EnrollmentType: requestV2.EnrollmentType,
+		Facility: &models.CertificationRequestFacility{
 			Address: &models.CertificationRequestFacilityAddress{
 				AddressLine1: requestV2.Facility.Address.AddressLine1,
 				AddressLine2: requestV2.Facility.Address.AddressLine2,
@@ -393,13 +391,13 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 				Pincode:      requestV2.Facility.Address.Pincode,
 				State:        requestV2.Facility.Address.State,
 			},
-			Name:    requestV2.Facility.Name,
+			Name: requestV2.Facility.Name,
 		},
 		Meta:              requestV2.Meta,
 		PreEnrollmentCode: requestV2.PreEnrollmentCode,
 		ProgramID:         requestV2.ProgramID,
-		Recipient:         &models.CertificationRequestRecipient{
-			Address:     &models.CertificationRequestRecipientAddress{
+		Recipient: &models.CertificationRequestRecipient{
+			Address: &models.CertificationRequestRecipientAddress{
 				AddressLine1: requestV2.Recipient.Address.AddressLine1,
 				AddressLine2: requestV2.Recipient.Address.AddressLine2,
 				Country:      requestV2.Recipient.Address.Country,
@@ -415,7 +413,7 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 			Name:        requestV2.Recipient.Name,
 			Nationality: requestV2.Recipient.Nationality,
 		},
-		Vaccination:       &models.CertificationRequestVaccination{
+		Vaccination: &models.CertificationRequestVaccination{
 			Batch:          requestV2.Vaccination.Batch,
 			Date:           requestV2.Vaccination.Date,
 			Dose:           requestV2.Vaccination.Dose,
@@ -425,7 +423,7 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 			Name:           requestV2.Vaccination.Name,
 			TotalDoses:     requestV2.Vaccination.TotalDoses,
 		},
-		Vaccinator:        &models.CertificationRequestVaccinator{Name:requestV2.Vaccinator.Name},
+		Vaccinator: &models.CertificationRequestVaccinator{Name: requestV2.Vaccinator.Name},
 	}
 }
 
@@ -766,7 +764,7 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 	var certificateFailedToAddToRevocationList []string
 	var certificateFailedToDeleteFromVaccCertRegistry []string
 	if response, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
-		log.Printf("Error in querying vaccination certificate %+v", err)
+		log.Errorf("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {
 		if listOfCerts, ok := response[CertificateEntity].([]interface{}); ok {
@@ -779,22 +777,29 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 					certificateId := body["certificateId"].(string)
 					var cert map[string]interface{}
 					if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
-						log.Printf("%v", err)
+						log.Errorf("%v", err)
 						continue
 					}
 					certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
 					if (dose != nil && *dose == certificateDose["dose"]) || dose == nil {
 						isCertificateFound = true
 						if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
-							log.Printf("Failed to delete vaccination certificate %+v", certificateId)
+							log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
 							certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
 						} else {
 							err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
 							if err != nil {
-								log.Printf("Failed to add certificate %v to revocation list", certificateId)
+								log.Errorf("Failed to add certificate %v to revocation list", certificateId)
 								certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
 							}
 						}
+						programId := body["programId"].(string)
+						log.Infof("Key for Redis : %v", preEnrollmentCode+"-"+programId+"-"+strconv.Itoa(int((certificateDose["dose"]).(float64))))
+						err := kafkaService.DeleteValue(preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64))))
+						if err != nil {
+							log.Errorf("Error while Deleteing key from redis: %v", err)
+						}
+
 					}
 				}
 			}
