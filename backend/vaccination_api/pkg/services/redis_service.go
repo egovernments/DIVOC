@@ -21,5 +21,12 @@ func InitRedis() {
 }
 
 func DeleteValue(key string) error {
+	_, err := redisClient.Get(ctx, key).Result()
+	if err == redis.Nil {
+		log.Infof("key does not exist")
+		return nil
+	} else if err != nil {
+		return err
+	}
 	return redisClient.Del(ctx, key).Err()
 }
