@@ -22,9 +22,7 @@ function redisConnectionEventListeners({ conn }) {
     // console.log('Redis - Connection status: reconnecting');
   });
   conn.on('error', (err) => {
-    if(err.errno !== -111) {
       console.error('Redis - Connection status: error ', { err });
-    }
   });
 }
 
