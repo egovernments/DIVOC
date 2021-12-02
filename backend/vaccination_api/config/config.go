@@ -100,6 +100,7 @@ var Config = struct {
 		RegistrationAPIPublicKey string `yaml:"registrationAPIPublickey" env:"REGISTRATION_API_PUBLIC_KEY"`
 	}
 	Redis struct {
-		Url string `env:"REDIS_URL" yaml:"redisurl"`
+		Url              string `env:"REDIS_URL" yaml:"redisurl"`
+		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching"`
 	}
 }{}

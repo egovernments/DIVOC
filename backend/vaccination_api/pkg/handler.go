@@ -794,8 +794,12 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 							}
 						}
 						programId := body["programId"].(string)
-						log.Infof("Key for Redis : %v", preEnrollmentCode+"-"+programId+"-"+strconv.Itoa(int((certificateDose["dose"]).(float64))))
-						err := kafkaService.DeleteValue(preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64))))
+						key := preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64)))
+						if config.Config.Redis.ProgramIdCaching == "false" {
+							key = preEnrollmentCode + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64)))
+						}
+						log.Infof("Key for Redis : %v, %v", key, config.Config.Redis.ProgramIdCaching)
+						err := kafkaService.DeleteValue(key)
 						if err != nil {
 							log.Errorf("Error while Deleteing key from redis: %v", err)
 						}
