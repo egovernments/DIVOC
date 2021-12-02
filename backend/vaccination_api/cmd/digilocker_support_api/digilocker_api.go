@@ -142,20 +142,22 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
 					slice := strings.Split(xmlRequest.DocDetails.URI, "-")
 					docType := slice[len(slice)-2]
-					if docType == "IVACR" && verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
-						if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
-							log.Errorf("Error in creating international certificate pdf")
-							go kafkaService.PublishEvent(models.Event{
-								Date:          time.Time{},
-								Source:        "" + xmlRequest.DocDetails.URI,
-								TypeOfMessage: "internal_error",
-								ExtraInfo:     nil,
-							})
-							w.WriteHeader(500)
-						} else {
-							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+					if docType == "IVACR" {
+						if verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
+							if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
+								log.Errorf("Error in creating international certificate pdf")
+								go kafkaService.PublishEvent(models.Event{
+									Date:          time.Time{},
+									Source:        "" + xmlRequest.DocDetails.URI,
+									TypeOfMessage: "internal_error",
+									ExtraInfo:     nil,
+								})
+								w.WriteHeader(500)
+							} else {
+								response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+							}
 						}
-					} else if docType == "VACER" {
+					} else {
 						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
 							log.Errorf("Error in creating domestic certificate pdf")
 							go kafkaService.PublishEvent(models.Event{
@@ -168,8 +170,6 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 						} else {
 							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
 						}
-					} else {
-						log.Errorf("No valid docType present")
 					}
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
@@ -245,21 +245,22 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 				response.DocDetails.URI = certBundle.Uri
 				response.ResponseStatus.Status = "1"
 				if xmlRequest.Format == "pdf" || xmlRequest.Format == "both" {
-					if xmlRequest.DocDetails.DocType == "IVACR" && verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
-						if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
-							log.Errorf("Error in creating international certificate pdf")
-						} else {
-							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
-						}
-					} else if xmlRequest.DocDetails.DocType == "VACER" {
-						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
-							log.Errorf("Error in creating domastic certificate pdf")
-						} else {
-							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+					if xmlRequest.DocDetails.DocType == "IVACR" {
+						if verifyIfLatestCertificateIsDDCCCompliant(certBundle.certificatesByDoses) {
+							if pdfBytes, err := getDDCCCertificateAsPdfV3(certBundle.certificatesByDoses); err != nil {
+								log.Errorf("Error in creating international certificate pdf")
+							} else {
+								response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+							}
 						}
 					} else {
-						log.Errorf("No valid docType present")
+						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
+							log.Errorf("Error in creating domestic certificate pdf")
+						} else {
+							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
+						}
 					}
+
 				}
 				if xmlRequest.Format == "both" || xmlRequest.Format == "xml" {
 					certificateId := certBundle.certificateId
