@@ -874,7 +874,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/CertificationRequest"
+                "$ref": "#/definitions/CertificationRequestV2"
               }
             }
           }
@@ -995,6 +995,216 @@ func init() {
             "address",
             "enrollmentType",
             "programId"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "age": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "vaccination": {
+          "type": "object",
+          "required": [
+            "name",
+            "manufacturer",
+            "date",
+            "effectiveStart",
+            "effectiveUntil",
+            "dose",
+            "totalDoses"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "minimum": 1,
+              "example": 1
+            },
+            "effectiveStart": {
+              "type": "string",
+              "format": "date"
+            },
+            "effectiveUntil": {
+              "type": "string",
+              "format": "date"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "minimum": 1,
+              "example": 2
+            }
+          }
+        },
+        "vaccinator": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "CertificationRequestV2": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "vaccination",
+        "facility"
+      ],
+      "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facility": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "nationality",
+            "identity",
+            "contact"
           ],
           "properties": {
             "address": {
@@ -2354,7 +2564,7 @@ func init() {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/definitions/CertificationRequest"
+                "$ref": "#/definitions/CertificationRequestV2"
               }
             }
           }
@@ -2789,6 +2999,460 @@ func init() {
           "type": "string"
         },
         "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "CertificationRequestV2": {
+      "type": "object",
+      "required": [
+        "preEnrollmentCode",
+        "recipient",
+        "vaccination",
+        "facility"
+      ],
+      "properties": {
+        "comorbidities": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "enrollmentType": {
+          "type": "string",
+          "minLength": 1
+        },
+        "facility": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "meta": {
+          "type": "object"
+        },
+        "preEnrollmentCode": {
+          "type": "string"
+        },
+        "programId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recipient": {
+          "type": "object",
+          "required": [
+            "name",
+            "nationality",
+            "identity",
+            "contact"
+          ],
+          "properties": {
+            "address": {
+              "type": "object",
+              "required": [
+                "addressLine1",
+                "district",
+                "state",
+                "pincode"
+              ],
+              "properties": {
+                "addressLine1": {
+                  "type": "string"
+                },
+                "addressLine2": {
+                  "type": "string"
+                },
+                "country": {
+                  "type": "string",
+                  "minLength": 2
+                },
+                "district": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "pincode": {
+                  "type": "string"
+                },
+                "state": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            },
+            "age": {
+              "type": "string",
+              "minLength": 1
+            },
+            "contact": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "dob": {
+              "type": "string",
+              "format": "date",
+              "x-nullable": true
+            },
+            "gender": {
+              "type": "string",
+              "minLength": 1
+            },
+            "identity": {
+              "type": "string",
+              "minLength": 1
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "nationality": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "vaccination": {
+          "type": "object",
+          "required": [
+            "name",
+            "manufacturer",
+            "date",
+            "effectiveStart",
+            "effectiveUntil",
+            "dose",
+            "totalDoses"
+          ],
+          "properties": {
+            "batch": {
+              "type": "string"
+            },
+            "date": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "dose": {
+              "description": "Dose number for example 1 for first dose of 2 doses",
+              "type": "number",
+              "minimum": 1,
+              "example": 1
+            },
+            "effectiveStart": {
+              "type": "string",
+              "format": "date"
+            },
+            "effectiveUntil": {
+              "type": "string",
+              "format": "date"
+            },
+            "manufacturer": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "totalDoses": {
+              "description": "Total number of doses required for this vaccination.",
+              "type": "number",
+              "minimum": 1,
+              "example": 2
+            }
+          }
+        },
+        "vaccinator": {
+          "type": "object",
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "CertificationRequestV2Facility": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string",
+              "minLength": 1
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "CertificationRequestV2FacilityAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string",
+          "minLength": 1
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "CertificationRequestV2Recipient": {
+      "type": "object",
+      "required": [
+        "name",
+        "nationality",
+        "identity",
+        "contact"
+      ],
+      "properties": {
+        "address": {
+          "type": "object",
+          "required": [
+            "addressLine1",
+            "district",
+            "state",
+            "pincode"
+          ],
+          "properties": {
+            "addressLine1": {
+              "type": "string"
+            },
+            "addressLine2": {
+              "type": "string"
+            },
+            "country": {
+              "type": "string",
+              "minLength": 2
+            },
+            "district": {
+              "type": "string",
+              "minLength": 1
+            },
+            "pincode": {
+              "type": "string"
+            },
+            "state": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "age": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contact": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "dob": {
+          "type": "string",
+          "format": "date",
+          "x-nullable": true
+        },
+        "gender": {
+          "type": "string",
+          "minLength": 1
+        },
+        "identity": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "nationality": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "CertificationRequestV2RecipientAddress": {
+      "type": "object",
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string",
+          "minLength": 2
+        },
+        "district": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pincode": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "CertificationRequestV2Vaccination": {
+      "type": "object",
+      "required": [
+        "name",
+        "manufacturer",
+        "date",
+        "effectiveStart",
+        "effectiveUntil",
+        "dose",
+        "totalDoses"
+      ],
+      "properties": {
+        "batch": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "dose": {
+          "description": "Dose number for example 1 for first dose of 2 doses",
+          "type": "number",
+          "minimum": 1,
+          "example": 1
+        },
+        "effectiveStart": {
+          "type": "string",
+          "format": "date"
+        },
+        "effectiveUntil": {
+          "type": "string",
+          "format": "date"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "totalDoses": {
+          "description": "Total number of doses required for this vaccination.",
+          "type": "number",
+          "minimum": 1,
+          "example": 2
+        }
+      }
+    },
+    "CertificationRequestV2Vaccinator": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "properties": {
+        "name": {
           "type": "string",
           "minLength": 1
         }

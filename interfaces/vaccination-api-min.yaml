@@ -295,30 +295,6 @@ paths:
           description: OK
           schema:
             type: object
-    delete:
-      summary: Revoke certificates for given preEnrollmentCode and dose
-      tags:
-        - certification
-      operationId: revokeCertificate
-      security: []
-      parameters:
-        - name: preEnrollmentCode
-          in: query
-          required: true
-          type: string
-          description: refId for which certificate needs to be revoked
-        - name: dose
-          in: query
-          required: false
-          type: number
-          description: dose for which certificate needs to be revoked
-      responses:
-        '200':
-          description: OK
-        '404':
-          description: certificate not found for given beneficiary, dose
-        '400':
-          description: Invalid input
   /v1/certificates/{certificateId}:
     get:
       summary: Get certificate json for given certificateId
@@ -748,16 +724,6 @@ definitions:
     properties:
       preEnrollmentCode:
         type: string
-      enrollmentType:
-        type: string
-        minLength: 1
-      programId:
-        type: string
-        minLength: 1
-      comorbidities:
-        type: array
-        items:
-          type: string
       recipient:
         type: object
         properties:
@@ -768,12 +734,6 @@ definitions:
             type: string
             format: date
             x-nullable: true
-          age:
-            type: string
-            minLength: 1
-          gender:
-            type: string
-            minLength: 1
           nationality:
             type: string
             minLength: 1
@@ -785,29 +745,6 @@ definitions:
             items:
               type: string
               minLength: 1
-          address:
-            type: object
-            properties:
-              addressLine1:
-                type: string
-              addressLine2:
-                type: string
-              district:
-                type: string
-                minLength: 1
-              state:
-                type: string
-                minLength: 1
-              country:
-                type: string
-                minLength: 2
-              pincode:
-                type: string
-            required:
-              - addressLine1
-              - district
-              - state
-              - pincode
         required:
           - name
           - nationality
@@ -865,30 +802,6 @@ definitions:
           name:
             type: string
             minLength: 1
-          address:
-            type: object
-            properties:
-              addressLine1:
-                type: string
-              addressLine2:
-                type: string
-              district:
-                type: string
-                minLength: 1
-              state:
-                type: string
-                minLength: 1
-              country:
-                type: string
-                minLength: 2
-              pincode:
-                type: string
-                minLength: 1
-            required:
-              - addressLine1
-              - district
-              - state
-              - pincode
         required:
           - name
       meta:
