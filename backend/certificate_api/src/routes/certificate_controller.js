@@ -277,8 +277,8 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         await page.setContent(certificate, {
             waitUntil: 'domcontentloaded'
         });
-        await page.addStyleTag({ path: path.join(__dirname, '/../../configs/css/report-style.css') });
-        await page.addStyleTag({ path: path.join(__dirname, '/../../configs/css/style.css') });
+        await page.addStyleTag({path: `${__dirname}/../../configs/css/report-style.css`});
+        await page.addStyleTag({path: `${__dirname}/../../configs/css/style.css`});
         const pdfBuffer = await page.pdf({
             format: 'A4'
         });
