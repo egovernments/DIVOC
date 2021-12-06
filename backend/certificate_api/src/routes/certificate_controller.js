@@ -230,22 +230,36 @@ async function createTestCertificatePDF(certificateResp, res, source) {
               return content;
           });
 
+        const icmrLogoDataUri = fs.readFileSync(`${__dirname}/../../configs/images/icmr_logo_data`);
         const dataURL = await QRCode.toDataURL(zippedData, {scale: 2});
         certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
         const {certificate: {credentialSubject, evidence}} = certificateRaw;
         const certificateData = {
+            facilityName: evidence[0].facility.name,
+            refId: credentialSubject.refId,
             name: credentialSubject.name,
-            dob: formatDate(credentialSubject.dob),
+            age: credentialSubject.age,
             gender: credentialSubject.gender,
+            contact: certificateRaw.contact,
+            mobile: certificateRaw.mobile,
+            country: evidence[0].facility.address.addressCountry,
+            aadhaar: certificateRaw.meta.aadhaar,
             identity: formatId(credentialSubject.id),
+            icmrId: certificateRaw.meta.icmrId,
+            srfId: certificateRaw.meta.srfId,
+            sampleOrigin: evidence[0].sampleOrigin,
+            reportId: certificateRaw.meta.reportId,
             recipientAddress: formatRecipientAddress(credentialSubject.address),
             disease: evidence[0].disease,
             testType: evidence[0].testType,
             sampleDate: formatDateTime(evidence[0].sampleCollectionTimestamp),
+            sampleReceived: formatDateTime(certificateRaw.meta.sampleReceivedTimestamp),
+            sampleTested: formatDateTime(certificateRaw.meta.sampleTestedTimestamp),
             resultDate: formatDateTime(evidence[0].resultTimestamp),
             result: evidence[0].result,
+            icmrLogoDataUri: icmrLogoDataUri,
             qrCode: dataURL,
-            country: evidence[0].facility.address.addressCountry
+
         };
         const htmlData = fs.readFileSync(`${__dirname}/../../configs/templates/test_certificate_template.html`, 'utf8');
         const template = Handlebars.compile(htmlData);
@@ -264,6 +278,8 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         await page.setContent(certificate, {
             waitUntil: 'domcontentloaded'
         });
+        await page.addStyleTag({path: `${__dirname}/../../configs/css/report-style.css`});
+        await page.addStyleTag({path: `${__dirname}/../../configs/css/style.css`});
         const pdfBuffer = await page.pdf({
             format: 'A4'
         });

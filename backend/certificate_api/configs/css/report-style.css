@@ -1,0 +1,102 @@
+html, body{
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    background-color: #ffffff;
+    color: #333333;
+}
+.jal-blue{
+    color: #119ac5;
+}
+.jal-red{
+    color: #e09b72;
+}
+.jal-gray{
+    color: #aaa69b;
+}
+.jal-light-bg{
+    background-color: #e9d0a7;
+}
+.lab-address-panel{
+    text-align: center;
+    border-radius: 10px;
+}
+.report-id-panel{
+    text-align: center;
+}
+.repot-list-wrapper table{
+    border-spacing: 4px;
+    border-collapse: inherit;
+}
+.repot-list-wrapper table th{
+    background-color: #e9d0a7;
+    border-radius: 8px;
+    color: #e09b72;
+}
+.repot-list-wrapper table td{
+    background-color: #ffffff;
+    border-radius: 8px;
+}
+.report-page-wrapper{
+    padding-bottom: 30px;
+}
+.report-page-wrapper p{
+    font-size: 12px;
+}
+.report-page-wrapper h6{
+    font-size: 14px;
+}
+.report-page-wrapper .form-control{
+    border-radius: 8px;
+}
+.input-padding-left{
+    padding-left: 32px !important;
+}
+
+@media print {
+    html, body{
+        font-family: 'Poppins', sans-serif;
+        font-size: 14px;
+        background-color: #ffffff;
+        color: #333333;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    .repot-list-wrapper table{
+        font-size: 14px !important;
+        border-spacing: 4px !important;
+        border-collapse: inherit !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    .repot-list-wrapper table th{
+        background-color: #e9d0a7 !important;
+        border-radius: 8px !important;
+        color: #e09b72 !important;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
+
+@supports (-moz-appearance:meterbar) {
+    .report-page-wrapper {
+        margin: 0;
+        font-size: 0.85em;
+        width: 100%;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    .repot-list-wrapper table{
+        font-size: 14px;
+        border-spacing: 4px;
+        border-collapse: inherit;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+    .repot-list-wrapper table th{
+        background-color: #e9d0a7;
+        border-radius: 8px;
+        color: #e09b72;
+        -webkit-print-color-adjust: exact;
+        color-adjust: exact;
+    }
+}
