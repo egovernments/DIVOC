@@ -235,6 +235,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
         const {certificate: {credentialSubject, evidence}} = certificateRaw;
         const certificateData = {
+            facilityName: evidence[0].facility.name,
             refId: credentialSubject.refId,
             name: credentialSubject.name,
             age: credentialSubject.age,
