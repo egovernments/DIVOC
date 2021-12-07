@@ -3,11 +3,15 @@ const {promisify} = require("util");
 let client;
 let existsAsync;
 let redisKeyExpiry;
+let isRedisEnabled;
 
 async function initRedis(config) {
-  client = redis.createClient(config.REDIS_URL);
-  redisConnectionEventListeners({ conn: client });
-  existsAsync = promisify(client.exists).bind(client);
+  isRedisEnabled = config.REDIS_ENABLED;
+  if(isRedisEnabled) {
+    client = redis.createClient(config.REDIS_URL);
+    redisConnectionEventListeners({ conn: client });
+    existsAsync = promisify(client.exists).bind(client);
+  }
   redisKeyExpiry = config.REDIS_KEY_EXPIRE;
 }
 
@@ -27,7 +31,7 @@ function redisConnectionEventListeners({ conn }) {
 }
 
 async function checkIfKeyExists(key) {
-  if(client.connected) {
+  if(isRedisEnabled && client.connected) {
     return existsAsync(key)
   } else {
     return false
@@ -35,13 +39,13 @@ async function checkIfKeyExists(key) {
 }
 
 function storeKeyWithExpiry(key, value, expiry = redisKeyExpiry) {
-  if(client.connected) {
+  if(isRedisEnabled && client.connected) {
     client.set(key, value, "EX", expiry)
   }
 }
 
 function deleteKey(key) {
-  if(client.connected) {
+  if(isRedisEnabled && client.connected) {
     client.del(key)
   }
 }
