@@ -1046,7 +1046,7 @@ func init() {
             },
             "date": {
               "type": "string",
-              "format": "date-time"
+              "format": "date"
             },
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
@@ -1256,7 +1256,7 @@ func init() {
             },
             "date": {
               "type": "string",
-              "format": "date-time"
+              "format": "date"
             },
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
@@ -2702,7 +2702,7 @@ func init() {
             },
             "date": {
               "type": "string",
-              "format": "date-time"
+              "format": "date"
             },
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
@@ -3102,7 +3102,7 @@ func init() {
             },
             "date": {
               "type": "string",
-              "format": "date-time"
+              "format": "date"
             },
             "dose": {
               "description": "Dose number for example 1 for first dose of 2 doses",
@@ -3348,7 +3348,7 @@ func init() {
         },
         "date": {
           "type": "string",
-          "format": "date-time"
+          "format": "date"
         },
         "dose": {
           "description": "Dose number for example 1 for first dose of 2 doses",
@@ -3407,7 +3407,7 @@ func init() {
         },
         "date": {
           "type": "string",
-          "format": "date-time"
+          "format": "date"
         },
         "dose": {
           "description": "Dose number for example 1 for first dose of 2 doses",

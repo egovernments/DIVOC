@@ -47,7 +47,7 @@ class ProgramDB {
 
         return {
             batch: event.batchId,
-            date: eventDate,
+            date: formatCertifyDate(eventDate),
             effectiveStart: formatCertifyDate(eventDate),
             effectiveUntil: effectiveUntilDate,
             manufacturer: givenVaccination["provider"] ?? "N/A",

@@ -31,7 +31,7 @@ func publishSimpleEvent(source string, event string) {
 func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 
 	dateAdr := func(d strfmt.Date) *strfmt.Date { return &d }
-	dateTimeAdr := func(dt strfmt.DateTime) *strfmt.DateTime { return &dt }
+	dateTimeAdr := func(dt strfmt.Date) *strfmt.Date { return &dt }
 
 	uploadDetails.TotalRecords = uploadDetails.TotalRecords + 1
 
@@ -107,7 +107,7 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 	}
 	vaccination := &models.CertificationRequestVaccination{
 		Batch:          certifyData.VaccinationBatch,
-		Date:           dateTimeAdr(strfmt.DateTime(vaccinationDate)),
+		Date:           dateTimeAdr(strfmt.Date(vaccinationDate)),
 		EffectiveStart: dateAdr(strfmt.Date(effectiveStart)),
 		EffectiveUntil: dateAdr(strfmt.Date(effectiveUntil)),
 		Manufacturer:   &certifyData.VaccinationManufacturer,
@@ -133,11 +133,11 @@ func createCertificate(data *Scanner, uploadDetails *db.CertifyUploads) error {
 
 	certificate := models.CertificationRequest{
 		PreEnrollmentCode: &certifyData.PreEnrollmentCode,
-		Facility:    facility,
-		Recipient:   recipient,
-		Vaccination: vaccination,
-		Vaccinator:  vaccinator,
-		Meta:        map[string]interface{}{"certificateType": CERTIFICATE_TYPE_V2},
+		Facility:          facility,
+		Recipient:         recipient,
+		Vaccination:       vaccination,
+		Vaccinator:        vaccinator,
+		Meta:              map[string]interface{}{"certificateType": CERTIFICATE_TYPE_V2},
 	}
 	if jsonRequestString, err := json.Marshal(certificate); err == nil {
 		log.Infof("Certificate request %+v", string(jsonRequestString))
@@ -155,7 +155,7 @@ func validateBulkCertifyCSVRowData(data *Scanner) error {
 	return validateBulkCertifyCSV(
 		"Fields",
 		requiredFields,
-		func(field string) bool { return data.Text(field) == ""},
+		func(field string) bool { return data.Text(field) == "" },
 	)
 }
 
@@ -197,7 +197,7 @@ func validateBulkCertifyCSVHeaders(headers []string) error {
 	return validateBulkCertifyCSV(
 		"Headers",
 		requiredHeaders,
-		func(field string) bool { return !contains(headers, field)},
+		func(field string) bool { return !contains(headers, field) },
 	)
 }
 

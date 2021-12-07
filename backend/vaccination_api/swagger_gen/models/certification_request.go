@@ -801,8 +801,8 @@ type CertificationRequestVaccination struct {
 
 	// date
 	// Required: true
-	// Format: date-time
-	Date *strfmt.DateTime `json:"date"`
+	// Format: date
+	Date *strfmt.Date `json:"date"`
 
 	// Dose number for example 1 for first dose of 2 doses
 	// Required: true
@@ -877,7 +877,7 @@ func (m *CertificationRequestVaccination) validateDate(formats strfmt.Registry) 
 		return err
 	}
 
-	if err := validate.FormatOf("vaccination"+"."+"date", "body", "date-time", m.Date.String(), formats); err != nil {
+	if err := validate.FormatOf("vaccination"+"."+"date", "body", "date", m.Date.String(), formats); err != nil {
 		return err
 	}
 

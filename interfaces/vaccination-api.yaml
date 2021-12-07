@@ -643,7 +643,7 @@ definitions:
             type: string
           date:
             type: string
-            format: date-time
+            format: date
           effectiveStart:
             type: string
             format: date
@@ -800,7 +800,7 @@ definitions:
             type: string
           date:
             type: string
-            format: date-time
+            format: date
           effectiveStart:
             type: string
             format: date

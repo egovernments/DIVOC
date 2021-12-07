@@ -1,9 +1,26 @@
 package models
 
 import (
+	"encoding/json"
 	"strconv"
 	"time"
 )
+
+type CustomTime time.Time
+
+func (mt *CustomTime) UnmarshalJSON(bs []byte) error {
+	var s string
+	err := json.Unmarshal(bs, &s)
+	if err != nil {
+		return err
+	}
+	t, err := time.ParseInLocation("2006-01-02", s, time.UTC)
+	if err != nil {
+		return err
+	}
+	*mt = CustomTime(t)
+	return nil
+}
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -28,19 +45,19 @@ type Certificate struct {
 	Issuer       string `json:"issuer"`
 	IssuanceDate string `json:"issuanceDate"`
 	Evidence     []struct {
-		ID             string    `json:"id"`
-		FeedbackURL    string    `json:"feedbackUrl"`
-		InfoURL        string    `json:"infoUrl"`
-		Type           []string  `json:"type"`
-		Batch          string    `json:"batch"`
-		Vaccine        string    `json:"vaccine"`
-		Manufacturer   string    `json:"manufacturer"`
-		Date           time.Time `json:"date"`
-		EffectiveStart string    `json:"effectiveStart"`
-		EffectiveUntil string    `json:"effectiveUntil"`
-		CertificateId  string    `json:"certificateId"`
-		Dose           int       `json:"dose"`
-		TotalDoses     int       `json:"totalDoses"`
+		ID             string     `json:"id"`
+		FeedbackURL    string     `json:"feedbackUrl"`
+		InfoURL        string     `json:"infoUrl"`
+		Type           []string   `json:"type"`
+		Batch          string     `json:"batch"`
+		Vaccine        string     `json:"vaccine"`
+		Manufacturer   string     `json:"manufacturer"`
+		Date           CustomTime `json:"date"`
+		EffectiveStart string     `json:"effectiveStart"`
+		EffectiveUntil string     `json:"effectiveUntil"`
+		CertificateId  string     `json:"certificateId"`
+		Dose           int        `json:"dose"`
+		TotalDoses     int        `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`

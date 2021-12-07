@@ -4,15 +4,32 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strings"
-	"time"
 )
 
 const mobilePhonePrefix = "tel:"
+
+type CustomTime time.Time
+
+func (mt *CustomTime) UnmarshalJSON(bs []byte) error {
+	var s string
+	err := json.Unmarshal(bs, &s)
+	if err != nil {
+		return err
+	}
+	t, err := time.ParseInLocation("2006-01-02", s, time.UTC)
+	if err != nil {
+		return err
+	}
+	*mt = CustomTime(t)
+	return nil
+}
 
 type VaccinationCertificateRequest struct {
 	ID     string `json:"id"`
@@ -53,12 +70,12 @@ type CertifyMessage struct {
 		Contact     []string `json:"contact"`
 	} `json:"recipient"`
 	Vaccination struct {
-		Batch          string    `json:"batch"`
-		Date           time.Time `json:"date"`
-		EffectiveStart string    `json:"effectiveStart"`
-		EffectiveUntil string    `json:"effectiveUntil"`
-		Manufacturer   string    `json:"manufacturer"`
-		Name           string    `json:"name"`
+		Batch          string     `json:"batch"`
+		Date           CustomTime `json:"date"`
+		EffectiveStart string     `json:"effectiveStart"`
+		EffectiveUntil string     `json:"effectiveUntil"`
+		Manufacturer   string     `json:"manufacturer"`
+		Name           string     `json:"name"`
 	} `json:"vaccination"`
 	Vaccinator struct {
 		Name string `json:"name"`
