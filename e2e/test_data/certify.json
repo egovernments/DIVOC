@@ -28,7 +28,7 @@
     },
     "vaccination": {
         "batch": "MB3428BX",
-        "date": "2020-12-02T19:21:18.646Z",
+        "date": "2020-12-02",
         "dose": 1,
         "effectiveStart": "2020-12-02",
         "effectiveUntil": "2025-12-02",
