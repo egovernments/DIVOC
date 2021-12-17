@@ -2,13 +2,14 @@ package services
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strconv"
 )
 
 var producer *kafka.Producer
@@ -284,18 +285,29 @@ func startCertificateRevocationConsumer(servers string) {
 				if err := json.Unmarshal(msg.Value, &message); err == nil {
 					// check the status
 					// update that status to certifyErrorRows db
-					if message.Meta.PreviousCertificateID != "" {
-						log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
-						revokedCertificate := map[string]interface{}{
-							"preEnrollmentCode":     message.PreEnrollmentCode,
-							"certificateId":         message.CertificateId,
-							"dose":                  message.Dose,
-							"previousCertificateId": message.Meta.PreviousCertificateID,
+					certificate := message.Certificate
+					var certificateJson map[string]interface{}
+					if error := json.Unmarshal([]byte(certificate), &certificateJson); error == nil {
+						log.Infof("CertificateJSON : ", certificateJson)
+						evidence := certificateJson["evidence"].([]interface{})[0].(map[string]interface{})
+						log.Infof("evidence : ", evidence)
+						dose := evidence["dose"]
+						log.Infof("dose : ", dose)
+						if message.Meta.PreviousCertificateID != "" {
+							log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
+							revokedCertificate := map[string]interface{}{
+								"preEnrollmentCode":     message.PreEnrollmentCode,
+								"certificateId":         message.CertificateId,
+								"dose":                  dose,
+								"previousCertificateId": message.Meta.PreviousCertificateID,
+							}
+							_, err := services.CreateNewRegistry(revokedCertificate, "RevokedCertificate")
+							if err != nil {
+								log.Error("Failed saving revoked certificate %+v", err)
+							}
 						}
-						_, err := services.CreateNewRegistry(revokedCertificate, "RevokedCertificate")
-						if err != nil {
-							log.Error("Failed saving revoked certificate %+v", err)
-						}
+					} else {
+						log.Errorf("Error occurred : %v", error)
 					}
 				}
 				consumer.CommitMessage(msg)
