@@ -288,13 +288,9 @@ func startCertificateRevocationConsumer(servers string) {
 					certificate := message.Certificate
 					var certificateJson map[string]interface{}
 					if error := json.Unmarshal([]byte(certificate), &certificateJson); error == nil {
-						log.Infof("CertificateJSON : ", certificateJson)
 						evidence := certificateJson["evidence"].([]interface{})[0].(map[string]interface{})
-						log.Infof("evidence : ", evidence)
 						dose := evidence["dose"]
-						log.Infof("dose : ", dose)
 						if message.Meta.PreviousCertificateID != "" {
-							log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 							revokedCertificate := map[string]interface{}{
 								"preEnrollmentCode":     message.PreEnrollmentCode,
 								"certificateId":         message.CertificateId,
