@@ -178,7 +178,7 @@ async function createCertificatePDF(certificateResp, res, source) {
     if (certificateResp.length > 0) {
         let certificateRaw = certificateService.getLatestCertificate(certificateResp);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
-        let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp, certificateRaw.certificate);
+        let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp, certificateRaw);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
         const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
@@ -596,9 +596,9 @@ function getVaccineDetailsOfPreviousDoses(certificates, latestCertificate) {
         }
     }
     if(latestCertificate.meta?.vaccinations?.length){
-        const latestCertificateTmp = JSON.parse(latestCertificate);
+        const latestCertificateTmp = JSON.parse(JSON.stringify(latestCertificate.meta));
         for (let i = 0; i < latestCertificate.meta.vaccinations.length; i++) {
-            let evidence = latestCertificateTmp.meta.vaccinations[i];
+            let evidence = latestCertificateTmp.vaccinations[i];
             doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromMeta(evidence));
         }
     }
@@ -623,7 +623,7 @@ function fetchVaccinationDetailsFromMeta(evidence) {
         dose: evidence.dose,
         totalDoses: evidence.totalDoses,
         date: evidence.date,
-        name: evidence.vaccine,
+        name: evidence.name,
         batch: evidence.batch,
         vaccinatedCountry: evidence.country,
         validity: evidence.effectiveUntil
