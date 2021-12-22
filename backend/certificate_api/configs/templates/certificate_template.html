@@ -177,27 +177,28 @@
         <td><span class="d-flex">{{recipientAddress}}</span></td>
     </tr>
 </table>
+</br>
 <div class="doses-table">
     <table>
         <thead>
             <tr>
+                <th>Date of Vaccination</th>
                 <th>Dose Type</th>
                 <th>Vaccine Name</th>
+                <th>Vaccine Type</th>
                 <th>Vaccine Batch</th>
-                <th>Date of Vaccination</th>
                 <th>Country of Vaccination</th>
-                <th>Validity period</th>
             </tr>
         </thead>
         <tbody>
             {{#each vaxEvents}}
             <tr>
+                <td>{{dateOfVax}}</td>
                 <td>{{doseType}}</td>
                 <td>{{vaxName}}</td>
+                <td>{{vaxType}}</td>
                 <td>{{vaxBatch}}</td>
-                <td>{{dateOfVax}}</td>
                 <td>{{countryOfVax}}</td>
-                <td>{{validity}}</td>
             </tr>
             {{/each}}
         </tbody>

@@ -12,8 +12,6 @@ const fhirCertificate = require("certificate-fhir-convertor");
 const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8} = require('../../configs/keys');
 const config = require('../../configs/config');
 const dcc = require("@pathcheck/dcc-sdk");
-const {sortCertificatesInUpdateTimeAscOrder} = require("../services/certificate_service");
-
 const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
 const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
 
@@ -178,7 +176,7 @@ async function createCertificatePDF(certificateResp, res, source) {
     if (certificateResp.length > 0) {
         let certificateRaw = certificateService.getLatestCertificate(certificateResp);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
-        let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp, certificateRaw);
+        let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
         const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
@@ -485,7 +483,7 @@ async function certificateAsEUPayload(req, res) {
             const dccPayload = certificateService.convertCertificateToDCCPayload(certificateRaw);
             const qrUri = await dcc.signAndPack(await dcc.makeCWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, dccPayload.v[0].co), euPublicKeyP8, euPrivateKeyPem);
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
-            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp, certificateRaw.certificate);
+            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
             const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
             const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
 
@@ -581,12 +579,13 @@ function getVaccineDetails(certificateData, doseToVaccinationDetailsMap) {
             dateOfVax: formatDate(value.date || ""),
             countryOfVax: value.vaccinatedCountry || "",
             validity: value.validity || "",
+            vaxType: value.vaxType || "",
         };
         certificateData["vaxEvents"].push(vaxEventMap);
     }
 }
 
-function getVaccineDetailsOfPreviousDoses(certificates, latestCertificate) {
+function getVaccineDetailsOfPreviousDoses(certificates) {
     let doseToVaccinationDetailsMap = new Map();
     if (certificates.length > 0) {
         for (let i = 0; i < certificates.length; i++) {
@@ -595,14 +594,7 @@ function getVaccineDetailsOfPreviousDoses(certificates, latestCertificate) {
             doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromCert(evidence));
         }
     }
-    if(latestCertificate.meta?.vaccinations?.length){
-        const latestCertificateTmp = JSON.parse(JSON.stringify(latestCertificate.meta));
-        for (let i = 0; i < latestCertificate.meta.vaccinations.length; i++) {
-            let evidence = latestCertificateTmp.vaccinations[i];
-            doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromMeta(evidence));
-        }
-    }
-    return doseToVaccinationDetailsMap;
+    return new Map([...doseToVaccinationDetailsMap].sort());
 }
 
 function fetchVaccinationDetailsFromCert(evidence) {
@@ -611,24 +603,15 @@ function fetchVaccinationDetailsFromCert(evidence) {
         totalDoses: evidence.totalDoses,
         date: evidence.date,
         name: evidence.vaccine,
+        vaxType: getVaxType(evidence.icd11Code, evidence.prophylaxis),
         batch: evidence.batch,
         vaccinatedCountry: evidence.facility.address.addressCountry,
-        validity: evidence.effectiveUntil
     };
     return vaccineDetails;
 }
 
-function fetchVaccinationDetailsFromMeta(evidence) {
-    let vaccineDetails = {
-        dose: evidence.dose,
-        totalDoses: evidence.totalDoses,
-        date: evidence.date,
-        name: evidence.name,
-        batch: evidence.batch,
-        vaccinatedCountry: evidence.country,
-        validity: evidence.effectiveUntil
-    };
-    return vaccineDetails;
+function getVaxType(icd11Code, prophylaxis) {
+    return icd11Code+', '+prophylaxis;
 }
 
 module.exports = {
