@@ -272,6 +272,10 @@ async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, re
     const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode);
     return await createTestCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
+async function createCertificateQRCodeCitizen(phone, certificateId, res) {
+    const certificateResp = await registryService.getCertificate(phone, certificateId);
+    return await createCertificateQRCode(certificateResp, res, certificateId);
+}
 
 async function getCertificate(req, res) {
     try {
@@ -286,6 +290,25 @@ async function getCertificate(req, res) {
         }
         const certificateId = req.url.replace("/certificate/api/certificate/", "").split("?")[0];
         res = await createCertificatePDFByCertificateId(claimBody.Phone, certificateId, res);
+        return res
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+async function getCertificateQRCode(req, res) {
+    try {
+        var queryData = url.parse(req.url, true).query;
+        let claimBody = "";
+        try {
+            claimBody = await verifyToken(queryData.authToken);
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        const certificateId = req.url.replace("/certificate/api/certificate/QRCode/", "").split("?")[0];
+        res = await createCertificateQRCodeCitizen(claimBody.Phone, certificateId, res);
         return res
     } catch (err) {
         console.error(err);
@@ -562,5 +585,6 @@ module.exports = {
     checkIfCertificateGenerated,
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
-    certificateAsEUPayload
+    certificateAsEUPayload,
+    getCertificateQRCode
 };
