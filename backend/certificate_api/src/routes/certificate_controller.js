@@ -594,7 +594,7 @@ function getVaccineDetailsOfPreviousDoses(certificates) {
             doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromCert(evidence));
         }
     }
-    return new Map([...doseToVaccinationDetailsMap].sort());
+    return new Map([...doseToVaccinationDetailsMap].reverse());
 }
 
 function fetchVaccinationDetailsFromCert(evidence) {
