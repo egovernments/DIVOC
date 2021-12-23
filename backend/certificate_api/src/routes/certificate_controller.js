@@ -611,7 +611,11 @@ function fetchVaccinationDetailsFromCert(evidence) {
 }
 
 function getVaxType(icd11Code, prophylaxis) {
-    return icd11Code+', '+prophylaxis;
+    if(icd11Code && prophylaxis) {
+        return icd11Code+', '+prophylaxis;
+    } else {
+        return 'Not Available';
+    }
 }
 
 module.exports = {
