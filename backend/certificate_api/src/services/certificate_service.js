@@ -2,7 +2,7 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
-const getLatestCertificate = (certificates) => {
+const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
       if (a.osUpdatedAt < b.osUpdatedAt) {
@@ -13,7 +13,14 @@ const getLatestCertificate = (certificates) => {
       }
       return 0;
     }).reverse();
-    return certificates[certificates.length - 1];
+    return certificates;
+  }
+};
+
+const getLatestCertificate = (certificates) => {
+  if (certificates.length > 0) {
+    let sortedCerts = sortCertificatesInUpdateTimeAscOrder(certificates);
+    return sortedCerts[sortedCerts.length - 1];
   }
 };
 
@@ -87,6 +94,7 @@ function dobOfRecipient(credentialSubject) {
 }
 
 module.exports = {
+  sortCertificatesInUpdateTimeAscOrder,
   getLatestCertificate,
   convertCertificateToDCCPayload
 };

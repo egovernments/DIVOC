@@ -93,6 +93,12 @@
         .font-bold {
             font-weight: bolder;
         }
+
+        .doses-table{display: inline-block; width:100%; margin:8px 0 8px 0;}
+        .doses-table table{width: inherit; border-collapse:collapse; text-align:center ;table-layout: fixed;word-wrap: break-word;}
+        .doses-table table tr th{border:1px double rgb(188,204,233); background-color: rgb(68,114,196);color: rgb(255,255,255);padding:4px;font-size:12px;}
+        .doses-table table tr:nth-child(even) td{border:1px solid rgb(126, 145, 180); padding:4px;font-size:12px;background-color: rgb(217,226,243)}
+        .doses-table table tr:nth-child(odd) td{border:1px solid rgb(188,204,233); padding:4px;font-size:12px;}
     </style>
 </head>
 <body>
@@ -120,13 +126,17 @@
             </div>
         </div>
         <i class="d-flex text-center pt-2 pb-2 certificate-title">
-            {{#if isFinalDose}}
-            Final Certificate <br/>
+            {{#if isBoosterDose}}
+            Booster Dose Certificate <br/>
             {{else}}
-            Provisional Certificate <br/>
+                {{#if isFinalDose}}
+                Final Certificate <br/>
+                {{else}}
+                Provisional Certificate <br/>
+                {{/if}}
             {{/if}}
             for COVID-19 Vaccination <br/>
-            {{#unless isFinalDose}}
+            {{#unless isBoosterOrFinalDose}}
             (1st Dose)
             {{/unless}}
         </i>
@@ -139,81 +149,61 @@
 <table class="pt-2">
     <tr>
         <td><span class="text-underline font-bold">Beneficiary Details</span></td>
-        <td><span class="text-underline font-bold">Vaccination Details</span></td>
     </tr>
     <tr>
         <td><span class="d-flex pt-1 pb-1 font-bold">Beneficiary Name / लाभार्थी का नाम</span></td>
-        <td><span class="d-flex pt-1 pb-1 font-bold">Vaccine Name / वैक्सीन का नाम</span></td>
+        <td><span class="d-flex pt-1 pb-1 font-bold">Age / उम्र</span></td>
     </tr>
     <tr>
         <td><span class="d-flex">{{name}}</span></td>
-        <td><span class="d-flex">{{vaccine}}</span></td>
-    </tr>
-    <tr>
-        <td><span class="d-flex pt-1 pb-1 font-bold">Age / उम्र</span></td>
-        <td><span class="d-flex pt-1 pb-1 font-bold">Date of Dose / खुराक की तारीख</span></td>
-    </tr>
-    <tr>
         <td><span class="d-flex">{{age}}</span></td>
-        <td><span class="d-flex">{{vaccinationDate}}</span></td>
     </tr>
+    <tr>
     <tr>
         <td><span class="d-flex pt-1 pb-1 font-bold">Gender / लिंग</span></td>
-        {{#if isFinalDose}}
-        <td><span class="d-flex pt-1 pb-1 font-bold">Vaccinated by / टीका लगने वाले का नाम</span></td>
-        {{else}}
-        <td><span class="d-flex pt-1 pb-1 font-bold">Next Due Date / अगली नियत तिथि</span></td>
-        {{/if}}
-
+        <td><span class="d-flex pt-1 pb-1 font-bold">ID Verified / पहचान पत्र सत्यापित</span></td>
     </tr>
     <tr>
         <td><span class="d-flex">{{gender}}</span></td>
-        {{#if isFinalDose}}
-        <td><span class="d-flex">{{vaccinatedBy}}</span></td>
-        {{else}}
-        <td><span class="d-flex">{{vaccineValidDays}}</span></td>
-        {{/if}}
-
-    </tr>
-    <tr>
-        <td><span class="d-flex pt-1 pb-1 font-bold">ID Verified / पहचान पत्र सत्यापित</span></td>
-        {{#if isFinalDose}}
-        <td><span class="d-flex pt-1 pb-1 font-bold">Vaccination at / टीकाकरण का स्थान</span></td>
-        {{else}}
-        <td><span class="d-flex pt-1 pb-1 font-bold">Vaccinated by / टीका लगने वाले का नाम</span></td>
-        {{/if}}
-
-    </tr>
-    <tr>
         <td><span class="d-flex">{{identity}}</span></td>
-        {{#if isFinalDose}}
-        <td><span class="d-flex">{{vaccinatedAt}}</span></td>
-        {{else}}
-        <td><span class="d-flex">{{vaccinatedBy}}</span></td>
-        {{/if}}
-
     </tr>
+
     <tr>
         <td><span class="d-flex pt-1 pb-1 font-bold">Beneficiary Reference ID</span></td>
-        {{#unless isFinalDose}}
-        <td><span class="d-flex pt-1 pb-1 font-bold">Vaccination at / टीकाकरण का स्थान</span></td>
-        {{/unless}}
+        <td><span class="d-flex pt-1 pb-1 font-bold">Residing at / पता</span></td>
     </tr>
     <tr>
         <td><span class="d-flex">{{beneficiaryId}}</span></td>
-        {{#unless isFinalDose}}
-        <td><span class="d-flex">{{vaccinatedAt}}</span></td>
-        {{/unless}}
-    </tr>
-    <tr>
-        <td><span class="d-flex pt-1 pb-1 font-bold">Residing at / पता</span></td>
-        <td><span class="d-flex pt-1 pb-1 font-bold"></span></td>
-    </tr>
-    <tr>
         <td><span class="d-flex">{{recipientAddress}}</span></td>
-        <td><span class="d-flex"></span></td>
     </tr>
 </table>
+</br>
+<div class="doses-table">
+    <table>
+        <thead>
+            <tr>
+                <th>Date of Vaccination</th>
+                <th>Dose Type</th>
+                <th>Vaccine Name</th>
+                <th>Vaccine Type</th>
+                <th>Vaccine Batch</th>
+                <th>Country of Vaccination</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each vaxEvents}}
+            <tr>
+                <td>{{dateOfVax}}</td>
+                <td>{{doseType}}</td>
+                <td>{{vaxName}}</td>
+                <td>{{vaxType}}</td>
+                <td>{{vaxBatch}}</td>
+                <td>{{countryOfVax}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
 <footer class="d-flex">
     <div class="d-flex align-item-center">
         <svg xmlns="http://www.w3.org/2000/svg" width="45.88" height="51.082" viewBox="0 0 45.88 51.082">
