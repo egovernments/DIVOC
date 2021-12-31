@@ -57,6 +57,50 @@ const VACCINE_ICD11_MAPPINGS = [
   {
     "vaccineName": "zycov",
     "icd11Code": "XM6AT1"
+  },
+  {
+    "vaccineName": "pfizer",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "janssen",
+    "icd11Code": "XM0CX4"
+  },
+  {
+    "vaccineName": "moderna",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "astrazeneca",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "sinovac",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "sinopharm",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "cansino",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "corbevax",
+    "icd11Code": "XM5JC5"
+  },
+  {
+    "vaccineName": "novavax",
+    "icd11Code": "XM5JC5"
+  },
+  {
+    "vaccineName": "covovax",
+    "icd11Code": "XM5JC5"
+  },
+  {
+    "vaccineName": "nuvaxovid",
+    "icd11Code": "XM5JC5"
   }
 ]
 
