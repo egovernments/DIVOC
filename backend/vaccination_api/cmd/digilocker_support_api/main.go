@@ -900,6 +900,9 @@ func formatId(identity string) string {
 	if strings.Contains(strings.ToLower(identityLowerCase), "ration") {
 		return "Ration Card # " + lastFragment
 	}
+	if strings.Contains(strings.ToLower(identityLowerCase), "student") {
+		return "Student Photo Id Card # " + lastFragment
+	}
 	return lastFragment
 }
 
