@@ -27,7 +27,7 @@ test('should convert certificate in eu specified payload if all fields are provi
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
         "fn": "Dinushan",
         "gn": "D V Chanaka"
@@ -78,7 +78,7 @@ test('should convert certificate in eu specified payload if country field is ful
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
@@ -129,7 +129,7 @@ test('should convert certificate in eu specified payload if country field is 2 l
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
@@ -180,7 +180,7 @@ test('should convert certificate in eu specified payload if country field is inv
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
