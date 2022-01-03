@@ -19,15 +19,15 @@ type ErrorResponse struct {
 }
 
 type CertificateKYCResponse struct {
-	Name        string 		`json:"name"`
-	Age         string 		`json:"age"`
-	Gender      string 		`json:"gender"`
-	Identity    string 		`json:"identity"`
-	RefId       string 		`json:"refId"`
-	Vaccine     string 		`json:"vaccine"`
-	Status    	string 		`json:"status"`
-	DateOfDose1 string 	`json:"dateOfDose1"`
-	DateOfDose2 string 	`json:"dateOfDose2"`
+	Name        string `json:"name"`
+	Age         string `json:"age"`
+	Gender      string `json:"gender"`
+	Identity    string `json:"identity"`
+	RefId       string `json:"refId"`
+	Vaccine     string `json:"vaccine"`
+	Status      string `json:"status"`
+	DateOfDose1 string `json:"dateOfDose1"`
+	DateOfDose2 string `json:"dateOfDose2"`
 }
 
 const NOT_VACCINATED = "NOT_VACCINATED"
@@ -146,7 +146,7 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request, eventTag s
 				publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Certificate not found")
 				return
 			} else {
-				if pdfBytes, err := getCertificateAsPdfV3(certificatesByDose, getLanguageFromQueryParams(r)); err != nil {
+				if pdfBytes, err := getVaccineCertificateAsPdf(certificatesByDose, getLanguageFromQueryParams(r)); err != nil {
 					log.Errorf("Error in creating certificate pdf")
 					publishEvent(pkg.ToString(beneficiaryId), eventTag+EventTagFailed, "Unknown "+err.Error())
 					w.WriteHeader(500)

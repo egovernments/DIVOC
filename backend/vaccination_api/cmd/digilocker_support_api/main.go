@@ -57,18 +57,22 @@ const YYYYMMDD = "2006-01-02"
 const DEFAULT_DUE_DATE_N_DAYS = 28
 const MaxDisplayCharacters = 40
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
+
 var vaccineProphylaxis = map[string]string{
-	"covaxin": "COVID-19 vaccine, inactivated virus",
+	"covaxin":    "COVID-19 vaccine, inactivated virus",
 	"covishield": "COVID-19 vaccine, non-replicating viral vector",
-	"sputnik": "COVID-19 vaccine, non-replicating viral vector",
-	"zycov": "COVID-19 vaccine, DNA based",
+	"sputnik":    "COVID-19 vaccine, non-replicating viral vector",
+	"zycov":      "COVID-19 vaccine, DNA based",
 }
 
 type DoseWiseData struct {
-	dose        int
-	doseDate    string
-	batchNumber string
-	country     string
+	dose         int
+	doseDate     string
+	batchNumber  string
+	country      string
+	name         string
+	vaccineType  string
+	manufacturer string
 }
 
 var (
@@ -255,6 +259,255 @@ func getCertificateVariant(certificate models.Certificate) string {
 	}
 }
 
+func getProphylaxis(certificate models.Certificate) string {
+	if certificate.Evidence[0].Prophylaxis == "" {
+		vaccine := strings.ToLower(certificate.Evidence[0].Vaccine)
+		for vaccName, proph := range vaccineProphylaxis {
+			if strings.Contains(vaccine, vaccName) {
+				return proph
+			}
+		}
+	}
+	return certificate.Evidence[0].Prophylaxis
+}
+
+func getVaccineCertificateAsPdf(certificateByDoses map[int][]map[string]interface{}, language string) ([]byte, error) {
+	var certificate models.Certificate
+	latestCertificate := getLatestCertificate(certificateByDoses)
+	latestCertificateText := latestCertificate["certificate"].(string)
+	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
+		log.Error("Unable to parse certificate string", err)
+		return nil, err
+	}
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
+	doseValue := certificate.Evidence[0].Dose
+
+	if doseValue <= totalDoses {
+		return getCertificateAsPdfV3(certificateByDoses, language)
+	} else {
+		return getCertificateAsPdfV4(certificateByDoses, language)
+	}
+}
+
+func getCertificateAsPdfV4(certificateByDoses map[int][]map[string]interface{}, language string) ([]byte, error) {
+	var certificate models.Certificate
+	latestCertificate := getLatestCertificate(certificateByDoses)
+	var doseWiseData []DoseWiseData
+	for dose, certificates := range certificateByDoses {
+		latestDoseCertificate := certificates[len(certificates)-1]
+		var certificate models.Certificate
+		if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
+			log.Error("Unable to parse certificate string", err)
+			return nil, err
+		}
+		doseWiseData = append(doseWiseData, DoseWiseData{
+			dose:         dose,
+			doseDate:     formatDateYYYYMMDD(certificate.Evidence[0].Date),
+			batchNumber:  certificate.Evidence[0].Batch,
+			country:      certificate.Evidence[0].Facility.Address.AddressCountry,
+			name:         certificate.Evidence[0].Vaccine,
+			vaccineType:  getProphylaxis(certificate),
+			manufacturer: certificate.Evidence[0].Manufacturer,
+		})
+	}
+	latestCertificateText := latestCertificate["certificate"].(string)
+	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
+		log.Error("Unable to parse certificate string", err)
+		return nil, err
+	}
+	if len(language) == 0 {
+		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
+	}
+	if len(language) == 0 {
+		language = "ENG"
+	}
+	pdf := gopdf.GoPdf{}
+	pdf.Start(gopdf.Config{PageSize: *gopdf.PageSizeA4})
+	pdf.AddPage()
+
+	if err := pdf.AddTTFFont("Proxima-Nova-Bold", "config/FontsFree-Net-proxima_nova_bold-webfont.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	if err := pdf.AddTTFFont("Roboto-Light", "config/Roboto-Light.ttf"); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(certificate.Evidence[0].Dose, totalDoses, strings.ToUpper(language)), 1, "/MediaBox")
+	// Draw pdf onto page
+	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
+
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+
+	// header certificateId
+	pdf.SetX(300.0)
+	pdf.SetY(159.0)
+	dText := certificate.Evidence[0].CertificateId
+	_ = pdf.Cell(nil, dText)
+
+	offsetX := 290.0
+	offsetY := 203.0
+	offsetNewX := 290.0
+	offsetNewY := 397.0
+	rowSize := 7
+
+	displayLabels := []string{
+		certificate.CredentialSubject.Name,
+		certificate.CredentialSubject.Age,
+		certificate.CredentialSubject.Gender,
+		formatId(certificate.CredentialSubject.ID),
+		certificate.CredentialSubject.Uhid,
+		certificate.CredentialSubject.RefId,
+	}
+	displayLabels = append(displayLabels, "Fully Vaccinated with "+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses ")
+	displayLabels = append(displayLabels, strconv.Itoa(certificate.Evidence[0].Dose-totalDoses)+" Precaution Dose")
+
+	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
+	i := 0
+	wrappedNames := splitNameIfLengthIsLonger(pdf, displayLabels)
+	if len(wrappedNames) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		nameOffsetY := offsetY - float64(5*(len(wrappedNames)))
+		for k := 0; k < len(wrappedNames); k++ {
+			pdf.SetX(offsetX)
+			pdf.SetY(nameOffsetY + float64(k)*14.7)
+			_ = pdf.Cell(nil, wrappedNames[k])
+		}
+		i += 1
+	}
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+		log.Print(err.Error())
+		return nil, err
+	}
+	for ; i < rowSize; i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*24)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	pdf.SetX(offsetX)
+	pdf.SetY(offsetY + 6*24 + 12)
+	_ = pdf.Cell(nil, displayLabels[7])
+
+	displayLabels = []string{
+		certificate.Evidence[0].Verifier.Name,
+		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
+			certificate.Evidence[0].Facility.Address.District),
+			certificate.Evidence[0].Facility.Address.AddressRegion),
+	}
+	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
+	for i = 0; i < len(displayLabels); i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetNewY)
+		offsetNewY = offsetNewY + 24
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+
+	//Building table
+
+	offsetNewY = offsetNewY + 36
+	offsetNewX = 39
+	previousOffsetNewX := offsetNewX
+	for i = 0; i < len(doseWiseData); i++ {
+		data, _ := getDataForDose(doseWiseData, i+1)
+		offsetNewX = previousOffsetNewX
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		var doseValue interface{}
+		var currentFont string
+		if data.dose > totalDoses {
+			currentFont = "Proxima-Nova-Bold"
+			if err := pdf.SetFont(currentFont, "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			doseValue = "Precaution"
+		} else {
+			currentFont = "Roboto-Light"
+			if err := pdf.SetFont(currentFont, "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			doseValue = data.dose
+		}
+		_ = pdf.Cell(nil, pkg.ToString(doseValue))
+		offsetNewX = offsetNewX + 57
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.doseDate)
+		offsetNewX = offsetNewX + 78
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.name)
+		offsetNewX = offsetNewX + 107
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.batchNumber)
+		offsetNewX = offsetNewX + 62
+		previousOffsetNewY := offsetNewY
+		vaccineTypeStrings := splitVaccineTypeIfLengthIsLonger(pdf, data.vaccineType)
+		if len(vaccineTypeStrings) > 1 {
+			offsetNewY = offsetNewY - float64(5*(len(vaccineTypeStrings)))
+			pdf.SetY(offsetNewY)
+			if err := pdf.SetFont(currentFont, "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			for _, value := range vaccineTypeStrings {
+				pdf.SetX(offsetNewX)
+				_ = pdf.Cell(nil, value)
+				offsetNewY = offsetNewY + 10
+				pdf.SetY(offsetNewY)
+			}
+			offsetNewY = previousOffsetNewY
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.vaccineType)
+		}
+		offsetNewX = offsetNewX + 149
+		manufacturerStrings := splitManufacturerIfLengthIsLonger(pdf, data.manufacturer)
+		if len(manufacturerStrings) > 1 {
+			offsetNewY = offsetNewY - float64(3*(len(manufacturerStrings)))
+			pdf.SetY(offsetNewY)
+			if err := pdf.SetFont(currentFont, "", 6); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			for _, value := range manufacturerStrings {
+				pdf.SetX(offsetNewX)
+				_ = pdf.Cell(nil, value)
+				offsetNewY = offsetNewY + 7
+				pdf.SetY(offsetNewY)
+			}
+			offsetNewY = previousOffsetNewY
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.manufacturer)
+		}
+		offsetNewY = offsetNewY + 20
+	}
+
+	//Table end
+
+	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 580)
+	if e != nil {
+		log.Errorf("error in pasting qr code %v", e)
+		return nil, e
+	}
+
+	var b bytes.Buffer
+	_ = pdf.Write(&b)
+	return b.Bytes(), nil
+}
+
 func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, language string) ([]byte, error) {
 	var certificate models.Certificate
 	latestCertificate := getLatestCertificate(certificateByDoses)
@@ -292,7 +545,8 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(certificate.Evidence[0].Dose, totalDoses, strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
@@ -328,7 +582,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		if certificate.Evidence[0].Dose > 1 {
 			dose = "Doses"
 		}
-		displayLabels = append(displayLabels, "Partially Vaccinated ("+pkg.ToString(certificate.Evidence[0].Dose)+" "+ dose+ ")")
+		displayLabels = append(displayLabels, "Partially Vaccinated ("+pkg.ToString(certificate.Evidence[0].Dose)+" "+dose+")")
 	}
 	//offsetYs := []float64{0, 20.0, 40.0, 60.0}
 	i := 0
@@ -338,13 +592,13 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			log.Print(err.Error())
 			return nil, err
 		}
-		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		nameOffsetY := offsetY - float64(5*(len(wrappedNames)))
 		for k := 0; k < len(wrappedNames); k++ {
 			pdf.SetX(offsetX)
-			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			pdf.SetY(nameOffsetY + float64(k)*14.7)
 			_ = pdf.Cell(nil, wrappedNames[k])
 		}
-		i +=1
+		i += 1
 	}
 	if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
 		log.Print(err.Error())
@@ -494,7 +748,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		certificate.CredentialSubject.Dob,
 		certificate.CredentialSubject.Gender,
 		getPassportIdValue(certificate.CredentialSubject.ID),
-		"Fully Vaccinated ("+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses)",
+		"Fully Vaccinated (" + pkg.ToString(certificate.Evidence[0].TotalDoses) + " Doses)",
 		certificate.CredentialSubject.RefId,
 	}
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
@@ -506,13 +760,13 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Print(err.Error())
 			return nil, err
 		}
-		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		nameOffsetY := offsetY - float64(5*(len(wrappedNames)))
 		for k := 0; k < len(wrappedNames); k++ {
 			pdf.SetX(offsetX)
-			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			pdf.SetY(nameOffsetY + float64(k)*14.7)
 			_ = pdf.Cell(nil, wrappedNames[k])
 		}
-		i +=1
+		i += 1
 	}
 	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
 		log.Print(err.Error())
@@ -568,7 +822,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 }
 
 func getDataForDose(doseWiseData []DoseWiseData, dose int) (DoseWiseData, error) {
-	for i:=0; i < len(doseWiseData); i++ {
+	for i := 0; i < len(doseWiseData); i++ {
 		if dose == doseWiseData[i].dose {
 			return doseWiseData[i], nil
 		}
@@ -602,7 +856,8 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(certificate.Evidence[0].Dose, totalDoses, strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
@@ -611,10 +866,10 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		return nil, err
 	}
 
-	// header dose	
+	// header dose
 	doffsetX := 300.0
 	doffsetY := 159.0
-	pdf.SetTextColor(41,73,121) // blue
+	pdf.SetTextColor(41, 73, 121) // blue
 	pdf.SetX(doffsetX)
 	pdf.SetY(doffsetY)
 	dText := formatDose(certificate.Evidence[0].Dose)
@@ -646,13 +901,13 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 			log.Print(err.Error())
 			return nil, err
 		}
-		nameOffsetY := offsetY - float64(5 * (len(wrappedNames)))
+		nameOffsetY := offsetY - float64(5*(len(wrappedNames)))
 		for k := 0; k < len(wrappedNames); k++ {
 			pdf.SetX(offsetX)
-			pdf.SetY(nameOffsetY + float64(k)*14.7 )
+			pdf.SetY(nameOffsetY + float64(k)*14.7)
 			_ = pdf.Cell(nil, wrappedNames[k])
 		}
-		i +=1
+		i += 1
 	}
 	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
 		log.Print(err.Error())
@@ -695,7 +950,7 @@ func wrapLongerText(text string, lineWidth int) []string {
 			wrapped = append(wrapped, word)
 			spaceLeft = lineWidth - len(word)
 		} else {
-			wrapped[len(wrapped) - 1] += " " + word
+			wrapped[len(wrapped)-1] += " " + word
 			spaceLeft -= 1 + len(word)
 		}
 	}
@@ -710,6 +965,16 @@ func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) [
 	displayLabels = displayLabels[:len(displayLabels)-1]
 	displayLabels = append(displayLabels, wrap...)
 	return displayLabels
+}
+
+func splitVaccineTypeIfLengthIsLonger(pdf gopdf.GoPdf, vaccineType string) []string {
+	wrappedVaccineType := wrapLongerText(vaccineType, 46)
+	return wrappedVaccineType
+}
+
+func splitManufacturerIfLengthIsLonger(pdf gopdf.GoPdf, manufacturer string) []string {
+	wrappedManufacturer := wrapLongerText(manufacturer, 29)
+	return wrappedManufacturer
 }
 
 func splitNameIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
@@ -992,7 +1257,7 @@ func getCertificateIdWithDoseHandler(w http.ResponseWriter, r *http.Request) {
 				log.Errorf("Error in converting json %+v", err)
 				w.WriteHeader(500)
 			} else {
-				response := map[string]string {"certificateId": certificate.Evidence[0].CertificateId}
+				response := map[string]string{"certificateId": certificate.Evidence[0].CertificateId}
 				writeResponse(w, 200, response)
 			}
 
@@ -1072,7 +1337,7 @@ func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
 	if dose, err := strconv.ParseInt(vars[Dose], 10, 64); err != nil {
 		w.WriteHeader(400)
 	} else {
-		certificatesByDoses, err :=  getCertificatesByDosesForDose(preEnrollmentCode, dose)
+		certificatesByDoses, err := getCertificatesByDosesForDose(preEnrollmentCode, dose)
 
 		if err != nil {
 			log.Infof("Error %+v", err)
@@ -1082,7 +1347,7 @@ func getCertificateByDoseHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if certificatesByDoses != nil {
-			if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
+			if pdfBytes, err := getVaccineCertificateAsPdf(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
 				log.Errorf("Error in creating certificate pdf")
 				w.WriteHeader(500)
 				publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -1163,7 +1428,7 @@ func headPDFHandler(w http.ResponseWriter, r *http.Request) {
 
 func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 	if getCertificateTypeFromQueryParams(r) == "ddcc" {
-		getDDCCPDFHandlerV3(w,r)
+		getDDCCPDFHandlerV3(w, r)
 	} else {
 		getPDFHandlerV3(w, r)
 	}
@@ -1185,7 +1450,7 @@ func getDDCCPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	log.Info("get ddcc pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	certificatesByDoses, err :=  getCertificatesByDoses(preEnrollmentCode)
+	certificatesByDoses, err := getCertificatesByDoses(preEnrollmentCode)
 
 	if err != nil {
 		log.Infof("Error %+v", err)
@@ -1210,14 +1475,13 @@ func getDDCCPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-
 }
 
 func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	log.Info("get pdf certificate")
 	vars := mux.Vars(r)
 	preEnrollmentCode := vars[PreEnrollmentCode]
-	certificatesByDoses, err :=  getCertificatesByDoses(preEnrollmentCode)
+	certificatesByDoses, err := getCertificatesByDoses(preEnrollmentCode)
 
 	if err != nil {
 		log.Infof("Error %+v", err)
@@ -1227,7 +1491,7 @@ func getPDFHandlerV3(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if certificatesByDoses != nil {
-		if pdfBytes, err := getCertificateAsPdfV3(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
+		if pdfBytes, err := getVaccineCertificateAsPdf(certificatesByDoses, getLanguageFromQueryParams(r)); err != nil {
 			log.Errorf("Error in creating certificate pdf")
 			w.WriteHeader(500)
 			publishEvent(preEnrollmentCode, EventTagInternal+EventTagError, "Error in creating pdf")
@@ -1310,7 +1574,7 @@ func getCertificatesByDoses(preEnrollmentCode string) (map[int][]map[string]inte
 			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err != nil {
 				log.Error("Unable to parse certificate string", err)
 			} else {
-				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold){
+				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold) {
 					// converting cert string to certificatesByDoses
 					result := map[string]interface{}{"certificate": cachedCertificate}
 					return map[int][]map[string]interface{}{
@@ -1368,7 +1632,7 @@ func getSignedJson(preEnrollmentCode string) (string, string, error) {
 			if err := json.Unmarshal([]byte(cachedCertificate), &certificate); err != nil {
 				log.Error("Unable to parse certificate string", err)
 			} else {
-				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold){
+				if certificate.Evidence[0].Dose == 1 && vaccinatedRecently(certificate.Evidence[0].Date, config.Config.Certificate.CacheRecentThreshold) {
 					latestSignedJson := cachedCertificate
 					provisionalSignedJson := ""
 					return latestSignedJson, provisionalSignedJson, nil
@@ -1416,7 +1680,7 @@ func getProvisionalCertificate(certificatesByDose map[int][]map[string]interface
 			minDose = key
 		}
 	}
-	return certificatesByDose[minDose][len(certificatesByDose[minDose]) - 1]
+	return certificatesByDose[minDose][len(certificatesByDose[minDose])-1]
 }
 
 func getLatestCertificate(certificatesByDose map[int][]map[string]interface{}) map[string]interface{} {
@@ -1426,7 +1690,7 @@ func getLatestCertificate(certificatesByDose map[int][]map[string]interface{}) m
 			maxDose = key
 		}
 	}
-	return certificatesByDose[maxDose][len(certificatesByDose[maxDose]) - 1]
+	return certificatesByDose[maxDose][len(certificatesByDose[maxDose])-1]
 }
 
 func publishEvent(preEnrollmentCode string, typeOfEvent string, info string) {

@@ -158,7 +158,7 @@ func docRequest(w http.ResponseWriter, req *http.Request) {
 							}
 						}
 					} else {
-						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
+						if pdfBytes, err := getVaccineCertificateAsPdf(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
 							log.Errorf("Error in creating domestic certificate pdf")
 							go kafkaService.PublishEvent(models.Event{
 								Date:          time.Time{},
@@ -254,7 +254,7 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 							}
 						}
 					} else {
-						if pdfBytes, err := getCertificateAsPdfV3(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
+						if pdfBytes, err := getVaccineCertificateAsPdf(certBundle.certificatesByDoses, getLanguageFromQueryParams(req)); err != nil {
 							log.Errorf("Error in creating domestic certificate pdf")
 						} else {
 							response.DocDetails.DocContent = base64.StdEncoding.EncodeToString(pdfBytes)
@@ -339,11 +339,11 @@ func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string
 }
 
 type VaccinationCertificateBundle struct {
-	certificateId         string
-	Uri                   string
-	mobile                string
-	name                  string
-	certificatesByDoses   map[int][]map[string]interface{}
+	certificateId       string
+	Uri                 string
+	mobile              string
+	name                string
+	certificatesByDoses map[int][]map[string]interface{}
 }
 
 func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
@@ -364,7 +364,7 @@ func getCertificateByUri(uri string, dob string) *VaccinationCertificateBundle {
 				}
 				// fetch provisional certs
 				preEnrollmentCode := latestCertificate["preEnrollmentCode"].(string)
-				prevCertificatesByDoses, err :=  getCertificatesByDosesForDose(preEnrollmentCode, int64(dose-1))
+				prevCertificatesByDoses, err := getCertificatesByDosesForDose(preEnrollmentCode, int64(dose-1))
 				if err == nil {
 					for d, v := range prevCertificatesByDoses {
 						certificatesByDoses[d] = v

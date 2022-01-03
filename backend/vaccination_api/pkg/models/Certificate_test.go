@@ -23,8 +23,9 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 	// TODO: use mock instead of overriding
 	config.PollingStates = []string{"tamil nadu"}
 	type args struct {
-		isFinal  bool
-		language string
+		dose       int
+		totalDoses int
+		language   string
 	}
 	tests := []struct {
 		name        string
@@ -35,25 +36,25 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 		{
 			certificate: certificateWithPS,
 			name:        "Non polling state provisional template",
-			args:        args{false, "HIN"},
+			args:        args{1, 2, "HIN"},
 			want:        "config/cov19–HIN-1-PS.pdf",
 		},
 		{
 			certificate: certificateWithPS,
 			name:        "polling state with final template",
-			args:        args{true, "HIN"},
+			args:        args{2, 2, "HIN"},
 			want:        "config/cov19–HIN-2-PS.pdf",
 		},
 		{
 			certificate: certificateWithNPS,
 			name:        "Non polling state provisional template",
-			args:        args{false, "HIN"},
+			args:        args{1, 2, "HIN"},
 			want:        "config/cov19–HIN-1-NPS.pdf",
 		},
 		{
 			certificate: certificateWithNPS,
 			name:        "polling state with final template",
-			args:        args{true, "HIN"},
+			args:        args{2, 2, "HIN"},
 			want:        "config/cov19–HIN-2-NPS.pdf",
 		},
 	}
@@ -69,7 +70,7 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 				NonTransferable:   tt.certificate.NonTransferable,
 				Proof:             tt.certificate.Proof,
 			}
-			if got := certificate.GetTemplateName(tt.args.isFinal, tt.args.language); got != tt.want {
+			if got := certificate.GetTemplateName(tt.args.dose, tt.args.totalDoses, tt.args.language); got != tt.want {
 				t.Errorf("GetTemplateName() = %v, want %v", got, tt.want)
 			}
 		})
@@ -147,7 +148,6 @@ func TestCertificate_GetNextDueDateInfo(t *testing.T) {
 			certificate,
 			"Due on 19 Apr 2021",
 		},
-
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -232,51 +232,53 @@ func TestCertificate_IsVaccinatedStatePollingOne(t *testing.T) {
 		}
 	}
 	config.Initialize()
-	ar := fields {Evidence: []struct {
-		ID             string                              `json:"id"`;
-		FeedbackURL    string                              `json:"feedbackUrl"`;
-		InfoURL        string                              `json:"infoUrl"`;
-		Type           []string                            `json:"type"`;
-		Batch          string                              `json:"batch"`;
-		Vaccine        string                              `json:"vaccine"`;
-		Manufacturer   string                              `json:"manufacturer"`;
-		Date           time.Time                           `json:"date"`;
-		EffectiveStart string                              `json:"effectiveStart"`;
-		EffectiveUntil string                              `json:"effectiveUntil"`;
-		CertificateId  string                              `json:"certificateId"`;
-		Dose           int                                 `json:"dose"`;
-		TotalDoses     interface{}                         `json:"totalDoses"`;
-		Verifier       struct{ Name string `json:"name"` } `json:"verifier"`;
-		Facility       struct {
-			Name    string `json:"name"`;
+	ar := fields{Evidence: []struct {
+		ID             string      `json:"id"`
+		FeedbackURL    string      `json:"feedbackUrl"`
+		InfoURL        string      `json:"infoUrl"`
+		Type           []string    `json:"type"`
+		Batch          string      `json:"batch"`
+		Vaccine        string      `json:"vaccine"`
+		Manufacturer   string      `json:"manufacturer"`
+		Date           time.Time   `json:"date"`
+		EffectiveStart string      `json:"effectiveStart"`
+		EffectiveUntil string      `json:"effectiveUntil"`
+		CertificateId  string      `json:"certificateId"`
+		Dose           int         `json:"dose"`
+		TotalDoses     interface{} `json:"totalDoses"`
+		Verifier       struct {
+			Name string `json:"name"`
+		} `json:"verifier"`
+		Facility struct {
+			Name    string `json:"name"`
 			Address struct {
-				StreetAddress  string      `json:"streetAddress"`;
-				StreetAddress2 string      `json:"streetAddress2"`;
-				District       string      `json:"district"`;
-				City           string      `json:"city"`;
-				AddressRegion  string      `json:"addressRegion"`;
-				AddressCountry string      `json:"addressCountry"`;
+				StreetAddress  string      `json:"streetAddress"`
+				StreetAddress2 string      `json:"streetAddress2"`
+				District       string      `json:"district"`
+				City           string      `json:"city"`
+				AddressRegion  string      `json:"addressRegion"`
+				AddressCountry string      `json:"addressCountry"`
 				PostalCode     interface{} `json:"postalCode"`
 			} `json:"address"`
 		} `json:"facility"`
 	}{{Facility: struct {
-		Name    string `json:"name"`;
+		Name    string `json:"name"`
 		Address struct {
-			StreetAddress  string      `json:"streetAddress"`;
-			StreetAddress2 string      `json:"streetAddress2"`;
-			District       string      `json:"district"`;
-			City           string      `json:"city"`;
-			AddressRegion  string      `json:"addressRegion"`;
-			AddressCountry string      `json:"addressCountry"`;
+			StreetAddress  string      `json:"streetAddress"`
+			StreetAddress2 string      `json:"streetAddress2"`
+			District       string      `json:"district"`
+			City           string      `json:"city"`
+			AddressRegion  string      `json:"addressRegion"`
+			AddressCountry string      `json:"addressCountry"`
 			PostalCode     interface{} `json:"postalCode"`
 		} `json:"address"`
 	}{Address: struct {
-		StreetAddress  string      `json:"streetAddress"`;
-		StreetAddress2 string      `json:"streetAddress2"`;
-		District       string      `json:"district"`;
-		City           string      `json:"city"`;
-		AddressRegion  string      `json:"addressRegion"`;
-		AddressCountry string      `json:"addressCountry"`;
+		StreetAddress  string      `json:"streetAddress"`
+		StreetAddress2 string      `json:"streetAddress2"`
+		District       string      `json:"district"`
+		City           string      `json:"city"`
+		AddressRegion  string      `json:"addressRegion"`
+		AddressCountry string      `json:"addressCountry"`
 		PostalCode     interface{} `json:"postalCode"`
 	}{
 		AddressRegion: "",

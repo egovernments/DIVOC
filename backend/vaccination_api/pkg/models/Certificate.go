@@ -10,6 +10,7 @@ import (
 
 const layout = "02 Jan 2006"
 const DefaultDueDays = 20
+
 var vaccineEffectiveDaysInfo = map[string]map[string]int{
 	"covaxin": {
 		"from": 28,
@@ -17,11 +18,11 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 	},
 	"covishield": {
 		"from": 84,
-		"to": 112,
+		"to":   112,
 	},
 	"sputnik v": {
 		"from": 21,
-		"to": 90,
+		"to":   90,
 	},
 	"zycov": {
 		"dueDays": 28,
@@ -53,19 +54,19 @@ type Certificate struct {
 	Issuer       string `json:"issuer"`
 	IssuanceDate string `json:"issuanceDate"`
 	Evidence     []struct {
-		ID             string    `json:"id"`
-		FeedbackURL    string    `json:"feedbackUrl"`
-		InfoURL        string    `json:"infoUrl"`
-		Type           []string  `json:"type"`
-		Batch          string    `json:"batch"`
-		Vaccine        string    `json:"vaccine"`
-		Manufacturer   string    `json:"manufacturer"`
-		Date           time.Time `json:"date"`
-		EffectiveStart string    `json:"effectiveStart"`
-		EffectiveUntil string    `json:"effectiveUntil"`
-		CertificateId  string    `json:"certificateId"`
-		Dose           int       `json:"dose"`
-		TotalDoses     interface{}       `json:"totalDoses"`
+		ID             string      `json:"id"`
+		FeedbackURL    string      `json:"feedbackUrl"`
+		InfoURL        string      `json:"infoUrl"`
+		Type           []string    `json:"type"`
+		Batch          string      `json:"batch"`
+		Vaccine        string      `json:"vaccine"`
+		Manufacturer   string      `json:"manufacturer"`
+		Date           time.Time   `json:"date"`
+		EffectiveStart string      `json:"effectiveStart"`
+		EffectiveUntil string      `json:"effectiveUntil"`
+		CertificateId  string      `json:"certificateId"`
+		Dose           int         `json:"dose"`
+		TotalDoses     interface{} `json:"totalDoses"`
 		Verifier       struct {
 			Name string `json:"name"`
 		} `json:"verifier"`
@@ -100,7 +101,7 @@ func (certificate *Certificate) GetFacilityPostalCode() string {
 	return certificate.Evidence[0].Facility.Address.PostalCode.(string)
 }
 
-func (certificate *Certificate) GetTemplateName(isFinal bool, language string) string {
+func (certificate *Certificate) GetTemplateName(dose int, totalDoses int, language string) string {
 	var certType string
 	var pollingType string
 
@@ -109,7 +110,9 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	} else {
 		pollingType = "NPS"
 	}
-	if isFinal {
+	if dose > totalDoses {
+		certType = "3"
+	} else if dose == totalDoses {
 		certType = "2"
 	} else {
 		certType = "1"
