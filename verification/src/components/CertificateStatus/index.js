@@ -152,7 +152,9 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         const dose = data["evidence"][0]["dose"]
         const totalDoses = data["evidence"][0]["totalDoses"] || 2
 
-        if (dose === totalDoses) {
+        if (dose > totalDoses) {
+            return "Final Certificate with Precaution dose for COVID-19 Vaccination"
+        } else if (dose === totalDoses) {
             return "Final Certificate for COVID-19 Vaccination"
         } else {
             return `Provisional Certificate for COVID-19 Vaccination (${getDose(data)} Dose)`
