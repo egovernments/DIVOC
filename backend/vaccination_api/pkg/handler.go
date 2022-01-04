@@ -741,11 +741,14 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	if resp, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
 		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificates) > 0 {
+				log.Infof("revoked certificate");
 				return certificate_revoked.NewCertificateRevokedOK()
 			}
+			log.Infof("revoked certificate not found");
 			return certificate_revoked.NewCertificateRevokedNotFound()
 		}
 	}
+	log.Infof("revoked certificate badrequest",err);
 	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
 

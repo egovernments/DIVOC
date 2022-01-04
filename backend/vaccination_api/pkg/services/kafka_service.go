@@ -281,15 +281,22 @@ func startCertificateRevocationConsumer(servers string) {
 			msg, err := consumer.ReadMessage(-1)
 			if err == nil {
 				var message models.CertifiedMessage
+				var certificate models.Certificate
+				var dose int
 				if err := json.Unmarshal(msg.Value, &message); err == nil {
 					// check the status
 					// update that status to certifyErrorRows db
+					if err := json.Unmarshal([]byte(message.Certificate), &certificate); err == nil {
+						dose = certificate.Evidence[0].Dose;
+					} else {
+						log.Infof("Certificate unmarshaling error: %v \n", err)
+					}
 					if message.Meta.PreviousCertificateID != "" {
 						log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 						revokedCertificate := map[string]interface{}{
 							"preEnrollmentCode":     message.PreEnrollmentCode,
 							"certificateId":         message.CertificateId,
-							"dose":                  message.Dose,
+							"dose":                  dose,
 							"previousCertificateId": message.Meta.PreviousCertificateID,
 						}
 						_, err := services.CreateNewRegistry(revokedCertificate, "RevokedCertificate")

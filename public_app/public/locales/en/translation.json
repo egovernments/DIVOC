@@ -194,6 +194,8 @@
     "scanWithQR": "SCAN WITH QR",
     "validStatus": "Successful",
     "invalidStatus": "Invalid Certificate",
+    "revokedStatus": "Certificate Revoked",
+    "revokeText": "Your Certificate has been revoked",
     "verifyAnotherCertificate": "Verify Another Certificate",
     "infoCard": [
       {
