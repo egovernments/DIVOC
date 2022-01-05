@@ -6,14 +6,16 @@ const getCertificatesByDose = (certificates) => {
   const certificatesMap = new Map();
   for(const certificate of certificates) {
     const parsedEvidence = JSON.parse(certificate.certificate);
-    let certificatesOfDose = new Array();
-    if(certificatesMap.get(parsedEvidence.evidence[0].dose) !== undefined) {
-      certificatesForDose = certificatesMap.get(parsedEvidence.evidence[0].dose);
+    let certificatesOfDose;
+    if(certificatesMap.get(parsedEvidence.evidence[0].dose) === undefined) {
+      certificatesOfDose = new Array();
+    }
+    else {
+      certificatesOfDose = certificatesMap.get(parsedEvidence.evidence[0].dose);
     }
     certificatesOfDose.push(certificate);
     certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesOfDose);
   }
-  console.log('Certificates : \n', certificatesMap);
   return certificatesMap;
 }
 const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
