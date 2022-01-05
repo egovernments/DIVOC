@@ -58,7 +58,7 @@ export const CertificateDetailsPaths = {
             const dose = parseInt(data.dose)
             const totalDoses = parseInt(data.totalDoses) || 2
             if (dose > totalDoses) {
-                return "Fully Vaccinated (" + totalDoses + " doses) and a Precautionary dose"
+               return "Fully vaccinated and precaution dose administered"
             } else if (dose < totalDoses) {
                 return "Partially Vaccinated"
             } else {

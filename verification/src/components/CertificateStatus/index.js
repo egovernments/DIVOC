@@ -148,23 +148,18 @@ export const CertificateStatus = ({certificateData, goBack}) => {
         if (!data || !data["evidence"]) {
             return ""
         }
-
-        const dose = data["evidence"][0]["dose"]
-        const totalDoses = data["evidence"][0]["totalDoses"] || 2
-
-        if (dose > totalDoses) {
-            return "Final Certificate with Precaution dose for COVID-19 Vaccination"
-        } else if (dose === totalDoses) {
-            return "Final Certificate for COVID-19 Vaccination"
-        } else {
-            return `Provisional Certificate for COVID-19 Vaccination (${getDose(data)} Dose)`
-        }
+        return "Certificate for COVID-19 Vaccination"
     }
 
     function getDose(data) {
         if (!data || !data["evidence"]) {
             return ""
         }
+
+        if(parseInt(data["evidence"][0]["dose"]) > parseInt(data["evidence"][0]["totalDoses"])){
+            return "Precaution"
+        }
+        
         return ordinal_suffix_of(data["evidence"][0]["dose"])
     }
 
