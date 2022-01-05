@@ -31,6 +31,9 @@ const server = http.createServer(async (req, res) => {
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/eu-certificate")) {
         const data = await certificateController.certificateAsEUPayload(req, res);
         res.end(data)
+    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/shc-certificate")) {
+        const data = await certificateController.certificateAsSHCPayload(req, res);
+        res.end(data)
     } else if (req.method === 'GET' && req.url.match("/certificate/api/test/certificatePDF/.+")) {
         const data = await certificateController.getTestCertificatePDFByPreEnrollmentCode(req, res);
         res.end(data)
