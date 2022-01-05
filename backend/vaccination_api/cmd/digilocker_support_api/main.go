@@ -278,6 +278,8 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		log.Error("Unable to parse certificate string", err)
 		return nil, err
 	}
+	latestDose := certificate.Evidence[0].Dose
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
 	if len(language) == 0 {
 		language = stateLanguageMapping[certificate.GetStateNameInLowerCaseLetter()]
 	}
@@ -292,7 +294,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(latestDose, totalDoses, strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
@@ -321,7 +323,9 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		certificate.CredentialSubject.Uhid,
 		certificate.CredentialSubject.RefId,
 	}
-	if isFinal(certificate) {
+	if latestDose > totalDoses {
+		displayLabels = append(displayLabels, "Fully Vaccinated ("+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses) and a Precaution Dose")
+	} else if isFinal(certificate) {
 		displayLabels = append(displayLabels, "Fully Vaccinated ("+pkg.ToString(certificate.Evidence[0].TotalDoses)+" Doses)")
 	} else {
 		dose := "Dose"
@@ -350,7 +354,24 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		log.Print(err.Error())
 		return nil, err
 	}
-	for ; i < rowSize; i++ {
+	for ; i < rowSize-1; i++ {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetY + float64(i)*20)
+		_ = pdf.Cell(nil, displayLabels[i])
+	}
+	wrappedVaccinationStatus := splitVaccinationStatusIfLengthIsLonger(pdf, displayLabels[i])
+	if len(wrappedVaccinationStatus) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		statusOffsetY := offsetY + float64(i)*20 - float64(3*(len(wrappedVaccinationStatus)))
+		for k := 0; k < len(wrappedVaccinationStatus); k++ {
+			pdf.SetX(offsetX)
+			pdf.SetY(statusOffsetY + float64(k)*10)
+			_ = pdf.Cell(nil, wrappedVaccinationStatus[k])
+		}
+	} else {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
@@ -382,7 +403,11 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		offsetNewY = previousOffsetNewY
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
+		if data.dose > totalDoses {
+			_ = pdf.Cell(nil, "Precaution dose")
+		} else {
+			_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
+		}
 		pdf.SetX(offsetNewX)
 		offsetNewY = offsetNewY + 20
 		pdf.SetY(offsetNewY)
@@ -396,7 +421,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		pdf.SetY(offsetNewY)
 		offsetNewX = offsetNewX + 100
 	}
-	if !isFinal(certificate) {
+	if latestDose < totalDoses {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetNewY)
 		offsetNewY = offsetNewY + 20
@@ -602,7 +627,8 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		log.Print(err.Error())
 		return nil, err
 	}
-	tpl1 := pdf.ImportPage(certificate.GetTemplateName(isFinal(certificate), strings.ToUpper(language)), 1, "/MediaBox")
+	totalDoses := toInteger(certificate.Evidence[0].TotalDoses, 2)
+	tpl1 := pdf.ImportPage(certificate.GetTemplateName(certificate.Evidence[0].Dose, totalDoses, strings.ToUpper(language)), 1, "/MediaBox")
 	// Draw pdf onto page
 	pdf.UseImportedTemplate(tpl1, 0, 0, 600, 0)
 
@@ -611,7 +637,7 @@ func getCertificateAsPdfV2(latestCertificateText string, provisionalSignedJson s
 		return nil, err
 	}
 
-	// header dose	
+	// header dose
 	doffsetX := 300.0
 	doffsetY := 159.0
 	pdf.SetTextColor(41,73,121) // blue
@@ -715,6 +741,11 @@ func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) [
 func splitNameIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
 	name := displayLabels[0]
 	wrap := wrapLongerText(name, 45)
+	return wrap
+}
+
+func splitVaccinationStatusIfLengthIsLonger(pdf gopdf.GoPdf, vaccinationStatus string) []string {
+	wrap := wrapLongerText(vaccinationStatus, 50)
 	return wrap
 }
 

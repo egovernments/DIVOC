@@ -100,7 +100,7 @@ func (certificate *Certificate) GetFacilityPostalCode() string {
 	return certificate.Evidence[0].Facility.Address.PostalCode.(string)
 }
 
-func (certificate *Certificate) GetTemplateName(isFinal bool, language string) string {
+func (certificate *Certificate) GetTemplateName(dose int, totalDoses int, language string) string {
 	var certType string
 	var pollingType string
 
@@ -109,7 +109,7 @@ func (certificate *Certificate) GetTemplateName(isFinal bool, language string) s
 	} else {
 		pollingType = "NPS"
 	}
-	if isFinal {
+	if dose >= totalDoses {
 		certType = "2"
 	} else {
 		certType = "1"

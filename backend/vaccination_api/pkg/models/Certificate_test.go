@@ -23,8 +23,9 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 	// TODO: use mock instead of overriding
 	config.PollingStates = []string{"tamil nadu"}
 	type args struct {
-		isFinal  bool
-		language string
+		dose       int
+		totalDoses int
+		language   string
 	}
 	tests := []struct {
 		name        string
@@ -34,26 +35,26 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 	}{
 		{
 			certificate: certificateWithPS,
-			name:        "Non polling state provisional template",
-			args:        args{false, "HIN"},
+			name:        "polling state provisional template",
+			args:        args{1, 2, "HIN"},
 			want:        "config/cov19–HIN-1-PS.pdf",
 		},
 		{
 			certificate: certificateWithPS,
 			name:        "polling state with final template",
-			args:        args{true, "HIN"},
+			args:        args{2, 2, "HIN"},
 			want:        "config/cov19–HIN-2-PS.pdf",
 		},
 		{
 			certificate: certificateWithNPS,
 			name:        "Non polling state provisional template",
-			args:        args{false, "HIN"},
+			args:        args{1, 2, "HIN"},
 			want:        "config/cov19–HIN-1-NPS.pdf",
 		},
 		{
 			certificate: certificateWithNPS,
-			name:        "polling state with final template",
-			args:        args{true, "HIN"},
+			name:        "Non polling state with final template",
+			args:        args{2, 2, "HIN"},
 			want:        "config/cov19–HIN-2-NPS.pdf",
 		},
 	}
@@ -69,7 +70,7 @@ func TestCertificate_GetTemplateName(t *testing.T) {
 				NonTransferable:   tt.certificate.NonTransferable,
 				Proof:             tt.certificate.Proof,
 			}
-			if got := certificate.GetTemplateName(tt.args.isFinal, tt.args.language); got != tt.want {
+			if got := certificate.GetTemplateName(tt.args.dose, tt.args.totalDoses, tt.args.language); got != tt.want {
 				t.Errorf("GetTemplateName() = %v, want %v", got, tt.want)
 			}
 		})
