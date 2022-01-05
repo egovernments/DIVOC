@@ -3,12 +3,13 @@ package pkg
 import (
 	"encoding/json"
 	"errors"
-	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 
 	eventsModel "github.com/divoc/api/pkg/models"
 
@@ -299,7 +300,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
-		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil {
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Invalid Age or DOB. Should be less than current date"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
@@ -346,7 +347,7 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		if request.Recipient.Age == "" {
 			request.Recipient.Age = calcAge(*(request.Recipient.Dob))
 		}
-		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil{
+		if age, err := strconv.Atoi(request.Recipient.Age); age < 0 || err != nil {
 			errorCode := "MISSING_FIELDS"
 			errorMsg := "Invalid Age or DOB. Should be less than current date"
 			return certification.NewCertifyBadRequest().WithPayload(&models.Error{
@@ -380,9 +381,9 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
 	return models.CertificationRequest{
-		Comorbidities:     requestV2.Comorbidities,
-		EnrollmentType:    requestV2.EnrollmentType,
-		Facility:          &models.CertificationRequestFacility{
+		Comorbidities:  requestV2.Comorbidities,
+		EnrollmentType: requestV2.EnrollmentType,
+		Facility: &models.CertificationRequestFacility{
 			Address: &models.CertificationRequestFacilityAddress{
 				AddressLine1: requestV2.Facility.Address.AddressLine1,
 				AddressLine2: requestV2.Facility.Address.AddressLine2,
@@ -391,13 +392,13 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 				Pincode:      requestV2.Facility.Address.Pincode,
 				State:        requestV2.Facility.Address.State,
 			},
-			Name:    requestV2.Facility.Name,
+			Name: requestV2.Facility.Name,
 		},
 		Meta:              requestV2.Meta,
 		PreEnrollmentCode: requestV2.PreEnrollmentCode,
 		ProgramID:         requestV2.ProgramID,
-		Recipient:         &models.CertificationRequestRecipient{
-			Address:     &models.CertificationRequestRecipientAddress{
+		Recipient: &models.CertificationRequestRecipient{
+			Address: &models.CertificationRequestRecipientAddress{
 				AddressLine1: requestV2.Recipient.Address.AddressLine1,
 				AddressLine2: requestV2.Recipient.Address.AddressLine2,
 				Country:      requestV2.Recipient.Address.Country,
@@ -413,7 +414,7 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 			Name:        requestV2.Recipient.Name,
 			Nationality: requestV2.Recipient.Nationality,
 		},
-		Vaccination:       &models.CertificationRequestVaccination{
+		Vaccination: &models.CertificationRequestVaccination{
 			Batch:          requestV2.Vaccination.Batch,
 			Date:           requestV2.Vaccination.Date,
 			Dose:           requestV2.Vaccination.Dose,
@@ -423,7 +424,7 @@ func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationR
 			Name:           requestV2.Vaccination.Name,
 			TotalDoses:     requestV2.Vaccination.TotalDoses,
 		},
-		Vaccinator:        &models.CertificationRequestVaccinator{Name:requestV2.Vaccinator.Name},
+		Vaccinator: &models.CertificationRequestVaccinator{Name: requestV2.Vaccinator.Name},
 	}
 }
 
@@ -582,7 +583,7 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -610,7 +611,7 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil{
+		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -636,7 +637,7 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 
 	filter := map[string]interface{}{
-		"preEnrollmentCode":  map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
 			"eq": request.PreEnrollmentCode,
 		},
 	}
@@ -649,10 +650,10 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 		}
 		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
 		// no changes to provisional certificate if final certificate is generated
-		if *request.Vaccination.Dose < *request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
-			log.Error("Updating provisional certificate restricted")
-			return nil
-		}
+		// if *request.Vaccination.Dose < *request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
+		// 	log.Error("Updating provisional certificate restricted")
+		// 	return nil
+		// }
 		// check if certificate exists for a dose
 		if certificateIds, ok := doseWiseCertificateIds[int(*request.Vaccination.Dose)]; ok && len(certificateIds) > 0 {
 			// check if maximum time of correction is reached
@@ -676,7 +677,7 @@ func getDoseWiseCertificateIds(certificates []interface{}) map[int][]string {
 		if certificate, ok := certificateObj.(map[string]interface{}); ok {
 			var res map[string]interface{}
 			json.Unmarshal([]byte(certificate["certificate"].(string)), &res)
-			if evidences,  found := res["evidence"].([]interface{}); found && len(evidences) > 0{
+			if evidences, found := res["evidence"].([]interface{}); found && len(evidences) > 0 {
 				if doseValue, found := evidences[0].(map[string]interface{})["dose"]; found {
 					if doseValueFloat, ok := doseValue.(float64); ok {
 						if certificateId, found := certificate["certificateId"]; found {
@@ -789,7 +790,7 @@ func getCertificateByCertificateId(params certification.GetCertificateByCertific
 func testBulkCertify(params certification.TestBulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {
 	data := NewScanner(params.File)
 	if err := validateTestBulkCertifyCSVHeaders(data.GetHeaders()); err != nil {
-		log.Error("Invalid template", err.Error());
+		log.Error("Invalid template", err.Error())
 		code := "INVALID_TEMPLATE"
 		message := err.Error()
 		return certification.NewTestBulkCertifyBadRequest().WithPayload(&models.Error{

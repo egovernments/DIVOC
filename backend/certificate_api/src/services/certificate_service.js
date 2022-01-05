@@ -2,6 +2,24 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
+const getCertificatesByDose = (certificates) => {
+  const certificatesMap = new Map();
+  for(const certificate of certificates) {
+    const parsedEvidence = JSON.parse(certificate.certificate);
+    if(certificatesMap.get(parsedEvidence.evidence[0].dose) === undefined) {
+      const certificatesOfDose = new Array();
+      certificatesOfDose.push(certificate)
+      certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesOfDose)
+    }
+    else {
+      const certificatesForDose = certificatesMap.get(parsedEvidence.evidence[0].dose)
+      certificatesForDose.push(certificate)
+      certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesForDose);
+    }
+  }
+  console.log('Certificates : \n', certificatesMap);
+  return certificatesMap;
+}
 const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -16,12 +34,27 @@ const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
     return certificates;
   }
 };
-
 const getLatestCertificate = (certificates) => {
-  if (certificates.length > 0) {
-    let sortedCerts = sortCertificatesInUpdateTimeAscOrder(certificates);
-    return sortedCerts[sortedCerts.length - 1];
-  }
+  const certificatesMap = getCertificatesByDose(certificates);
+  var keys = []
+  certificatesMap.forEach((value, key, certificatesMap) => {
+    keys.push(key)
+  });
+  keys.sort();
+  certificates = sortCertificatesInUpdateTimeAscOrder(certificatesMap.get(keys[keys.length-1]));
+  return certificates[certificates.length - 1];
+  // if (certificates.length > 0) {
+  //   certificates = certificates.sort(function (a, b) {
+  //     if (a.osUpdatedAt < b.osUpdatedAt) {
+  //       return 1;
+  //     }
+  //     if (a.osUpdatedAt > b.osUpdatedAt) {
+  //       return -1;
+  //     }
+  //     return 0;
+  //   }).reverse();
+  //   return certificates[certificates.length - 1];
+  // }
 };
 
 const convertCertificateToDCCPayload = (certificateRaw) => {
