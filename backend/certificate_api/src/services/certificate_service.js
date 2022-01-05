@@ -6,16 +6,12 @@ const getCertificatesByDose = (certificates) => {
   const certificatesMap = new Map();
   for(const certificate of certificates) {
     const parsedEvidence = JSON.parse(certificate.certificate);
-    if(certificatesMap.get(parsedEvidence.evidence[0].dose) === undefined) {
-      const certificatesOfDose = new Array();
-      certificatesOfDose.push(certificate)
-      certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesOfDose)
+    let certificatesOfDose = new Array();
+    if(certificatesMap.get(parsedEvidence.evidence[0].dose) !== undefined) {
+      certificatesForDose = certificatesMap.get(parsedEvidence.evidence[0].dose);
     }
-    else {
-      const certificatesForDose = certificatesMap.get(parsedEvidence.evidence[0].dose)
-      certificatesForDose.push(certificate)
-      certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesForDose);
-    }
+    certificatesOfDose.push(certificate);
+    certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesOfDose);
   }
   console.log('Certificates : \n', certificatesMap);
   return certificatesMap;
@@ -43,18 +39,6 @@ const getLatestCertificate = (certificates) => {
   keys.sort();
   certificates = sortCertificatesInUpdateTimeAscOrder(certificatesMap.get(keys[keys.length-1]));
   return certificates[certificates.length - 1];
-  // if (certificates.length > 0) {
-  //   certificates = certificates.sort(function (a, b) {
-  //     if (a.osUpdatedAt < b.osUpdatedAt) {
-  //       return 1;
-  //     }
-  //     if (a.osUpdatedAt > b.osUpdatedAt) {
-  //       return -1;
-  //     }
-  //     return 0;
-  //   }).reverse();
-  //   return certificates[certificates.length - 1];
-  // }
 };
 
 const convertCertificateToDCCPayload = (certificateRaw) => {
