@@ -144,7 +144,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 }
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON);
-                    if (revokedResponse.response.status === 404) {
+                    if (revokedResponse.status === 404) {
                         console.log('Signature verified.');
                         setValid(true);
                         setData(signedJSON);
@@ -193,8 +193,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 dispatch(addEventAction({type: EVENT_TYPES.REVOKED_CERTIFICATE, extra: certificateData}));
                 return res
             }).catch((e) => {
-                console.log(e);
-                return e
+                console.log(e.response);
+                return e.response
             });
     }
 

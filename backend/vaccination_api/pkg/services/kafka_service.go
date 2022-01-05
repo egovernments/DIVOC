@@ -289,7 +289,7 @@ func startCertificateRevocationConsumer(servers string) {
 					if err := json.Unmarshal([]byte(message.Certificate), &certificate); err == nil {
 						dose = certificate.Evidence[0].Dose;
 					} else {
-						log.Infof("Certificate unmarshaling error: %v \n", err)
+						log.Errorf("Certificate unmarshaling error: %v \n", err)
 					}
 					if message.Meta.PreviousCertificateID != "" {
 						log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
