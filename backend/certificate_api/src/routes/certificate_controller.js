@@ -568,7 +568,8 @@ async function certificateAsSHCPayload(req, res) {
 
             const qrUri = await shc.signAndPack(await shc.makeJWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER), shcKeyPair[0]);
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
-            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
+            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
             const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
 
             res.statusCode = 200;
