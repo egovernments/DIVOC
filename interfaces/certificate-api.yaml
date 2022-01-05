@@ -149,6 +149,30 @@ paths:
           description: Not found
         '403':
           description: Forbidden
+  '/shc-certificate':
+    get:
+      tags:
+        - certificate
+      summary: Get certificate in SHC(Smart Health Card) format
+      security:
+        - Bearer: [ ]
+      parameters:
+        - name: refId
+          in: query
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Not found
+        '403':
+          description: Forbidden
   '/test/certificatePDF/{preEnrollmentCode}':
     get:
       tags:
