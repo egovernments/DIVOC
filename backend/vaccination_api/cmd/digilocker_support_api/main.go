@@ -269,7 +269,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
 			dose:        dose,
-			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
+			doseDate:    formatDate(certificate.Evidence[0].Date),
 			batchNumber: certificate.Evidence[0].Batch,
 			country:     certificate.Evidence[0].Facility.Address.AddressCountry,
 		})
