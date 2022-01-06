@@ -2,44 +2,26 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
-const getCertificatesByDose = (certificates) => {
-  const certificatesMap = new Map();
-  for(const certificate of certificates) {
-    const parsedEvidence = JSON.parse(certificate.certificate);
-    let certificatesOfDose;
-    if(certificatesMap.get(parsedEvidence.evidence[0].dose) === undefined) {
-      certificatesOfDose = new Array();
-    }
-    else {
-      certificatesOfDose = certificatesMap.get(parsedEvidence.evidence[0].dose);
-    }
-    certificatesOfDose.push(certificate);
-    certificatesMap.set(parsedEvidence.evidence[0].dose, certificatesOfDose);
-  }
-  return certificatesMap;
-}
 const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
-      if (a.osUpdatedAt < b.osUpdatedAt) {
-        return 1;
+      const parsedEvidenceOfA = JSON.parse(a.certificate);
+      const parsedEvidenceOfB = JSON.parse(b.certificate);
+      if (parsedEvidenceOfA.evidence[0].dose === parsedEvidenceOfB.evidence[0].dose) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
       }
-      if (a.osUpdatedAt > b.osUpdatedAt) {
-        return -1;
-      }
-      return 0;
+      return parsedEvidenceOfB.evidence[0].dose - parsedEvidenceOfA.evidence[0].dose;
     }).reverse();
     return certificates;
   }
 };
 const getLatestCertificate = (certificates) => {
-  const certificatesMap = getCertificatesByDose(certificates);
-  var keys = []
-  certificatesMap.forEach((value, key, certificatesMap) => {
-    keys.push(key)
-  });
-  keys.sort();
-  certificates = sortCertificatesInUpdateTimeAscOrder(certificatesMap.get(keys[keys.length-1]));
+  certificates = sortCertificatesInUpdateTimeAscOrder(certificates);
   return certificates[certificates.length - 1];
 };
 
