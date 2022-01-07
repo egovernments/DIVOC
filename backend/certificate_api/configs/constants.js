@@ -12,7 +12,8 @@ const EU_VACCINE_PROPH = {
   "vaxzevria": "J07BX03",
   "sinovac": "J07BX03",
   "coronavac": "J07BX03",
-  "BBIBP- CorV": "J07BX03",
+  "bbibp-corv": "J07BX03",
+  "sinopharm": "J07BX03",
   "convidecia": "J07BX03",
   "novavax": "J07BX03",
   "covovax": "J07BX03"
@@ -30,7 +31,8 @@ const EU_VACCINE_CODE = {
   "vaxzevria": "EU/1/21/1529",
   "sinovac": "CoronaVac",
   "coronavac": "CoronaVac",
-  "BBIBP- CorV": "BBIBP- CorV",
+  "bbibp-corv": "BBIBP- CorV",
+  "sinopharm": "BBIBP- CorV",
   "convidecia": "Convidecia",
   "novavax": "NVX - CoV2373",
   "covovax": "NVX - CoV2373"
@@ -40,17 +42,12 @@ const VACCINE_MANUF = {
   "serum": "ORG-100001981",
   "gamaleya": "Gamaleya-Research-Institute",
   "biontech": "ORG-100030215",
-  "biontech": "ORG-100030215",
   "janssen": "ORG-100001417",
   "moderna": "ORG-100031184",
-  "moderna": "ORG-100031184",
   "astrazeneca": "ORG-100001699",
-  "astrazeneca": "ORG-100001699",
-  "sinovac": "Sinovac- Biontech",
   "sinovac": "Sinovac- Biontech",
   "sinopharm": "ORG-100020693",
   "canSino": "ORG-100013793",
-  "novavax": "ORG-100032020",
   "novavax": "ORG-100032020"
 };
 
