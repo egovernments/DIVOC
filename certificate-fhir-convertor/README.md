@@ -4,7 +4,7 @@ This module is used to convert certificates issued by DIVOC to signed FHIR compl
 
 ## Quickstart
 
-To convert a DIVOC issued W3C certificate to FHIR R4 Json.
+###To convert a DIVOC issued W3C certificate to FHIR R4 Json.
 
 **1. Install**
 
@@ -38,3 +38,16 @@ console.log(valid);
 
 ```
 
+###To convert a DIVOC issued W3C certificate to Smart Health Card Json.
+
+```javascript
+const {certificateToSmartHealthJson} = require("certificate-fhir-convertor");
+
+try {
+    const shcJson = certificateToSmartHealthJson(certificate);
+    console.log(shcJson);
+} catch (err) {
+    console.error(err);
+    // handle the error case
+}
+```
