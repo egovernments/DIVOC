@@ -15,8 +15,8 @@ const ICD11_MAPPINGS = {
     "disease": "COVID-19"
   },
   "XM0GQ8": {
-    "vaccineType": "mRNA",
-    "icd11Term": "COVID-19 vaccine, mRNA based vaccine",
+    "vaccineType": "RNA",
+    "icd11Term": "COVID-19 vaccine, RNA based vaccine",
     "disease": "COVID-19"
   },
   "XM9QW8": {
@@ -43,6 +43,10 @@ const ICD11_MAPPINGS = {
 
 const VACCINE_ICD11_MAPPINGS = [
   {
+    "vaccineName": "zycov-d",
+    "icd11Code": "XM6AT1"
+  },
+  {
     "vaccineName": "covaxin",
     "icd11Code" :"XM1NL1"
   },
@@ -51,15 +55,15 @@ const VACCINE_ICD11_MAPPINGS = [
     "icd11Code" :"XM9QW8"
   },
   {
-    "vaccineName": "sputnik",
+    "vaccineName": "sputnik v",
     "icd11Code" :"XM9QW8"
   },
   {
-    "vaccineName": "zycov",
-    "icd11Code": "XM6AT1"
+    "vaccineName": "pfizer",
+    "icd11Code": "XM0GQ8"
   },
   {
-    "vaccineName": "pfizer",
+    "vaccineName": "comirnaty",
     "icd11Code": "XM0GQ8"
   },
   {
@@ -71,7 +75,19 @@ const VACCINE_ICD11_MAPPINGS = [
     "icd11Code": "XM0GQ8"
   },
   {
+    "vaccineName": "modema",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "spikevax",
+    "icd11Code": "XM0GQ8"
+  },
+  {
     "vaccineName": "astrazeneca",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "vaxzevria",
     "icd11Code": "XM9QW8"
   },
   {
@@ -79,11 +95,23 @@ const VACCINE_ICD11_MAPPINGS = [
     "icd11Code": "XM1NL1"
   },
   {
+    "vaccineName": "coronavac",
+    "icd11Code": "XM1NL1"
+  },
+  {
     "vaccineName": "sinopharm",
     "icd11Code": "XM1NL1"
   },
   {
+    "vaccineName": "bbibp- corv",
+    "icd11Code": "XM1NL1"
+  },
+  {
     "vaccineName": "cansino",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "convidecia",
     "icd11Code": "XM9QW8"
   },
   {
@@ -96,10 +124,6 @@ const VACCINE_ICD11_MAPPINGS = [
   },
   {
     "vaccineName": "covovax",
-    "icd11Code": "XM5JC5"
-  },
-  {
-    "vaccineName": "nuvaxovid",
     "icd11Code": "XM5JC5"
   }
 ]
