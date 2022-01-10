@@ -338,6 +338,10 @@ services:
         -----BEGIN PRIVATE KEY-----
         MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgZgp3uylFeCIIXozbZkCkSNr4DcLDxplZ1ax/u7ndXqahRANCAARkJeqyO85dyR+UrQ5Ey8EdgLyf9NtsCrwORAj6T68/elL19aoISQDbzaNYJjdD77XdHtd+nFGTQVpB88wPTwgb
         -----END PRIVATE KEY-----
+      SHC_CERTIFICATE_PRIVATE_KEY: |
+        -----BEGIN EC PRIVATE KEY-----
+        MHcCAQEEIDMzz0wbs+8IB3EC7ymiwevUyeA0NQyWCaX2A6k3s/y5oAoGCCqGSM49AwEHoUQDQgAEftkMDoidplcHjVwxbggb8/xdXJQX2S1hib34pFzu1EyifUNAAhcQCQOEkbjaiLSps4GGF+pH4t1GD3rAf3F67g==
+        -----END EC PRIVATE KEY-----
     depends_on:
       kafka:
         condition: service_healthy
