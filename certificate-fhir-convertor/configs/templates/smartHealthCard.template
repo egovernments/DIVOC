@@ -1,0 +1,56 @@
+{
+    "type": [
+      "https://smarthealth.cards#health-card",
+      "https://smarthealth.cards#immunization",
+      "https://smarthealth.cards#covid19"
+    ],
+    "credentialSubject": {
+      "fhirVersion": "4.0.1",
+      "fhirBundle": {
+        "resourceType": "Bundle",
+        "type": "collection",
+        "entry": [
+          {
+            "fullUrl": "urn:uuid:{{patientId}}",
+            "resource": {
+              "resourceType": "Patient",
+              "name": [
+                {
+                  "use": "official",
+                  "text": "{{patientName}}"
+                }
+              ],
+              "birthDate": "{{dob}}"
+            }
+          },
+          {
+            "fullUrl": "urn:uuid:{{immunizationId}}",
+            "resource": {
+              "resourceType": "Immunization",
+              "status": "completed",
+              "vaccineCode": {
+                "coding": [
+                  {
+                    "system": "http://id.who.int/icd11/mms",
+                    "code": "{{vaccineCode}}"
+                  }
+                ]
+              },
+              "patient": {
+                "reference": "urn:uuid:{{patientId}}"
+              },
+              "occurrenceDateTime": "{{vaccinationDate}}",
+              "performer": [
+                {
+                  "actor": {
+                    "display": "{{facilityName}}"
+                  }
+                }
+              ],
+              "lotNumber": "{{batchNumber}}"
+            }
+          }
+        ]
+      }
+    }
+  }

@@ -9,11 +9,16 @@ const registryService = require("../services/registry_service");
 const certificateService = require("../services/certificate_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 const fhirCertificate = require("certificate-fhir-convertor");
-const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8} = require('../../configs/keys');
+const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8, shcPrivateKeyPem} = require('../../configs/keys');
 const config = require('../../configs/config');
 const dcc = require("@pathcheck/dcc-sdk");
+const shc = require("@pathcheck/shc-sdk");
+const keyUtils = require("../services/key_utils");
+
 const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
 const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
+
+let shcKeyPair = [];
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -535,6 +540,63 @@ async function certificateAsEUPayload(req, res) {
     }
 }
 
+async function certificateAsSHCPayload(req, res) {
+    let refId;
+    try {
+        var queryData = url.parse(req.url, true).query;
+        try {
+            await verifyKeycloakToken(req.headers.authorization);
+            refId = queryData.refId;
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+        if (certificateResp.length > 0) {
+            let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+            let certificate = JSON.parse(certificateRaw.certificate);
+
+            // convert certificate to SHC Json
+            const dccPayload = fhirCertificate.certificateToSmartHealthJson(certificate, {});
+
+            // get keyPair from pem for 1st time
+            if (shcKeyPair.length === 0) {
+                const keyFile = keyUtils.PEMtoDER(shcPrivateKeyPem)
+                shcKeyPair = await keyUtils.DERtoJWK(keyFile, []);
+            }
+
+            const qrUri = await shc.signAndPack(await shc.makeJWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER), shcKeyPair[0]);
+            const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
+            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
+            const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+
+            res.statusCode = 200;
+            sendEvents({
+                date: new Date(),
+                source: refId,
+                type: "shc-cert-success",
+                extra: "Certificate found"
+            });
+            return pdfBuffer
+
+        } else {
+            res.statusCode = 404;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "Certificate not found"
+            };
+            return JSON.stringify(error);
+        }
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
 async function createPDF(templateFile, data) {
     const htmlData = fs.readFileSync(templateFile, 'utf8');
     const template = Handlebars.compile(htmlData);
@@ -650,5 +712,6 @@ module.exports = {
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
     certificateAsEUPayload,
-    getCertificateQRCode
+    getCertificateQRCode,
+    certificateAsSHCPayload
 };
