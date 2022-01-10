@@ -120,10 +120,8 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
 })();
 
 function populateIdentity(cert, preEnrollmentCode) {
-  let isURI = false;
   let identity = R.pathOr('', ['recipient', 'identity'], cert);
-  isURI = isURIFormat(identity);
-
+  let isURI  = isURIFormat(identity);
   return isURI ? identity : reinitIdentityFromPayload(identity, preEnrollmentCode);
 }
 
@@ -134,15 +132,12 @@ function isURIFormat(param) {
     parsed = new URL(param);
     isURI = true;
   } catch (e) {
-    console.error("Identity field must be of URI format");
     isURI = false;
   }
 
   if (isURI && !parsed.protocol) {
-    console.error("Identity field must be of URI format");
     isURI = false;
   }
-  console.log("Identity is having the value "+param)
   return isURI;
 }
 
