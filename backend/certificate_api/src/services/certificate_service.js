@@ -97,7 +97,7 @@ function dobOfRecipient(credentialSubject) {
 }
 
 module.exports = {
-  sortCertificatesInUpdateTimeAscOrder,
+  sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
   convertCertificateToDCCPayload
 };
