@@ -2,7 +2,7 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
-const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
+const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
       const parsedEvidenceOfA = JSON.parse(a.certificate);
@@ -21,8 +21,10 @@ const sortCertificatesInUpdateTimeAscOrder = (certificates) => {
   }
 };
 const getLatestCertificate = (certificates) => {
-  certificates = sortCertificatesInUpdateTimeAscOrder(certificates);
-  return certificates[certificates.length - 1];
+  if(certificates.length > 0) {
+    let sortedCerts = sortCertificatesInDoseAndUpdateTimeAscOrder(certificates);
+    return sortedCerts[sortedCerts.length - 1];
+  }
 };
 
 const convertCertificateToDCCPayload = (certificateRaw) => {
