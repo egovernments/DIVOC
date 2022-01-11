@@ -47,7 +47,7 @@ const CERTIFICATE_FEEDBACK_BASE_URL = "https://divoc.dev/?";
 const CERTIFICATE_INFO_BASE_URL = "https://divoc.dev/?";
 const CERTIFICATE_DID = "did:india";
 const CERTIFICATE_PUBKEY_ID = "https://example.com/i/india";
-const IDENTITY_REJECTION_PATTERN = "NA"
+const IDENTITY_REJECTION_PATTERN = "^NA$|^.?$"
 
 // vaccine certificate transformer
 function transformW3(cert, certificateId) {
@@ -253,6 +253,38 @@ test('Sign json with invalid identity and verify for did identity with preEnroll
   const credentialSubjectId = 'did:india:12346';
   let certModified = JSON.parse(JSON.stringify(cert2));
   certModified.recipient.identity = 'NA';
+  let sign = await signJSON(transformW3(certModified, certificateId));
+  expect(sign.credentialSubject.id).toBe(credentialSubjectId);
+});
+
+test('Sign json with ANAMIKA identity and verify for did identity with preEnrollmentCode', async () => {
+  const credentialSubjectId = 'did:india:ANAMIKA';
+  let certModified = JSON.parse(JSON.stringify(cert2));
+  certModified.recipient.identity = 'ANAMIKA';
+  let sign = await signJSON(transformW3(certModified, certificateId));
+  expect(sign.credentialSubject.id).toBe(credentialSubjectId);
+});
+
+test('Sign json with special-char identity and verify for did identity with preEnrollmentCode', async () => {
+  const credentialSubjectId = 'did:india:12346';
+  let certModified = JSON.parse(JSON.stringify(cert2));
+  certModified.recipient.identity = '_';
+  let sign = await signJSON(transformW3(certModified, certificateId));
+  expect(sign.credentialSubject.id).toBe(credentialSubjectId);
+});
+
+test('Sign json with single-char identity and verify for did identity with preEnrollmentCode', async () => {
+  const credentialSubjectId = 'did:india:12346';
+  let certModified = JSON.parse(JSON.stringify(cert2));
+  certModified.recipient.identity = 'i';
+  let sign = await signJSON(transformW3(certModified, certificateId));
+  expect(sign.credentialSubject.id).toBe(credentialSubjectId);
+});
+
+test('Sign json with single-digit identity and verify for did identity with preEnrollmentCode', async () => {
+  const credentialSubjectId = 'did:india:12346';
+  let certModified = JSON.parse(JSON.stringify(cert2));
+  certModified.recipient.identity = '6';
   let sign = await signJSON(transformW3(certModified, certificateId));
   expect(sign.credentialSubject.id).toBe(credentialSubjectId);
 });
