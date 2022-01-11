@@ -10,7 +10,7 @@ import (
 var Config = struct {
 	Auth struct {
 		PublicKey            string `yaml:"publickey" env:"AUTH_PUBLIC_KEY"`
-		PrivateKey           string `yaml:"privatekey" env:"AUTH_PRIVATE_KEY"`
+		PrivateKey           string `env:"AUTH_PRIVATE_KEY"`
 		TTLForOtp            int    `yaml:"ttlforotpinminutes"`
 		MAXOtpVerifyAttempts int64  `yaml:"maxotpverifyattempts"`
 		OTPLength            int    `yaml:"otp_length" env:"OTP_LENGTH" default:"6"`
