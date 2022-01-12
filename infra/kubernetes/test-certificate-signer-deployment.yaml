@@ -26,6 +26,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: divoc-config
+            - secretRef:
+                name: divoc-secrets
           env:
             - name: CERTIFICATE_NAMESPACE
               value: "https://cowin.gov.in/credentials/testCertificate/v1"

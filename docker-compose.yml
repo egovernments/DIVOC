@@ -75,7 +75,7 @@ services:
     image: checkr/flagr
     environment:
       FLAGR_DB_DBDRIVER: postgres
-      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/registry?sslmode=disable
+      FLAGR_DB_DBCONNECTIONSTR: "$FLAGR_DB_DBCONNECTIONSTR"
       HOST: 0.0.0.0
       FLAGR_WEB_PREFIX: /config
     ports:

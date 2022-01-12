@@ -30,6 +30,8 @@ spec:
           envFrom:
             - configMapRef:
                 name: divoc-config
+            - secretRef:
+                name: divoc-secrets
           name: vaccination-api
           resources:
             requests:

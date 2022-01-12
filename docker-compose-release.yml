@@ -65,7 +65,7 @@ services:
     image: checkr/flagr
     environment:
       FLAGR_DB_DBDRIVER: registry
-      FLAGR_DB_DBCONNECTIONSTR: postgres://postgres:postgres@db:5432/registry?sslmode=disable
+      FLAGR_DB_DBCONNECTIONSTR: "$FLAGR_DB_DBCONNECTIONSTR"
       HOST: 0.0.0.0
       FLAGR_WEB_PREFIX: /config
     ports:
@@ -138,7 +138,7 @@ services:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
@@ -157,7 +157,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
     depends_on:
       - registry
   certificate_signer:
