@@ -31,7 +31,7 @@ func NewCertify(ctx *middleware.Context, handler CertifyHandler) *Certify {
 	return &Certify{Context: ctx, Handler: handler}
 }
 
-/*Certify swagger:route POST /v1/certify certification certify
+/* Certify swagger:route POST /v1/certify certification certify
 
 Certify the one or more vaccination
 
@@ -46,17 +46,16 @@ type Certify struct {
 func (o *Certify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	route, rCtx, _ := o.Context.RouteInfo(r)
 	if rCtx != nil {
-		r = rCtx
+		*r = *rCtx
 	}
 	var Params = NewCertifyParams()
-
 	uprinc, aCtx, err := o.Context.Authorize(r, route)
 	if err != nil {
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 	if aCtx != nil {
-		r = aCtx
+		*r = *aCtx
 	}
 	var principal *models.JWTClaimBody
 	if uprinc != nil {
@@ -69,7 +68,6 @@ func (o *Certify) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 
 	res := o.Handler.Handle(Params, principal) // actually handle the request
-
 	o.Context.Respond(rw, r, route.Produces, route, res)
 
 }

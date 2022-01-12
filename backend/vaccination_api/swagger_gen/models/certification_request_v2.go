@@ -6,7 +6,9 @@ package models
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"context"
 	"encoding/json"
+	"strconv"
 
 	"github.com/go-openapi/errors"
 	"github.com/go-openapi/strfmt"
@@ -69,7 +71,6 @@ func (m *CertificationRequestV2) Validate(formats strfmt.Registry) error {
 }
 
 func (m *CertificationRequestV2) validateFacility(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Facility) { // not required
 		return nil
 	}
@@ -87,7 +88,6 @@ func (m *CertificationRequestV2) validateFacility(formats strfmt.Registry) error
 }
 
 func (m *CertificationRequestV2) validateMeta(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Meta) { // not required
 		return nil
 	}
@@ -105,7 +105,6 @@ func (m *CertificationRequestV2) validateMeta(formats strfmt.Registry) error {
 }
 
 func (m *CertificationRequestV2) validateRecipient(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Recipient) { // not required
 		return nil
 	}
@@ -123,7 +122,6 @@ func (m *CertificationRequestV2) validateRecipient(formats strfmt.Registry) erro
 }
 
 func (m *CertificationRequestV2) validateVaccination(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Vaccination) { // not required
 		return nil
 	}
@@ -141,13 +139,112 @@ func (m *CertificationRequestV2) validateVaccination(formats strfmt.Registry) er
 }
 
 func (m *CertificationRequestV2) validateVaccinator(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Vaccinator) { // not required
 		return nil
 	}
 
 	if m.Vaccinator != nil {
 		if err := m.Vaccinator.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("vaccinator")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this certification request v2 based on the context it is used
+func (m *CertificationRequestV2) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateFacility(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateMeta(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateRecipient(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateVaccination(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateVaccinator(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestV2) contextValidateFacility(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Facility != nil {
+		if err := m.Facility.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("facility")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2) contextValidateMeta(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Meta != nil {
+		if err := m.Meta.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("meta")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2) contextValidateRecipient(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Recipient != nil {
+		if err := m.Recipient.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("recipient")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2) contextValidateVaccination(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Vaccination != nil {
+		if err := m.Vaccination.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("vaccination")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2) contextValidateVaccinator(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Vaccinator != nil {
+		if err := m.Vaccinator.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("vaccinator")
 			}
@@ -212,13 +309,40 @@ func (m *CertificationRequestV2Facility) Validate(formats strfmt.Registry) error
 }
 
 func (m *CertificationRequestV2Facility) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
 
 	if m.Address != nil {
 		if err := m.Address.Validate(formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("facility" + "." + "address")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+// ContextValidate validate this certification request v2 facility based on the context it is used
+func (m *CertificationRequestV2Facility) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestV2Facility) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
 			if ve, ok := err.(*errors.Validation); ok {
 				return ve.ValidateName("facility" + "." + "address")
 			}
@@ -270,6 +394,11 @@ type CertificationRequestV2FacilityAddress struct {
 
 // Validate validates this certification request v2 facility address
 func (m *CertificationRequestV2FacilityAddress) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this certification request v2 facility address based on context it is used
+func (m *CertificationRequestV2FacilityAddress) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -325,6 +454,9 @@ type CertificationRequestV2Meta struct {
 	// vaccination app
 	VaccinationApp *CertificationRequestV2MetaVaccinationApp `json:"vaccinationApp,omitempty"`
 
+	// vaccinations
+	Vaccinations []*CertificationRequestV2MetaVaccinationsItems0 `json:"vaccinations"`
+
 	// ID verification number of attempts (ex number of attempts done for Aadhaar)
 	VerificationAttempts int64 `json:"verificationAttempts,omitempty"`
 
@@ -360,6 +492,10 @@ func (m *CertificationRequestV2Meta) Validate(formats strfmt.Registry) error {
 	}
 
 	if err := m.validateVaccinationApp(formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.validateVaccinations(formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -402,7 +538,6 @@ func (m *CertificationRequestV2Meta) validateFacilityTypeEnum(path, location str
 }
 
 func (m *CertificationRequestV2Meta) validateFacilityType(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.FacilityType) { // not required
 		return nil
 	}
@@ -457,7 +592,6 @@ func (m *CertificationRequestV2Meta) validatePaymentTypeEnum(path, location stri
 }
 
 func (m *CertificationRequestV2Meta) validatePaymentType(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.PaymentType) { // not required
 		return nil
 	}
@@ -503,7 +637,6 @@ func (m *CertificationRequestV2Meta) validateRegistrationCategoryEnum(path, loca
 }
 
 func (m *CertificationRequestV2Meta) validateRegistrationCategory(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.RegistrationCategory) { // not required
 		return nil
 	}
@@ -552,7 +685,6 @@ func (m *CertificationRequestV2Meta) validateRegistrationDataModeEnum(path, loca
 }
 
 func (m *CertificationRequestV2Meta) validateRegistrationDataMode(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.RegistrationDataMode) { // not required
 		return nil
 	}
@@ -566,7 +698,6 @@ func (m *CertificationRequestV2Meta) validateRegistrationDataMode(formats strfmt
 }
 
 func (m *CertificationRequestV2Meta) validateUploadTimestamp(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.UploadTimestamp) { // not required
 		return nil
 	}
@@ -579,7 +710,6 @@ func (m *CertificationRequestV2Meta) validateUploadTimestamp(formats strfmt.Regi
 }
 
 func (m *CertificationRequestV2Meta) validateVaccinationApp(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.VaccinationApp) { // not required
 		return nil
 	}
@@ -591,6 +721,80 @@ func (m *CertificationRequestV2Meta) validateVaccinationApp(formats strfmt.Regis
 			}
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2Meta) validateVaccinations(formats strfmt.Registry) error {
+	if swag.IsZero(m.Vaccinations) { // not required
+		return nil
+	}
+
+	for i := 0; i < len(m.Vaccinations); i++ {
+		if swag.IsZero(m.Vaccinations[i]) { // not required
+			continue
+		}
+
+		if m.Vaccinations[i] != nil {
+			if err := m.Vaccinations[i].Validate(formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("meta" + "." + "vaccinations" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
+	}
+
+	return nil
+}
+
+// ContextValidate validate this certification request v2 meta based on the context it is used
+func (m *CertificationRequestV2Meta) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateVaccinationApp(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if err := m.contextValidateVaccinations(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestV2Meta) contextValidateVaccinationApp(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.VaccinationApp != nil {
+		if err := m.VaccinationApp.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("meta" + "." + "vaccinationApp")
+			}
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (m *CertificationRequestV2Meta) contextValidateVaccinations(ctx context.Context, formats strfmt.Registry) error {
+
+	for i := 0; i < len(m.Vaccinations); i++ {
+
+		if m.Vaccinations[i] != nil {
+			if err := m.Vaccinations[i].ContextValidate(ctx, formats); err != nil {
+				if ve, ok := err.(*errors.Validation); ok {
+					return ve.ValidateName("meta" + "." + "vaccinations" + "." + strconv.Itoa(i))
+				}
+				return err
+			}
+		}
+
 	}
 
 	return nil
@@ -709,7 +913,6 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateAppModeEnum(path, loc
 }
 
 func (m *CertificationRequestV2MetaVaccinationApp) validateAppMode(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.AppMode) { // not required
 		return nil
 	}
@@ -755,7 +958,6 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateConnectionTypeEnum(pa
 }
 
 func (m *CertificationRequestV2MetaVaccinationApp) validateConnectionType(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.ConnectionType) { // not required
 		return nil
 	}
@@ -801,7 +1003,6 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateDeviceEnum(path, loca
 }
 
 func (m *CertificationRequestV2MetaVaccinationApp) validateDevice(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Device) { // not required
 		return nil
 	}
@@ -853,7 +1054,6 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateDeviceOSEnum(path, lo
 }
 
 func (m *CertificationRequestV2MetaVaccinationApp) validateDeviceOS(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.DeviceOS) { // not required
 		return nil
 	}
@@ -899,7 +1099,6 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateTypeEnum(path, locati
 }
 
 func (m *CertificationRequestV2MetaVaccinationApp) validateType(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Type) { // not required
 		return nil
 	}
@@ -909,6 +1108,11 @@ func (m *CertificationRequestV2MetaVaccinationApp) validateType(formats strfmt.R
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this certification request v2 meta vaccination app based on context it is used
+func (m *CertificationRequestV2MetaVaccinationApp) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -923,6 +1127,55 @@ func (m *CertificationRequestV2MetaVaccinationApp) MarshalBinary() ([]byte, erro
 // UnmarshalBinary interface implementation
 func (m *CertificationRequestV2MetaVaccinationApp) UnmarshalBinary(b []byte) error {
 	var res CertificationRequestV2MetaVaccinationApp
+	if err := swag.ReadJSON(b, &res); err != nil {
+		return err
+	}
+	*m = res
+	return nil
+}
+
+// CertificationRequestV2MetaVaccinationsItems0 certification request v2 meta vaccinations items0
+//
+// swagger:model CertificationRequestV2MetaVaccinationsItems0
+type CertificationRequestV2MetaVaccinationsItems0 struct {
+
+	// batch
+	Batch string `json:"batch,omitempty"`
+
+	// date
+	Date string `json:"date,omitempty"`
+
+	// dose
+	Dose int64 `json:"dose,omitempty"`
+
+	// manufacturer
+	Manufacturer string `json:"manufacturer,omitempty"`
+
+	// name
+	Name string `json:"name,omitempty"`
+}
+
+// Validate validates this certification request v2 meta vaccinations items0
+func (m *CertificationRequestV2MetaVaccinationsItems0) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this certification request v2 meta vaccinations items0 based on context it is used
+func (m *CertificationRequestV2MetaVaccinationsItems0) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
+// MarshalBinary interface implementation
+func (m *CertificationRequestV2MetaVaccinationsItems0) MarshalBinary() ([]byte, error) {
+	if m == nil {
+		return nil, nil
+	}
+	return swag.WriteJSON(m)
+}
+
+// UnmarshalBinary interface implementation
+func (m *CertificationRequestV2MetaVaccinationsItems0) UnmarshalBinary(b []byte) error {
+	var res CertificationRequestV2MetaVaccinationsItems0
 	if err := swag.ReadJSON(b, &res); err != nil {
 		return err
 	}
@@ -983,7 +1236,6 @@ func (m *CertificationRequestV2Recipient) Validate(formats strfmt.Registry) erro
 }
 
 func (m *CertificationRequestV2Recipient) validateAddress(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Address) { // not required
 		return nil
 	}
@@ -1001,13 +1253,40 @@ func (m *CertificationRequestV2Recipient) validateAddress(formats strfmt.Registr
 }
 
 func (m *CertificationRequestV2Recipient) validateDob(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Dob) { // not required
 		return nil
 	}
 
 	if err := validate.FormatOf("recipient"+"."+"dob", "body", "date", m.Dob.String(), formats); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// ContextValidate validate this certification request v2 recipient based on the context it is used
+func (m *CertificationRequestV2Recipient) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	var res []error
+
+	if err := m.contextValidateAddress(ctx, formats); err != nil {
+		res = append(res, err)
+	}
+
+	if len(res) > 0 {
+		return errors.CompositeValidationError(res...)
+	}
+	return nil
+}
+
+func (m *CertificationRequestV2Recipient) contextValidateAddress(ctx context.Context, formats strfmt.Registry) error {
+
+	if m.Address != nil {
+		if err := m.Address.ContextValidate(ctx, formats); err != nil {
+			if ve, ok := err.(*errors.Validation); ok {
+				return ve.ValidateName("recipient" + "." + "address")
+			}
+			return err
+		}
 	}
 
 	return nil
@@ -1057,6 +1336,11 @@ func (m *CertificationRequestV2RecipientAddress) Validate(formats strfmt.Registr
 	return nil
 }
 
+// ContextValidate validates this certification request v2 recipient address based on context it is used
+func (m *CertificationRequestV2RecipientAddress) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
+	return nil
+}
+
 // MarshalBinary interface implementation
 func (m *CertificationRequestV2RecipientAddress) MarshalBinary() ([]byte, error) {
 	if m == nil {
@@ -1088,6 +1372,7 @@ type CertificationRequestV2Vaccination struct {
 	Date strfmt.DateTime `json:"date,omitempty"`
 
 	// Dose number for example 1 for first dose of 2 doses
+	// Example: 1
 	Dose float64 `json:"dose,omitempty"`
 
 	// effective start
@@ -1105,6 +1390,7 @@ type CertificationRequestV2Vaccination struct {
 	Name string `json:"name,omitempty"`
 
 	// Total number of doses required for this vaccination.
+	// Example: 2
 	TotalDoses float64 `json:"totalDoses,omitempty"`
 }
 
@@ -1131,7 +1417,6 @@ func (m *CertificationRequestV2Vaccination) Validate(formats strfmt.Registry) er
 }
 
 func (m *CertificationRequestV2Vaccination) validateDate(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.Date) { // not required
 		return nil
 	}
@@ -1144,7 +1429,6 @@ func (m *CertificationRequestV2Vaccination) validateDate(formats strfmt.Registry
 }
 
 func (m *CertificationRequestV2Vaccination) validateEffectiveStart(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.EffectiveStart) { // not required
 		return nil
 	}
@@ -1157,7 +1441,6 @@ func (m *CertificationRequestV2Vaccination) validateEffectiveStart(formats strfm
 }
 
 func (m *CertificationRequestV2Vaccination) validateEffectiveUntil(formats strfmt.Registry) error {
-
 	if swag.IsZero(m.EffectiveUntil) { // not required
 		return nil
 	}
@@ -1166,6 +1449,11 @@ func (m *CertificationRequestV2Vaccination) validateEffectiveUntil(formats strfm
 		return err
 	}
 
+	return nil
+}
+
+// ContextValidate validates this certification request v2 vaccination based on context it is used
+func (m *CertificationRequestV2Vaccination) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 
@@ -1201,6 +1489,11 @@ type CertificationRequestV2Vaccinator struct {
 
 // Validate validates this certification request v2 vaccinator
 func (m *CertificationRequestV2Vaccinator) Validate(formats strfmt.Registry) error {
+	return nil
+}
+
+// ContextValidate validates this certification request v2 vaccinator based on context it is used
+func (m *CertificationRequestV2Vaccinator) ContextValidate(ctx context.Context, formats strfmt.Registry) error {
 	return nil
 }
 

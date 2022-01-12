@@ -17,7 +17,8 @@ import (
 )
 
 // NewUpdateCertificateV3Params creates a new UpdateCertificateV3Params object
-// no default values defined in spec.
+//
+// There are no default values defined in the spec.
 func NewUpdateCertificateV3Params() UpdateCertificateV3Params {
 
 	return UpdateCertificateV3Params{}
@@ -58,6 +59,7 @@ func (o *UpdateCertificateV3Params) BindRequest(r *http.Request, route *middlewa
 				res = append(res, errors.NewParseError("body", "body", "", err))
 			}
 		} else {
+
 			// validate array of body objects
 			for i := range body {
 				if body[i] == nil {
@@ -68,6 +70,7 @@ func (o *UpdateCertificateV3Params) BindRequest(r *http.Request, route *middlewa
 					break
 				}
 			}
+
 			if len(res) == 0 {
 				o.Body = body
 			}
