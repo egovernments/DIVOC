@@ -19,7 +19,7 @@
     "papaparse": "^5.3.0",
     "pure-react-carousel": "^1.27.6",
     "qrcode.react": "^1.0.0",
-    "ramda": "^0.27.1",
+    "ramda": "^0.27.2",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-datepicker": "^3.3.0",
