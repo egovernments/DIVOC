@@ -66,8 +66,8 @@ func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccina
 		return true, err
 	}
 	// assuming that none of these fields should be empty. If empty we will not do the data update
-	if requestData.Batch == "" || requestData.Name == "" || requestData.Manufacturer == "" || requestData.Dose < 1 {
-		log.Info("Required fields are empty")
+	if requestData.Batch == "" || requestData.Dose < 1 {
+		log.Info("Required fields are invalid")
 		return true, nil
 	}
 	if vaccinationDate != dbData.Date || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
@@ -98,10 +98,19 @@ func createVaccinationInfo(metaData *models2.CertificationRequestV2MetaVaccinati
 	dbData *models.Certificate) *models2.CertificationRequestV2Vaccination {
 	vaccinationInfo := new(models2.CertificationRequestV2Vaccination)
 	vaccinationInfo.Date, _ = strfmt.ParseDateTime(metaData.Date)
-	vaccinationInfo.Name = metaData.Name
+	if metaData.Name != "" {
+		vaccinationInfo.Name = metaData.Name
+	} else {
+		vaccinationInfo.Name = dbData.Evidence[0].Vaccine
+	}
 	vaccinationInfo.Dose = float64(metaData.Dose)
 	vaccinationInfo.TotalDoses = dbData.Evidence[0].TotalDoses.(float64)
 	vaccinationInfo.Batch = metaData.Batch
+	if metaData.Manufacturer != "" {
+		vaccinationInfo.Manufacturer = metaData.Manufacturer
+	} else {
+		vaccinationInfo.Manufacturer = dbData.Evidence[0].Manufacturer
+	}
 	vaccinationInfo.Manufacturer = metaData.Manufacturer
 	effectiveStart, terr := time.Parse("2006-01-02", dbData.Evidence[0].EffectiveStart)
 	if terr != nil {
