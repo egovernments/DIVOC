@@ -18,7 +18,7 @@
     "keycloak-js": "^11.0.3",
     "lodash": "^4.17.21",
     "prop-types": "latest",
-    "ramda": "^0.27.1",
+    "ramda": "^0.27.2",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-dom": "^17.0.1",
