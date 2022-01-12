@@ -65,6 +65,11 @@ func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccina
 	if vaccinationDate, err = strfmt.ParseDateTime(requestData.Date); err != nil {
 		return true, err
 	}
+	// assuming that none of these fields should be empty. If empty we will not do the data update
+	if requestData.Batch == "" || requestData.Name == "" || requestData.Manufacturer == "" || requestData.Dose < 1 {
+		log.Info("Required fields are empty")
+		return true, nil
+	}
 	if vaccinationDate != dbData.Date || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
 		return false, nil
 	}
