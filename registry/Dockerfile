@@ -1,4 +1,4 @@
-FROM tejashjl/open-saber
+FROM dockerhub/sunbird-rc-core
 
 ADD *.json /home/opensaber/config/public/_schemas/
 
