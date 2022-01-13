@@ -29,17 +29,13 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: dockerhub/registry-es:1.25.0-generic
+    image: dockerhub/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
-      - registry_base_apis_enable=true
-      - taskExecutor_index_queueCapacity=100
-      - auditTaskExecutor_queueCapacity=100
-      - signature_enabled=false
     ports:
       - "8081:8081"
     depends_on:
