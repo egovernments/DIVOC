@@ -60,6 +60,7 @@ const customLoader = url => {
 export const CertificateStatus = ({certificateData, goBack}) => {
     const [isLoading, setLoading] = useState(true);
     const [isValid, setValid] = useState(false);
+    const [isRevoked, setRevoked] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
     const {t} = useTranslation();
@@ -143,12 +144,24 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 }
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON);
-                    if (revokedResponse.response.status === 404) {
+                    if (revokedResponse.status === 404) {
                         console.log('Signature verified.');
                         setValid(true);
                         setData(signedJSON);
+                        setRevoked(false);
                         dispatch(addEventAction({
                             type: EVENT_TYPES.VALID_VERIFICATION,
+                            extra: signedJSON.credentialSubject
+                        }));
+                        setLoading(false);
+                        return
+                    }else if(revokedResponse.status === 200){
+                        console.log('Certificate revoked.');
+                        setValid(false);
+                        setData(signedJSON);
+                        setRevoked(true);
+                        dispatch(addEventAction({
+                            type: EVENT_TYPES.REVOKED_CERTIFICATE,
                             extra: signedJSON.credentialSubject
                         }));
                         setLoading(false);
@@ -180,8 +193,8 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 dispatch(addEventAction({type: EVENT_TYPES.REVOKED_CERTIFICATE, extra: certificateData}));
                 return res
             }).catch((e) => {
-                console.log(e);
-                return e
+                console.log(e.response);
+                return e.response
             });
     }
 
@@ -192,9 +205,12 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                          className="certificate-status-image"/>
                     <h3 className="certificate-status">
                         {
-                            isValid ? t('verifyCertificate.validStatus') : t('verifyCertificate.invalidStatus')
+                            isValid ? t('verifyCertificate.validStatus') : (isRevoked ? t('verifyCertificate.revokedStatus') : t('verifyCertificate.invalidStatus'))
                         }
                     </h3>
+                    {
+                        isRevoked   && <h4>{ t('verifyCertificate.revokeText')}</h4>
+                    }
                     {
                         isValid && <table className="mt-3">
                             {
