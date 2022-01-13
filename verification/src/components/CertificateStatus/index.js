@@ -200,6 +200,15 @@ export const CertificateStatus = ({certificateData, goBack}) => {
             }
             <br/>
             <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
+           <br/>
+           {
+                !isValid && <h5>
+                    {
+                         <a href= 'https://www.cowin.gov.in'>Please visit https://www.cowin.gov.in to get your latest dose certificate</a>
+                    }
+                </h5>
+            }
+           
             {/*<SmallInfoCards text={"Provide Feedback"}*/}
             {/*                onClick={() => {*/}
             {/*                    history.push("/side-effects")*/}
