@@ -87,7 +87,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
     healthcheck:
       test:
-        ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+        ["CMD", "kafka-topics", "--list", "--bootstrap-server", "localhost:9092"]
       interval: 30s
       timeout: 10s
       retries: 4

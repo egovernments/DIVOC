@@ -3,13 +3,14 @@ package services
 import (
 	"encoding/json"
 	"errors"
+	"sort"
+	"time"
+
 	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
-	"sort"
-	"time"
 )
 
 func getDoseFromCertificate(certificateMap map[string]interface{}) int {
@@ -55,22 +56,47 @@ func sortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
 	return certificateArr
 }
 
+func compareVaccineDates(metaDate string, dbDate string) (bool, error) {
+	metaTime, err := time.Parse("2006-01-02T00:00:00.000Z", metaDate)
+	if err != nil {
+		return true, err
+	}
+	dbTime, err := time.Parse("2006-01-02T00:00:00.000Z", dbDate)
+	if err != nil {
+		return true, err
+	}
+	my, mm, md := metaTime.Date()
+	dy, dm, dd := dbTime.Date()
+	if my == dy && mm == dm && md == dd {
+		return true, nil
+	}
+	return false, nil
+}
+
 func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccinationsItems0, dbData *models2.CertificationRequestV2Vaccination) (bool, error) {
-	var vaccinationDate strfmt.DateTime
 	var err error
-	if !strfmt.IsDateTime(requestData.Date) {
+	if requestData.Date == "" {
 		log.Error("Invalid vaccination date")
 		return true, errors.New("invalid vaccination date")
 	}
-	if vaccinationDate, err = strfmt.ParseDateTime(requestData.Date); err != nil {
-		return true, err
+	if strfmt.IsDate(requestData.Date) {
+		date, err := time.Parse("2006-01-02", requestData.Date)
+		if err != nil {
+			return true, err
+		}
+		requestData.Date = date.Format("2006-01-02T00:00:00.000Z")
 	}
 	// assuming that none of these fields should be empty. If empty we will not do the data update
 	if requestData.Batch == "" || requestData.Dose < 1 {
 		log.Info("Required fields are invalid")
 		return true, nil
 	}
-	if vaccinationDate != dbData.Date || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
+	vaccineDatesMatched, err := compareVaccineDates(requestData.Date, dbData.Date.String())
+	if err != nil {
+		log.Error(err)
+		return true, err
+	}
+	if !vaccineDatesMatched || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
 		return false, nil
 	}
 	return true, nil
@@ -175,18 +201,14 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) {
 			dbData.Date = strfmt.DateTime(certificate.Evidence[0].Date)
 			dbData.Name = certificate.Evidence[0].Vaccine
 			dbData.Manufacturer = certificate.Evidence[0].Manufacturer
-			if isDataConsistent, err := CheckDataConsistence(vaccinationData, dbData); err == nil {
-				if isDataConsistent {
-					continue
-				} else {
-					updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, vaccinationData)
-					if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
-						PublishCertifyMessage(
-							jsonRequestString,
-							nil,
-							nil,
-							MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
-					}
+			if isDataConsistent, err := CheckDataConsistence(vaccinationData, dbData); err == nil && !isDataConsistent {
+				updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, vaccinationData)
+				if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
+					PublishCertifyMessage(
+						jsonRequestString,
+						nil,
+						nil,
+						MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
 				}
 			} else {
 				log.Error(err)

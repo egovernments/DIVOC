@@ -270,6 +270,8 @@ func startCertificateDataReconciliationConsumer(servers string) {
 					if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
 						reconcileData(&message)
 					}
+				} else {
+					log.Errorf("Error unmarshaling certify message %s", err)
 				}
 				consumer.CommitMessage(msg)
 			} else {
