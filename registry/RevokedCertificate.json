@@ -44,6 +44,6 @@
   "signedFields": [],
   "indexFields": ["(certificateId,preEnrollmentCode,dose)"],
   "uniqueIndexFields": [],
-  "systemFields": ["osCreatedAt", "osUpdatedAt", "osCreatedBy", "osUpdatedBy"]
+  "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
 }
 }
