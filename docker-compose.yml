@@ -34,10 +34,6 @@ services:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
-      - registry_base_apis_enable=true
-      - taskExecutor_index_queueCapacity=100
-      - auditTaskExecutor_queueCapacity=100
-      - signature_enabled=false
       - elastic_search_connection_url=es:9200
       - search_provider=io.opensaber.registry.service.ElasticSearchService
     ports:
