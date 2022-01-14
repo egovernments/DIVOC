@@ -1,10 +1,12 @@
 const {
+  CERTIFICATE_DID,
   CERTIFICATE_NAMESPACE,
   CERTIFICATE_NAMESPACE_V2,
   CERTIFICATE_ISSUER,
   CERTIFICATE_BASE_URL,
   CERTIFICATE_FEEDBACK_BASE_URL,
   CERTIFICATE_INFO_BASE_URL,
+  IDENTITY_REJECTION_PATTERN,
   ENABLE_FEEDBACK_URL
 } = require ("./config/config");
 const {Kafka} = require('kafkajs');
@@ -16,6 +18,7 @@ const {vaccinationContext, vaccinationContextV2} = require("vaccination-context"
 const signer = require('certificate-signer-library');
 const Mustache = require("mustache");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
+const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -116,6 +119,38 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
   })
 })();
 
+function populateIdentity(cert, preEnrollmentCode) {
+  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+  let isURI  = isURIFormat(identity);
+  return isURI ? identity : reinitIdentityFromPayload(identity, preEnrollmentCode);
+}
+
+function isURIFormat(param) {
+  let parsed;
+  let isURI;
+  try {
+    parsed = new URL(param);
+    isURI = true;
+  } catch (e) {
+    isURI = false;
+  }
+
+  if (isURI && !parsed.protocol) {
+    isURI = false;
+  }
+  return isURI;
+}
+
+function reinitIdentityFromPayload(identity, preEnrollmentCode) {
+  if(identity && !identityRejectionRegex.test(identity.toUpperCase())) {
+    let newTempIdentity = `${CERTIFICATE_DID}:${identity}`;
+    if (isURIFormat(newTempIdentity)) {
+      return newTempIdentity;
+    }
+  }
+  return `${CERTIFICATE_DID}:${preEnrollmentCode}`;
+}
+
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
   if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
@@ -139,8 +174,8 @@ function transformW3(cert, certificateId) {
   const certificateType = R.pathOr('', ['meta', 'certificateType'], cert);
 
   const namespace = certificateType === CERTIFICATE_TYPE_V3 ? CERTIFICATE_NAMESPACE_V2 : CERTIFICATE_NAMESPACE;
-  const recipientIdentifier = R.pathOr('', ['recipient', 'identity'], cert);
   const preEnrollmentCode = R.pathOr('', ['preEnrollmentCode'], cert);
+  const recipientIdentifier = populateIdentity(cert, preEnrollmentCode);
   const recipientName = R.pathOr('', ['recipient', 'name'], cert);
   const recipientGender = R.pathOr('', ['recipient', 'gender'], cert);
   const recipientNationality = R.pathOr('', ['recipient', 'nationality'], cert);
