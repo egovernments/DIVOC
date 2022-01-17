@@ -49,7 +49,7 @@ export const CertificateDetailsPaths = {
         optional: true
     },
     "Date of ${dose} Dose": {
-        path: ["evidence", "0", "effectiveStart"],
+        path: ["evidence", "0", "date"],
         format: (data) => (formatDate(data))
     },
     "Vaccination Status": {

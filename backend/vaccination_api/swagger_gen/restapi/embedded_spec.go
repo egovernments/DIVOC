@@ -966,6 +966,29 @@ func init() {
                 }
               }
             },
+            "vaccinations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "batch": {
+                    "type": "string"
+                  },
+                  "date": {
+                    "type": "string"
+                  },
+                  "dose": {
+                    "type": "integer"
+                  },
+                  "manufacturer": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
             "verificationAttempts": {
               "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
               "type": "integer"
@@ -1862,7 +1885,7 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "$ref": "#/definitions/certifyV2BadRequestBody"
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -1896,19 +1919,7 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "type": "object",
-              "required": [
-                "code",
-                "message"
-              ],
-              "properties": {
-                "code": {
-                  "type": "string"
-                },
-                "message": {
-                  "type": "string"
-                }
-              }
+              "$ref": "#/definitions/Error"
             }
           },
           "412": {
@@ -1948,7 +1959,7 @@ func init() {
           "400": {
             "description": "Invalid input",
             "schema": {
-              "$ref": "#/definitions/certifyV2BadRequestBody"
+              "$ref": "#/definitions/Error"
             }
           }
         }
@@ -2373,6 +2384,12 @@ func init() {
                 }
               }
             },
+            "vaccinations": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/CertificationRequestV2MetaVaccinationsItems0"
+              }
+            },
             "verificationAttempts": {
               "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
               "type": "integer"
@@ -2661,6 +2678,12 @@ func init() {
             }
           }
         },
+        "vaccinations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/CertificationRequestV2MetaVaccinationsItems0"
+          }
+        },
         "verificationAttempts": {
           "description": "ID verification number of attempts (ex number of attempts done for Aadhaar)",
           "type": "integer"
@@ -2729,6 +2752,26 @@ func init() {
           ]
         },
         "version": {
+          "type": "string"
+        }
+      }
+    },
+    "CertificationRequestV2MetaVaccinationsItems0": {
+      "type": "object",
+      "properties": {
+        "batch": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string"
+        },
+        "dose": {
+          "type": "integer"
+        },
+        "manufacturer": {
+          "type": "string"
+        },
+        "name": {
           "type": "string"
         }
       }
@@ -3097,22 +3140,6 @@ func init() {
           }
         }
       }
-    },
-    "certifyV2BadRequestBody": {
-      "type": "object",
-      "required": [
-        "code",
-        "message"
-      ],
-      "properties": {
-        "code": {
-          "type": "string"
-        },
-        "message": {
-          "type": "string"
-        }
-      },
-      "x-go-gen-location": "operations"
     },
     "sideEffectsResponse": {
       "description": "Indian address format",

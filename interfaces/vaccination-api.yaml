@@ -533,6 +533,21 @@ definitions:
         properties:
           previousCertificateId:
             type: string
+          vaccinations:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                dose:
+                  type: integer
+                manufacturer:
+                  type: string
+                date:
+                  type: string
+                batch:
+                  type: string
           vaccinationApp:
             type: object
             properties:
