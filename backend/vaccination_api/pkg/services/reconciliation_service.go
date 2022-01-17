@@ -137,7 +137,6 @@ func createVaccinationInfo(metaData *models2.CertificationRequestV2MetaVaccinati
 	} else {
 		vaccinationInfo.Manufacturer = dbData.Evidence[0].Manufacturer
 	}
-	vaccinationInfo.Manufacturer = metaData.Manufacturer
 	effectiveStart, terr := time.Parse("2006-01-02", dbData.Evidence[0].EffectiveStart)
 	if terr != nil {
 		log.Info("error while parsing effectiveStart Date")

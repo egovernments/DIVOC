@@ -232,7 +232,7 @@ func startCertificateRevocationConsumer(servers string) {
 						}
 						err := services.CreateNewRegistry(revokedCertificate, "RevokedCertificate")
 						if err != nil {
-							log.Error("Failed saving revoked certificate %+v", err)
+							log.Errorf("Failed saving revoked certificate %+v", err)
 						}
 					}
 				}
