@@ -379,6 +379,8 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 }
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
+	log.Infof("Convert %v", requestV2.EnrollmentType)
+	log.Infof("Convert %v", requestV2.Facility.Address)
 	return models.CertificationRequest{
 		Comorbidities:  requestV2.Comorbidities,
 		EnrollmentType: requestV2.EnrollmentType,
@@ -582,7 +584,9 @@ func updateCertificate(params certification.UpdateCertificateParams, principal *
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
+		preEnrollmentCode := request.PreEnrollmentCode
+		dose := int(*request.Vaccination.Dose)
+		if certificateId := getCertificateIdToBeUpdated(preEnrollmentCode, dose); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -610,7 +614,9 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 	// sign verification can be disabled and use vaccination certification generation
 	log.Debugf("%+v\n", params.Body[0])
 	for _, request := range params.Body {
-		if certificateId := getCertificateIdToBeUpdated(request); certificateId != nil {
+		preEnrollmentCode := request.PreEnrollmentCode
+		dose := int(*request.Vaccination.Dose)
+		if certificateId := getCertificateIdToBeUpdated(preEnrollmentCode, dose); certificateId != nil {
 			log.Infof("Certificate update request approved %+v", request)
 			if request.Meta == nil {
 				request.Meta = map[string]interface{}{
@@ -633,11 +639,11 @@ func updateCertificateV3(params certification.UpdateCertificateV3Params, princip
 	return certification.NewUpdateCertificateV3OK()
 }
 
-func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
+func getCertificateIdToBeUpdated(preEnrollmentCode *string, dose int) *string {
 
 	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
-			"eq": request.PreEnrollmentCode,
+			"eq": preEnrollmentCode,
 		},
 	}
 	certificateFromRegistry, err := kernelService.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
@@ -649,16 +655,16 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequest) *string {
 		}
 		doseWiseCertificateIds := getDoseWiseCertificateIds(certificates)
 		// no changes to provisional certificate if final certificate is generated
-		if *request.Vaccination.Dose < *request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
-			log.Error("Updating provisional certificate restricted")
-			return nil
-		}
+		// if *request.Vaccination.Dose < *request.Vaccination.TotalDoses && len(doseWiseCertificateIds) > 1 {
+		// 	log.Error("Updating provisional certificate restricted")
+		// 	return nil
+		// }
 		// check if certificate exists for a dose
-		if certificateIds, ok := doseWiseCertificateIds[int(*request.Vaccination.Dose)]; ok && len(certificateIds) > 0 {
+		if certificateIds, ok := doseWiseCertificateIds[dose]; ok && len(certificateIds) > 0 {
 			// check if maximum time of correction is reached
 			count := len(certificateIds)
 			if count < (config.Config.Certificate.UpdateLimit + 1) {
-				certificateId := doseWiseCertificateIds[int(*request.Vaccination.Dose)][count-1]
+				certificateId := doseWiseCertificateIds[dose][count-1]
 				return &certificateId
 			} else {
 				log.Error("Certificate update limit reached")
@@ -741,11 +747,14 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	if resp, err := kernelService.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
 		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificates) > 0 {
+				log.Infof("revoked certificate")
 				return certificate_revoked.NewCertificateRevokedOK()
 			}
+			log.Infof("revoked certificate not found")
 			return certificate_revoked.NewCertificateRevokedNotFound()
 		}
 	}
+	log.Infof("revoked certificate badrequest", err)
 	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
 

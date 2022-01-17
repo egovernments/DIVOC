@@ -77,6 +77,7 @@
     "deleteRegistration": "Delete Registration",
     "programDeleteForBeneficiaryInfo": "'{{program}}' program registration will be deleted for {{beneficiaryName}}",
     "downloadCertificate": "Download Certificate",
+    "downloadQRCode": "Download QR Code",
     "newProgram": "New Program",
     "selectProgram": {
       "title": "Please select vaccination program"
@@ -162,7 +163,6 @@
       "completeMsgTitle": "The healthcare facility has been notified. You will receive a call back soon.",
       "completeMsgTitle2": "If the symptoms worsen, please visit the facility so that the doctors can attend to at the earliest.",
       "completeMsgSubTitle": "If you need to contact the facility immediately"
-
     }
   },
   "certificate": {
@@ -194,6 +194,8 @@
     "scanWithQR": "SCAN WITH QR",
     "validStatus": "Successful",
     "invalidStatus": "Invalid Certificate",
+    "revokedStatus": "Certificate Revoked",
+    "revokeText": "Your Certificate has been revoked",
     "verifyAnotherCertificate": "Verify Another Certificate",
     "infoCard": [
       {

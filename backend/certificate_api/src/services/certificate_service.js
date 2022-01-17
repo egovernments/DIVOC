@@ -2,18 +2,28 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
-const getLatestCertificate = (certificates) => {
+const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
-      if (a.osUpdatedAt < b.osUpdatedAt) {
-        return 1;
+      const parsedEvidenceOfA = JSON.parse(a.certificate);
+      const parsedEvidenceOfB = JSON.parse(b.certificate);
+      if (parsedEvidenceOfA.evidence[0].dose === parsedEvidenceOfB.evidence[0].dose) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
       }
-      if (a.osUpdatedAt > b.osUpdatedAt) {
-        return -1;
-      }
-      return 0;
+      return parsedEvidenceOfB.evidence[0].dose - parsedEvidenceOfA.evidence[0].dose;
     }).reverse();
-    return certificates[certificates.length - 1];
+    return certificates;
+  }
+};
+const getLatestCertificate = (certificates) => {
+  if(certificates.length > 0) {
+    let sortedCerts = sortCertificatesInDoseAndUpdateTimeAscOrder(certificates);
+    return sortedCerts[sortedCerts.length - 1];
   }
 };
 
@@ -25,21 +35,26 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
     Object.entries(constants.VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
   const prophylaxisCode = Object.keys(constants.EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
     Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
+  const vaccineCode = Object.keys(constants.EU_VACCINE_CODE).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
+    Object.entries(constants.EU_VACCINE_CODE).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
   const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
-  const fullNameSplitArr = credentialSubject.name.split(' ');
+  
+  const fullName = credentialSubject.name.trim();
+  const lastName = fullName.substring(fullName.lastIndexOf(" ")+1)
+  const firstName = fullName.substring(0,(fullName.length - lastName.length)).trim();
   return {
-    "ver": "1.0.0",
+    "ver": "1.3.0",
     "nam": {
-      "fn": fullNameSplitArr[fullNameSplitArr.length - 1],
-      "gn": firstNameOfRecipient(fullNameSplitArr)
+      "fn": lastName,
+      "gn": firstName
     },
     "dob": dobOfRecipient(credentialSubject),
     "v": [
       {
         "tg": constants.EU_DISEASE[config.DISEASE_CODE.toLowerCase()],          // disease or agent targeted
         "vp": prophylaxisCode,                                          // vaccine or prophylaxis "1119349007"
-        "mp": evidence[0].vaccine,                                              // vaccine medicinal product
+        "mp": vaccineCode,                                              // vaccine medicinal product
         "ma": manufacturerCode,                                                 // Marketing Authorization Holder - if no MAH present, then manufacturer
         "dn": evidence[0].dose,                                                 // Dose Number
         "sd": evidence[0].totalDoses,                                           // Total Series of Doses
@@ -50,14 +65,6 @@ const convertCertificateToDCCPayload = (certificateRaw) => {
       }
     ]
   };
-}
-
-function firstNameOfRecipient(nameArr) {
-  let firstName = '';
-  for(let i=0; i<nameArr.length - 1; i++) {
-    firstName += nameArr[i] + " ";
-  }
-  return firstName.trim();
 }
 
 function getAlpha2CodeForCountry(addressCountry) {
@@ -87,6 +94,7 @@ function dobOfRecipient(credentialSubject) {
 }
 
 module.exports = {
+  sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
   convertCertificateToDCCPayload
 };

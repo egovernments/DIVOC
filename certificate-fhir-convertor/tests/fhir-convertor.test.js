@@ -1,5 +1,5 @@
 
-const {certificateToFhirJson, validateSignedFhirJson, validateQRContent} = require("../fhir-convertor");
+const {certificateToFhirJson, certificateToSmartHealthJson, validateSignedFhirJson, validateQRContent} = require("../fhir-convertor");
 const rs = require("jsrsasign");
 const config = require('../configs/config');
 // const privateKeyPem = '-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAnXQalrgztecTpc+INjRQ8s73FSE1kU5QSlwBdICCVJBUKiuQUt7s+Z5epgCvLVAOCbP1mm5lV7bfgV/iYWDio7lzX4MlJwDedWLiufr3Ajq+79CQiqPaIbZTo0i13zijKtX7wgxQ78wT/HkJRLkFpmGeK3za21tEfttytkhmJYlwaDTEc+Kx3RJqVhVh/dfwJGeuV4Xc/e2NH++ht0ENGuTk44KpQ+pwQVqtW7lmbDZQJoOJ7HYmmoKGJ0qt2hrj15uwcD1WEYfY5N7N0ArTzPgctExtZFDmituLGzuAZfv2AZZ9/7Y+igshzfB0reIFdUKw3cdVTzfv5FNrIqN5pwIDAQABAoIBAHPILMUoLt5UTd5f/YnebqgeCRNAmGOBcwk7HtbMqQoGF93qqvZFd30XOAJZ/ncTpz77Vl95ToxxrWk1WQLCe+ZpOK3Dgk5sFSm8zXx1T64UBNPUSnWoh37C1D39+b9rppCZScgnxlyPdSLy3h3q8Hyoy+auqUEkm/ms5W2lT3fJscyN1IAyHrhsOBWjl3Ilq5GxBo5tbYv/Fb1pQiP/p2SIHA1+2ASXNYQP100F5Vn0V6SFtBXTCQnwcvbP083NvlGxs9+xRs3MCUcxCkKepWuzYwOZDmu/2yCz1/EsP6wlsYEHmCZLdIb0tQt0caqzB/RoxfBpNRIlhOtqHvBzUgECgYEAzIRn5Y7lqO3N+V29wXXtVZjYWvBh7xUfOxAwVYv0rKI0y9kHJHhIrU+wOVOKGISxBKmzqBQRPvXtXW8E0/14Zz82g60rRwtNjvW0UoZAY3KPouwruUIjAe2UnKZcQ//MBTrvds8QGpL6nxvPsBqU0y2K+ySAOxBtNtGEjzv8nxUCgYEAxRbMWukIbgVOuQjangkfJEfA1UaRFQqQ8jUmT9aiq2nREnd4mYP8kNKzJa9L7zj6Un6yLH5DbGspZ2gGODeRw3uVFN8XSzRdLvllNEyiG/waiysUtXfG2DPOR6xD8tXXDMm/tl9gTa8cbkvqYy10XT9MpfOAsusEZVmc0/DBBMsCgYAYdAxoKjnThPuHwWma5BrIjUnxNaTADWp6iWj+EYnjylE9vmlYNvmZn1mWwSJV5Ce2QwQ0KJIXURhcf5W4MypeTfSase3mxLc1TLOO2naAbYY3GL3xnLLK3DlUsZ9+kes3BOD097UZOFG3DIA8sjDxPxTLCoY6ibBFSa/r4GRIMQKBgQCranDCgPu79RHLDVBXM0fKnj2xQXbd/hqjDmcL+Xnx7E7S6OYTXyBENX1qwVQh9ESDi34cBJVPrsSME4WVT3+PreS0CnSQDDMfr/m9ywkTnejYMdgJHOvtDuHSpJlUk3g+vxnm3H0+E5d+trhdGiOjFnLrwyWkd5OTMqWcEEFQkQKBgFfXObDz/7KqeSaAxI8RzXWbI3Fa492b4qQUhbKYVpGn98CCVEFJr11vuB/8AXYCa92OtbwgMw6Ah5JOGzRScJKdipoxo7oc2LJ9sSjjw3RB/aWl35ChvnCJhmfSL8Usbj0nWVTrPwRLjMC2bIxkLtnm9qYXPumW1EjEbusjVMpN\n-----END RSA PRIVATE KEY-----\n';
@@ -33,7 +33,7 @@ const cert2 = {
         "type": "Person",
         "id": "did:in.gov.uidai.aadhaar:123456",
         "refId": "12346",
-        "name": "Ved Prakash",
+        "name": "ABC Name",
         "gender": "Male",
         "age": "34",
         "nationality": "Indian",
@@ -131,6 +131,23 @@ test('should convert W3C certificate json to fhir json', async () => {
 
     expect(fhirCert.signature.sigFormat).toBe("application/jose");
     expect(fhirCert.signature.data.split(".").length).toBe(3);
+
+});
+
+test('should convert W3C certificate json to Smart Health Card json', async () => {
+
+    let shcCert = await certificateToSmartHealthJson(cert2, meta);
+    console.log(JSON.stringify(shcCert));
+
+    expect(shcCert.credentialSubject.fhirBundle.entry[0].fullUrl).toContain('urn:uuid:');
+    expect(shcCert.credentialSubject.fhirBundle.entry[0].resource.resourceType).toBe('Patient');
+    expect(shcCert.credentialSubject.fhirBundle.entry[0].resource.name[0].text).toBe(cert2.credentialSubject.name);
+
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].fullUrl).toContain('urn:uuid:');
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.resourceType).toBe('Immunization');
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime).toBe(cert2.evidence[0].date);
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.lotNumber).toBe(cert2.evidence[0].batch);
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.performer[0].actor.display).toBe(cert2.evidence[0].facility.name);
 
 });
 

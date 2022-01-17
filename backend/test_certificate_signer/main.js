@@ -3,7 +3,9 @@ const {
   CERTIFICATE_ISSUER,
   CERTIFICATE_BASE_URL,
   CERTIFICATE_FEEDBACK_BASE_URL,
-  CERTIFICATE_INFO_BASE_URL
+  CERTIFICATE_INFO_BASE_URL,
+  CERTIFICATE_DID,
+  IDENTITY_REJECTION_PATTERN
 } = require ("./config/config");
 const {Kafka} = require('kafkajs');
 const config = require('./config/config');
@@ -11,6 +13,7 @@ const R = require('ramda');
 const {testCertificateContext} = require("test-certificate-context");
 const signer = require('certificate-signer-library');
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
+const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -109,7 +112,7 @@ function transformW3(cert, certificateId) {
     type: ['VerifiableCredential', 'ProofOfTestCertificateCredential'],
     credentialSubject: {
       type: "Person",
-      id: R.pathOr('', ['recipient', 'identity'], cert),
+      id: populateIdentity(cert),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
@@ -162,4 +165,37 @@ function transformW3(cert, certificateId) {
     "nonTransferable": "true"
   };
   return certificateFromTemplate;
+}
+
+function populateIdentity(cert) {
+  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+  let preEnrollmentCode = R.pathOr('', ['preEnrollmentCode'], cert);
+  let isURI  = isURIFormat(identity);
+  return isURI ? identity : reinitIdentityFromPayload(identity, preEnrollmentCode);
+}
+
+function isURIFormat(param) {
+  let parsed;
+  let isURI;
+  try {
+    parsed = new URL(param);
+    isURI = true;
+  } catch (e) {
+    isURI = false;
+  }
+
+  if (isURI && !parsed.protocol) {
+    isURI = false;
+  }
+  return isURI;
+}
+
+function reinitIdentityFromPayload(identity, preEnrollmentCode) {
+  if(identity && !identityRejectionRegex.test(identity.toUpperCase())) {
+    let newTempIdentity = `${CERTIFICATE_DID}:${identity}`;
+    if (isURIFormat(newTempIdentity)) {
+      return newTempIdentity;
+    }
+  }
+  return `${CERTIFICATE_DID}:${preEnrollmentCode}`;
 }

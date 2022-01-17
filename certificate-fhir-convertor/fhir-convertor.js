@@ -12,6 +12,7 @@ const JWS = rs.jws.JWS;
 const TEMPLATES_FOLDER = __dirname +'/configs/templates/';
 const r4TemplateFile = 'fhir-r4.template';
 const questionnairResponseTemplateFile = 'questionnaireResponse.template';
+const smartHealthTemplateFile = 'smartHealthCard.template';
 const CERTIFICATE_FILE = "certificate.json";
 
 function render(template, data) {
@@ -28,7 +29,7 @@ function dobOfRecipient(certificate) {
     return "";
 }
 
-async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
+function getDataFromCertificate(certificate, meta) {
     const dateString = new Date().toJSON();
 
     const patientId = uuidv4();
@@ -71,7 +72,7 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
     const diseaseCode = R.pathOr('', ['diseaseCode'], meta);
     const publicHealthAuthority = R.pathOr('', ['publicHealthAuthority'], meta);
 
-    let data = {
+    return {
         dateString, patientId, organisationId, qrId, bundleId, compositionId, immunizationId,
         practitionerName, vaccineName, vaccineCode,
         facilityName, facilityCity, facilityDistrict, facilityCountry, facilityId,
@@ -79,6 +80,10 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
         manufacturer, batchNumber, effectiveUntilDate, effectiveStartDate, dose, totalDoses,
         diseaseCode, refId, publicHealthAuthority, certificateId, questionnaireResponseId
     };
+}
+
+async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
+    let data = getDataFromCertificate(certificate, meta);
 
     // build QR data and img
     const QR_template = fs.readFileSync(TEMPLATES_FOLDER+questionnairResponseTemplateFile, 'utf8');
@@ -100,7 +105,15 @@ async function certificateToFhirJson(certificate, privateSigningKeyPem, meta) {
     const template = fs.readFileSync(TEMPLATES_FOLDER+r4TemplateFile, 'utf8');
     let fhirCert = render(template, data);
 
-    return signFhirCert(fhirCert, vaccinationDate, privateSigningKeyPem)
+    return signFhirCert(fhirCert, data.vaccinationDate, privateSigningKeyPem)
+}
+
+function certificateToSmartHealthJson(certificate, meta) {
+    let data = getDataFromCertificate(certificate, meta);
+
+    // build Smart Health Payload
+    const QR_template = fs.readFileSync(TEMPLATES_FOLDER+smartHealthTemplateFile, 'utf8');
+    return render(QR_template, data)
 }
 
 function signFhirCert(fhirJson, vaccinationDate, privateKeyPem) {
@@ -203,6 +216,7 @@ function verify(content, publicKeyPem) {
 
 module.exports = {
     certificateToFhirJson,
+    certificateToSmartHealthJson,
     validateSignedFhirJson,
     validateQRContent
 };

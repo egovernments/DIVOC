@@ -36,7 +36,7 @@ type UpdateCertificateV3Params struct {
 	  Required: true
 	  In: body
 	*/
-	Body []*models.CertificationRequest
+	Body []*models.CertificationRequestV2
 }
 
 // BindRequest both binds and validates a request, it assumes that complex things implement a Validatable(strfmt.Registry) error interface
@@ -50,7 +50,7 @@ func (o *UpdateCertificateV3Params) BindRequest(r *http.Request, route *middlewa
 
 	if runtime.HasBody(r) {
 		defer r.Body.Close()
-		var body []*models.CertificationRequest
+		var body []*models.CertificationRequestV2
 		if err := route.Consumer.Consume(r.Body, &body); err != nil {
 			if err == io.EOF {
 				res = append(res, errors.Required("body", "body", ""))

@@ -9,7 +9,11 @@ const port = process.env.PORT || 4321;
 const server = http.createServer(async (req, res) => {
     console.time(req.url)
     console.log(`API ${req.method} ${req.url} called`);
-    if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificate/")) {
+    if (req.method === 'GET' && req.url.match("/certificate/api/certificate/QRCode")) {
+        const data = await certificateController.getCertificateQRCode(req, res);
+        res.end(data)
+    }
+    else if (req.method === 'GET' && req.url.startsWith("/certificate/api/certificate/")) {
         const data = await certificateController.getCertificate(req, res);
         res.end(data)
     } else if (req.method === 'GET' && req.url.match("/certificate/api/certificatePDF/.+")) {
@@ -26,6 +30,9 @@ const server = http.createServer(async (req, res) => {
         res.end(data)
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/eu-certificate")) {
         const data = await certificateController.certificateAsEUPayload(req, res);
+        res.end(data)
+    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/shc-certificate")) {
+        const data = await certificateController.certificateAsSHCPayload(req, res);
         res.end(data)
     } else if (req.method === 'GET' && req.url.match("/certificate/api/test/certificatePDF/.+")) {
         const data = await certificateController.getTestCertificatePDFByPreEnrollmentCode(req, res);
