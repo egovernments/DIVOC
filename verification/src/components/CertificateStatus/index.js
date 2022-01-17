@@ -134,7 +134,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
     async function checkIfRevokedCertificate(data) {
         return axios
-            .post("/divoc/api/v1/certificate/revoked", data)
+            .post("/cert/api/certificate/revoked", data)
             .then((res) => {
                 dispatch(addEventAction({type: EVENT_TYPES.REVOKED_CERTIFICATE, extra: certificateData}));
                 return res

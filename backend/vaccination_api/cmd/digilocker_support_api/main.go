@@ -1338,6 +1338,59 @@ func getPDFHandlerV2(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func postCertificateRevoked(w http.ResponseWriter, r *http.Request) {
+	typeId := "RevokedCertificate"
+	var rb interface{}
+	err := json.NewDecoder(r.Body).Decode(&rb)
+	requestBody, err := json.Marshal(rb)
+	if err != nil {
+		log.Errorf("JSON marshalling error %v", err)
+		w.WriteHeader(400)
+		return
+	}
+
+	var certificate models.Certificate
+	err = json.Unmarshal(requestBody, &certificate)
+	if err != nil {
+		log.Errorf("Error while converting requestBody to Certificate object %v", err)
+		w.WriteHeader(400)
+		return
+	}
+	if len(certificate.Evidence) == 0 {
+		log.Errorf("Error while getting Evidence array in requestBody %v", certificate)
+		w.WriteHeader(400)
+		return
+	}
+
+	preEnrollmentCode := certificate.CredentialSubject.RefId
+	certificateId := certificate.Evidence[0].CertificateId
+	dose := certificate.Evidence[0].Dose
+
+	filter := map[string]interface{}{
+		"previousCertificateId": map[string]interface{}{
+			"eq": certificateId,
+		},
+		"dose": map[string]interface{}{
+			"eq": dose,
+		},
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+	if resp, err := services.QueryRegistry(typeId, filter); err == nil {
+		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+			if len(revokedCertificates) > 0 {
+				w.WriteHeader(200)
+				return
+			}
+			w.WriteHeader(404)
+			return
+		}
+	}
+	w.WriteHeader(400)
+	return
+}
+
 func getCertificateTypeFromQueryParams(r *http.Request) string {
 	if language := r.URL.Query().Get("type"); language != "" {
 		return language
@@ -1566,6 +1619,8 @@ func main() {
 	r.HandleFunc("/cert/api/certificate/{preEnrollmentCode}/{dose}", timed(authorize(headCertificateWithDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("HEAD")
 	r.HandleFunc("/cert/api/certificatePDF/{preEnrollmentCode}/{dose}", timed(authorize(getCertificateByDoseHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	r.HandleFunc("/cert/pdf/certificate", timed(authorize(handleFetchPDFPostRequest, []string{ApiRole}, EventTagInternal))).Methods("POST")
+
+	r.HandleFunc("/cert/api/certificate/revoked", timed(postCertificateRevoked)).Methods("POST")
 
 	r.HandleFunc("/certificatePDF/{preEnrollmentCode}", timed(authorize(getPDFHandler, []string{ApiRole}, EventTagInternal))).Methods("GET")
 	//external
