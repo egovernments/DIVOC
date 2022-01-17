@@ -2,18 +2,28 @@ const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
 
-const getLatestCertificate = (certificates) => {
+const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
-      if (a.osUpdatedAt < b.osUpdatedAt) {
-        return 1;
+      const parsedEvidenceOfA = JSON.parse(a.certificate);
+      const parsedEvidenceOfB = JSON.parse(b.certificate);
+      if (parsedEvidenceOfA.evidence[0].dose === parsedEvidenceOfB.evidence[0].dose) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
       }
-      if (a.osUpdatedAt > b.osUpdatedAt) {
-        return -1;
-      }
-      return 0;
+      return parsedEvidenceOfB.evidence[0].dose - parsedEvidenceOfA.evidence[0].dose;
     }).reverse();
-    return certificates[certificates.length - 1];
+    return certificates;
+  }
+};
+const getLatestCertificate = (certificates) => {
+  if(certificates.length > 0) {
+    let sortedCerts = sortCertificatesInDoseAndUpdateTimeAscOrder(certificates);
+    return sortedCerts[sortedCerts.length - 1];
   }
 };
 
@@ -87,6 +97,7 @@ function dobOfRecipient(credentialSubject) {
 }
 
 module.exports = {
+  sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
   convertCertificateToDCCPayload
 };

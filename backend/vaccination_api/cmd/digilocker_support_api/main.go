@@ -7,6 +7,14 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
+	"math"
+	"net/http"
+	"os"
+	"sort"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/auth"
@@ -21,12 +29,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/skip2/go-qrcode"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"io"
-	"math"
-	"net/http"
-	"os"
-	"strings"
-	"time"
 )
 
 const ApiRole = "api"
@@ -47,6 +49,7 @@ const InternalFailedEvent = "internal-failed"
 const ExternalSuccessEvent = "external-success"
 const ExternalFailedEvent = "external-failed"
 const YYYYMMDD = "2006-01-02"
+
 var (
 	requestHistogram = promauto.NewHistogram(prometheus.HistogramOpts{
 		Name: "http_request_duration_milliseconds",
@@ -114,7 +117,7 @@ type Certificate struct {
 	} `json:"proof"`
 }
 
-func getVaccineValidDays(start string,end string) string {
+func getVaccineValidDays(start string, end string) string {
 	days := 28
 	startDate, err := time.Parse(YYYYMMDD, start)
 	if err == nil {
@@ -130,7 +133,7 @@ func getVaccineValidDays(start string,end string) string {
 }
 
 func showLabelsAsPerTemplate(certificate Certificate) []string {
-	if (!isFinal(certificate)) {
+	if !isFinal(certificate) {
 		return []string{certificate.CredentialSubject.Name,
 			certificate.CredentialSubject.Age,
 			certificate.CredentialSubject.Gender,
@@ -391,10 +394,23 @@ func getCertificateList(w http.ResponseWriter, request *http.Request) {
 		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			certificateArr = SortCertificatesByCreateAt(certificateArr)
 			log.Infof("Certificate query return %d records", len(certificateArr))
 			if len(certificateArr) > 0 {
+				newCertificateArr := make([]map[string]interface{}, 0)
+				certificatesByDose := GetDoseWiseCertificates(certificateArr)
+				keys := make([]int, 0)
+				for key, _ := range certificatesByDose {
+					keys = append(keys, key)
+				}
+				sort.Slice(keys, func(i, j int) bool {
+					return keys[i] < keys[j]
+				})
+				for _, j := range keys {
+					newCertificateArr = append(newCertificateArr, certificatesByDose[j]...)
+				}
 				certificates := map[string]interface{}{
-					"certificates": certificateArr,
+					"certificates": newCertificateArr,
 				}
 				if responseBytes, err := json.Marshal(certificates); err != nil {
 					log.Errorf("Error while serializing xml")
@@ -493,9 +509,11 @@ func getCertificatePDF(w http.ResponseWriter, r *http.Request) {
 		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			certificateArr = SortCertificatesByCreateAt(certificateArr)
 			log.Infof("Certificate query return %d records", len(certificateArr))
 			if len(certificateArr) > 0 {
-				certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+				certificatesByDose := GetDoseWiseCertificates(certificateArr)
+				certificateObj := getLatestCertificate(certificatesByDose)
 				log.Infof("certificate resp %v", certificateObj)
 				signedJson := certificateObj["certificate"].(string)
 				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
@@ -557,9 +575,11 @@ func getRecipientCertificatePDF(w http.ResponseWriter, r *http.Request) {
 		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+			certificateArr = SortCertificatesByCreateAt(certificateArr)
 			log.Infof("Certificate query return %d records", len(certificateArr))
 			if len(certificateArr) > 0 {
-				certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+				certificatesByDose := GetDoseWiseCertificates(certificateArr)
+				certificateObj := getLatestCertificate(certificatesByDose)
 				log.Infof("certificate resp %v", certificateObj)
 				signedJson := certificateObj["certificate"].(string)
 				if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {
@@ -611,7 +631,8 @@ func getPDFHandler(w http.ResponseWriter, r *http.Request) {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			certificatesByDose := GetDoseWiseCertificates(certificateArr)
+			certificateObj := getLatestCertificate(certificatesByDose)
 			log.Infof("certificate resp %v", certificateObj)
 			signedJson := certificateObj["certificate"].(string)
 			if pdfBytes, err := getCertificateAsPdf(signedJson); err != nil {

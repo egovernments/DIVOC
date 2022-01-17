@@ -9,12 +9,16 @@ const registryService = require("../services/registry_service");
 const certificateService = require("../services/certificate_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
 const fhirCertificate = require("certificate-fhir-convertor");
-const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8} = require('../../configs/keys');
+const {privateKeyPem, euPrivateKeyPem, euPublicKeyP8, shcPrivateKeyPem} = require('../../configs/keys');
 const config = require('../../configs/config');
 const dcc = require("@pathcheck/dcc-sdk");
+const shc = require("@pathcheck/shc-sdk");
+const keyUtils = require("../services/key_utils");
 
 const vaccineCertificateTemplateFilePath = `${__dirname}/../../configs/templates/certificate_template.html`;
 const testCertificateTemplateFilePath = `${__dirname}/../../configs/templates/test_certificate_template.html`;
+
+let shcKeyPair = [];
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -96,6 +100,15 @@ function formatDate(givenDate) {
     return `${padDigit(day)}-${monthName}-${year}`;
 }
 
+function formatDateISO(givenDate) {
+    const dob = new Date(givenDate);
+    let day = dob.getDate();
+    let month = dob.getMonth()+1;
+    let year = dob.getFullYear();
+
+    return `${year}-${month}-${padDigit(day)}`;
+}
+
 function formatDateTime(givenDateTime) {
     const dob = new Date(givenDateTime);
     let day = dob.getDate();
@@ -164,10 +177,12 @@ async function createCertificateQRCode(certificateResp, res, source) {
 }
 
 async function createCertificatePDF(certificateResp, res, source) {
+
     if (certificateResp.length > 0) {
         let certificateRaw = certificateService.getLatestCertificate(certificateResp);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
-        const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
+        let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+        const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
         const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
         sendEvents({
@@ -272,6 +287,10 @@ async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, re
     const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode);
     return await createTestCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
+async function createCertificateQRCodeCitizen(phone, certificateId, res) {
+    const certificateResp = await registryService.getCertificate(phone, certificateId);
+    return await createCertificateQRCode(certificateResp, res, certificateId);
+}
 
 async function getCertificate(req, res) {
     try {
@@ -286,6 +305,25 @@ async function getCertificate(req, res) {
         }
         const certificateId = req.url.replace("/certificate/api/certificate/", "").split("?")[0];
         res = await createCertificatePDFByCertificateId(claimBody.Phone, certificateId, res);
+        return res
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+async function getCertificateQRCode(req, res) {
+    try {
+        var queryData = url.parse(req.url, true).query;
+        let claimBody = "";
+        try {
+            claimBody = await verifyToken(queryData.authToken);
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        const certificateId = req.url.replace("/certificate/api/certificate/QRCode/", "").split("?")[0];
+        res = await createCertificateQRCodeCitizen(claimBody.Phone, certificateId, res);
         return res
     } catch (err) {
         console.error(err);
@@ -473,7 +511,8 @@ async function certificateAsEUPayload(req, res) {
             const dccPayload = certificateService.convertCertificateToDCCPayload(certificateRaw);
             const qrUri = await dcc.signAndPack(await dcc.makeCWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, dccPayload.v[0].co), euPublicKeyP8, euPrivateKeyPem);
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
-            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL);
+            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
             const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
 
             res.statusCode = 200;
@@ -481,6 +520,63 @@ async function certificateAsEUPayload(req, res) {
                 date: new Date(),
                 source: refId,
                 type: "eu-cert-success",
+                extra: "Certificate found"
+            });
+            return pdfBuffer
+
+        } else {
+            res.statusCode = 404;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "Certificate not found"
+            };
+            return JSON.stringify(error);
+        }
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
+async function certificateAsSHCPayload(req, res) {
+    let refId;
+    try {
+        var queryData = url.parse(req.url, true).query;
+        try {
+            await verifyKeycloakToken(req.headers.authorization);
+            refId = queryData.refId;
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+        if (certificateResp.length > 0) {
+            let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+            let certificate = JSON.parse(certificateRaw.certificate);
+
+            // convert certificate to SHC Json
+            const dccPayload = fhirCertificate.certificateToSmartHealthJson(certificate, {});
+
+            // get keyPair from pem for 1st time
+            if (shcKeyPair.length === 0) {
+                const keyFile = keyUtils.PEMtoDER(shcPrivateKeyPem)
+                shcKeyPair = await keyUtils.DERtoJWK(keyFile, []);
+            }
+
+            const qrUri = await shc.signAndPack(await shc.makeJWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER), shcKeyPair[0]);
+            const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
+            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
+            const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+
+            res.statusCode = 200;
+            sendEvents({
+                date: new Date(),
+                source: refId,
+                type: "shc-cert-success",
                 extra: "Certificate found"
             });
             return pdfBuffer
@@ -529,7 +625,7 @@ async function createPDF(templateFile, data) {
     return pdfBuffer
 }
 
-function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL) {
+function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap) {
     certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
     const {certificate: {credentialSubject, evidence}} = certificateRaw;
     const certificateData = {
@@ -548,10 +644,63 @@ function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL) {
         dose: evidence[0].dose,
         totalDoses: evidence[0].totalDoses,
         isFinalDose: evidence[0].dose === evidence[0].totalDoses,
+        isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
+        isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
         currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`
     };
-
+    getVaccineDetails(certificateData, doseToVaccinationDetailsMap);
     return certificateData;
+}
+
+function getVaccineDetails(certificateData, doseToVaccinationDetailsMap) {
+    certificateData["vaxEvents"] = [];
+    for (let [key, value] of doseToVaccinationDetailsMap) {
+        let vaxEventMap = {
+            doseType: (value.dose <= value.totalDoses) ?
+                ("Primary Dose " + value.dose) :
+                ("Booster Dose " + (value.dose - value.totalDoses)),
+            vaxName: value.name || "",
+            vaxBatch: value.batch || "",
+            dateOfVax: formatDate(value.date || ""),
+            countryOfVax: value.vaccinatedCountry || "",
+            validity: value.validity || "",
+            vaxType: value.vaxType || "",
+        };
+        certificateData["vaxEvents"].push(vaxEventMap);
+    }
+}
+
+function getVaccineDetailsOfPreviousDoses(certificates) {
+    let doseToVaccinationDetailsMap = new Map();
+    if (certificates.length > 0) {
+        for (let i = 0; i < certificates.length; i++) {
+            const certificateTmp = JSON.parse(certificates[i].certificate);
+            let evidence = certificateTmp.evidence[0];
+            doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromCert(evidence));
+        }
+    }
+    return new Map([...doseToVaccinationDetailsMap].reverse());
+}
+
+function fetchVaccinationDetailsFromCert(evidence) {
+    let vaccineDetails = {
+        dose: evidence.dose,
+        totalDoses: evidence.totalDoses,
+        date: evidence.date,
+        name: evidence.vaccine,
+        vaxType: getVaxType(evidence.icd11Code, evidence.prophylaxis),
+        batch: evidence.batch,
+        vaccinatedCountry: evidence.facility.address.addressCountry,
+    };
+    return vaccineDetails;
+}
+
+function getVaxType(icd11Code, prophylaxis) {
+    if(icd11Code && prophylaxis) {
+        return icd11Code+', '+prophylaxis;
+    } else {
+        return 'Not Available';
+    }
 }
 
 module.exports = {
@@ -562,5 +711,7 @@ module.exports = {
     checkIfCertificateGenerated,
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
-    certificateAsEUPayload
+    certificateAsEUPayload,
+    getCertificateQRCode,
+    certificateAsSHCPayload
 };

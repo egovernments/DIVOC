@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import "./index.css";
 import VerifyCertificateImg from "../../assets/img/verify-certificate.png"
 import LoadingImg from "../../assets/img/loading-buffering.gif"
@@ -15,6 +15,7 @@ export const VerifyCertificate = () => {
     const [result, setResult] = useState("");
     const [showScanner, setShowScanner] = useState(false);
     const [showTimeout, setShowTimeout] = useState(false);
+    const [timerClocked, setTimerClocked] = useState(false);
     const {t} = useTranslation();
     const handleScan = data => {
         if (data) {
@@ -22,7 +23,7 @@ export const VerifyCertificate = () => {
             zip.loadAsync(data).then((contents) => {
                 return contents.files[CERTIFICATE_FILE].async('text')
             }).then(function (contents) {
-                setResult(contents)
+                setResult(contents);
             }).catch(err => {
                     setResult(data)
                 }
@@ -34,18 +35,24 @@ export const VerifyCertificate = () => {
         console.error(err)
     };
 
+    useEffect(() => {
+        if(timerClocked && result === '') {
+            setShowTimeout(true);
+        }
+    });
+
     const onScanWithQR = () => {
         setShowScanner(true);
+        setTimerClocked(false);
         setTimeout(() => {
-            if(!result) {
-                setShowTimeout(true);
-            }
+            setTimerClocked(true);
         }, config.CERTIFICATE_SCAN_TIMEOUT);
     };
 
     const onTryAgain = () => {
         setShowTimeout(false);
-        setShowScanner(false)
+        setShowScanner(false);
+        setTimerClocked(false);
     };
     return (
         <div className="container-fluid verify-certificate-wrapper">
@@ -75,6 +82,7 @@ export const VerifyCertificate = () => {
                 result && <CertificateStatus certificateData={result} goBack={() => {
                     setShowScanner(false);
                     setShowTimeout(false);
+                    setTimerClocked(false);
                     setResult("");
                 }
                 }/>

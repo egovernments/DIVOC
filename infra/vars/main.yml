@@ -1,8 +1,13 @@
 postgresql_databases:
-  - name: divoc_db
+  - name: registry
+  - name: keycloak
 postgresql_users:
   - name: postgres
     password: postgres
+  - name: keycloak
+    password: keycloak
+  - name: registry
+    password: registry
 postgresql_global_config_options:
   - option: unix_socket_directories
     value: '{{ postgresql_unix_socket_directories | join(",") }}'

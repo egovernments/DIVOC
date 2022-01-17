@@ -396,7 +396,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/CertificationRequest'
+              $ref: '#/definitions/CertificationRequestV2'
       responses:
         '200':
           description: OK
@@ -423,7 +423,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/CertificationRequestV2'
+              $ref: '#/definitions/CertificationRequest'
       responses:
         '200':
           description: OK
@@ -724,16 +724,6 @@ definitions:
     properties:
       preEnrollmentCode:
         type: string
-      enrollmentType:
-        type: string
-        minLength: 1
-      programId:
-        type: string
-        minLength: 1
-      comorbidities:
-        type: array
-        items:
-          type: string
       recipient:
         type: object
         properties:
@@ -744,12 +734,6 @@ definitions:
             type: string
             format: date
             x-nullable: true
-          age:
-            type: string
-            minLength: 1
-          gender:
-            type: string
-            minLength: 1
           nationality:
             type: string
             minLength: 1
@@ -761,29 +745,6 @@ definitions:
             items:
               type: string
               minLength: 1
-          address:
-            type: object
-            properties:
-              addressLine1:
-                type: string
-              addressLine2:
-                type: string
-              district:
-                type: string
-                minLength: 1
-              state:
-                type: string
-                minLength: 1
-              country:
-                type: string
-                minLength: 2
-              pincode:
-                type: string
-            required:
-              - addressLine1
-              - district
-              - state
-              - pincode
         required:
           - name
           - nationality
@@ -841,30 +802,6 @@ definitions:
           name:
             type: string
             minLength: 1
-          address:
-            type: object
-            properties:
-              addressLine1:
-                type: string
-              addressLine2:
-                type: string
-              district:
-                type: string
-                minLength: 1
-              state:
-                type: string
-                minLength: 1
-              country:
-                type: string
-                minLength: 2
-              pincode:
-                type: string
-                minLength: 1
-            required:
-              - addressLine1
-              - district
-              - state
-              - pincode
         required:
           - name
       meta:
