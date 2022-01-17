@@ -201,8 +201,7 @@ func getMockUpdateRequestObject(t *testing.T) *models2.CertificationRequestV2 {
 	return nil
 }
 
-func TestCreateUpdateRequestObject(t *testing.T) {
-	// updating date, vaccine name, batch number
+func TestUpdateDateAndVaccine(t *testing.T) {
 	certifyMessage := getMockCertifyRequestV2(t)
 	signedCertificateFromDB := getMockSignedCertificateData(t)
 	expectedUpdateReqObject := getMockUpdateRequestObject(t)
@@ -210,7 +209,12 @@ func TestCreateUpdateRequestObject(t *testing.T) {
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject.Facility.Address, *updateReqObject.Facility.Address)
 	}
+}
 
+func TestUpdateDateAndBatchNumber(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	signedCertificateFromDB := getMockSignedCertificateData(t)
+	expectedUpdateReqObject := getMockUpdateRequestObject(t)
 	// updating batch number and date, using same vaccine name and manufacturer in signed certificate
 	certifyMessage.Meta.Vaccinations[0] = &models2.CertificationRequestV2MetaVaccinationsItems0{
 		Batch:        "4121Z063",
@@ -221,15 +225,20 @@ func TestCreateUpdateRequestObject(t *testing.T) {
 	}
 	expectedUpdateReqObject.Vaccination.Manufacturer = "Serum Institute of India"
 	expectedUpdateReqObject.Vaccination.Name = "COVISHIELD"
-	updateReqObject = CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	updateReqObject := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject, *updateReqObject)
 	}
+}
 
+func TestIfPinCodeIsEmpty(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	signedCertificateFromDB := getMockSignedCertificateData(t)
+	expectedUpdateReqObject := getMockUpdateRequestObject(t)
 	//signed certificate facility pincode is empty
 	signedCertificateFromDB.Evidence[0].Facility.Address.PostalCode = ""
 	expectedUpdateReqObject.Facility.Address.Pincode = 0
-	updateReqObject = CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	updateReqObject := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject, *updateReqObject)
 	}
