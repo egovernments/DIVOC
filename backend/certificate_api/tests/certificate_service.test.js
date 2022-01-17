@@ -27,7 +27,7 @@ test('should convert certificate in eu specified payload if all fields are provi
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
         "fn": "Dinushan",
         "gn": "D V Chanaka"
@@ -36,7 +36,7 @@ test('should convert certificate in eu specified payload if all fields are provi
         "v": [
             {
                 "tg": "840539006",
-                "vp": "1119349007",
+                "vp": "J07BX03",
                 "mp": "Covishield",
                 "ma": "ORG-100001699",
                 "dn": 1,
@@ -78,7 +78,7 @@ test('should convert certificate in eu specified payload if country field is ful
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
@@ -87,7 +87,7 @@ test('should convert certificate in eu specified payload if country field is ful
         "v": [
             {
                 "tg": "840539006",
-                "vp": "1119349007",
+                "vp": "J07BX03",
                 "mp": "Covishield",
                 "ma": "ORG-100001699",
                 "dn": 1,
@@ -129,7 +129,7 @@ test('should convert certificate in eu specified payload if country field is 2 l
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
@@ -138,7 +138,7 @@ test('should convert certificate in eu specified payload if country field is 2 l
         "v": [
             {
                 "tg": "840539006",
-                "vp": "1119349007",
+                "vp": "J07BX03",
                 "mp": "Covishield",
                 "ma": "ORG-100001699",
                 "dn": 1,
@@ -180,7 +180,7 @@ test('should convert certificate in eu specified payload if country field is inv
         osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
     };
     const expectedDccPayload = {
-        "ver": "1.0.0",
+        "ver": "1.3.0",
         "nam": {
             "fn": "Dinushan",
             "gn": "D V Chanaka"
@@ -189,7 +189,7 @@ test('should convert certificate in eu specified payload if country field is inv
         "v": [
             {
                 "tg": "840539006",
-                "vp": "1119349007",
+                "vp": "J07BX03",
                 "mp": "Covishield",
                 "ma": "ORG-100001699",
                 "dn": 1,
