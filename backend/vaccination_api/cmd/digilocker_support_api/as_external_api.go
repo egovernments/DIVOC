@@ -3,22 +3,22 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"time"
 )
 
 type ErrorResponse struct {
-	Status  string `json:"status"`
-	ErrorCode    int     `json:"errorCode"`
-	Message string `json:"message"`
+	Status    string `json:"status"`
+	ErrorCode int    `json:"errorCode"`
+	Message   string `json:"message"`
 }
-
 
 func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	log.Info("GET PDF HANDLER REQUEST")
@@ -46,9 +46,11 @@ func getCertificatePDFHandler(w http.ResponseWriter, r *http.Request) {
 	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = SortCertificatesByCreateAt(certificateArr)
 		log.Infof("Certificate query return %d records", len(certificateArr))
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			certificatesByDose := GetDoseWiseCertificates(certificateArr)
+			certificateObj := getLatestCertificate(certificatesByDose)
 			log.Infof("certificate resp %v", certificateObj)
 			mobileOnCert := certificateObj["mobile"].(string)
 			if mobile != mobileOnCert {
@@ -95,7 +97,6 @@ func mobileNumberMismatchError() ErrorResponse {
 	}
 	return payload
 }
-
 
 func getCertificates(w http.ResponseWriter, request *http.Request) {
 	log.Info("GET CERTIFICATES JSON ")

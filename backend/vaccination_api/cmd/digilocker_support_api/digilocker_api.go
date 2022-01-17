@@ -6,13 +6,14 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/xml"
+	"net/http"
+	"strings"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
-	"net/http"
-	"strings"
-	"time"
 )
 
 type PullURIRequest struct {
@@ -103,7 +104,7 @@ type PullDocResponse struct {
 	} `xml:"DocDetails"`
 }
 
-func ValidMAC(message string, messageMAC [] byte, keyString string) bool {
+func ValidMAC(message string, messageMAC []byte, keyString string) bool {
 	if keyString == "ignore" {
 		return true
 	}
@@ -273,7 +274,6 @@ func uriRequest(w http.ResponseWriter, req *http.Request) {
 
 }
 
-
 func preProcessRequest(req *http.Request, w http.ResponseWriter) ([]byte, string, []byte, bool) {
 	log.Info("Got request ")
 	for name, values := range req.Header {
@@ -326,8 +326,10 @@ func getCertificate(preEnrollmentCode string, dob string, mobile string) *Vaccin
 func returnLatestCertificate(err error, certificateFromRegistry map[string]interface{}, referenceId string) *VaccinationCertificateBundle {
 	if err == nil {
 		certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
+		certificateArr = SortCertificatesByCreateAt(certificateArr)
 		if len(certificateArr) > 0 {
-			certificateObj := certificateArr[len(certificateArr)-1].(map[string]interface{})
+			certificatesByDose := GetDoseWiseCertificates(certificateArr)
+			certificateObj := getLatestCertificate(certificatesByDose)
 			log.Infof("certificate resp %v", certificateObj)
 			var cert VaccinationCertificateBundle
 			cert.certificateId = certificateObj["certificateId"].(string)
@@ -341,4 +343,3 @@ func returnLatestCertificate(err error, certificateFromRegistry map[string]inter
 	}
 	return nil
 }
-

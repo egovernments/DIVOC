@@ -423,7 +423,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/CertificationRequest'
+              $ref: '#/definitions/CertificationRequestV2'
       responses:
         '200':
           description: OK
