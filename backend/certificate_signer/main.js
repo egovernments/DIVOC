@@ -23,6 +23,14 @@ const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
+// Overriding escape function to not escape any values
+// This should not have any security issues as its not executed
+// we convert the json to string and store it.
+Mustache.escape = function (value)
+{
+  return value;
+};
+
 const CERTIFICATE_TYPE_V2 = "certifyV2";
 const CERTIFICATE_TYPE_V3 = "certifyV3";
 
