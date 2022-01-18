@@ -139,11 +139,11 @@ test('should convert W3C certificate json to Smart Health Card json', async () =
     let shcCert = await certificateToSmartHealthJson(cert2, meta);
     console.log(JSON.stringify(shcCert));
 
-    expect(shcCert.credentialSubject.fhirBundle.entry[0].fullUrl).toContain('urn:uuid:');
+    expect(shcCert.credentialSubject.fhirBundle.entry[0].fullUrl).toContain('resource:0');
     expect(shcCert.credentialSubject.fhirBundle.entry[0].resource.resourceType).toBe('Patient');
     expect(shcCert.credentialSubject.fhirBundle.entry[0].resource.name[0].text).toBe(cert2.credentialSubject.name);
 
-    expect(shcCert.credentialSubject.fhirBundle.entry[1].fullUrl).toContain('urn:uuid:');
+    expect(shcCert.credentialSubject.fhirBundle.entry[1].fullUrl).toContain('resource:1');
     expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.resourceType).toBe('Immunization');
     expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.occurrenceDateTime).toBe(cert2.evidence[0].date);
     expect(shcCert.credentialSubject.fhirBundle.entry[1].resource.lotNumber).toBe(cert2.evidence[0].batch);

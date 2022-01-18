@@ -15,7 +15,7 @@ const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost
 const DISEASE_CODE = process.env.DISEASE_CODE || 'COVID-19';
 const PUBLIC_HEALTH_AUTHORITY = process.env.FHIR_PUBLIC_HEALTH_AUTHORITY || 'Govt Of India';
 const EU_CERTIFICATE_EXPIRY = parseInt(process.env.EU_CERTIFICATE_EXPIRY) || 12;
-const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://divoc.dev/";
+const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://divoc.dev";
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
