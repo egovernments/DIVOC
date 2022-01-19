@@ -227,9 +227,21 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) {
 	log.Infof("Reconciled: %v", time.Since(start))
 }
 
+func initializeKafka(servers string) {
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	if err != nil {
+		panic(err)
+	}
+
+	log.Infof("Connected to kafka on %s", servers)
+
+	kafkaService.StartCertifyProducer(producer)
+}
+
 func main() {
 	config.Initialize()
 	servers := config.Config.Kafka.BootstrapServers
+	initializeKafka(servers)
 	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  servers,
 		"group.id":           "certificate_reconciliation",
@@ -240,14 +252,6 @@ func main() {
 		log.Errorf("error while creating consumer %+v", err)
 		panic(err)
 	}
-	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
-	if err != nil {
-		panic(err)
-	}
-
-	log.Infof("Connected to kafka on %s", servers)
-
-	kafkaService.StartCertifyProducer(producer)
 	err = consumer.SubscribeTopics([]string{"certify"}, nil)
 	if err != nil {
 		log.Errorf("error while subscribing to consumer %+v", err)
