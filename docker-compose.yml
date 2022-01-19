@@ -203,6 +203,7 @@ services:
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
     depends_on:
       kafka:
@@ -222,7 +223,7 @@ services:
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/test/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
-      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_TEST_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
     depends_on:
       kafka:
