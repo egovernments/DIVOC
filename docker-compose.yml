@@ -162,16 +162,7 @@ services:
       # in min
       CACHE_TTL: 60
       AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
-      AUTH_PUBLIC_KEY: |
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
-        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
-        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
-        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
-        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
-        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
-        OQIDAQAB
-        -----END PUBLIC KEY-----
+      AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
     depends_on:
       kafka:
         condition: service_healthy
@@ -231,6 +222,7 @@ services:
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/test/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
     depends_on:
       kafka:
@@ -268,16 +260,7 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-      REGISTRATION_API_PUBLIC_KEY: |
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
-        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
-        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
-        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
-        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
-        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
-        OQIDAQAB
-        -----END PUBLIC KEY-----
+      REGISTRATION_API_PUBLIC_KEY: "$REGISTRATION_API_PUBLIC_KEY"
     depends_on:
       kafka:
         condition: service_healthy
@@ -291,16 +274,9 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
-      AUTH_PUBLIC_KEY: |
-        -----BEGIN PUBLIC KEY-----
-        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1mIX9SFluySnfIfT6Jz5
-        LdORWO+O0j3L7cF+BLaAdX7JuiN10MTISpyOA5z81YXMSgk0PPLUzHv5DTDPMR3r
-        sb6ut/PweLn9sLmwsj9OGSAuH7DFOHVV+Mct9TXBeZu1tzboDhtqKz1PMnBFdmgv
-        d2+WnKYtdWfgo8kB82WkGolAT7++efm/HnOkvRkoNbefbbpnELjtcM5uN32HdCpz
-        Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
-        57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
-        OQIDAQAB
-        -----END PUBLIC KEY-----
+      AUTH_PUBLIC_KEY: "$CERTIFICATE_API_AUTH_PUBLIC_KEY"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_API_PUBLIC_KEY"
+      EU_CERTIFICATE_PUBLIC_KEY: "$EU_CERTIFICATE_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_API_PRIVATE_KEY"
       EU_CERTIFICATE_PRIVATE_KEY: "$EU_CERTIFICATE_PRIVATE_KEY"
       SHC_CERTIFICATE_PRIVATE_KEY: "SHC_CERTIFICATE_PRIVATE_KEY"
