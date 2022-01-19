@@ -1,6 +1,8 @@
 import React, {useEffect, useState} from "react";
 import Navbar from "react-bootstrap/Navbar";
 import NavbarLogo from "../../assets/img/nav-logo.png";
+import NavbarLogo2 from "../../assets/img/nav-logo2.ico";
+
 import "./Header.css";
 import Nav from "react-bootstrap/Nav";
 import {useKeycloak} from "@react-keycloak/web";
@@ -33,9 +35,15 @@ function Header() {
     return(
         <Navbar fixed="top" bg="white">
             <Navbar.Brand href={"/"}>
-                <img
+                 <img
                     src={NavbarLogo}
-                    width="200"
+                    width="25"
+                    className="d-inline-block align-top"
+                    alt="React Bootstrap logo"
+                /> 
+                  <img
+                    src={NavbarLogo2}
+                    width="60"
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />

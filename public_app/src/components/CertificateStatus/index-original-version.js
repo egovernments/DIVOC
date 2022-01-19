@@ -6,12 +6,7 @@ import NextArrowImg from "../../assets/img/next-arrow.svg";
 import LearnProcessImg from "../../assets/img/leanr_more_small.png";
 import FeedbackSmallImg from "../../assets/img/feedback-small.png";
 import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
-import config, {CERTIFICATE_CONTROLLER_ID,
-    CERTIFICATE_DID,
-    CERTIFICATE_NAMESPACE,
-    CERTIFICATE_NAMESPACE_V2,
-    CERTIFICATE_PUBKEY_ID
-} from "../../config";
+import config from "../../config";
 import {pathOr} from "ramda";
 import {CustomButton} from "../CustomButton";
 import {CertificateDetailsPaths} from "../../constants";
@@ -19,7 +14,6 @@ import {useDispatch} from "react-redux";
 import {addEventAction, EVENT_TYPES} from "../../redux/reducers/events";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
-import {Loader} from "../Loader";
 
 const jsigs = require('jsonld-signatures');
 const {RSAKeyPair} = require('crypto-ld');
@@ -27,25 +21,16 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
-const {vaccinationContext,vaccinationContextV2} = require('vaccination-context');
+const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
-  /*  const c = {
+    const c = {
         "did:srilanka:moh": config.certificatePublicKey,
         "https://example.com/i/india": config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
         "https://divoc.lgcc.gov.lk/credentials/vaccination/v1": vaccinationContext,
-    }; */
-    const c = {
-        [CERTIFICATE_DID]: config.certificatePublicKey,
-        [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
-        "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
-        'https://www.w3.org/2018/credentials#': credentialsv1,
-        "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        [CERTIFICATE_NAMESPACE]: vaccinationContext,
-        [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
     };
     let context = c[url];
     if (context === undefined) {
@@ -65,7 +50,6 @@ const customLoader = url => {
 };
 
 export const CertificateStatus = ({certificateData, goBack}) => {
-    const [isLoading, setLoading] = useState(true);
     const [isValid, setValid] = useState(false);
     const [data, setData] = useState({});
     const history = useHistory();
@@ -84,15 +68,14 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-  	setLoading(true);
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
                 const publicKey = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: CERTIFICATE_DID,
+                    id: 'did:srilanka:moh',
                     type: 'RsaVerificationKey2018',
-                    controller: CERTIFICATE_CONTROLLER_ID,
+                    controller: 'https://divoc.lgcc.gov.lk/',
                     publicKeyPem: config.certificatePublicKey
                 };
                 const controller = {
@@ -122,20 +105,16 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                             type: EVENT_TYPES.VALID_VERIFICATION,
                             extra: signedJSON.credentialSubject
                         }));
- 			setLoading(false);
                         return
                     }
                 }
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: signedJSON}));
                 setValid(false);
-                setLoading(false);
             } catch (e) {
                 console.log('Invalid data', e);
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
 
-            }finally {
-                setLoading(false);
             }
 
         }
@@ -157,13 +136,13 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     }
 
     return (
-	isLoading ? <Loader/> :
         <div className="certificate-status-wrapper">
             <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
                  className="certificate-status-image"/>
             <h3 className="certificate-status">
                 {
-                    isValid ? "Valid Certificate":  "Scan Error or Invalid Certificate: Please try again"
+                   // isValid ? "Valid Certificate": "Invalid Certificate"
+                   isValid ? "Valid Certificate": "Scan Error:Please try again."
                 }
             </h3>
             {

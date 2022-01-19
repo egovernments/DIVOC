@@ -1,0 +1,7 @@
+{
+  "urlPath": "/certificate",
+  "certificatePublicKey": "-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnhht8e5qjjnzcpA8fWbdv7whEbseWdvDcwEptGqyGpLGen2bLUZ2KeKloF1+BxeNOHyd8/Po79uogLVs5TvlJvjYCyj668ZjNaqsqvvNz27izQuvUDsaDIawFO10o7QqBC1YhCeRzSfjpbzQr3bcCJ4+hdNH30os6jBa7TMlNJk+N297bQ+vI1TDl6AR3bl/bYIDx56aKIyK6APi5mdZUPyYbVw+gHv/4FTTnuWH76XQHkQBHOWvCSH1JTmB+HjX9xtDBt9BBW7z00H3sAf0gsYauDgjfNxKhm/boHdjJxUGDwxIkYIrz85fJCjL3sNvHI0l4kn4IrREsTUKZ1cBEwIDAQAB\n-----END PUBLIC KEY-----\n",
+  "registerMemberLimit": 4
+}
+
+

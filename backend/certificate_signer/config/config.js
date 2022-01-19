@@ -1,11 +1,11 @@
-const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://divoc.dev/credentials/vaccination/v1";
-const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://divoc.dev/';
+const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
+const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://cowin.gov.in/';
 const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
 const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:india';
-const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://divoc.dev/";
-const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://divoc.dev/vaccine/";
-const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://divoc.dev/?";
-const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "https://divoc.dev/?";
+const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://cowin.gov.in/";
+const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://cowin.gov.in/vaccine/";
+const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://cowin.gov.in/?";
+const CERTIFICATE_INFO_BASE_URL = process.env.CERTIFICATE_INFO_BASE_URL || "https://cowin.gov.in/?";
 
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOUT || 300000; // in ms

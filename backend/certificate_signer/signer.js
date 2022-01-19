@@ -98,7 +98,7 @@ async function signJSON(certificate) {
 function ageOfRecipient(recipient) {
   if (recipient.age) return recipient.age;
   if (recipient.dob && new Date(recipient.dob).getFullYear() > 1900)
-    return "" + (Math.floor((new Date() - new Date(recipient.dob))/1000/60/60/24.0/365.25));
+    return "" + (new Date().getFullYear() - new Date(recipient.dob).getFullYear())
   return "";
 }
 

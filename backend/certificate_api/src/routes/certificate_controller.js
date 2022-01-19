@@ -73,6 +73,15 @@ function formatId(identity) {
     return lastFragment
 }
 
+function mergeNicPassport(nic,passportNo) {
+
+let nicandpassport ="NIC: "+nic;
+	if(passportNo!==""){
+	 nicandpassport +=" / Passport: "+passportNo;
+	}
+return nicandpassport;
+}
+
 const monthNames = [
     "Jan", "Feb", "Mar", "Apr",
     "May", "Jun", "Jul", "Aug",
@@ -80,6 +89,18 @@ const monthNames = [
 ];
 
 function formatDate(givenDate) {
+  
+    const dob = new Date(givenDate);
+    let day = dob.getDate();
+    let monthName = monthNames[dob.getMonth()];
+    let year = dob.getFullYear();
+
+    return `${padDigit(day)}-${monthName}-${year}`;
+}
+function formatDateVaccineTwo(givenDate) {
+    if(givenDate===""){
+        return ""
+    }
     const dob = new Date(givenDate);
     let day = dob.getDate();
     let monthName = monthNames[dob.getMonth()];
@@ -113,6 +134,7 @@ async function createCertificatePDF(certificateResp, res, source) {
             }
             return 0;
         }).reverse();
+        console.log(certificateResp);
         let certificateRaw = certificateResp[certificateResp.length - 1];
         const zip = new JSZip();
         zip.file("certificate.json", certificateRaw.certificate, {
@@ -130,20 +152,36 @@ async function createCertificatePDF(certificateResp, res, source) {
         const certificateData = {
             name: credentialSubject.name,
             age: credentialSubject.age,
+            dob: certificateRaw.meta?.dob || "",
+         //   dob: formatDate(credentialSubject?.dob || ""),
             gender: credentialSubject.gender,
-            identity: formatId(credentialSubject.id),
+            identity: mergeNicPassport(credentialSubject.id,certificateRaw.meta?.passportNo || ""),
             beneficiaryId: credentialSubject.refId,
             recipientAddress: formatRecipientAddress(credentialSubject.address),
             vaccine: evidence[0].vaccine,
-            vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
+            vaccinationDate: formatDate(evidence[0].date),
             vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
             vaccinatedBy: evidence[0].verifier.name,
             vaccinatedAt: formatFacilityAddress(evidence[0]),
             qrCode: dataURL,
+	        vaccine2Name: certificateRaw.meta?.name || "",
+	        vaccine2Date: formatDateVaccineTwo(certificateRaw.meta?.date || ""),
+            batch1: evidence[0].batch,
+            batch2: certificateRaw.meta?.batch || "",
+	        cit: certificateRaw.meta?.cit || "",
             dose: evidence[0].dose,
             totalDoses: evidence[0].totalDoses,
             isFinalDose: evidence[0].dose === evidence[0].totalDoses,
-            currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`
+            currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
+            issueDate:formatDate(certificateRaw.meta?.issueDate || ""),
+            vaccinationStatus: certificateRaw.meta?.status || "Completed",
+            d3name: certificateRaw.meta?.d3name || "",
+            d3batch: certificateRaw.meta?.d3batch || "",
+            d3date: formatDateVaccineTwo(certificateRaw.meta?.d3date || ""),
+            d4name: certificateRaw.meta?.d4name || "",
+            d4batch: certificateRaw.meta?.d4batch || "",
+            d4date: formatDateVaccineTwo(certificateRaw.meta?.d4date || ""),
+	    
         };
         const htmlData = fs.readFileSync(`${__dirname}/../../configs/templates/certificate_template.html`, 'utf8');
         const template = Handlebars.compile(htmlData);
@@ -289,7 +327,7 @@ async function checkIfCertificateGenerated(req, res) {
         res.statusCode = 404;
     }
 }
-
+///update changes
 module.exports = {
     getCertificate,
     getCertificatePDF,

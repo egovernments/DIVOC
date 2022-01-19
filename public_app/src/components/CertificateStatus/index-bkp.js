@@ -9,7 +9,6 @@ import DownloadSmallImg from "../../assets/img/download-certificate-small.png";
 import config, {CERTIFICATE_CONTROLLER_ID,
     CERTIFICATE_DID,
     CERTIFICATE_NAMESPACE,
-    CERTIFICATE_NAMESPACE_V2,
     CERTIFICATE_PUBKEY_ID
 } from "../../config";
 import {pathOr} from "ramda";
@@ -27,17 +26,9 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
-const {vaccinationContext,vaccinationContextV2} = require('vaccination-context');
+const {vaccinationContext} = require('vaccination-context');
 
 const customLoader = url => {
-  /*  const c = {
-        "did:srilanka:moh": config.certificatePublicKey,
-        "https://example.com/i/india": config.certificatePublicKey,
-        "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
-        'https://www.w3.org/2018/credentials#': credentialsv1,
-        "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        "https://divoc.lgcc.gov.lk/credentials/vaccination/v1": vaccinationContext,
-    }; */
     const c = {
         [CERTIFICATE_DID]: config.certificatePublicKey,
         [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
@@ -45,7 +36,6 @@ const customLoader = url => {
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
         [CERTIFICATE_NAMESPACE]: vaccinationContext,
-        [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
     };
     let context = c[url];
     if (context === undefined) {
@@ -73,7 +63,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     setTimeout(()=>{
         try {
             axios
-              .post("/divoc/api/v1/events/", {"date":new Date().toISOString(), "type":"verify"})
+              .post("/divoc/api/v1/events/", [{"date":new Date().toISOString(), "type":"verify"}])
               .catch((e) => {
                 console.log(e);
             });
@@ -84,20 +74,20 @@ export const CertificateStatus = ({certificateData, goBack}) => {
 
     const dispatch = useDispatch();
     useEffect(() => {
-  	setLoading(true);
+        setLoading(true);
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
                 const publicKey = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: CERTIFICATE_DID,
+                    id: 'did:india',
                     type: 'RsaVerificationKey2018',
                     controller: CERTIFICATE_CONTROLLER_ID,
                     publicKeyPem: config.certificatePublicKey
                 };
                 const controller = {
                     '@context': jsigs.SECURITY_CONTEXT_URL,
-                    id: 'https://cowin.gov.in/',
+                    id: CERTIFICATE_CONTROLLER_ID,
                     publicKey: [publicKey],
                     // this authorizes this key to be used for making assertions
                     assertionMethod: [publicKey.id]
@@ -111,7 +101,6 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                     documentLoader: customLoader,
                     compactProof: false
                 });
-		console.log(result);
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON);
                     if (revokedResponse.response.status === 404) {
@@ -122,7 +111,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                             type: EVENT_TYPES.VALID_VERIFICATION,
                             extra: signedJSON.credentialSubject
                         }));
- 			setLoading(false);
+                        setLoading(false);
                         return
                     }
                 }
@@ -134,7 +123,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 setValid(false);
                 dispatch(addEventAction({type: EVENT_TYPES.INVALID_VERIFICATION, extra: certificateData}));
 
-            }finally {
+            } finally {
                 setLoading(false);
             }
 
@@ -157,34 +146,43 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     }
 
     return (
-	isLoading ? <Loader/> :
-        <div className="certificate-status-wrapper">
-            <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
-                 className="certificate-status-image"/>
-            <h3 className="certificate-status">
-                {
-                    isValid ? "Valid Certificate":  "Scan Error or Invalid Certificate: Please try again"
-                }
-            </h3>
-            {
-                isValid && <table className="mt-3">
+        isLoading ? <Loader/> :
+                <div className="certificate-status-wrapper">
+                    <img src={isValid ? CertificateValidImg : CertificateInValidImg} alt={""}
+                         className="certificate-status-image"/>
+                    <h3 className="certificate-status">
+                        {
+                            isValid ? "Successful" : "Invalid Certificate"
+                        }
+                    </h3>
                     {
-                        Object.keys(CertificateDetailsPaths).map((key, index) => {
-                            const context = CertificateDetailsPaths[key];
-                            return (
-                                <tr key={index}>
-                                    <td className="pr-3">{key}</td>
-                                    <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
-                                </tr>
-                            )
-                        })
-                    }
+                        isValid && <table className="mt-3">
+                            {
+                                Object.keys(CertificateDetailsPaths).map((key, index) => {
+                                    const context = CertificateDetailsPaths[key];
+                                    return (
+                                        <tr key={index}>
+                                            <td className="pr-3">{key}</td>
+                                            <td className="font-weight-bolder">{context.format(pathOr("NA", context.path, data))}</td>
+                                        </tr>
+                                    )
+                                })
+                            }
 
-                </table>
-            }
-            <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
-          
-        </div>
+                        </table>
+                    }
+                    <CustomButton className="blue-btn m-3" onClick={goBack}>Verify Another Certificate</CustomButton>
+                    <SmallInfoCards text={"Provide Feedback"}
+                                    onClick={() => {
+                                        history.push("/side-effects")
+                                    }}
+                                    img={FeedbackSmallImg} backgroundColor={"#FFFBF0"}/>
+                    <SmallInfoCards text={"Learn about the Vaccination process"} img={LearnProcessImg}
+                                    onClick={() => {
+                                        history.push("/learn")
+                                    }}
+                                    backgroundColor={"#EFF5FD"}/>
+                </div>
     )
 };
 
@@ -200,3 +198,4 @@ export const SmallInfoCards = ({text, img, onClick, backgroundColor}) => (
         </div>
     </div>
 );
+

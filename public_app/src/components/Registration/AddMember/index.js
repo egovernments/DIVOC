@@ -13,7 +13,7 @@ import {useHistory} from "react-router";
 import "./index.css"
 import Row from "react-bootstrap/Row";
 import {getCookie} from "../../../utils/cookies";
-import appConfig from "../../../config.js";
+import appConfig from "../../../config.json";
 import {INVALID_BENEFICIARY_ERROR_MSG} from "./error-constants";
 
 
@@ -284,7 +284,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
               </div>
             <div hidden={formData.choice === "no"} className="pt-3">
               <p>If yes, please select (all) applicable comorbidities</p>
-              <div className={"col-12 ml-0 comorbidities-list-wrapper"}>
+              <Row className={"col-6 ml-0 comorbidities-list-wrapper"}>
                 {
                   conditions.map(x =>
                     <div>
@@ -298,7 +298,7 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
                 <div className="invalid-input">
                   {errors.choice}
                 </div>
-              </div>
+              </Row>
             </div>
           </div>
         </div>

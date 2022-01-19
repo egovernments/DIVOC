@@ -28,9 +28,9 @@ import {ViewRecipient} from "./components/ViewRecipient";
 function App() {
     const {initialized, keycloak} = useKeycloak();
 
-    if (!initialized) {
-        return <div>Loading...</div>
-    }
+    // if (!initialized) {
+    //     return <div>Loading...</div>
+    // }
     return (
         <Provider store={store}>
             <div className={""}>
@@ -38,7 +38,7 @@ function App() {
                     <Header/>
                     <div style={{paddingBottom: "3rem", paddingTop: "3rem"}}>
                         <Switch>
-                            <Route exact path={"/"} component={Home}/>
+                            <Route exact path={"/"} component={VerifyCertificate}/>
                             <Route exact path={config.urlPath + "/login"} component={Login}/>
                             <Route exact path={"/side-effects"} component={SideEffects}/>
                             <Route exact path={"/feedback"} component={SideEffects}/>
