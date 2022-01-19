@@ -1,4 +1,4 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry dockerhub/divoc-certification-ack
+IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/registry dockerhub/divoc-certification-ack dockerhub/reconciliation
 ifeq ($(RELEASE_VERSION), )
 RELEASE_VERSION := 1.0.15
 endif

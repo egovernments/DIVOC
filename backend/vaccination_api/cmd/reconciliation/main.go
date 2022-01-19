@@ -1,17 +1,21 @@
-package services
+package main
 
 import (
 	"encoding/json"
 	"errors"
-	"sort"
-	"time"
-
+	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
+	kafkaService "github.com/divoc/api/pkg/services"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/strfmt"
 	log "github.com/sirupsen/logrus"
+	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"sort"
+	"time"
 )
+
+const CERTIFICATE_TYPE_V3 = "certifyV3"
 
 func getDoseFromCertificate(certificateMap map[string]interface{}) int {
 	if doseValue, found := certificateMap["dose"]; found {
@@ -172,7 +176,16 @@ func createMetaInfo(dbData *models.Certificate) *models2.CertificationRequestV2M
 	return meta
 }
 
+func publishCertifyMessage(request []byte) {
+	go kafkaService.PublishCertifyMessage(
+		request,
+		nil,
+		nil,
+		kafkaService.MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
+}
+
 func reconcileData(certifyMessage *models2.CertificationRequestV2) {
+	start := time.Now()
 	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
 			"eq": certifyMessage.PreEnrollmentCode,
@@ -193,7 +206,7 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) {
 			latestDoseCertificate := doseCertificates[len(doseCertificates)-1]
 			dbData := new(models2.CertificationRequestV2Vaccination)
 			if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
-				log.Error("Unable to parse certificate string", err)
+				log.Errorf("Unable to parse certificate string %+v", err)
 				continue
 			}
 			dbData.Batch = certificate.Evidence[0].Batch
@@ -203,16 +216,59 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) {
 			if isDataConsistent, err := CheckDataConsistence(vaccinationData, dbData); err == nil && !isDataConsistent {
 				updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, vaccinationData)
 				if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
-					PublishCertifyMessage(
-						jsonRequestString,
-						nil,
-						nil,
-						MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
+					publishCertifyMessage(jsonRequestString)
 				}
 			} else {
 				log.Error(err)
 				continue
 			}
+		}
+	}
+	log.Infof("Reconciled: %v", time.Since(start))
+}
+
+func main() {
+	config.Initialize()
+	servers := config.Config.Kafka.BootstrapServers
+	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  servers,
+		"group.id":           "certificate_reconciliation",
+		"auto.offset.reset":  "latest",
+		"enable.auto.commit": "false",
+	})
+	if err != nil {
+		log.Errorf("error while creating consumer %+v", err)
+		panic(err)
+	}
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	if err != nil {
+		panic(err)
+	}
+
+	log.Infof("Connected to kafka on %s", servers)
+
+	kafkaService.StartCertifyProducer(producer)
+	err = consumer.SubscribeTopics([]string{"certify"}, nil)
+	if err != nil {
+		log.Errorf("error while subscribing to consumer %+v", err)
+		panic(err)
+	}
+
+	for {
+		msg, err := consumer.ReadMessage(-1)
+		if err == nil {
+			var message models2.CertificationRequestV2
+			if err := json.Unmarshal(msg.Value, &message); err == nil {
+				if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
+					reconcileData(&message)
+				}
+			} else {
+				log.Errorf("Error unmarshaling certify message %s", err)
+			}
+			consumer.CommitMessage(msg)
+		} else {
+			// The client will automatically try to recover from all errors.
+			log.Errorf("Consumer error: %v \n", err)
 		}
 	}
 }

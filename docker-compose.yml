@@ -172,6 +172,12 @@ services:
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
   divoc-certification-ack:
-    image: dockerhub/divoc-certification-ack
+    image: dockerhub/divoc-certification-ack:1.0.15
     environment:
       REGISTRY_URL: "http://registry:8081"
+  reconciliation:
+    image: dockerhub/reconciliation
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KEYCLOAK_URL: "http://keycloak:8080/auth"

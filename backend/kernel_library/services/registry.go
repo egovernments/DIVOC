@@ -151,7 +151,7 @@ func QueryRegistry(typeId string, filter map[string]interface{}) (map[string]int
 	if err != nil {
 		return nil, errors.Wrap(err, "Unable to parse response from registry.")
 	}
-	log.Infof("Response %+v", responseObject)
+	log.Debugf("Response %+v", responseObject)
 	if responseObject.Params.Status != "SUCCESSFUL" {
 		log.Infof("Response from registry %+v", responseObject)
 		return nil, errors.New("Failed while querying from registry")
