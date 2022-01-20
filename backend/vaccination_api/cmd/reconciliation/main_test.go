@@ -243,3 +243,35 @@ func TestIfPinCodeIsEmpty(t *testing.T) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject, *updateReqObject)
 	}
 }
+
+func TestCheckDataConsistenceForInconsistentRecords(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	signedCertificate := getMockSignedCertificateData(t)
+	dbVaccinationData := getDBVaccinationData(signedCertificate)
+	var isConsistent bool
+	var err error
+	if isConsistent, err = CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData); err != nil {
+		t.Errorf("Error while data consistence checking %v", err)
+	}
+	if !reflect.DeepEqual(false, isConsistent) {
+		t.Errorf("Incorrect consistency determined")
+	}
+}
+
+func TestCheckDataConsistenceForConsistentRecords(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	certifyMessage.Meta.Vaccinations[0].Date = "2021-12-15"
+	certifyMessage.Meta.Vaccinations[0].Batch = "4121Z062"
+	certifyMessage.Meta.Vaccinations[0].Name = "COVISHIELD"
+	certifyMessage.Meta.Vaccinations[0].Manufacturer = "Serum Institute of India"
+	signedCertificate := getMockSignedCertificateData(t)
+	dbVaccinationData := getDBVaccinationData(signedCertificate)
+	var isConsistent bool
+	var err error
+	if isConsistent, err = CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData); err != nil {
+		t.Errorf("Error while data consistence checking %v", err)
+	}
+	if !reflect.DeepEqual(true, isConsistent) {
+		t.Errorf("Incorrect consistency determined")
+	}
+}

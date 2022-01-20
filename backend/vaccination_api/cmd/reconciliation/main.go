@@ -83,22 +83,26 @@ func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccina
 		log.Error("Invalid vaccination date")
 		return true, errors.New("invalid vaccination date")
 	}
+	metaVaccineDateWithTimestamp := requestData.Date
 	if strfmt.IsDate(requestData.Date) {
 		date, err := time.Parse("2006-01-02", requestData.Date)
 		if err != nil {
 			return true, err
 		}
-		requestData.Date = date.Format("2006-01-02T00:00:00.000Z")
+		metaVaccineDateWithTimestamp = date.Format("2006-01-02T00:00:00.000Z")
 	}
 	// assuming that none of these fields should be empty. If empty we will not do the data update
 	if requestData.Batch == "" || requestData.Dose < 1 {
 		log.Info("Required fields are invalid")
 		return true, nil
 	}
-	vaccineDatesMatched, err := compareVaccineDates(requestData.Date, dbData.Date.String())
+	vaccineDatesMatched, err := compareVaccineDates(metaVaccineDateWithTimestamp, dbData.Date.String())
 	if err != nil {
 		log.Error(err)
 		return true, err
+	}
+	if vaccineDatesMatched {
+		requestData.Date = dbData.Date.String()
 	}
 	if !vaccineDatesMatched || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
 		return false, nil
@@ -184,6 +188,15 @@ func publishCertifyMessage(request []byte) {
 		kafkaService.MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
 }
 
+func getDBVaccinationData(certificate *models.Certificate) *models2.CertificationRequestV2Vaccination {
+	dbData := new(models2.CertificationRequestV2Vaccination)
+	dbData.Batch = certificate.Evidence[0].Batch
+	dbData.Date = strfmt.DateTime(certificate.Evidence[0].Date)
+	dbData.Name = certificate.Evidence[0].Vaccine
+	dbData.Manufacturer = certificate.Evidence[0].Manufacturer
+	return dbData
+}
+
 func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 	start := time.Now()
 	filter := map[string]interface{}{
@@ -200,9 +213,9 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 	currentDose := int64(certifyMessage.Vaccination.Dose)
 	if len(certificates) > 0 {
 		certificatesByDose := getDoseWiseCertificates(certificates)
-		for _, vaccinationData := range certifyMessage.Meta.Vaccinations {
+		for _, metaVaccinationData := range certifyMessage.Meta.Vaccinations {
 			var certificate models.Certificate
-			dose := vaccinationData.Dose
+			dose := metaVaccinationData.Dose
 			if dose > currentDose {
 				continue
 			}
@@ -211,21 +224,17 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 				continue
 			}
 			latestDoseCertificate := doseCertificates[len(doseCertificates)-1]
-			dbData := new(models2.CertificationRequestV2Vaccination)
 			if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
 				log.Errorf("Unable to parse certificate string %+v", err)
 				continue
 			}
-			dbData.Batch = certificate.Evidence[0].Batch
-			dbData.Date = strfmt.DateTime(certificate.Evidence[0].Date)
-			dbData.Name = certificate.Evidence[0].Vaccine
-			dbData.Manufacturer = certificate.Evidence[0].Manufacturer
-			isDataConsistent, err := CheckDataConsistence(vaccinationData, dbData)
+			dbVaccinationData := getDBVaccinationData(&certificate)
+			isDataConsistent, err := CheckDataConsistence(metaVaccinationData, dbVaccinationData)
 			if err != nil {
 				log.Errorf("Error while checking data consistency %v", err)
 				continue
 			} else if !isDataConsistent {
-				updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, vaccinationData)
+				updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, metaVaccinationData)
 				if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
 					publishCertifyMessage(jsonRequestString)
 				}
