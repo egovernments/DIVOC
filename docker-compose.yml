@@ -284,3 +284,22 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
+  etcd:
+    image: gcr.io/etcd-development/etcd:v3.5.1
+    entrypoint: /usr/local/bin/etcd
+    command: 
+      - '--name=s1'
+      - '--data-dir=/etcd-data'
+      - '--listen-client-urls=http://0.0.0.0:2379'
+      - '--advertise-client-urls=http://0.0.0.0:2379'
+      - '--listen-peer-urls=http://0.0.0.0:2380'
+      - '--initial-advertise-peer-urls=http://0.0.0.0:2380'
+      - '--initial-cluster=s1=http://0.0.0.0:2380'
+      - '--initial-cluster-token=tkn'
+      - '--initial-cluster-state=new'
+      - '--log-level=info'
+      - '--logger=zap'
+      - '--log-outputs=stderr'
+    ports:
+      - "2379:2379"
+      - "2380:2380"
