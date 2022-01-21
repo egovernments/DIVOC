@@ -21,6 +21,7 @@ const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 const CERTIFICATE_TYPE_V2 = "certifyV2";
 const CERTIFICATE_TYPE_V3 = "certifyV3";
+const identityRejectionRegex = new RegExp(config.IDENTITY_REJECTION_PATTERN);
 
 const publicKey = {
   '@context': jsigs.SECURITY_CONTEXT_URL,
@@ -109,7 +110,41 @@ function identityOfSubject(cert) {
   return identity;
 }
 
+function populateIdentity(cert, preEnrollmentCode) {
+  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+  let isURI  = isURIFormat(identity);
+  return isURI ? identityOfSubject(cert) : reinitIdentityFromPayload(identity, preEnrollmentCode);
+}
+
+function isURIFormat(param) {
+  let parsed;
+  let isURI;
+  try {
+    parsed = new URL(param);
+    isURI = true;
+  } catch (e) {
+    isURI = false;
+  }
+
+  if (isURI && !parsed.protocol) {
+    isURI = false;
+  }
+  return isURI;
+}
+
+function reinitIdentityFromPayload(identity, preEnrollmentCode) {
+  if(identity && !identityRejectionRegex.test(identity.toUpperCase())) {
+    let newTempIdentity = `${config.CERTIFICATE_DID}:${identity}`;
+    if (isURIFormat(newTempIdentity)) {
+      return newTempIdentity;
+    }
+  }
+  return `${config.CERTIFICATE_DID}:${preEnrollmentCode}`;
+}
+
 function transformW3(cert, certificateId, certificateType) {
+  let preEnrollmentCode = R.pathOr('', ['preEnrollmentCode'], cert)
+  let recipientIdentifier = populateIdentity(cert, preEnrollmentCode)
   let certificateFromTemplate = {
     "@context": [
       "https://www.w3.org/2018/credentials/v1",
@@ -118,8 +153,8 @@ function transformW3(cert, certificateId, certificateType) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: identityOfSubject(cert),
-      refId: R.pathOr('', ['preEnrollmentCode'], cert),
+      id: recipientIdentifier,
+      refId: preEnrollmentCode,
       name: R.pathOr('', ['recipient', 'name'], cert),
       uhid: R.pathOr('', ['recipient', 'uhid'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
