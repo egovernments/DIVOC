@@ -100,8 +100,7 @@ function ageOfRecipient(recipient) {
   return "";
 }
 
-function identityOfSubject(cert) {
-  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+function identityOfSubject(identity) {
   let parts = identity.split(":");
   if (parts.length >= 2 && parts[0] === "did") {
     parts[1] = parts[1].replace(/[" "]+/g, "").toLowerCase();
@@ -113,7 +112,7 @@ function identityOfSubject(cert) {
 function populateIdentity(cert, preEnrollmentCode) {
   let identity = R.pathOr('', ['recipient', 'identity'], cert);
   let isURI  = isURIFormat(identity);
-  return isURI ? identityOfSubject(cert) : reinitIdentityFromPayload(identity, preEnrollmentCode);
+  return isURI ? identityOfSubject(identity) : reinitIdentityFromPayload(identity, preEnrollmentCode);
 }
 
 function isURIFormat(param) {
@@ -136,10 +135,10 @@ function reinitIdentityFromPayload(identity, preEnrollmentCode) {
   if(identity && !identityRejectionRegex.test(identity.toUpperCase())) {
     let newTempIdentity = `${config.CERTIFICATE_DID}:${identity}`;
     if (isURIFormat(newTempIdentity)) {
-      return newTempIdentity;
+      return identityOfSubject(newTempIdentity);
     }
   }
-  return `${config.CERTIFICATE_DID}:${preEnrollmentCode}`;
+  return identityOfSubject(`${config.CERTIFICATE_DID}:${preEnrollmentCode}`);
 }
 
 function transformW3(cert, certificateId, certificateType) {

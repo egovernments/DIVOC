@@ -115,14 +115,14 @@ test('Signed json to include certificate id', async () => {
     expect(sign.evidence[0].certificateId).toBe(certificateId);
 });
 
-test('did tranformation', async () => {
-  expect(identityOfSubject({"recipient":{"identity": ""}})).toBe("")
-  expect(identityOfSubject({"recipient":{"identity": "asdf"}})).toBe("asdf")
-  expect(identityOfSubject({"recipient":{"identity": "234234"}})).toBe("234234")
-  expect(identityOfSubject({"recipient":{"identity": "example.com"}})).toBe("example.com")
-  expect(identityOfSubject({"recipient":{"identity": "did:aadhaar:3234234"}})).toBe("did:aadhaar:3234234")
-  expect(identityOfSubject({"recipient":{"identity": "did:aadhaar:AB34234"}})).toBe("did:aadhaar:AB34234")
-  expect(identityOfSubject({"recipient":{"identity": "custom:Aadhaar Card:AB34234"}})).toBe("custom:Aadhaar Card:AB34234")
+test('did transformation', async () => {
+  expect(identityOfSubject("")).toBe("")
+  expect(identityOfSubject("asdf")).toBe("asdf")
+  expect(identityOfSubject("234234")).toBe("234234")
+  expect(identityOfSubject("example.com")).toBe("example.com")
+  expect(identityOfSubject("did:aadhaar:3234234")).toBe("did:aadhaar:3234234")
+  expect(identityOfSubject("did:aadhaar:AB34234")).toBe("did:aadhaar:AB34234")
+  expect(identityOfSubject("custom:Aadhaar Card:AB34234")).toBe("custom:Aadhaar Card:AB34234")
 });
 
 test('Sign json and verify credentialSubject.id', async () => {
