@@ -12,10 +12,13 @@ Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
 OQIDAQAB
 -----END PUBLIC KEY-----`;
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
+const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka';
+
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
     KAFKA_BOOTSTRAP_SERVER,
     KEYCLOAK_URL,
-    KEYCLOAK_REALM
+    KEYCLOAK_REALM,
+    CERTIFICATE_DID
 };

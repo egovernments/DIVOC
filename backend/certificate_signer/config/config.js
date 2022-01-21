@@ -1,7 +1,7 @@
 const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
 const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://cowin.gov.in/';
-const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
-const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:india';
+const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/srilanka';
+const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka';
 const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://cowin.gov.in/";
 const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://cowin.gov.in/vaccine/";
 const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://cowin.gov.in/?";
@@ -20,6 +20,7 @@ const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMEN
 const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
 const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
 const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
+const IDENTITY_REJECTION_PATTERN = process.env.IDENTITY_REJECTION_PATTERN || "^NA$|^.?$";
 
 module.exports = {
   CERTIFICATE_NAMESPACE,
@@ -43,5 +44,5 @@ module.exports = {
   REDIS_URL,
   REDIS_KEY_EXPIRE,
   DUPLICATE_CERTIFICATE_TOPIC,
-
+  IDENTITY_REJECTION_PATTERN
 };

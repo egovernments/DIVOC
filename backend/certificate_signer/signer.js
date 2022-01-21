@@ -5,7 +5,8 @@ const {CERTIFICATE_CONTROLLER_ID,
   CERTIFICATE_BASE_URL,
   CERTIFICATE_FEEDBACK_BASE_URL,
   CERTIFICATE_INFO_BASE_URL,
-  CERTIFICATE_PUBKEY_ID
+  CERTIFICATE_PUBKEY_ID,
+  IDENTITY_REJECTION_PATTERN
 } = require ("./config/config");
 
 const jsigs = require('jsonld-signatures');
@@ -34,7 +35,7 @@ const publicKey = {
   controller: CERTIFICATE_PUBKEY_ID,
   publicKeyPem
 };
-
+const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
 const documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
 documentLoaderMapping[CERTIFICATE_DID] = publicKey;
 documentLoaderMapping[CERTIFICATE_PUBKEY_ID] = publicKey;
@@ -102,6 +103,39 @@ function ageOfRecipient(recipient) {
   return "";
 }
 
+function populateIdentity(cert, preEnrollmentCode) {
+  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+  let isURI  = isURIFormat(identity);
+  console.log("isURL: "+isURI);
+  return isURI ? identity : reinitIdentityFromPayload(identity, preEnrollmentCode);
+}
+
+function isURIFormat(param) {
+  let parsed;
+  let isURI;
+  try {
+    parsed = new URL(param);
+    isURI = true;
+  } catch (e) {
+    isURI = false;
+  }
+
+  if (isURI && !parsed.protocol) {
+    isURI = false;
+  }
+  return isURI;
+}
+
+function reinitIdentityFromPayload(identity, preEnrollmentCode) {
+  if(identity && !identityRejectionRegex.test(identity.toUpperCase())) {
+    let newTempIdentity = `${CERTIFICATE_DID}:${identity}`;
+    if (isURIFormat(newTempIdentity)) {
+      return newTempIdentity;
+    }
+  }
+  return `${CERTIFICATE_DID}:${preEnrollmentCode}`;
+}
+
 function transformW3(cert, certificateId) {
   const certificateFromTemplate = {
     "@context": [
@@ -111,7 +145,7 @@ function transformW3(cert, certificateId) {
     type: ['VerifiableCredential', 'ProofOfVaccinationCredential'],
     credentialSubject: {
       type: "Person",
-      id: R.pathOr('', ['recipient', 'identity'], cert),
+      id: populateIdentity(cert, R.pathOr('', ['preEnrollmentCode'], cert)),
       refId: R.pathOr('', ['preEnrollmentCode'], cert),
       name: R.pathOr('', ['recipient', 'name'], cert),
       gender: R.pathOr('', ['recipient', 'gender'], cert),
