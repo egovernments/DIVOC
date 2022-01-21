@@ -21,6 +21,8 @@ spec:
           resources:
             requests:
               cpu: "200m"
+            limits:
+              cpu: "200m"
           name: reconciliation
           envFrom:
             - configMapRef:
