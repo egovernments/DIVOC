@@ -12,7 +12,7 @@ Tm87zshvOoEvkBUcBJdmKNjzLwBc0E2SpthOuxQUw7zSSqnvOOW+sOub6dIgDgR5
 OQIDAQAB
 -----END PUBLIC KEY-----`;
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
-const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka';
+const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka:moh';
 
 module.exports = {
     REGISTRY_URL,

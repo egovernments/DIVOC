@@ -76,7 +76,8 @@ function formatId(identity) {
 
 function mergeNicPassport(nic,passportNo) {
 
-    let Regex = new RegExp("(?:"+ CERTIFICATE_DID+":)(.*)");
+    let regexPattern = "(?:"+ CERTIFICATE_DID+":)(.*)";
+    let Regex = new RegExp(regexPattern);
     let id = (Regex.test(nic)? Regex.exec(nic)[1] : nic);
 
 let nicandpassport ="NIC: "+id;

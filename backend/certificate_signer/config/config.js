@@ -1,7 +1,7 @@
 const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || "https://cowin.gov.in/credentials/vaccination/v1";
 const CERTIFICATE_CONTROLLER_ID = process.env.CERTIFICATE_CONTROLLER_ID || 'https://cowin.gov.in/';
 const CERTIFICATE_PUBKEY_ID = process.env.CERTIFICATE_PUBKEY_ID || 'https://example.com/i/srilanka';
-const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka';
+const CERTIFICATE_DID = process.env.CERTIFICATE_DID || 'did:srilanka:moh';
 const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://cowin.gov.in/";
 const CERTIFICATE_BASE_URL = process.env.CERTIFICATE_BASE_URL || "https://cowin.gov.in/vaccine/";
 const CERTIFICATE_FEEDBACK_BASE_URL = process.env.CERTIFICATE_FEEDBACK_BASE_URL || "https://cowin.gov.in/?";
