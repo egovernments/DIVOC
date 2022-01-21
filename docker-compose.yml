@@ -175,3 +175,9 @@ services:
     image: dockerhub/divoc-certification-ack
     environment:
       REGISTRY_URL: "http://registry:8081"
+  reconciliation:
+    image: dockerhub/reconciliation
+    environment:
+      REGISTRY_URL: "http://registry:8081"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      KEYCLOAK_URL: "http://keycloak:8080/auth"

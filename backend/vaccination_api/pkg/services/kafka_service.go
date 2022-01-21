@@ -5,7 +5,6 @@ import (
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
-	models2 "github.com/divoc/api/swagger_gen/models"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
@@ -52,7 +51,6 @@ func InitializeKafka() {
 	}
 
 	startCertificateRevocationConsumer(servers)
-	startCertificateDataReconciliationConsumer(servers)
 
 	LogProducerEvents(producer)
 }
@@ -235,43 +233,6 @@ func startCertificateRevocationConsumer(servers string) {
 							log.Errorf("Failed saving revoked certificate %+v", err)
 						}
 					}
-				}
-				consumer.CommitMessage(msg)
-			} else {
-				// The client will automatically try to recover from all errors.
-				log.Infof("Consumer error: %v \n", err)
-			}
-		}
-	}()
-}
-
-func startCertificateDataReconciliationConsumer(servers string) {
-	go func() {
-		consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-			"bootstrap.servers":  servers,
-			"group.id":           "certificate_reconciliation",
-			"auto.offset.reset":  "latest",
-			"enable.auto.commit": "false",
-		})
-		if err != nil {
-			panic(err)
-		}
-
-		err = consumer.SubscribeTopics([]string{"certify"}, nil)
-		if err != nil {
-			panic(err)
-		}
-
-		for {
-			msg, err := consumer.ReadMessage(-1)
-			if err == nil {
-				var message models2.CertificationRequestV2
-				if err := json.Unmarshal(msg.Value, &message); err == nil {
-					if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
-						reconcileData(&message)
-					}
-				} else {
-					log.Errorf("Error unmarshaling certify message %s", err)
 				}
 				consumer.CommitMessage(msg)
 			} else {

@@ -103,3 +103,12 @@ COPY vaccination_api/config /config
 #RUN useradd -u 8004 divoc-cache
 USER 8006
 CMD ["/app/divoc-certification-ack"]
+
+#reconciliation
+FROM alpine:3.9 as reconciliation
+LABEL name=reconciliation
+RUN apk add ca-certificates
+COPY --from=build_base /tmp/divoc/vaccination_api/reconciliation /app/reconciliation
+COPY vaccination_api/config /config
+USER 8008
+CMD ["/app/reconciliation"]
