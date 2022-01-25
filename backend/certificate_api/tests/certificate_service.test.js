@@ -1,6 +1,10 @@
 const certificate_service = require('../src/services/certificate_service');
 const dcc = require('@pathcheck/dcc-sdk');
 
+const config = require('../configs/config');
+config.DISEASE_CODE = 'COVID-19';
+config.PUBLIC_HEALTH_AUTHORITY = 'Govt Of India';
+
 test('should convert certificate in eu specified payload if all fields are provided in correct format', () => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
