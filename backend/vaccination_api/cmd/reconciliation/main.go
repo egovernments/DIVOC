@@ -103,6 +103,8 @@ func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccina
 	}
 	if vaccineDatesMatched {
 		requestData.Date = dbData.Date.String()
+	} else {
+		requestData.Date = metaVaccineDateWithTimestamp
 	}
 	if !vaccineDatesMatched || requestData.Batch != dbData.Batch || requestData.Name != dbData.Name || requestData.Manufacturer != dbData.Manufacturer {
 		return false, nil
@@ -216,7 +218,7 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 		for _, metaVaccinationData := range certifyMessage.Meta.Vaccinations {
 			var certificate models.Certificate
 			dose := metaVaccinationData.Dose
-			if dose > currentDose {
+			if dose >= currentDose {
 				continue
 			}
 			doseCertificates := certificatesByDose[int(dose)]

@@ -275,3 +275,22 @@ func TestCheckDataConsistenceForConsistentRecords(t *testing.T) {
 		t.Errorf("Incorrect consistency determined")
 	}
 }
+
+func TestCheckNewDateTimestampInUpdateRequest(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	certifyMessage.Meta.Vaccinations[0].Date = "2021-12-13"
+	certifyMessage.Meta.Vaccinations[0].Batch = "4121Z062"
+	certifyMessage.Meta.Vaccinations[0].Name = "COVISHIELD"
+	certifyMessage.Meta.Vaccinations[0].Manufacturer = "Serum Institute of India"
+	signedCertificate := getMockSignedCertificateData(t)
+	dbVaccinationData := getDBVaccinationData(signedCertificate)
+	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-13T00:00:00.000Z" {
+		t.Errorf("Error in time stamp of update request object")
+	}
+	certifyMessage.Meta.Vaccinations[0].Date = "2021-12-15"
+	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-15T00:06:00.000Z" {
+		t.Errorf("Error in time stamp of update request object for consistent data")
+	}
+}
