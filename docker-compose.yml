@@ -232,8 +232,8 @@ services:
       REDIS_URL: redis://redis:6379
       CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
       CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
-      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
-      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_PUBKEY_ID: "https://divoc.lgcc.gov.lk/moh"
+      CERTIFICATE_DID: "did:srilanka:moh"
       CERTIFICATE_ISSUER: "https://cowin.gov.in/"
       CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
       CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
@@ -296,6 +296,7 @@ services:
     environment:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CERTIFICATE_DID: "did:srilanka:moh"
       REGISTRY_URL: "http://registry:8081"
       AUTH_PUBLIC_KEY: |
         -----BEGIN PUBLIC KEY-----

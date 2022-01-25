@@ -7,6 +7,7 @@ const JSZip = require("jszip");
 const {sendEvents} = require("../services/kafka_service");
 const registryService = require("../services/registry_service");
 const {verifyToken, verifyKeycloakToken} = require("../services/auth_service");
+const {CERTIFICATE_DID} = require('../../configs/config');
 
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
@@ -75,7 +76,11 @@ function formatId(identity) {
 
 function mergeNicPassport(nic,passportNo) {
 
-let nicandpassport ="NIC: "+nic;
+    let regexPattern = "(?:"+ CERTIFICATE_DID+":)(.*)";
+    let Regex = new RegExp(regexPattern);
+    let id = (Regex.test(nic)? Regex.exec(nic)[1] : nic);
+
+let nicandpassport ="NIC: "+id;
 	if(passportNo!==""){
 	 nicandpassport +=" / Passport: "+passportNo;
 	}
