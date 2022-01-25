@@ -452,6 +452,18 @@ async function certificateAsFHIRJson(req, res) {
             res.statusCode = 403;
             return;
         }
+        // check if config are set properly
+        if (!config.DISEASE_CODE || !config.PUBLIC_HEALTH_AUTHORITY || !privateKeyPem) {
+            console.error("Some of DISEASE_CODE, PUBLIC_HEALTH_AUTHORITY or privateKeyPem is not set to process EU certificate");
+            res.statusCode = 500;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "configuration not set"
+            };
+            return JSON.stringify(error);
+        }
         let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
 
         const meta = {
@@ -506,6 +518,18 @@ async function certificateAsEUPayload(req, res) {
             console.error(e);
             res.statusCode = 403;
             return;
+        }
+        // check if config are set properly
+        if (!config.EU_CERTIFICATE_EXPIRY || !config.PUBLIC_HEALTH_AUTHORITY || !euPublicKeyP8 || !euPrivateKeyPem) {
+            console.error("Some of EU_CERTIFICATE_EXPIRY, PUBLIC_HEALTH_AUTHORITY, euPublicKeyP8 or euPrivateKeyPem is not set to process EU certificate");
+            res.statusCode = 500;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "configuration not set"
+            };
+            return JSON.stringify(error);
         }
         let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
         if (certificateResp.length > 0) {
@@ -563,6 +587,18 @@ async function certificateAsSHCPayload(req, res) {
             res.statusCode = 403;
             return;
         }
+        // check if config are set properly
+        if (!config.SHC_CERTIFICATE_EXPIRY || !config.CERTIFICATE_ISSUER || !shcPrivateKeyPem) {
+            console.error("Some of SHC_CERTIFICATE_EXPIRY, CERTIFICATE_ISSUER or shcPrivateKeyPem is not set to process SHC certificate");
+            res.statusCode = 500;
+            let error = {
+                date: new Date(),
+                source: refId,
+                type: "internal-failed",
+                extra: "configuration not set"
+            };
+            return JSON.stringify(error);
+        }
         let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
         if (certificateResp.length > 0) {
             let certificateRaw = certificateService.getLatestCertificate(certificateResp);
@@ -577,7 +613,7 @@ async function certificateAsSHCPayload(req, res) {
                 shcKeyPair = await keyUtils.DERtoJWK(keyFile, []);
             }
 
-            const qrUri = await shc.signAndPack(await shc.makeJWT(shcPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER, new Date()), shcKeyPair[0]);
+            const qrUri = await shc.signAndPack(await shc.makeJWT(shcPayload, config.SHC_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER, new Date()), shcKeyPair[0]);
 
             let buffer ;
 
