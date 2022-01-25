@@ -15,7 +15,7 @@
       "type": "object",
       "title": "Certification Revocation List",
       "required": [
-        "certificateId"
+        "previousCertificateId"
       ],
       "properties": {
         "preEnrollmentCode": {
@@ -42,7 +42,7 @@
 
   "privateFields": [],
   "signedFields": [],
-  "indexFields": ["(certificateId,preEnrollmentCode,dose)"],
+  "indexFields": ["(previousCertificateId,preEnrollmentCode,dose)"],
   "uniqueIndexFields": [],
   "systemFields": ["_osCreatedAt", "_osUpdatedAt", "_osCreatedBy", "_osUpdatedBy"]
 }
