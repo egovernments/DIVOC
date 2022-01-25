@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
+	"github.com/go-openapi/strfmt"
 	"reflect"
 	"testing"
 )
@@ -286,11 +287,13 @@ func TestCheckNewDateTimestampInUpdateRequest(t *testing.T) {
 	dbVaccinationData := getDBVaccinationData(signedCertificate)
 	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
 	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-13T00:00:00.000Z" {
-		t.Errorf("Error in time stamp of update request object")
+		x, _ := strfmt.ParseDateTime(certifyMessage.Meta.Vaccinations[0].Date)
+		t.Errorf("Error in time stamp of update request object: %v", x)
 	}
 	certifyMessage.Meta.Vaccinations[0].Date = "2021-12-15"
 	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
 	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-15T00:06:00.000Z" {
-		t.Errorf("Error in time stamp of update request object for consistent data")
+		x, _ := strfmt.ParseDateTime(certifyMessage.Meta.Vaccinations[0].Date)
+		t.Errorf("Error in time stamp of update request object for consistent data: %v", x)
 	}
 }
