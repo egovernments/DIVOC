@@ -26,5 +26,7 @@ spec:
           envFrom:
             - configMapRef:
                 name: divoc-config
+            - secretRef:
+                name: divoc-secrets
       restartPolicy: Always
 status: {}

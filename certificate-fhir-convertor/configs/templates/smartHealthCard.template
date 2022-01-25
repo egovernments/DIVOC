@@ -11,7 +11,7 @@
         "type": "collection",
         "entry": [
           {
-            "fullUrl": "urn:uuid:{{patientId}}",
+            "fullUrl": "resource:0",
             "resource": {
               "resourceType": "Patient",
               "name": [
@@ -24,7 +24,7 @@
             }
           },
           {
-            "fullUrl": "urn:uuid:{{immunizationId}}",
+            "fullUrl": "resource:1",
             "resource": {
               "resourceType": "Immunization",
               "status": "completed",
@@ -37,7 +37,7 @@
                 ]
               },
               "patient": {
-                "reference": "urn:uuid:{{patientId}}"
+                "reference": "resource:0"
               },
               "occurrenceDateTime": "{{vaccinationDate}}",
               "performer": [

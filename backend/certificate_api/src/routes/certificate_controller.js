@@ -542,11 +542,13 @@ async function certificateAsEUPayload(req, res) {
 
 async function certificateAsSHCPayload(req, res) {
     let refId;
+    let type;
     try {
         var queryData = url.parse(req.url, true).query;
         try {
             await verifyKeycloakToken(req.headers.authorization);
             refId = queryData.refId;
+            type = queryData.type;
         } catch (e) {
             console.error(e);
             res.statusCode = 403;
@@ -558,7 +560,7 @@ async function certificateAsSHCPayload(req, res) {
             let certificate = JSON.parse(certificateRaw.certificate);
 
             // convert certificate to SHC Json
-            const dccPayload = fhirCertificate.certificateToSmartHealthJson(certificate, {});
+            const shcPayload = fhirCertificate.certificateToSmartHealthJson(certificate, {});
 
             // get keyPair from pem for 1st time
             if (shcKeyPair.length === 0) {
@@ -566,11 +568,17 @@ async function certificateAsSHCPayload(req, res) {
                 shcKeyPair = await keyUtils.DERtoJWK(keyFile, []);
             }
 
-            const qrUri = await shc.signAndPack(await shc.makeJWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER), shcKeyPair[0]);
-            const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
-            let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
-            const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-            const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+            const qrUri = await shc.signAndPack(await shc.makeJWT(shcPayload, config.EU_CERTIFICATE_EXPIRY, config.CERTIFICATE_ISSUER, new Date()), shcKeyPair[0]);
+
+            let buffer ;
+            if (type && type.toLowerCase() === "qrcode") {
+                buffer = await QRCode.toBuffer(qrUri, {scale: 2})
+            } else {
+                const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
+                let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
+                const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
+                buffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+            }
 
             res.statusCode = 200;
             sendEvents({
@@ -579,7 +587,7 @@ async function certificateAsSHCPayload(req, res) {
                 type: "shc-cert-success",
                 extra: "Certificate found"
             });
-            return pdfBuffer
+            return buffer
 
         } else {
             res.statusCode = 404;

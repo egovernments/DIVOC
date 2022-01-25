@@ -9,7 +9,7 @@ services:
     entrypoint: /bin/true
   portal_api:
     environment:
-        ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
+        ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
   keycloak:
     environment:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json
@@ -24,7 +24,7 @@ services:
       start_period: 1m
   certificate_processor:
       environment:
-        ADMIN_API_CLIENT_SECRET: a1832880-059a-40d0-86b1-e318ced82613
+        ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
   e2e_test:
     build:
       context: ./e2e
