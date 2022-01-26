@@ -7,6 +7,10 @@ const DISEASE_CODE = process.env.DISEASE_CODE || 'COVID-19';
 const PUBLIC_HEALTH_AUTHORITY = process.env.FHIR_PUBLIC_HEALTH_AUTHORITY || 'Govt Of India';
 const EU_CERTIFICATE_EXPIRY = parseInt(process.env.EU_CERTIFICATE_EXPIRY) || 12;
 const CERTIFICATE_ISSUER = process.env.CERTIFICATE_ISSUER || "https://divoc.dev";
+const REDIS_URL = process.env.REDIS_URL || "redis://redis:6379"
+const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
+const REDIS_ENABLED = process.env.REDIS_ENABLED || true
+const ETCD_URL = process.env.ETCD_URL || 'etcd:2379';
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
@@ -16,5 +20,9 @@ module.exports = {
     DISEASE_CODE,
     PUBLIC_HEALTH_AUTHORITY,
     EU_CERTIFICATE_EXPIRY,
-    CERTIFICATE_ISSUER
+    CERTIFICATE_ISSUER,
+    REDIS_ENABLED,
+    REDIS_URL,
+    REDIS_KEY_EXPIRE,
+    ETCD_URL
 };

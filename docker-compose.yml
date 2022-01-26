@@ -281,6 +281,7 @@ services:
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_API_PRIVATE_KEY"
       EU_CERTIFICATE_PRIVATE_KEY: "$EU_CERTIFICATE_PRIVATE_KEY"
       SHC_CERTIFICATE_PRIVATE_KEY: "SHC_CERTIFICATE_PRIVATE_KEY"
+      REDIS_URL: redis://redis:6379
     depends_on:
       kafka:
         condition: service_healthy
