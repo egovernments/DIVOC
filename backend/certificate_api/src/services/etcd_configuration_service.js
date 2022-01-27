@@ -13,7 +13,7 @@ const vaccineCertificateKey = 'vaccineCertificateTemplate';
 const testCertificateKey = 'testCertificateTemplate';
 
 (async() => {
-  etcdClient = new Etcd3({hosts: config.ETCD_URL})
+  etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(vaccineCertificateKey);
   setUpWatcher(testCertificateKey);
   await initRedis(config);
@@ -57,12 +57,15 @@ function setUpWatcher(templateKey) {
       .on('put', res => {
         deleteKey(templateKey);
       });
+    })
+    .catch(err => {
+      console.log(err);
     });
 }
 
 class VaccineCertificateTemplate {
   async getCertificateTemplate(strategy) {
-    let vaccineCertificateTemplate =  await getTemplateFromCache(vaccineCertificateKey);
+    let vaccineCertificateTemplate = await getTemplateFromCache(vaccineCertificateKey);
     if(vaccineCertificateTemplate === null || vaccineCertificateTemplate === undefined) {
       let client = null;
       if(strategy.toLowerCase() === 'etcd') {
@@ -96,12 +99,12 @@ class VaccineCertificateTemplate {
     await allowedTagsPromise.then(value => {
       allowedVaccineCertificateTags = value;
     });
+    await allowedAttributesPromise.then(value => {
+      allowedVaccineCertificateAttributes = value;
+    });
     await allowedClassesPromise.then(value => {
       allowedVaccineCertificateClasses = value;
     });
-    await allowedAttributesPromise.then(value => {
-      allowedVaccineCertificateAttributes = value;
-    })
   }
 }
 
@@ -142,37 +145,38 @@ class TestCertificateTemplate {
     await allowedTagsPromise.then(value => {
       allowedTestCertificateTags = value;
     });
-    await allowedClassesPromise.then(value => {
-      allowedTestCertificateClasses = value;
-    });
     await allowedAttributesPromise.then(value => {
       allowedTestCertificateAttributes = value;
+    });
+    await allowedClassesPromise.then(value => {
+      allowedTestCertificateClasses = value;
     });
   }
 }
 
 const etcd = function() {
-    this.getCertificateTemplate = async function(templateKey) {
-      const template = (await etcdClient.get(templateKey).string());
-      return template;
-    }
+  this.getCertificateTemplate = async function(templateKey) {
+    const template = (await etcdClient.get(templateKey).string());
+    return template;
+  }
 
-    this.getAllowedTags = async function(tagsKey) {
-      const allowedTags = (await etcdClient.get(tagsKey).string());
-      return allowedTags;
-    }
+  this.getAllowedTags = async function(tagsKey) {
+    const allowedTags = (await etcdClient.get(tagsKey).string());
+    return allowedTags;
+  }
 
-    this.getAllowedAttributes = async function(attributesKey) {
-      const allowedAttributes = (await etcdClient.get(attributesKey).string());
-      return JSON.parse(allowedAttributes);
-    }
+  this.getAllowedAttributes = async function(attributesKey) {
+    const allowedAttributes = (await etcdClient.get(attributesKey).string());
+    return JSON.parse(allowedAttributes);
+  }
 
-    this.getAllowedClasses = async function(classesKey) {
-      const allowedClasses = (await etcdClient.get(classesKey).string());
-      return JSON.parse(allowedClasses);
-    }
+  this.getAllowedClasses = async function(classesKey) {
+    const allowedClasses = (await etcdClient.get(classesKey).string());
+    return JSON.parse(allowedClasses);
+  }
 }
 
 module.exports = {
-    VaccineCertificateTemplate, TestCertificateTemplate
+  VaccineCertificateTemplate,
+  TestCertificateTemplate
 }

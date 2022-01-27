@@ -180,7 +180,21 @@ async function createCertificatePDF(certificateResp, res, source) {
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-        const pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+        let pdfBuffer = null;
+        try {
+            pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+        } catch(err) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            let error = {
+                date: new Date(),
+                source: "GetVaccinePDFCertificate",
+                type: "internal-failed",
+                extra: err.message
+            };
+            sendEvents(error);
+            return;
+        }
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -243,7 +257,21 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
         };
-        const pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+        let pdfBuffer = null;
+        try {
+            pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+        } catch(err) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            let error = {
+                date: new Date(),
+                source: "GetTestPDFCertificate",
+                type: "internal-failed",
+                extra: err.message
+            };
+            sendEvents(error);
+            return;
+        }
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -512,7 +540,21 @@ async function certificateAsEUPayload(req, res) {
             const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
             let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
             const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-            const pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+            let pdfBuffer = null;
+            try {
+                pdfBuffer = await createPDF(isVaccineTemplate, certificateData);
+            } catch(err) {
+                res.statusCode = 500;
+                res.setHeader("Content-Type", "application/json");
+                let error = {
+                    date: new Date(),
+                    source: "EUCertificateConverter",
+                    type: "internal-failed",
+                    extra: err.message
+                };
+                sendEvents(error);
+                return;
+            }
 
             res.statusCode = 200;
             sendEvents({
@@ -577,7 +619,20 @@ async function certificateAsSHCPayload(req, res) {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-                buffer = await createPDF(isVaccineTemplate, certificateData);
+                try {
+                    buffer = await createPDF(isVaccineTemplate, certificateData);
+                } catch(err) {
+                    res.statusCode = 500;
+                    res.setHeader("Content-Type", "application/json");
+                    let error = {
+                        date: new Date(),
+                        source: "SHCConverter",
+                        type: "internal-failed",
+                        extra: err.message
+                    };
+                    sendEvents(error);
+                    return;
+                }
             }
 
             res.statusCode = 200;

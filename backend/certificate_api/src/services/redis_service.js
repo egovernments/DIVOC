@@ -5,7 +5,7 @@ let existsAsync;
 let getAsync;
 let redisKeyExpiry;
 let isRedisEnabled;
-async function initRedis(config) {
+function initRedis(config) {
   isRedisEnabled = config.REDIS_ENABLED;
   if(isRedisEnabled) {
     redisClient = redis.createClient(config.REDIS_URL);
@@ -27,22 +27,22 @@ function redisConnectionEventListeners({ conn }) {
     console.log('Redis - Connection status: reconnecting');
   });
   conn.on('error', (err) => {
-      console.error('Redis - Connection status: error ', { err });
+    console.error('Redis - Connection status: error ', { err });
   });
 }
   
 async function checkIfKeyExists(key) {
-    if(isRedisEnabled && redisClient.connected) {
-        return await existsAsync(key)
-    } else {
-        return false
-    }
+  if(isRedisEnabled && redisClient.connected) {
+    return await existsAsync(key)
+  } else {
+    return false
+  }
 }
 
 function storeKeyWithExpiry(key, value, expiry = redisKeyExpiry) {  
-    if(isRedisEnabled && redisClient.connected) {
-        redisClient.set(key, value, "EX", expiry)
-    }
+  if(isRedisEnabled && redisClient.connected) {
+    redisClient.set(key, value, "EX", expiry)
+  }
 }
 
 function deleteKey(key) {
@@ -56,5 +56,9 @@ async function getValueAsync(key) {
 }
 
 module.exports = {
-    initRedis, checkIfKeyExists, getValueAsync, storeKeyWithExpiry, deleteKey
+  initRedis,
+  checkIfKeyExists,
+  getValueAsync,
+  storeKeyWithExpiry,
+  deleteKey
 }
