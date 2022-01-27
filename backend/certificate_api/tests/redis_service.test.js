@@ -1,31 +1,44 @@
-const mockRedis = require("redis-mock");
+const mockRedis = require('redis-mock');
 const redis = require('redis');
-const config = require('../configs/config');
-const redisService = require('../src/services/redis_service');
-jest.mock('redis', () => jest.requireActual('redis-mock'));
-const mockClient = mockRedis.createClient(config.REDIS_URL);
+const util = require('util');
 
-jest.setTimeout(3000);
+const config = require('../configs/config');
+jest.mock('redis', () => jest.requireActual('redis-mock'));
+var mockExistsFun = new Function();
+jest.spyOn(util, 'promisify').mockReturnValueOnce(mockExistsFun)
+const mockClient = mockRedis.createClient(config.REDIS_URL);
+const redisService = require('../src/services/redis_service');
 
 beforeEach(async() => {
     const mock = jest.spyOn(redis, 'createClient');
     mock.mockImplementation(() => mockClient);
-    // console.log = jest.fn();
+    console.log = jest.fn();
 });
 
 test('should initialize redis', async() => {
-    await redisService.initRedis(config);
+    redisService.initRedis(config);
     expect(redis.createClient).toHaveBeenCalled();
 });
 
 test('should call get stored value from redis', async(done) => {
     try {
-        const ans = await redisService.getValueAsync('abc');
-        // expect(ans).toEqual('xyz')
+        await redisService.getValueAsync('abc');
+        expect(util.promisify).toHaveBeenCalledWith(mockClient.get);
         done();
     }
     catch (err) {
         done(err);
+    }
+});
+
+test('should check if key is already present in redis', async(done) => {
+    try{
+        await redisService.checkIfKeyExists('abc');
+        expect(util.promisify).toHaveBeenCalledWith(mockClient.exists);
+        done();
+    }
+    catch(err) {
+        done(err)
     }
 });
 
@@ -41,3 +54,29 @@ test('should call set in redis when adding a value', async(done) => {
     }
 });
 
+test('should call delete function of redis when trying to delete value', async(done) => {
+    try {
+        jest.spyOn(mockClient, 'del');
+        redisService.deleteKey('abc');
+        expect(mockClient.del).toHaveBeenCalled();
+        done();
+    }
+    catch(err) {
+        done(err);
+    }
+});
+
+test('should return false from checkIfKeyExists function when redis is disabled', async(done) => {
+    try {
+        const config1 = {
+            REDIS_ENABLED: false
+        }
+        redisService.initRedis(config1);
+        const exists = await redisService.checkIfKeyExists('abc');
+        expect(exists).toEqual(false);
+        done();
+    }
+    catch(err) {
+        done(err);
+    }
+});

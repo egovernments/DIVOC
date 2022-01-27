@@ -71,7 +71,10 @@ class VaccineCertificateTemplate {
       if(strategy.toLowerCase() === 'etcd') {
           client = new etcd();
       }
-      const certificateTemplatePromise = client !== null ? client.getCertificateTemplate(vaccineCertificateKey) : null;
+      if(client === null) {
+        return null;
+      }
+      const certificateTemplatePromise = client.getCertificateTemplate(vaccineCertificateKey);
       await this.getAllowedHtmlOptions(client);
       vaccineCertificateTemplate = certificateTemplatePromise;
       await certificateTemplatePromise.then(value => {
@@ -90,9 +93,6 @@ class VaccineCertificateTemplate {
   getAllowedClasses() {}
 
   async getAllowedHtmlOptions(client) {
-    if(client === null) {
-      return;
-    }
     const allowedTagsPromise = client !== null ? client.getAllowedTags(vaccineTagsKey) : null;
     const allowedAttributesPromise = client !== null ? client.getAllowedAttributes(vaccineAttributesKey) : null;
     const allowedClassesPromise = client !== null ? client.getAllowedClasses(vaccineClassesKey) : null;
@@ -117,6 +117,10 @@ class TestCertificateTemplate {
       if(strategy.toLowerCase() === 'etcd') {
           client = new etcd();
       }
+      if(client === null) {
+        return null;
+      }
+      console.log(client);
       const testCertificateTemplatePromise = client !== null ? client.getCertificateTemplate(testCertificateKey) : null;
       await this.getAllowedHtmlOptions(client);
       testCertificateTemplate = testCertificateTemplatePromise;
@@ -136,9 +140,6 @@ class TestCertificateTemplate {
   getAllowedClasses() {}
 
   async getAllowedHtmlOptions(client) {
-    if(client === null) {
-      return;
-    }
     const allowedTagsPromise = client !== null ? client.getAllowedTags(testTagsKey) : null;
     const allowedAttributesPromise = client !== null ? client.getAllowedAttributes(testAttributesKey) : null;
     const allowedClassesPromise = client !== null ? client.getAllowedClasses(testClassesKey) : null;
