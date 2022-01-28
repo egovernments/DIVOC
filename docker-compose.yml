@@ -288,18 +288,17 @@ services:
     image: gcr.io/etcd-development/etcd:v3.5.1
     entrypoint: /usr/local/bin/etcd
     command: 
-      - '--name=s1'
-      - '--data-dir=/etcd-data'
-      - '--listen-client-urls=http://0.0.0.0:2379'
-      - '--advertise-client-urls=http://0.0.0.0:2379'
-      - '--listen-peer-urls=http://0.0.0.0:2380'
-      - '--initial-advertise-peer-urls=http://0.0.0.0:2380'
-      - '--initial-cluster=s1=http://0.0.0.0:2380'
-      - '--initial-cluster-token=tkn'
-      - '--initial-cluster-state=new'
-      - '--log-level=info'
-      - '--logger=zap'
-      - '--log-outputs=stderr'
+      - '--name=$ETCD_NAME'
+      - '--data-dir=$ETCD_DATA_DIR'
+      - '--listen-client-urls=$LISTEN_CLIENT_URLS'
+      - '--advertise-client-urls=$ADVERTISE_CLIENT_URLS'
+      - '--listen-peer-urls=$LISTEN_PEER_URLS'
+      - '--initial-advertise-peer-urls=$ADVERTISE_PEER_URLS'
+      - '--initial-cluster=$ETCD_NAME=$INITIAL_CLUSTER'
+      - '--initial-cluster-token=$INITIAL_CLUSTER_TOKEN'
+      - '--initial-cluster-state=$INITIAL_CLUSTER_STATE'
+      - '--log-level=$LOG_LEVEL'
+      - '--logger=$LOGGER'
+      - '--log-outputs=$LOG_OUTPUTS'
     ports:
       - "2379:2379"
-      - "2380:2380"
