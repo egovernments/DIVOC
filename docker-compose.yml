@@ -301,4 +301,4 @@ services:
       - '--logger=$ETCD_LOGGER'
       - '--log-outputs=$ETCD_LOG_OUTPUTS'
     ports:
-      - "2379:2379"
+      - $ETCD_CLIENT_CONNECTIONS_PORT:$ETCD_CLIENT_CONNECTIONS_PORT
