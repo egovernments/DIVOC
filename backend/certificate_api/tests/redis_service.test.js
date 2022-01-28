@@ -2,7 +2,11 @@ const mockRedis = require('redis-mock');
 const redis = require('redis');
 const util = require('util');
 
-const config = require('../configs/config');
+const config = {
+    REDIS_URL: "redis://redis:6379",
+    REDIS_KEY_EXPIRE: 172800,
+    REDIS_ENABLED: true
+};
 jest.mock('redis', () => jest.requireActual('redis-mock'));
 var mockExistsFun = new Function();
 jest.spyOn(util, 'promisify').mockReturnValueOnce(mockExistsFun)

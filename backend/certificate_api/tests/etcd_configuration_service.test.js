@@ -1,6 +1,5 @@
 const etcd3 = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
-const config = require('../configs/config');
 jest.mock('sanitize-html');
 const redisService = require('../src/services/redis_service');
 jest.mock('../src/services/redis_service');

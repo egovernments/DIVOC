@@ -26,6 +26,9 @@ async function getTemplateFromCache(key) {
 
 
 function cleanHTML(html) {
+  if(html === null) {
+    return null;
+  }
   const cleanedHtml = sanitizeHtml(html, {
     allowedTags: false,
     allowedAttributes: false,
@@ -64,10 +67,10 @@ function setUpWatcher(templateKey) {
     });
 }
 
-class VaccineCertificateTemplate {
-  async getCertificateTemplate(strategy) {
-    let vaccineCertificateTemplate = await getTemplateFromCache(vaccineCertificateKey);
-    if(vaccineCertificateTemplate === null || vaccineCertificateTemplate === undefined) {
+class CertificateTemplate {
+  async getCertificateTemplate(strategy, key) {
+    let certificateTemplate = await getTemplateFromCache(key);
+    if(certificateTemplate === null || certificateTemplate === undefined) {
       let client = null;
       if(strategy.toLowerCase() === 'etcd') {
           client = new etcd();
@@ -75,36 +78,24 @@ class VaccineCertificateTemplate {
       if(client === null) {
         return null;
       }
-      const certificateTemplatePromise = client.getCertificateTemplate(vaccineCertificateKey);
-      vaccineCertificateTemplate = certificateTemplatePromise;
-      await certificateTemplatePromise.then(value => {
-        value = cleanHTML(value);
-        vaccineCertificateTemplate = value;
-        storeKeyWithExpiry(vaccineCertificateKey, value);
-      });
+      certificateTemplate = await client.getCertificateTemplate(key);
+      certificateTemplate = cleanHTML(certificateTemplate);
+      storeKeyWithExpiry(key, certificateTemplate);
     }
-    return vaccineCertificateTemplate;
+    return certificateTemplate;
   }
 }
-class TestCertificateTemplate {
+
+class VaccineCertificateTemplate extends CertificateTemplate {
   async getCertificateTemplate(strategy) {
-    let testCertificateTemplate =  await getTemplateFromCache(testCertificateKey);
-    if(testCertificateTemplate === null || testCertificateTemplate === undefined) {
-      let client = null;
-      if(strategy.toLowerCase() === 'etcd') {
-          client = new etcd();
-      }
-      if(client === null) {
-        return null;
-      }
-      const testCertificateTemplatePromise = client !== null ? client.getCertificateTemplate(testCertificateKey) : null;
-      testCertificateTemplate = testCertificateTemplatePromise;
-      await testCertificateTemplatePromise.then(value => {
-        value = cleanHTML(value);
-        testCertificateTemplate = value;
-        storeKeyWithExpiry(testCertificateKey, value);
-      });
-    }
+    const vaccineCertificateTemplate = await super.getCertificateTemplate(strategy, vaccineCertificateKey);
+    return vaccineCertificateTemplate
+  }
+}
+class TestCertificateTemplate extends CertificateTemplate{
+  async getCertificateTemplate(strategy) {
+    const testCertificateTemplate = await super.getCertificateTemplate(strategy, testCertificateKey);
+    console.log(testCertificateTemplate);
     return testCertificateTemplate;
   }
 }
