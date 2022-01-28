@@ -5,10 +5,6 @@ const config = require('../../configs/config');
 const {storeKeyWithExpiry, getValueAsync, checkIfKeyExists, initRedis, deleteKey} = require('./redis_service');
 
 let etcdClient;
-let allowedVaccineCertificateTags = '';
-let allowedTestCertificateTags = '';
-const vaccineTagsKey = 'vaccineTags';
-const testTagsKey = 'testTags';
 const vaccineCertificateKey = 'vaccineCertificateTemplate';
 const testCertificateKey = 'testCertificateTemplate';
 
@@ -29,17 +25,20 @@ async function getTemplateFromCache(key) {
 }
 
 
-function cleanHTML(html, allowedTags, allowedAttributes, allowedClasses) {
-  const arr = allowedTags.split(',').map(item => item.trim());
+function cleanHTML(html) {
   const cleanedHtml = sanitizeHtml(html, {
-    allowedTags: sanitizeHtml.defaults.allowedTags.concat(arr),
+    allowedTags: false,
     allowedAttributes: false,
     allowedClasses: {
       "*": ["*"]
     },
     parser: {
       lowerCaseAttributeNames: false
-    }
+    },
+    allowedScriptDomains: [''],
+    allowedScriptHostnames: [''],
+    allowedIframeHostnames: [''],
+    allowedIframeDomains: ['']
   });
   return cleanedHtml;
 }
@@ -77,24 +76,14 @@ class VaccineCertificateTemplate {
         return null;
       }
       const certificateTemplatePromise = client.getCertificateTemplate(vaccineCertificateKey);
-      await this.getAllowedHtmlOptions(client);
       vaccineCertificateTemplate = certificateTemplatePromise;
       await certificateTemplatePromise.then(value => {
-        value = cleanHTML(value, allowedVaccineCertificateTags);
+        value = cleanHTML(value);
         vaccineCertificateTemplate = value;
         storeKeyWithExpiry(vaccineCertificateKey, value);
       });
     }
     return vaccineCertificateTemplate;
-  }
-
-  getAllowedTags() {}
-
-  async getAllowedHtmlOptions(client) {
-    const allowedTagsPromise = client !== null ? client.getAllowedTags(vaccineTagsKey) : null;
-    await allowedTagsPromise.then(value => {
-      allowedVaccineCertificateTags = value;
-    });
   }
 }
 class TestCertificateTemplate {
@@ -109,24 +98,14 @@ class TestCertificateTemplate {
         return null;
       }
       const testCertificateTemplatePromise = client !== null ? client.getCertificateTemplate(testCertificateKey) : null;
-      await this.getAllowedHtmlOptions(client);
       testCertificateTemplate = testCertificateTemplatePromise;
       await testCertificateTemplatePromise.then(value => {
-        value = cleanHTML(value, allowedTestCertificateTags);
+        value = cleanHTML(value);
         testCertificateTemplate = value;
         storeKeyWithExpiry(testCertificateKey, value);
       });
     }
     return testCertificateTemplate;
-  }
-
-  getAllowedTags() {}
-
-  async getAllowedHtmlOptions(client) {
-    const allowedTagsPromise = client !== null ? client.getAllowedTags(testTagsKey) : null;
-    await allowedTagsPromise.then(value => {
-      allowedTestCertificateTags = value;
-    });
   }
 }
 
@@ -134,11 +113,6 @@ const etcd = function() {
   this.getCertificateTemplate = async function(templateKey) {
     const template = (await etcdClient.get(templateKey).string());
     return template;
-  }
-
-  this.getAllowedTags = async function(tagsKey) {
-    const allowedTags = (await etcdClient.get(tagsKey).string());
-    return allowedTags;
   }
 }
 
