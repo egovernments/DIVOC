@@ -26,6 +26,9 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 	"zycov": {
 		"dueDays": 28,
 	},
+	"covovax": {
+		"dueDays": 21,
+	},
 }
 
 type Certificate struct {

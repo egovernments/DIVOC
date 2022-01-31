@@ -38,6 +38,11 @@ const ICD11_MAPPINGS = {
     "vaccineType": "Virus like particle",
     "icd11Term": "COVID-19 vaccine, virus like particle (VLP)",
     "disease": "COVID-19"
+  },
+  "XM5JC5": {
+    "vaccineType": "Protein subunit",
+    "icd11Term": "COVID-19 vaccine, Recombinant Protein Nanoparticle",
+    "disease": "COVID-19"
   }
 };
 
@@ -57,6 +62,10 @@ const VACCINE_ICD11_MAPPINGS = [
   {
     "vaccineName": "zycov",
     "icd11Code": "XM6AT1"
+  },
+  {
+    "vaccineName": "covovax",
+    "icd11Code": "XM5JC5"
   }
 ]
 
