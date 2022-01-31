@@ -41,7 +41,7 @@ const ICD11_MAPPINGS = {
   },
   "XM5JC5": {
     "vaccineType": "Protein subunit",
-    "icd11Term": "COVID-19 vaccine, Recombinant, adjuvanted",
+    "icd11Term": "COVID-19 vaccine, Recombinant Protein Nanoparticle",
     "disease": "COVID-19"
   }
 };
