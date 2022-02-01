@@ -4,6 +4,10 @@ jest.mock('sanitize-html');
 const redisService = require('../src/services/redis_service');
 jest.mock('../src/services/redis_service');
 console.log = jest.fn();
+const Templates = {
+    VACCINE: "vaccineCertificateTemplate",
+    TEST: "testCertificateTemplate"
+}
 const html = `<html>
         <head>
             <title>Dummy</title>
@@ -63,8 +67,8 @@ test('should instantiate Etcd3', () => {
 });
 
 test('should call sanitizeHtml method 2 times each for getCertificateTemplate method of VaccineCertificateTemplate and TestCertificateTemplate for valid configuration passed', async() => {
-    (await (new etcd_configuration.VaccineCertificateTemplate()).getCertificateTemplate('etcd'));
-    (await (new etcd_configuration.TestCertificateTemplate()).getCertificateTemplate('etcd'));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
     expect(sanitizeHtml).toHaveBeenCalledTimes(2);
     expect(sanitizeHtml).toHaveBeenCalledWith(html, {
         allowedTags: false,
@@ -82,13 +86,6 @@ test('should call sanitizeHtml method 2 times each for getCertificateTemplate me
     });
 });
 
-test('should return null when invalid configuration passed to VaccineCertificateTemplate and TestCertificateTemplate', async() => {
-    const vaccineTemplate = (await (new etcd_configuration.VaccineCertificateTemplate()).getCertificateTemplate('etc'));
-    const testTemplate = (await (new etcd_configuration.TestCertificateTemplate()).getCertificateTemplate('etc'));
-    expect(vaccineTemplate).toEqual(null);
-    expect(testTemplate).toEqual(null);
-});
-
 test('should call watch method to watch for changes in etcd', () => {
     expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(2);
 });
@@ -96,8 +93,29 @@ test('should call watch method to watch for changes in etcd', () => {
 test('should get template from redis when present', async() => {
     jest.spyOn(redisService, 'checkIfKeyExists').mockImplementation(() => true)
     jest.spyOn(redisService, 'getValueAsync').mockReturnValueOnce('abc').mockReturnValueOnce('def');
-    const vaccineTemplate = (await (new etcd_configuration.VaccineCertificateTemplate()).getCertificateTemplate('etcd'));
-    const testTemplate = (await (new etcd_configuration.TestCertificateTemplate()).getCertificateTemplate('etcd'));
+    const vaccineTemplate = (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
+    const testTemplate = (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
     expect(vaccineTemplate).toEqual('abc');
     expect(testTemplate).toEqual('def');
+});
+
+describe('environment variables', () => {
+    const OLD_ENV = process.env;
+    beforeEach(() => {
+        jest.resetModules();
+        process.env = {
+            ...OLD_ENV,
+            CONFIGURATION_LAYER: 'etc'
+        };
+    });
+    afterEach(() => {
+        process.env = OLD_ENV;
+    });
+    test('should return null when invalid configuration passed to VaccineCertificateTemplate and TestCertificateTemplate', async() => {
+        let configuration = require('../src/services/etcd_configuration_service');
+        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
+        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
+        expect(vaccineTemplate).toEqual(null);
+        expect(testTemplate).toEqual(null);
+    });
 });

@@ -7,12 +7,13 @@ const {storeKeyWithExpiry, getValueAsync, checkIfKeyExists, initRedis, deleteKey
 let etcdClient;
 const vaccineCertificateKey = 'vaccineCertificateTemplate';
 const testCertificateKey = 'testCertificateTemplate';
-
+let configuration;
 (async() => {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(vaccineCertificateKey);
   setUpWatcher(testCertificateKey);
   await initRedis(config);
+  configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd(): null ;
 })();
 
 async function getTemplateFromCache(key) {
@@ -68,35 +69,17 @@ function setUpWatcher(templateKey) {
 }
 
 class CertificateTemplate {
-  async getCertificateTemplate(strategy, key) {
+  async getCertificateTemplate(key) {
     let certificateTemplate = await getTemplateFromCache(key);
     if(certificateTemplate === null || certificateTemplate === undefined) {
-      let client = null;
-      if(strategy.toLowerCase() === 'etcd') {
-          client = new etcd();
-      }
-      if(client === null) {
+      if(configuration === null) {
         return null;
       }
-      certificateTemplate = await client.getCertificateTemplate(key);
+      certificateTemplate = await configuration.getCertificateTemplate(key);
       certificateTemplate = cleanHTML(certificateTemplate);
       storeKeyWithExpiry(key, certificateTemplate);
     }
     return certificateTemplate;
-  }
-}
-
-class VaccineCertificateTemplate extends CertificateTemplate {
-  async getCertificateTemplate(strategy) {
-    const vaccineCertificateTemplate = await super.getCertificateTemplate(strategy, vaccineCertificateKey);
-    return vaccineCertificateTemplate
-  }
-}
-class TestCertificateTemplate extends CertificateTemplate{
-  async getCertificateTemplate(strategy) {
-    const testCertificateTemplate = await super.getCertificateTemplate(strategy, testCertificateKey);
-    console.log(testCertificateTemplate);
-    return testCertificateTemplate;
   }
 }
 
@@ -108,6 +91,5 @@ const etcd = function() {
 }
 
 module.exports = {
-  VaccineCertificateTemplate,
-  TestCertificateTemplate
+  CertificateTemplate
 }
