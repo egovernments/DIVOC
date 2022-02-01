@@ -9,14 +9,17 @@ import (
 	"errors"
 	"net/url"
 	golangswaggerpaths "path"
+	"strings"
 
 	"github.com/go-openapi/swag"
 )
 
 // RevokeCertificateURL generates an URL for the revoke certificate operation
 type RevokeCertificateURL struct {
-	Dose              *float64
 	PreEnrollmentCode string
+
+	AllDoses *bool
+	Doses    []int64
 
 	_basePath string
 	// avoid unkeyed usage
@@ -42,7 +45,14 @@ func (o *RevokeCertificateURL) SetBasePath(bp string) {
 func (o *RevokeCertificateURL) Build() (*url.URL, error) {
 	var _result url.URL
 
-	var _path = "/v1/certificates"
+	var _path = "/v1/certificates/{preEnrollmentCode}"
+
+	preEnrollmentCode := o.PreEnrollmentCode
+	if preEnrollmentCode != "" {
+		_path = strings.Replace(_path, "{preEnrollmentCode}", preEnrollmentCode, -1)
+	} else {
+		return nil, errors.New("preEnrollmentCode is required on RevokeCertificateURL")
+	}
 
 	_basePath := o._basePath
 	if _basePath == "" {
@@ -52,17 +62,29 @@ func (o *RevokeCertificateURL) Build() (*url.URL, error) {
 
 	qs := make(url.Values)
 
-	var doseQ string
-	if o.Dose != nil {
-		doseQ = swag.FormatFloat64(*o.Dose)
+	var allDosesQ string
+	if o.AllDoses != nil {
+		allDosesQ = swag.FormatBool(*o.AllDoses)
 	}
-	if doseQ != "" {
-		qs.Set("dose", doseQ)
+	if allDosesQ != "" {
+		qs.Set("allDoses", allDosesQ)
 	}
 
-	preEnrollmentCodeQ := o.PreEnrollmentCode
-	if preEnrollmentCodeQ != "" {
-		qs.Set("preEnrollmentCode", preEnrollmentCodeQ)
+	var dosesIR []string
+	for _, dosesI := range o.Doses {
+		dosesIS := swag.FormatInt64(dosesI)
+		if dosesIS != "" {
+			dosesIR = append(dosesIR, dosesIS)
+		}
+	}
+
+	doses := swag.JoinByFormat(dosesIR, "")
+
+	if len(doses) > 0 {
+		qsv := doses[0]
+		if qsv != "" {
+			qs.Set("doses", qsv)
+		}
 	}
 
 	_result.RawQuery = qs.Encode()

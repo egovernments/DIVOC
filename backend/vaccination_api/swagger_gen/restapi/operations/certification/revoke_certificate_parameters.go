@@ -6,6 +6,7 @@ package certification
 // Editing this file might prove futile when you re-run the swagger generate command
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/go-openapi/errors"
@@ -13,7 +14,6 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/go-openapi/strfmt"
 	"github.com/go-openapi/swag"
-	"github.com/go-openapi/validate"
 )
 
 // NewRevokeCertificateParams creates a new RevokeCertificateParams object
@@ -32,13 +32,17 @@ type RevokeCertificateParams struct {
 	// HTTP Request Object
 	HTTPRequest *http.Request `json:"-"`
 
-	/*dose for which certificate needs to be revoked
+	/*flag specifying if certificates for all doses for this refId should be revoked
 	  In: query
 	*/
-	Dose *float64
+	AllDoses *bool
+	/*dose(s) for which certificate needs to be revoked
+	  In: query
+	*/
+	Doses []int64
 	/*refId for which certificate needs to be revoked
 	  Required: true
-	  In: query
+	  In: path
 	*/
 	PreEnrollmentCode string
 }
@@ -54,13 +58,18 @@ func (o *RevokeCertificateParams) BindRequest(r *http.Request, route *middleware
 
 	qs := runtime.Values(r.URL.Query())
 
-	qDose, qhkDose, _ := qs.GetOK("dose")
-	if err := o.bindDose(qDose, qhkDose, route.Formats); err != nil {
+	qAllDoses, qhkAllDoses, _ := qs.GetOK("allDoses")
+	if err := o.bindAllDoses(qAllDoses, qhkAllDoses, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
-	qPreEnrollmentCode, qhkPreEnrollmentCode, _ := qs.GetOK("preEnrollmentCode")
-	if err := o.bindPreEnrollmentCode(qPreEnrollmentCode, qhkPreEnrollmentCode, route.Formats); err != nil {
+	qDoses, qhkDoses, _ := qs.GetOK("doses")
+	if err := o.bindDoses(qDoses, qhkDoses, route.Formats); err != nil {
+		res = append(res, err)
+	}
+
+	rPreEnrollmentCode, rhkPreEnrollmentCode, _ := route.Params.GetOK("preEnrollmentCode")
+	if err := o.bindPreEnrollmentCode(rPreEnrollmentCode, rhkPreEnrollmentCode, route.Formats); err != nil {
 		res = append(res, err)
 	}
 
@@ -70,8 +79,8 @@ func (o *RevokeCertificateParams) BindRequest(r *http.Request, route *middleware
 	return nil
 }
 
-// bindDose binds and validates parameter Dose from query.
-func (o *RevokeCertificateParams) bindDose(rawData []string, hasKey bool, formats strfmt.Registry) error {
+// bindAllDoses binds and validates parameter AllDoses from query.
+func (o *RevokeCertificateParams) bindAllDoses(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
@@ -83,30 +92,55 @@ func (o *RevokeCertificateParams) bindDose(rawData []string, hasKey bool, format
 		return nil
 	}
 
-	value, err := swag.ConvertFloat64(raw)
+	value, err := swag.ConvertBool(raw)
 	if err != nil {
-		return errors.InvalidType("dose", "query", "float64", raw)
+		return errors.InvalidType("allDoses", "query", "bool", raw)
 	}
-	o.Dose = &value
+	o.AllDoses = &value
 
 	return nil
 }
 
-// bindPreEnrollmentCode binds and validates parameter PreEnrollmentCode from query.
-func (o *RevokeCertificateParams) bindPreEnrollmentCode(rawData []string, hasKey bool, formats strfmt.Registry) error {
-	if !hasKey {
-		return errors.Required("preEnrollmentCode", "query", rawData)
+// bindDoses binds and validates array parameter Doses from query.
+//
+// Arrays are parsed according to CollectionFormat: "" (defaults to "csv" when empty).
+func (o *RevokeCertificateParams) bindDoses(rawData []string, hasKey bool, formats strfmt.Registry) error {
+
+	var qvDoses string
+	if len(rawData) > 0 {
+		qvDoses = rawData[len(rawData)-1]
 	}
+
+	// CollectionFormat:
+	dosesIC := swag.SplitByFormat(qvDoses, "")
+	if len(dosesIC) == 0 {
+		return nil
+	}
+
+	var dosesIR []int64
+	for i, dosesIV := range dosesIC {
+		dosesI, err := swag.ConvertInt64(dosesIV)
+		if err != nil {
+			return errors.InvalidType(fmt.Sprintf("%s.%v", "doses", i), "query", "int64", dosesI)
+		}
+
+		dosesIR = append(dosesIR, dosesI)
+	}
+
+	o.Doses = dosesIR
+
+	return nil
+}
+
+// bindPreEnrollmentCode binds and validates parameter PreEnrollmentCode from path.
+func (o *RevokeCertificateParams) bindPreEnrollmentCode(rawData []string, hasKey bool, formats strfmt.Registry) error {
 	var raw string
 	if len(rawData) > 0 {
 		raw = rawData[len(rawData)-1]
 	}
 
 	// Required: true
-	// AllowEmptyValue: false
-	if err := validate.RequiredString("preEnrollmentCode", "query", raw); err != nil {
-		return err
-	}
+	// Parameter is provided by construction from the route
 
 	o.PreEnrollmentCode = raw
 

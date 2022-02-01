@@ -763,15 +763,24 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 		return certification.NewRevokeCertificateBadRequest()
 	}
 	preEnrollmentCode := params.PreEnrollmentCode
-	dose := params.Dose
+	doses := params.Doses
+	allDoses := params.AllDoses
+
+	log.Infof("revokeCertificate params: %+v %+v", doses, allDoses)
+	if doses == nil && (allDoses == nil || (allDoses != nil && *allDoses != true)) {
+		return certification.NewRevokeCertificateBadRequest()
+	}
+
+	if allDoses != nil && *allDoses == true {
+		doses = nil
+	}
 
 	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
 			"eq": preEnrollmentCode,
 		},
 	}
-	var certificateFailedToAddToRevocationList []string
-	var certificateFailedToDeleteFromVaccCertRegistry []string
+
 	if response, err := kernelService.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
 		log.Errorf("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
@@ -783,100 +792,45 @@ func revokeCertificate(params certification.RevokeCertificateParams) middleware.
 			isCertificateFound := false
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
-					certificateId := body["certificateId"].(string)
 					var cert map[string]interface{}
 					if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
 						log.Errorf("%v", err)
 						continue
 					}
 					certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
-					if (dose != nil && *dose == certificateDose["dose"]) || dose == nil {
-						isCertificateFound = true
-						if err := deleteVaccineCertificate(body["osid"].(string)); err != nil {
-							log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
-							certificateFailedToDeleteFromVaccCertRegistry = append(certificateFailedToDeleteFromVaccCertRegistry, certificateId)
-						} else {
-							err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
-							if err != nil {
-								log.Errorf("Failed to add certificate %v to revocation list", certificateId)
-								certificateFailedToAddToRevocationList = append(certificateFailedToAddToRevocationList, certificateId)
+					revokeCertForDose := false
+					if doses != nil {
+						for _, currentDose := range doses {
+							if currentDose == int64(certificateDose["dose"].(float64)) {
+								revokeCertForDose = true
 							}
 						}
-						programId := body["programId"].(string)
-						key := preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64)))
-						if config.Config.Redis.ProgramIdCaching == "false" {
-							key = preEnrollmentCode + "-" + strconv.Itoa(int((certificateDose["dose"]).(float64)))
-						}
-						log.Infof("Key for Redis : %v, %v", key, config.Config.Redis.ProgramIdCaching)
-						err := services.DeleteValue(key)
-						if err != nil {
-							log.Errorf("Error while Deleteing key from redis: %v", err)
-						}
+					}
 
+					if revokeCertForDose == true || (allDoses != nil && *allDoses == true) {
+						isCertificateFound = true
+						revokeMsg, _ := json.Marshal(struct {
+							PreEnrollmentCode string                 `json:"preEnrollmentCode"`
+							CertificateBody   map[string]interface{} `json:"certificateBody"`
+						}{
+							PreEnrollmentCode: preEnrollmentCode,
+							CertificateBody:   body,
+						})
+						log.Infof("Found certificate for revocation. Adding to Kafka topic.")
+						services.PublishRevokeCertificateMessage(revokeMsg)
 					}
 				}
 			}
 			if !isCertificateFound {
 				return certification.NewRevokeCertificateNotFound()
 			}
-			if len(certificateFailedToAddToRevocationList) > 0 || len(certificateFailedToDeleteFromVaccCertRegistry) > 0 {
-				return NewGenericServerError()
-			}
+
 			return certification.NewRevokeCertificateOK()
 		} else {
 			log.Printf("Error occurred while extracting the certificates from registry response")
 			return NewGenericServerError()
 		}
 	}
-}
-
-func deleteVaccineCertificate(osid string) error {
-	typeId := "VaccinationCertificate"
-	filter := map[string]interface{}{
-		"osid": osid,
-	}
-	if _, err := kernelService.DeleteRegistry(typeId, filter); err != nil {
-		log.Errorf("Error in deleting vaccination certificate %+v", err)
-		return errors.New("error in deleting vaccination certificate")
-	} else {
-		return nil
-	}
-}
-
-func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) error {
-	typeId := "RevokedCertificate"
-	revokeCertificate := map[string]interface{}{
-		"preEnrollmentCode":     preEnrollmentCode,
-		"dose":                  dose,
-		"previousCertificateId": certificateId,
-	}
-	filter := map[string]interface{}{
-		"previousCertificateId": map[string]interface{}{
-			"eq": certificateId,
-		},
-		"dose": map[string]interface{}{
-			"eq": dose,
-		},
-		"preEnrollmentCode": map[string]interface{}{
-			"eq": preEnrollmentCode,
-		},
-	}
-	if resp, err := kernelService.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
-		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
-			if len(revokedCertificate) > 0 {
-				log.Infof("%v certificateId already exists in revocation", certificateId)
-				return nil
-			}
-			_, err = kernelService.CreateNewRegistry(revokeCertificate, typeId)
-			if err != nil {
-				log.Infof("Failed saving revoked Certificate %+v", err)
-				return err
-			}
-			log.Infof("%v certificateId added to revocation", certificateId)
-			return nil
-		}
-	}
-	return errors.New("error occurred while adding certificate to revocation list")
 }
 
 func getCertificateByCertificateId(params certification.GetCertificateByCertificateIDParams, principal *models.JWTClaimBody) middleware.Responder {

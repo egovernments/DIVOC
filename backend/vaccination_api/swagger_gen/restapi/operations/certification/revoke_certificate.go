@@ -29,9 +29,9 @@ func NewRevokeCertificate(ctx *middleware.Context, handler RevokeCertificateHand
 	return &RevokeCertificate{Context: ctx, Handler: handler}
 }
 
-/*RevokeCertificate swagger:route DELETE /v1/certificates certification revokeCertificate
+/*RevokeCertificate swagger:route DELETE /v1/certificates/{preEnrollmentCode} certification revokeCertificate
 
-Revoke certificates for given preEnrollmentCode and dose
+Revoke certificates for given preEnrollmentCode and dose(s)
 
 */
 type RevokeCertificate struct {

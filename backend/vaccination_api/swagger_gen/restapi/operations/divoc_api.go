@@ -593,7 +593,7 @@ func (o *DivocAPI) initHandlerCache() {
 	if o.handlers["DELETE"] == nil {
 		o.handlers["DELETE"] = make(map[string]http.Handler)
 	}
-	o.handlers["DELETE"]["/v1/certificates"] = certification.NewRevokeCertificate(o.context, o.CertificationRevokeCertificateHandler)
+	o.handlers["DELETE"]["/v1/certificates/{preEnrollmentCode}"] = certification.NewRevokeCertificate(o.context, o.CertificationRevokeCertificateHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

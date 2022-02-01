@@ -295,28 +295,36 @@ paths:
           description: OK
           schema:
             type: object
+  /v1/certificates/{preEnrollmentCode}:
     delete:
-      summary: Revoke certificates for given preEnrollmentCode and dose
+      summary: Revoke certificates for given preEnrollmentCode and dose(s)
       tags:
         - certification
       operationId: revokeCertificate
       security: []
       parameters:
         - name: preEnrollmentCode
-          in: query
+          in: path
           required: true
           type: string
           description: refId for which certificate needs to be revoked
-        - name: dose
+        - name: doses
           in: query
           required: false
-          type: number
-          description: dose for which certificate needs to be revoked
+          type: array
+          items:
+            type: integer
+          description: dose(s) for which certificate needs to be revoked
+        - name: allDoses
+          in: query
+          required: false
+          type: boolean
+          description: flag specifying if certificates for all doses for this refId should be revoked
       responses:
         '200':
           description: OK
         '404':
-          description: certificate not found for given beneficiary, dose
+          description: Certificate not found for given beneficiary, dose
         '400':
           description: Invalid input
   /v1/certificates/{certificateId}:
