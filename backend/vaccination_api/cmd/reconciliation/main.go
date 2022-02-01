@@ -12,10 +12,21 @@ import (
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"sort"
+	"sync"
 	"time"
 )
 
 const CERTIFICATE_TYPE_V3 = "certifyV3"
+const RECONCILIATION_TYPE = "precautionaryUpdatePrev"
+
+type ReconciliationStatus string
+
+const (
+	TEMP_ERROR         ReconciliationStatus = "tempError"
+	DATA_ERROR         ReconciliationStatus = "dataError"
+	SUCCESS_RECONCILED ReconciliationStatus = "reconciled"
+	DATA_MATCHED       ReconciliationStatus = "dataMatched"
+)
 
 func getDoseFromCertificate(certificateMap map[string]interface{}) int {
 	if doseValue, found := certificateMap["dose"]; found {
@@ -79,7 +90,7 @@ func compareVaccineDates(metaDate string, dbDate string) (bool, error) {
 
 func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccinationsItems0, dbData *models2.CertificationRequestV2Vaccination) (bool, error) {
 	var err error
-	if requestData.Date == "" {
+	if !strfmt.IsDate(requestData.Date) && !strfmt.IsDateTime(requestData.Date) {
 		log.Error("Invalid vaccination date")
 		return true, errors.New("invalid vaccination date")
 	}
@@ -113,15 +124,23 @@ func CheckDataConsistence(requestData *models2.CertificationRequestV2MetaVaccina
 }
 
 func CreateUpdateRequestObject(certifyMessage *models2.CertificationRequestV2, dbData *models.Certificate,
-	metaData *models2.CertificationRequestV2MetaVaccinationsItems0) *models2.CertificationRequestV2 {
+	metaData *models2.CertificationRequestV2MetaVaccinationsItems0) (*models2.CertificationRequestV2, error) {
 	updateReqV2 := new(models2.CertificationRequestV2)
 	updateReqV2.PreEnrollmentCode = certifyMessage.PreEnrollmentCode
 	updateReqV2.Recipient = certifyMessage.Recipient
-	updateReqV2.Vaccination = createVaccinationInfo(metaData, dbData)
+	updateVaccination, err := createVaccinationInfo(certifyMessage, metaData, dbData)
+	if err != nil {
+		return updateReqV2, err
+	}
+	updateReqV2.Vaccination = updateVaccination
 	updateReqV2.Vaccinator = createVaccinatorInfo(dbData)
-	updateReqV2.Facility = createFacilityInfo(dbData)
+	updateFacility, err := createFacilityInfo(dbData)
+	if err != nil {
+		return updateReqV2, err
+	}
+	updateReqV2.Facility = updateFacility
 	updateReqV2.Meta = createMetaInfo(dbData)
-	return updateReqV2
+	return updateReqV2, nil
 }
 
 func createVaccinatorInfo(dbData *models.Certificate) *models2.CertificationRequestV2Vaccinator {
@@ -130,8 +149,8 @@ func createVaccinatorInfo(dbData *models.Certificate) *models2.CertificationRequ
 	return vaccinator
 }
 
-func createVaccinationInfo(metaData *models2.CertificationRequestV2MetaVaccinationsItems0,
-	dbData *models.Certificate) *models2.CertificationRequestV2Vaccination {
+func createVaccinationInfo(certifyMessage *models2.CertificationRequestV2, metaData *models2.CertificationRequestV2MetaVaccinationsItems0,
+	dbData *models.Certificate) (*models2.CertificationRequestV2Vaccination, error) {
 	vaccinationInfo := new(models2.CertificationRequestV2Vaccination)
 	vaccinationInfo.Date, _ = strfmt.ParseDateTime(metaData.Date)
 	if metaData.Name != "" {
@@ -140,7 +159,11 @@ func createVaccinationInfo(metaData *models2.CertificationRequestV2MetaVaccinati
 		vaccinationInfo.Name = dbData.Evidence[0].Vaccine
 	}
 	vaccinationInfo.Dose = float64(metaData.Dose)
-	vaccinationInfo.TotalDoses = dbData.Evidence[0].TotalDoses.(float64)
+	if totalDoseValue, ok := dbData.Evidence[0].TotalDoses.(float64); ok {
+		vaccinationInfo.TotalDoses = totalDoseValue
+	} else {
+		vaccinationInfo.TotalDoses = certifyMessage.Vaccination.TotalDoses
+	}
 	vaccinationInfo.Batch = metaData.Batch
 	if metaData.Manufacturer != "" {
 		vaccinationInfo.Manufacturer = metaData.Manufacturer
@@ -150,17 +173,19 @@ func createVaccinationInfo(metaData *models2.CertificationRequestV2MetaVaccinati
 	effectiveStart, terr := time.Parse("2006-01-02", dbData.Evidence[0].EffectiveStart)
 	if terr != nil {
 		log.Info("error while parsing effectiveStart Date")
+		return vaccinationInfo, terr
 	}
 	vaccinationInfo.EffectiveStart = strfmt.Date(effectiveStart)
 	effectiveUntil, terr := time.Parse("2006-01-02", dbData.Evidence[0].EffectiveUntil)
 	if terr != nil {
 		log.Info("error while parsing effectiveUntilDate")
+		return vaccinationInfo, terr
 	}
 	vaccinationInfo.EffectiveUntil = strfmt.Date(effectiveUntil)
-	return vaccinationInfo
+	return vaccinationInfo, nil
 }
 
-func createFacilityInfo(dbData *models.Certificate) *models2.CertificationRequestV2Facility {
+func createFacilityInfo(dbData *models.Certificate) (*models2.CertificationRequestV2Facility, error) {
 	facility := new(models2.CertificationRequestV2Facility)
 	facilityInDB := dbData.Evidence[0].Facility
 	facility.Name = facilityInDB.Name
@@ -170,10 +195,14 @@ func createFacilityInfo(dbData *models.Certificate) *models2.CertificationReques
 	facilityAddress.District = facilityInDB.Address.District
 	facilityAddress.State = facilityInDB.Address.AddressRegion
 	if facilityInDB.Address.PostalCode != "" {
-		facilityAddress.Pincode = int64(facilityInDB.Address.PostalCode.(float64))
+		if facilityPincode, ok := facilityInDB.Address.PostalCode.(float64); ok {
+			facilityAddress.Pincode = int64(facilityPincode)
+		} else {
+			return facility, errors.New("invalid pin code for facility")
+		}
 	}
 	facility.Address = facilityAddress
-	return facility
+	return facility, nil
 }
 
 func createMetaInfo(dbData *models.Certificate) *models2.CertificationRequestV2Meta {
@@ -190,6 +219,15 @@ func publishCertifyMessage(request []byte) {
 		kafkaService.MessageHeader{CertificateType: CERTIFICATE_TYPE_V3})
 }
 
+func publishReconciliationEvent(preEnrollmentCode string, reconStatus string) {
+	go kafkaService.PublishReconciliationEvent(models.ReconciliationEvent{
+		Date:                 time.Now(),
+		PreEnrollmentCode:    preEnrollmentCode,
+		ReconciliationType:   RECONCILIATION_TYPE,
+		ReconciliationStatus: reconStatus,
+	})
+}
+
 func getDBVaccinationData(certificate *models.Certificate) *models2.CertificationRequestV2Vaccination {
 	dbData := new(models2.CertificationRequestV2Vaccination)
 	dbData.Batch = certificate.Evidence[0].Batch
@@ -199,7 +237,7 @@ func getDBVaccinationData(certificate *models.Certificate) *models2.Certificatio
 	return dbData
 }
 
-func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
+func reconcileData(certifyMessage *models2.CertificationRequestV2) (ReconciliationStatus, error) {
 	start := time.Now()
 	filter := map[string]interface{}{
 		"preEnrollmentCode": map[string]interface{}{
@@ -208,11 +246,12 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 	}
 	certificateFromRegistry, err := services.QueryRegistry("VaccinationCertificate", filter)
 	if err != nil {
-		return err
+		return TEMP_ERROR, err
 	}
 	certificates := certificateFromRegistry["VaccinationCertificate"].([]interface{})
 	certificates = sortCertificatesByCreateAt(certificates)
 	currentDose := int64(certifyMessage.Vaccination.Dose)
+	reconciliationStatus := DATA_MATCHED
 	if len(certificates) > 0 {
 		certificatesByDose := getDoseWiseCertificates(certificates)
 		for _, metaVaccinationData := range certifyMessage.Meta.Vaccinations {
@@ -228,23 +267,39 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) error {
 			latestDoseCertificate := doseCertificates[len(doseCertificates)-1]
 			if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
 				log.Errorf("Unable to parse certificate string %+v", err)
-				continue
+				return DATA_ERROR, err
 			}
 			dbVaccinationData := getDBVaccinationData(&certificate)
 			isDataConsistent, err := CheckDataConsistence(metaVaccinationData, dbVaccinationData)
 			if err != nil {
 				log.Errorf("Error while checking data consistency %v", err)
-				continue
-			} else if !isDataConsistent {
-				updateRequestObject := CreateUpdateRequestObject(certifyMessage, &certificate, metaVaccinationData)
-				if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
-					publishCertifyMessage(jsonRequestString)
-				}
+				return DATA_ERROR, err
+			}
+			reconciliationStatus, err = publishUpdateRequestForInconsistentData(isDataConsistent, certifyMessage, &certificate, metaVaccinationData)
+			if err != nil {
+				return reconciliationStatus, err
 			}
 		}
 	}
 	log.Infof("Reconciled: %v", time.Since(start))
-	return nil
+	return reconciliationStatus, nil
+}
+
+func publishUpdateRequestForInconsistentData(isDataConsistent bool, certifyMessage *models2.CertificationRequestV2,
+	certificate *models.Certificate, metaVaccinationData *models2.CertificationRequestV2MetaVaccinationsItems0) (ReconciliationStatus, error) {
+	if !isDataConsistent {
+		updateRequestObject, err := CreateUpdateRequestObject(certifyMessage, certificate, metaVaccinationData)
+		if err != nil {
+			return DATA_ERROR, err
+		}
+		if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
+			publishCertifyMessage(jsonRequestString)
+			return SUCCESS_RECONCILED, err
+		} else {
+			return DATA_ERROR, err
+		}
+	}
+	return DATA_MATCHED, nil
 }
 
 func initializeKafka(servers string) {
@@ -256,46 +311,58 @@ func initializeKafka(servers string) {
 	log.Infof("Connected to kafka on %s", servers)
 
 	kafkaService.StartCertifyProducer(producer)
+	kafkaService.StartReconciliationEventProducer(producer)
 }
 
 func main() {
 	config.Initialize()
 	servers := config.Config.Kafka.BootstrapServers
 	initializeKafka(servers)
-	consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  servers,
-		"group.id":           "certificate_reconciliation",
-		"auto.offset.reset":  "latest",
-		"enable.auto.commit": "false",
-	})
-	if err != nil {
-		log.Errorf("error while creating consumer %+v", err)
-		panic(err)
-	}
-	err = consumer.SubscribeTopics([]string{"certify"}, nil)
-	if err != nil {
-		log.Errorf("error while subscribing to consumer %+v", err)
-		panic(err)
-	}
-
-	for {
-		msg, err := consumer.ReadMessage(-1)
-		if err == nil {
-			var message models2.CertificationRequestV2
-			if err := json.Unmarshal(msg.Value, &message); err == nil {
-				if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
-					err := reconcileData(&message)
-					if err != nil {
-						continue
-					}
-				}
-			} else {
-				log.Errorf("Error unmarshaling certify message %s", err)
-			}
-			consumer.CommitMessage(msg)
-		} else {
-			// The client will automatically try to recover from all errors.
-			log.Errorf("Consumer error: %v \n", err)
+	var wg sync.WaitGroup
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		consumer, err := kafka.NewConsumer(&kafka.ConfigMap{
+			"bootstrap.servers":  servers,
+			"group.id":           "certificate_reconciliation",
+			"auto.offset.reset":  "latest",
+			"enable.auto.commit": "false",
+		})
+		if err != nil {
+			log.Errorf("error while creating consumer %+v", err)
+			panic(err)
 		}
-	}
+		err = consumer.SubscribeTopics([]string{"certify"}, nil)
+		if err != nil {
+			log.Errorf("error while subscribing to consumer %+v", err)
+			panic(err)
+		}
+
+		for {
+			msg, err := consumer.ReadMessage(-1)
+			if err == nil {
+				var message models2.CertificationRequestV2
+				if err := json.Unmarshal(msg.Value, &message); err == nil {
+					if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
+						status, err := reconcileData(&message)
+						if err != nil && status == TEMP_ERROR {
+							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
+							continue
+						} else if err != nil && status == DATA_ERROR {
+							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
+						} else if status == DATA_MATCHED || status == SUCCESS_RECONCILED {
+							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
+						}
+					}
+				} else {
+					log.Errorf("Error unmarshaling certify message %s", err)
+				}
+				consumer.CommitMessage(msg)
+			} else {
+				// The client will automatically try to recover from all errors.
+				log.Errorf("Consumer error: %v \n", err)
+			}
+		}
+	}()
+	wg.Wait()
 }

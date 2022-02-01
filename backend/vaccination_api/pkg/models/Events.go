@@ -8,3 +8,10 @@ type Event struct {
 	TypeOfMessage string      `json:"type"`
 	ExtraInfo     interface{} `json:"extra"`
 }
+
+type ReconciliationEvent struct {
+	Date                 time.Time `json:"date"`
+	PreEnrollmentCode    string    `json:"preEnrollmentCode"`
+	ReconciliationType   string    `json:"reconciliationType"`
+	ReconciliationStatus string    `json:"reconciliationStatus"`
+}

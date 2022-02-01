@@ -15,6 +15,7 @@ var producer *kafka.Producer
 
 var messages = make(chan Message)
 var events = make(chan []byte)
+var reconEvents = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
 const CERTIFICATE_TYPE_V2 = "certifyV2"
@@ -43,6 +44,8 @@ func InitializeKafka() {
 	StartCertifyProducer(producer)
 
 	StartEventProducer(producer)
+
+	StartReconciliationEventProducer(producer)
 
 	StartReportedSideEffectsProducer(producer)
 
@@ -172,6 +175,21 @@ func StartEventProducer(producerClient *kafka.Producer) {
 	}()
 }
 
+func StartReconciliationEventProducer(producerClient *kafka.Producer) {
+	go func() {
+		topic := "reconciliationEvents"
+		for {
+			msg := <-reconEvents
+			if err := producerClient.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
 func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte, header MessageHeader) {
 	messages <- Message{
 		UploadId: uploadId,
@@ -186,6 +204,14 @@ func PublishEvent(event models.Event) {
 		log.Errorf("Error in getting json of event %+v", event)
 	} else {
 		events <- messageJson
+	}
+}
+
+func PublishReconciliationEvent(event models.ReconciliationEvent) {
+	if messageJson, err := json.Marshal(event); err != nil {
+		log.Errorf("Error in getting json of event %+v", event)
+	} else {
+		reconEvents <- messageJson
 	}
 }
 
