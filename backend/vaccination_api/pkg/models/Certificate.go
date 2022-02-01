@@ -19,7 +19,7 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 		"from": 84,
 		"to": 112,
 	},
-	"sputnik v": {
+	"sputnik": {
 		"from": 21,
 		"to": 90,
 	},
