@@ -24,7 +24,7 @@ const REDIS_ENABLED = process.env.REDIS_ENABLED || true;
 const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
 const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
 const ENABLE_PROGRAM_ID_CACHING_KEY = process.env.ENABLE_PROGRAM_ID_CACHING_KEY || true;
-const FACILITY_COUNTRY_CODE = process.env.FACILITY_COUNTRY_CODE || 'IND';
+const COUNTRY_CODE = process.env.COUNTRY_CODE || '';
 const IDENTITY_REJECTION_PATTERN = process.env.IDENTITY_REJECTION_PATTERN || "^NA$|^.?$";
 
 module.exports = {
@@ -53,6 +53,6 @@ module.exports = {
   CERTIFICATE_ACK_TOPIC,
   ENABLE_FEEDBACK_URL,
   ENABLE_PROGRAM_ID_CACHING_KEY,
-  FACILITY_COUNTRY_CODE,
+  COUNTRY_CODE,
   IDENTITY_REJECTION_PATTERN
 };
