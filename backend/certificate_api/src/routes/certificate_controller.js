@@ -157,6 +157,7 @@ async function createCertificateQRCode(certificateResp, res, source) {
         let certificateRaw = certificateService.getLatestCertificate(certificateResp);
         const qrCode = await getQRCodeData(certificateRaw.certificate, false);
         res.statusCode = 200;
+        res.setHeader("Content-Type", "image/png");
         sendEvents({
             date: new Date(),
             source: source,
@@ -166,6 +167,7 @@ async function createCertificateQRCode(certificateResp, res, source) {
         return qrCode;
     } else {
         res.statusCode = 404;
+        res.setHeader("Content-Type", "application/json");
         let error = {
             date: new Date(),
             source: source,
@@ -187,6 +189,7 @@ async function createCertificatePDF(certificateResp, res, source) {
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
         const pdfBuffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
         res.statusCode = 200;
+        res.setHeader("Content-Type", "application/pdf");
         sendEvents({
             date: new Date(),
             source: source,
@@ -196,6 +199,7 @@ async function createCertificatePDF(certificateResp, res, source) {
         return pdfBuffer;
     } else {
         res.statusCode = 404;
+        res.setHeader("Content-Type", "application/json");
         let error = {
             date: new Date(),
             source: source,
@@ -248,6 +252,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             country: evidence[0].facility.address.addressCountry
         };
         const pdfBuffer = await createPDF(testCertificateTemplateFilePath, certificateData);
+        res.setHeader("Content-Type", "application/pdf");
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -258,6 +263,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
         return pdfBuffer;
     } else {
         res.statusCode = 404;
+        res.setHeader("Content-Type", "application/json");
         let error = {
             date: new Date(),
             source: source,
@@ -456,6 +462,7 @@ async function certificateAsFHIRJson(req, res) {
         if (!config.DISEASE_CODE || !config.PUBLIC_HEALTH_AUTHORITY || !privateKeyPem) {
             console.error("Some of DISEASE_CODE, PUBLIC_HEALTH_AUTHORITY or privateKeyPem is not set to process EU certificate");
             res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
@@ -492,6 +499,7 @@ async function certificateAsFHIRJson(req, res) {
             }
         } else {
             res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
@@ -523,6 +531,7 @@ async function certificateAsEUPayload(req, res) {
         if (!config.EU_CERTIFICATE_EXPIRY || !config.PUBLIC_HEALTH_AUTHORITY || !euPublicKeyP8 || !euPrivateKeyPem) {
             console.error("Some of EU_CERTIFICATE_EXPIRY, PUBLIC_HEALTH_AUTHORITY, euPublicKeyP8 or euPrivateKeyPem is not set to process EU certificate");
             res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
@@ -541,11 +550,13 @@ async function certificateAsEUPayload(req, res) {
             let buffer ;
             if (type && type.toLowerCase() === QR_TYPE) {
                 buffer = await QRCode.toBuffer(qrUri, {scale: 2})
+                res.setHeader("Content-Type", "image/png");
             } else {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
                 buffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+                res.setHeader("Content-Type", "application/pdf");
             }
 
             res.statusCode = 200;
@@ -559,6 +570,7 @@ async function certificateAsEUPayload(req, res) {
 
         } else {
             res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
@@ -591,6 +603,7 @@ async function certificateAsSHCPayload(req, res) {
         if (!config.SHC_CERTIFICATE_EXPIRY || !config.CERTIFICATE_ISSUER || !shcPrivateKeyPem) {
             console.error("Some of SHC_CERTIFICATE_EXPIRY, CERTIFICATE_ISSUER or shcPrivateKeyPem is not set to process SHC certificate");
             res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
@@ -619,11 +632,13 @@ async function certificateAsSHCPayload(req, res) {
 
             if (type && type.toLowerCase() === QR_TYPE) {
                 buffer = await QRCode.toBuffer(qrUri, {scale: 2})
+                res.setHeader("Content-Type", "image/png");
             } else {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
                 buffer = await createPDF(vaccineCertificateTemplateFilePath, certificateData);
+                res.setHeader("Content-Type", "application/pdf");
             }
 
             res.statusCode = 200;
@@ -637,6 +652,7 @@ async function certificateAsSHCPayload(req, res) {
 
         } else {
             res.statusCode = 404;
+            res.setHeader("Content-Type", "application/json");
             let error = {
                 date: new Date(),
                 source: refId,
