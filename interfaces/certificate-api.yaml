@@ -28,17 +28,12 @@ paths:
       consumes:
         - application/json
       produces:
-        - application/json
+        - application/pdf
       security:
         - Bearer: [ ]
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
@@ -54,14 +49,11 @@ paths:
           in: path
           required: true
           type: string
+      produces:
+        - application/pdf
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
@@ -91,14 +83,11 @@ paths:
         - in: query
           name: certificateId
           type: string
+      produces:
+        - application/pdf
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
@@ -115,12 +104,11 @@ paths:
           in: query
           required: true
           type: string
+      produces:
+        - application/json
       responses:
         '200':
           description: OK
-          content:
-            schema:
-              type: object
         '404':
           description: Not found
         '403':
@@ -137,14 +125,16 @@ paths:
           in: query
           required: true
           type: string
+        - name: type
+          in: query
+          type: string
+          enum: ["qrcode"]
+      produces:
+        - application/pdf
+        - image/png
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
@@ -161,14 +151,16 @@ paths:
           in: query
           required: true
           type: string
+        - name: type
+          in: query
+          type: string
+          enum: ["qrcode"]
+      produces:
+        - application/pdf
+        - image/png
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
@@ -183,14 +175,11 @@ paths:
           in: path
           required: true
           type: string
+      produces:
+        - application/pdf
       responses:
         '200':
           description: OK
-          content:
-            application/pdf:
-              schema:
-                type: string
-                format: binary
         '404':
           description: Not found
         '403':
