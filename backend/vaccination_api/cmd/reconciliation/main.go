@@ -22,10 +22,9 @@ const RECONCILIATION_TYPE = "precautionaryUpdatePrev"
 type ReconciliationStatus string
 
 const (
-	TEMP_ERROR         ReconciliationStatus = "tempError"
-	DATA_ERROR         ReconciliationStatus = "dataError"
-	SUCCESS_RECONCILED ReconciliationStatus = "reconciled"
-	DATA_MATCHED       ReconciliationStatus = "dataMatched"
+	TEMP_ERROR ReconciliationStatus = "tempError"
+	ERROR      ReconciliationStatus = "error"
+	SUCCESS    ReconciliationStatus = "success"
 )
 
 func getDoseFromCertificate(certificateMap map[string]interface{}) int {
@@ -220,12 +219,22 @@ func publishCertifyMessage(request []byte) {
 }
 
 func publishReconciliationEvent(preEnrollmentCode string, reconStatus string) {
-	go kafkaService.PublishReconciliationEvent(models.ReconciliationEvent{
-		Date:                 time.Now(),
-		PreEnrollmentCode:    preEnrollmentCode,
-		ReconciliationType:   RECONCILIATION_TYPE,
-		ReconciliationStatus: reconStatus,
+	go kafkaService.PublishProcStatus(models.ProcStatus{
+		Date:              time.Now(),
+		PreEnrollmentCode: preEnrollmentCode,
+		ProcType:          RECONCILIATION_TYPE,
+		Status:            reconStatus,
 	})
+}
+
+func publishReconErrorRequest(request *models2.CertificationRequestV2) {
+	if jsonRequestString, err := json.Marshal(request); err == nil {
+		go kafkaService.PublishReconErrorRequest(
+			jsonRequestString,
+			nil,
+			nil,
+			kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3})
+	}
 }
 
 func getDBVaccinationData(certificate *models.Certificate) *models2.CertificationRequestV2Vaccination {
@@ -251,7 +260,7 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) (Reconciliati
 	certificates := certificateFromRegistry["VaccinationCertificate"].([]interface{})
 	certificates = sortCertificatesByCreateAt(certificates)
 	currentDose := int64(certifyMessage.Vaccination.Dose)
-	reconciliationStatus := DATA_MATCHED
+	reconciliationStatus := SUCCESS
 	if len(certificates) > 0 {
 		certificatesByDose := getDoseWiseCertificates(certificates)
 		for _, metaVaccinationData := range certifyMessage.Meta.Vaccinations {
@@ -267,13 +276,13 @@ func reconcileData(certifyMessage *models2.CertificationRequestV2) (Reconciliati
 			latestDoseCertificate := doseCertificates[len(doseCertificates)-1]
 			if err := json.Unmarshal([]byte(latestDoseCertificate["certificate"].(string)), &certificate); err != nil {
 				log.Errorf("Unable to parse certificate string %+v", err)
-				return DATA_ERROR, err
+				return ERROR, err
 			}
 			dbVaccinationData := getDBVaccinationData(&certificate)
 			isDataConsistent, err := CheckDataConsistence(metaVaccinationData, dbVaccinationData)
 			if err != nil {
 				log.Errorf("Error while checking data consistency %v", err)
-				return DATA_ERROR, err
+				return ERROR, err
 			}
 			reconciliationStatus, err = publishUpdateRequestForInconsistentData(isDataConsistent, certifyMessage, &certificate, metaVaccinationData)
 			if err != nil {
@@ -290,16 +299,16 @@ func publishUpdateRequestForInconsistentData(isDataConsistent bool, certifyMessa
 	if !isDataConsistent {
 		updateRequestObject, err := CreateUpdateRequestObject(certifyMessage, certificate, metaVaccinationData)
 		if err != nil {
-			return DATA_ERROR, err
+			return ERROR, err
 		}
 		if jsonRequestString, err := json.Marshal(updateRequestObject); err == nil {
 			publishCertifyMessage(jsonRequestString)
-			return SUCCESS_RECONCILED, err
+			return SUCCESS, err
 		} else {
-			return DATA_ERROR, err
+			return ERROR, err
 		}
 	}
-	return DATA_MATCHED, nil
+	return SUCCESS, nil
 }
 
 func initializeKafka(servers string) {
@@ -311,7 +320,8 @@ func initializeKafka(servers string) {
 	log.Infof("Connected to kafka on %s", servers)
 
 	kafkaService.StartCertifyProducer(producer)
-	kafkaService.StartReconciliationEventProducer(producer)
+	kafkaService.StartProcStatusEventProducer(producer)
+	kafkaService.StartReconErrorRequestProducer(producer)
 }
 
 func main() {
@@ -345,13 +355,11 @@ func main() {
 				if err := json.Unmarshal(msg.Value, &message); err == nil {
 					if message.Meta != nil && message.Meta.Vaccinations != nil && len(message.Meta.Vaccinations) != 0 {
 						status, err := reconcileData(&message)
+						publishReconciliationEvent(message.PreEnrollmentCode, string(status))
 						if err != nil && status == TEMP_ERROR {
-							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
 							continue
-						} else if err != nil && status == DATA_ERROR {
-							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
-						} else if status == DATA_MATCHED || status == SUCCESS_RECONCILED {
-							publishReconciliationEvent(message.PreEnrollmentCode, string(status))
+						} else if status == ERROR {
+							publishReconErrorRequest(&message)
 						}
 					}
 				} else {

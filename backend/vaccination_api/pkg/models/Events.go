@@ -9,9 +9,9 @@ type Event struct {
 	ExtraInfo     interface{} `json:"extra"`
 }
 
-type ReconciliationEvent struct {
-	Date                 time.Time `json:"date"`
-	PreEnrollmentCode    string    `json:"preEnrollmentCode"`
-	ReconciliationType   string    `json:"reconciliationType"`
-	ReconciliationStatus string    `json:"reconciliationStatus"`
+type ProcStatus struct {
+	PreEnrollmentCode string    `json:"preEnrollmentCode"`
+	Status            string    `json:"status"`
+	ProcType          string    `json:"procType"`
+	Date              time.Time `json:"date"`
 }
