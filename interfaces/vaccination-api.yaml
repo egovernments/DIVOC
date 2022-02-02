@@ -301,6 +301,8 @@ paths:
       tags:
         - certification
       operationId: revokeCertificate
+      produces:
+        - application/json
       parameters:
         - name: preEnrollmentCode
           in: path
