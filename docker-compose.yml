@@ -207,6 +207,8 @@ services:
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
       COUNTRY_CODE: "IND"
       FACILITY_COUNTRY_CODE: "IND"
+      ETCD_URL: etcd:2379
+      CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
         condition: service_healthy
