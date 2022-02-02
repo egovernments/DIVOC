@@ -103,12 +103,8 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
-      await configLayerObj.getICDMappings(MAPPINGS_KEYS.ICD).then(icd11Mappings => {
-        ICD11_MAPPINGS = JSON.parse(icd11Mappings);
-      });
-      await configLayerObj.getICDMappings(MAPPINGS_KEYS.VACCINE_ICD).then(vaccineIcd11Mappings => {
-        VACCINE_ICD11_MAPPINGS = JSON.parse(vaccineIcd11Mappings);
-      });
+      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getICDMappings(MAPPINGS_KEYS.ICD));
+      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getICDMappings(MAPPINGS_KEYS.VACCINE_ICD))
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());

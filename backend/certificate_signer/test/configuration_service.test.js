@@ -10,7 +10,7 @@ describe('should retrieve all mappings if correct configuration layer passed', (
         return mockConfig;
     });
     console.log = jest.fn();
-    const {ConfigLayer, init} = require('../etcd_configuration_service');
+    const {ConfigLayer, init} = require('../configuration_service');
     var getFn = {
         string: jest.fn()
                 .mockReturnValueOnce(new Promise((resolve, reject) => {
@@ -80,7 +80,7 @@ describe('wrong environment variable for configuration layer', () => {
     jest.mock('../config/config', () => {
         return mockConfig;
     });
-    const services = require('../etcd_configuration_service');
+    const services = require('../configuration_service');
     beforeEach(() => {
         services.init();
     });

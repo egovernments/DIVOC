@@ -2,7 +2,7 @@ const {Etcd3} = require('etcd3');
 const config = require('./config/config');
 const {MAPPINGS_KEYS} = require('./config/constants');
 
-let ICD11_MAPPINGS = null, VACCINE_ICD11_MAPPINGS = null
+let ICD11_MAPPINGS = null, VACCINE_ICD11_MAPPINGS = null;
 let etcdClient;
 let configuration;
 
