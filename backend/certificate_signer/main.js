@@ -8,6 +8,7 @@ const {
   CERTIFICATE_INFO_BASE_URL,
   IDENTITY_REJECTION_PATTERN,
   COUNTRY_CODE,
+  FACILITY_COUNTRY_CODE,
   ENABLE_FEEDBACK_URL
 } = require ("./config/config");
 const {Kafka} = require('kafkajs');
@@ -222,7 +223,7 @@ function transformW3(cert, certificateId) {
   const facilityAddressDistrict = R.pathOr('', ['facility', 'address', 'district'], cert);
   const facilityAddressCity = R.pathOr('', ['facility', 'address', 'city'], cert);
   const facilityAddressRegion = R.pathOr('', ['facility', 'address', 'state'], cert);
-  const facilityAddressCountry = R.pathOr(config.COUNTRY_CODE, ['facility', 'address', 'country'], cert);
+  const facilityAddressCountry = R.pathOr(config.FACILITY_COUNTRY_CODE, ['facility', 'address', 'country'], cert);
   const facilityAddressPostalCode = R.pathOr('', ['facility', 'address', 'pincode'], cert);
 
   let data = {
