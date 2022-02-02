@@ -65,6 +65,7 @@ var Config = struct {
 		ErrorCertificateTopic    string `default:"error_certificate" env:"ERROR_CERTIFICATE_TOPIC" yaml:"ErrorCertificateTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		ProcStatusTopic			 string `default:"proc_status" yaml:"procStatusTopic"`
 		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
 	}
 	Database struct {

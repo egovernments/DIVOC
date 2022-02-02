@@ -154,6 +154,18 @@ dt Date
 	}
 
 	_, err = connect.Exec(`
+CREATE TABLE IF NOT EXISTS procStatusV1 (
+preEnrollmentCode String,
+status String,
+procType String,
+dt Date
+) engine = MergeTree() order by dt
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	_, err = connect.Exec(`
 ALTER TABLE certifiedv1 ADD COLUMN IF NOT EXISTS updatedCertificate UInt8, ADD COLUMN IF NOT EXISTS previousCertificateId String;
 `)
 	if err != nil {
@@ -171,6 +183,7 @@ ALTER TABLE certifiedv1 ADD COLUMN IF NOT EXISTS updatedCertificate UInt8, ADD C
 	go startCertificateEventConsumer(err, connect, saveCertifiedEventV1, config.Config.Kafka.CertifiedTopic, "latest")
 	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveProcStatusEvent, config.Config.Kafka.ProcStatusTopic, "earliest")
 	wg.Wait()
 }
 
@@ -264,6 +277,40 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) error {
 		event.Source,
 		event.TypeOfMessage,
 		info,
+	); err != nil {
+		log.Errorf("Error in saving %+v", err)
+	}
+
+	defer stmt.Close()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return nil
+}
+
+func saveProcStatusEvent(connect *sql.DB, msg string) error {
+	event := models.ProcStatus{}
+	if err := json.Unmarshal([]byte(msg), &event); err != nil {
+		log.Errorf("Kafka message unmarshalling error %+v", err)
+		return errors.New("kafka message unmarshalling failed")
+	}
+	// push to click house - todo: batch it
+	var (
+		tx, _     = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO procStatusV1 
+	(  preEnrollmentCode,
+	status,
+	procType,dt ) 
+	VALUES (?,?,?,?)`)
+	)
+	if err != nil {
+		log.Infof("Error in preparing stmt %+v", err)
+	}
+	if _, err := stmt.Exec(
+		event.PreEnrollmentCode,
+		event.Status,
+		event.ProcType,
+		event.Date,
 	); err != nil {
 		log.Errorf("Error in saving %+v", err)
 	}
