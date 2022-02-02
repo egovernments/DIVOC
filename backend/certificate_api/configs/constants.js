@@ -51,9 +51,16 @@ const VACCINE_MANUF = {
   "novavax": "ORG-100032020"
 };
 
+const TEMPLATES = {
+  VACCINE: "vaccineCertificateTemplate",
+  TEST: "testCertificateTemplate"
+};
+Object.freeze(TEMPLATES);
+
 module.exports = {
   EU_DISEASE,
   EU_VACCINE_PROPH,
   EU_VACCINE_CODE,
-  VACCINE_MANUF
+  VACCINE_MANUF,
+  TEMPLATES
 }

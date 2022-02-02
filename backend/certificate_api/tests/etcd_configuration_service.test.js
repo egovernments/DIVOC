@@ -1,13 +1,9 @@
 const etcd3 = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 jest.mock('sanitize-html');
-const redisService = require('../src/services/redis_service');
+const {TEMPLATES} = require('../configs/constants');
 jest.mock('../src/services/redis_service');
 console.log = jest.fn();
-const Templates = {
-    VACCINE: "vaccineCertificateTemplate",
-    TEST: "testCertificateTemplate"
-}
 const html = `<html>
         <head>
             <title>Dummy</title>
@@ -61,14 +57,14 @@ jest.mock('etcd3', () => {
     }
 });
 const etcd_configuration = require('../src/services/etcd_configuration_service');
-
+etcd_configuration.init();
 test('should instantiate Etcd3', () => {
     expect(etcd3.Etcd3).toHaveBeenCalled();
 });
 
 test('should call sanitizeHtml method 2 times each for getCertificateTemplate method of VaccineCertificateTemplate and TestCertificateTemplate for valid configuration passed', async() => {
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINE));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST));
     expect(sanitizeHtml).toHaveBeenCalledTimes(2);
     expect(sanitizeHtml).toHaveBeenCalledWith(html, {
         allowedTags: false,
@@ -90,15 +86,6 @@ test('should call watch method to watch for changes in etcd', () => {
     expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(2);
 });
 
-test('should get template from redis when present', async() => {
-    jest.spyOn(redisService, 'checkIfKeyExists').mockImplementation(() => true)
-    jest.spyOn(redisService, 'getValueAsync').mockReturnValueOnce('abc').mockReturnValueOnce('def');
-    const vaccineTemplate = (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
-    const testTemplate = (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
-    expect(vaccineTemplate).toEqual('abc');
-    expect(testTemplate).toEqual('def');
-});
-
 describe('environment variables', () => {
     const OLD_ENV = process.env;
     beforeEach(() => {
@@ -113,8 +100,8 @@ describe('environment variables', () => {
     });
     test('should return null when invalid configuration passed to VaccineCertificateTemplate and TestCertificateTemplate', async() => {
         let configuration = require('../src/services/etcd_configuration_service');
-        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(Templates.VACCINE));
-        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(Templates.TEST));
+        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINE));
+        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST));
         expect(vaccineTemplate).toEqual(null);
         expect(testTemplate).toEqual(null);
     });

@@ -13,18 +13,13 @@ const config = require('../../configs/config');
 const dcc = require("@pathcheck/dcc-sdk");
 const shc = require("@pathcheck/shc-sdk");
 const keyUtils = require("../services/key_utils");
-const { CertificateTemplate } = require('../services/etcd_configuration_service');
-
+const { CertificateTemplate, init } = require('../services/etcd_configuration_service');
+const {TEMPLATES} = require('../../configs/constants');
 const QR_TYPE = "qrcode";
-const Templates = {
-    VACCINE: "vaccineCertificateTemplate",
-    TEST: "testCertificateTemplate"
-};
-Object.freeze(Templates);
 
+init();
 let shcKeyPair = [];
 const certificateTemplate = new CertificateTemplate();
-
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
@@ -187,9 +182,10 @@ async function createCertificatePDF(certificateResp, res, source) {
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-        let htmlData;
+        const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINE);
+        let pdfBuffer;
         try {
-            htmlData = await certificateTemplate.getCertificateTemplate(Templates.VACCINE);
+            pdfBuffer = await createPDF(htmlData, certificateData);
         } catch(err) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
@@ -202,7 +198,6 @@ async function createCertificatePDF(certificateResp, res, source) {
             sendEvents(error);
             return;
         }
-        const pdfBuffer = await createPDF(htmlData, certificateData);
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -264,9 +259,10 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
         };
-        let htmlData;
+        const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.TEST);;
+        let pdfBuffer;
         try {
-            htmlData = await certificateTemplate.getCertificateTemplate(Templates.TEST);
+            pdfBuffer = await createPDF(htmlData, certificateData);
         } catch(err) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
@@ -279,7 +275,6 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             sendEvents(error);
             return;
         }
-        const pdfBuffer = await createPDF(htmlData, certificateData);
         res.statusCode = 200;
         sendEvents({
             date: new Date(),
@@ -576,9 +571,9 @@ async function certificateAsEUPayload(req, res) {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-                let htmlData;
+                const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINE);;
                 try {
-                    htmlData = await certificateTemplate.getCertificateTemplate(Templates.VACCINE);
+                    buffer = await createPDF(htmlData, certificateData);
                 } catch(err) {
                     res.statusCode = 500;
                     res.setHeader("Content-Type", "application/json");
@@ -591,7 +586,6 @@ async function certificateAsEUPayload(req, res) {
                     sendEvents(error);
                     return;
                 }
-                buffer = await createPDF(htmlData, certificateData);
             }
 
             res.statusCode = 200;
@@ -669,9 +663,9 @@ async function certificateAsSHCPayload(req, res) {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-                let htmlData;
+                const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINE);;
                 try {
-                    htmlData = await certificateTemplate.getCertificateTemplate(Templates.VACCINE);
+                    buffer = await createPDF(htmlData, certificateData);
                 } catch(err) {
                     res.statusCode = 500;
                     res.setHeader("Content-Type", "application/json");
@@ -684,7 +678,6 @@ async function certificateAsSHCPayload(req, res) {
                     sendEvents(error);
                     return;
                 }
-                buffer = await createPDF(htmlData, certificateData);
             }
 
             res.statusCode = 200;

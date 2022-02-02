@@ -2,29 +2,17 @@ const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 
 const config = require('../../configs/config');
-const {storeKeyWithExpiry, getValueAsync, checkIfKeyExists, initRedis, deleteKey} = require('./redis_service');
-
+const {TEMPLATES} = require('../../configs/constants');
 let etcdClient;
-const vaccineCertificateKey = 'vaccineCertificateTemplate';
-const testCertificateKey = 'testCertificateTemplate';
 let configuration;
-(async() => {
+let vaccineCertificateTemplate = null, testCertificateTemplate = null;
+
+function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
-  setUpWatcher(vaccineCertificateKey);
-  setUpWatcher(testCertificateKey);
-  await initRedis(config);
+  setUpWatcher(TEMPLATES.VACCINE);
+  setUpWatcher(TEMPLATES.TEST);
   configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd(): null ;
-})();
-
-async function getTemplateFromCache(key) {
-  const isKeyPresent = await checkIfKeyExists(key);
-  let template;
-  if(isKeyPresent) {
-    template = await getValueAsync(key);
-  }
-  return template;
 }
-
 
 function cleanHTML(html) {
   if(html === null) {
@@ -47,6 +35,17 @@ function cleanHTML(html) {
   return cleanedHtml;
 }
 
+function updateTemplate(templateKey, template) {
+  switch(templateKey) {
+    case TEMPLATES.VACCINE:
+      vaccineCertificateTemplate = template;
+      break;
+    case TEMPLATES.TEST:
+      testCertificateTemplate = template;
+      break;
+  }
+}
+
 function setUpWatcher(templateKey) {
   etcdClient.watch()
     .key(templateKey)
@@ -60,7 +59,7 @@ function setUpWatcher(templateKey) {
         console.log('connected');
       })
       .on('put', res => {
-        deleteKey(templateKey);
+        updateTemplate(templateKey, res.value.toString());
       });
     })
     .catch(err => {
@@ -68,16 +67,28 @@ function setUpWatcher(templateKey) {
     });
 }
 
+function loadCertificateTemplate(key) {
+  let certificateTemplate;
+  switch(key) {
+    case TEMPLATES.VACCINE:
+      certificateTemplate = vaccineCertificateTemplate;
+      break;
+    case TEMPLATES.TEST:
+      certificateTemplate = testCertificateTemplate;
+      break;
+  }
+  return certificateTemplate;
+}
+
 class CertificateTemplate {
   async getCertificateTemplate(key) {
-    let certificateTemplate = await getTemplateFromCache(key);
+    let certificateTemplate = loadCertificateTemplate(key);
     if(certificateTemplate === null || certificateTemplate === undefined) {
-      if(configuration === null) {
+      if(configuration === null || configuration === undefined) {
         return null;
       }
       certificateTemplate = await configuration.getCertificateTemplate(key);
       certificateTemplate = cleanHTML(certificateTemplate);
-      storeKeyWithExpiry(key, certificateTemplate);
     }
     return certificateTemplate;
   }
@@ -91,5 +102,5 @@ const etcd = function() {
 }
 
 module.exports = {
-  CertificateTemplate
+  CertificateTemplate, init
 }
