@@ -51,7 +51,6 @@ paths:
           type: string
       produces:
         - application/pdf
-        - image/png
       responses:
         '200':
           description: OK
