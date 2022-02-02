@@ -89,6 +89,7 @@ class CertificateTemplate {
       }
       certificateTemplate = await configuration.getCertificateTemplate(key);
       certificateTemplate = cleanHTML(certificateTemplate);
+      updateTemplate(key, certificateTemplate);
     }
     return certificateTemplate;
   }
