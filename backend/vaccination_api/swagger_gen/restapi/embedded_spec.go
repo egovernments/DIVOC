@@ -247,7 +247,6 @@ func init() {
     },
     "/v1/certificates/{preEnrollmentCode}": {
       "delete": {
-        "security": [],
         "tags": [
           "certification"
         ],
@@ -285,7 +284,7 @@ func init() {
             "description": "Invalid input"
           },
           "404": {
-            "description": "certificate not found for given beneficiary, dose"
+            "description": "Certificate not found for given beneficiary, dose"
           }
         }
       }
@@ -1948,7 +1947,6 @@ func init() {
     },
     "/v1/certificates/{preEnrollmentCode}": {
       "delete": {
-        "security": [],
         "tags": [
           "certification"
         ],
@@ -1986,7 +1984,7 @@ func init() {
             "description": "Invalid input"
           },
           "404": {
-            "description": "certificate not found for given beneficiary, dose"
+            "description": "Certificate not found for given beneficiary, dose"
           }
         }
       }

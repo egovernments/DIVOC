@@ -758,7 +758,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 	return certificate_revoked.NewCertificateRevokedBadRequest()
 }
 
-func revokeCertificate(params certification.RevokeCertificateParams) middleware.Responder {
+func revokeCertificate(params certification.RevokeCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 	if params.PreEnrollmentCode == "" {
 		return certification.NewRevokeCertificateBadRequest()
 	}

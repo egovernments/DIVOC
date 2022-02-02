@@ -119,7 +119,7 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		ConfigurationGetVaccinatorsHandler: configuration.GetVaccinatorsHandlerFunc(func(params configuration.GetVaccinatorsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation configuration.GetVaccinators has not yet been implemented")
 		}),
-		CertificationRevokeCertificateHandler: certification.RevokeCertificateHandlerFunc(func(params certification.RevokeCertificateParams) middleware.Responder {
+		CertificationRevokeCertificateHandler: certification.RevokeCertificateHandlerFunc(func(params certification.RevokeCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.RevokeCertificate has not yet been implemented")
 		}),
 		CertificationTestBulkCertifyHandler: certification.TestBulkCertifyHandlerFunc(func(params certification.TestBulkCertifyParams, principal *models.JWTClaimBody) middleware.Responder {

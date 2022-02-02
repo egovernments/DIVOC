@@ -9,19 +9,21 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime/middleware"
+
+	"github.com/divoc/api/swagger_gen/models"
 )
 
 // RevokeCertificateHandlerFunc turns a function with the right signature into a revoke certificate handler
-type RevokeCertificateHandlerFunc func(RevokeCertificateParams) middleware.Responder
+type RevokeCertificateHandlerFunc func(RevokeCertificateParams, *models.JWTClaimBody) middleware.Responder
 
 // Handle executing the request and returning a response
-func (fn RevokeCertificateHandlerFunc) Handle(params RevokeCertificateParams) middleware.Responder {
-	return fn(params)
+func (fn RevokeCertificateHandlerFunc) Handle(params RevokeCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+	return fn(params, principal)
 }
 
 // RevokeCertificateHandler interface for that can handle valid revoke certificate params
 type RevokeCertificateHandler interface {
-	Handle(RevokeCertificateParams) middleware.Responder
+	Handle(RevokeCertificateParams, *models.JWTClaimBody) middleware.Responder
 }
 
 // NewRevokeCertificate creates a new http.Handler for the revoke certificate operation
@@ -46,12 +48,25 @@ func (o *RevokeCertificate) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	}
 	var Params = NewRevokeCertificateParams()
 
+	uprinc, aCtx, err := o.Context.Authorize(r, route)
+	if err != nil {
+		o.Context.Respond(rw, r, route.Produces, route, err)
+		return
+	}
+	if aCtx != nil {
+		r = aCtx
+	}
+	var principal *models.JWTClaimBody
+	if uprinc != nil {
+		principal = uprinc.(*models.JWTClaimBody) // this is really a models.JWTClaimBody, I promise
+	}
+
 	if err := o.Context.BindValidRequest(r, route, &Params); err != nil { // bind params
 		o.Context.Respond(rw, r, route.Produces, route, err)
 		return
 	}
 
-	res := o.Handler.Handle(Params) // actually handle the request
+	res := o.Handler.Handle(Params, principal) // actually handle the request
 
 	o.Context.Respond(rw, r, route.Produces, route, res)
 

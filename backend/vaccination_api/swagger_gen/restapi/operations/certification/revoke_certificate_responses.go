@@ -62,7 +62,7 @@ func (o *RevokeCertificateBadRequest) WriteResponse(rw http.ResponseWriter, prod
 // RevokeCertificateNotFoundCode is the HTTP code returned for type RevokeCertificateNotFound
 const RevokeCertificateNotFoundCode int = 404
 
-/*RevokeCertificateNotFound certificate not found for given beneficiary, dose
+/*RevokeCertificateNotFound Certificate not found for given beneficiary, dose
 
 swagger:response revokeCertificateNotFound
 */
