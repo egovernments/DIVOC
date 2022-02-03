@@ -17,7 +17,7 @@ func SendSMS(mobileNumber string, message string) (map[string]interface{}, error
 			"authkey":      config.Config.SmsAPI.AuthKey,
 			"Content-Type": "application/json",
 		}
-		log.Info("SMS request ", smsRequest)
+		log.Info("SMS request ", config.Config.SmsAPI.URL, header, smsRequest)
 		response, err := req.Post(config.Config.SmsAPI.URL, header, req.BodyJSON(smsRequest))
 		if err != nil {
 			return nil, nil
