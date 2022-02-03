@@ -22,9 +22,10 @@ var Config = struct {
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
 	}
 	SmsAPI struct {
-		URL     string `env:"SMS_URL" default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`
-		AuthKey string `env:"SMS_AUTH_KEY" default:"" yaml:"authKey"`
-		Enable  bool   `env:"ENABLE_SMS" yaml:"enable"`
+		URL             string `env:"SMS_URL" default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`
+		AuthKey         string `env:"SMS_AUTH_KEY" default:"" yaml:"authKey"`
+		Enable          bool   `env:"ENABLE_SMS" yaml:"enable"`
+		RequestTemplate string `env:"SMS_REQUEST_TEMPLATE" yaml:"requestTemplate" default:""`
 	}
 	EmailSMTP struct {
 		FromAddress string `env:"SENDER_EMAIL" yaml:"fromAddress"`

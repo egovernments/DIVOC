@@ -1,22 +1,18 @@
 package services
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/divoc/notification-service/config"
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
+	"text/template"
 )
 
 func SendSMS(mobileNumber string, message string) (map[string]interface{}, error) {
 	if config.Config.SmsAPI.Enable {
-		smsRequest := map[string]interface{}{
-			"sender": "SOCKET",
-			"route":  "4",
-			//TODO: get from certificate context
-			"country": "91",
-			"unicode": "1",
-			"sms":     []map[string]interface{}{{"message": message, "to": []string{mobileNumber}}},
-		}
+		smsRequest := GetSmsRequestPayload(message, mobileNumber)
 		header := req.Header{
 			"authkey":      config.Config.SmsAPI.AuthKey,
 			"Content-Type": "application/json",
@@ -43,4 +39,21 @@ func SendSMS(mobileNumber string, message string) (map[string]interface{}, error
 	}
 	log.Infof("SMS notifier disabled")
 	return nil, nil
+}
+
+func GetSmsRequestPayload(message string, mobileNumber string) map[string]interface{} {
+	smsRequestTemplate := template.Must(template.New("").Parse(config.Config.SmsAPI.RequestTemplate))
+	buf := bytes.Buffer{}
+	if err := smsRequestTemplate.Execute(&buf, map[string]interface{}{
+		"message": message,
+		"to":      mobileNumber,
+	}); err == nil {
+		smsRequest := make(map[string]interface{})
+		if err = json.Unmarshal(buf.Bytes(), &smsRequest); err == nil {
+			return smsRequest
+		} else {
+			log.Error(err)
+		}
+	}
+	return nil
 }
