@@ -200,7 +200,7 @@ func StartEventProducer(producerClient *kafka.Producer) {
 
 func StartProcStatusEventProducer(producerClient *kafka.Producer) {
 	go func() {
-		topic := "proc_status"
+		topic := config.Config.Kafka.ProcStatusTopic
 		for {
 			msg := <-procStatusEvents
 			if err := producerClient.Produce(&kafka.Message{

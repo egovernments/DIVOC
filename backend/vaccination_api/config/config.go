@@ -65,6 +65,7 @@ var Config = struct {
 		ErrorCertificateTopic    string `default:"error_certificate" env:"ERROR_CERTIFICATE_TOPIC" yaml:"ErrorCertificateTopic"`
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
+		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
 		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
 	}
 	Database struct {
@@ -83,7 +84,7 @@ var Config = struct {
 		Upload struct {
 			Columns string `yaml:"columns"`
 		}
-		UpdateLimit int `env:"CERTIFICATE_UPDATE_LIMIT" default:"1"`
+		UpdateLimit          int `env:"CERTIFICATE_UPDATE_LIMIT" default:"1"`
 		CacheRecentThreshold int `env:"CERTIFICATE_CACHE_RECENT_THRESHOLD_DAYS" default:"2"`
 	}
 	Clickhouse struct {
@@ -95,10 +96,10 @@ var Config = struct {
 		DocType     string `env:"DIGILOCKER_DOCTYPE"`
 	}
 	Acknowledgement struct {
-		CallbackAuthUrl string `env:"ACK_CALLBACK_AUTH_URL"`
-		CallbackAuthKey     string `env:"ACK_CALLBACK_AUTH_KEY"`
-		CallbackAuthExpiryMinutes int `default:"10" env:"ACK_CALLBACK_AUTH_TOKEN_EXPIRY"`
-		CallbackUrl     string `env:"ACK_CALLBACK_URL"`
+		CallbackAuthUrl           string `env:"ACK_CALLBACK_AUTH_URL"`
+		CallbackAuthKey           string `env:"ACK_CALLBACK_AUTH_KEY"`
+		CallbackAuthExpiryMinutes int    `default:"10" env:"ACK_CALLBACK_AUTH_TOKEN_EXPIRY"`
+		CallbackUrl               string `env:"ACK_CALLBACK_URL"`
 	}
 	PollingStatesCSV string `default:"" yaml:"pollingstates" env:"POLLING_STATES"`
 }{}
