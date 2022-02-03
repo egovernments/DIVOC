@@ -1,2 +1,3 @@
 requests
 pytest
+etcd3

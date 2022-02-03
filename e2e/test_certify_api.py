@@ -4,9 +4,12 @@ import sys
 import time
 import utils
 import random
+import etcd3
 
 VACCINATION_API = "http://vaccination_api:8000" + "/divoc/api/v1/"
 CERTIFY_REQUEST_BODY = "test_data/certify.json"
+ICD_REQUEST_BODY = "test_data/icd.json"
+VACCINE_ICD_REQUEST_BODY = "test_data/vaccine_icd.json"
 
 def service_check():
     try:
@@ -27,6 +30,11 @@ def call_and_verify():
         'Authorization' : 'Bearer ' + utils.fetch_auth_token(),
         'Content-Type': 'application/json'
     }
+    icd_data = json.load(open(ICD_REQUEST_BODY))
+    vaccine_icd_data = json.load(open(VACCINE_ICD_REQUEST_BODY))
+    etcd = etcd3.client(host='etcd')
+    etcd.put('ICD', str(icd_data).replace("'", '"'))
+    etcd.put('VACCINE_ICD', str(vaccine_icd_data).replace("'", '"'))
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
     certify_data["preEnrollmentCode"] = cid
     certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
@@ -47,6 +55,8 @@ def call_and_verify():
         print("No new Certificate found")
         time.sleep(5)
     assert len(new_certs) == len(old_certs) + 1, "Cerrificate creation failed"
+    etcd.delete('ICD')
+    etcd.delete('VACCINE_ICD')
 
 def test_certify():
     test_ran = False
