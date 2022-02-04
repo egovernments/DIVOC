@@ -215,6 +215,20 @@ func TestUpdateDateAndVaccine(t *testing.T) {
 	}
 }
 
+func TestUpdateDateAndVaccineWithIncorrectTotalDoses(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	signedCertificateFromDB := getMockSignedCertificateData(t)
+	signedCertificateFromDB.Evidence[0].TotalDoses = ""
+	expectedUpdateReqObject := getMockUpdateRequestObject(t)
+	updateReqObject, err := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	if err != nil {
+		t.Error(err)
+	}
+	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
+		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject.Facility.Address, *updateReqObject.Facility.Address)
+	}
+}
+
 func TestUpdateDateAndBatchNumber(t *testing.T) {
 	certifyMessage := getMockCertifyRequestV2(t)
 	signedCertificateFromDB := getMockSignedCertificateData(t)
