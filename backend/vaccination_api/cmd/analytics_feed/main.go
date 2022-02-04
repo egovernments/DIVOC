@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg"
 	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
@@ -519,7 +520,7 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) error {
 		evidence.EffectiveStart,
 		evidence.EffectiveUntil,
 		evidence.Dose,
-		evidence.TotalDoses,
+		pkg.ToInt(evidence.TotalDoses),
 
 		evidence.Facility.Name,
 		"IN",
