@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/models"
+	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"time"
@@ -135,12 +137,19 @@ func initializeRevokeCertificate() {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-
-			if err := handleCertificateRevocationMessage(string(msg.Value)); err == nil {
+			preEnrollmentCode, revokeStatus, _ := handleCertificateRevocationMessage(string(msg.Value))
+			if revokeStatus == SUCCESS {
 				c.CommitMessage(msg)
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
+				services.PublishRevokeCertificateErrorMessage(msg.Value)
 			}
+			services.PublishProcStatus(models.ProcStatus{
+				Date:              time.Now(),
+				PreEnrollmentCode: preEnrollmentCode,
+				ProcType:          "revoke_cert",
+				Status:            string(revokeStatus),
+			})
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)

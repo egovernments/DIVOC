@@ -64,6 +64,8 @@ var Config = struct {
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 		RevokeCertTopic          string `default:"revoke_cert" yaml:"revokeCertTopic"`
+		RevokeCertErrTopic       string `default:"revoke_cert_err" yaml:"revokeCertErrTopic"`
+		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`

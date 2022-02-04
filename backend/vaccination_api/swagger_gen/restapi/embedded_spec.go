@@ -247,6 +247,9 @@ func init() {
     },
     "/v1/certificates/{preEnrollmentCode}": {
       "delete": {
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "certification"
         ],
@@ -1947,6 +1950,9 @@ func init() {
     },
     "/v1/certificates/{preEnrollmentCode}": {
       "delete": {
+        "produces": [
+          "application/json"
+        ],
         "tags": [
           "certification"
         ],

@@ -15,13 +15,21 @@ type RevokeCertificateRequest struct {
 	CertificateBody   map[string]interface{} `json:"certificateBody"`
 }
 
-func handleCertificateRevocationMessage(msg string) error {
-	log.Infof("In handleCertificateRevocationMessage %+v", msg)
+type RevocationStatus string
+
+const (
+	TEMP_ERROR RevocationStatus = "tempError"
+	ERROR      RevocationStatus = "error"
+	SUCCESS    RevocationStatus = "success"
+)
+
+func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, error) {
+	log.Debugf("In handleCertificateRevocationMessage %+v", msg)
 	var revokeCertificateMessage RevokeCertificateRequest
 
 	if err := json.Unmarshal([]byte(msg), &revokeCertificateMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return errors.New("kafka message unmarshalling failed")
+		return "unknown", ERROR, errors.New("kafka message unmarshalling failed")
 	}
 
 	certificateBody := revokeCertificateMessage.CertificateBody
@@ -29,38 +37,41 @@ func handleCertificateRevocationMessage(msg string) error {
 
 	certificateId := certificateBody["certificateId"].(string)
 
-	if err := deleteVaccineCertificate(certificateBody["osid"].(string)); err != nil {
+	if status, err := deleteVaccineCertificate(certificateBody["osid"].(string)); err != nil {
 		log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
+		return preEnrollmentCode, status, err
 	} else {
 		var cert map[string]interface{}
 		if err := json.Unmarshal([]byte(certificateBody["certificate"].(string)), &cert); err != nil {
 			log.Errorf("%v", err)
+			return preEnrollmentCode, ERROR, errors.New("certificate unmarshalling failed")
 		}
 		certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
-		log.Infof("certificateDose doses: %+v dose: %+v", certificateDose["doses"], certificateDose["dose"])
-		err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
+		log.Debugf("certificateDose doses: %+v dose: %+v", certificateDose["doses"], certificateDose["dose"])
+		status, err = addCertificateToRevocationList(preEnrollmentCode, int(certificateDose["dose"].(float64)), certificateId)
 		if err != nil {
 			log.Errorf("Failed to add certificate %v to revocation list", certificateId)
+			return preEnrollmentCode, status, err
 		}
-		deleteKeyFromRedis(preEnrollmentCode, certificateBody["programId"].(string), int(certificateDose["dose"].(float64)))
+		status, err = deleteKeyFromRedis(preEnrollmentCode, certificateBody["programId"].(string), int(certificateDose["dose"].(float64)))
+		return preEnrollmentCode, status, err
 	}
-	return nil
 }
 
-func deleteVaccineCertificate(osid string) error {
+func deleteVaccineCertificate(osid string) (RevocationStatus, error) {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
 		"osid": osid,
 	}
 	if _, err := kernelService.DeleteRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in deleting vaccination certificate %+v", err)
-		return errors.New("error in deleting vaccination certificate")
+		return TEMP_ERROR, errors.New("error in deleting vaccination certificate")
 	} else {
-		return nil
+		return SUCCESS, nil
 	}
 }
 
-func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) error {
+func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) (RevocationStatus, error) {
 	typeId := "RevokedCertificate"
 	revokeCertificate := map[string]interface{}{
 		"preEnrollmentCode":     preEnrollmentCode,
@@ -82,21 +93,21 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificate) > 0 {
 				log.Infof("%v certificateId already exists in revocation", certificateId)
-				return nil
+				return SUCCESS, nil
 			}
 			_, err = kernelService.CreateNewRegistry(revokeCertificate, typeId)
 			if err != nil {
 				log.Infof("Failed saving revoked Certificate %+v", err)
-				return err
+				return ERROR, err
 			}
 			log.Infof("%v certificateId added to revocation", certificateId)
-			return nil
+			return SUCCESS, nil
 		}
 	}
-	return errors.New("error occurred while adding certificate to revocation list")
+	return TEMP_ERROR, errors.New("error occurred while adding certificate to revocation list")
 }
 
-func deleteKeyFromRedis(preEnrollmentCode string, programId string, dose int) {
+func deleteKeyFromRedis(preEnrollmentCode string, programId string, dose int) (RevocationStatus, error) {
 	log.Infof("preEnrollmentCode %+v programId %+v dose %+v", preEnrollmentCode, programId, dose)
 
 	key := preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(dose)
@@ -107,5 +118,7 @@ func deleteKeyFromRedis(preEnrollmentCode string, programId string, dose int) {
 	err := services.DeleteValue(key)
 	if err != nil {
 		log.Errorf("Error while deleting key from redis: %v", err)
+		return ERROR, errors.New("error while deleting key from redis")
 	}
+	return SUCCESS, nil
 }
