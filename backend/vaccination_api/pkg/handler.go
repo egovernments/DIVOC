@@ -766,13 +766,22 @@ func revokeCertificate(params certification.RevokeCertificateParams, principal *
 	doses := params.Doses
 	allDoses := params.AllDoses
 
-	log.Infof("revokeCertificate params: %+v %+v", doses, allDoses)
+	log.Infof("revokeCertificate params: doses:%v allDoes:%v", doses, allDoses)
 	if doses == nil && (allDoses == nil || (allDoses != nil && *allDoses != true)) {
 		return certification.NewRevokeCertificateBadRequest()
 	}
 
 	if allDoses != nil && *allDoses == true {
 		doses = nil
+	}
+
+	if doses != nil && len(doses) > 1 { // ensure doses provided are sequential
+		sort.Slice(doses, func(i, j int) bool { return doses[i] < doses[j] })
+		for i, dose := range doses {
+			if i < len(doses)-1 && doses[i+1]-dose > 1 {
+				return certification.NewRevokeCertificateBadRequest()
+			}
+		}
 	}
 
 	filter := map[string]interface{}{
@@ -786,10 +795,14 @@ func revokeCertificate(params certification.RevokeCertificateParams, principal *
 		return NewGenericServerError()
 	} else {
 		if listOfCerts, ok := response[CertificateEntity].([]interface{}); ok {
+			log.Infof("%v certs found for preEnrollmentCode %v", len(listOfCerts), preEnrollmentCode)
+
 			if len(listOfCerts) == 0 {
 				return certification.NewRevokeCertificateNotFound()
 			}
 			isCertificateFound := false
+			maxDose := 0
+			var certificatesToBeRevoked []map[string]interface{}
 			for _, v := range listOfCerts {
 				if body, ok := v.(map[string]interface{}); ok {
 					var cert map[string]interface{}
@@ -798,31 +811,51 @@ func revokeCertificate(params certification.RevokeCertificateParams, principal *
 						continue
 					}
 					certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
-					revokeCertForDose := false
 					if doses != nil {
 						for _, currentDose := range doses {
-							if currentDose == int64(certificateDose["dose"].(float64)) {
-								revokeCertForDose = true
+							log.Infof("Checking dose %v against %v", currentDose, certificateDose["dose"])
+							if currentDose == int32(certificateDose["dose"].(float64)) {
+								isCertificateFound = true
+								certificatesToBeRevoked = append(certificatesToBeRevoked, body)
+							}
+							if int(certificateDose["dose"].(float64)) > maxDose {
+								maxDose = int(certificateDose["dose"].(float64))
 							}
 						}
-					}
-
-					if revokeCertForDose == true || (allDoses != nil && *allDoses == true) {
+					} else {
 						isCertificateFound = true
-						revokeMsg, _ := json.Marshal(struct {
-							PreEnrollmentCode string                 `json:"preEnrollmentCode"`
-							CertificateBody   map[string]interface{} `json:"certificateBody"`
-						}{
-							PreEnrollmentCode: preEnrollmentCode,
-							CertificateBody:   body,
-						})
-						log.Infof("Found certificate for revocation. Adding to Kafka topic.")
-						services.PublishRevokeCertificateMessage(revokeMsg)
+						certificatesToBeRevoked = append(certificatesToBeRevoked, body)
 					}
 				}
 			}
 			if !isCertificateFound {
 				return certification.NewRevokeCertificateNotFound()
+			} else {
+				maxDoseIsPresent := false
+				if doses != nil {
+					for _, i := range doses {
+						if int(i) == maxDose {
+							maxDoseIsPresent = true
+						}
+					}
+					log.Infof("maxDose %v maxDoseIsPresent %v", maxDose, maxDoseIsPresent)
+
+					if maxDoseIsPresent != true {
+						return certification.NewRevokeCertificateBadRequest()
+					}
+				}
+
+				for _, body := range certificatesToBeRevoked {
+					revokeMsg, _ := json.Marshal(struct {
+						PreEnrollmentCode string                 `json:"preEnrollmentCode"`
+						CertificateBody   map[string]interface{} `json:"certificateBody"`
+					}{
+						PreEnrollmentCode: preEnrollmentCode,
+						CertificateBody:   body,
+					})
+					log.Infof("Found certificate for revocation. Adding to Kafka topic.")
+					services.PublishRevokeCertificateMessage(revokeMsg)
+				}
 			}
 
 			return certification.NewRevokeCertificateOK()

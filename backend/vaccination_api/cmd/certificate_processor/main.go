@@ -137,13 +137,15 @@ func initializeRevokeCertificate() {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
-			preEnrollmentCode, revokeStatus, _ := handleCertificateRevocationMessage(string(msg.Value))
-			if revokeStatus == SUCCESS {
+			preEnrollmentCode, revokeStatus, err := handleCertificateRevocationMessage(string(msg.Value))
+			if revokeStatus == SUCCESS || revokeStatus == ERROR {
 				c.CommitMessage(msg)
-			} else {
-				log.Errorf("Error in processing the certificate %+v", err)
+			}
+			if revokeStatus == ERROR {
+				log.Errorf("Error in revoking the certificate %+v", err)
 				services.PublishRevokeCertificateErrorMessage(msg.Value)
 			}
+			log.Infof("Publishing to ProcStatus")
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
 				PreEnrollmentCode: preEnrollmentCode,

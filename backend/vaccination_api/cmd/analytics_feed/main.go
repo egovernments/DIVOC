@@ -366,6 +366,7 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) error {
 }
 
 func saveProcStatusEvent(connect *sql.DB, msg string) error {
+	log.Infof("Saving proc status event")
 	event := models.ProcStatus{}
 	if err := json.Unmarshal([]byte(msg), &event); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)

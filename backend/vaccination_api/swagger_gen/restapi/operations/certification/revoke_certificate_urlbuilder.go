@@ -19,7 +19,7 @@ type RevokeCertificateURL struct {
 	PreEnrollmentCode string
 
 	AllDoses *bool
-	Doses    []int64
+	Doses    []int32
 
 	_basePath string
 	// avoid unkeyed usage
@@ -72,7 +72,7 @@ func (o *RevokeCertificateURL) Build() (*url.URL, error) {
 
 	var dosesIR []string
 	for _, dosesI := range o.Doses {
-		dosesIS := swag.FormatInt64(dosesI)
+		dosesIS := swag.FormatInt32(dosesI)
 		if dosesIS != "" {
 			dosesIR = append(dosesIR, dosesIS)
 		}

@@ -316,6 +316,8 @@ func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
 }
 
 func PublishProcStatus(event models.ProcStatus) {
+	log.Infof("Publishing to proc status topic")
+
 	if messageJson, err := json.Marshal(event); err != nil {
 		log.Errorf("PublishProcStatus: Error in getting json of event %+v", event)
 	} else {

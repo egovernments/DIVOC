@@ -266,9 +266,10 @@ func init() {
           {
             "type": "array",
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             },
-            "description": "dose(s) for which certificate needs to be revoked",
+            "description": "dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.",
             "name": "doses",
             "in": "query"
           },
@@ -1969,9 +1970,10 @@ func init() {
           {
             "type": "array",
             "items": {
-              "type": "integer"
+              "type": "integer",
+              "format": "int32"
             },
-            "description": "dose(s) for which certificate needs to be revoked",
+            "description": "dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.",
             "name": "doses",
             "in": "query"
           },

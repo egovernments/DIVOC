@@ -315,7 +315,8 @@ paths:
           type: array
           items:
             type: integer
-          description: dose(s) for which certificate needs to be revoked
+            format: int32
+          description: dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.
         - name: allDoses
           in: query
           required: false

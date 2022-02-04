@@ -36,10 +36,10 @@ type RevokeCertificateParams struct {
 	  In: query
 	*/
 	AllDoses *bool
-	/*dose(s) for which certificate needs to be revoked
+	/*dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.
 	  In: query
 	*/
-	Doses []int64
+	Doses []int32
 	/*refId for which certificate needs to be revoked
 	  Required: true
 	  In: path
@@ -117,11 +117,12 @@ func (o *RevokeCertificateParams) bindDoses(rawData []string, hasKey bool, forma
 		return nil
 	}
 
-	var dosesIR []int64
+	var dosesIR []int32
 	for i, dosesIV := range dosesIC {
-		dosesI, err := swag.ConvertInt64(dosesIV)
+		// items.Format: "int32"
+		dosesI, err := swag.ConvertInt32(dosesIV)
 		if err != nil {
-			return errors.InvalidType(fmt.Sprintf("%s.%v", "doses", i), "query", "int64", dosesI)
+			return errors.InvalidType(fmt.Sprintf("%s.%v", "doses", i), "query", "int32", dosesI)
 		}
 
 		dosesIR = append(dosesIR, dosesI)
