@@ -287,6 +287,11 @@ services:
       CERTIFICATE_ISSUER: "https://divoc.dev"
       FHIR_PUBLIC_HEALTH_AUTHORITY: "Govt Of India"
       DISEASE_CODE: "COVID-19"
+      REDIS_URL: redis://redis:6379
+      REDIS_KEY_EXPIRE: 172800
+      REDIS_ENABLED: "true"
+      ETCD_URL: etcd:2379
+      CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
         condition: service_healthy
