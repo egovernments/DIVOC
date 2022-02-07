@@ -9,8 +9,8 @@ let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 
 function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
-  setUpWatcher(TEMPLATES.VACCINE);
-  setUpWatcher(TEMPLATES.TEST);
+  setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE);
+  setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
   configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd(): null ;
 }
 
@@ -37,10 +37,10 @@ function cleanHTML(html) {
 
 function updateTemplate(templateKey, template) {
   switch(templateKey) {
-    case TEMPLATES.VACCINE:
+    case TEMPLATES.VACCINATION_CERTIFICATE:
       vaccineCertificateTemplate = template;
       break;
-    case TEMPLATES.TEST:
+    case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = template;
       break;
   }
@@ -70,10 +70,10 @@ function setUpWatcher(templateKey) {
 function loadCertificateTemplate(key) {
   let certificateTemplate;
   switch(key) {
-    case TEMPLATES.VACCINE:
+    case TEMPLATES.VACCINATION_CERTIFICATE:
       certificateTemplate = vaccineCertificateTemplate;
       break;
-    case TEMPLATES.TEST:
+    case TEMPLATES.TEST_CERTIFICATE:
       certificateTemplate = testCertificateTemplate;
       break;
   }

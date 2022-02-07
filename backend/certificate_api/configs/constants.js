@@ -52,8 +52,8 @@ const VACCINE_MANUF = {
 };
 
 const TEMPLATES = {
-  VACCINE: "vaccineCertificateTemplate",
-  TEST: "testCertificateTemplate"
+  VACCINATION_CERTIFICATE: "vaccineCertificateTemplate",
+  TEST_CERTIFICATE: "testCertificateTemplate"
 };
 Object.freeze(TEMPLATES);
 

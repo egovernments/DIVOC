@@ -63,8 +63,8 @@ test('should instantiate Etcd3', () => {
 });
 
 test('should call sanitizeHtml method 2 times each for getCertificateTemplate method of VaccineCertificateTemplate and TestCertificateTemplate for valid configuration passed', async() => {
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINE));
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
+    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
     expect(sanitizeHtml).toHaveBeenCalledTimes(2);
     expect(sanitizeHtml).toHaveBeenCalledWith(html, {
         allowedTags: false,
@@ -100,8 +100,8 @@ describe('environment variables', () => {
     });
     test('should return null when invalid configuration passed to VaccineCertificateTemplate and TestCertificateTemplate', async() => {
         let configuration = require('../src/services/etcd_configuration_service');
-        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINE));
-        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST));
+        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
+        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
         expect(vaccineTemplate).toEqual(null);
         expect(testTemplate).toEqual(null);
     });
