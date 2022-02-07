@@ -67,7 +67,7 @@ function setUpWatcher(templateKey) {
     });
 }
 
-function loadCertificateTemplate(key) {
+async function loadCertificateTemplate(key) {
   let certificateTemplate;
   switch(key) {
     case TEMPLATES.VACCINATION_CERTIFICATE:
@@ -77,20 +77,20 @@ function loadCertificateTemplate(key) {
       certificateTemplate = testCertificateTemplate;
       break;
   }
+  if(certificateTemplate === null || certificateTemplate === undefined) {
+    if(configuration === null || configuration === undefined) {
+      return null;
+    }
+    certificateTemplate = await configuration.getCertificateTemplate(key);
+  }
   return certificateTemplate;
 }
 
 class CertificateTemplate {
   async getCertificateTemplate(key) {
-    let certificateTemplate = loadCertificateTemplate(key);
-    if(certificateTemplate === null || certificateTemplate === undefined) {
-      if(configuration === null || configuration === undefined) {
-        return null;
-      }
-      certificateTemplate = await configuration.getCertificateTemplate(key);
-      certificateTemplate = cleanHTML(certificateTemplate);
-      updateTemplate(key, certificateTemplate);
-    }
+    let certificateTemplate = await loadCertificateTemplate(key);
+    certificateTemplate = cleanHTML(certificateTemplate);
+    updateTemplate(key, certificateTemplate);
     return certificateTemplate;
   }
 }
