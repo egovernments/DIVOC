@@ -14,7 +14,9 @@ import (
 var producer *kafka.Producer
 
 var messages = make(chan Message)
+var reconErrorRequests = make(chan Message)
 var events = make(chan []byte)
+var procStatusEvents = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 
 const CERTIFICATE_TYPE_V2 = "certifyV2"
@@ -42,7 +44,11 @@ func InitializeKafka() {
 
 	StartCertifyProducer(producer)
 
+	StartReconErrorRequestProducer(producer)
+
 	StartEventProducer(producer)
+
+	StartProcStatusEventProducer(producer)
 
 	StartReportedSideEffectsProducer(producer)
 
@@ -60,6 +66,26 @@ func StartCertifyProducer(producer *kafka.Producer) {
 		topic := config.Config.Kafka.CertifyTopic
 		for {
 			msg := <-messages
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          []byte(msg.payload),
+				Headers: []kafka.Header{
+					{Key: "uploadId", Value: msg.UploadId},
+					{Key: "rowId", Value: msg.rowId},
+					{Key: "certificateType", Value: []byte(msg.header.CertificateType)},
+				},
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func StartReconErrorRequestProducer(producer *kafka.Producer) {
+	go func() {
+		topic := "recon_error"
+		for {
+			msg := <-reconErrorRequests
 			if err := producer.Produce(&kafka.Message{
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          []byte(msg.payload),
@@ -172,8 +198,32 @@ func StartEventProducer(producerClient *kafka.Producer) {
 	}()
 }
 
+func StartProcStatusEventProducer(producerClient *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.ProcStatusTopic
+		for {
+			msg := <-procStatusEvents
+			if err := producerClient.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
 func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte, header MessageHeader) {
 	messages <- Message{
+		UploadId: uploadId,
+		rowId:    rowId,
+		header:   header,
+		payload:  string(message),
+	}
+}
+
+func PublishReconErrorRequest(message []byte, uploadId []byte, rowId []byte, header MessageHeader) {
+	reconErrorRequests <- Message{
 		UploadId: uploadId,
 		rowId:    rowId,
 		header:   header,
@@ -186,6 +236,14 @@ func PublishEvent(event models.Event) {
 		log.Errorf("Error in getting json of event %+v", event)
 	} else {
 		events <- messageJson
+	}
+}
+
+func PublishProcStatus(event models.ProcStatus) {
+	if messageJson, err := json.Marshal(event); err != nil {
+		log.Errorf("Error in getting json of event %+v", event)
+	} else {
+		procStatusEvents <- messageJson
 	}
 }
 

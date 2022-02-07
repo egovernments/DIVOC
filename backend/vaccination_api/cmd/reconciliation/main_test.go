@@ -206,7 +206,24 @@ func TestUpdateDateAndVaccine(t *testing.T) {
 	certifyMessage := getMockCertifyRequestV2(t)
 	signedCertificateFromDB := getMockSignedCertificateData(t)
 	expectedUpdateReqObject := getMockUpdateRequestObject(t)
-	updateReqObject := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	updateReqObject, err := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	if err != nil {
+		t.Error(err)
+	}
+	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
+		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject.Facility.Address, *updateReqObject.Facility.Address)
+	}
+}
+
+func TestUpdateDateAndVaccineWithIncorrectTotalDoses(t *testing.T) {
+	certifyMessage := getMockCertifyRequestV2(t)
+	signedCertificateFromDB := getMockSignedCertificateData(t)
+	signedCertificateFromDB.Evidence[0].TotalDoses = ""
+	expectedUpdateReqObject := getMockUpdateRequestObject(t)
+	updateReqObject, err := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	if err != nil {
+		t.Error(err)
+	}
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject.Facility.Address, *updateReqObject.Facility.Address)
 	}
@@ -226,7 +243,10 @@ func TestUpdateDateAndBatchNumber(t *testing.T) {
 	}
 	expectedUpdateReqObject.Vaccination.Manufacturer = "Serum Institute of India"
 	expectedUpdateReqObject.Vaccination.Name = "COVISHIELD"
-	updateReqObject := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	updateReqObject, err := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	if err != nil {
+		t.Error(err)
+	}
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject, *updateReqObject)
 	}
@@ -239,7 +259,10 @@ func TestIfPinCodeIsEmpty(t *testing.T) {
 	//signed certificate facility pincode is empty
 	signedCertificateFromDB.Evidence[0].Facility.Address.PostalCode = ""
 	expectedUpdateReqObject.Facility.Address.Pincode = 0
-	updateReqObject := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	updateReqObject, err := CreateUpdateRequestObject(certifyMessage, signedCertificateFromDB, certifyMessage.Meta.Vaccinations[0])
+	if err != nil {
+		t.Error(err)
+	}
 	if !reflect.DeepEqual(*expectedUpdateReqObject, *updateReqObject) {
 		t.Errorf("Expected %v, got %v", *expectedUpdateReqObject, *updateReqObject)
 	}
@@ -285,13 +308,19 @@ func TestCheckNewDateTimestampInUpdateRequest(t *testing.T) {
 	certifyMessage.Meta.Vaccinations[0].Manufacturer = "Serum Institute of India"
 	signedCertificate := getMockSignedCertificateData(t)
 	dbVaccinationData := getDBVaccinationData(signedCertificate)
-	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	_, err := CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	if err != nil {
+		t.Error(err)
+	}
 	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-13T00:00:00.000Z" {
 		x, _ := strfmt.ParseDateTime(certifyMessage.Meta.Vaccinations[0].Date)
 		t.Errorf("Error in time stamp of update request object: %v", x)
 	}
 	certifyMessage.Meta.Vaccinations[0].Date = "2021-12-15"
-	CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	_, err = CheckDataConsistence(certifyMessage.Meta.Vaccinations[0], dbVaccinationData)
+	if err != nil {
+		t.Error(err)
+	}
 	if certifyMessage.Meta.Vaccinations[0].Date != "2021-12-15T00:06:00.000Z" {
 		x, _ := strfmt.ParseDateTime(certifyMessage.Meta.Vaccinations[0].Date)
 		t.Errorf("Error in time stamp of update request object for consistent data: %v", x)
