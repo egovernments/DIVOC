@@ -13,13 +13,13 @@ const config = require('../../configs/config');
 const dcc = require("@pathcheck/dcc-sdk");
 const shc = require("@pathcheck/shc-sdk");
 const keyUtils = require("../services/key_utils");
-const { CertificateTemplate, init } = require('../services/etcd_configuration_service');
+const { ConfigurationService, init } = require('../services/configuration_service');
 const {TEMPLATES} = require('../../configs/constants');
 const QR_TYPE = "qrcode";
 
 init();
 let shcKeyPair = [];
-const certificateTemplate = new CertificateTemplate();
+const configurationService = new ConfigurationService();
 function getNumberWithOrdinal(n) {
     const s = ["th", "st", "nd", "rd"],
         v = n % 100;
@@ -184,7 +184,7 @@ async function createCertificatePDF(certificateResp, res, source) {
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
         const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-        const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);
+        const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);
         let pdfBuffer;
         try {
             pdfBuffer = await createPDF(htmlData, certificateData);
@@ -263,7 +263,7 @@ async function createTestCertificatePDF(certificateResp, res, source) {
             qrCode: dataURL,
             country: evidence[0].facility.address.addressCountry
         };
-        const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE);;
+        const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE);;
         let pdfBuffer;
         try {
             pdfBuffer = await createPDF(htmlData, certificateData);
@@ -571,7 +571,21 @@ async function certificateAsEUPayload(req, res) {
         if (certificateResp.length > 0) {
             let certificateRaw = certificateService.getLatestCertificate(certificateResp);
             // convert certificate to EU Json
-            const dccPayload = certificateService.convertCertificateToDCCPayload(certificateRaw);
+            let dccPayload;
+            try {
+                dccPayload = await certificateService.convertCertificateToDCCPayload(certificateRaw);
+            } catch(err) {
+                res.statusCode = 500;
+                res.setHeader("Content-Type", "application/json");
+                let error = {
+                    date: new Date(),
+                    source: "EUCertificateConverter",
+                    type: "internal-failed",
+                    extra: err.message
+                };
+                sendEvents(error);
+                return JSON.stringify(error);
+            }
             const qrUri = await dcc.signAndPack(await dcc.makeCWT(dccPayload, config.EU_CERTIFICATE_EXPIRY, dccPayload.v[0].co), euPublicKeyP8, euPrivateKeyPem);
             let buffer = null;
             if (type && type.toLowerCase() === QR_TYPE) {
@@ -581,7 +595,7 @@ async function certificateAsEUPayload(req, res) {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-                const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);;
+                const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);;
                 try {
                     buffer = await createPDF(htmlData, certificateData);
                     res.setHeader("Content-Type", "application/pdf");
@@ -677,7 +691,7 @@ async function certificateAsSHCPayload(req, res) {
                 const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
                 let doseToVaccinationDetailsMap = getVaccineDetailsOfPreviousDoses(certificateResp);
                 const certificateData = prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-                const htmlData = await certificateTemplate.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);;
+                const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);;
                 try {
                     buffer = await createPDF(htmlData, certificateData);
                     res.setHeader("Content-Type", "application/pdf");

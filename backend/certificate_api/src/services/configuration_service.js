@@ -2,15 +2,19 @@ const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 
 const config = require('../../configs/config');
-const {TEMPLATES} = require('../../configs/constants');
+const {TEMPLATES, EU_VACCINE} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null;
+let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 
 function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
-  setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE);
+  setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
+  setUpWatcher(EU_VACCINE.CODE);
+  setUpWatcher(EU_VACCINE.MANUF);
+  setUpWatcher(EU_VACCINE.PROPH);
   configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd(): null ;
 }
 
@@ -35,13 +39,22 @@ function cleanHTML(html) {
   return cleanedHtml;
 }
 
-function updateTemplate(templateKey, template) {
-  switch(templateKey) {
+function updateConfigValues(key, value) {
+  switch(key) {
     case TEMPLATES.VACCINATION_CERTIFICATE:
-      vaccineCertificateTemplate = template;
+      vaccineCertificateTemplate = value;
       break;
     case TEMPLATES.TEST_CERTIFICATE:
-      testCertificateTemplate = template;
+      testCertificateTemplate = value;
+      break;
+    case EU_VACCINE.CODE:
+      EU_VACCINE_CODE = value;
+      break;
+    case EU_VACCINE.MANUF:
+      EU_VACCINE_MANUF = value;
+      break;
+    case EU_VACCINE.PROPH:
+      EU_VACCINE_PROPH = value;
       break;
   }
 }
@@ -59,7 +72,7 @@ function setUpWatcher(templateKey) {
         console.log('connected');
       })
       .on('put', res => {
-        updateTemplate(templateKey, res.value.toString());
+        updateConfigValues(templateKey, res.value.toString());
       });
     })
     .catch(err => {
@@ -67,31 +80,46 @@ function setUpWatcher(templateKey) {
     });
 }
 
-async function loadCertificateTemplate(key) {
-  let certificateTemplate;
+async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
+  let value;
   switch(key) {
     case TEMPLATES.VACCINATION_CERTIFICATE:
-      certificateTemplate = vaccineCertificateTemplate;
+      value = vaccineCertificateTemplate;
       break;
     case TEMPLATES.TEST_CERTIFICATE:
-      certificateTemplate = testCertificateTemplate;
+      value = testCertificateTemplate;
+      break;
+    case EU_VACCINE.MANUF:
+      value = EU_VACCINE_MANUF;
+      break;
+    case EU_VACCINE.CODE:
+      value = EU_VACCINE_CODE;
+      break;
+    case EU_VACCINE.PROPH:
+      value = EU_VACCINE_PROPH;
       break;
   }
-  if(certificateTemplate === null || certificateTemplate === undefined) {
+  if(value === null || value === undefined) {
     if(configuration === null || configuration === undefined) {
       return null;
     }
-    certificateTemplate = await configuration.getCertificateTemplate(key);
+    value = fetchConfigCallbackFunc();
   }
-  return certificateTemplate;
+  return value;
 }
 
-class CertificateTemplate {
+class ConfigurationService {
   async getCertificateTemplate(key) {
-    let certificateTemplate = await loadCertificateTemplate(key);
+    let certificateTemplate = await loadConfigurationValues(key, async() => await configuration.getCertificateTemplate(key));
     certificateTemplate = cleanHTML(certificateTemplate);
-    updateTemplate(key, certificateTemplate);
+    updateConfigValues(key, certificateTemplate);
     return certificateTemplate;
+  }
+
+  async getEUVaccineDetails(key) {
+    let details = await loadConfigurationValues(key, async() => JSON.parse(await configuration.getEUVaccineDetails(key)));
+    updateConfigValues(key, details);
+    return details;
   }
 }
 
@@ -100,8 +128,13 @@ const etcd = function() {
     const template = (await etcdClient.get(templateKey).string());
     return template;
   }
+
+  this.getEUVaccineDetails = async function(key) {
+    const value = (await etcdClient.get(key).string());
+    return value;
+  }
 }
 
 module.exports = {
-  CertificateTemplate, init
+  ConfigurationService, init
 }

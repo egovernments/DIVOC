@@ -1,6 +1,7 @@
 const constants = require('../../configs/constants');
 const config = require('../../configs/config');
 const countries = require('i18n-iso-countries')
+const configService = require('./configuration_service');
 
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
@@ -27,16 +28,22 @@ const getLatestCertificate = (certificates) => {
   }
 };
 
-const convertCertificateToDCCPayload = (certificateRaw) => {
+const convertCertificateToDCCPayload = async(certificateRaw) => {
   let certificate = JSON.parse(certificateRaw.certificate);
-
+  const configurationService = new configService.ConfigurationService();
+  const VACCINE_MANUF = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.MANUF);
+  const EU_VACCINE_PROPH = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.PROPH);
+  const EU_VACCINE_CODE = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.CODE);
+  if(VACCINE_MANUF === null || EU_VACCINE_PROPH === null || EU_VACCINE_CODE === null || EU_VACCINE_CODE === undefined || EU_VACCINE_PROPH === undefined || VACCINE_MANUF === undefined) {
+    throw new Error("EU Vaccine Details are missing from Configuration");
+  }
   const {credentialSubject, evidence} = certificate;
-  const manufacturerCode = Object.keys(constants.VACCINE_MANUF).filter(a => evidence[0].manufacturer.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(constants.VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
-  const prophylaxisCode = Object.keys(constants.EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(constants.EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
-  const vaccineCode = Object.keys(constants.EU_VACCINE_CODE).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
-    Object.entries(constants.EU_VACCINE_CODE).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
+  const manufacturerCode = Object.keys(VACCINE_MANUF).filter(a => evidence[0].manufacturer.toLowerCase().includes(a)).length > 0 ?
+    Object.entries(VACCINE_MANUF).filter(([k, v]) => evidence[0].manufacturer.toLowerCase().includes(k))[0][1] : "";
+  const prophylaxisCode = Object.keys(EU_VACCINE_PROPH).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
+    Object.entries(EU_VACCINE_PROPH).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
+  const vaccineCode = Object.keys(EU_VACCINE_CODE).filter(a => evidence[0].vaccine.toLowerCase().includes(a)).length > 0 ?
+    Object.entries(EU_VACCINE_CODE).filter(([k, v]) => evidence[0].vaccine.toLowerCase().includes(k))[0][1] : "";
   const addressCountry = getAlpha2CodeForCountry(evidence[0].facility.address.addressCountry)
   const certificateId = "URN:UVCI:01:" + addressCountry + ":" + evidence[0].certificateId;
   

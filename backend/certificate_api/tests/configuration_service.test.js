@@ -1,7 +1,7 @@
 const etcd3 = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 jest.mock('sanitize-html');
-const {TEMPLATES} = require('../configs/constants');
+const {TEMPLATES, EU_VACCINE} = require('../configs/constants');
 jest.mock('../src/services/redis_service');
 console.log = jest.fn();
 const html = `<html>
@@ -26,6 +26,15 @@ var getFn = {
             }))
             .mockReturnValueOnce(new Promise((resolve, reject) => {
                 resolve(html)
+            }))
+            .mockReturnValueOnce(new Promise((resolve, reject) => {
+                resolve("{\"covaxin\": \"J07BX03\"}")
+            }))
+            .mockReturnValueOnce(new Promise((resolve, reject) => {
+                resolve("{\"covaxin\": \"Covaxin\"}")
+            }))
+            .mockReturnValueOnce(new Promise((resolve, reject) => {
+                resolve("{\"bharat\": \"Bharat-Biotech\"}")
             }))
 }
 var mockWatcher = {
@@ -56,15 +65,15 @@ jest.mock('etcd3', () => {
         Etcd3: jest.fn().mockImplementation(() => mockEtcd3Constructor)
     }
 });
-const etcd_configuration = require('../src/services/etcd_configuration_service');
-etcd_configuration.init();
+const configuration = require('../src/services/configuration_service');
+configuration.init();
 test('should instantiate Etcd3', () => {
     expect(etcd3.Etcd3).toHaveBeenCalled();
 });
 
 test('should call sanitizeHtml method 2 times each for getCertificateTemplate method of VaccineCertificateTemplate and TestCertificateTemplate for valid configuration passed', async() => {
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
-    (await (new etcd_configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
+    (await (new configuration.ConfigurationService()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
+    (await (new configuration.ConfigurationService()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
     expect(sanitizeHtml).toHaveBeenCalledTimes(2);
     expect(sanitizeHtml).toHaveBeenCalledWith(html, {
         allowedTags: false,
@@ -83,7 +92,28 @@ test('should call sanitizeHtml method 2 times each for getCertificateTemplate me
 });
 
 test('should call watch method to watch for changes in etcd', () => {
-    expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(2);
+    expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
+});
+
+test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
+    jest.spyOn(mockEtcd3Constructor, 'get')
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.PROPH));
+    expect(proph).toEqual({"covaxin": "J07BX03"});
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.PROPH);
+});
+
+test('should retrieve EU_VACCINE_CODE details from etcd', async() => {
+    jest.spyOn(mockEtcd3Constructor, 'get')
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.CODE));
+    expect(proph).toEqual({"covaxin": "Covaxin"});
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.CODE);
+});
+
+test('should retrieve EU_VACCINE_MANUF details from etcd', async() => {
+    jest.spyOn(mockEtcd3Constructor, 'get')
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.MANUF));
+    expect(proph).toEqual({"bharat": "Bharat-Biotech"});
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.MANUF);
 });
 
 describe('environment variables', () => {
@@ -99,9 +129,9 @@ describe('environment variables', () => {
         process.env = OLD_ENV;
     });
     test('should return null when invalid configuration passed to VaccineCertificateTemplate and TestCertificateTemplate', async() => {
-        let configuration = require('../src/services/etcd_configuration_service');
-        const vaccineTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
-        const testTemplate = (await (new configuration.CertificateTemplate()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
+        let configuration = require('../src/services/configuration_service');
+        const vaccineTemplate = (await (new configuration.ConfigurationService()).getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE));
+        const testTemplate = (await (new configuration.ConfigurationService()).getCertificateTemplate(TEMPLATES.TEST_CERTIFICATE));
         expect(vaccineTemplate).toEqual(null);
         expect(testTemplate).toEqual(null);
     });
