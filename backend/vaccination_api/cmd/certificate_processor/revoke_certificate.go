@@ -38,6 +38,8 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 
 	certificateId := certificateBody["certificateId"].(string)
 
+	log.Infof("Revoke certificateId: %v", certificateId)
+
 	if status, err := deleteVaccineCertificate(certificateBody["osid"].(string)); err != nil {
 		log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
 		return preEnrollmentCode, status, err
@@ -82,6 +84,7 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 		"preEnrollmentCode":     preEnrollmentCode,
 		"dose":                  dose,
 		"previousCertificateId": certificateId,
+		"certificateId":         "",
 	}
 	filter := map[string]interface{}{
 		"previousCertificateId": map[string]interface{}{
@@ -94,6 +97,8 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 			"eq": preEnrollmentCode,
 		},
 	}
+	log.Debugf("revokeCertificate: %v", revokeCertificate)
+	log.Debugf("filter: %v", filter)
 	if resp, err := kernelService.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
 		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificate) > 0 {
