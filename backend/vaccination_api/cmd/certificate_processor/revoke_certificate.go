@@ -8,6 +8,7 @@ import (
 	kernelService "github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"strconv"
+	"strings"
 )
 
 type RevokeCertificateRequest struct {
@@ -65,7 +66,11 @@ func deleteVaccineCertificate(osid string) (RevocationStatus, error) {
 	}
 	if _, err := kernelService.DeleteRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in deleting vaccination certificate %+v", err)
-		return TEMP_ERROR, errors.New("error in deleting vaccination certificate")
+		if strings.HasPrefix(err.Error(), "tempError") {
+			return TEMP_ERROR, errors.New("tempError in deleting vaccination certificate")
+		} else {
+			return ERROR, errors.New("error in deleting vaccination certificate")
+		}
 	} else {
 		return SUCCESS, nil
 	}

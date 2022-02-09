@@ -227,7 +227,7 @@ func UpdateRegistry(typeId string, update map[string]interface{}) (map[string]in
 
 func DeleteRegistry(typeId string, update map[string]interface{}) (map[string]interface{}, error) {
 	queryRequest := RegistryRequest{
-		"open-saber.registry.read",
+		"open-saber.registry.update",
 		"1.0",
 		map[string]interface{}{
 			typeId: update,
@@ -236,10 +236,10 @@ func DeleteRegistry(typeId string, update map[string]interface{}) (map[string]in
 	log.Info("Registry Query ", queryRequest)
 	response, err := req.Post(config.Config.Registry.Url+"/"+config.Config.Registry.DeleteOperationId, req.BodyJSON(queryRequest))
 	if err != nil {
-		return nil, errors.Errorf("Error while deleting registry", err)
+		return nil, errors.Errorf("tempError while deleting registry", err)
 	}
 	if response.Response().StatusCode != 200 {
-		return nil, errors.New("Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
+		return nil, errors.New("tempError Query failed, registry response " + strconv.Itoa(response.Response().StatusCode))
 	}
 	responseObject := RegistryResponse{}
 	err = response.ToJSON(&responseObject)
