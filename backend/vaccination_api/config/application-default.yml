@@ -41,3 +41,9 @@ auth:
     57KyVGKL9NUvlbbp9jglcZERtpE6pRhbjDwBlmzx8NufSap24VzWIUNjy+CiF0J6
     OQIDAQAB
     -----END PUBLIC KEY-----
+redis:
+  redisurl: "redis://0.0.0.0:6379"
+  programidcaching: "false"
+enabledServices:
+  createRecipientInKeycloakService: "false"
+  revokeCertificateService: "true"

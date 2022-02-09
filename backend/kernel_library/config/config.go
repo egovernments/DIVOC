@@ -2,7 +2,6 @@ package config
 
 import "github.com/jinzhu/configor"
 
-
 func init() {
 	print("kernel config initialization")
 	err := configor.Load(&Config, "./config/application-default.yml") //"config/application.yml"
@@ -18,6 +17,7 @@ var Config = struct {
 		AddOperationId    string `default:"add"`
 		SearchOperationId string `default:"search"`
 		UpdateOperationId string `default:"update"`
+		DeleteOperationId string `default:"delete"`
 		ReadOperationId   string `default:"read"`
 		ApiVersion        string `default:"1"`
 	}

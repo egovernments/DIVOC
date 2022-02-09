@@ -245,6 +245,54 @@ func init() {
         }
       }
     },
+    "/v1/certificates/{preEnrollmentCode}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose(s)",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.",
+            "name": "doses",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "flag specifying if certificates for all doses for this refId should be revoked",
+            "name": "allDoses",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Certificate not found for given beneficiary, dose"
+          }
+        }
+      }
+    },
     "/v1/certify": {
       "post": {
         "description": "Certification happens asynchronously, this requires vaccinator authorization and vaccinator should be trained for the vaccination that is being certified.",
@@ -1897,6 +1945,54 @@ func init() {
           },
           "404": {
             "description": "certificate for given certificateId not found"
+          }
+        }
+      }
+    },
+    "/v1/certificates/{preEnrollmentCode}": {
+      "delete": {
+        "produces": [
+          "application/json"
+        ],
+        "tags": [
+          "certification"
+        ],
+        "summary": "Revoke certificates for given preEnrollmentCode and dose(s)",
+        "operationId": "revokeCertificate",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "refId for which certificate needs to be revoked",
+            "name": "preEnrollmentCode",
+            "in": "path",
+            "required": true
+          },
+          {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "description": "dose(s) for which certificate needs to be revoked. Must include doses between (inclusive of) lowest dose to be revoked and latest dose.",
+            "name": "doses",
+            "in": "query"
+          },
+          {
+            "type": "boolean",
+            "description": "flag specifying if certificates for all doses for this refId should be revoked",
+            "name": "allDoses",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Certificate not found for given beneficiary, dose"
           }
         }
       }
