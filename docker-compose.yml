@@ -185,6 +185,8 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+      REDIS_URL: redis://redis:6379
+      ENABLE_PROGRAM_ID_CACHING_KEY: "true"
     depends_on:
       registry:
         condition: service_started
