@@ -120,6 +120,9 @@ func initializeCreateUserInKeycloak() {
 func initializeRevokeCertificate() {
 	log.Infof("Using kafka for revoke_cert %s", config.Config.Kafka.BootstrapServers)
 
+	services.InitRedis()
+	services.InitializeKafka()
+
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "revoke_cert",
@@ -145,13 +148,13 @@ func initializeRevokeCertificate() {
 				log.Errorf("Error in revoking the certificate %+v", err)
 				services.PublishRevokeCertificateErrorMessage(msg.Value)
 			}
-			log.Infof("Publishing to ProcStatus")
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
 				PreEnrollmentCode: preEnrollmentCode,
 				ProcType:          "revoke_cert",
 				Status:            string(revokeStatus),
 			})
+			log.Infof("Published revoke_cert request status for %v with status %v to ProcStatus", preEnrollmentCode, revokeStatus)
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
