@@ -19,7 +19,6 @@ var testMessages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 var revokedCertificates = make(chan []byte)
-var revokedCertificateErrors = make(chan []byte)
 var procStatusEvents = make(chan []byte)
 
 type Message struct {
@@ -203,19 +202,6 @@ func InitializeKafka() {
 	}()
 
 	go func() {
-		topic := config.Config.Kafka.RevokeCertErrTopic
-		for {
-			msg := <-revokedCertificateErrors
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
-	go func() {
 		topic := config.Config.Kafka.ProcStatusTopic
 		for {
 			msg := <-procStatusEvents
@@ -308,11 +294,6 @@ func PublishReportedSideEffects(event models.ReportedSideEffectsEvent) {
 func PublishRevokeCertificateMessage(revokeMessage []byte) {
 	log.Infof("Publishing to revoke certificate topic")
 	revokedCertificates <- revokeMessage
-}
-
-func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
-	log.Infof("Publishing to revoke certificate errors topic")
-	revokedCertificateErrors <- revokeErrorMessage
 }
 
 func PublishProcStatus(event models.ProcStatus) {

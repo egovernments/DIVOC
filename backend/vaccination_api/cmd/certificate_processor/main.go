@@ -12,6 +12,8 @@ import (
 
 const mobilePhonePrefix = "tel:"
 
+var revokedCertificateErrors = make(chan []byte)
+
 type VaccinationCertificateRequest struct {
 	ID     string `json:"id"`
 	Ver    string `json:"ver"`
@@ -122,6 +124,21 @@ func initializeRevokeCertificate() {
 
 	services.InitRedis()
 	services.InitializeKafka()
+	servers := config.Config.Kafka.BootstrapServers
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+
+	go func() {
+		topic := config.Config.Kafka.RevokeCertErrTopic
+		for {
+			msg := <-revokedCertificateErrors
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
 
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
@@ -146,7 +163,7 @@ func initializeRevokeCertificate() {
 			}
 			if revokeStatus == ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
-				services.PublishRevokeCertificateErrorMessage(msg.Value)
+				PublishRevokeCertificateErrorMessage(msg.Value)
 			}
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
@@ -162,4 +179,9 @@ func initializeRevokeCertificate() {
 	}
 
 	c.Close()
+}
+
+func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
+	log.Infof("Publishing to revoke certificate errors topic")
+	revokedCertificateErrors <- revokeErrorMessage
 }
