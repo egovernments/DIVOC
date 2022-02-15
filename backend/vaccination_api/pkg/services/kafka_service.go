@@ -19,7 +19,6 @@ var testMessages = make(chan Message)
 var events = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
 var revokedCertificates = make(chan []byte)
-var revokedCertificateErrors = make(chan []byte)
 var procStatusEvents = make(chan []byte)
 
 type Message struct {
@@ -99,6 +98,8 @@ func InitializeKafka() {
 	}()
 
 	StartEventProducer(producer)
+	startRevokeCertificateProducer(producer)
+	startProcStatusProducer(producer)
 
 	go func() {
 		topic := config.Config.Kafka.ReportedSideEffectsTopic
@@ -189,45 +190,6 @@ func InitializeKafka() {
 		}
 	}()
 
-	go func() {
-		topic := config.Config.Kafka.RevokeCertTopic
-		for {
-			msg := <-revokedCertificates
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
-	go func() {
-		topic := config.Config.Kafka.RevokeCertErrTopic
-		for {
-			msg := <-revokedCertificateErrors
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
-	go func() {
-		topic := config.Config.Kafka.ProcStatusTopic
-		for {
-			msg := <-procStatusEvents
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
 	LogProducerEvents(producer)
 }
 
@@ -310,11 +272,6 @@ func PublishRevokeCertificateMessage(revokeMessage []byte) {
 	revokedCertificates <- revokeMessage
 }
 
-func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
-	log.Infof("Publishing to revoke certificate errors topic")
-	revokedCertificateErrors <- revokeErrorMessage
-}
-
 func PublishProcStatus(event models.ProcStatus) {
 	log.Infof("Publishing to proc status topic")
 
@@ -374,4 +331,39 @@ func startCertificateRevocationConsumer(servers string) {
 			}
 		}
 	}()
+}
+
+func startRevokeCertificateProducer(producer *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.RevokeCertTopic
+		for {
+			msg := <-revokedCertificates
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func startProcStatusProducer(producer *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.ProcStatusTopic
+		for {
+			msg := <-procStatusEvents
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func InitializeKafkaForRevocationService(producer *kafka.Producer) {
+	startRevokeCertificateProducer(producer)
+	startProcStatusProducer(producer)
 }

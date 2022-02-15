@@ -12,6 +12,8 @@ import (
 
 const mobilePhonePrefix = "tel:"
 
+var revokedCertificateErrors = make(chan []byte)
+
 type VaccinationCertificateRequest struct {
 	ID     string `json:"id"`
 	Ver    string `json:"ver"`
@@ -120,6 +122,24 @@ func initializeCreateUserInKeycloak() {
 func initializeRevokeCertificate() {
 	log.Infof("Using kafka for revoke_cert %s", config.Config.Kafka.BootstrapServers)
 
+	servers := config.Config.Kafka.BootstrapServers
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	services.InitializeKafkaForRevocationService(producer)
+	services.InitRedis()
+
+	go func() {
+		topic := config.Config.Kafka.RevokeCertErrTopic
+		for {
+			msg := <-revokedCertificateErrors
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "revoke_cert",
@@ -143,15 +163,15 @@ func initializeRevokeCertificate() {
 			}
 			if revokeStatus == ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
-				services.PublishRevokeCertificateErrorMessage(msg.Value)
+				PublishRevokeCertificateErrorMessage(msg.Value)
 			}
-			log.Infof("Publishing to ProcStatus")
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
 				PreEnrollmentCode: preEnrollmentCode,
 				ProcType:          "revoke_cert",
 				Status:            string(revokeStatus),
 			})
+			log.Infof("Published revoke_cert request status for %v with status %v to ProcStatus", preEnrollmentCode, revokeStatus)
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
@@ -159,4 +179,9 @@ func initializeRevokeCertificate() {
 	}
 
 	c.Close()
+}
+
+func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
+	log.Infof("Publishing to revoke certificate errors topic")
+	revokedCertificateErrors <- revokeErrorMessage
 }
