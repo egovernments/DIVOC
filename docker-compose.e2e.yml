@@ -12,8 +12,6 @@ services:
         ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
   etcd:
     entrypoint: /usr/local/bin/etcd
-    environment:
-      ETCD_ENABLE_V2: "true"
   keycloak:
     environment:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json

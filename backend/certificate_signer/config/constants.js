@@ -1,9 +1,9 @@
-const MAPPINGS_KEYS = {
+const ICD_MAPPINGS_KEYS = {
   ICD: "ICD",
   VACCINE_ICD: "VACCINE_ICD"
 };
-Object.freeze(MAPPINGS_KEYS);
+Object.freeze(ICD_MAPPINGS_KEYS);
 
 module.exports = {
-  MAPPINGS_KEYS
+  ICD_MAPPINGS_KEYS
 }

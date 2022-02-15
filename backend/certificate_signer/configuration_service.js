@@ -1,6 +1,6 @@
 const {Etcd3} = require('etcd3');
 const config = require('./config/config');
-const {MAPPINGS_KEYS} = require('./config/constants');
+const {ICD_MAPPINGS_KEYS} = require('./config/constants');
 
 let ICD11_MAPPINGS = null, VACCINE_ICD11_MAPPINGS = null;
 let etcdClient;
@@ -8,8 +8,8 @@ let configuration;
 
 function init() {
     etcdClient = new Etcd3({hosts: config.ETCD_URL});
-    setUpWatcher(MAPPINGS_KEYS.ICD);
-    setUpWatcher(MAPPINGS_KEYS.VACCINE_ICD);
+    setUpWatcher(ICD_MAPPINGS_KEYS.ICD);
+    setUpWatcher(ICD_MAPPINGS_KEYS.VACCINE_ICD);
     configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd() : null
 }
 
@@ -37,10 +37,10 @@ function setUpWatcher(key) {
 function loadMappings(key) {
     let mapping;
     switch(key) {
-        case MAPPINGS_KEYS.ICD:
+        case ICD_MAPPINGS_KEYS.ICD:
             mapping = ICD11_MAPPINGS;
             break;
-        case MAPPINGS_KEYS.VACCINE_ICD:
+        case ICD_MAPPINGS_KEYS.VACCINE_ICD:
             mapping = VACCINE_ICD11_MAPPINGS;
             break;
     }
@@ -70,10 +70,10 @@ const etcd = function() {
 
 function updateMappingValues(key, value) {
     switch(key) {
-        case MAPPINGS_KEYS.ICD:
+        case ICD_MAPPINGS_KEYS.ICD:
             ICD11_MAPPINGS = value
             break;
-        case MAPPINGS_KEYS.VACCINE_ICD:
+        case ICD_MAPPINGS_KEYS.VACCINE_ICD:
             VACCINE_ICD11_MAPPINGS = value
             break;
     }

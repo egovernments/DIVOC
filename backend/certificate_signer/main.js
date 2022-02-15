@@ -21,7 +21,7 @@ const signer = require('certificate-signer-library');
 const Mustache = require("mustache");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
-const {MAPPINGS_KEYS} = require('./config/constants');
+const {ICD_MAPPINGS_KEYS} = require('./config/constants');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
@@ -103,8 +103,8 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
-      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getICDMappings(MAPPINGS_KEYS.ICD));
-      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getICDMappings(MAPPINGS_KEYS.VACCINE_ICD))
+      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.ICD));
+      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.VACCINE_ICD))
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());

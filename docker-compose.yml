@@ -207,7 +207,7 @@ services:
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
       COUNTRY_CODE: "IND"
       FACILITY_COUNTRY_CODE: "IND"
-      ETCD_URL: etcd:2379
+      ETCD_URL: $ETCD_URL
       CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
@@ -296,18 +296,18 @@ services:
   etcd:
     image: gcr.io/etcd-development/etcd:v3.5.1
     entrypoint: /usr/local/bin/etcd
-    command: 
-      - '--name=$ETCD_NAME'
-      - '--data-dir=$ETCD_DATA_DIR'
-      - '--listen-client-urls=$ETCD_LISTEN_CLIENT_URLS'
-      - '--advertise-client-urls=$ETCD_ADVERTISE_CLIENT_URLS'
-      - '--listen-peer-urls=$ETCD_LISTEN_PEER_URLS'
-      - '--initial-advertise-peer-urls=$ETCD_ADVERTISE_PEER_URLS'
-      - '--initial-cluster=$ETCD_NAME=$ETCD_INITIAL_CLUSTER'
-      - '--initial-cluster-token=$ETCD_INITIAL_CLUSTER_TOKEN'
-      - '--initial-cluster-state=$ETCD_INITIAL_CLUSTER_STATE'
-      - '--log-level=$ETCD_LOG_LEVEL'
-      - '--logger=$ETCD_LOGGER'
-      - '--log-outputs=$ETCD_LOG_OUTPUTS'
+    environment: 
+      ETCD_NAME: '$ETCD_NAME'
+      ETCD_DATA_DIR: '$ETCD_DATA_DIR'
+      ETCD_LISTEN_CLIENT_URLS: '$ETCD_LISTEN_CLIENT_URLS'
+      ETCD_ADVERTISE_CLIENT_URLS: '$ETCD_ADVERTISE_CLIENT_URLS'
+      ETCD_LISTEN_PEER_URLS: '$ETCD_LISTEN_PEER_URLS'
+      ETCD_INITIAL_ADVERTISE_PEER_URLS: '$ETCD_ADVERTISE_PEER_URLS'
+      ETCD_INITIAL_CLUSTER: '$ETCD_NAME=$ETCD_INITIAL_CLUSTER'
+      ETCD_INITIAL_CLUSTER_TOKEN: '$ETCD_INITIAL_CLUSTER_TOKEN'
+      ETCD_INITIAL_CLUSTER_STATE: '$ETCD_INITIAL_CLUSTER_STATE'
+      ETCD_LOG_LEVEL: '$ETCD_LOG_LEVEL'
+      ETCD_LOGGER: '$ETCD_LOGGER'
+      ETCD_LOG_OUTPUTS: '$ETCD_LOG_OUTPUTS'
     ports:
       - $ETCD_CLIENT_CONNECTIONS_PORT:$ETCD_CLIENT_CONNECTIONS_PORT
