@@ -119,6 +119,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
+      REDIS_URL: redis://redis:6379
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -184,6 +185,8 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+      REDIS_URL: "redis://redis:6379"
+      ENABLE_PROGRAM_ID_CACHING_KEY: "true"
     depends_on:
       registry:
         condition: service_started
@@ -205,7 +208,6 @@ services:
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
-      COUNTRY_CODE: "IND"
       FACILITY_COUNTRY_CODE: "IND"
       ETCD_URL: $ETCD_URL
       CONFIGURATION_LAYER: "etcd"
@@ -290,6 +292,11 @@ services:
       CERTIFICATE_ISSUER: "https://divoc.dev"
       FHIR_PUBLIC_HEALTH_AUTHORITY: "Govt Of India"
       DISEASE_CODE: "COVID-19"
+      REDIS_URL: redis://redis:6379
+      REDIS_KEY_EXPIRE: 172800
+      REDIS_ENABLED: "true"
+      ETCD_URL: etcd:2379
+      CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
         condition: service_healthy
