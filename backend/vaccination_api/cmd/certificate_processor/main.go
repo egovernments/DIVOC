@@ -122,10 +122,10 @@ func initializeCreateUserInKeycloak() {
 func initializeRevokeCertificate() {
 	log.Infof("Using kafka for revoke_cert %s", config.Config.Kafka.BootstrapServers)
 
-	services.InitRedis()
-	services.InitializeKafka()
 	servers := config.Config.Kafka.BootstrapServers
 	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	services.InitializeKafkaForRevocationService(producer)
+	services.InitRedis()
 
 	go func() {
 		topic := config.Config.Kafka.RevokeCertErrTopic

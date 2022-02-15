@@ -98,6 +98,8 @@ func InitializeKafka() {
 	}()
 
 	StartEventProducer(producer)
+	startRevokeCertificateProducer(producer)
+	startProcStatusProducer(producer)
 
 	go func() {
 		topic := config.Config.Kafka.ReportedSideEffectsTopic
@@ -184,32 +186,6 @@ func InitializeKafka() {
 			} else {
 				// The client will automatically try to recover from all errors.
 				log.Infof("Consumer error: %v \n", err)
-			}
-		}
-	}()
-
-	go func() {
-		topic := config.Config.Kafka.RevokeCertTopic
-		for {
-			msg := <-revokedCertificates
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
-	go func() {
-		topic := config.Config.Kafka.ProcStatusTopic
-		for {
-			msg := <-procStatusEvents
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
 			}
 		}
 	}()
@@ -355,4 +331,39 @@ func startCertificateRevocationConsumer(servers string) {
 			}
 		}
 	}()
+}
+
+func startRevokeCertificateProducer(producer *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.RevokeCertTopic
+		for {
+			msg := <-revokedCertificates
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func startProcStatusProducer(producer *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.ProcStatusTopic
+		for {
+			msg := <-procStatusEvents
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func InitializeKafkaForRevocationService(producer *kafka.Producer) {
+	startRevokeCertificateProducer(producer)
+	startProcStatusProducer(producer)
 }
