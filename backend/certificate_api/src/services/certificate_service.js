@@ -31,9 +31,9 @@ const getLatestCertificate = (certificates) => {
 const convertCertificateToDCCPayload = async(certificateRaw) => {
   let certificate = JSON.parse(certificateRaw.certificate);
   const configurationService = new configService.ConfigurationService();
-  const VACCINE_MANUF = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.MANUF);
-  const EU_VACCINE_PROPH = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.PROPH);
-  const EU_VACCINE_CODE = await configurationService.getEUVaccineDetails(constants.EU_VACCINE.CODE);
+  const VACCINE_MANUF = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
+  const EU_VACCINE_PROPH = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
+  const EU_VACCINE_CODE = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
   if(VACCINE_MANUF === null || EU_VACCINE_PROPH === null || EU_VACCINE_CODE === null || EU_VACCINE_CODE === undefined || EU_VACCINE_PROPH === undefined || VACCINE_MANUF === undefined) {
     throw new Error("EU Vaccine Details are missing from Configuration");
   }

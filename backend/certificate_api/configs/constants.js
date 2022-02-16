@@ -5,14 +5,14 @@ const TEMPLATES = {
 };
 Object.freeze(TEMPLATES);
 
-const EU_VACCINE = {
-  PROPH: "euVaccineProph",
-  CODE: "euVaccineCode",
-  MANUF: "euVaccineManuf"
+const EU_VACCINE_CONFIG_KEYS = {
+  PROPHYLAXIS_TYPE: "euVaccineProph",
+  VACCINE_CODE: "euVaccineCode",
+  MANUFACTURER: "euVaccineManuf"
 }
 
 module.exports = {
   EU_DISEASE,
   TEMPLATES,
-  EU_VACCINE
+  EU_VACCINE_CONFIG_KEYS
 }

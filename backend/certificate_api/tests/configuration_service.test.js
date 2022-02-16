@@ -1,7 +1,7 @@
 const etcd3 = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 jest.mock('sanitize-html');
-const {TEMPLATES, EU_VACCINE} = require('../configs/constants');
+const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../configs/constants');
 jest.mock('../src/services/redis_service');
 console.log = jest.fn();
 const html = `<html>
@@ -97,23 +97,23 @@ test('should call watch method to watch for changes in etcd', () => {
 
 test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
     jest.spyOn(mockEtcd3Constructor, 'get')
-    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.PROPH));
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE));
     expect(proph).toEqual({"covaxin": "J07BX03"});
-    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.PROPH);
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
 });
 
 test('should retrieve EU_VACCINE_CODE details from etcd', async() => {
     jest.spyOn(mockEtcd3Constructor, 'get')
-    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.CODE));
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE));
     expect(proph).toEqual({"covaxin": "Covaxin"});
-    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.CODE);
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
 });
 
 test('should retrieve EU_VACCINE_MANUF details from etcd', async() => {
     jest.spyOn(mockEtcd3Constructor, 'get')
-    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE.MANUF));
+    const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.MANUFACTURER));
     expect(proph).toEqual({"bharat": "Bharat-Biotech"});
-    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE.MANUF);
+    expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
 });
 
 describe('environment variables', () => {

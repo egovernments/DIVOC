@@ -2,7 +2,7 @@ const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 
 const config = require('../../configs/config');
-const {TEMPLATES, EU_VACCINE} = require('../../configs/constants');
+const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null;
@@ -12,9 +12,9 @@ function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
-  setUpWatcher(EU_VACCINE.CODE);
-  setUpWatcher(EU_VACCINE.MANUF);
-  setUpWatcher(EU_VACCINE.PROPH);
+  setUpWatcher(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
+  setUpWatcher(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
+  setUpWatcher(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
   configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd(): null ;
 }
 
@@ -47,13 +47,13 @@ function updateConfigValues(key, value) {
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
       break;
-    case EU_VACCINE.CODE:
+    case EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
       EU_VACCINE_CODE = value;
       break;
-    case EU_VACCINE.MANUF:
+    case EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
       EU_VACCINE_MANUF = value;
       break;
-    case EU_VACCINE.PROPH:
+    case EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE:
       EU_VACCINE_PROPH = value;
       break;
   }
@@ -89,13 +89,13 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
       break;
-    case EU_VACCINE.MANUF:
+    case EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
       value = EU_VACCINE_MANUF;
       break;
-    case EU_VACCINE.CODE:
+    case EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
       value = EU_VACCINE_CODE;
       break;
-    case EU_VACCINE.PROPH:
+    case EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE:
       value = EU_VACCINE_PROPH;
       break;
   }
