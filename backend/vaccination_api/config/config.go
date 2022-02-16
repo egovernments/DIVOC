@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +33,7 @@ func updatePublicKeyFromKeycloak() error {
 			Config.Keycloak.Pubkey = publicKey
 		}
 	}
-	return errors.New("Unable to get public key from keycloak")
+	return errors.New("unable to get public key from keycloak")
 }
 
 var Config = struct {
@@ -62,6 +63,9 @@ var Config = struct {
 		EventsTopic              string `default:"events" yaml:"eventsTopic"`
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		EnrollmentACKTopic       string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
+		RevokeCertTopic          string `default:"revoke_cert" yaml:"revokeCertTopic"`
+		RevokeCertErrTopic       string `default:"revoke_cert_err" yaml:"revokeCertErrTopic"`
+		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
@@ -97,5 +101,13 @@ var Config = struct {
 	}
 	Auth struct {
 		RegistrationAPIPublicKey string `yaml:"registrationAPIPublickey" env:"REGISTRATION_API_PUBLIC_KEY"`
+	}
+	Redis struct {
+		Url              string `env:"REDIS_URL" yaml:"redisurl"`
+		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching"`
+	}
+	EnabledServices struct {
+		CreateRecipientInKeycloakService string `env:"ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE" yaml:"createRecipientInKeycloakService" default:"false"`
+		RevokeCertificateService         string `env:"ENABLE_REVOKE_CERTIFICATION_SERVICE" yaml:"revokeCertificateService" default:"true"`
 	}
 }{}

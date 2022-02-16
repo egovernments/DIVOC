@@ -119,6 +119,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
+      REDIS_URL: redis://redis:6379
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -184,6 +185,8 @@ services:
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+      REDIS_URL: "redis://redis:6379"
+      ENABLE_PROGRAM_ID_CACHING_KEY: "true"
     depends_on:
       registry:
         condition: service_started
