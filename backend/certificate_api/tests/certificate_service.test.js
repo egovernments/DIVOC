@@ -1,11 +1,32 @@
 const certificate_service = require('../src/services/certificate_service');
 const dcc = require('@pathcheck/dcc-sdk');
-
+const configurationService = require('../src/services/configuration_service');
 const config = require('../configs/config');
 config.DISEASE_CODE = 'COVID-19';
 config.PUBLIC_HEALTH_AUTHORITY = 'Govt Of India';
 
-test('should convert certificate in eu specified payload if all fields are provided in correct format', () => {
+var mockConstructor = {
+    getEUVaccineDetails: jest.fn()
+                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
+                            .mockReturnValueOnce({"covishield": "J07BX03"})
+                            .mockReturnValueOnce({"covishield": "Covishield"})
+                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
+                            .mockReturnValueOnce({"covishield": "J07BX03"})
+                            .mockReturnValueOnce({"covishield": "Covishield"})
+                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
+                            .mockReturnValueOnce({"covishield": "J07BX03"})
+                            .mockReturnValueOnce({"covishield": "Covishield"})
+                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
+                            .mockReturnValueOnce({"covishield": "J07BX03"})
+                            .mockReturnValueOnce({"covishield": "Covishield"})
+}
+jest.mock('../src/services/configuration_service', () => {
+    return {
+        ConfigurationService: jest.fn().mockImplementation(() => mockConstructor)
+    }
+});
+
+test('should convert certificate in eu specified payload if all fields are provided in correct format', async() => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
         contact: [ 'tel:0779039495' ],
@@ -52,11 +73,11 @@ test('should convert certificate in eu specified payload if all fields are provi
             }
         ]
     };
-    const actualDccPayload = certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
-test('should convert certificate in eu specified payload if country field is full name of country', () => {
+test('should convert certificate in eu specified payload if country field is full name of country', async() => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
         contact: [ 'tel:0779039495' ],
@@ -103,11 +124,11 @@ test('should convert certificate in eu specified payload if country field is ful
             }
         ]
     };
-    const actualDccPayload = certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
-test('should convert certificate in eu specified payload if country field is 2 letter code', () => {
+test('should convert certificate in eu specified payload if country field is 2 letter code', async() => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
         contact: [ 'tel:0779039495' ],
@@ -154,11 +175,11 @@ test('should convert certificate in eu specified payload if country field is 2 l
             }
         ]
     };
-    const actualDccPayload = certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
-test('should convert certificate in eu specified payload if country field is invalid country code', () => {
+test('should convert certificate in eu specified payload if country field is invalid country code', async() => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
         contact: [ 'tel:0779039495' ],
@@ -205,7 +226,7 @@ test('should convert certificate in eu specified payload if country field is inv
             }
         ]
     };
-    const actualDccPayload = certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
