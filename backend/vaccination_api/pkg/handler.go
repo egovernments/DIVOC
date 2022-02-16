@@ -4,18 +4,19 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	eventsModel "github.com/divoc/api/pkg/models"
-	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 	"net/http"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/swagger_gen/restapi/operations/certificate_revoked"
 
 	"github.com/divoc/api/config"
 	"github.com/jinzhu/gorm"
 
 	"github.com/divoc/api/pkg/auth"
 	"github.com/divoc/api/pkg/db"
+	eventsModel "github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/pkg/models"
 	kafkaService "github.com/divoc/api/pkg/services"
 	"github.com/divoc/api/swagger_gen/models"
@@ -27,7 +28,7 @@ import (
 	"github.com/divoc/api/swagger_gen/restapi/operations/report_side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/side_effects"
 	"github.com/divoc/api/swagger_gen/restapi/operations/vaccination"
-	"github.com/divoc/kernel_library/services"
+	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 	log "github.com/sirupsen/logrus"
@@ -62,6 +63,7 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationUpdateCertificateHandler = certification.UpdateCertificateHandlerFunc(updateCertificate)
 	api.CertificationUpdateCertificateV3Handler = certification.UpdateCertificateV3HandlerFunc(updateCertificateV3)
 	api.CertificateRevokedCertificateRevokedHandler = certificate_revoked.CertificateRevokedHandlerFunc(postCertificateRevoked)
+	api.CertificationRevokeCertificateHandler = certification.RevokeCertificateHandlerFunc(revokeCertificate)
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -116,7 +118,7 @@ func getCertificate(params operations.GetCertificateParams, principal *models.JW
 			"eq": principal.PreferredUsername,
 		},
 	}
-	if response, err := services.QueryRegistry(typeId, filter); err != nil {
+	if response, err := kernelService.QueryRegistry(typeId, filter); err != nil {
 		log.Infof("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {
@@ -296,7 +298,7 @@ func getCertificateIdToBeUpdated(request *models.CertificationRequestV2) *string
 			"eq": request.PreEnrollmentCode,
 		},
 	}
-	certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter)
+	certificateFromRegistry, err := kernelService.QueryRegistry(CertificateEntity, filter)
 	certificates := certificateFromRegistry[CertificateEntity].([]interface{})
 	if err == nil && len(certificates) > 0 {
 		certificates = SortCertificatesByCreateAt(certificates)
@@ -378,7 +380,7 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 				jsonRequestString,
 				nil,
 				nil,
-				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3,})
+				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V3})
 		}
 	}
 	return certification.NewCertifyV3OK()
@@ -394,7 +396,7 @@ func certifyV2(params certification.CertifyV2Params, principal *models.JWTClaimB
 				jsonRequestString,
 				nil,
 				nil,
-				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
+				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyV2OK()
@@ -415,7 +417,7 @@ func certify(params certification.CertifyParams, principal *models.JWTClaimBody)
 				jsonRequestString,
 				nil,
 				nil,
-				kafkaService.MessageHeader{CertificateType:kafkaService.CERTIFICATE_TYPE_V2})
+				kafkaService.MessageHeader{CertificateType: kafkaService.CERTIFICATE_TYPE_V2})
 		}
 	}
 	return certification.NewCertifyOK()
@@ -610,7 +612,7 @@ func postCertificateRevoked(params certificate_revoked.CertificateRevokedParams)
 			"eq": preEnrollmentCode,
 		},
 	}
-	if resp, err := services.QueryRegistry(typeId, filter); err == nil {
+	if resp, err := kernelService.QueryRegistry(typeId, filter); err == nil {
 		if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificates) > 0 {
 				return certificate_revoked.NewCertificateRevokedOK()
@@ -630,4 +632,112 @@ func SortCertificatesByCreateAt(certificateArr []interface{}) []interface{} {
 		return certificateACreateAt < certificateBCreateAt
 	})
 	return certificateArr
+}
+
+func revokeCertificate(params certification.RevokeCertificateParams, principal *models.JWTClaimBody) middleware.Responder {
+	if params.PreEnrollmentCode == "" {
+		return certification.NewRevokeCertificateBadRequest()
+	}
+	preEnrollmentCode := params.PreEnrollmentCode
+	doses := params.Doses
+	allDoses := params.AllDoses
+
+	log.Infof("revokeCertificate params: doses:%v allDoes:%v", doses, allDoses)
+	if doses == nil && (allDoses == nil || (allDoses != nil && *allDoses != true)) {
+		return certification.NewRevokeCertificateBadRequest()
+	}
+
+	if allDoses != nil && *allDoses == true {
+		doses = nil
+	}
+
+	if doses != nil && len(doses) > 1 { // ensure doses provided are sequential
+		sort.Slice(doses, func(i, j int) bool { return doses[i] < doses[j] })
+		for i, dose := range doses {
+			if i < len(doses)-1 && doses[i+1]-dose > 1 {
+				return certification.NewRevokeCertificateBadRequest()
+			}
+		}
+	}
+
+	filter := map[string]interface{}{
+		"preEnrollmentCode": map[string]interface{}{
+			"eq": preEnrollmentCode,
+		},
+	}
+
+	if response, err := kernelService.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
+		log.Errorf("Error in querying vaccination certificate %+v", err)
+		return NewGenericServerError()
+	} else {
+		if listOfCerts, ok := response[CertificateEntity].([]interface{}); ok {
+			log.Infof("%v certs found for preEnrollmentCode %v", len(listOfCerts), preEnrollmentCode)
+
+			if len(listOfCerts) == 0 {
+				return certification.NewRevokeCertificateNotFound()
+			}
+			isCertificateFound := false
+			maxDose := 0
+			var certificatesToBeRevoked []map[string]interface{}
+			for _, v := range listOfCerts {
+				if body, ok := v.(map[string]interface{}); ok {
+					var cert map[string]interface{}
+					if err := json.Unmarshal([]byte(body["certificate"].(string)), &cert); err != nil {
+						log.Errorf("%v", err)
+						continue
+					}
+					certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
+					if doses != nil {
+						for _, currentDose := range doses {
+							log.Infof("Checking dose %v against %v", currentDose, certificateDose["dose"])
+							if currentDose == int32(certificateDose["dose"].(float64)) {
+								isCertificateFound = true
+								certificatesToBeRevoked = append(certificatesToBeRevoked, body)
+							}
+							if int(certificateDose["dose"].(float64)) > maxDose {
+								maxDose = int(certificateDose["dose"].(float64))
+							}
+						}
+					} else {
+						isCertificateFound = true
+						certificatesToBeRevoked = append(certificatesToBeRevoked, body)
+					}
+				}
+			}
+			if !isCertificateFound {
+				return certification.NewRevokeCertificateNotFound()
+			} else {
+				maxDoseIsPresent := false
+				if doses != nil {
+					for _, i := range doses {
+						if int(i) == maxDose {
+							maxDoseIsPresent = true
+						}
+					}
+					log.Infof("maxDose %v maxDoseIsPresent %v", maxDose, maxDoseIsPresent)
+
+					if maxDoseIsPresent != true {
+						return certification.NewRevokeCertificateBadRequest()
+					}
+				}
+
+				for _, body := range certificatesToBeRevoked {
+					revokeMsg, _ := json.Marshal(struct {
+						PreEnrollmentCode string                 `json:"preEnrollmentCode"`
+						CertificateBody   map[string]interface{} `json:"certificateBody"`
+					}{
+						PreEnrollmentCode: preEnrollmentCode,
+						CertificateBody:   body,
+					})
+					log.Infof("Found certificate for revocation. Adding to Kafka topic.")
+					kafkaService.PublishRevokeCertificateMessage(revokeMsg)
+				}
+			}
+
+			return certification.NewRevokeCertificateOK()
+		} else {
+			log.Printf("Error occurred while extracting the certificates from registry response")
+			return NewGenericServerError()
+		}
+	}
 }

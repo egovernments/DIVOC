@@ -27,3 +27,9 @@ clickhouse:
 acknowledgement:
   callbackauthurl: "https://api.sit.co-vin.in/api/v1/auth/guest/login"
   callbackurl: "https://api.sit.co-vin.in/api/v1/registration/certificate/ackCertificate"
+redis:
+  redisurl: "redis://redis:6379"
+  programidcaching: "true"
+enabledServices:
+  createRecipientInKeycloakService: "true"
+  revokeCertificateService: "true"

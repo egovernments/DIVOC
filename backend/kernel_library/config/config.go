@@ -17,6 +17,7 @@ var Config = struct {
 		AddOperationId    string
 		SearchOperationId string `default:"search"`
 		UpdateOperationId string `default:"update"`
+		DeleteOperationId string `default:"delete"`
 		ReadOperationId   string `default:"read"`
 		ApiVersion        string `default:"1"`
 	}

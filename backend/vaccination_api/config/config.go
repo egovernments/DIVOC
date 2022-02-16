@@ -2,10 +2,11 @@ package config
 
 import (
 	"errors"
+	"strings"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
-	"strings"
 )
 
 var PollingStates []string
@@ -38,7 +39,7 @@ func updatePublicKeyFromKeycloak() error {
 			Config.Keycloak.Pubkey = publicKey
 		}
 	}
-	return errors.New("Unable to get public key from keycloak")
+	return errors.New("unable to get public key from keycloak")
 }
 
 var Config = struct {
@@ -67,6 +68,8 @@ var Config = struct {
 		ReportedSideEffectsTopic string `default:"reported_side_effects" yaml:"reportedSideEffectsTopic"`
 		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
 		EnableCertificateAck     bool   `default:"false" env:"ENABLE_CERTIFICATE_ACK"`
+		RevokeCertTopic          string `default:"revoke_cert" yaml:"revokeCertTopic"`
+		RevokeCertErrTopic       string `default:"revoke_cert_err" yaml:"revokeCertErrTopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
@@ -76,9 +79,10 @@ var Config = struct {
 		DBName   string `default:"postgres" yaml:"dbname" env:"DB_NAME"`
 	}
 	Redis struct {
-		Url      string `env:"REDIS_URL" default:"redis://0.0.0.0:6379"`
-		Password string `default:"" env:"REDIS_PASSWORD"`
-		DB       int    `default:"0" env:"REDIS_DB"`
+		Url              string `env:"REDIS_URL" yaml:"redisurl" default:"redis://redis:6379"`
+		Password         string `default:"" env:"REDIS_PASSWORD"`
+		DB               int    `default:"0" env:"REDIS_DB"`
+		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching"`
 	}
 	Certificate struct {
 		Upload struct {
@@ -100,6 +104,10 @@ var Config = struct {
 		CallbackAuthKey           string `env:"ACK_CALLBACK_AUTH_KEY"`
 		CallbackAuthExpiryMinutes int    `default:"10" env:"ACK_CALLBACK_AUTH_TOKEN_EXPIRY"`
 		CallbackUrl               string `env:"ACK_CALLBACK_URL"`
+	}
+	EnabledServices struct {
+		CreateRecipientInKeycloakService string `env:"ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE" yaml:"createRecipientInKeycloakService" default:"true"`
+		RevokeCertificateService         string `env:"ENABLE_REVOKE_CERTIFICATION_SERVICE" yaml:"revokeCertificateService" default:"true"`
 	}
 	PollingStatesCSV string `default:"" yaml:"pollingstates" env:"POLLING_STATES"`
 }{}

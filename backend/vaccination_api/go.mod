@@ -13,7 +13,7 @@ require (
 	github.com/go-openapi/strfmt v0.19.8
 	github.com/go-openapi/swag v0.19.11
 	github.com/go-openapi/validate v0.19.12
-	github.com/go-redis/redis/v8 v8.5.0
+	github.com/go-redis/redis/v8 v8.11.4
 	github.com/gorilla/mux v1.8.0
 	github.com/gospotcheck/jwt-go v4.0.0+incompatible
 	github.com/imroc/req v0.3.0
@@ -26,7 +26,7 @@ require (
 	github.com/sirupsen/logrus v1.7.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/unrolled/secure v1.0.8
-	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
+	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
 

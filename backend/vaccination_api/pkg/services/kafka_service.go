@@ -2,13 +2,14 @@ package services
 
 import (
 	"encoding/json"
+	"strconv"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/db"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strconv"
 )
 
 var producer *kafka.Producer
@@ -18,6 +19,7 @@ var reconErrorRequests = make(chan Message)
 var events = make(chan []byte)
 var procStatusEvents = make(chan []byte)
 var reportedSideEffects = make(chan []byte)
+var revokedCertificates = make(chan []byte)
 
 const CERTIFICATE_TYPE_V2 = "certifyV2"
 const CERTIFICATE_TYPE_V3 = "certifyV3"
@@ -47,6 +49,8 @@ func InitializeKafka() {
 	StartReconErrorRequestProducer(producer)
 
 	StartEventProducer(producer)
+
+	startRevokeCertificateProducer(producer)
 
 	StartProcStatusEventProducer(producer)
 
@@ -213,6 +217,22 @@ func StartProcStatusEventProducer(producerClient *kafka.Producer) {
 	}()
 }
 
+func startRevokeCertificateProducer(producerClient *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.RevokeCertTopic
+		for {
+			msg := <-revokedCertificates
+			if err := producerClient.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+
+}
+
 func PublishCertifyMessage(message []byte, uploadId []byte, rowId []byte, header MessageHeader) {
 	messages <- Message{
 		UploadId: uploadId,
@@ -239,7 +259,13 @@ func PublishEvent(event models.Event) {
 	}
 }
 
+func PublishRevokeCertificateMessage(revokeMessage []byte) {
+	log.Infof("Publishing to revoke certificate topic")
+	revokedCertificates <- revokeMessage
+}
+
 func PublishProcStatus(event models.ProcStatus) {
+	log.Infof("Publishing to proc status topic")
 	if messageJson, err := json.Marshal(event); err != nil {
 		log.Errorf("Error in getting json of event %+v", event)
 	} else {
@@ -299,4 +325,9 @@ func startCertificateRevocationConsumer(servers string) {
 			}
 		}
 	}()
+}
+
+func InitializeKafkaForRevocationService(producer *kafka.Producer) {
+	startRevokeCertificateProducer(producer)
+	StartProcStatusEventProducer(producer)
 }
