@@ -1,17 +1,12 @@
 package main
 
 import (
-	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"math/rand"
-	"strconv"
-	"strings"
 	"time"
 )
 

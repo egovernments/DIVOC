@@ -99,13 +99,13 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 	}
 	log.Debugf("revokeCertificate: %v", revokeCertificate)
 	log.Debugf("filter: %v", filter)
-	if resp, err := kernelService.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
+	if resp, err := kernelService.QueryRegistry(typeId, filter); err == nil {
 		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificate) > 0 {
 				log.Infof("%v certificateId already exists in revocation", certificateId)
 				return SUCCESS, nil
 			}
-			_, err = kernelService.CreateNewRegistry(revokeCertificate, typeId)
+			err = kernelService.CreateNewRegistry(revokeCertificate, typeId)
 			if err != nil {
 				log.Infof("Failed saving revoked Certificate %+v", err)
 				return ERROR, err

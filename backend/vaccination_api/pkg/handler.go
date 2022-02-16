@@ -666,7 +666,7 @@ func revokeCertificate(params certification.RevokeCertificateParams, principal *
 		},
 	}
 
-	if response, err := kernelService.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err != nil {
+	if response, err := kernelService.QueryRegistry(CertificateEntity, filter); err != nil {
 		log.Errorf("Error in querying vaccination certificate %+v", err)
 		return NewGenericServerError()
 	} else {

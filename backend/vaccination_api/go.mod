@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	github.com/ClickHouse/clickhouse-go v1.4.3
+	github.com/PuerkitoBio/purell v1.1.1 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
 	github.com/go-openapi/errors v0.19.7
@@ -22,6 +23,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/prometheus/client_golang v1.9.0
+	github.com/prometheus/client_model v0.2.0 // indirect
 	github.com/signintech/gopdf v0.9.12
 	github.com/sirupsen/logrus v1.7.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
