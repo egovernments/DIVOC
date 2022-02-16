@@ -10,6 +10,8 @@ services:
   portal_api:
     environment:
         ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+  etcd:
+    entrypoint: /usr/local/bin/etcd
   keycloak:
     environment:
       - KEYCLOAK_IMPORT=/config/e2e-divoc-realm.json
@@ -35,4 +37,6 @@ services:
       keycloak:
         condition: service_healthy
       registry:
+        condition: service_started
+      etcd:
         condition: service_started

@@ -13,14 +13,14 @@ const {
 const {Kafka} = require('kafkajs');
 const fs = require('fs');
 const config = require('./config/config');
-const constants = require("./config/constants");
+const configuration_service = require('./configuration_service');
 const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
 const signer = require('certificate-signer-library');
 const Mustache = require("mustache");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
-
+const {ICD_MAPPINGS_KEYS} = require('./config/constants');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
@@ -80,17 +80,20 @@ let signingConfig = {
 
 };
 
+let ICD11_MAPPINGS;
+let VACCINE_ICD11_MAPPINGS;
+let configLayerObj;
 const documentLoader = {};
 documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
 documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
 
 (async function() {
+  configuration_service.init();
   await consumer.connect();
   await producer.connect();
   await consumer.subscribe({topic: config.CERTIFY_TOPIC, fromBeginning: true});
-
   await signer.init_signer(signingConfig, transformW3, documentLoader);
-
+  configLayerObj = new configuration_service.ConfigLayer();
   await consumer.run({
     eachMessage: async ({topic, partition, message}) => {
       console.time("certify");
@@ -99,6 +102,8 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
+      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.ICD));
+      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.VACCINE_ICD))
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());
@@ -107,7 +112,10 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         const programId = R.pathOr("", ["programId"], jsonMessage);
         const enablePid = JSON.parse(config.ENABLE_PROGRAM_ID_CACHING_KEY)
         if (preEnrollmentCode === "" || currentDose === "" || (enablePid && programId === "")) {
-          throw Error("Required parameters not available")
+          throw Error("Required parameters not available");
+        }
+        if(ICD11_MAPPINGS === null || VACCINE_ICD11_MAPPINGS === null) {
+          throw Error("Please set ICD11 and VACCINE_ICD11 Mappings in ETCD");
         }
         const key = enablePid ? `${preEnrollmentCode}-${programId}-${currentDose}` : `${preEnrollmentCode}-${currentDose}`;
         await signer.signCertificate(jsonMessage, message.headers, key);
@@ -207,8 +215,8 @@ function transformW3(cert, certificateId) {
 
   const batch = R.pathOr('', ['vaccination', 'batch'], cert);
   const vaccine = R.pathOr('', ['vaccination', 'name'], cert);
-  const icd11Code = vaccine ? constants.VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
-  const prophylaxis = icd11Code ? constants.ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
+  const icd11Code = vaccine ? VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
+  const prophylaxis = icd11Code ? ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
   const manufacturer = R.pathOr('', ['vaccination', 'manufacturer'], cert);
   const vaccinationDate = R.pathOr('', ['vaccination', 'date'], cert);
   const effectiveStart = R.pathOr('', ['vaccination', 'effectiveStart'], cert);
