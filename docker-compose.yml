@@ -187,6 +187,8 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       REDIS_URL: "redis://redis:6379"
       ENABLE_PROGRAM_ID_CACHING_KEY: "true"
+      ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE: "true"
+      ENABLE_REVOKE_CERTIFICATION_SERVICE: "true"
     depends_on:
       registry:
         condition: service_started
