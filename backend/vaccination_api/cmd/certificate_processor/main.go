@@ -86,9 +86,8 @@ func main() {
 
 func initializeCreateUserInKeycloak() {
 	log.Infof("Using kafka for certificate_processor %s", config.Config.Kafka.BootstrapServers)
-	c, err := createConsumer("certificate_processor", "earliest", "false")
-	err = c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil)
-	if err != nil {
+	c := createConsumer("certificate_processor", "earliest", "false")
+	if err := c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil); err != nil {
 		panic(err)
 	}
 	for {
@@ -122,9 +121,8 @@ func initializeRevokeCertificate() {
 	services.InitializeKafkaForRevocationService(producer)
 	services.InitRedis()
 	startRevokeCertificateErrorTopicProducer(producer)
-	c, err := createConsumer("revoke_cert", "earliest", "false")
-	err = c.SubscribeTopics([]string{config.Config.Kafka.RevokeCertTopic}, nil)
-	if err != nil {
+	c := createConsumer("revoke_cert", "earliest", "false")
+	if err = c.SubscribeTopics([]string{config.Config.Kafka.RevokeCertTopic}, nil); err != nil {
 		panic(err)
 	}
 	for {
@@ -155,13 +153,17 @@ func initializeRevokeCertificate() {
 	c.Close()
 }
 
-func createConsumer(groupId string, autoOffsetReset string, enableAutoCommit string) (*kafka.Consumer, error) {
-	return kafka.NewConsumer(&kafka.ConfigMap{
+func createConsumer(groupId string, autoOffsetReset string, enableAutoCommit string) *kafka.Consumer {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           groupId,
 		"auto.offset.reset":  autoOffsetReset,
 		"enable.auto.commit": enableAutoCommit,
 	})
+	if err != nil {
+		panic(err)
+	}
+	return c
 }
 
 func startRevokeCertificateErrorTopicProducer(producer *kafka.Producer) {
