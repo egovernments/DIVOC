@@ -82,7 +82,7 @@ var Config = struct {
 		Url              string `env:"REDIS_URL" yaml:"redisurl" default:"redis://redis:6379"`
 		Password         string `default:"" env:"REDIS_PASSWORD"`
 		DB               int    `default:"0" env:"REDIS_DB"`
-		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching"`
+		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching" default:"false"`
 	}
 	Certificate struct {
 		Upload struct {

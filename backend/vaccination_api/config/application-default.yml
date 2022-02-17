@@ -29,7 +29,7 @@ acknowledgement:
   callbackurl: "https://api.sit.co-vin.in/api/v1/registration/certificate/ackCertificate"
 redis:
   redisurl: "redis://redis:6379"
-  programidcaching: "true"
+  programidcaching: "false"
 enabledServices:
   createRecipientInKeycloakService: "true"
   revokeCertificateService: "true"

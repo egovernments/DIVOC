@@ -7,6 +7,7 @@ import (
 	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"sync"
 	"time"
 )
 
@@ -64,36 +65,29 @@ type CertifyMessage struct {
 }
 
 func main() {
-	config.Initialize()
 	log.Infof("Starting certificate processor")
+	config.Initialize()
 
+	var wg sync.WaitGroup
+	wg.Add(2)
 	log.Infof("CreateRecipientInKeycloakService enabled %s", config.Config.EnabledServices.CreateRecipientInKeycloakService)
 	if config.Config.EnabledServices.CreateRecipientInKeycloakService == "true" {
-		initializeCreateUserInKeycloak()
+		go initializeCreateUserInKeycloak()
 	}
 
 	log.Infof("RevokeCertificateService enabled %s", config.Config.EnabledServices.RevokeCertificateService)
 	if config.Config.EnabledServices.RevokeCertificateService == "true" {
-		initializeRevokeCertificate()
+		go initializeRevokeCertificate()
 	}
+	wg.Wait()
 }
 
 func initializeCreateUserInKeycloak() {
 	log.Infof("Using kafka for certificate_processor %s", config.Config.Kafka.BootstrapServers)
-
-	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
-		"group.id":           "certificate_processor",
-		"auto.offset.reset":  "earliest",
-		"enable.auto.commit": "false",
-	})
-
-	if err != nil {
+	c := createConsumer("certificate_processor", "earliest", "false")
+	if err := c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil); err != nil {
 		panic(err)
 	}
-
-	c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil)
-
 	for {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
@@ -124,33 +118,11 @@ func initializeRevokeCertificate() {
 	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
 	services.InitializeKafkaForRevocationService(producer)
 	services.InitRedis()
-
-	go func() {
-		topic := config.Config.Kafka.RevokeCertErrTopic
-		for {
-			msg := <-revokedCertificateErrors
-			if err := producer.Produce(&kafka.Message{
-				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
-				Value:          msg,
-			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
-			}
-		}
-	}()
-
-	c, err := kafka.NewConsumer(&kafka.ConfigMap{
-		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
-		"group.id":           "revoke_cert",
-		"auto.offset.reset":  "earliest",
-		"enable.auto.commit": "false",
-	})
-
-	if err != nil {
+	startRevokeCertificateErrorTopicProducer(producer)
+	c := createConsumer("revoke_cert", "earliest", "false")
+	if err = c.SubscribeTopics([]string{config.Config.Kafka.RevokeCertTopic}, nil); err != nil {
 		panic(err)
 	}
-
-	c.SubscribeTopics([]string{config.Config.Kafka.RevokeCertTopic}, nil)
-
 	for {
 		msg, err := c.ReadMessage(-1)
 		if err == nil {
@@ -161,7 +133,7 @@ func initializeRevokeCertificate() {
 			}
 			if revokeStatus == ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
-				PublishRevokeCertificateErrorMessage(msg.Value)
+				publishRevokeCertificateErrorMessage(msg.Value)
 			}
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
@@ -179,7 +151,35 @@ func initializeRevokeCertificate() {
 	c.Close()
 }
 
-func PublishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
+func createConsumer(groupId string, autoOffsetReset string, enableAutoCommit string) *kafka.Consumer {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
+		"group.id":           groupId,
+		"auto.offset.reset":  autoOffsetReset,
+		"enable.auto.commit": enableAutoCommit,
+	})
+	if err != nil {
+		panic(err)
+	}
+	return c
+}
+
+func startRevokeCertificateErrorTopicProducer(producer *kafka.Producer) {
+	go func() {
+		topic := config.Config.Kafka.RevokeCertErrTopic
+		for {
+			msg := <-revokedCertificateErrors
+			if err := producer.Produce(&kafka.Message{
+				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
+				Value:          msg,
+			}, nil); err != nil {
+				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+			}
+		}
+	}()
+}
+
+func publishRevokeCertificateErrorMessage(revokeErrorMessage []byte) {
 	log.Infof("Publishing to revoke certificate errors topic")
 	revokedCertificateErrors <- revokeErrorMessage
 }
