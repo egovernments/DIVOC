@@ -56,7 +56,7 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 			log.Errorf("Failed to add certificate %v to revocation list", certificateId)
 			return preEnrollmentCode, status, err
 		}
-		status, err = deleteKeyFromRedis(preEnrollmentCode, certificateBody["programId"].(string), int(certificateDose["dose"].(float64)))
+		status, err = deleteKeyFromRedis(preEnrollmentCode, certificateBody["programId"], int(certificateDose["dose"].(float64)))
 		return preEnrollmentCode, status, err
 	}
 }
@@ -117,12 +117,12 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 	return TEMP_ERROR, errors.New("error occurred while adding certificate to revocation list")
 }
 
-func deleteKeyFromRedis(preEnrollmentCode string, programId string, dose int) (RevocationStatus, error) {
+func deleteKeyFromRedis(preEnrollmentCode string, programId interface{}, dose int) (RevocationStatus, error) {
 	log.Infof("preEnrollmentCode %+v programId %+v dose %+v", preEnrollmentCode, programId, dose)
 
-	key := preEnrollmentCode + "-" + programId + "-" + strconv.Itoa(dose)
-	if config.Config.Redis.ProgramIdCaching == "false" {
-		key = preEnrollmentCode + "-" + strconv.Itoa(dose)
+	key := preEnrollmentCode + "-" + strconv.Itoa(dose)
+	if config.Config.Redis.ProgramIdCaching == "true" {
+		key = preEnrollmentCode + "-" + programId.(string) + "-" + strconv.Itoa(dose)
 	}
 	log.Infof("Key for Redis : %v, %v", key, config.Config.Redis.ProgramIdCaching)
 	err := services.DeleteValue(key)
