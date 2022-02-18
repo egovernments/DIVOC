@@ -34,5 +34,5 @@ redis:
   redisurl: "redis://redis:6379"
   programidcaching: "false"
 enabledServices:
-  createRecipientInKeycloakService: "true"
+  createRecipientInKeycloakService: "false"
   revokeCertificateService: "true"

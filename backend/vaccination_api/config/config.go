@@ -106,7 +106,7 @@ var Config = struct {
 		CallbackUrl               string `env:"ACK_CALLBACK_URL"`
 	}
 	EnabledServices struct {
-		CreateRecipientInKeycloakService string `env:"ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE" yaml:"createRecipientInKeycloakService" default:"true"`
+		CreateRecipientInKeycloakService string `env:"ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE" yaml:"createRecipientInKeycloakService" default:"false"`
 		RevokeCertificateService         string `env:"ENABLE_REVOKE_CERTIFICATION_SERVICE" yaml:"revokeCertificateService" default:"true"`
 	}
 	PollingStatesCSV string `default:"" yaml:"pollingstates" env:"POLLING_STATES"`
