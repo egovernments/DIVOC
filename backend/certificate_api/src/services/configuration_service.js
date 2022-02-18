@@ -117,9 +117,9 @@ class ConfigurationService {
   }
 
   async getEUVaccineDetails(key) {
-    let details = await loadConfigurationValues(key, async() => JSON.parse(await configuration.getEUVaccineDetails(key)));
+    let details = await loadConfigurationValues(key, async() => await configuration.getEUVaccineDetails(key));
     updateConfigValues(key, details);
-    return details;
+    return JSON.parse(details);
   }
 }
 
