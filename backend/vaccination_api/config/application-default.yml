@@ -13,6 +13,9 @@ kafka:
   certifiedTopic: certified
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
+  revokeCertTopic: revoke_cert
+  revokeCertErrTopic: revoke_cert_err
+  procStatusTopic: proc_status
 database:
   host: localhost
   port: 5432
@@ -27,3 +30,9 @@ clickhouse:
 acknowledgement:
   callbackauthurl: "https://api.sit.co-vin.in/api/v1/auth/guest/login"
   callbackurl: "https://api.sit.co-vin.in/api/v1/registration/certificate/ackCertificate"
+redis:
+  redisurl: "redis://redis:6379"
+  programidcaching: "false"
+enabledServices:
+  createRecipientInKeycloakService: "false"
+  revokeCertificateService: "true"
