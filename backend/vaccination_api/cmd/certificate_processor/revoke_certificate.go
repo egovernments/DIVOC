@@ -121,7 +121,7 @@ func deleteKeyFromRedis(preEnrollmentCode string, programId interface{}, dose in
 	log.Infof("preEnrollmentCode %+v programId %+v dose %+v", preEnrollmentCode, programId, dose)
 
 	key := preEnrollmentCode + "-" + strconv.Itoa(dose)
-	if config.Config.Redis.ProgramIdCaching == "true" {
+	if config.Config.Redis.ProgramIdCaching == "true" && programId != nil && programId.(string) != "" {
 		key = preEnrollmentCode + "-" + programId.(string) + "-" + strconv.Itoa(dose)
 	}
 	log.Infof("Key for Redis : %v, %v", key, config.Config.Redis.ProgramIdCaching)
