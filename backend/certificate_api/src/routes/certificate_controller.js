@@ -783,7 +783,8 @@ function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseT
         isFinalDose: evidence[0].dose === evidence[0].totalDoses,
         isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
         isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
-        currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`
+        currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
+        meta: certificateRaw.meta
     };
     getVaccineDetails(certificateData, doseToVaccinationDetailsMap);
     return certificateData;
