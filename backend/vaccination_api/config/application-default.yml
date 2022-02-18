@@ -13,6 +13,9 @@ kafka:
   certifiedTopic: certified
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
+  revokeCertTopic: revoke_cert
+  revokeCertErrTopic: revoke_cert_err
+  procStatusTopic: proc_status
 database:
   host: localhost
   port: 5432
