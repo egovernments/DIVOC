@@ -157,7 +157,7 @@ function transformW3(cert, certificateId) {
         "district": R.pathOr('', ['recipient', 'address', 'district'], cert),
         "city": R.pathOr('', ['recipient', 'address', 'city'], cert),
         "addressRegion": R.pathOr('', ['recipient', 'address', 'state'], cert),
-        "addressCountry": R.pathOr('IN', ['recipient', 'address', 'country'], cert),
+        "addressCountry": R.pathOr('LKA', ['recipient', 'address', 'country'], cert),
         "postalCode": R.pathOr('', ['recipient', 'address', 'pincode'], cert),
       }
     },
@@ -189,7 +189,7 @@ function transformW3(cert, certificateId) {
           "district": R.pathOr('', ['facility', 'address', 'district'], cert),
           "city": R.pathOr('', ['facility', 'address', 'city'], cert),
           "addressRegion": R.pathOr('', ['facility', 'address', 'state'], cert),
-          "addressCountry": R.pathOr('IN', ['facility', 'address', 'country'], cert),
+          "addressCountry": R.pathOr('LKA', ['facility', 'address', 'country'], cert),
           "postalCode": R.pathOr('', ['facility', 'address', 'pincode'], cert)
         },
       }
