@@ -151,9 +151,12 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                  className="certificate-status-image"/>
             <h3 className="certificate-status">
                 {
-                    isValid ? "Successful" : (isRevoked ? "Revoked Certificate" : "Invalid Certificate")
+                    isValid ? "Successful" : (isRevoked ? "Certificate Revoked" : "Invalid Certificate")
                 }
             </h3>
+            {
+                isRevoked   && <h4>Your Certificate has been revoked</h4>
+            }
             {
                 isValid && <table className="mt-3">
                     {
