@@ -27,7 +27,6 @@ function getNumberWithOrdinal(n) {
 }
 
 function appendCommaIfNotEmpty(address, suffix) {
-    console.log(address);
     if (address?.trim().length > 0) {
         if (suffix?.trim().length > 0) {
             return address + ", " + suffix
