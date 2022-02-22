@@ -10,6 +10,9 @@ VACCINATION_API = "http://vaccination_api:8000" + "/divoc/api/v1/"
 CERTIFY_REQUEST_BODY = "test_data/certify.json"
 ICD_REQUEST_BODY = "test_data/icd.json"
 VACCINE_ICD_REQUEST_BODY = "test_data/vaccine_icd.json"
+DDCC_TEMPLATE = "test_data/ddcc_w3c_payload.template"
+W3C_TEMPLATE = "test_data/w3c_payload.template"
+FIELDS_KEY_PATH = "test_data/fields_key_path.json"
 
 def service_check():
     try:
@@ -32,9 +35,15 @@ def call_and_verify():
     }
     icd_data = json.load(open(ICD_REQUEST_BODY))
     vaccine_icd_data = json.load(open(VACCINE_ICD_REQUEST_BODY))
+    w3c_template = open(W3C_TEMPLATE)
+    ddcc_template = open(DDCC_TEMPLATE)
+    fields_key_path = json.load(open(FIELDS_KEY_PATH))
     etcd = etcd3.client(host='etcd')
     etcd.put('ICD', str(icd_data).replace("'", '"'))
     etcd.put('VACCINE_ICD', str(vaccine_icd_data).replace("'", '"'))
+    etcd.put('W3C_TEMPLATE', str(w3c_template.read()))
+    etcd.put('DDCC_TEMPLATE', str(ddcc_template.read()))
+    etcd.put('fieldsKeyPath', str(fields_key_path).replace("'", '"'))
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
     certify_data["preEnrollmentCode"] = cid
     certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
@@ -57,6 +66,9 @@ def call_and_verify():
     assert len(new_certs) == len(old_certs) + 1, "Cerrificate creation failed"
     etcd.delete('ICD')
     etcd.delete('VACCINE_ICD')
+    etcd.delete('W3C_TEMPLATE')
+    etcd.delete('DDCC_TEMPLATE')
+    etcd.delete('fieldsKeyPath')
 
 def test_certify():
     test_ran = False
