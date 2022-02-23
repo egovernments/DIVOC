@@ -18,14 +18,16 @@ services:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
+    volumes:
+      - divocdata:/var/lib/postgresql/data
   registry:
-    image: dockerhub/registry
+    image: dockerhub/registry:1.0.19
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/postgres
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
-#      - elastic_search_connection_url=es:9200
-#      - search_provider=io.opensaber.registry.service.ElasticSearchService
+    #      - elastic_search_connection_url=es:9200
+    #      - search_provider=io.opensaber.registry.service.ElasticSearchService
     #command: java -Xms1024m -Xmx2048m -XX:+UseG1GC -Dserver.port=8081 -jar /home/opensaber/registry.jar
     ports:
       - "8081:8081"
@@ -73,7 +75,7 @@ services:
       ZOOKEEPER_CLIENT_PORT: "2181"
       ZOOKEEPER_TICK_TIME: "2000"
   kafka:
-    image: confluentinc/cp-kafka:latest
+    image: confluentinc/cp-kafka:5.2.5-10
     depends_on:
       - zookeeper
     ports:
@@ -97,40 +99,41 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api
+    image: dockerhub/vaccination_api:1.0.26
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
+      CERTIFICATE_UPDATE_LIMIT: 10
     ports:
       - "8000:8000"
     depends_on:
       - kafka
       - keycloak
   portal_api:
-    image: dockerhub/portal_api
+    image: dockerhub/portal_api:1.0.15
     ports:
       - "8001:8001"
     environment:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
+      ADMIN_API_CLIENT_SECRET: 1d1053d6-6987-45f0-afa7-dfcbfae7ccff
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - kafka
       - keycloak
   analytics_feed:
-    image: dockerhub/analytics_feed
+    image: dockerhub/analytics_feed:1.0.17
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
   certificate_processor:
-    image: dockerhub/certificate_processor
+    image: dockerhub/certificate_processor:1.0.16
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -155,7 +158,7 @@ services:
       - vaccination_api
       - portal_api
   notification-service:
-    image: dockerhub/notification-service
+    image: dockerhub/notification-service:1.0.15
     ports:
       - "8765:8765"
     environment:
@@ -166,18 +169,36 @@ services:
     depends_on:
       - kafka
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+    image: dockerhub/digilocker_support_api:1.0.57
     environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
+      POLLING_STATES: "goa,manipur,punjab,uttar pradesh,uttarakhand"
+  digilocker-support-api-v2:
+    image: dockerhub/digilocker_support_api:1.0.57
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081"
+      DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
+      KEYCLOAK_URL: "http://keycloak:8080/auth"
+      POLLING_STATES: "goa,manipur,punjab,uttar pradesh,uttarakhand"
+    ports:
+      - "8007:8003"
   divoc-certification-ack:
-    image: dockerhub/divoc-certification-ack
+    image: dockerhub/divoc-certification-ack:1.0.16
     environment:
       REGISTRY_URL: "http://registry:8081"
   reconciliation:
-    image: dockerhub/reconciliation
+    image: dockerhub/reconciliation:1.0.3
     environment:
       REGISTRY_URL: "http://registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       KEYCLOAK_URL: "http://keycloak:8080/auth"
+  verification:
+    image: dockerhub/verification:1.0.29
+    ports:
+      - "4000:80"
+volumes:
+  divocdata:
