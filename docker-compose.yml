@@ -119,7 +119,7 @@ services:
       REGISTRY_URL: "http://registry:8081"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: 1d1053d6-6987-45f0-afa7-dfcbfae7ccff
+      ADMIN_API_CLIENT_SECRET: 1d9a5c6c-0c23-47e2-850c-3d04b0b56d87
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
