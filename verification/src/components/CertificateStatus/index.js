@@ -182,7 +182,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                  className="certificate-status-image"/>
             <h3 className="certificate-status">
                 {
-                    isValid ? "Certificate Successfully Verified" : (isRevoked ? "Certificate Revoked" : "Invalid Certificate")
+                    isValid ? "Certificate Successfully Verified" : (isRevoked ? "Certificate Revoked" : "Certificate Invalid")
                 }
             </h3>
             <br/>
