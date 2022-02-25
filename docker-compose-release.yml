@@ -169,8 +169,8 @@ services:
     depends_on:
       - kafka
       - redis
-  nginx:
-    image: divoc/nginx:1.23.3-generic
+  gateway:
+    image: divoc/gateway:1.23.3-generic
     ports:
       - "81:80"
     depends_on:

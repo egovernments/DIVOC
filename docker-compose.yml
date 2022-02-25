@@ -236,8 +236,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-  nginx:
-    image: divoc/nginx
+  gateway:
+    image: divoc/gateway
     ports:
       - "80:80"
     depends_on:
