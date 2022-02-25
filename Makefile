@@ -1,4 +1,4 @@
-IMAGES:=dockerhub/nginx dockerhub/portal_api dockerhub/registration_api dockerhub/vaccination_api dockerhub/certificate_processor dockerhub/analytics_feed dockerhub/notification-service dockerhub/digilocker_support_api dockerhub/certificate_signer dockerhub/test_certificate_signer dockerhub/registry-es dockerhub/keycloak dockerhub/certificate_api
+IMAGES:=divoc/nginx divoc/portal_api divoc/registration_api divoc/vaccination_api divoc/certificate_processor divoc/analytics_feed divoc/notification-service divoc/digilocker_support_api divoc/certificate_signer divoc/test_certificate_signer divoc/registry-es divoc/keycloak divoc/certificate_api
 ifeq ($(RELEASE_VERSION), )
 RELEASE_VERSION := 1.24.0-generic
 endif
@@ -10,7 +10,7 @@ docker:
 	CERTIFICATE_CONTROLLER_ID="https://cowin.gov.in/" \
 	CERTIFICATE_PUBKEY_ID="https://example.com/i/india" \
 	CERTIFICATE_DID="did:india" \
-	docker build -t dockerhub/nginx .
+	docker build -t divoc/nginx .
 	$(MAKE) -C backend
 	$(MAKE) -C registry
 test:

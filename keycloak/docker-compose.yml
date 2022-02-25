@@ -8,7 +8,7 @@ services:
       - POSTGRES_USER=keycloak
       - POSTGRES_PASSWORD=keycloak
   keycloak:
-    image: dockerhub/keycloak
+    image: divoc/keycloak
 #    build:
 #      .
     environment:

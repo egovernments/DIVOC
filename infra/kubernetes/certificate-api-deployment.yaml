@@ -16,7 +16,7 @@ spec:
         k8s-app: certificate-api
     spec:
       containers:
-        - image: dockerhub/certificate_api:latest
+        - image: divoc/certificate_api:latest
           imagePullPolicy: Always
           resources:
             requests:

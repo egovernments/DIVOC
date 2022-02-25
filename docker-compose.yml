@@ -29,7 +29,7 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: dockerhub/registry-es
+    image: divoc/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -44,7 +44,7 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: dockerhub/keycloak
+    image: divoc/keycloak
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -112,7 +112,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination_api:
-    image: dockerhub/vaccination_api
+    image: divoc/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
@@ -133,7 +133,7 @@ services:
       keycloak:
         condition: service_healthy
   portal_api:
-    image: dockerhub/portal_api
+    image: divoc/portal_api
     ports:
       - "8001:8001"
     environment:
@@ -150,7 +150,7 @@ services:
       keycloak:
         condition: service_healthy
   registration_api:
-    image: dockerhub/registration_api
+    image: divoc/registration_api
     ports:
       - "8002:8002"
     environment:
@@ -170,7 +170,7 @@ services:
       keycloak:
         condition: service_healthy  
   analytics_feed:
-    image: dockerhub/analytics_feed
+    image: divoc/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -178,7 +178,7 @@ services:
       clickhouse-server:
         condition: service_started
   certificate_processor:
-    image: dockerhub/certificate_processor
+    image: divoc/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -193,7 +193,7 @@ services:
       registry:
         condition: service_started
   certificate_signer:
-    image: dockerhub/certificate_signer
+    image: divoc/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -217,7 +217,7 @@ services:
       kafka:
         condition: service_healthy
   test_certificate_signer:
-    image: dockerhub/test_certificate_signer
+    image: divoc/test_certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -237,7 +237,7 @@ services:
       kafka:
         condition: service_healthy
   nginx:
-    image: dockerhub/nginx
+    image: divoc/nginx
     ports:
       - "80:80"
     depends_on:
@@ -250,7 +250,7 @@ services:
       digilocker_support_api:
         condition: service_started
   notification-service:
-    image: dockerhub/notification-service
+    image: divoc/notification-service
     ports:
       - "8765:8765"
     environment:
@@ -262,7 +262,7 @@ services:
       kafka:
         condition: service_healthy
   digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+    image: divoc/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -276,7 +276,7 @@ services:
       keycloak:
         condition: service_healthy
   certificate_api:
-    image: dockerhub/certificate_api
+    image: divoc/certificate_api
     ports:
       - "4321:4321"
     environment:

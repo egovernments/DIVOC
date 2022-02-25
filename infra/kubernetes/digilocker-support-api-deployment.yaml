@@ -16,7 +16,7 @@ spec:
         k8s-app: digilocker-support-api
     spec:
       containers:
-        - image: dockerhub/digilocker_support_api:latest
+        - image: divoc/digilocker_support_api:latest
           imagePullPolicy: Always
           resources:
             requests:

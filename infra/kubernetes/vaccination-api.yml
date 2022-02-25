@@ -25,7 +25,7 @@ spec:
       name: vaccination-api
     spec:
       containers:
-        - image: dockerhub/vaccination_api
+        - image: divoc/vaccination_api
           imagePullPolicy: Always
           envFrom:
             - configMapRef:
