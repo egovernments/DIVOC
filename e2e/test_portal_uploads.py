@@ -58,8 +58,8 @@ def entity_upload_verify(entityType, uploadURL, fetchURL, uploadFile, expectedAd
 def test_facility_upload():
     entity_upload_verify(
         "Facilities", 
-        "http://portal_api:8001/divoc/admin/api/v1/facilities", 
-        "http://portal_api:8001/divoc/admin/api/v1/facilities", 
+        "http://portal-api:8001/divoc/admin/api/v1/facilities",
+        "http://portal-api:8001/divoc/admin/api/v1/facilities",
         "test_data/facilities.csv", 
         5
     )
@@ -67,8 +67,8 @@ def test_facility_upload():
 def test_vaccinator_upload():
     entity_upload_verify(
         "Vaccinators", 
-        "http://portal_api:8001/divoc/admin/api/v1/vaccinators", 
-        "http://portal_api:8001/divoc/admin/api/v1/vaccinators", 
+        "http://portal-api:8001/divoc/admin/api/v1/vaccinators",
+        "http://portal-api:8001/divoc/admin/api/v1/vaccinators",
         "test_data/vaccinators.csv", 
         3
     )
@@ -76,8 +76,8 @@ def test_vaccinator_upload():
 def test_enrollment_upload():
     entity_upload_verify(
         "Enrollments", 
-        "http://portal_api:8001/divoc/admin/api/v1/enrollments", 
-        "http://portal_api:8001/divoc/admin/api/v1/enrollments", 
+        "http://portal-api:8001/divoc/admin/api/v1/enrollments",
+        "http://portal-api:8001/divoc/admin/api/v1/enrollments",
         "test_data/enrollments.csv", 
         3,
         finalFetchWaitTime=10, 
