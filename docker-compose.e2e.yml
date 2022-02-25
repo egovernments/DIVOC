@@ -1,13 +1,13 @@
 version: "2.4"
 
 services:
-  analytics_feed:
+  analytics-feed:
     entrypoint: /bin/true
   notification-service:
     entrypoint: /bin/true
   clickhouse-server:
     entrypoint: /bin/true
-  portal_api:
+  portal-api:
     environment:
         ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
   etcd:
@@ -24,7 +24,7 @@ services:
       timeout: 10s
       retries: 5
       start_period: 1m
-  certificate_processor:
+  certificate-processor:
       environment:
         ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
   e2e_test:
@@ -32,7 +32,7 @@ services:
       context: ./e2e
     container_name: e2e_test
     depends_on: 
-      vaccination_api:
+      vaccination-api:
         condition: service_started
       keycloak:
         condition: service_healthy

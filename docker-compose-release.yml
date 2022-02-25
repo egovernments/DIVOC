@@ -103,7 +103,7 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
-  vaccination_api:
+  vaccination-api:
     image: divoc/vaccination_api:1.23.3-generic
     environment:
       REGISTRY_URL: "http://registry:8081"
@@ -115,7 +115,7 @@ services:
     depends_on:
       - kafka
       - keycloak
-  registration_api:
+  registration-api:
     image: divoc/registration_api:1.23.3-generic
     ports:
       - "8002:8002"
@@ -130,7 +130,7 @@ services:
     depends_on:
       - kafka
       - keycloak
-  portal_api:
+  portal-api:
     image: divoc/portal_api:1.23.3-generic
     ports:
       - "8001:8001"
@@ -144,14 +144,14 @@ services:
     depends_on:
       - kafka
       - keycloak
-  analytics_feed:
+  analytics-feed:
     image: divoc/analytics_feed:1.23.3-generic
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       - clickhouse-server
-  certificate_processor:
+  certificate-processor:
     image: divoc/certificate_processor:1.23.3-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -160,7 +160,7 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
     depends_on:
       - registry
-  certificate_signer:
+  certificate-signer:
     image: divoc/certificate_signer:1.23.3-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -174,9 +174,9 @@ services:
     ports:
       - "81:80"
     depends_on:
-      - vaccination_api
-      - portal_api
-      - registration_api
+      - vaccination-api
+      - portal-api
+      - registration-api
   notification-service:
     image: divoc/notification-service:1.23.3-generic
     ports:
@@ -188,14 +188,14 @@ services:
       SENDER_PASSWORD: xxxx
     depends_on:
       - kafka
-  digilocker_support_api:
+  digilocker-support-api:
     image: divoc/digilocker_support_api:1.23.3-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
       DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
       KEYCLOAK_URL: "http://keycloak:8080/auth"
-  certificate_api:
+  certificate-api:
     image: divoc/certificate_api:1.23.3-generic
     ports:
       - "4321:4321"
