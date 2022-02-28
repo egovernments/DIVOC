@@ -16,7 +16,7 @@ spec:
         k8s-app: certificate-signer
     spec:
       containers:
-        - image: dockerhub/certificate_signer:latest
+        - image: divoc/certificate_signer:latest
           imagePullPolicy: Always
           resources:
             requests:

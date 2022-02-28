@@ -16,7 +16,7 @@ spec:
         k8s-app: analytics-feed
     spec:
       containers:
-        - image: dockerhub/analytics_feed:latest
+        - image: divoc/analytics_feed:latest
           imagePullPolicy: Always
           resources:
             requests:

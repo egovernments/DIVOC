@@ -1,6 +1,6 @@
 
 
 all:
-	docker build -t dockerhub/registry-es .
+	docker build -t divoc/registry-es .
 publish:
-	docker push dockerhub/registry-es
+	docker push divoc/registry-es

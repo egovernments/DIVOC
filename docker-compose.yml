@@ -29,7 +29,7 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: dockerhub/registry-es
+    image: divoc/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -44,7 +44,7 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: dockerhub/keycloak
+    image: divoc/keycloak
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
@@ -111,8 +111,8 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
-  vaccination_api:
-    image: dockerhub/vaccination_api
+  vaccination-api:
+    image: divoc/vaccination_api
     environment:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
@@ -120,6 +120,7 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       DB_HOST: db
       REDIS_URL: redis://redis:6379
+      ENABLE_KEYCLOAK: "true"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -132,8 +133,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
-  portal_api:
-    image: dockerhub/portal_api
+  portal-api:
+    image: divoc/portal_api
     ports:
       - "8001:8001"
     environment:
@@ -149,8 +150,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
-  registration_api:
-    image: dockerhub/registration_api
+  registration-api:
+    image: divoc/registration_api
     ports:
       - "8002:8002"
     environment:
@@ -169,16 +170,16 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy  
-  analytics_feed:
-    image: dockerhub/analytics_feed
+  analytics-feed:
+    image: divoc/analytics_feed
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       clickhouse-server:
         condition: service_started
-  certificate_processor:
-    image: dockerhub/certificate_processor
+  certificate-processor:
+    image: divoc/certificate_processor
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -192,8 +193,8 @@ services:
     depends_on:
       registry:
         condition: service_started
-  certificate_signer:
-    image: dockerhub/certificate_signer
+  certificate-signer:
+    image: divoc/certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -216,8 +217,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-  test_certificate_signer:
-    image: dockerhub/test_certificate_signer
+  test-certificate-signer:
+    image: divoc/test_certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -236,21 +237,21 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-  nginx:
-    image: dockerhub/nginx
+  gateway:
+    image: divoc/gateway
     ports:
       - "80:80"
     depends_on:
-      vaccination_api:
+      vaccination-api:
         condition: service_started
-      portal_api:
+      portal-api:
         condition: service_started
-      registration_api:
+      registration-api:
         condition: service_started
-      digilocker_support_api:
+      digilocker-support-api:
         condition: service_started
   notification-service:
-    image: dockerhub/notification-service
+    image: divoc/notification-service
     ports:
       - "8765:8765"
     environment:
@@ -261,8 +262,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-  digilocker_support_api:
-    image: dockerhub/digilocker_support_api
+  digilocker-support-api:
+    image: divoc/digilocker_support_api
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -275,8 +276,8 @@ services:
         condition: service_healthy
       keycloak:
         condition: service_healthy
-  certificate_api:
-    image: dockerhub/certificate_api
+  certificate-api:
+    image: divoc/certificate_api
     ports:
       - "4321:4321"
     environment:

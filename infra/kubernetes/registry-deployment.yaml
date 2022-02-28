@@ -30,7 +30,7 @@ spec:
               value: jdbc:postgresql://172.31.25.17:5432/postgres
             - name: connectionInfo_username
               value: postgres
-          image: dockerhub/registry-es:latest
+          image: divoc/registry-es:latest
           imagePullPolicy: Always
           resources:
             requests:

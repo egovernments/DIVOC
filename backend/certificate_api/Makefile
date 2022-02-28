@@ -1,5 +1,5 @@
 
-IMAGE:=dockerhub/certificate_api
+IMAGE:=divoc/certificate_api
 
 docker:
 	@docker build -t $(IMAGE) .

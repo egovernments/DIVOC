@@ -36,7 +36,7 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
      ```
      docker-compose restart certificate_processor certificate_signer digilocker_support_api notification-service portal_api vaccination_api registry
      ```
-   * If going to `localhost` returns status 502, restart nginx. `docker-compose restart nginx` 
+   * If going to `localhost` returns status 502, restart nginx. `docker-compose restart gateway` 
    * On Mac/Windows services might crash with exit code : 137, if sufficient memory is not set for docker.
     This can be changed in Docker desktop preferences, resources tab as shown [here](https://docs.docker.com/docker-for-mac/#resources).
 
@@ -72,7 +72,7 @@ In this section, we'll walk you through how to run DIVOC project on a local mach
       * Rebuild and restart the services that use `ADMIN_API_CLIENT_SECRET`.
         ```
          docker-compose up -d --build --no-deps <service1> <service2>...
-         docker-compose restart nginx
+         docker-compose restart gateway
         ```
         
    * Flagr Configuration

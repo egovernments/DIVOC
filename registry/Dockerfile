@@ -1,4 +1,4 @@
-FROM tejashjl/open-saber
+FROM divoc/open-saber
 
 ADD *.json /home/opensaber/config/public/_schemas/
 

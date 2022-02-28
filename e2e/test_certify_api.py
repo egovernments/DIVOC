@@ -6,7 +6,7 @@ import utils
 import random
 import etcd3
 
-VACCINATION_API = "http://vaccination_api:8000" + "/divoc/api/v1/"
+VACCINATION_API = "http://vaccination-api:8000" + "/divoc/api/v1/"
 CERTIFY_REQUEST_BODY = "test_data/certify.json"
 ICD_REQUEST_BODY = "test_data/icd.json"
 VACCINE_ICD_REQUEST_BODY = "test_data/vaccine_icd.json"

@@ -16,7 +16,7 @@ spec:
         k8s-app: keycloak-service
     spec:
       containers:
-        - image: dockerhub/keycloak:latest
+        - image: divoc/keycloak:latest
           imagePullPolicy: Always
           resources:
             requests:
