@@ -81,7 +81,7 @@ let signingConfig = {
 
 let ICD11_MAPPINGS;
 let VACCINE_ICD11_MAPPINGS;
-let fieldsKeyPath;
+let certificateFieldsKeyPath;
 let configLayerObj;
 const documentLoader = {};
 documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
@@ -103,8 +103,8 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
       ICD11_MAPPINGS = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.ICD));
-      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getConfigValue(CONFIG_KEYS.VACCINE_ICD))
-      fieldsKeyPath = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.FIELDS_KEY_PATH))
+      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getConfigValue(CONFIG_KEYS.VACCINE_ICD));
+      certificateFieldsKeyPath = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH));
       DDCC_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.DDCC_TEMPLATE);
       W3C_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.W3C_TEMPLATE);
       let jsonMessage = {};
@@ -145,16 +145,16 @@ function populateIdentity(identity, preEnrollmentCode) {
 }
 
 function isURIFormat(param) {
-  let parsed;
+  let optionalCertificateFieldsObj;
   let isURI;
   try {
-    parsed = new URL(param);
+    optionalCertificateFieldsObj = new URL(param);
     isURI = true;
   } catch (e) {
     isURI = false;
   }
 
-  if (isURI && !parsed.protocol) {
+  if (isURI && !optionalCertificateFieldsObj.protocol) {
     isURI = false;
   }
   return isURI;
@@ -211,16 +211,16 @@ function transformW3(cert, certificateID) {
   const feedbackUrl = CERTIFICATE_FEEDBACK_BASE_URL + certificateId;
 
   const issuanceDate = new Date().toISOString();  
-  let parsed = {};
-  for(const [key, value] of Object.entries(fieldsKeyPath)) {
-    let abc = R.pathOr('', value, cert);
-    if(key === "recipientIdentifier") {
-      abc = populateIdentity(abc, preEnrollmentCode);
+  let optionalCertificateFields = {};
+  for(const [fieldName, certificatePath] of Object.entries(certificateFieldsKeyPath)) {
+    let fieldValue = R.pathOr('', certificatePath, cert);
+    if(fieldName === "recipientIdentifier") {
+      fieldValue = populateIdentity(fieldValue, preEnrollmentCode);
     }
-    else if(key === "recipientAge") {
-      abc = ageOfRecipient(cert.recipient);
+    else if(fieldName === "recipientAge") {
+      fieldValue = ageOfRecipient(cert.recipient);
     }
-    parsed[key] = abc;
+    optionalCertificateFields[fieldName] = fieldValue;
   }
 
   let data = {
@@ -229,7 +229,7 @@ function transformW3(cert, certificateID) {
     issuer, issuanceDate, evidenceId, InfoUrl, feedbackUrl,
     certificateId, batch, vaccine, icd11Code, prophylaxis, vaccinationDate, dose, totalDoses,
     facilityAddressCountry,
-    ...parsed
+    ...optionalCertificateFields
   };
   const template = certificateType === CERTIFICATE_TYPE_V3 ? DDCC_TEMPLATE : W3C_TEMPLATE;
   return render(template, data);
