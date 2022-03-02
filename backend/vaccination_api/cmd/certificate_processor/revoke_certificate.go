@@ -40,7 +40,7 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 
 	log.Infof("Revoke certificateId: %v", certificateId)
 
-	if status, err := deleteVaccineCertificate(certificateBody["certificateId"].(string)); err != nil {
+	if status, err := deleteVaccineCertificate(certificateId); err != nil {
 		log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
 		return preEnrollmentCode, status, err
 	} else {
