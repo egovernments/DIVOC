@@ -27,8 +27,8 @@ function getNumberWithOrdinal(n) {
 }
 
 function appendCommaIfNotEmpty(address, suffix) {
-    if (address.trim().length > 0) {
-        if (suffix.trim().length > 0) {
+    if (address?.trim().length > 0) {
+        if (suffix?.trim().length > 0) {
             return address + ", " + suffix
         } else {
             return address
@@ -41,14 +41,14 @@ function concatenateReadableString(a, b) {
     let address = "";
     address = appendCommaIfNotEmpty(address, a);
     address = appendCommaIfNotEmpty(address, b);
-    if (address.length > 0) {
+    if (address?.length > 0) {
         return address
     }
     return "NA"
 }
 
 function formatRecipientAddress(address) {
-    return concatenateReadableString(address.streetAddress, address.district)
+    return concatenateReadableString(address?.streetAddress, address?.district)
 }
 
 function formatFacilityAddress(evidence) {
@@ -775,7 +775,7 @@ function prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseT
         vaccine: evidence[0].vaccine,
         vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
         vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
-        vaccinatedBy: evidence[0].verifier.name,
+        vaccinatedBy: evidence[0].verifier?.name,
         vaccinatedAt: formatFacilityAddress(evidence[0]),
         qrCode: dataURL,
         dose: evidence[0].dose,

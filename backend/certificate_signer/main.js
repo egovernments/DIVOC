@@ -20,7 +20,7 @@ const signer = require('certificate-signer-library');
 const Mustache = require("mustache");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
-const {ICD_MAPPINGS_KEYS} = require('./config/constants');
+const {CONFIG_KEYS} = require('./config/constants');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
@@ -35,9 +35,8 @@ Mustache.escape = function (value)
 const CERTIFICATE_TYPE_V2 = "certifyV2";
 const CERTIFICATE_TYPE_V3 = "certifyV3";
 
-const TEMPLATES_FOLDER = __dirname +'/config/templates/';
-const DDCC_TEMPLATE_FILEPATH = TEMPLATES_FOLDER+"ddcc_w3c_certificate_payload.template";
-const W3C_TEMPLATE_FILEPATH = TEMPLATES_FOLDER+"w3c_certificate_payload.template";
+let DDCC_TEMPLATE;
+let W3C_TEMPLATE;
 
 const kafka = new Kafka({
   clientId: 'divoc-cert',
@@ -82,6 +81,7 @@ let signingConfig = {
 
 let ICD11_MAPPINGS;
 let VACCINE_ICD11_MAPPINGS;
+let certificateFieldsKeyPath;
 let configLayerObj;
 const documentLoader = {};
 documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
@@ -102,8 +102,11 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
         uploadId: message.headers.uploadId ? message.headers.uploadId.toString():'',
         rowId: message.headers.rowId ? message.headers.rowId.toString():'',
       });
-      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.ICD));
-      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getICDMappings(ICD_MAPPINGS_KEYS.VACCINE_ICD))
+      ICD11_MAPPINGS = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.ICD));
+      VACCINE_ICD11_MAPPINGS = JSON.parse( await configLayerObj.getConfigValue(CONFIG_KEYS.VACCINE_ICD));
+      certificateFieldsKeyPath = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH));
+      DDCC_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.DDCC_TEMPLATE);
+      W3C_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.W3C_TEMPLATE);
       let jsonMessage = {};
       try {
         jsonMessage = JSON.parse(message.value.toString());
@@ -136,23 +139,22 @@ documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
   })
 })();
 
-function populateIdentity(cert, preEnrollmentCode) {
-  let identity = R.pathOr('', ['recipient', 'identity'], cert);
+function populateIdentity(identity, preEnrollmentCode) {
   let isURI  = isURIFormat(identity);
   return isURI ? identity : reinitIdentityFromPayload(identity, preEnrollmentCode);
 }
 
 function isURIFormat(param) {
-  let parsed;
+  let optionalCertificateFieldsObj;
   let isURI;
   try {
-    parsed = new URL(param);
+    optionalCertificateFieldsObj = new URL(param);
     isURI = true;
   } catch (e) {
     isURI = false;
   }
 
-  if (isURI && !parsed.protocol) {
+  if (isURI && !optionalCertificateFieldsObj.protocol) {
     isURI = false;
   }
   return isURI;
@@ -187,61 +189,48 @@ function render(template, data) {
   return JSON.parse(Mustache.render(template, data))
 }
 
-function transformW3(cert, certificateId) {
+function transformW3(cert, certificateID) {
   const certificateType = R.pathOr('', ['meta', 'certificateType'], cert);
-
   const namespace = certificateType === CERTIFICATE_TYPE_V3 ? CERTIFICATE_NAMESPACE_V2 : CERTIFICATE_NAMESPACE;
   const preEnrollmentCode = R.pathOr('', ['preEnrollmentCode'], cert);
-  const recipientIdentifier = populateIdentity(cert, preEnrollmentCode);
   const recipientName = R.pathOr('', ['recipient', 'name'], cert);
-  const recipientGender = R.pathOr('', ['recipient', 'gender'], cert);
-  const recipientNationality = R.pathOr('', ['recipient', 'nationality'], cert);
-  const recipientAge = ageOfRecipient(cert.recipient); //from dob
   const recipientDob = dobOfRecipient(cert.recipient);
-  const recipientAddressLine1 = R.pathOr('', ['recipient', 'address', 'addressLine1'], cert);
-  const recipientAddressLine2 = R.pathOr('', ['recipient', 'address', 'addressLine2'], cert);
-  const recipientAddressDistrict = R.pathOr('', ['recipient', 'address', 'district'], cert);
-  const recipientAddressCity = R.pathOr('', ['recipient', 'address', 'city'], cert);
-  const recipientAddressRegion = R.pathOr('', ['recipient', 'address', 'state'], cert);
-  const recipientAddressCountry = R.pathOr('', ['recipient', 'address', 'country'], cert);
-  const recipientAddressPostalCode = R.pathOr('', ['recipient', 'address', 'pincode'], cert);
-
+  const vaccine = R.pathOr('', ['vaccination', 'name'], cert);
+  const icd11Code = vaccine ? VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
+  const prophylaxis = icd11Code ? ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
+  const batch = R.pathOr('', ['vaccination', 'batch'], cert);
+  const vaccinationDate = R.pathOr('', ['vaccination', 'date'], cert);
+  const dose = R.pathOr('', ['vaccination', 'dose'], cert);
+  const totalDoses = R.pathOr('', ['vaccination', 'totalDoses'], cert);
+  const facilityAddressCountry = R.pathOr(config.FACILITY_COUNTRY_CODE, ['facility', 'address', 'country'], cert);
   const issuer = CERTIFICATE_ISSUER;
-  const issuanceDate = new Date().toISOString();
+  const certificateId = certificateID;
 
   const evidenceId = CERTIFICATE_BASE_URL + certificateId;
   const InfoUrl = CERTIFICATE_INFO_BASE_URL + certificateId;
   const feedbackUrl = CERTIFICATE_FEEDBACK_BASE_URL + certificateId;
 
-  const batch = R.pathOr('', ['vaccination', 'batch'], cert);
-  const vaccine = R.pathOr('', ['vaccination', 'name'], cert);
-  const icd11Code = vaccine ? VACCINE_ICD11_MAPPINGS.filter(a => vaccine.toLowerCase().includes(a.vaccineName)).map(a => a.icd11Code)[0]: '';
-  const prophylaxis = icd11Code ? ICD11_MAPPINGS[icd11Code]["icd11Term"]: '';
-  const manufacturer = R.pathOr('', ['vaccination', 'manufacturer'], cert);
-  const vaccinationDate = R.pathOr('', ['vaccination', 'date'], cert);
-  const effectiveStart = R.pathOr('', ['vaccination', 'effectiveStart'], cert);
-  const effectiveUntil = R.pathOr('', ['vaccination', 'effectiveUntil'], cert);
-  const dose = R.pathOr('', ['vaccination', 'dose'], cert);
-  const totalDoses = R.pathOr('', ['vaccination', 'totalDoses'], cert);
-  const verifierName = R.pathOr('', ['vaccinator', 'name'], cert);
-  const facilityName = R.pathOr('', ['facility', 'name'], cert);
-  const facilityAddressLine1 = R.pathOr('', ['facility', 'address', 'addressLine1'], cert);
-  const facilityAddressLine2 = R.pathOr('', ['facility', 'address', 'addressLine2'], cert);
-  const facilityAddressDistrict = R.pathOr('', ['facility', 'address', 'district'], cert);
-  const facilityAddressCity = R.pathOr('', ['facility', 'address', 'city'], cert);
-  const facilityAddressRegion = R.pathOr('', ['facility', 'address', 'state'], cert);
-  const facilityAddressCountry = R.pathOr(config.FACILITY_COUNTRY_CODE, ['facility', 'address', 'country'], cert);
-  const facilityAddressPostalCode = R.pathOr('', ['facility', 'address', 'pincode'], cert);
+  const issuanceDate = new Date().toISOString();  
+  let optionalCertificateFields = {};
+  for(const [fieldName, certificatePath] of Object.entries(certificateFieldsKeyPath)) {
+    let fieldValue = R.pathOr('', certificatePath, cert);
+    if(fieldName === "recipientIdentifier") {
+      fieldValue = populateIdentity(fieldValue, preEnrollmentCode);
+    }
+    else if(fieldName === "recipientAge") {
+      fieldValue = ageOfRecipient(cert.recipient);
+    }
+    optionalCertificateFields[fieldName] = fieldValue;
+  }
 
   let data = {
-    namespace, recipientIdentifier, preEnrollmentCode, recipientName, recipientGender, recipientDob, recipientAge, recipientNationality,
-    recipientAddressLine1, recipientAddressLine2, recipientAddressDistrict, recipientAddressCity, recipientAddressRegion, recipientAddressCountry, recipientAddressPostalCode,
+    namespace, preEnrollmentCode, 
+    recipientName, recipientDob,
     issuer, issuanceDate, evidenceId, InfoUrl, feedbackUrl,
-    certificateId, batch, vaccine, icd11Code,  prophylaxis, manufacturer, vaccinationDate, effectiveStart, effectiveUntil, dose, totalDoses,
-    verifierName,
-    facilityName, facilityAddressLine1, facilityAddressLine2, facilityAddressDistrict, facilityAddressCity, facilityAddressRegion, facilityAddressCountry, facilityAddressPostalCode
+    certificateId, batch, vaccine, icd11Code, prophylaxis, vaccinationDate, dose, totalDoses,
+    facilityAddressCountry,
+    ...optionalCertificateFields
   };
-
-  const template = certificateType === CERTIFICATE_TYPE_V3 ? fs.readFileSync(DDCC_TEMPLATE_FILEPATH, 'utf8') : fs.readFileSync(W3C_TEMPLATE_FILEPATH, 'utf8');
+  const template = certificateType === CERTIFICATE_TYPE_V3 ? DDCC_TEMPLATE : W3C_TEMPLATE;
   return render(template, data);
 }

@@ -1,7 +1,7 @@
 describe('should retrieve all mappings if correct configuration layer passed', () => {
     const etcd3 = require('etcd3');
     const config = require('../config/config');
-    const { ICD_MAPPINGS_KEYS } = require('../config/constants');
+    const { CONFIG_KEYS } = require('../config/constants');
     var mockConfig = {
         CONFIGURATION_LAYER: 'etcd',
         ETCD_URL: 'etcd:2379'
@@ -53,24 +53,24 @@ describe('should retrieve all mappings if correct configuration layer passed', (
         init();
     });
     
-    test('should initialise two watchers each for ICD and VACCINE_ICD mapping keys', () => {
+    test('should initialise five times watchers each for ICD, VACCINE_ICD, DDCC_TEMPLATE, W3C_TEMPLATE and FIELDS_KEY_PATH ', () => {
         expect(etcd3.Etcd3).toHaveBeenCalled();
-        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(2);
+        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
     });
     
     test('should fetch values of ICD Mapping and VACCINE_ICD mapping from etcd', async() => {
-        const ICD = await (new ConfigLayer()).getICDMappings(ICD_MAPPINGS_KEYS.ICD);
-        const VACCINE_ICD = await (new ConfigLayer()).getICDMappings(ICD_MAPPINGS_KEYS.VACCINE_ICD);
+        const ICD = await (new ConfigLayer()).getConfigValue(CONFIG_KEYS.ICD);
+        const VACCINE_ICD = await (new ConfigLayer()).getConfigValue(CONFIG_KEYS.VACCINE_ICD);
         expect(ICD).toEqual({})
         expect(VACCINE_ICD).toEqual([])
         expect(mockEtcd3Constructor.get).toHaveBeenCalledTimes(2);
-        expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(ICD_MAPPINGS_KEYS.ICD);
-        expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(ICD_MAPPINGS_KEYS.VACCINE_ICD);
+        expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(CONFIG_KEYS.ICD);
+        expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(CONFIG_KEYS.VACCINE_ICD);
     });
 });
 
 describe('wrong environment variable for configuration layer', () => {
-    const { ICD_MAPPINGS_KEYS } = require('../config/constants');
+    const { CONFIG_KEYS } = require('../config/constants');
     const OLD_ENV = process.env;
     jest.resetModules();
     var mockConfig = {
@@ -89,7 +89,7 @@ describe('wrong environment variable for configuration layer', () => {
     });
 
     test('should return null if wrong configuration passed', async() => {
-        const mapping = await (new services.ConfigLayer()).getICDMappings(ICD_MAPPINGS_KEYS.ICD);
+        const mapping = await (new services.ConfigLayer()).getConfigValue(CONFIG_KEYS.ICD);
         expect(mapping).toEqual(null);
     })
 });
