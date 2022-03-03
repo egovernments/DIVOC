@@ -43,7 +43,7 @@ def call_and_verify():
     etcd.put('VACCINE_ICD', str(vaccine_icd_data).replace("'", '"'))
     etcd.put('W3C_TEMPLATE', str(w3c_template.read()))
     etcd.put('DDCC_TEMPLATE', str(ddcc_template.read()))
-    etcd.put('fieldsKeyPath', str(fields_key_path).replace("'", '"'))
+    etcd.put('certificateOptionalFieldsKeyPaths', str(fields_key_path).replace("'", '"'))
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
     certify_data["preEnrollmentCode"] = cid
     certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
@@ -68,7 +68,7 @@ def call_and_verify():
     etcd.delete('VACCINE_ICD')
     etcd.delete('W3C_TEMPLATE')
     etcd.delete('DDCC_TEMPLATE')
-    etcd.delete('fieldsKeyPath')
+    etcd.delete('certificateOptionalFieldsKeyPaths')
 
 def test_certify():
     test_ran = False

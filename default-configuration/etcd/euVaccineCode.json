@@ -1,0 +1,19 @@
+{
+    "covaxin": "Covaxin",
+    "covishield": "Covishield",
+    "sputnik": "Sputnik-V",
+    "pfizer-biontech": "EU/1/20/1528",
+    "comirnaty": "EU/1/20/1528",
+    "janssen": "EU/1/20/1525",
+    "moderna": "EU/1/20/1507",
+    "spikevax": "EU/1/20/1507",
+    "astrazeneca": "EU/1/21/1529",
+    "vaxzevria": "EU/1/21/1529",
+    "sinovac": "CoronaVac",
+    "coronavac": "CoronaVac",
+    "bbibp-corv": "BBIBP- CorV",
+    "sinopharm": "BBIBP- CorV",
+    "convidecia": "Convidecia",
+    "novavax": "NVX - CoV2373",
+    "covovax": "NVX - CoV2373"
+}
