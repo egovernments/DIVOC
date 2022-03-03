@@ -40,7 +40,7 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 
 	log.Infof("Revoke certificateId: %v", certificateId)
 
-	if status, err := deleteVaccineCertificate(certificateId); err != nil {
+	if status, err := deleteVaccineCertificate(certificateBody["osid"].(string)); err != nil {
 		log.Errorf("Failed to delete vaccination certificate %+v", certificateId)
 		return preEnrollmentCode, status, err
 	} else {
@@ -61,10 +61,10 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 	}
 }
 
-func deleteVaccineCertificate(certificateId string) (RevocationStatus, error) {
+func deleteVaccineCertificate(osid string) (RevocationStatus, error) {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
-		"certificateId": certificateId,
+		"osid": osid,
 	}
 	if _, err := kernelService.DeleteRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in deleting vaccination certificate %+v", err)
