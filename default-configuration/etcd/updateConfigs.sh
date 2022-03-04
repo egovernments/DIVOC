@@ -4,6 +4,6 @@ Arr=($(echo $FILE | tr "." "\n"))
 KEY=${Arr[0]}
 VALUE=$(<$FILE)
 encodedKey=`echo -n ${KEY} | base64`
-encodedValue=`echo ${VALUE} | base64`
+encodedValue=`echo ${VALUE} | base64 -w 0`
 curl -L http://localhost:2379/v3/kv/put -X POST -d "{\"key\": \"$encodedKey\", \"value\": \"$encodedValue\"}"
 done
