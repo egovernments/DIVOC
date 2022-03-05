@@ -11,8 +11,11 @@ const EU_VACCINE_CONFIG_KEYS = {
   MANUFACTURER: "euVaccineManuf"
 }
 
+const QR_TYPE = "qrcode";
+
 module.exports = {
   EU_DISEASE,
   TEMPLATES,
-  EU_VACCINE_CONFIG_KEYS
+  EU_VACCINE_CONFIG_KEYS,
+  QR_TYPE
 }

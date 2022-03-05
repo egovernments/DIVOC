@@ -1,7 +1,8 @@
 const constants = require('../../configs/constants');
 const config = require('../../configs/config');
-const countries = require('i18n-iso-countries')
+const countries = require('i18n-iso-countries');
 const configService = require('./configuration_service');
+const {formatDate, formatId, getNumberWithOrdinal, concatenateReadableString} = require('./utils');
 
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
@@ -28,7 +29,104 @@ const getLatestCertificate = (certificates) => {
   }
 };
 
-const convertCertificateToDCCPayload = async(certificateRaw) => {
+const getVaccineDetailsOfPreviousDoses = (certificates) => {
+  let doseToVaccinationDetailsMap = new Map();
+  if (certificates.length > 0) {
+    for (let i = 0; i < certificates.length; i++) {
+      const certificateTmp = JSON.parse(certificates[i].certificate);
+      let evidence = certificateTmp.evidence[0];
+      doseToVaccinationDetailsMap.set(evidence.dose, fetchVaccinationDetailsFromCert(evidence));
+    }
+  }
+  return new Map([...doseToVaccinationDetailsMap].reverse());
+}
+
+const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseToVaccinationDetailsMap) => {
+  certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
+  const {certificate: {credentialSubject, evidence}} = certificateRaw;
+  const certificateData = {
+    name: credentialSubject.name,
+    age: credentialSubject.age,
+    gender: credentialSubject.gender,
+    identity: formatId(credentialSubject.id),
+    beneficiaryId: credentialSubject.refId,
+    recipientAddress: formatRecipientAddress(credentialSubject.address),
+    vaccine: evidence[0].vaccine,
+    vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
+    vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
+    vaccinatedBy: evidence[0].verifier.name,
+    vaccinatedAt: formatFacilityAddress(evidence[0]),
+    qrCode: dataURL,
+    dose: evidence[0].dose,
+    totalDoses: evidence[0].totalDoses,
+    isFinalDose: evidence[0].dose === evidence[0].totalDoses,
+    isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
+    isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
+    currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
+    meta: certificateRaw.meta
+  };
+  getVaccineDetails(certificateData, doseToVaccinationDetailsMap);
+  return certificateData;
+}
+
+function getVaccineDetails(certificateData, doseToVaccinationDetailsMap) {
+  certificateData["vaxEvents"] = [];
+  for (let [key, value] of doseToVaccinationDetailsMap) {
+    let vaxEventMap = {
+      doseType: (value.dose <= value.totalDoses) ?
+        ("Primary Dose " + value.dose) :
+        ("Booster Dose " + (value.dose - value.totalDoses)),
+      vaxName: value.name || "",
+      vaxBatch: value.batch || "",
+      dateOfVax: formatDate(value.date || ""),
+      countryOfVax: value.vaccinatedCountry || "",
+      validity: value.validity || "",
+      vaxType: value.vaxType || "",
+    };
+    certificateData["vaxEvents"].push(vaxEventMap);
+  }
+}
+
+function fetchVaccinationDetailsFromCert(evidence) {
+  let vaccineDetails = {
+    dose: evidence.dose,
+    totalDoses: evidence.totalDoses,
+    date: evidence.date,
+    name: evidence.vaccine,
+    vaxType: getVaxType(evidence.icd11Code, evidence.prophylaxis),
+    batch: evidence.batch,
+    vaccinatedCountry: evidence.facility.address.addressCountry,
+  };
+  return vaccineDetails;
+}
+
+function getVaxType(icd11Code, prophylaxis) {
+  if(icd11Code && prophylaxis) {
+    return icd11Code+', '+prophylaxis;
+  } else {
+    return 'Not Available';
+  }
+}
+
+function formatRecipientAddress(address) {
+  return concatenateReadableString(address.streetAddress, address.district)
+}
+
+function formatFacilityAddress(evidence) {
+  return concatenateReadableString(evidence.facility.name, evidence.facility.address.district)
+}
+
+function getVaccineValidDays(start, end) {
+  const a = new Date(start);
+  const b = new Date(end);
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
+
+const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
   let certificate = JSON.parse(certificateRaw.certificate);
   const configurationService = new configService.ConfigurationService();
   const VACCINE_MANUF = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
@@ -53,8 +151,10 @@ const convertCertificateToDCCPayload = async(certificateRaw) => {
   return {
     "ver": "1.3.0",
     "nam": {
-      "fn": lastName,
-      "gn": firstName
+      "fn": nameDetails.fn,
+      "gn": nameDetails.gn,
+      "fnt": nameDetails.fnt,
+      "gnt": nameDetails.gnt
     },
     "dob": dobOfRecipient(credentialSubject),
     "v": [
@@ -103,5 +203,7 @@ function dobOfRecipient(credentialSubject) {
 module.exports = {
   sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
-  convertCertificateToDCCPayload
+  convertCertificateToDCCPayload,
+  getVaccineDetailsOfPreviousDoses,
+  prepareDataForVaccineCertificateTemplate
 };

@@ -1,4 +1,5 @@
 const certificateController = require("./src/routes/certificate_controller");
+const euCertificateController = require("./src/routes/eu_certificate_controller");
 const {initKafa} = require("./src/services/kafka_service");
 
 const http = require('http');
@@ -28,8 +29,8 @@ const server = http.createServer(async (req, res) => {
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/fhir-certificate")) {
         const data = await certificateController.certificateAsFHIRJson(req, res);
         res.end(data)
-    } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/eu-certificate")) {
-        const data = await certificateController.certificateAsEUPayload(req, res);
+    } else if (req.method === 'POST' && req.url.startsWith("/certificate/api/eu-certificate")) {
+        const data = await euCertificateController.certificateAsEUPayload(req, res);
         res.end(data)
     } else if (req.method === 'GET' && req.url.startsWith("/certificate/api/shc-certificate")) {
         const data = await certificateController.certificateAsSHCPayload(req, res);
