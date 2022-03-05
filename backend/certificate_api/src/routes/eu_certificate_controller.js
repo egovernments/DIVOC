@@ -10,6 +10,7 @@ const {TEMPLATES, QR_TYPE} = require("../../configs/constants");
 const {sendEvents} = require("../services/kafka_service");
 const QRCode = require('qrcode');
 const { ConfigurationService } = require('../services/configuration_service');
+const { storeKeyWithExpiry } = require('../services/redis_service');
 
 const configurationService = new ConfigurationService();
 
@@ -108,6 +109,8 @@ async function certificateAsEUPayload(req, res) {
         type: "eu-cert-success",
         extra: "Certificate found"
       });
+      // caching the eu payload
+      storeKeyWithExpiry("eu-"+refId+"-"+Date.now(), JSON.stringify(requestBody));
       return buffer
 
     } else {
