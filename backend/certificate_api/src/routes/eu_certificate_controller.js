@@ -11,6 +11,7 @@ const {sendEvents} = require("../services/kafka_service");
 const QRCode = require('qrcode');
 const { ConfigurationService } = require('../services/configuration_service');
 const { storeKeyWithExpiry } = require('../services/redis_service');
+const {createPDF} = require("../services/pdf_service")
 
 const configurationService = new ConfigurationService();
 
@@ -83,8 +84,10 @@ async function certificateAsEUPayload(req, res) {
       } else {
         const dataURL = await QRCode.toDataURL(qrUri, {scale: 2});
         let doseToVaccinationDetailsMap = certificateService.getVaccineDetailsOfPreviousDoses(certificateResp);
-        const certificateData = certificateService.prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
-        const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);;
+        let certificateData = certificateService.prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
+        // Overriding the name to as passed in request body
+        certificateData["name"] = [requestBody.fn, requestBody.gn].join(" ");
+        const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.VACCINATION_CERTIFICATE);
         try {
           buffer = await createPDF(htmlData, certificateData);
           res.setHeader("Content-Type", "application/pdf");
@@ -98,7 +101,7 @@ async function certificateAsEUPayload(req, res) {
             extra: err.message
           };
           sendEvents(error);
-          return;
+          return JSON.stringify(error);;
         }
       }
 
@@ -110,7 +113,8 @@ async function certificateAsEUPayload(req, res) {
         extra: "Certificate found"
       });
       // caching the eu payload
-      storeKeyWithExpiry("eu-"+refId+"-"+Date.now(), JSON.stringify(requestBody));
+      redisKey = ["eu", refId, Date.now()].join("-")
+      storeKeyWithExpiry(redisKey, JSON.stringify(requestBody));
       return buffer
 
     } else {
