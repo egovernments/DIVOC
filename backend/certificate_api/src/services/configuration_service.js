@@ -2,17 +2,17 @@ const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 const Handlebars = require('handlebars');
 const config = require('../../configs/config');
-const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../../configs/constants');
+const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
-let AddHandlerHelper = null;
+let addHandlerHelper = null;
 function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
-  setUpWatcher(TEMPLATES.ADD_HELPER);
+  setUpWatcher(HELPERS.CERTIFICATE_HELPER_FUNCTIONS);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
@@ -48,8 +48,8 @@ function updateConfigValues(key, value) {
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
       break;
-    case TEMPLATES.ADD_HELPER:
-      AddHandlerHelper = value;
+    case HELPERS.CERTIFICATE_HELPER_FUNCTIONS:
+      addHandlerHelper = value;
       break;
     case EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
       EU_VACCINE_CODE = value;
@@ -93,8 +93,8 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
       break;
-    case TEMPLATES.ADD_HELPER:
-      value = AddHandlerHelper;
+    case HELPERS.CERTIFICATE_HELPER_FUNCTIONS:
+      value = addHandlerHelper;
       break;
     case EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
       value = EU_VACCINE_MANUF;
@@ -122,8 +122,8 @@ class ConfigurationService {
     updateConfigValues(key, certificateTemplate);
     return certificateTemplate;
   }
-  async AddHelpers(key){
-    let helper= await loadConfigurationValues(key, async() => await configuration.AddHelpers(key));
+  async addHelpers(key){
+    let helper = await loadConfigurationValues(key, async() => await configuration.AddHelpers(key));
     updateConfigValues(key,helper);
     return helper;
   }
@@ -139,7 +139,7 @@ const etcd = function() {
     const template = (await etcdClient.get(templateKey).string());
     return template;
   }
-  this.AddHelpers = async function(key){
+  this.addHelpers = async function(key) {
     const value = (await etcdClient.get(key).string());
     return value;
   }

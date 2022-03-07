@@ -1,8 +1,7 @@
 const EU_DISEASE = {"covid-19": "840539006"};
 const TEMPLATES = {
   VACCINATION_CERTIFICATE: "vaccineCertificateTemplate",
-  TEST_CERTIFICATE: "testCertificateTemplate",
-  ADD_HELPER: "handlerHelpers"
+  TEST_CERTIFICATE: "testCertificateTemplate"
 };
 Object.freeze(TEMPLATES);
 
@@ -12,11 +11,16 @@ const EU_VACCINE_CONFIG_KEYS = {
   MANUFACTURER: "euVaccineManuf"
 }
 
+const HELPERS = {
+  CERTIFICATE_HELPER_FUNCTIONS: "certificateHelperFunctions"
+}
+
 const QR_TYPE = "qrcode";
 
 module.exports = {
   EU_DISEASE,
   TEMPLATES,
   EU_VACCINE_CONFIG_KEYS,
-  QR_TYPE
+  QR_TYPE,
+  HELPERS
 }
