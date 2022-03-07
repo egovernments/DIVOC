@@ -26,6 +26,11 @@ jest.mock('../src/services/configuration_service', () => {
     }
 });
 
+const nameConfig = {
+    "fn": "Dinushan",
+    "gn": "D V Chanaka"
+};
+
 test('should convert certificate in eu specified payload if all fields are provided in correct format', async() => {
     const certificateRaw = {
         name: 'D V Chanaka Dinushan',
@@ -73,7 +78,7 @@ test('should convert certificate in eu specified payload if all fields are provi
             }
         ]
     };
-    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw, nameConfig);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
@@ -124,7 +129,7 @@ test('should convert certificate in eu specified payload if country field is ful
             }
         ]
     };
-    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw, nameConfig);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
@@ -175,7 +180,7 @@ test('should convert certificate in eu specified payload if country field is 2 l
             }
         ]
     };
-    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw, nameConfig);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
@@ -226,7 +231,7 @@ test('should convert certificate in eu specified payload if country field is inv
             }
         ]
     };
-    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw);
+    const actualDccPayload = await certificate_service.convertCertificateToDCCPayload(certificateRaw, nameConfig);
     expect(actualDccPayload).toEqual(expectedDccPayload);
 });
 
