@@ -65,12 +65,12 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
     meta: certificateRaw.meta
   };
-  getVaccineDetails(certificateData, doseToVaccinationDetailsMap);
+  certificateData["vaxEvents"] = getVaccineDetails(doseToVaccinationDetailsMap);
   return certificateData;
 }
 
-function getVaccineDetails(certificateData, doseToVaccinationDetailsMap) {
-  certificateData["vaxEvents"] = [];
+function getVaccineDetails(doseToVaccinationDetailsMap) {
+  let vaxEvents = [];
   for (let [key, value] of doseToVaccinationDetailsMap) {
     let vaxEventMap = {
       doseType: (value.dose <= value.totalDoses) ?
@@ -83,8 +83,9 @@ function getVaccineDetails(certificateData, doseToVaccinationDetailsMap) {
       validity: value.validity || "",
       vaxType: value.vaxType || "",
     };
-    certificateData["vaxEvents"].push(vaxEventMap);
+    vaxEvents.push(vaxEventMap);
   }
+  return vaxEvents
 }
 
 function fetchVaccinationDetailsFromCert(evidence) {
