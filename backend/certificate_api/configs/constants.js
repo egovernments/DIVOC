@@ -1,7 +1,8 @@
 const EU_DISEASE = {"covid-19": "840539006"};
 const TEMPLATES = {
   VACCINATION_CERTIFICATE: "vaccineCertificateTemplate",
-  TEST_CERTIFICATE: "testCertificateTemplate"
+  TEST_CERTIFICATE: "testCertificateTemplate",
+  ADD_HELPER: "handlerHelpers"
 };
 Object.freeze(TEMPLATES);
 

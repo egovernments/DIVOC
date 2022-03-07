@@ -1,8 +1,14 @@
 const Handlebars = require('handlebars');
 const puppeteer = require('puppeteer');
+const { ConfigurationService } = require('./configuration_service');
+const {TEMPLATES} = require('../../configs/constants');
+const configurationService = new ConfigurationService();
 
 async function createPDF(htmlData, data) {
   const template = Handlebars.compile(htmlData);
+  let helpers = Handlebars.compile(await configurationService.AddHelpers(TEMPLATES.ADD_HELPER))().toString();
+  eval(helpers);
+
   let certificate = template(data);
   const browser = await puppeteer.launch({
     headless: true,

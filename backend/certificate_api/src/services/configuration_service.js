@@ -1,17 +1,18 @@
 const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
-
+const Handlebars = require('handlebars');
 const config = require('../../configs/config');
 const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
-
+let AddHandlerHelper = null;
 function init() {
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
+  setUpWatcher(TEMPLATES.ADD_HELPER);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
@@ -46,6 +47,9 @@ function updateConfigValues(key, value) {
       break;
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
+      break;
+    case TEMPLATES.ADD_HELPER:
+      AddHandlerHelper = value;
       break;
     case EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
       EU_VACCINE_CODE = value;
@@ -89,6 +93,9 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
       break;
+    case TEMPLATES.ADD_HELPER:
+      value = AddHandlerHelper;
+      break;
     case EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
       value = EU_VACCINE_MANUF;
       break;
@@ -115,7 +122,11 @@ class ConfigurationService {
     updateConfigValues(key, certificateTemplate);
     return certificateTemplate;
   }
-
+  async AddHelpers(key){
+    let helper= await loadConfigurationValues(key, async() => await configuration.AddHelpers(key));
+    updateConfigValues(key,helper);
+    return helper;
+  }
   async getEUVaccineDetails(key) {
     let details = await loadConfigurationValues(key, async() => await configuration.getEUVaccineDetails(key));
     updateConfigValues(key, details);
@@ -127,6 +138,10 @@ const etcd = function() {
   this.getCertificateTemplate = async function(templateKey) {
     const template = (await etcdClient.get(templateKey).string());
     return template;
+  }
+  this.AddHelpers = async function(key){
+    const value = (await etcdClient.get(key).string());
+    return value;
   }
 
   this.getEUVaccineDetails = async function(key) {

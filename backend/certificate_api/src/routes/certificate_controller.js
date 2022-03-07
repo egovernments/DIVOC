@@ -106,6 +106,7 @@ async function createCertificatePDF(certificateResp, res, source) {
         } catch(err) {
             res.statusCode = 500;
             res.setHeader("Content-Type", "application/json");
+            console.error(err);
             let error = {
                 date: new Date(),
                 source: "GetVaccinePDFCertificate",
