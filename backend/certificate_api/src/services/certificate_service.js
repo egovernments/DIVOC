@@ -149,13 +149,11 @@ const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
   const fullName = credentialSubject.name.trim();
   const lastName = fullName.substring(fullName.lastIndexOf(" ")+1)
   const firstName = fullName.substring(0,(fullName.length - lastName.length)).trim();
-  return {
+  let euPayload = {
     "ver": "1.3.0",
     "nam": {
       "fn": nameDetails.fn,
-      "gn": nameDetails.gn,
       "fnt": nameDetails.fnt,
-      "gnt": nameDetails.gnt
     },
     "dob": dobOfRecipient(credentialSubject),
     "v": [
@@ -173,6 +171,11 @@ const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
       }
     ]
   };
+  if (nameDetails.gn && nameDetails.gnt) {
+    euPayload.nam.gn = nameDetails.gn;
+    euPayload.nam.gnt = nameDetails.gnt
+  }
+  return euPayload
 }
 
 function getAlpha2CodeForCountry(addressCountry) {
