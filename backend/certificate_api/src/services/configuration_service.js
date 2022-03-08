@@ -123,7 +123,7 @@ class ConfigurationService {
     return certificateTemplate;
   }
   async addHelpers(key){
-    let helper = await loadConfigurationValues(key, async() => await configuration.AddHelpers(key));
+    let helper = await loadConfigurationValues(key, async() => await configuration.addHelpers(key));
     updateConfigValues(key,helper);
     return helper;
   }
