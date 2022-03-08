@@ -58,4 +58,14 @@ describe("validation for EU request body", () => {
 
     expect(valid).toEqual(false)
   })
+
+  test('return false if gnt is present without gn', () => {
+    const valid = validateEURequestBody({
+      "fn": "d'Arsøns - van Halen",
+      "fnt": "DARSONS<VAN<HALEN",
+      "gnt": "FRANCOIS<JOAN"
+    });
+
+    expect(valid).toEqual(false)
+  })
 })
