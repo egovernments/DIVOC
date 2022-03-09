@@ -1,9 +1,11 @@
 const etcd3 = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
+const config = require('../configs/config');
 jest.mock('sanitize-html');
 const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../configs/constants');
 jest.mock('../src/services/redis_service');
 console.log = jest.fn();
+config.ETCD_URL = 'etcd:2379'
 const html = `<html>
         <head>
             <title>Dummy</title>

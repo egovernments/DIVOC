@@ -7,6 +7,9 @@ let etcdClient;
 let configuration;
 
 function init() {
+    if(!config.ETCD_URL) {
+        throw Error('ETCD_URL not set. Please set ETCD_URL')
+    }
     etcdClient = new Etcd3({hosts: config.ETCD_URL});
     setUpWatcher(CONFIG_KEYS.ICD);
     setUpWatcher(CONFIG_KEYS.VACCINE_ICD);

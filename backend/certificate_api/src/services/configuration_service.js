@@ -9,6 +9,9 @@ let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 
 function init() {
+  if(!config.ETCD_URL) {
+    throw Error("ETCD_URL not set. Please set ETCD_URL")
+  }
   etcdClient = new Etcd3({hosts: config.ETCD_URL});
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);

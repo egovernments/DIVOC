@@ -86,9 +86,8 @@ let configLayerObj;
 const documentLoader = {};
 documentLoader[CERTIFICATE_NAMESPACE] = vaccinationContext;
 documentLoader[CERTIFICATE_NAMESPACE_V2] = vaccinationContextV2;
-
+configuration_service.init();
 (async function() {
-  configuration_service.init();
   await consumer.connect();
   await producer.connect();
   await consumer.subscribe({topic: config.CERTIFY_TOPIC, fromBeginning: true});

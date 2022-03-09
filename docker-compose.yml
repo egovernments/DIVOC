@@ -298,7 +298,7 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_KEY_EXPIRE: 172800
       REDIS_ENABLED: "true"
-      ETCD_URL: etcd:2379
+      ETCD_URL: $ETCD_URL
       CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
