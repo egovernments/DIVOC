@@ -177,7 +177,7 @@ services:
       KEYCLOAK_URL: "http://keycloak:8080/auth"
       POLLING_STATES: "goa,manipur,punjab,uttar pradesh,uttarakhand"
   digilocker-support-api-v2:
-    image: dockerhub/digilocker_support_api:1.0.57
+    image: dockerhub/digilocker_support_api:1.0.58
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
