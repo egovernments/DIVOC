@@ -92,7 +92,7 @@ test('should call sanitizeHtml method 2 times each for getCertificateTemplate me
 });
 
 test('should call watch method to watch for changes in etcd', () => {
-    expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
+    expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(6);
 });
 
 test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
