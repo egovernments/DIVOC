@@ -98,6 +98,7 @@ var Config = struct {
 		AuthKeyName string `env:"DIGILOCKER_AUTHKEYNAME" default:"x-digilocker-hmac"`
 		AuthHMACKey string `env:"DIGILOCKER_HMAC_AUTHKEY"`
 		DocType     string `env:"DIGILOCKER_DOCTYPE"`
+		LocalTimeZone     string `env:"DIGILOCKER_LOCAL_TIMEZONE" default:"Asia/Kolkata"`
 	}
 	Acknowledgement struct {
 		CallbackAuthUrl           string `env:"ACK_CALLBACK_AUTH_URL"`

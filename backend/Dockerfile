@@ -78,6 +78,7 @@ CMD ["/app/notification-service", "--scheme", "http", "--port", "8765", "--host"
 FROM alpine:3.9 as digilocker_support_api
 LABEL name=digilocker_support_api
 RUN apk add ca-certificates
+RUN apk add --no-cache tzdata
 COPY --from=build_base /tmp/divoc/vaccination_api/digilocker_support_api /app/digilocker_support_api
 COPY vaccination_api/config /config
 #RUN useradd -u 8003 divoc-cert
