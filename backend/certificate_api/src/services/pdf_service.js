@@ -7,9 +7,9 @@ const configurationService = new ConfigurationService();
 async function createPDF(htmlData, data) {
   const template = Handlebars.compile(htmlData);
 
-  const handlerObj = new Function(await configurationService.addHelpers(HELPERS.CERTIFICATE_HELPER_FUNCTIONS))();
+  const helperFunctions = new Function(await configurationService.addHelpers(HELPERS.CERTIFICATE_HELPER_FUNCTIONS))();
   
-  let certificate = template(data, {helpers:handlerObj});
+  let certificate = template(data, {helpers: helperFunctions});
 
   const browser = await puppeteer.launch({
     headless: true,
