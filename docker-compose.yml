@@ -35,7 +35,11 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
-      - search_provider=io.opensaber.registry.service.ElasticSearchService
+      - search_providerName=dev.sunbirdrc.registry.service.ElasticSearchService
+      - registry_base_apis_enable=true
+      - signature_enabled=false
+      - taskExecutor_index_queueCapacity=100
+      - auditTaskExecutor_queueCapacity=100
     ports:
       - "8081:8081"
     depends_on:
