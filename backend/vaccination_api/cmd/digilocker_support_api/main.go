@@ -879,11 +879,15 @@ func appendCommaIfNotEmpty(address string, suffix string) string {
 }
 
 func formatDate(date time.Time) string {
-	return date.Format("02 Jan 2006")
+	loc, _ := time.LoadLocation(config.Config.Digilocker.LocalTimeZone)
+	localDate := date.In(loc)
+	return localDate.Format("02 Jan 2006")
 }
 
 func formatDateYYYYMMDD(date time.Time) string {
-	return date.Format("2006-01-02")
+	loc, _ := time.LoadLocation(config.Config.Digilocker.LocalTimeZone)
+	localDate := date.In(loc)
+	return localDate.Format("2006-01-02")
 }
 
 func formatDose(dose int) string {

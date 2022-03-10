@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	"io/ioutil"
 	"os"
@@ -654,6 +655,33 @@ func Test_getPassportIdValue(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := getPassportIdValue(tt.args.identity); got != tt.want {
 				t.Errorf("formatId() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_formatDate(t *testing.T) {
+	type args struct {
+		vaccinationDate time.Time
+	}
+	// setting local time to India timezone
+	config.Config.Digilocker.LocalTimeZone = "Asia/Kolkata"
+
+	dDate, _ := time.Parse(time.RFC3339,"2021-09-17T22:00:00.000Z")
+	dDate2, _ := time.Parse(time.RFC3339,"2021-09-17T18:00:00.000Z")
+	tests := []struct {
+		name string
+		args args
+		expected string
+	}{
+		{name:"date for time between 0.00 am to 5:30 am", args:args{vaccinationDate:dDate}, expected:"18 Sep 2021"},
+		{name:"date for time after 5:30 am", args:args{vaccinationDate:dDate2}, expected:"17 Sep 2021"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := formatDate(tt.args.vaccinationDate)
+			if result!=tt.expected {
+				t.Fail()
 			}
 		})
 	}
