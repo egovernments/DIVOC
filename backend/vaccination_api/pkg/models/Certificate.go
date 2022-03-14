@@ -29,6 +29,9 @@ var vaccineEffectiveDaysInfo = map[string]map[string]int{
 	"covovax": {
 		"dueDays": 21,
 	},
+	"corbevax": {
+		"dueDays": 28,
+	},
 }
 
 type Certificate struct {

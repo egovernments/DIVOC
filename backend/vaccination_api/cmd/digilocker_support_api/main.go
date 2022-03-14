@@ -63,7 +63,9 @@ var vaccineProphylaxis = map[string]string{
 	"covishield": "COVID-19 vaccine, non-replicating viral vector",
 	"sputnik":    "COVID-19 vaccine, non-replicating viral vector",
 	"zycov":      "COVID-19 vaccine, DNA based",
-	"covovax":    "COVID-19 vaccine, Recombinant Protein Nanoparticle",
+	"covovax":    "COVID-19 vaccine, virus protein subunit",
+	"corbevax":   "COVID-19 vaccine, virus protein subunit",
+
 }
 
 type DoseWiseData struct {
