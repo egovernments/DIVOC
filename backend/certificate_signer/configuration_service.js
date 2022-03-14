@@ -7,7 +7,20 @@ let etcdClient;
 let configuration;
 
 function init() {
-    etcdClient = new Etcd3({hosts: config.ETCD_URL});
+    if(!config.ETCD_URL) {
+        throw Error('ETCD_URL not set. Please set ETCD_URL')
+    }
+    let options = {hosts: config.ETCD_URL}
+    if(config.ETCD_AUTH_ENABLED) {
+      options = {
+        ...options,
+        auth: {
+          username: config.ETCD_USERNAME,
+          password: config.ETCD_PASSWORD
+        }
+      }
+    }
+    etcdClient = new Etcd3(options);
     setUpWatcher(CONFIG_KEYS.ICD);
     setUpWatcher(CONFIG_KEYS.VACCINE_ICD);
     setUpWatcher(CONFIG_KEYS.DDCC_TEMPLATE);

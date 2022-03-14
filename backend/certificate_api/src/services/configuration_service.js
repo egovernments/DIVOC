@@ -9,7 +9,20 @@ let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 let addHandlerHelper = null;
 function init() {
-  etcdClient = new Etcd3({hosts: config.ETCD_URL});
+  if(!config.ETCD_URL) {
+    throw Error("ETCD_URL not set. Please set ETCD_URL")
+  }
+  let options = {hosts: config.ETCD_URL}
+  if(config.ETCD_AUTH_ENABLED) {
+    options = {
+      ...options,
+      auth: {
+        username: config.ETCD_USERNAME,
+        password: config.ETCD_PASSWORD
+      }
+    }
+  }
+  etcdClient = new Etcd3(options);
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
   setUpWatcher(HELPERS.CERTIFICATE_HELPER_FUNCTIONS);
