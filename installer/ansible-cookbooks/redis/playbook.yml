@@ -1,0 +1,13 @@
+---
+- name: configure the master redis server
+  hosts: redis-master
+  become: true
+  roles:
+    - redisdb
+
+- name: configure redis slaves
+  hosts: redis-slave
+  vars:
+    - redis_slaveof: "{{ master_node_ip }} {{ redis_port }}"
+  roles:
+    - redisdb

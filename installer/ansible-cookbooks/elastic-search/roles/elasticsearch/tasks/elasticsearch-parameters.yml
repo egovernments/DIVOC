@@ -1,0 +1,59 @@
+---
+# Check for mandatory parameters
+
+- name: Warn about deprecated  es_xpack_features variable
+  debug:
+    msg: "WARNING: es_xpack_features variable is now deprecated. All feature are now enabled by default"
+  when: es_xpack_features is defined and not oss_version
+
+- name: "fail when oss_version is true with es_version >= 7.11.0"
+  fail:
+    msg: >
+      OSS versions are not available for Elasticsearch >= 7.11.0.
+      See https://www.elastic.co/blog/licensing-change for more details.
+  when: oss_version and es_version is version('7.11.0', '>=')
+
+- name: fail when es_proxy_port is not defined or is blank
+  fail: msg="es_proxy_port must be specified and cannot be blank when es_proxy_host is defined"
+  when: (es_proxy_port is not defined or es_proxy_port == '') and (es_proxy_host is defined and es_proxy_host != '')
+
+# If the user attempts to lock memory they must specify a heap size
+- name: fail when heap size is not specified when using memory lock
+  fail: msg="If locking memory with bootstrap.memory_lock a heap size must be specified"
+  when: es_config['bootstrap.memory_lock'] is defined and es_config['bootstrap.memory_lock'] == True and es_heap_size is not defined and not ansible_check_mode
+
+- name: fail when password is not declared when using security
+  fail: msg="Enabling security requires an es_api_basic_auth_username and es_api_basic_auth_password to be provided to allow cluster operations"
+  when:
+    - not oss_version
+    - es_api_basic_auth_username is defined
+    - es_api_basic_auth_password is not defined
+
+- name: fail when api credentials are not declared when using tls
+  fail: msg="Enabling tls requires an es_api_basic_auth_username and es_api_basic_auth_password"
+  when:
+    - not oss_version
+    - es_enable_http_ssl or es_enable_transport_ssl
+    - es_api_basic_auth_username is not defined or es_api_basic_auth_password is not defined
+
+- name: fail when ssl enabled without defining a key and certificate
+  fail: msg="Enabling SSL/TLS (es_enable_http_ssl or es_enable_transport_ssl) requires es_ssl_keystore and es_ssl_truststore or es_ssl_key and es_ssl_certificate to be provided"
+  when:
+    - es_enable_http_ssl or es_enable_transport_ssl
+    - (es_ssl_key == "" or es_ssl_certificate == "")
+    - (es_ssl_keystore == "" or es_ssl_truststore == "")
+
+- name: set fact file_reserved_users
+  set_fact: file_reserved_users={{ es_users.file.keys() | list | intersect (reserved_xpack_users) }}
+  when: es_users is defined and es_users.file is defined and (es_users.file.keys() | list | length > 0) and (es_users.file.keys() | list | intersect (reserved_xpack_users) | length > 0)
+
+- name: fail when changing users through file realm
+  fail:
+    msg: "ERROR: INVALID CONFIG - YOU CANNOT CHANGE RESERVED USERS THROUGH THE FILE REALM. THE FOLLOWING CANNOT BE CHANGED: {{file_reserved_users}}. USE THE NATIVE REALM."
+  when: file_reserved_users | default([]) | length > 0
+
+- name: set fact m_lock_enabled
+  set_fact: m_lock_enabled={{ es_config['bootstrap.memory_lock'] is defined and es_config['bootstrap.memory_lock'] == True }}
+
+- name: set fact use_system_d
+  set_fact: use_system_d={{ (ansible_distribution == 'Debian' and ansible_distribution_version is version('8', '>=')) or (ansible_distribution in ['RedHat','CentOS'] and ansible_distribution_version is version('7', '>=')) or (ansible_distribution == 'Ubuntu' and ansible_distribution_version is version('15', '>=')) or (ansible_distribution == 'Amazon' and ansible_distribution_version is version('2', '>=')) }}

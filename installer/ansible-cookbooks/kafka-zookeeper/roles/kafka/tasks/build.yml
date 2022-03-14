@@ -1,0 +1,91 @@
+---
+
+- name: Ensure install folders
+  become: yes
+  become_method: sudo
+  become_user: root
+  file:
+    state: directory
+    path: "{{ item }}"
+  with_items:
+    - "/home/{{ sansible_kafka_user }}/bin"
+    - "/home/{{ sansible_kafka_user }}/tmp"
+    - "/home/{{ sansible_kafka_user }}/log"
+    - "/home/{{ sansible_kafka_user }}/data"
+
+- name: Remove lost+found in the datadir
+  become: yes
+  file:
+    path: "/home/{{ sansible_kafka_user }}/data/lost+found"
+    state: absent
+
+- name: Fetch kafka binary package
+  become: yes
+  become_method: sudo
+  become_user: root
+  get_url:
+    dest: "/home/{{ sansible_kafka_user }}/tmp/\
+      kafka_{{ sansible_kafka_version_scala }}-{{ sansible_kafka_version_kafka }}.tgz"
+    url: "{{ sansible_kafka_apache_mirror }}/kafka/{{ sansible_kafka_version_kafka }}/\
+      kafka_{{ sansible_kafka_version_scala }}-{{ sansible_kafka_version_kafka }}.tgz"
+
+- name: Uncompress the kafka tar
+  become: yes
+  become_method: sudo
+  become_user: root
+  unarchive:
+    copy: no
+    creates: "/home/{{ sansible_kafka_user }}/kafka_{{ sansible_kafka_version_scala }}-{{ sansible_kafka_version_kafka }}"
+    dest: "/home/{{ sansible_kafka_user }}"
+    src: "/home/{{ sansible_kafka_user }}/tmp/kafka_{{ sansible_kafka_version_scala }}-{{ sansible_kafka_version_kafka }}.tgz"
+
+- name: Link kafka to the right version
+  become: yes
+  become_method: sudo
+  become_user: root
+  file:
+    path: "/home/{{ sansible_kafka_user }}/kafka"
+    src: "/home/{{ sansible_kafka_user }}/kafka_{{ sansible_kafka_version_scala }}-{{ sansible_kafka_version_kafka }}"
+    state: link
+
+- name: link config dir
+  become: yes
+  become_method: sudo
+  become_user: root
+  file:
+    force: yes
+    path: "/home/{{ sansible_kafka_user }}/etc"
+    src: "/home/{{ sansible_kafka_user }}/kafka/config"
+    state: link
+
+- name: Create Kafka service for SysV
+  become: yes
+  template:
+    dest: /etc/init.d/kafka
+    owner: root
+    mode: 0755
+    src: kafka_sysv.j2
+  when: ansible_service_mgr != "systemd"
+
+- name: Add Kafka SystemD script
+  become: yes
+  template:
+    dest: /etc/systemd/system/kafka.service
+    mode: u+rw,g+rw,o+r
+    src: kafka.service.j2
+  when: ansible_service_mgr == "systemd"
+
+- name: Ensure Kafka is enabled for SysV
+  become: yes
+  service:
+    name: kafka
+    enabled: yes
+  when: ansible_service_mgr != "systemd"
+
+- name: Ensure Kafka is enabled for SystemD
+  become: yes
+  systemd:
+    daemon_reload: yes
+    name: kafka
+    enabled: yes
+  when: ansible_service_mgr == "systemd"

@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: certificate-api
+  name: certificate-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: certificate-api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: certificate-api
+    spec:
+      containers:
+        - image: REGISTRY/certificate_api:latest
+          imagePullPolicy: Always
+          name: certificate-api
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

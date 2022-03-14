@@ -1,0 +1,11 @@
+---
+- name: Setup Elasticsearch OSS 6.x
+  hosts: localhost
+  post_tasks:
+    - include: elasticsearch/test/integration/debug.yml
+  roles:
+    - elasticsearch
+  vars:
+    oss_version: true
+
+#Do not add tests here. This test is run twice and confirms idempotency.

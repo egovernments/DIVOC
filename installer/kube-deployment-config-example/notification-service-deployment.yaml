@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: notification-service
+  name: notification-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: notification-service
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: notification-service
+    spec:
+      containers:
+        - image: REGISTRY/notification-service:latest
+          imagePullPolicy: Always
+          name: notification-service
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

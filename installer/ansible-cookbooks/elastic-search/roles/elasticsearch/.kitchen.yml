@@ -1,0 +1,195 @@
+---
+driver:
+  name: docker
+
+transport:
+  max_ssh_sessions: 6
+
+provisioner:
+  name: ansible_playbook
+  hosts: localhost
+  roles_path: ../
+  require_ansible_repo: true
+  require_ansible_omnibus: false
+  require_ansible_source: false
+  http_proxy: <%= ENV['HTTP_PROXY'] %>
+  https_proxy: <%= ENV['HTTPS_PROXY'] %>
+  no_proxy: localhost,127.0.0.1
+  ignore_extensions_from_root: [".git",".idea",".kitchen.yml"]
+  ignore_paths_from_root: [".git",".idea",".kitchen"]
+  <% if ENV['VERSION'] %>
+  attributes:
+    extra_vars:
+      es_major_version: "<%= ENV['VERSION'] %>"
+      <% if ENV['VERSION'] == '6.x' %>
+      es_version: '6.8.23'
+      <% end %>
+  <% end %>
+
+platforms:
+  - name: ubuntu-14.04
+    driver_config:
+      image: ubuntu:14.04
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q software-properties-common && add-apt-repository -y ppa:ansible/ansible && add-apt-repository -y ppa:openjdk-r/ppa
+        - apt-get update -q && apt-get -y -q install ansible openjdk-8-jre python-jmespath
+        - locale-gen en_US.UTF-8 && localedef -i en_US -c -f UTF-8 en_US.UTF-8
+      use_sudo: false
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+  - name: ubuntu-16.04
+    driver_config:
+      image: ubuntu:16.04
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q iproute locales software-properties-common && add-apt-repository -y ppa:ansible/ansible
+        - apt-get update -q && apt-get install -y -q ansible python-jmespath
+        - locale-gen en_US.UTF-8 && localedef -i en_US -c -f UTF-8 en_US.UTF-8
+      use_sudo: false
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/sbin/init"
+  - name: ubuntu-18.04
+    driver_config:
+      image: ubuntu:18.04
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q ansible iproute2 python-jmespath
+      use_sudo: false
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/sbin/init"
+  - name: ubuntu-20.04
+    driver_config:
+      image: ubuntu:20.04
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q ansible gpg iproute2 python3-jmespath
+      use_sudo: false
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/sbin/init"
+  - name: debian-8
+    driver_config:
+      image: debian:8
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q gnupg2 python-jmespath
+        - echo "deb http://archive.debian.org/debian jessie-backports main" > /etc/apt/sources.list.d/jessie-backports.list
+        - echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf
+        - apt-get update && apt-get -y install -t jessie-backports openjdk-8-jre-headless
+        - echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
+        - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+        - apt-get update -q && apt-get install -y -q ansible
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      use_sudo: false
+      run_command: "/sbin/init"
+  - name: debian-9
+    driver_config:
+      image: debian:9
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q gnupg2 python-jmespath systemd-sysv
+        - echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
+        - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+        - apt-get update -q && apt-get install -y -q ansible
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      use_sudo: false
+      run_command: "/sbin/init"
+  - name: debian-10
+    driver_config:
+      image: debian:10
+      privileged: true
+      provision_command:
+        - apt-get update -q && apt-get install -y -q gnupg2 python-jmespath systemd-sysv
+        - echo "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main" > /etc/apt/sources.list.d/ansible.list
+        - apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+        - apt-get update -q && apt-get install -y -q ansible
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      use_sudo: false
+      run_command: "/sbin/init"
+  - name: centos-7
+    driver_config:
+      image: centos:7
+      provision_command:
+        - yum -y install epel-release
+        - yum -y install ansible iproute python2-jmespath
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/usr/sbin/init"
+      privileged: true
+      use_sudo: false
+  - name: centos-8
+    driver_config:
+      image: centos:8
+      provision_command:
+        - yum -y install epel-release
+        - yum -y install ansible iproute python3-jmespath
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/usr/sbin/init"
+      privileged: true
+      use_sudo: false
+  - name: amazonlinux-2
+    driver_config:
+      image: amazonlinux:2
+      provision_command:
+        - yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+        - yum -y install ansible iproute python2-jmespath
+      volume:
+        - <%=ENV['ES_XPACK_LICENSE_FILE']%>:/tmp/license.json
+        - /etc # This fixes certain java file actions that check the mount point. Without this adding users fails for some docker storage drivers
+      run_command: "/usr/sbin/init"
+      privileged: true
+      use_sudo: false
+
+suites:
+  - name: custom-config
+    provisioner:
+      idempotency_test: true
+      playbook: test/integration/custom-config.yml
+  - name: default
+    provisioner:
+      playbook: test/integration/default.yml
+      idempotency_test: true
+  - name: license
+    provisioner:
+      playbook: test/integration/license.yml
+      idempotency_test: true
+  - name: oss
+    provisioner:
+      idempotency_test: true
+      playbook: test/integration/oss.yml
+  - name: oss-to-default-upgrade
+    provisioner:
+      playbook: test/integration/oss-to-default-upgrade.yml
+      idempotency_test: false
+  - name: oss-upgrade
+    provisioner:
+      playbook: test/integration/oss-upgrade.yml
+      idempotency_test: false
+  - name: security
+    provisioner:
+      playbook: test/integration/security.yml
+      idempotency_test: true
+  - name: trial
+    provisioner:
+      playbook: test/integration/trial.yml
+      idempotency_test: false # es_xpack_trial is not idempotent currently
+  - name: upgrade
+    provisioner:
+      playbook: test/integration/upgrade.yml
+      idempotency_test: false

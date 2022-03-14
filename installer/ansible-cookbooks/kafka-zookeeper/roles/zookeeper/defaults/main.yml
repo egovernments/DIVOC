@@ -1,0 +1,33 @@
+---
+
+sansible_zookeeper_aws_cluster_assigned_id_enabled: no
+sansible_zookeeper_aws_cluster_assigned_id_tag_name: instanceindex
+sansible_zookeeper_aws_cluster_autodiscover_enabled: no
+sansible_zookeeper_aws_cluster_autodiscover_id_tag_name: ZookeeperID
+sansible_zookeeper_aws_cluster_autodiscover_lookup_filter: "Name=tag:Environment,Values=dev Name=tag:Role,Values=zookeeper"
+sansible_zookeeper_aws_cluster_autodiscover_r53_zone_id: ~
+sansible_zookeeper_aws_delay: 5
+sansible_zookeeper_aws_retries: 3
+sansible_zookeeper_client_port: 2181
+sansible_zookeeper_conf_dir: /home/zookeeper/conf
+sansible_zookeeper_connect_port: 2888
+sansible_zookeeper_data_dir: /home/zookeeper/lib
+sansible_zookeeper_download_url: "https://downloads.apache.org/zookeeper/zookeeper-{{ sansible_zookeeper_version }}/apache-zookeeper-{{ sansible_zookeeper_version }}-bin.tar.gz"
+sansible_zookeeper_election_port: 3888
+sansible_zookeeper_group: zookeeper
+sansible_zookeeper_hosts:
+  - localhost
+sansible_zookeeper_id: 1
+sansible_zookeeper_init_limit: 60
+sansible_zookeeper_install_dir: /home/zookeeper/zookeeper
+sansible_zookeeper_java_opts: "-Xmx{{ (ansible_memtotal_mb / 2) | int }}m -Xms{{ (ansible_memtotal_mb / 2) | int }}m"
+sansible_zookeeper_java_vendor: openjdk
+sansible_zookeeper_java_version: 8
+sansible_zookeeper_log_dir: /home/zookeeper/log
+sansible_zookeeper_log_level: WARN
+sansible_zookeeper_max_open_files: 4098
+sansible_zookeeper_sync_limit: 25
+sansible_zookeeper_tick_time: 2000
+sansible_zookeeper_user: zookeeper
+sansible_zookeeper_version: 3.6.3
+sansible_zookeeper_wait_for_server: 60

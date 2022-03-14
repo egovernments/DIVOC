@@ -1,0 +1,6 @@
+---
+- name: 'Install Private Docker registry'
+  hosts: docker-registry
+  become: true
+  roles:
+    - container-registry

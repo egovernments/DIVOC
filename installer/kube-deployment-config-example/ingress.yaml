@@ -1,0 +1,67 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-divoc
+  namespace: divoc
+  annotations:
+    kubernetes.io/ingress.class: nginx
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /auth
+            pathType: Prefix
+            backend:
+              service:
+                name: keycloak
+                port: 
+                  number: 8080
+          - path: /divoc
+            pathType: Prefix
+            backend:
+              service:
+                name: vaccination-api
+                port: 
+                  number: 8000
+          - path: /divoc/api/citizen
+            pathType: Prefix
+            backend:
+              service: 
+                name: registration-api
+                port: 
+                  number: 8002
+          - path: /divoc/admin
+            pathType: Prefix
+            backend:
+              service: 
+                name: portal-api
+                port: 
+                  number: 8001
+          - path: /config
+            pathType: Prefix
+            backend:
+              service:
+                name: flagr
+                port: 
+                  number: 18000
+          - path: /cert
+            pathType: Prefix
+            backend:
+              service: 
+                name: digilocker-support-api
+                port: 
+                  number: 8003
+          - path: /certificate/api
+            pathType: Prefix
+            backend:
+              service:
+                name: certificate-api
+                port: 
+                  number: 4321
+          - path: /
+            pathType: Prefix
+            backend:
+              service: 
+                name: public-app
+                port: 
+                  number: 80

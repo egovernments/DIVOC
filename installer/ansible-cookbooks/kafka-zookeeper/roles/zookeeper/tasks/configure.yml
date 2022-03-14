@@ -1,0 +1,142 @@
+---
+
+- name: Copy AWS autodiscover script
+  become: yes
+  become_user: root
+  copy:
+    src: aws_cluster_autodiscover
+    dest: "/home/{{ sansible_zookeeper_user }}/bin/aws_cluster_autodiscover"
+    owner: "{{ sansible_zookeeper_user }}"
+    group: "{{ sansible_zookeeper_group }}"
+    mode: 0750
+  when: sansible_zookeeper_aws_cluster_autodiscover_enabled == true
+
+- name: Run AWS autodiscover script and grab ID
+  become: yes
+  become_user: root
+  command: "./aws_cluster_autodiscover {{ sansible_zookeeper_hosts | join(',') }} {{ sansible_zookeeper_aws_cluster_autodiscover_r53_zone_id }} \"{{ sansible_zookeeper_aws_cluster_autodiscover_lookup_filter }}\" {{ sansible_zookeeper_aws_cluster_autodiscover_id_tag_name }}"
+  args:
+    chdir: "/home/{{ sansible_zookeeper_user }}/bin"
+  register: aws_cluster_autodiscover
+  until: aws_cluster_autodiscover is succeeded
+  retries: 4
+  delay: 15
+  when: sansible_zookeeper_aws_cluster_autodiscover_enabled == true
+
+- name: Wait for server
+  pause:
+    seconds: "{{ sansible_zookeeper_wait_for_server }}"
+  when: sansible_zookeeper_aws_cluster_autodiscover_enabled == true
+
+# Combine is used with set fact as successive calls to the module
+# seem to remove previous values added to hashes
+- name: Set cluster facts based on AWS autodiscover script output
+  set_fact:
+    zookeeper: "{{ zookeeper | combine( {
+        'aws_cluster_autodiscover': {
+          'data': aws_cluster_autodiscover.stdout | from_json
+        }
+      }, recursive=True) }}"
+  when: sansible_zookeeper_aws_cluster_autodiscover_enabled == true
+
+- name: Assigned ID EC2 fact hunt
+  action: ec2_metadata_facts
+  register: ec2_vars
+  until: ec2_vars is succeeded
+  retries: "{{ sansible_zookeeper_aws_retries }}"
+  delay: "{{ sansible_zookeeper_aws_delay }}"
+  when: sansible_zookeeper_aws_cluster_assigned_id_enabled == true
+
+- name: Assigned ID grab tags from EC2 instance
+  ec2_tag:
+    region: "{{ ansible_ec2_placement_region }}"
+    resource: "{{ ansible_ec2_instance_id }}"
+    state: list
+  register: assigned_id_instance_tags
+  when:
+    - ansible_ec2_instance_id | default(none) is not none
+    - sansible_zookeeper_aws_cluster_assigned_id_enabled == true
+  retries: "{{ sansible_zookeeper_aws_retries }}"
+  delay: "{{ sansible_zookeeper_aws_delay }}"
+  until: assigned_id_instance_tags is succeeded
+
+- name: Assigned ID set Broker ID
+  set_fact:
+    sansible_zookeeper_aws_cluster_assigned_id: "{{ assigned_id_instance_tags.tags[sansible_zookeeper_aws_cluster_assigned_id_tag_name] }}"
+  when:
+    - ansible_ec2_instance_id | default(none) is not none
+    - sansible_zookeeper_aws_cluster_assigned_id_enabled == true
+
+- name: Setup Zookeeper environment config
+  become: yes
+  become_user: root
+  template:
+    dest: "{{ sansible_zookeeper_conf_dir }}/environment"
+    mode: 0644
+    src: environment.j2
+  notify:
+    - restart zookeeper
+
+- name: Setup myid
+  become: yes
+  become_user: root
+  template:
+    dest: "{{ sansible_zookeeper_data_dir }}/myid"
+    src: myid.j2
+  notify:
+    - restart zookeeper
+
+- name: Setup zoo.cfg file
+  become: yes
+  become_user: root
+  template:
+    dest: "{{ sansible_zookeeper_conf_dir }}/zoo.cfg"
+    mode: 0644
+    src: zoo.cfg.j2
+  notify:
+    - restart zookeeper
+
+- name: Create Zookeeper log4j config
+  become: yes
+  become_user: root
+  template:
+    dest: "{{ sansible_zookeeper_conf_dir }}/log4j.properties"
+    mode: 0644
+    src: log4j.properties.j2
+  notify:
+    - restart zookeeper
+
+- name: Start Zookeeper service
+  become: yes
+  become_user: root
+  service:
+    enabled: yes
+    name: zookeeper
+    state: started
+
+- name: Flush handlers to ensure Zookeeper is up to date
+  meta: flush_handlers
+
+- name: Wait for Zookeeper client port
+  wait_for:
+    port: "{{ sansible_zookeeper_client_port }}"
+    state: started
+    timeout: 60
+
+- name: Copy zookeeper check script
+  become: yes
+  become_user: root
+  copy:
+    src: zookeeper_check
+    dest: "/home/{{ sansible_zookeeper_user }}/bin/zookeeper_check"
+    owner: "{{ sansible_zookeeper_user }}"
+    group: "{{ sansible_zookeeper_group }}"
+    mode: 0750
+
+- name: Run zookeeper check script
+  become: yes
+  become_user: root
+  command: "/home/{{ sansible_zookeeper_user }}/bin/zookeeper_check"
+  async: 7200
+  poll: 0
+  when: sansible_zookeeper_aws_cluster_autodiscover_enabled == true

@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: flagr
+  name: flagr
+spec:
+  ports:
+    - name: "tcp-18000"
+      port: 18000
+      protocol: TCP
+      targetPort: 18000
+      nodePort: 32000
+  selector:
+    k8s-app: flagr
+  sessionAffinity: None
+  type: NodePort

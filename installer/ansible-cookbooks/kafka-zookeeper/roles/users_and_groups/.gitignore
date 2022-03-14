@@ -1,0 +1,19 @@
+## IDEs, editors, ...
+.\#*
+.DS_Store
+.idea
+.project
+*.bak
+*.iml
+*.sublime*
+*.swp
+/.settings
+\#*\#
+
+# Build and Tests Artefacts
+*.pyc
+*.retry
+.cache/
+.molecule/
+.venv_*
+/meta/.galaxy_install_info

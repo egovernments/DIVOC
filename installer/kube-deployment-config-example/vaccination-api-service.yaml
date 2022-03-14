@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: vaccination-api
+  name: vaccination-api
+spec:
+  ports:
+    - name: "tcp-8000"
+      port: 8000
+      protocol: TCP
+      targetPort: 8000
+      nodePort: 32700
+  selector:
+    k8s-app: vaccination-api
+  sessionAffinity: None
+  type: NodePort

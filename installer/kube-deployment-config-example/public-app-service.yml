@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: divoc
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    k8s-app: public-app
+  name: public-app
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: "tcp-3000"
+      port: 80
+      protocol: TCP
+      targetPort: 80
+      nodePort: 31000
+  selector:
+    k8s-app: public-app
+  sessionAffinity: None
+  type: NodePort

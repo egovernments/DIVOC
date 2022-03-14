@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - divoc-config.yaml
+  - keycloak-deployment.yaml
+  - keycloak-service.yaml
+  - registry-deployment.yaml
+  - registry-service.yaml
+  - vaccination-api-deployment.yaml
+  - vaccination-api-service.yaml
+  - certificate-processor-deployment.yaml
+  - certificate-signer-deployment.yaml
+  - notification-service-deployment.yaml
+  - notification-service-service.yaml
+  - digilocker-support-api-deployment.yaml
+  - digilocker-support-api-service.yaml
+  - certificate-api-deployment.yaml
+  - certificate-api-service.yaml
+  - portal-api-deployment.yaml
+  - portal-api-service.yaml
+  - registration-api-deployment.yaml
+  - registration-api-service.yaml
+  - flagr-deployment.yaml
+  - flagr-service.yaml
+  - public-app-deployment.yaml
+  - public-app-service.yml

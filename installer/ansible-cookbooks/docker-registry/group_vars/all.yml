@@ -1,0 +1,7 @@
+---
+
+ansible_ssh_user: root
+ansible_ssh_pass: root
+registry_port: 5000
+registry_user: registryuser
+registry_pass: somepassword

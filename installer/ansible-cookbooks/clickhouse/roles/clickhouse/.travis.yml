@@ -1,0 +1,39 @@
+---
+language: python
+python: "3.7"
+
+services:
+  - docker
+
+matrix:
+  include:
+    - os: linux
+      dist: xenial
+      sudo: true
+      env: MOLECULE_SCENARIO_NAME='ubuntu_xenial'
+    - os: linux
+      dist: focal
+      sudo: true
+      env: MOLECULE_SCENARIO_NAME='ubuntu_focal'
+    - os: linux
+      dist: bionic
+      sudo: true
+      env: MOLECULE_SCENARIO_NAME='ubuntu_bionic'
+
+# Use the new container infrastructure
+sudo: true
+
+# Install ansible
+addons:
+  apt:
+    packages:
+    - python3-pip
+
+install:
+  - pip install --upgrade pip setuptools && pip install wheel && pip install -r requirements-test.txt
+
+script:
+  - molecule test -s ${MOLECULE_SCENARIO_NAME}
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

@@ -1,0 +1,7 @@
+---
+
+- hosts: elasticsearch
+  roles:
+    - { role: elasticsearch, es_instance_name: "node1", es_heap_size: "1g", es_config: {network.host: "_eth0_", discovery.zen.ping.unicast.hosts: "localhost:9300", http.port: 9200, transport.tcp.port: 9300, node.data: false, node.master: true, bootstrap.memory_lock: true } }
+  vars:
+    es_cluster_name: test-cluster

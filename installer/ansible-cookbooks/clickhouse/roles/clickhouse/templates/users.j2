@@ -1,0 +1,121 @@
+<?xml version="1.0"?>
+{{ ansible_managed | comment('xml') }} 
+<yandex>
+   <profiles>
+    <!-- Profiles of settings. -->
+    <!-- Default profiles. -->
+    {% for dict_item in clickhouse_profiles_default %}
+    <{{ dict_item }}>
+    {% for item in clickhouse_profiles_default[dict_item] %}
+        <{{ item }}>{{ clickhouse_profiles_default[dict_item][item] }}</{{ item }}>
+    {% endfor %}
+    </{{ dict_item }}>
+    {% endfor %}
+    <!-- Default profiles end. -->
+    <!-- Custom profiles. -->
+    {% for dict_item in clickhouse_profiles_custom %}
+    <{{ dict_item }}>
+    {% for item in clickhouse_profiles_custom[dict_item] %}
+        <{{ item }}>{{ clickhouse_profiles_custom[dict_item][item] }}</{{ item }}>
+    {% endfor %}
+    </{{ dict_item }}>
+    {% endfor %}
+    <!-- Custom profiles end. -->
+    </profiles>
+
+    <!-- Users and ACL. -->
+    <users>
+    <!-- Default users. -->
+    {% for user in clickhouse_users_default %}
+    {% if user.comment is defined %}
+    <!-- {{user.comment}} -->
+    {% endif %}
+    <{{ user.name }}>
+        {% if user.password is defined and user.password_sha256_hex is not defined %}
+        <password>{{ user.password }}</password>
+        {% elif user.password is not defined and user.password_sha256_hex is defined %}
+        <password_sha256_hex>{{ user.password_sha256_hex }}</password_sha256_hex>
+        {% elif user.password is defined and user.password_sha256_hex is defined %}
+        <password_sha256_hex>{{ user.password_sha256_hex }}</password_sha256_hex>
+        {% endif %}
+        <networks incl="networks" replace="replace">
+        {% for net in user.networks %}
+        <ip>{{ net }}</ip>
+        {% endfor %}
+        </networks>
+        <profile>{{ user.profile }}</profile>
+        <quota>{{ user.quota }}</quota>
+        {% if user.dbs is defined %}
+         <allow_databases>
+        {% for db in user.dbs %}
+            <database>{{ db }}</database>
+        {% endfor %}
+        </allow_databases>
+        {% endif %}
+    </{{ user.name }}>
+    {% endfor %}
+    <!-- Custom users. -->
+    {% for user in clickhouse_users_custom %}
+    {% if user.comment is defined %}
+    <!-- {{user.comment}} -->
+    {% endif %}
+    <{{ user.name }}>
+        {% if user.password is defined and user.password_sha256_hex is not defined %}
+        <password>{{ user.password }}</password>
+        {% elif user.password_sha256_hex is defined %}
+        <password_sha256_hex>{{ user.password_sha256_hex }}</password_sha256_hex>
+        {% endif %}
+        <networks incl="networks" replace="replace">
+        {% for net in user.networks %}
+        <ip>{{ net }}</ip>
+        {% endfor %}
+        </networks>
+        <profile>{{ user.profile }}</profile>
+        <quota>{{ user.quota }}</quota>
+        {% if user.dbs is defined %}
+         <allow_databases>
+        {% for db in user.dbs %}
+            <database>{{ db }}</database>
+        {% endfor %}
+        </allow_databases>
+        {% endif %}
+        {% if user.ldap_server is defined %}
+        <ldap><server>{{  user.ldap_server  }}</server></ldap>
+        {% endif %}
+    </{{ user.name }}>
+    {% endfor %}
+    </users>
+
+    <!-- Quotas. -->
+    <quotas>
+        <!-- Default quotas. -->
+    {% for quota in clickhouse_quotas_default %}
+    <{{ quota.name }}>
+    {% for interval in quota.intervals %}
+    <interval>
+        <duration>{{ interval.duration }}</duration>
+        <queries>{{ interval.queries }}</queries>
+        <errors>{{ interval.errors }}</errors>
+        <result_rows>{{ interval.result_rows }}</result_rows>
+        <read_rows>{{ interval.read_rows }}</read_rows>
+        <execution_time>{{ interval.execution_time }}</execution_time>
+    </interval>
+    {% endfor %}
+    </{{ quota.name }}>
+    {% endfor %}
+    {% for quota in clickhouse_quotas_custom %}
+    <{{ quota.name }}>
+    {% for interval in quota.intervals %}
+    <interval>
+        <duration>{{ interval.duration }}</duration>
+        <queries>{{ interval.queries }}</queries>
+        <errors>{{ interval.errors }}</errors>
+        <result_rows>{{ interval.result_rows }}</result_rows>
+        <read_rows>{{ interval.read_rows }}</read_rows>
+        <execution_time>{{ interval.execution_time }}</execution_time>
+    </interval>
+    {% endfor %}
+    </{{ quota.name }}>
+    {% endfor %}
+    </quotas>
+</yandex>

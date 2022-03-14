@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: correct-certificate-signer
+  name: correct-certificate-signer
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      k8s-app: correct-certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: correct-certificate-signer
+    spec:
+      containers:
+        - image: REGISTRY/correct_certificate_signer:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "500m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"      
+          name: correct-certificate-signer
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

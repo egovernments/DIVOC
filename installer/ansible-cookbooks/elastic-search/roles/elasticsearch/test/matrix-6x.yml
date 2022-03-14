@@ -1,0 +1,20 @@
+OS:
+  - ubuntu-1604
+  - ubuntu-1804
+  - ubuntu-2004
+  - debian-8
+  - debian-9
+  - debian-10
+  - centos-7
+  - centos-8
+  - amazonlinux-2
+TEST_TYPE:
+  - custom-config
+  - default
+  - license
+  - oss
+  - oss-to-default-upgrade
+  - oss-upgrade
+  - security
+  - trial
+  - upgrade

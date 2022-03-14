@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: certificate-signer
+  name: certificate-signer
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      k8s-app: certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: certificate-signer
+    spec:
+      containers:
+        - image: REGISTRY/certificate_signer:latest
+          imagePullPolicy: Always
+          name: certificate-signer
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

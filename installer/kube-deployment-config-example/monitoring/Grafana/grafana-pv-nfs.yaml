@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv-nfs-storage
+  namespace: monitoring
+  labels:
+    type: nfs
+spec:
+  storageClassName: managed-nfs
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  nfs:
+    server: 192.168.31.174
+    path: "/mnt/nfs/grafana-storage"

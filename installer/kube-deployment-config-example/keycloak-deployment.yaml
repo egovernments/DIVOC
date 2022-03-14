@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: keycloak
+  name: keycloak
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: keycloak
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: keycloak
+    spec:
+      containers:
+        - image: REGISTRY/keycloak:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              cpu: "500m"
+              memory: "512Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"
+          name: keycloak
+          env:
+            - name: DB_ADDR
+              value: 192.168.0.27
+            - name: DB_DATABASE
+              value: registry
+            - name: DB_PASSWORD
+              value: registry123
+            - name: DB_PORT
+              value: "5000"
+            - name: DB_USER
+              value: registry
+            - name: DB_VENDOR
+              value: postgres
+            - name: KEYCLOAK_PASSWORD
+              value: qP8q#8#KU38@
+            - name: KEYCLOAK_USER
+              value: admin
+            - name: ENABLE_OTP_MESSAGE
+              value: "false"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "192.168.0.13:9092"
+      restartPolicy: Always

@@ -1,0 +1,6 @@
+resources:
+    - grafana-pv-nfs.yaml
+    - grafana-pvc-nfs.yaml
+    - grafana-datasource-config.yaml
+    - grafana-deployment.yaml
+    - grafana-service.yaml

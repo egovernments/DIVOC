@@ -1,0 +1,27 @@
+- name: 'Install docker'
+  shell: 'curl -fsSL https://get.docker.com -o get-docker.sh; sh ./get-docker.sh'
+
+- name: 'Install docker-compose'
+  shell: 'curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose; chmod +x /usr/local/bin/docker-compose'
+
+
+- name: 'Create required directories'
+  shell: 'mkdir -vp /opt/divoc/docker-registry;mkdir -vp /opt/divoc/docker-registry/auth'
+
+
+- name: 清理旧数据
+  shell: 'docker-compose -f /opt/divoc/docker-registry/docker-compose.yaml rm -fsva && rm -rf /opt/divoc/docker-registry'
+  ignore_errors: yes
+
+#- name: 制作自签署证书
+  #shell: 'openssl req -newkey rsa:2048 -nodes -sha256 -keyout /opt/gengxiankun-galaxy/docker-registry/certs/{{ DOCKER_REGISTRY_CN }}.key -x509 -days 365 -out /opt/gengxiankun-galaxy/docker-registry/certs/{{ DOCKER_REGISTRY_CN }}.crt -subj "/C={{ DOCKER_REGISTRY_C }}/ST={{ DOCKER_REGISTRY_ST }}/L={{  DOCKER_REGISTRY_L }}/O={{ DOCKER_REGISTRY_O }}/OU={{ DOCKER_REGISTRY_OU }}/CN={{ DOCKER_REGISTRY_CN }}/emailAddress={{ DOCKER_REGISTRY_EMAIL_ADDRESS }}"'
+
+- name: 生成鉴权密码文件
+  shell: 'docker run --entrypoint htpasswd registry:2.7.0 -Bbn {{ DOCKER_REGISTRY_USER }} {{ DOCKER_REGISTRY_PASSWORD }}  > /opt/divoc/docker-registry/auth/htpasswd'
+  when: DOCKER_REGISTRY_HTPASSWD_ENABLED
+
+- name: 配置docker-compose.yml
+  template: src=docker-compose.yml.j2 dest=/opt/divoc/docker-registry/docker-compose.yml
+
+- name: 启动服务
+  shell: 'docker-compose -p registry -f /opt/divoc/docker-registry/docker-compose.yml up -d'

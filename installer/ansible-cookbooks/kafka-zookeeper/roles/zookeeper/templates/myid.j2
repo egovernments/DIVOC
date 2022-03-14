@@ -1,0 +1,5 @@
+{%- if sansible_zookeeper_aws_cluster_assigned_id is defined -%}
+{{ sansible_zookeeper_aws_cluster_assigned_id }}
+{%- else -%}
+{{ broker_id }}
+{%- endif -%}

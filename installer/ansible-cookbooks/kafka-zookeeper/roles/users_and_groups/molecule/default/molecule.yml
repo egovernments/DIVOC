@@ -1,0 +1,39 @@
+---
+
+driver:
+  name: docker
+
+platforms:
+  - name: sansible_users_and_groups-trusty
+    image: ubuntu:trusty
+  - name: sansible_users_and_groups-xenial
+    image: ubuntu:xenial
+  - name: sansible_users_and_groups-bionic
+    image: ubuntu:bionic
+
+provisioner:
+  name: ansible
+  lint:
+    name: ansible-lint
+
+lint:
+  name: yamllint
+  options:
+    config-data:
+      extends: default
+      ignore: .venv_ansible*
+      rules:
+        line-length:
+          max: 159
+        truthy: disable
+
+dependency:
+  name: galaxy
+
+scenario:
+  name: default
+
+verifier:
+  name: testinfra
+  lint:
+    name: flake8

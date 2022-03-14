@@ -1,0 +1,22 @@
+---
+
+- name: start kafka
+  become: yes
+  become_user: root
+  service:
+    name: kafka
+    state: started
+
+- name: stop kafka
+  become: yes
+  become_user: root
+  service:
+    name: kafka
+    state: stopped
+
+- name: restart kafka
+  become: yes
+  become_user: root
+  service:
+    name: kafka
+    state: restarted

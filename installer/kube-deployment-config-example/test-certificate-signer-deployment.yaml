@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: test-certificate-signer
+  name: test-certificate-signer
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      k8s-app: test-certificate-signer
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: test-certificate-signer
+    spec:
+      containers:
+        - image: REGISTRY/test_certificate_signer:latest
+          imagePullPolicy: Always
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "400m"
+          name: test-certificate-signer
+          volumeMounts:
+            - name: tz-config1
+              mountPath: /etc/timezone
+              readOnly: true
+            - name: tz-config2
+              mountPath: /etc/localtime
+              readOnly: true
+            - name: tz-config3
+              mountPath: /usr/share/zoneinfo/
+              readOnly: true
+            volumes:
+              - name: tz-config1
+                hostPath:
+                  path: /etc/timezone
+                  type: File
+              - name: tz-config2
+                hostPath:
+                  path: /etc/localtime
+                  type: File
+              - name: tz-config3
+                hostPath:
+                  path: /usr/share/zoneinfo/
+                  type: Directory
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+          env:
+            - name: CERTIFICATE_NAMESPACE
+              value: "https://cowin.gov.in/credentials/testCertificate/v1"
+            - name: CERTIFICATE_BASE_URL
+              value: "https://cowin.gov.in/test/"
+      restartPolicy: Always
+status: {}

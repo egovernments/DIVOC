@@ -1,0 +1,5 @@
+---
+# Instance settings
+cloud_image: ubuntu-1804
+mode: aio
+vm_memory: 1600Mi

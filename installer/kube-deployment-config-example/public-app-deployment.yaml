@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: divoc
+  labels:
+    k8s-app: public-app
+  name: public-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: public-app
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: public-app
+    spec:
+      containers:
+        - image: REGISTRY/nginx:latest
+          imagePullPolicy: Always
+          name: public-app
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

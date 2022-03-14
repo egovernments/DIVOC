@@ -1,0 +1,19 @@
+---
+- name: Deploy Elasticsearch OSS version
+  hosts: localhost
+  post_tasks:
+    - include: elasticsearch/test/integration/debug.yml
+  roles:
+    - elasticsearch
+  vars:
+    es_version: "{{ '7.0.0' if es_major_version == '7.x' else '6.7.1' }}" # This is set to an older version than the current default to force an upgrade
+    oss_version: true
+
+- name: Upgrade to Elasticsearch default version
+  hosts: localhost
+  post_tasks:
+    - include: elasticsearch/test/integration/debug.yml
+  roles:
+    - elasticsearch
+  vars:
+    oss_version: false

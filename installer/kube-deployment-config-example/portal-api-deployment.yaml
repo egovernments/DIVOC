@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: portal-api
+  name: portal-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: portal-api
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        k8s-app: portal-api
+    spec:
+      containers:
+        - image: REGISTRY/portal_api:latest
+          imagePullPolicy: Always
+          name: portal-api
+          envFrom:
+            - configMapRef:
+                name: divoc-config
+      restartPolicy: Always
+status: {}

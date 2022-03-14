@@ -1,0 +1,16 @@
+---
+- name: reset | check dummy0 network device
+  stat:
+    path: /sys/class/net/dummy0
+    get_attributes: no
+    get_checksum: no
+    get_mime: no
+  register: dummy0
+
+- name: reset | remove the network device created by calico
+  command: ip link del dummy0
+  when: dummy0.stat.exists
+
+- name: reset | get and remove remaining routes set by bird
+  shell: ip route show proto bird | xargs -i bash -c "ip route del {} proto bird "
+  changed_when: false

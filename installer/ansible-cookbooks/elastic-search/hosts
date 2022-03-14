@@ -1,0 +1,2 @@
+[nodes]
+ansible-test ansible_ssh_host=192.168.99.100 ansible_ssh_port=32798

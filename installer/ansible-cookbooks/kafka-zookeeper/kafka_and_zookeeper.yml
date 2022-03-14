@@ -1,0 +1,23 @@
+---
+- hosts: kafka-nodes
+  become: true
+  pre_tasks:
+    - raw: test -e /usr/bin/python || (apt -y update && apt install -y python3 python3-zipstream)
+- name: Install zookeeper
+  hosts: kafka-nodes
+  become: true
+  roles:
+    - role: zookeeper
+      sansible_kafka_zookeeper_hosts: 
+        - 192.168.0.13
+
+- name: Install kafka
+  hosts: kafka-nodes
+  become: true
+  roles:
+    - role: kafka
+      sansible_kafka_listen_address: "{{ ansible_default_ipv4.address }}"
+      sansible_kafka_advertised_host_name: "{{ ansible_default_ipv4.address }}"
+      sansible_kafka_zookeeper_hosts:
+        - 192.168.0.13
+

@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.22.0 (HEAD)
+  labels:
+    k8s-app: registry
+  name: registry
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: registry
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose convert
+        kompose.version: 1.22.0 (HEAD)
+      labels:
+        k8s-app: registry
+    spec:
+      containers:
+        - env:
+            - name: connectionInfo_password
+              value: registry123
+            - name: connectionInfo_uri
+              value: jdbc:postgresql://192.168.0.27:5000/registry
+            - name: connectionInfo_username
+              value: registry
+            - name: elastic_search_enabled
+              value: "false"
+            - name: registry_base_apis_enable
+              value: "true"
+            - name: taskExecutor_index_queueCapacity
+              value: "100"
+            - name: auditTaskExecutor_queueCapacity
+              value: "100"
+            - name: signature_enabled
+              value: "false"
+          image: REGISTRY/registry-es:latest
+          imagePullPolicy: Always
+          name: registry
+          ports:
+            - containerPort: 8081
+      restartPolicy: Always

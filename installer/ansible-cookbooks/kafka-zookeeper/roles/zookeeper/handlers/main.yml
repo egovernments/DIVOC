@@ -1,0 +1,22 @@
+---
+
+- name: start zookeeper
+  become: yes
+  become_user: root
+  service:
+    name: zookeeper
+    state: started
+
+- name: stop zookeeper
+  become: yes
+  become_user: root
+  service:
+    name: zookeeper
+    state: stopped
+
+- name: restart zookeeper
+  become: yes
+  become_user: root
+  service:
+    name: zookeeper
+    state: restarted

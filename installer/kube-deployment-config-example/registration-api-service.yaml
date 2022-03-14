@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: registration-api
+  name: registration-api
+spec:
+  ports:
+    - name: "tcp-8002"
+      port: 8002
+      protocol: TCP
+      targetPort: 8002
+      nodePort: 32002
+  selector:
+    k8s-app: registration-api
+  sessionAffinity: None
+  type: NodePort

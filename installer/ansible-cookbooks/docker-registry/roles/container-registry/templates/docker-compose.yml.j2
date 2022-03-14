@@ -1,0 +1,17 @@
+registry:
+  container_name: registry
+  restart: always
+  image: registry:2.7.0
+  ports:
+    - {{ DOCKER_REGISTRY_PORT }}:5000
+{% if DOCKER_REGISTRY_HTPASSWD_ENABLED %}
+  environment:
+    REGISTRY_AUTH: htpasswd
+    REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+    REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+{% endif %}
+  volumes:
+    - {{ SRV_PATH }}/registry:/var/lib/registry
+{% if DOCKER_REGISTRY_HTPASSWD_ENABLED %}
+    - /opt/divoc/docker-registry/auth:/auth
+{% endif %}

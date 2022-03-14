@@ -1,0 +1,8 @@
+- name: Requirements check | Checking sse4_2 support
+  command: grep -q sse4_2 /proc/cpuinfo
+  changed_when: False
+
+- name: Requirements check | Not supported distribution && release
+  fail:
+    msg: "Your distribution {{ ansible_distribution }}_{{ ansible_distribution_release }} not supported by this role,sorry."
+  when: not clickhouse_supported|bool
