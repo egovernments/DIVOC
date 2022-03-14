@@ -1,4 +1,5 @@
 describe('should retrieve all mappings if correct configuration layer passed', () => {
+    jest.resetModules();
     const etcd3 = require('etcd3');
     const sanitizeHtml = require('sanitize-html');
     const config = require('../configs/config');
@@ -98,7 +99,7 @@ describe('should retrieve all mappings if correct configuration layer passed', (
     });
 
     test('should call watch method to watch for changes in etcd', () => {
-        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
+        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(6);
     });
 
     test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
