@@ -2,26 +2,32 @@ const certificate_service = require('../src/services/certificate_service');
 const dcc = require('@pathcheck/dcc-sdk');
 const configurationService = require('../src/services/configuration_service');
 const config = require('../configs/config');
+const constants = require('../configs/constants');
 config.DISEASE_CODE = 'COVID-19';
 config.PUBLIC_HEALTH_AUTHORITY = 'Govt Of India';
-
+config.ETCD_URL = 'etcd:2379'
 var mockConstructor = {
-    getEUVaccineDetails: jest.fn()
-                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
-                            .mockReturnValueOnce({"covishield": "J07BX03"})
-                            .mockReturnValueOnce({"covishield": "Covishield"})
-                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
-                            .mockReturnValueOnce({"covishield": "J07BX03"})
-                            .mockReturnValueOnce({"covishield": "Covishield"})
-                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
-                            .mockReturnValueOnce({"covishield": "J07BX03"})
-                            .mockReturnValueOnce({"covishield": "Covishield"})
-                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
-                            .mockReturnValueOnce({"covishield": "J07BX03"})
-                            .mockReturnValueOnce({"covishield": "Covishield"})
-                            .mockReturnValueOnce({"astrazeneca": "ORG-100001699"})
-                            .mockReturnValueOnce({"covishield": "J07BX03"})
-                            .mockReturnValueOnce({"covishield": "Covishield"})
+    getEUVaccineDetails: jest.fn().mockImplementation((args) => {
+        let vaccineDetails;
+        switch(args) {
+            case constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
+                vaccineDetails = {
+                    "astrazeneca": "ORG-100001699"
+                };
+                break;
+            case constants.EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE:
+                vaccineDetails = {
+                    "covishield": "J07BX03"
+                };
+                break;
+            case constants.EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
+                vaccineDetails = {
+                    "covishield": "Covishield"
+                };
+                break;
+        }
+        return vaccineDetails;
+    })
 }
 jest.mock('../src/services/configuration_service', () => {
     return {
