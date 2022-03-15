@@ -213,6 +213,9 @@ services:
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
       FACILITY_COUNTRY_CODE: "IND"
       ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
       CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
@@ -298,8 +301,11 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_KEY_EXPIRE: 172800
       REDIS_ENABLED: "true"
-      ETCD_URL: etcd:2379
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       CONFIGURATION_LAYER: "etcd"
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy

@@ -13,6 +13,9 @@ const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE;
 const REDIS_ENABLED = process.env.REDIS_ENABLED === "true";
 const ETCD_URL = process.env.ETCD_URL;
 const CONFIGURATION_LAYER = process.env.CONFIGURATION_LAYER;
+const ETCD_AUTH_ENABLED = process.env.ETCD_AUTH_ENABLED === "true"
+const ETCD_USERNAME = process.env.ETCD_USERNAME;
+const ETCD_PASSWORD = process.env.ETCD_PASSWORD;
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
@@ -28,5 +31,8 @@ module.exports = {
     REDIS_KEY_EXPIRE,
     ETCD_URL,
     SHC_CERTIFICATE_EXPIRY,
-    CONFIGURATION_LAYER
+    CONFIGURATION_LAYER,
+    ETCD_AUTH_ENABLED,
+    ETCD_USERNAME,
+    ETCD_PASSWORD
 };
