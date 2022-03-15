@@ -1,20 +1,31 @@
 const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
-
+const Handlebars = require('handlebars');
 const config = require('../../configs/config');
-const {TEMPLATES, EU_VACCINE_CONFIG_KEYS} = require('../../configs/constants');
+const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
-
+let addHandlerHelper = null;
 function init() {
   if(!config.ETCD_URL) {
     throw Error("ETCD_URL not set. Please set ETCD_URL")
   }
-  etcdClient = new Etcd3({hosts: config.ETCD_URL});
+  let options = {hosts: config.ETCD_URL}
+  if(config.ETCD_AUTH_ENABLED) {
+    options = {
+      ...options,
+      auth: {
+        username: config.ETCD_USERNAME,
+        password: config.ETCD_PASSWORD
+      }
+    }
+  }
+  etcdClient = new Etcd3(options);
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
+  setUpWatcher(HELPERS.CERTIFICATE_HELPER_FUNCTIONS);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
   setUpWatcher(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
@@ -49,6 +60,9 @@ function updateConfigValues(key, value) {
       break;
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
+      break;
+    case HELPERS.CERTIFICATE_HELPER_FUNCTIONS:
+      addHandlerHelper = value;
       break;
     case EU_VACCINE_CONFIG_KEYS.VACCINE_CODE:
       EU_VACCINE_CODE = value;
@@ -92,6 +106,9 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
       break;
+    case HELPERS.CERTIFICATE_HELPER_FUNCTIONS:
+      value = addHandlerHelper;
+      break;
     case EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
       value = EU_VACCINE_MANUF;
       break;
@@ -118,7 +135,11 @@ class ConfigurationService {
     updateConfigValues(key, certificateTemplate);
     return certificateTemplate;
   }
-
+  async addHelpers(key){
+    let helper = await loadConfigurationValues(key, async() => await configuration.addHelpers(key));
+    updateConfigValues(key,helper);
+    return helper;
+  }
   async getEUVaccineDetails(key) {
     let details = await loadConfigurationValues(key, async() => await configuration.getEUVaccineDetails(key));
     updateConfigValues(key, details);
@@ -130,6 +151,10 @@ const etcd = function() {
   this.getCertificateTemplate = async function(templateKey) {
     const template = (await etcdClient.get(templateKey).string());
     return template;
+  }
+  this.addHelpers = async function(key) {
+    const value = (await etcdClient.get(key).string());
+    return value;
   }
 
   this.getEUVaccineDetails = async function(key) {
