@@ -7,5 +7,6 @@ CREATE INDEX "public_V_VaccinationCertificate_preEnrollmentCode_sqlgIdx" ON "pub
 CREATE UNIQUE INDEX "public_V_VaccinationCertificate_certificateId_sqlgIdx" ON "public"."V_VaccinationCertificate" ("certificateId");
 CREATE INDEX "public_V_VaccinationCertificate_contact_sqlgIdx" ON "public"."V_VaccinationCertificate" ("contact");
 CREATE INDEX "public_V_VaccinationCertificate_mobile_sqlgIdx" ON "public"."V_VaccinationCertificate" ("mobile");
+CREATE INDEX "public_V_VaccinationCertificate_osid_sqlgIdx" ON "public"."V_VaccinationCertificate" ("osid");
 CREATE UNIQUE INDEX "public_V_Vaccinator_code_sqlgIdx" ON "public"."V_Vaccinator" ("code");
 

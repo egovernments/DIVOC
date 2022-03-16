@@ -4,7 +4,10 @@ describe('should retrieve all mappings if correct configuration layer passed', (
     const { CONFIG_KEYS } = require('../config/constants');
     var mockConfig = {
         CONFIGURATION_LAYER: 'etcd',
-        ETCD_URL: 'etcd:2379'
+        ETCD_URL: 'etcd:2379',
+        ETCD_AUTH_ENABLED: true,
+        ETCD_USERNAME: 'etcd',
+        ETCD_PASSWORD: 'etcd'
     }
     jest.mock('../config/config', () => {
         return mockConfig;
@@ -54,7 +57,7 @@ describe('should retrieve all mappings if correct configuration layer passed', (
     });
     
     test('should initialise five times watchers each for ICD, VACCINE_ICD, DDCC_TEMPLATE, W3C_TEMPLATE and FIELDS_KEY_PATH ', () => {
-        expect(etcd3.Etcd3).toHaveBeenCalled();
+        expect(etcd3.Etcd3).toHaveBeenCalledWith({hosts: 'etcd:2379', auth:{username: 'etcd', password: 'etcd'}});
         expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
     });
     
@@ -92,4 +95,34 @@ describe('wrong environment variable for configuration layer', () => {
         const mapping = await (new services.ConfigLayer()).getConfigValue(CONFIG_KEYS.ICD);
         expect(mapping).toEqual(null);
     })
+});
+
+describe('should connect if auth is disabled', () => {
+    const etcd3 = require('etcd3');
+    const config = require('../config/config');
+
+    var mockConfig = {
+        CONFIGURATION_LAYER: 'etcd',
+        ETCD_URL: 'etcd:2379',
+        ETCD_AUTH_ENABLED: false,
+    }
+    const services = require('../configuration_service');
+    beforeEach(() => {
+        services.init();
+    });
+    jest.mock('../config/config', () => {
+        return mockConfig;
+    });
+    console.log = jest.fn();
+    var mockEtcd3Constructor = {
+    };
+    jest.mock('etcd3', () => {
+        return {
+            Etcd3: jest.fn().mockImplementation(() => mockEtcd3Constructor)
+        }
+    });
+    
+    test('should call etcd constructor without auth parameter', () => {
+        expect(etcd3.Etcd3).toHaveBeenCalledWith({hosts: 'etcd:2379'})
+    });
 });
