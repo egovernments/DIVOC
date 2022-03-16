@@ -87,7 +87,8 @@ test('should call sanitizeHtml method 2 times each for getCertificateTemplate me
         allowedScriptDomains: [''],
         allowedScriptHostnames: [''],
         allowedIframeHostnames: [''],
-        allowedIframeDomains: ['']
+        allowedIframeDomains: [''],
+        allowedSchemes: ['data']
     });
 });
 
