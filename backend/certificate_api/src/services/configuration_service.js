@@ -35,8 +35,7 @@ function cleanHTML(html) {
     allowedScriptDomains: [''],
     allowedScriptHostnames: [''],
     allowedIframeHostnames: [''],
-    allowedIframeDomains: [''],
-    allowedSchemes: ['data']
+    allowedIframeDomains: ['']
   });
   return cleanedHtml;
 }
