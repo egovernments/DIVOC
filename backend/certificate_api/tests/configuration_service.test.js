@@ -94,7 +94,8 @@ describe('should retrieve all mappings if correct configuration layer passed', (
             allowedScriptDomains: [''],
             allowedScriptHostnames: [''],
             allowedIframeHostnames: [''],
-            allowedIframeDomains: ['']
+            allowedIframeDomains: [''],
+            allowedSchemes: ['data']
         });
     });
 
