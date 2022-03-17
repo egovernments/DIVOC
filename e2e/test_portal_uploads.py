@@ -46,7 +46,7 @@ def entity_upload_verify(entityType, uploadURL, fetchURL, uploadFile, expectedAd
         time.sleep(finalFetchWaitTime)
         print("Retries if failed : ", i)
         latest = fetch_results(fetchURL, token)
-        print(entityType, " Latest : ", len(existing))
+        print(entityType, " Latest : ", len(latest))
         if len(latest) == len(existing) + expectedAdditions:
             uploadSuccess = True
             break
