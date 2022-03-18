@@ -20,7 +20,7 @@ const initBrowser = async () => {
 }
 
 async function createPDF(htmlData, data) {
-  if (browser === undefined) await initBrowser();
+  if (browser === undefined || !browser.isConnected()) await initBrowser();
   const template = Handlebars.compile(htmlData);
 
   const helperFunctions = new Function(await configurationService.addHelpers(HELPERS.CERTIFICATE_HELPER_FUNCTIONS))();
