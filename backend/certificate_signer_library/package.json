@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "axios": "^0.21.1",
-    "jsonld-signatures": "^6.0.0",
+    "jsonld-signatures": "^8.0.0",
     "kafkajs": "^1.15.0",
     "nodemailer": "^6.4.17",
     "ramda": "^0.27.1",
