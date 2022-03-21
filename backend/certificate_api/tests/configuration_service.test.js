@@ -100,7 +100,7 @@ describe('should retrieve all mappings if correct configuration layer passed', (
     });
 
     test('should call watch method to watch for changes in etcd', () => {
-        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(6);
+        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(7);
     });
 
     test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
