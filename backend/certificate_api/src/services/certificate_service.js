@@ -49,6 +49,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     age: credentialSubject.age,
     gender: credentialSubject.gender,
     identity: formatId(credentialSubject.id),
+    nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
     recipientAddress: formatRecipientAddress(credentialSubject.address),
     vaccine: evidence[0].vaccine,
@@ -63,7 +64,8 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
     isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
     currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
-    meta: certificateRaw.meta
+    meta: certificateRaw.meta,
+    certificateId: certificateRaw.certificateId
   };
   certificateData["vaxEvents"] = getVaccineDetails(doseToVaccinationDetailsMap);
   return certificateData;
