@@ -53,7 +53,10 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     beneficiaryId: credentialSubject.refId,
     recipientAddress: formatRecipientAddress(credentialSubject.address),
     vaccine: evidence[0].vaccine,
-    vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
+    vaccinationDate: formatDate(evidence[0].date),
+    vaccineBatch: evidence[0].batch,
+    vaccineType: getVaxType(evidence[0].icd11Code, evidence[0].prophylaxis),
+    vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
     vaccinatedBy: evidence[0].verifier.name,
     vaccinatedAt: formatFacilityAddress(evidence[0]),
@@ -64,8 +67,9 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
     isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
     currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
+    certificateId: certificateRaw.certificateId,
     meta: certificateRaw.meta,
-    certificateId: certificateRaw.certificateId
+    raw: certificateRaw
   };
   certificateData["vaxEvents"] = getVaccineDetails(doseToVaccinationDetailsMap);
   return certificateData;
