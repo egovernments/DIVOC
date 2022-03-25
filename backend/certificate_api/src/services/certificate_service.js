@@ -55,6 +55,8 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     vaccine: evidence[0].vaccine,
     vaccinationDate: formatDate(evidence[0].date),
     vaccineBatch: evidence[0].batch,
+    vaccineICD11Code: evidence[0].icd11Code || "",
+    vaccineProphylaxis: evidence[0].prophylaxis || "",
     vaccineType: getVaxType(evidence[0].icd11Code, evidence[0].prophylaxis),
     vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
@@ -84,6 +86,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
         ("Booster Dose " + (value.dose - value.totalDoses)),
       vaxName: value.name || "",
       vaxBatch: value.batch || "",
+      vaxManufacturer : value.manufacturer || "",
       dateOfVax: formatDate(value.date || ""),
       countryOfVax: value.vaccinatedCountry || "",
       validity: value.validity || "",
@@ -102,6 +105,7 @@ function fetchVaccinationDetailsFromCert(evidence) {
     name: evidence.vaccine,
     vaxType: getVaxType(evidence.icd11Code, evidence.prophylaxis),
     batch: evidence.batch,
+    manufacturer: evidence.manufacturer,
     vaccinatedCountry: evidence.facility.address.addressCountry,
   };
   return vaccineDetails;
