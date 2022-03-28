@@ -89,12 +89,12 @@
               "statusUpdatedAt": {
                 "$id": "#/properties/statusUpdatedAt",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               },
               "certifiedUpdatedAt": {
                 "$id": "#/properties/certifiedUpdatedAt",
                 "type": "string",
-                "format": "date"
+                "format": "date-time"
               }
             }
           }
