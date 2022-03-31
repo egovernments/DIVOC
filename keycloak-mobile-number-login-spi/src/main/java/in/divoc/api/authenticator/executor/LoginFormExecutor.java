@@ -19,8 +19,8 @@ public class LoginFormExecutor implements FormExecutor{
         String mobileNumber = formData.getFirst(MOBILE_NUMBER);
         RealmModel realmModel = context.getSession().getContext().getRealm();
         Optional<UserModel> optUser = context.getSession().users()
-                .searchForUserByUserAttribute(MOBILE_NUMBER, mobileNumber, realmModel)
-                .stream().findFirst();
+                .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, mobileNumber)
+                .findFirst();
         optUser.ifPresentOrElse(user -> {
             if (context.getProtector().isTemporarilyDisabled(context.getSession(), realmModel, user)) {
                 Response challengeResponse = context.form()
