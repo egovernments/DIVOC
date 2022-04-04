@@ -20,24 +20,24 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-core</artifactId>
-      <version>16.1.0</version>
+      <version>11.0.3</version>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi</artifactId>
-      <version>16.1.0</version>
+      <version>11.0.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi-private</artifactId>
-      <version>16.1.0</version>
+      <version>11.0.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-services</artifactId>
-      <version>16.1.0</version>
+      <version>11.0.3</version>
       <scope>provided</scope>
     </dependency>
     <dependency>

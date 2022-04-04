@@ -52,7 +52,7 @@ public class FacilityUserRestProvider implements RealmResourceProvider {
         return new UserGroup(groupModel.getId(), groupModel.getName());
     }
     private void verifyToken() {
-        final AuthenticationManager.AuthResult auth = new AppAuthManager.BearerTokenAuthenticator(session).authenticate();
+        final AuthenticationManager.AuthResult auth = new AppAuthManager().authenticateBearerToken(session);
         if (auth == null) {
             throw new NotAuthorizedException("Bearer");
         }
