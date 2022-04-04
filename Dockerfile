@@ -35,10 +35,20 @@ RUN npm install --silent
 COPY mobile ./
 RUN npm run build
 
+FROM node:lts-alpine as verification_app_build
+WORKDIR /app
+ENV PATH /app/node_modules/.bin:$PATH
+COPY vaccination_app/package.json ./
+COPY vaccination_app/package-lock.json ./
+RUN npm install --silent
+COPY vaccination_app ./
+RUN npm run build
+
 FROM nginx:stable-alpine
 COPY --from=public_app_build /app/build /usr/share/nginx/html
 COPY --from=portal_app_build /app/build /usr/share/nginx/html/portal
 COPY --from=facility_app_build /app/build /usr/share/nginx/html/facility_app
+COPY --from=verification_app_build /app/build /usr/share/nginx/html/verification_app
 COPY nginx/nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
