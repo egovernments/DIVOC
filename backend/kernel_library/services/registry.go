@@ -168,7 +168,10 @@ func analyseResponse(response *req.Resp, err error) (map[string]interface{}, err
 }
 
 func QueryRegistry(typeId string, filter map[string]interface{}, limit int, offset int) (map[string]interface{}, error) {
-
+	// Note: If registry layer is used with es(elastic search),
+	// then there may be a chance that recent entries (creation time - query time < 1s) may not be returned,
+	// as es takes some time to index those.
+	// Caller should handle those cases if necessary.
 	queryRequest := RegistryRequest{
 		"open-saber.registry.search",
 		"1.0",
