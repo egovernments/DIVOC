@@ -24,7 +24,7 @@ public class LoginFormExecutor implements FormExecutor{
         optUser.ifPresentOrElse(user -> {
             if (context.getProtector().isTemporarilyDisabled(context.getSession(), realmModel, user)) {
                 Response challengeResponse = context.form()
-                        .setError(USER_TEMPORARY_DISABLED, realmModel.getMaxDeltaTimeSeconds()/TIME, UNIT)
+                        .setError(USER_TEMPORARY_DISABLED, realmModel.getWaitIncrementSeconds()/TIME, UNIT)
                         .createForm(ERROR_UI);
                 context.failure(AuthenticationFlowError.USER_TEMPORARILY_DISABLED, challengeResponse);
                 return;
