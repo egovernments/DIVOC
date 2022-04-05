@@ -4,6 +4,32 @@ const countries = require('i18n-iso-countries');
 const configService = require('./configuration_service');
 const {formatDate, formatId, getNumberWithOrdinal, concatenateReadableString} = require('./utils');
 
+const mapCertificatesByPreEnrollmentCode = (certificates) => {
+  const map = new Map();
+  for(let certificate of certificates) {
+    const preEnrollmentCode = certificate.preEnrollmentCode;
+    if(map.get(preEnrollmentCode) === undefined) {
+      map.set(preEnrollmentCode, certificate);
+    }
+  }
+  return map;
+}
+
+const getCertificateData = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = mapCertificatesByPreEnrollmentCode(certificates);
+  const certificateData = new Array();
+  for(let certificate of certificatesMapByPreEnrollmentCode.values()) {
+    const credentialSubject = JSON.parse(certificate.certificate).credentialSubject;
+    certificateData.push({
+      preEnrollmentCode: certificate.preEnrollmentCode,
+      name: credentialSubject.name,
+      gender: credentialSubject.gender,
+      dob: credentialSubject.dob
+    });
+  }
+  return certificateData;
+}
+
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -219,5 +245,6 @@ module.exports = {
   getLatestCertificate,
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
-  prepareDataForVaccineCertificateTemplate
+  prepareDataForVaccineCertificateTemplate,
+  getCertificateData
 };

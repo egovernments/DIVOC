@@ -319,6 +319,7 @@ paths:
             - user
             - controller
             - facility-admin
+            - facility-print-staff
       responses:
         '200':
           description: OK

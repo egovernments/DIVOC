@@ -243,6 +243,40 @@ async function createCertificateQRCodeCitizen(phone, certificateId, res) {
     return await createCertificateQRCode(certificateResp, res, certificateId);
 }
 
+async function getCertificateByPhnoAndDob(req, res) {
+    var queryData = url.parse(req.url, true).query;
+    let claimBody = "";
+    try {
+        claimBody = await verifyKeycloakToken(req.headers.authorization);
+    } catch(e) {
+        console.error(e);
+        res.statusCode = 403;
+        return;
+    }
+    const certificatesByPhNo = await registryService.getCertificateByPhno(queryData.phoneno);
+    const certificatesByPhNoAndDob = filterByDobs(certificatesByPhNo, queryData.dob);
+    return certificateService.getCertificateData(certificatesByPhNoAndDob);
+}
+
+function filterByDobs(certificates, dob) {
+    const newCertificatesArr = [];
+    for(let certificate of certificates) {
+        let c = JSON.parse(certificate.certificate);        
+        if(isEqualsDOB(c.credentialSubject.dob, dob)) {
+            newCertificatesArr.push(certificate);
+        }
+    }
+    return newCertificatesArr;
+}
+
+function isEqualsDOB(certificateDob, dob) {
+    const dateCertificateDob = new Date(certificateDob);
+    const dateRequestDob = new Date(dob);
+    console.log(dateCertificateDob);
+    console.log(dateRequestDob);
+    return dateRequestDob.getTime() === dateCertificateDob.getTime();
+}
+
 async function getCertificate(req, res) {
     try {
         var queryData = url.parse(req.url, true).query;
@@ -562,5 +596,6 @@ module.exports = {
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
     getCertificateQRCode,
-    certificateAsSHCPayload
+    certificateAsSHCPayload,
+    getCertificateByPhnoAndDob
 };

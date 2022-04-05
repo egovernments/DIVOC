@@ -923,7 +923,8 @@ func init() {
               "admin",
               "user",
               "controller",
-              "facility-admin"
+              "facility-admin",
+              "facility-print-staff"
             ]
           }
         ],
@@ -3022,6 +3023,7 @@ func init() {
               "admin",
               "controller",
               "facility-admin",
+              "facility-print-staff",
               "user"
             ]
           }
@@ -4008,7 +4010,7 @@ func init() {
         },
         "certifiedUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/certifiedUpdatedAt"
         },
         "id": {
@@ -4016,7 +4018,7 @@ func init() {
         },
         "statusUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/statusUpdatedAt"
         }
       }
