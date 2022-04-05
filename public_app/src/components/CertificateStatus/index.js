@@ -32,8 +32,6 @@ const {vaccinationContext, vaccinationContextV2} = require('vaccination-context'
 
 const customLoader = url => {
     const c = {
-        [CERTIFICATE_DID]: config.certificatePublicKey,
-        [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
         "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
         'https://www.w3.org/2018/credentials#': credentialsv1,
         "https://www.w3.org/2018/credentials/v1": credentialsv1,
@@ -88,9 +86,9 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                 if(CERTIFICATE_SIGNED_KEY_TYPE === "RSA") {
                     const publicKey = {
                         '@context': jsigs.SECURITY_CONTEXT_URL,
-                        id: 'did:india',
+                        id: CERTIFICATE_DID,
                         type: 'RsaVerificationKey2018',
-                        controller: CERTIFICATE_CONTROLLER_ID,
+                        controller: CERTIFICATE_PUBKEY_ID,
                         publicKeyPem: config.certificatePublicKey
                     };
                     const controller = {
@@ -113,7 +111,7 @@ export const CertificateStatus = ({certificateData, goBack}) => {
                         '@context': jsigs.SECURITY_CONTEXT_URL,
                         id: CERTIFICATE_DID,
                         type: 'Ed25519VerificationKey2018',
-                        controller: CERTIFICATE_CONTROLLER_ID,
+                        controller: CERTIFICATE_PUBKEY_ID,
                     };
 
                     const controller = {
