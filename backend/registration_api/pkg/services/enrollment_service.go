@@ -138,6 +138,11 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload, retryCount int) erro
 		// increment the enrollment code
 		eNo, _ := strconv.Atoi(strings.Split(enrollmentPayload.Enrollment.Code, "-")[1])
 		eNo = eNo + 1
+		if eNo >= config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed {
+			errMsg := "Maximum enrollment creation limit is reached"
+			log.Error(errMsg)
+			return openApiError.New(400, errMsg)
+		}
 		enrollmentPayload.OverrideEnrollmentCode(utils.GenerateEnrollmentCode(enrollmentPayload.Phone, eNo))
 	}
 
