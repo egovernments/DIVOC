@@ -25,19 +25,19 @@
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi</artifactId>
-      <version>11.0.3</version>
+      <version>13.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-server-spi-private</artifactId>
-      <version>11.0.3</version>
+      <version>13.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.keycloak</groupId>
       <artifactId>keycloak-services</artifactId>
-      <version>11.0.3</version>
+      <version>13.0.0</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
