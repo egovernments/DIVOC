@@ -923,8 +923,7 @@ func init() {
               "admin",
               "user",
               "controller",
-              "facility-admin",
-              "facility-print-staff"
+              "facility-admin"
             ]
           }
         ],
@@ -3023,7 +3022,6 @@ func init() {
               "admin",
               "controller",
               "facility-admin",
-              "facility-print-staff",
               "user"
             ]
           }
