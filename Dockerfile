@@ -38,10 +38,10 @@ RUN npm run build
 FROM node:lts-alpine as verification_app_build
 WORKDIR /app
 ENV PATH /app/node_modules/.bin:$PATH
-COPY vaccination_app/package.json ./
-COPY vaccination_app/package-lock.json ./
+COPY verification_app/package.json ./
+COPY verification_app/package-lock.json ./
 RUN npm install --silent
-COPY vaccination_app ./
+COPY verification_app ./
 RUN npm run build
 
 FROM nginx:stable-alpine
