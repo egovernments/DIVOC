@@ -38,6 +38,11 @@
         "title": "Report symptoms",
         "subTitle": "By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.",
         "button": "Report Side-effects"
+      },
+      {
+        "title": "Employee Login",
+        "subTitle": "Employees can login here.",
+        "button": "Login"
       }
     ],
     "onGoingProgramTitle": "Ongoing Vaccination Programs"
