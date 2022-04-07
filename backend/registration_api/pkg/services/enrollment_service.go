@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"strings"
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
@@ -25,6 +26,7 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 }
 
 const EnrollmentEntity = "Enrollment"
+const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64, enrollmentOsid string) {
 	enrollmentResponse, err := kernelService.ReadRegistry(EnrollmentEntity, enrollmentOsid)
@@ -75,7 +77,7 @@ func registerToNextDose(programId string, dose float64) map[string]interface{} {
 	return newAppointment
 }
 
-func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
+func CreateEnrollment(enrollmentPayload *EnrollmentPayload, retryCount int) error {
 
 	enrollmentArr, err := FetchEnrollments(enrollmentPayload.Phone)
 	if err != nil {
@@ -115,24 +117,49 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload) error {
 	}
 
 	// no duplicates, after maxEnrollment check
-	enrollmentPayload.OverrideEnrollmentCode(func() string {
-		existingCodes := map[string]bool{}
-		for _, e := range enrollments {
-			existingCodes[e.Code] = true
-		}
-		i := 1
-		for {
-			newCode := utils.GenerateEnrollmentCode(enrollmentPayload.Phone, i)
-			if !existingCodes[newCode] {
-				log.Info("New Code : ", newCode)
-				return newCode
+	if retryCount == 0 {
+		// generate new enrollmentCode
+		enrollmentPayload.OverrideEnrollmentCode(func() string {
+			existingCodes := map[string]bool{}
+			for _, e := range enrollments {
+				existingCodes[e.Code] = true
 			}
-			i++
+			i := 1
+			for {
+				newCode := utils.GenerateEnrollmentCode(enrollmentPayload.Phone, i)
+				if !existingCodes[newCode] {
+					log.Info("New Code : ", newCode)
+					return newCode
+				}
+				i++
+			}
+		}())
+	} else {
+		// increment the enrollment code
+		eNo, _ := strconv.Atoi(strings.Split(enrollmentPayload.Enrollment.Code, "-")[1])
+		eNo = eNo + 1
+		if eNo >= config.Config.EnrollmentCreation.MaxEnrollmentCreationAllowed {
+			errMsg := "Maximum enrollment creation limit is reached"
+			log.Error(errMsg)
+			return openApiError.New(400, errMsg)
 		}
-	}())
+		enrollmentPayload.OverrideEnrollmentCode(utils.GenerateEnrollmentCode(enrollmentPayload.Phone, eNo))
+	}
+
 	registryResponse, err := kernelService.CreateNewRegistry(enrollmentPayload.Enrollment, "Enrollment")
 	if err != nil {
 		log.Error("Error quering registry : ", err)
+		if strings.Contains(err.Error(), DUPLICATE_MSG) {
+			// enrollmentCode already exists, trying with new enrollment code
+			if retryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
+				log.Infof("Duplicate enrollmentCode found, retrying attempt ", retryCount, " of ", config.Config.EnrollmentCreation.MaxRetryCount)
+				retryCount = retryCount + 1
+				return CreateEnrollment(enrollmentPayload, retryCount)
+			} else {
+				log.Error("Max retry attempted")
+				return err
+			}
+		}
 		return err
 	}
 	result := registryResponse.Result["Enrollment"].(map[string]interface{})["osid"]
