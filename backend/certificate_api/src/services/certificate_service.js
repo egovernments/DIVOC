@@ -21,8 +21,8 @@ const mapCertificatesByPreEnrollmentCode = (certificates) => {
   return map;
 }
 
-function filterByDobs(certificates, dob) {
-  let certificateData = getCertificateData(certificates);
+function filterByDob(certificates, dob) {
+  let certificateData = getBasicBeneficiaryDataFromCert(certificates);
   return certificateData.filter(certificate => isEqualsDOB(certificate.dob, dob));
 }
 
@@ -40,7 +40,7 @@ const sortCertificatesForEachBeneficiary = (certificates) => {
   return certificatesMapByPreEnrollmentCode;
 }
 
-const getCertificateData = (certificates) => {
+const getBasicBeneficiaryDataFromCert = (certificates) => {
   const certificatesMapByPreEnrollmentCode = sortCertificatesForEachBeneficiary(certificates);
   const certificateData = new Array();
   for(let certificate of certificatesMapByPreEnrollmentCode.values()) {
@@ -271,5 +271,5 @@ module.exports = {
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
   prepareDataForVaccineCertificateTemplate,
-  filterByDobs
+  filterByDob
 };

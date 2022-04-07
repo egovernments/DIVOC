@@ -253,12 +253,9 @@ async function getCertificateByPhnoAndDob(req, res) {
         res.statusCode = 403;
         return;
     }
-    const certificatesByPhNo = await registryService.getCertificateByPhno(queryData.phoneno);
-    const certificatesByPhNoAndDob = certificateService.filterByDobs(certificatesByPhNo, queryData.dob);
-    return certificatesByPhNoAndDob;
+    const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno);
+    return certificateService.filterByDob(certificatesByPhno, queryData.dob);
 }
-
-
 
 async function getCertificate(req, res) {
     try {

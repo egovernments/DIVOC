@@ -436,3 +436,72 @@ test('should convert certificate in eu specified payload with only fn, fnt if gn
     expect(actualDccPayload.nam.hasOwnProperty("gn")).toEqual(false);
     expect(actualDccPayload.nam.hasOwnProperty("gnt")).toEqual(false);
 });
+
+test('should filter certificates on the basis of date of birth', () => {
+    let cert = [{
+        name: 'D V Chanaka Dinushan',
+        contact: [ 'tel:0779039495' ],
+        mobile: '0779039495',
+        preEnrollmentCode: '987456126',
+        certificateId: '788954392',
+        certificate: '{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v1"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"872550100V","refId":"987456126","name":"D V Chanaka Dinushan","gender":"Male","age":"35", "dob": "1986-10-12","nationality":"Sri Lankan","address":{"streetAddress":"Tharaka, Kudawella South, Nakulugala, Tangalle","streetAddress2":"","district":"Hambanthota","city":"","addressRegion":" ","addressCountry":"ABC","postalCode":"r"}},"issuer":"https://cowin.gov.in/","issuanceDate":"2021-10-25T05:19:03.399Z","evidence":[{"id":"https://cowin.gov.in/vaccine/788954392","infoUrl":"https://cowin.gov.in/?788954392","certificateId":"788954392","type":["Vaccination"],"batch":"41202025","vaccine":"Covishield","manufacturer":"astrazeneca","date":"2021-02-17T05:30:28.187Z","effectiveStart":"2021-05-21","effectiveUntil":"2022-05-21","dose":1,"totalDoses":2,"verifier":{"name":"ss"},"facility":{"name":"MOH Gothatuwa","address":{"streetAddress":"df","streetAddress2":"","district":"wew","city":"","addressRegion":"w","addressCountry":"ABC","postalCode":"w"}},"feedbackUrl":"https://cowin.gov.in/?788954392"}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2021-10-25T05:19:03Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..UO2nMyTy0wY3CIXBz4agd2KJU9sTlKPB_M0CmPEOkCFgeZUGVuYyjiF3HOwDnk-FwzPsI_Syn42pLE18o5iO9PA3Fred4afj_bq-3Fy8zPW0tfOydIJpfayv1ANjBbgXTD_2i8aOrHmDv1ivVdIMs8nZGegEgP_3R3Km5VH4QkNdtadKNxoHI6KKJdL51ib5OphS7dGHlICseM79dINt9DEXWpIDYH4qAUq8TPa2uinJkLYEk3lKS8DxvW3g2BamQkzCF7p4EiI_r5QqSdGN9Jnv0mXFgZ9d3XU8U-Hchw64OMZHOiV3ImF5qWH6lel3SH0DeipO_o1w2LHoHnhywQ"}}',
+        programId: 'VCC001',
+        meta: {
+            batch: '41212009',
+            certificateType: 'certifyV2',
+            cit: '00000074',
+            date: '2021-05-07T05:30:28.187Z',
+            manufacturer: 'india',
+            name: 'Covishield',
+            totalDoses: 2,
+            osCreatedAt: '2021-10-25T05:19:03.624Z',
+            osUpdatedAt: '2021-10-25T05:19:03.624Z',
+            osid: 'f3ca00e0-38cb-4a94-bce6-ec4a8ea11bb5'
+        },
+        osCreatedAt: '2021-10-25T05:19:03.624Z',
+        osUpdatedAt: '2021-10-25T05:19:03.624Z',
+        osid: '4cf9228f-5802-4a51-aae2-2acacadef1ae'
+    }];
+    let actualData = certificate_service.filterByDob(cert, "1986-10-12");
+    let expectedData = [{
+        preEnrollmentCode: '987456126',
+        dob: "1986-10-12",
+        name: "D V Chanaka Dinushan",
+        gender: "Male"
+    }];
+    expect(actualData).toEqual(expectedData);
+});
+
+test('should return latest certificate\'s details based on dob', () => {
+    let cert = [{
+        name: 'John Doeq',
+        contact: [ 'tel:0779039495' ],
+        mobile: '0779039495',
+        preEnrollmentCode: '987456126',
+        certificateId: '303232161',
+        certificate: '{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:india:872550100V","refId":"987456102","name":"John Doeq","gender":"","age":"35","nationality":"Sri Lankan","address":{"streetAddress":"","streetAddress2":"","district":"","city":"","addressRegion":"","addressCountry":"","postalCode":""},"dob":"1987-04-23"},"issuer":"https://cowin.gov.in/","issuanceDate":"2022-04-07T12:31:45.990Z","evidence":[{"id":"https://cowin.gov.in/vaccine/303232161","infoUrl":"https://cowin.gov.in/?303232161","feedbackUrl":"https://cowin.gov.in/?303232161","certificateId":"303232161","type":["Vaccination"],"batch":"41202025","vaccine":"Covishield","manufacturer":"india","icd11Code":"XM9QW8","prophylaxis":"COVID-19 vaccine, non-replicating viral vector","date":"2021-02-17T05:30:28.187Z","effectiveStart":"2021-05-21","effectiveUntil":"2022-05-21","dose":1,"totalDoses":2,"verifier":{"name":"ss"},"facility":{"name":"MOH Gothatuwa","address":{"streetAddress":"","streetAddress2":"","district":"","city":"","addressRegion":"","addressCountry":"IND","postalCode":""}}}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2022-04-07T12:31:45Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..Fh0ziaKRNPiHbr8tp3WaK6I6QGpTytcNSKdHiWW6NpPK8GWFKIMO7bnAi0bYXHrJfOIvjL7_sjGOg6rSATzS0Ay4gZM0tDGjXWD2jMDtWahgaZ1aTdFkPzB3xprEnTwi3wco2KJJ8mCgkKwp2vKBU7Ftm6jECvavcZlLy67qDw6trUq86uDYau1L472RYLslBv0OAsgokeUOavrusECI2pwmvf0GMeJDtY5ZPzAUtUC6YMAh-J2bZlavxzVDiiFhawCFXhvNjy_XHZDpI5o_38K2_3NtkivAGBxOhx5cFQbaz45yAz73FAGBnwiHCXEOATcYpmF-y-C9ZCMq4jIShA"}}',
+        programId: 'VCC001',
+        osCreatedAt: '2022-04-07T12:31:46.075Z',
+        osUpdatedAt: '2022-04-07T12:31:46.075Z',
+        osid: 'e876be8f-d5eb-4d59-a7b7-32e0b70236fb'
+    }, {
+        name: 'John Doew',
+        contact: [ 'tel:0779039495' ],
+        mobile: '0779039495',
+        preEnrollmentCode: '987456126',
+        certificateId: '788954391',
+        certificate: '{"@context":["https://www.w3.org/2018/credentials/v1","https://cowin.gov.in/credentials/vaccination/v2"],"type":["VerifiableCredential","ProofOfVaccinationCredential"],"credentialSubject":{"type":"Person","id":"did:india:872550100V","refId":"987456102","name":"John Doew","gender":"","age":"35","nationality":"Sri Lankan","address":{"streetAddress":"","streetAddress2":"","district":"","city":"","addressRegion":"","addressCountry":"","postalCode":""},"dob":"1987-04-23"},"issuer":"https://cowin.gov.in/","issuanceDate":"2022-04-07T12:32:00.334Z","evidence":[{"id":"https://cowin.gov.in/vaccine/853171866","infoUrl":"https://cowin.gov.in/?853171866","feedbackUrl":"https://cowin.gov.in/?853171866","certificateId":"853171866","type":["Vaccination"],"batch":"41202025","vaccine":"Covishield","manufacturer":"india","icd11Code":"XM9QW8","prophylaxis":"COVID-19 vaccine, non-replicating viral vector","date":"2021-02-17T05:30:28.187Z","effectiveStart":"2021-05-21","effectiveUntil":"2022-05-21","dose":1,"totalDoses":2,"verifier":{"name":"ss"},"facility":{"name":"MOH Gothatuwa","address":{"streetAddress":"","streetAddress2":"","district":"","city":"","addressRegion":"","addressCountry":"IND","postalCode":""}}}],"nonTransferable":"true","proof":{"type":"RsaSignature2018","created":"2022-04-07T12:32:00Z","verificationMethod":"did:india","proofPurpose":"assertionMethod","jws":"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..iwjUoL7U_QdvM7fk_prjP8HngRKh2uiGFaYdfPwjTklCVaL9lIZ7flYs9uJKpZxNcniBW74irLnennH6KVtBKq2_0ggsCS3M5M_Z1CQYZInxkEoMDYajFiBPqPRxzEOE3cDpqQw7WZFXzG7R9joGT8huxRC16cnAxl4US80wjMOl1M0WqMz8oslI97UNAfz8EA59_-m6UrV8ZcLE9iIagVxm6slrL32IpG1cJdBLyMFA0UA0H6gWwW9YnJWAI_iqn2jQIUxISzUJGfB5fmZudG4Su3_xCb3mvsu2DqZ8BTIDGprZ_ujUfto1_qmw9m5B1-F16L9LqEvi8Q4Z8CCljQ"}}',
+        programId: 'VCC001',
+        osCreatedAt: '2022-04-07T12:32:00.394Z',
+        osUpdatedAt: '2022-04-07T12:32:00.394Z',
+        osid: '856a2f99-3cb6-403b-bfc8-26801e54086b'
+    }];
+    let actualData = certificate_service.filterByDob(cert, "1987-04-23");
+    let expectedData = [{
+        preEnrollmentCode: '987456126',
+        dob: "1987-04-23",
+        name: "John Doew",
+        gender: ""
+    }];
+    expect(actualData).toEqual(expectedData);
+});
