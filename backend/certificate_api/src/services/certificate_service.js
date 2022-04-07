@@ -8,15 +8,40 @@ const mapCertificatesByPreEnrollmentCode = (certificates) => {
   const map = new Map();
   for(let certificate of certificates) {
     const preEnrollmentCode = certificate.preEnrollmentCode;
+    let arr;
     if(map.get(preEnrollmentCode) === undefined) {
-      map.set(preEnrollmentCode, certificate);
+      arr = new Array();
     }
+    else {
+      arr = map.get(preEnrollmentCode)
+    }
+    arr.push(certificate);
+    map.set(preEnrollmentCode, arr);
   }
   return map;
 }
 
-const getCertificateData = (certificates) => {
+function filterByDobs(certificates, dob) {
+  let certificateData = getCertificateData(certificates);
+  return certificateData.filter(certificate => isEqualsDOB(certificate.dob, dob));
+}
+
+function isEqualsDOB(certificateDob, dob) {
+  const dateCertificateDob = new Date(certificateDob);
+  const dateRequestDob = new Date(dob);
+  return dateRequestDob.getTime() === dateCertificateDob.getTime();
+}
+
+const sortCertificatesForEachBeneficiary = (certificates) => {
   const certificatesMapByPreEnrollmentCode = mapCertificatesByPreEnrollmentCode(certificates);
+  for([preEnrollmentCode, certificates] of certificatesMapByPreEnrollmentCode) {
+    certificatesMapByPreEnrollmentCode.set(preEnrollmentCode, ((sortCertificatesInDoseAndUpdateTimeAscOrder(certificates))[certificates.length - 1]));
+  }
+  return certificatesMapByPreEnrollmentCode;
+}
+
+const getCertificateData = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = sortCertificatesForEachBeneficiary(certificates);
   const certificateData = new Array();
   for(let certificate of certificatesMapByPreEnrollmentCode.values()) {
     const credentialSubject = JSON.parse(certificate.certificate).credentialSubject;
@@ -246,5 +271,5 @@ module.exports = {
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
   prepareDataForVaccineCertificateTemplate,
-  getCertificateData
+  filterByDobs
 };

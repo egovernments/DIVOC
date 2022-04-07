@@ -254,28 +254,11 @@ async function getCertificateByPhnoAndDob(req, res) {
         return;
     }
     const certificatesByPhNo = await registryService.getCertificateByPhno(queryData.phoneno);
-    const certificatesByPhNoAndDob = filterByDobs(certificatesByPhNo, queryData.dob);
-    return certificateService.getCertificateData(certificatesByPhNoAndDob);
+    const certificatesByPhNoAndDob = certificateService.filterByDobs(certificatesByPhNo, queryData.dob);
+    return certificatesByPhNoAndDob;
 }
 
-function filterByDobs(certificates, dob) {
-    const newCertificatesArr = [];
-    for(let certificate of certificates) {
-        let c = JSON.parse(certificate.certificate);        
-        if(isEqualsDOB(c.credentialSubject.dob, dob)) {
-            newCertificatesArr.push(certificate);
-        }
-    }
-    return newCertificatesArr;
-}
 
-function isEqualsDOB(certificateDob, dob) {
-    const dateCertificateDob = new Date(certificateDob);
-    const dateRequestDob = new Date(dob);
-    console.log(dateCertificateDob);
-    console.log(dateRequestDob);
-    return dateRequestDob.getTime() === dateCertificateDob.getTime();
-}
 
 async function getCertificate(req, res) {
     try {
