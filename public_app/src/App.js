@@ -59,6 +59,10 @@ function App() {
                             <Route exact path={"/addMember"} component={AddMembersFlow} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/member/:enrollment_code"} component={ViewRecipient} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/citizen"} component={CitizenLoginComponent}/>
+                            <Route path='/verification_app' component={() => {
+                                window.location.replace('/verification_app');
+                                return null;
+                            }}/>
                             <Redirect to={"/not-found"}/>
                         </Switch>
                     </div>
