@@ -75,7 +75,7 @@ export const SideEffects = () => {
                         text={t('sideEffect.infoCard.0.text')}
                         img={VerifyCertificateImg}
                         onClick={() => {
-                            history.push("/verify-certificate/")
+                            history.push("/verification_app/")
                         }}
                         backgroundColor={"#F2FAF6"}
                     />

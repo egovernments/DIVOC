@@ -44,7 +44,6 @@ function App() {
                             <Route exact path={"/feedback"} component={SideEffects}/>
                             <PrivateRoute exact path={"/feedback/verify"} component={SubmitSymptomsForm} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/dashboard"} component={Dashboard}/>
-                            <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
                             <Route exact path={"/learn"} component={Learn}/>
                             <Route exact path={"/not-found"} component={PageNotFound}/>
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}

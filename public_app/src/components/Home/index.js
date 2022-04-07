@@ -171,7 +171,7 @@ export const Home = () => {
                                       subtitle={t('home.homeCard.1.subTitle')}
                                       buttonText={t('home.homeCard.1.button')}
                                       buttonOnClick={() => {
-                                          history.push("/verify-certificate/")
+                                          history.push("/verification_app/")
                                       }}
                                       buttonClassName="green-btn"
                                       backgroundColor={"#F2FAF6"}
