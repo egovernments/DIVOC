@@ -258,7 +258,7 @@ async function getCertificateByPhnoAndDob(req, res) {
             date: new Date(),
             source: queryData.dob,
             type: "invalid-input",
-            extra: "Invalid request body"
+            extra: "Invalid request parameters"
         }
         res.statusCode = 400;
         return error;
