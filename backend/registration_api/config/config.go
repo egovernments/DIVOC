@@ -32,7 +32,7 @@ var Config = struct {
 	}
 
 	EnrollmentCreation struct {
-		MaxRetryCount                    int `default:"10" yaml:"maxretrycount"`
+		MaxRetryCount                    int `env:"ENROLLMENT_RETRY_COUNT" default:"4" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode   int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 		MaxEnrollmentCreationAllowed     int `default:"4" yaml:"maxenrollmentcreationallowed"`
 		MaxWalkEnrollmentCreationAllowed int `default:"4" yaml:"maxwalkinenrollmentcreationallowed"`

@@ -32,3 +32,4 @@ keycloak/themes
 *.pyc
 perf/results
 perf/.bsp
+keycloak-mobile-number-login-spi/keycloak-mobile-number-login-spi.iml

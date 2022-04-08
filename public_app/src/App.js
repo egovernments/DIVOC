@@ -44,6 +44,7 @@ function App() {
                             <Route exact path={"/feedback"} component={SideEffects}/>
                             <PrivateRoute exact path={"/feedback/verify"} component={SubmitSymptomsForm} role={RECIPIENT_ROLE} clientId={RECIPIENT_CLIENT_ID}/>
                             <Route exact path={"/dashboard"} component={Dashboard}/>
+                            <Route exact path={"/verify-certificate"} component={VerifyCertificate}/>
                             <Route exact path={"/learn"} component={Learn}/>
                             <Route exact path={"/not-found"} component={PageNotFound}/>
                             <PrivateRoute exact path={config.urlPath + "/"} component={CertificateView}
@@ -61,6 +62,10 @@ function App() {
                             <Route exact path={"/citizen"} component={CitizenLoginComponent}/>
                             <Route path='/verification_app' component={() => {
                                 window.location.replace('/verification_app');
+                                return null;
+                            }}/>
+                            <Route path='/portal' component={() => {
+                                window.location.replace('/portal');
                                 return null;
                             }}/>
                             <Redirect to={"/not-found"}/>
