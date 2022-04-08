@@ -253,6 +253,10 @@ async function getCertificateByPhnoAndDob(req, res) {
         res.statusCode = 403;
         return;
     }
+    if(isNaN(Date.parse(queryData.dob))) {
+        res.statusCode = 400;
+        return;
+    }
     const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno);
     return certificateService.filterByDob(certificatesByPhno, queryData.dob);
 }
