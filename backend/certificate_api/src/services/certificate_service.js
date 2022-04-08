@@ -4,6 +4,57 @@ const countries = require('i18n-iso-countries');
 const configService = require('./configuration_service');
 const {formatDate, formatId, getNumberWithOrdinal, concatenateReadableString} = require('./utils');
 
+const mapCertificatesByPreEnrollmentCode = (certificates) => {
+  const map = new Map();
+  for(let certificate of certificates) {
+    const preEnrollmentCode = certificate.preEnrollmentCode;
+    let arr;
+    if(map.get(preEnrollmentCode) === undefined) {
+      arr = new Array();
+    }
+    else {
+      arr = map.get(preEnrollmentCode)
+    }
+    arr.push(certificate);
+    map.set(preEnrollmentCode, arr);
+  }
+  return map;
+}
+
+function filterByDob(certificates, dob) {
+  let certificateData = getBasicBeneficiaryDataFromCert(certificates);
+  return certificateData.filter(certificate => isEqualsDOB(certificate.dob, dob));
+}
+
+function isEqualsDOB(certificateDob, dob) {
+  const dateCertificateDob = new Date(certificateDob);
+  const dateRequestDob = new Date(dob);
+  return dateRequestDob.getTime() === dateCertificateDob.getTime();
+}
+
+const sortCertificatesForEachBeneficiary = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = mapCertificatesByPreEnrollmentCode(certificates);
+  for([preEnrollmentCode, certificates] of certificatesMapByPreEnrollmentCode) {
+    certificatesMapByPreEnrollmentCode.set(preEnrollmentCode, ((sortCertificatesInDoseAndUpdateTimeAscOrder(certificates))[certificates.length - 1]));
+  }
+  return certificatesMapByPreEnrollmentCode;
+}
+
+const getBasicBeneficiaryDataFromCert = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = sortCertificatesForEachBeneficiary(certificates);
+  const certificateData = new Array();
+  for(let certificate of certificatesMapByPreEnrollmentCode.values()) {
+    const credentialSubject = JSON.parse(certificate.certificate).credentialSubject;
+    certificateData.push({
+      preEnrollmentCode: certificate.preEnrollmentCode,
+      name: credentialSubject.name,
+      gender: credentialSubject.gender,
+      dob: credentialSubject.dob
+    });
+  }
+  return certificateData;
+}
+
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -219,5 +270,6 @@ module.exports = {
   getLatestCertificate,
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
-  prepareDataForVaccineCertificateTemplate
+  prepareDataForVaccineCertificateTemplate,
+  filterByDob
 };
