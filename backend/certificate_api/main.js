@@ -15,7 +15,7 @@ const server = http.createServer(async (req, res) => {
         const data = await certificateController.getCertificateQRCode(req, res);
         res.end(data)
     }
-    else if(req.method === 'GET' && req.url.startsWith("/certificate/api/beneficiary")) {
+    else if(req.method === 'GET' && req.url.startsWith("/certificate/api/beneficiaries")) {
         const data = await certificateController.getCertificateByPhnoAndDob(req, res);
         res.end(JSON.stringify(data));
     }

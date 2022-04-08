@@ -254,8 +254,14 @@ async function getCertificateByPhnoAndDob(req, res) {
         return;
     }
     if(isNaN(Date.parse(queryData.dob))) {
+        let error = {
+            date: new Date(),
+            source: queryData.dob,
+            type: "invalid-input",
+            extra: "Invalid request body"
+        }
         res.statusCode = 400;
-        return;
+        return error;
     }
     const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno);
     return certificateService.filterByDob(certificatesByPhno, queryData.dob);
