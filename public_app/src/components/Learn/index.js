@@ -77,7 +77,7 @@ function Learn(props) {
                     text={"Verify Certificate"}
                     img={VerifyCertificateImg}
                     onClick={() => {
-                        history.push("/verify-certificate/")
+                        history.push("/verification_app/")
                     }}
                     backgroundColor={"#F2FAF6"}/>
             </div>
