@@ -253,12 +253,12 @@ async function getCertificateByPhnoAndDob(req, res) {
         res.statusCode = 403;
         return;
     }
-    if(isNaN(Date.parse(queryData.dob))) {
+    if(isNaN(Date.parse(queryData.dob)) || queryData.dob === undefined || queryData.phoneno === undefined || queryData.phoneno.trim() === '' )  {
         let error = {
             date: new Date(),
-            source: queryData.dob,
+            source: 'getCertificateByPhnoAndDob',
             type: "invalid-input",
-            extra: "Invalid request parameters"
+            extra: "Invalid Date of Birth or Phone number"
         }
         res.statusCode = 400;
         return error;
