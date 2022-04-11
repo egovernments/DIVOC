@@ -10,12 +10,11 @@ import { formatYYYYMMDDDate } from "../../utils/dateutil";
 
 function PrintCertificate() {
     const today = new Date();
-    const [tableData,setTableData] = React.useState([]);
+    const [tableData,setTableData] = useState([]);
     const [options, setOptions] = useState({maxDate: today});
     const [mobileNumber, setMobileNumber] = useState('');
     const [dob, setDob] = useState(today);
     const axiosInstance = useAxios('');
-    const [dateValue, setDateValue] = useState('');
     const [showSpinner, setShowSpinner] = useState(false);
 
 
@@ -87,7 +86,7 @@ function PrintCertificate() {
                     </div>
                     <div className="col-sm-3 col-xs-3">
                         <label className="custom-text-label required">Date of Birth</label>
-                        <CustomDateWidget options={options} onChange={(dob) => {setDob(dob); setDateValue(dob)}} value={dateValue} id="date-picker"></CustomDateWidget>
+                        <CustomDateWidget options={options} onChange={(dob) => {setDob(dob)}} value={dob} id="date-picker"></CustomDateWidget>
                     </div>
                     <div className="col-sm-3 col-xs-3">
                         <CustomButton className="blue-btn m-29 full-width" onClick={() => {fetchCertificates()}}>Search</CustomButton>
