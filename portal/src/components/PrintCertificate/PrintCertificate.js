@@ -62,7 +62,7 @@ function PrintCertificate() {
                 <td>{data.name}</td>
                 <td>{data.gender}</td>
                 <td>{data.dob}</td>
-                <td><button className={styles['action-link']} onClick={() => printCertificate(data.preEnrollmentCode)}>Action</button></td>
+                <td><button className={styles['action-link']} onClick={() => printCertificate(data.preEnrollmentCode)}>Print</button></td>
             </tr>)
            tableRow.push(tableCells)
        })
