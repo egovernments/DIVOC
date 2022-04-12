@@ -19,3 +19,7 @@
 .date-picker-label{
     padding: 5rem;
 }
+
+.date-picker > div.react-datepicker-wrapper {
+    width: 100%;
+}
