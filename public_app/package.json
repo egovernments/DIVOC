@@ -26,7 +26,7 @@
     "prop-types": "^15.7.2",
     "pure-react-carousel": "^1.27.6",
     "qrcode.react": "^1.0.0",
-    "ramda": "^0.27.1",
+    "ramda": "^0.27.2",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
     "react-cookie": "^4.0.3",
