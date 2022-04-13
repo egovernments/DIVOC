@@ -97,7 +97,14 @@ func mobileNumberMismatchError() ErrorResponse {
 	}
 	return payload
 }
-
+func mobileNumberUpdatedError() ErrorResponse {
+	payload := ErrorResponse{
+		Status:    "not_found",
+		ErrorCode: 3,
+		Message:   `No certificate has been issued against this number. If you were vaccinated before please ensure you log in using the registered number. `,
+	}
+	return payload
+}
 func getCertificates(w http.ResponseWriter, request *http.Request) {
 	log.Info("GET CERTIFICATES JSON ")
 	var requestBody map[string]interface{}
