@@ -112,7 +112,7 @@ func initializeCreateUserInKeycloak(wg *sync.WaitGroup) {
 			services.PublishProcStatus(models.ProcStatus{
 				Date:              time.Now(),
 				PreEnrollmentCode: preEnrollmentCode,
-				ProcType:          "certify",
+				ProcType:          "keycloak_user_creation",
 				Status:            string(status),
 			})
 		} else {
