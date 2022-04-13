@@ -3,12 +3,14 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"strconv"
+	"strings"
+
 	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	kernelService "github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
-	"strconv"
-	"strings"
 )
 
 type RevokeCertificateRequest struct {
@@ -16,21 +18,13 @@ type RevokeCertificateRequest struct {
 	CertificateBody   map[string]interface{} `json:"certificateBody"`
 }
 
-type RevocationStatus string
-
-const (
-	TEMP_ERROR RevocationStatus = "tempError"
-	ERROR      RevocationStatus = "error"
-	SUCCESS    RevocationStatus = "success"
-)
-
-func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, error) {
+func handleCertificateRevocationMessage(msg string) (string, models.Status, error) {
 	log.Debugf("In handleCertificateRevocationMessage %+v", msg)
 	var revokeCertificateMessage RevokeCertificateRequest
 
 	if err := json.Unmarshal([]byte(msg), &revokeCertificateMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "unknown", ERROR, errors.New("kafka message unmarshalling failed")
+		return "unknown", models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 
 	certificateBody := revokeCertificateMessage.CertificateBody
@@ -47,7 +41,7 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 		var cert map[string]interface{}
 		if err := json.Unmarshal([]byte(certificateBody["certificate"].(string)), &cert); err != nil {
 			log.Errorf("%v", err)
-			return preEnrollmentCode, ERROR, errors.New("certificate unmarshalling failed")
+			return preEnrollmentCode, models.ERROR, errors.New("certificate unmarshalling failed")
 		}
 		certificateDose := cert["evidence"].([]interface{})[0].(map[string]interface{})
 		log.Debugf("certificateDose doses: %+v dose: %+v", certificateDose["doses"], certificateDose["dose"])
@@ -61,7 +55,7 @@ func handleCertificateRevocationMessage(msg string) (string, RevocationStatus, e
 	}
 }
 
-func deleteVaccineCertificate(osid string) (RevocationStatus, error) {
+func deleteVaccineCertificate(osid string) (models.Status, error) {
 	typeId := "VaccinationCertificate"
 	filter := map[string]interface{}{
 		"osid": osid,
@@ -69,16 +63,16 @@ func deleteVaccineCertificate(osid string) (RevocationStatus, error) {
 	if _, err := kernelService.DeleteRegistry(typeId, filter); err != nil {
 		log.Errorf("Error in deleting vaccination certificate %+v", err)
 		if strings.HasPrefix(err.Error(), "tempError") {
-			return TEMP_ERROR, errors.New("tempError in deleting vaccination certificate")
+			return models.TEMP_ERROR, errors.New("tempError in deleting vaccination certificate")
 		} else {
-			return ERROR, errors.New("error in deleting vaccination certificate")
+			return models.ERROR, errors.New("error in deleting vaccination certificate")
 		}
 	} else {
-		return SUCCESS, nil
+		return models.SUCCESS, nil
 	}
 }
 
-func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) (RevocationStatus, error) {
+func addCertificateToRevocationList(preEnrollmentCode string, dose int, certificateId string) (models.Status, error) {
 	typeId := "RevokedCertificate"
 	revokeCertificate := map[string]interface{}{
 		"preEnrollmentCode":     preEnrollmentCode,
@@ -103,21 +97,21 @@ func addCertificateToRevocationList(preEnrollmentCode string, dose int, certific
 		if revokedCertificate, ok := resp[typeId].([]interface{}); ok {
 			if len(revokedCertificate) > 0 {
 				log.Infof("%v certificateId already exists in revocation", certificateId)
-				return SUCCESS, nil
+				return models.SUCCESS, nil
 			}
 			_, err = kernelService.CreateNewRegistry(revokeCertificate, typeId)
 			if err != nil {
 				log.Infof("Failed saving revoked Certificate %+v", err)
-				return ERROR, err
+				return models.ERROR, err
 			}
 			log.Infof("%v certificateId added to revocation", certificateId)
-			return SUCCESS, nil
+			return models.SUCCESS, nil
 		}
 	}
-	return TEMP_ERROR, errors.New("error occurred while adding certificate to revocation list")
+	return models.TEMP_ERROR, errors.New("error occurred while adding certificate to revocation list")
 }
 
-func deleteKeyFromRedis(preEnrollmentCode string, programId interface{}, dose int) (RevocationStatus, error) {
+func deleteKeyFromRedis(preEnrollmentCode string, programId interface{}, dose int) (models.Status, error) {
 	log.Infof("preEnrollmentCode %+v programId %+v dose %+v", preEnrollmentCode, programId, dose)
 
 	key := preEnrollmentCode + "-" + strconv.Itoa(dose)
@@ -128,7 +122,7 @@ func deleteKeyFromRedis(preEnrollmentCode string, programId interface{}, dose in
 	err := services.DeleteValue(key)
 	if err != nil {
 		log.Errorf("Error while deleting key from redis: %v", err)
-		return ERROR, errors.New("error while deleting key from redis")
+		return models.ERROR, errors.New("error while deleting key from redis")
 	}
-	return SUCCESS, nil
+	return models.SUCCESS, nil
 }

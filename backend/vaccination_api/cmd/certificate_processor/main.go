@@ -142,10 +142,10 @@ func initializeRevokeCertificate(wg *sync.WaitGroup) {
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			preEnrollmentCode, revokeStatus, err := handleCertificateRevocationMessage(string(msg.Value))
-			if revokeStatus == SUCCESS || revokeStatus == ERROR {
+			if revokeStatus == models.SUCCESS || revokeStatus == models.ERROR {
 				c.CommitMessage(msg)
 			}
-			if revokeStatus == ERROR {
+			if revokeStatus == models.ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
 				publishRevokeCertificateErrorMessage(msg.Value)
 			}
