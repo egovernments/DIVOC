@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"sync"
-	"time"
 )
 
 const mobilePhonePrefix = "tel:"
@@ -100,11 +101,20 @@ func initializeCreateUserInKeycloak(wg *sync.WaitGroup) {
 			//push to back up queue -- todo what do we do with these requests?
 			//}
 			//message := signCertificate(message)
-			if err := processCertificateMessage(string(msg.Value)); err == nil {
+			var err error
+			var preEnrollmentCode string
+			var status models.Status
+			if preEnrollmentCode, status, err = processCertificateMessage(string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
 			}
+			services.PublishProcStatus(models.ProcStatus{
+				Date:              time.Now(),
+				PreEnrollmentCode: preEnrollmentCode,
+				ProcType:          "keycloak_user_creation",
+				Status:            string(status),
+			})
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
@@ -132,10 +142,10 @@ func initializeRevokeCertificate(wg *sync.WaitGroup) {
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			preEnrollmentCode, revokeStatus, err := handleCertificateRevocationMessage(string(msg.Value))
-			if revokeStatus == SUCCESS || revokeStatus == ERROR {
+			if revokeStatus == models.SUCCESS || revokeStatus == models.ERROR {
 				c.CommitMessage(msg)
 			}
-			if revokeStatus == ERROR {
+			if revokeStatus == models.ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
 				publishRevokeCertificateErrorMessage(msg.Value)
 			}
