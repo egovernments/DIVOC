@@ -11,7 +11,6 @@ import (
 	"math"
 	"net/http"
 	"os"
-	"sort"
 	"strings"
 	"time"
 
@@ -382,9 +381,13 @@ func compress(certificateText string) (*bytes.Buffer, error) {
 	}
 	return buf, err
 }
+func removeRevokedCertificate(certificatesArr []interface{}, i int) []interface{} {
+	return append(certificatesArr[:i], certificatesArr[i+1:]...)
+}
 
 func getCertificateList(w http.ResponseWriter, request *http.Request) {
 	log.Info("GET CERTIFICATES JSON ")
+	typeId := "RevokedCertificate"
 	claimBody := auth.ExtractClaimBodyFromHeader(request)
 	if claimBody != nil {
 		filter := map[string]interface{}{}
@@ -394,23 +397,40 @@ func getCertificateList(w http.ResponseWriter, request *http.Request) {
 		certificateFromRegistry, err := services.QueryRegistry(CertificateEntity, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset)
 		if err == nil {
 			certificateArr := certificateFromRegistry[CertificateEntity].([]interface{})
-			certificateArr = SortCertificatesByCreateAt(certificateArr)
-			log.Infof("Certificate query return %d records", len(certificateArr))
+			for i := 0; i < len(certificateArr); i++ {
+				certificateJson := certificateArr[i].(map[string]interface{})
+				certificateId := certificateJson["certificateId"]
+				filter := map[string]interface{}{
+					"previousCertificateId": map[string]interface{}{
+						"eq": certificateId,
+					},
+				}
+				if resp, err := services.QueryRegistry(typeId, filter, config.Config.SearchRegistry.DefaultLimit, config.Config.SearchRegistry.DefaultOffset); err == nil {
+					if revokedCertificates, ok := resp[typeId].([]interface{}); ok {
+						if len(revokedCertificates) > 0 {
+							certificateArr = removeRevokedCertificate(certificateArr, i)
+							i--
+						}
+					}
+				}
+			}
+			log.Infof("Certificate query return %v records", len(certificateArr))
+			preEnrollmentCodeCertsMap := make(map[string][]interface{})
+			for _, value := range certificateArr {
+				cert := value.(map[string]interface{})
+				enrollmentCode := cert["preEnrollmentCode"].(string)
+				preEnrollmentCodeCertsMap[enrollmentCode] = append(preEnrollmentCodeCertsMap[enrollmentCode], cert)
+			}
+			certificateArr = nil
+			for _, value := range preEnrollmentCodeCertsMap {
+				value = SortCertificatesByCreateAt(value)
+				certificatesMap := GetDoseWiseCertificates(value)
+				certificateObj := getLatestCertificate(certificatesMap)
+				certificateArr = append(certificateArr, certificateObj)
+			}
 			if len(certificateArr) > 0 {
-				newCertificateArr := make([]map[string]interface{}, 0)
-				certificatesByDose := GetDoseWiseCertificates(certificateArr)
-				keys := make([]int, 0)
-				for key, _ := range certificatesByDose {
-					keys = append(keys, key)
-				}
-				sort.Slice(keys, func(i, j int) bool {
-					return keys[i] < keys[j]
-				})
-				for _, j := range keys {
-					newCertificateArr = append(newCertificateArr, certificatesByDose[j]...)
-				}
 				certificates := map[string]interface{}{
-					"certificates": newCertificateArr,
+					"certificates": certificateArr,
 				}
 				if responseBytes, err := json.Marshal(certificates); err != nil {
 					log.Errorf("Error while serializing xml")
@@ -426,6 +446,9 @@ func getCertificateList(w http.ResponseWriter, request *http.Request) {
 					})
 					return
 				}
+			} else if len(certificateArr) == 0 && len(certificateFromRegistry[CertificateEntity].([]interface{})) > 0 {
+				log.Errorf("No certificates found for request %v", filter)
+				writeResponse(w, 404, mobileNumberUpdatedError())
 			} else {
 				log.Errorf("No certificates found for request %v", filter)
 				writeResponse(w, 404, mobileNumberMismatchError())
