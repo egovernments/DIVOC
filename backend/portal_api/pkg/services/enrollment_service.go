@@ -12,8 +12,8 @@ import (
 const PreEnrollmentRegistered = "preEnrollmentRegistered"
 
 func NotifyRecipient(enrollment models.Enrollment) error {
-	preEnrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[PreEnrollmentRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[PreEnrollmentRegistered].Subject
+	preEnrollmentTemplateString := kernelService.EtcdConfigs.NotificationTemplates[PreEnrollmentRegistered].Message
+	subject := kernelService.EtcdConfigs.NotificationTemplates[PreEnrollmentRegistered].Subject
 
 	var preEnrollmentTemplate = template.Must(template.New("").Parse(preEnrollmentTemplateString))
 

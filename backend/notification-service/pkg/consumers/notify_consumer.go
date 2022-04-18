@@ -17,10 +17,6 @@ import (
 const RecipientCertified = "recipientCertified"
 
 func certifiedEmailNotificationConsumer() {
-	facilityRegisteredTemplateString := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Message
-	subject := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Subject
-
-	var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certified_email_notifier",
@@ -57,6 +53,10 @@ func certifiedEmailNotificationConsumer() {
 											"VaccineName": vaccineName,
 										}
 										buf := bytes.Buffer{}
+										facilityRegisteredTemplateString := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Message
+										subject := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Subject
+										facilityRegisteredTemplate := template.Must(template.New("").Parse(facilityRegisteredTemplateString))
+
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
 										if err == nil {
 											if err := services.SendEmail(emailID, subject, buf.String()); err == nil {
@@ -90,8 +90,6 @@ func certifiedEmailNotificationConsumer() {
 }
 
 func certifiedSMSNotificationConsumer() {
-	facilityRegisteredTemplateString := kernelServices.FlagrConfigs.NotificationTemplates[RecipientCertified].Message
-	var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certified_sms_notifier",
@@ -103,7 +101,7 @@ func certifiedSMSNotificationConsumer() {
 		log.Error(err)
 	} else {
 		topicName := config.Config.Kafka.CertifiedTopic
-		if err := c.SubscribeTopics([]string{topicName}, nil); err!=nil {
+		if err := c.SubscribeTopics([]string{topicName}, nil); err != nil {
 			log.Errorf("Error in subscribing to %s : %+v", topicName, err)
 		} else {
 			for {
@@ -128,6 +126,8 @@ func certifiedSMSNotificationConsumer() {
 											"VaccineName": vaccineName,
 										}
 										buf := bytes.Buffer{}
+										facilityRegisteredTemplateString := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Message
+										facilityRegisteredTemplate := template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
 										if err == nil {
 											if resp, err := services.SendSMS(mobileNumber, buf.String()); err == nil {

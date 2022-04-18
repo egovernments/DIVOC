@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	services.InitializeFlagr()
+	services.InitializeEtcd()
 	config.Initialize()
 	consumers.Init()
 	log.Infof("Starting certificate processor")

@@ -16,7 +16,7 @@ import (
 func main() {
 	config.Initialize()
 	services.InitializeKafka()
-	kernelServices.InitializeFlagr()
+	kernelServices.InitializeEtcd()
 	services.InitRedis()
 	consumers.Init()
 

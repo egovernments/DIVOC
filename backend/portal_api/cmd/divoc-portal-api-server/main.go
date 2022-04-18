@@ -19,7 +19,7 @@ func main() {
 	config.Initialize()
 	services.InitializeKafka()
 	pkg.InitClickHouseConnection()
-	kernelServices.InitializeFlagr()
+	kernelServices.InitializeEtcd()
 	db.Init()
 
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)

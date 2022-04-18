@@ -149,6 +149,10 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -169,6 +173,10 @@ services:
       CACHE_TTL: 60
       AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
       AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -268,6 +276,10 @@ services:
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
