@@ -31,7 +31,7 @@
     <body>
     <nav class="navbar navbar-expand-lg navbar-light">
         <a class="navbar-brand" href="#">
-            <img src="${url.resourcesPath}/img/nav-logo.png" width="125px" alt="">
+            <img src="${url.resourcesPath}/img/nav-logo.png" width="100%"alt="">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
                 aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">

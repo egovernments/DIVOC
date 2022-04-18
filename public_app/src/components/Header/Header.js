@@ -43,7 +43,7 @@ function Header() {
             <Navbar.Brand href={"/"}>
                 <img
                     src={NavbarLogo}
-                    width="125"
+                    width="100%"
                     className="d-inline-block align-top"
                     alt="React Bootstrap logo"
                 />
