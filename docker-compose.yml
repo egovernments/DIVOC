@@ -29,7 +29,7 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: divoc/registry-es
+    image: divoc/registry-es:2.0.0-generic
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -61,7 +61,12 @@ services:
       - KC_HOSTNAME_STRICT:false
       - KC_HOSTNAME_STRICT_HTTPS:false
       - KC_HTTP_RELATIVE_PATH=/auth
+      - KC_HOSTNAME=localhost
+      - KC_HOSTNAME_PORT=8080
+      - KC_HTTPS_KEY_STORE_FILE=/opt/keycloak/serverkey
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+    volumes:
+      - "./keycloak/server.keystore:/opt/keycloak/serverkey"   # map certificates to container
     healthcheck:
       test:
         ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
@@ -69,7 +74,7 @@ services:
       timeout: 10s
       retries: 5
     ports:
-      - "8080:8080"
+      - "8080:8443"
       - "9990:9990"
     depends_on:
       db:
@@ -119,7 +124,7 @@ services:
       - "8123:8123"
       - "9000:9000"
   vaccination-api:
-    image: divoc/vaccination_api
+    image: divoc/vaccination_api:2.0.0-generic
     environment:
       REGISTRY_URL: "http://registry:8081"
       REGISTRY_WITH_ES_URL: "http://registry-es:8081"
@@ -141,7 +146,7 @@ services:
       keycloak:
         condition: service_healthy
   portal-api:
-    image: divoc/portal_api
+    image: divoc/portal_api:2.0.0-generic
     ports:
       - "8001:8001"
     environment:
@@ -158,7 +163,7 @@ services:
       keycloak:
         condition: service_healthy
   registration-api:
-    image: divoc/registration_api
+    image: divoc/registration_api:2.0.0-generic
     ports:
       - "8002:8002"
     environment:
@@ -178,7 +183,7 @@ services:
       keycloak:
         condition: service_healthy  
   analytics-feed:
-    image: divoc/analytics_feed
+    image: divoc/analytics_feed:2.0.0-generic
     environment:
       CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
@@ -186,7 +191,7 @@ services:
       clickhouse-server:
         condition: service_started
   certificate-processor:
-    image: divoc/certificate_processor
+    image: divoc/certificate_processor:2.0.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -201,7 +206,7 @@ services:
       registry:
         condition: service_started
   certificate-signer:
-    image: divoc/certificate_signer
+    image: divoc/certificate_signer:2.0.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -229,7 +234,7 @@ services:
       kafka:
         condition: service_healthy
   test-certificate-signer:
-    image: divoc/test_certificate_signer
+    image: divoc/test_certificate_signer:2.0.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -250,9 +255,9 @@ services:
       kafka:
         condition: service_healthy
   gateway:
-    image: divoc/gateway
+    image: divoc/gateway:2.0.0-generic
     ports:
-      - "80:80"
+      - "81:80"
     depends_on:
       vaccination-api:
         condition: service_started
@@ -263,7 +268,7 @@ services:
       digilocker-support-api:
         condition: service_started
   notification-service:
-    image: divoc/notification-service
+    image: divoc/notification-service:2.0.0-generic
     ports:
       - "8765:8765"
     environment:
@@ -275,7 +280,7 @@ services:
       kafka:
         condition: service_healthy
   digilocker-support-api:
-    image: divoc/digilocker_support_api
+    image: divoc/digilocker_support_api:2.0.0-generic
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081"
@@ -289,7 +294,7 @@ services:
       keycloak:
         condition: service_healthy
   certificate-api:
-    image: divoc/certificate_api
+    image: divoc/certificate_api:2.0.0-generic
     ports:
       - "4321:4321"
     environment:
