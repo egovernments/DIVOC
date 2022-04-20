@@ -8,6 +8,7 @@
 }
 .container{
     padding: 20px;
+    margin-top: 5%;
 }
 .card{
     margin: 10px;
@@ -15,10 +16,13 @@
 .table-container{
     height: 100%;
     box-shadow: 0px 6px 20px #C1CFD933;
-    border-radius: 0px 0px 10px 10px;
+    border-radius: 10px;
+}
+.recipient-detail {
+    margin: 3%;
 }
 .table-header{
-    background: #4CA07A 0% 0% no-repeat padding-box;
+    background: #68686833 0% 0% no-repeat padding-box;
     box-shadow: 0px 6px 20px #C1CFD933;
     border-radius: 10px 10px 0px 0px;
     opacity: 1;
@@ -63,8 +67,10 @@
     font-weight: bolder;
 }
 
-.certificate>tbody>tr{
-    padding: 5px;
+.beneficiary-details {
+    border: 2px solid #68686833;
+    border-radius: 5px;
+    margin-top: 3%;
 }
 
 .input-container > label > input[type="checkbox"]:checked + .wrapper {
@@ -78,3 +84,18 @@
 .input-container > label > input[type="radio"] {
     display: none;
 }
+
+.action-link {
+    background: transparent;
+    border: none;
+    text-decoration: underline;
+    color: #4CA07A;
+}
+
+.iframe-class {
+    height: 0px; 
+    width: 0px; 
+    position: absolute;
+    display: none;
+}
+

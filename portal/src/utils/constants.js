@@ -35,7 +35,9 @@ export const API_URL = Object.freeze({
     PRE_ENROLLMENT_FILE_UPLOAD_ERRORS_API: '/divoc/admin/api/v1/enrollments/uploads/:id/errors',
     FACILITY_PROGRAM_SCHEDULE_API: '/divoc/admin/api/v1/facility/:facilityId/program/:programId/schedule',
     BENEFICIARY_SEARCH_API: '/divoc/api/citizen/beneficiaries/search',
-    CERTIFICATE_API: '/divoc/api/v1/certificates/:id'
+    CERTIFICATE_API: '/divoc/api/v1/certificates/:id',
+    SEARCH_CERTIFICATE_API: '/certificate/api/beneficiaries?dob=:dob&phoneno=:phoneno',
+    PRINT_CERTIFICATE_API: '/certificate/api/certificatePDF/:preEnrollmentCode'
 });
 
 export class SampleCSV {

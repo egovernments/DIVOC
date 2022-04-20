@@ -6,7 +6,6 @@ import VaccinatorList from "../VaccinatorList/VaccinatorList";
 import keycloak from "../../../utils/keycloak";
 import {equals, reject} from "ramda";
 import {API_URL} from "../../../utils/constants";
-import "./Vaccinators.css";
 
 export default function Vaccinators() {
     const [vaccinators, setVaccinators] = useState([]);

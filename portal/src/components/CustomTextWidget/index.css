@@ -5,3 +5,7 @@
     height: 4vh;
     padding-left: 0.5rem ;
 }
+
+.full-width {
+    width: 100%;
+}

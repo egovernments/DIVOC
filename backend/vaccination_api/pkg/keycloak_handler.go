@@ -3,12 +3,14 @@ package pkg
 import (
 	"errors"
 	"fmt"
-	"github.com/divoc/api/config"
-	"github.com/imroc/req"
-	log "github.com/sirupsen/logrus"
-	cache "github.com/patrickmn/go-cache"
 	"strings"
 	"time"
+
+	"github.com/divoc/api/config"
+	"github.com/divoc/api/pkg/models"
+	"github.com/imroc/req"
+	cache "github.com/patrickmn/go-cache"
+	log "github.com/sirupsen/logrus"
 )
 
 var cacheStore = cache.New(5*time.Minute, 10*time.Minute)
@@ -23,7 +25,7 @@ type KeycloakUserAttributes struct {
 	MobileNumber []string `json:"mobile_number"`
 }
 
-func CreateRecipientUserId(mobile string) error {
+func CreateRecipientUserId(mobile string) (models.Status, error) {
 	userRequest := KeyCloakUserRequest{
 		Username: mobile,
 		Enabled:  "true",
@@ -36,16 +38,16 @@ func CreateRecipientUserId(mobile string) error {
 	log.Infof("Create keycloak user %d %s", resp.Response().StatusCode, resp.String())
 	if err != nil || !isUserCreatedOrAlreadyExists(resp) {
 		log.Errorf("Error while creating keycloak user : %s", mobile)
-		return errors.New("error while creating keycloak user")
+		return models.ERROR, errors.New("error while creating keycloak user")
 	} else {
 		log.Infof("Setting up roles for the user %s", mobile)
 		keycloakUserId := getKeycloakUserId(resp, userRequest, authHeader)
 		if keycloakUserId != "" {
 			_ = addUserToGroup(keycloakUserId, config.Config.Keycloak.RecipientGroupId, authHeader)
-			return nil
+			return models.SUCCESS, nil
 		} else {
 			log.Errorf("Unable to map keycloak user id for %s", mobile)
-			return errors.New("unable to map keycloak user for recipient group")
+			return models.ERROR, errors.New("unable to map keycloak user for recipient group")
 		}
 	}
 }
@@ -60,10 +62,10 @@ func getAuthToken() string {
 		"grant_type":    "client_credentials",
 		"client_id":     "admin-api",
 		"client_secret": config.Config.Keycloak.AdminApiClientSecret,
-	}); err!=nil {
+	}); err != nil {
 		log.Errorf("Error in getting the token from keycloak %+v", err)
 	} else {
-		log.Debugf("Response %d %+v",resp.Response().StatusCode, resp)
+		log.Debugf("Response %d %+v", resp.Response().StatusCode, resp)
 		if resp.Response().StatusCode == 200 {
 			responseObject := map[string]interface{}{}
 			if err := resp.ToJSON(&responseObject); err != nil {
@@ -141,5 +143,3 @@ func addUserToGroup(userId string, groupId string, authHeader string) error {
 	}
 	return nil
 }
-
-
