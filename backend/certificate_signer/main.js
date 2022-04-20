@@ -12,7 +12,6 @@ const {
 } = require ("./config/config");
 const {Kafka} = require('kafkajs');
 const fs = require('fs');
-const config = require('./config/config');
 const configuration_service = require('./configuration_service');
 const R = require('ramda');
 const {vaccinationContext, vaccinationContextV2} = require("vaccination-context");
@@ -20,7 +19,8 @@ const signer = require('certificate-signer-library');
 const Mustache = require("mustache");
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
-const {CONFIG_KEYS} = require('./config/constants');
+const {CONFIG_KEYS, PROC_TOPIC} = require('./config/constants');
+const config = require('./config/config');
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
 
@@ -107,9 +107,10 @@ configuration_service.init();
       DDCC_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.DDCC_TEMPLATE);
       W3C_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.W3C_TEMPLATE);
       let jsonMessage = {};
+      let preEnrollmentCode;
       try {
         jsonMessage = JSON.parse(message.value.toString());
-        const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
+        preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
         const programId = R.pathOr("", ["programId"], jsonMessage);
         const enablePid = JSON.parse(config.ENABLE_PROGRAM_ID_CACHING_KEY)
@@ -127,7 +128,12 @@ configuration_service.init();
         // if (preEnrollmentCode !== "" && currentDose !== "") {
         //   redis.deleteKey(`${preEnrollmentCode}-${currentDose}`) //if retry fails it clears the key -
         // }
-        console.error("ERROR: " + e.message)
+        await producer.send({
+          topic: PROC_TOPIC,
+          messages: [
+            {key: null, value: JSON.stringify({preEnrollmentCode: preEnrollmentCode, date: new Date(), ProcType: 'sign_certificate', Status: 'error'})}
+          ]
+        });
         await producer.send({
           topic: config.ERROR_CERTIFICATE_TOPIC,
           messages: [{key: null, value: JSON.stringify({message: message.value.toString(), error: e.message})}]
