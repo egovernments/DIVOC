@@ -55,6 +55,9 @@ export const CustomDateWidget = (props) => {
             onChange={updateValue} 
             dateFormat="dd-MM-yyyy"
             id="date-picker"
+            showMonthDropdown
+            showYearDropdown
+            dropdownMode="select"
             minDate={minDate}
             maxDate={maxDate}
             customInput={<CustomInput />}
