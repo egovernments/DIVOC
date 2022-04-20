@@ -48,19 +48,16 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: divoc/keycloak:17.0.1
+    image: divoc/keycloak
     environment:
-      - KC_DB=postgres
-      - KC_DB_URL_DATABASE=registry
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=postgres
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_DB_URL=jdbc:postgresql://db:5432/registry
-      - KC_HTTP_ENABLED:true
-      - KC_HOSTNAME_STRICT:false
-      - KC_HOSTNAME_STRICT_HTTPS:false
-      - KC_HTTP_RELATIVE_PATH=/auth
+      - DB_VENDOR=postgres
+      - DB_ADDR=db
+      - DB_PORT=5432
+      - DB_DATABASE=registry
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
