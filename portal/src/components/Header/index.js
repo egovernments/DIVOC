@@ -19,8 +19,7 @@ export const Header = (props) => {
     const logo = useSelector(state => state.flagr.appConfig.applicationLogo);
     const facility = useSelector(state => state.facility);
     const isFacilityUser = () => {
-        return keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT) ||
-            keycloak.hasResourceRole(CONSTANTS.FACILITY_PRINT_STAFF, CONSTANTS.PORTAL_CLIENT)
+        return keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)
     };
     const userMobileNumber = keycloak.idTokenParsed?.preferred_username;
     const userName = keycloak.idTokenParsed?.full_name;
