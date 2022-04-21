@@ -65,7 +65,7 @@ export const Header = (props) => {
                                         <p style={{fontWeight:"light"}}>{getRoleAsString()}</p>
                                     </span>
                                 </Dropdown.Toggle>
-                                <Dropdown.Menu>
+                                <Dropdown.Menu className="dropdown-menu-end">
                                 { isFacilityUser() && facility &&
                                     <div>
                                         <Dropdown.Item onClick={() => history.push(config.urlPath+"/facility_info")}>
