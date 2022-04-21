@@ -40,6 +40,8 @@ export const Header = (props) => {
             return "Admin"
         if (keycloak.hasResourceRole(CONSTANTS.ROLE_CONTROLLER, CONSTANTS.PORTAL_CLIENT))
             return "Controller"
+        if (keycloak.hasResourceRole(CONSTANTS.FACILITY_PRINT_STAFF, CONSTANTS.PORTAL_CLIENT))
+            return "Facility Print Staff"
         return ""
     }
 
