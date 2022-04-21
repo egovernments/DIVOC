@@ -48,7 +48,7 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: divoc/keycloak:16.0.1
+    image: divoc/keycloak
     environment:
       - DB_VENDOR=postgres
       - DB_ADDR=db
