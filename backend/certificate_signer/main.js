@@ -122,6 +122,12 @@ configuration_service.init();
         }
         const key = enablePid ? `${preEnrollmentCode}-${programId}-${currentDose}` : `${preEnrollmentCode}-${currentDose}`;
         await signer.signCertificate(jsonMessage, message.headers, key);
+        await producer.send({
+          topic: PROC_TOPIC,
+          messages: [
+            {key: null, value: JSON.stringify({preEnrollmentCode: preEnrollmentCode, date: new Date(), ProcType: 'sign_certificate', Status: 'success'})}
+          ]
+        });
       } catch (e) {
         // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         // const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
