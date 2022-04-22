@@ -1,4 +1,4 @@
-FROM jboss/keycloak:11.0.3
+FROM jboss/keycloak:16.1.1
 
 ADD themes /opt/jboss/keycloak/themes
 ADD providers /opt/jboss/keycloak/providers

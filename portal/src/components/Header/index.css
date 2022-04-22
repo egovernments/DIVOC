@@ -25,3 +25,8 @@ button#dropdown-split-basic {
 #dropdown-split-basic p {
     margin-bottom: 0;
 }
+
+.dropdown-menu-end {
+    left: auto;
+    right: 0;
+}
