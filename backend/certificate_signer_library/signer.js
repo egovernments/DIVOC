@@ -126,8 +126,44 @@ async function signJSON(certificate) {
   return signed;
 }
 
+async function verifyJSON(signedJSON) {
+  const {AssertionProofPurpose} = jsigs.purposes;
+  let result;
+  if(signingKeyType === "RSA") {
+    const key = new RSAKeyPair({...publicKey});
+    const {RsaSignature2018} = jsigs.suites;
+    result = await jsigs.verify(signedJSON, {
+      suite: new RsaSignature2018({key}),
+      purpose: new AssertionProofPurpose({controller}),
+      documentLoader: customLoader,
+      compactProof: false
+    });
+  } else if (signingKeyType === "ED25519") {
+    const purpose = new AssertionProofPurpose({
+      controller: controller
+    });
+    const {Ed25519Signature2018} = jsigs.suites;
+    const key = new Ed25519KeyPair(
+      {
+        publicKeyBase58: publicKeyBase58,
+        id: certificateDID
+      }
+    );
+    result = await vc.verifyCredential({
+      credential: signedJSON,
+      suite: new Ed25519Signature2018({key}),
+      purpose: purpose,
+      documentLoader: customLoader,
+      compactProof: false
+    });
+  }
+
+  return result
+}
+
 module.exports = {
   signJSON,
+  verifyJSON,
   customLoader,
   setDocumentLoader,
   KeyType

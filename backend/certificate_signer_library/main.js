@@ -177,9 +177,14 @@ async function signJSON(certificate) {
   return signer.signJSON(certificate)
 }
 
+async function verifyJSON(signedJSON) {
+  return signer.verifyJSON(signedJSON)
+}
+
 
 module.exports = {
   signCertificate,
   init_signer,
-  signJSON
+  signJSON,
+  verifyJSON
 };
