@@ -1,7 +1,4 @@
-const {signJSON, customLoader, setDocumentLoader, KeyType} = require('../signer');
-const jsigs = require('jsonld-signatures');
-const {RSAKeyPair} = require('crypto-ld');
-const {RsaSignature2018} = jsigs.suites;
+const {signJSON, verifyJSON, setDocumentLoader, KeyType} = require('../signer');
 const R = require('ramda');
 const {vaccinationContext} = require("vaccination-context");
 const certificateId = "123";
@@ -118,22 +115,7 @@ function transformW3(cert, certificateId) {
 const publicKeyPem = '-----BEGIN PUBLIC KEY-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnXQalrgztecTpc+INjRQ8s73FSE1kU5QSlwBdICCVJBUKiuQUt7s+Z5epgCvLVAOCbP1mm5lV7bfgV/iYWDio7lzX4MlJwDedWLiufr3Ajq+79CQiqPaIbZTo0i13zijKtX7wgxQ78wT/HkJRLkFpmGeK3za21tEfttytkhmJYlwaDTEc+Kx3RJqVhVh/dfwJGeuV4Xc/e2NH++ht0ENGuTk44KpQ+pwQVqtW7lmbDZQJoOJ7HYmmoKGJ0qt2hrj15uwcD1WEYfY5N7N0ArTzPgctExtZFDmituLGzuAZfv2AZZ9/7Y+igshzfB0reIFdUKw3cdVTzfv5FNrIqN5pwIDAQAB\n-----END PUBLIC KEY-----\n';
 const privateKeyPem = '-----BEGIN RSA PRIVATE KEY-----\nMIIEowIBAAKCAQEAnXQalrgztecTpc+INjRQ8s73FSE1kU5QSlwBdICCVJBUKiuQUt7s+Z5epgCvLVAOCbP1mm5lV7bfgV/iYWDio7lzX4MlJwDedWLiufr3Ajq+79CQiqPaIbZTo0i13zijKtX7wgxQ78wT/HkJRLkFpmGeK3za21tEfttytkhmJYlwaDTEc+Kx3RJqVhVh/dfwJGeuV4Xc/e2NH++ht0ENGuTk44KpQ+pwQVqtW7lmbDZQJoOJ7HYmmoKGJ0qt2hrj15uwcD1WEYfY5N7N0ArTzPgctExtZFDmituLGzuAZfv2AZZ9/7Y+igshzfB0reIFdUKw3cdVTzfv5FNrIqN5pwIDAQABAoIBAHPILMUoLt5UTd5f/YnebqgeCRNAmGOBcwk7HtbMqQoGF93qqvZFd30XOAJZ/ncTpz77Vl95ToxxrWk1WQLCe+ZpOK3Dgk5sFSm8zXx1T64UBNPUSnWoh37C1D39+b9rppCZScgnxlyPdSLy3h3q8Hyoy+auqUEkm/ms5W2lT3fJscyN1IAyHrhsOBWjl3Ilq5GxBo5tbYv/Fb1pQiP/p2SIHA1+2ASXNYQP100F5Vn0V6SFtBXTCQnwcvbP083NvlGxs9+xRs3MCUcxCkKepWuzYwOZDmu/2yCz1/EsP6wlsYEHmCZLdIb0tQt0caqzB/RoxfBpNRIlhOtqHvBzUgECgYEAzIRn5Y7lqO3N+V29wXXtVZjYWvBh7xUfOxAwVYv0rKI0y9kHJHhIrU+wOVOKGISxBKmzqBQRPvXtXW8E0/14Zz82g60rRwtNjvW0UoZAY3KPouwruUIjAe2UnKZcQ//MBTrvds8QGpL6nxvPsBqU0y2K+ySAOxBtNtGEjzv8nxUCgYEAxRbMWukIbgVOuQjangkfJEfA1UaRFQqQ8jUmT9aiq2nREnd4mYP8kNKzJa9L7zj6Un6yLH5DbGspZ2gGODeRw3uVFN8XSzRdLvllNEyiG/waiysUtXfG2DPOR6xD8tXXDMm/tl9gTa8cbkvqYy10XT9MpfOAsusEZVmc0/DBBMsCgYAYdAxoKjnThPuHwWma5BrIjUnxNaTADWp6iWj+EYnjylE9vmlYNvmZn1mWwSJV5Ce2QwQ0KJIXURhcf5W4MypeTfSase3mxLc1TLOO2naAbYY3GL3xnLLK3DlUsZ9+kes3BOD097UZOFG3DIA8sjDxPxTLCoY6ibBFSa/r4GRIMQKBgQCranDCgPu79RHLDVBXM0fKnj2xQXbd/hqjDmcL+Xnx7E7S6OYTXyBENX1qwVQh9ESDi34cBJVPrsSME4WVT3+PreS0CnSQDDMfr/m9ywkTnejYMdgJHOvtDuHSpJlUk3g+vxnm3H0+E5d+trhdGiOjFnLrwyWkd5OTMqWcEEFQkQKBgFfXObDz/7KqeSaAxI8RzXWbI3Fa492b4qQUhbKYVpGn98CCVEFJr11vuB/8AXYCa92OtbwgMw6Ah5JOGzRScJKdipoxo7oc2LJ9sSjjw3RB/aWl35ChvnCJhmfSL8Usbj0nWVTrPwRLjMC2bIxkLtnm9qYXPumW1EjEbusjVMpN\n-----END RSA PRIVATE KEY-----\n';
 
-const publicKey = {
-  '@context': jsigs.SECURITY_CONTEXT_URL,
-  id: 'did:india',
-  type: 'RsaVerificationKey2018',
-  controller: 'https://cowin.gov.in/',
-  publicKeyPem
-};
 
-const controller = {
-  '@context': jsigs.SECURITY_CONTEXT_URL,
-  id: 'https://cowin.gov.in/',
-  publicKey: [publicKey],
-  // this authorizes this key to be used for making assertions
-  assertionMethod: [publicKey.id]
-};
-const key = new RSAKeyPair({...publicKey});
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
 let signingKeyType = KeyType.RSA;
 let signingConfig = {
@@ -209,17 +191,10 @@ test('Sign the json', async () => {
   expect(sign).not.toBe(null);
 });
 
-test('Verify the signed json', async () => {
+test('Verify the signed json with RsaSignature2018 type', async () => {
   // const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://cowin.gov.in/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:2342343334\",\"refId\":\"12346\",\"name\":\"Bhaya Mitra\",\"gender\":\"Male\",\"age\":\"27\",\"nationality\":\"Indian\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"\",\"city\":\"\",\"addressRegion\":\"\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}},\"issuer\":\"https://cowin.gov.in/\",\"issuanceDate\":\"2021-01-15T17:21:13.117Z\",\"evidence\":[{\"id\":\"https://cowin.gov.in/vaccine/undefined\",\"feedbackUrl\":\"https://cowin.gov.in/?undefined\",\"infoUrl\":\"https://cowin.gov.in/?undefined\",\"type\":[\"Vaccination\"],\"batch\":\"MB3428BX\",\"vaccine\":\"CoVax\",\"manufacturer\":\"COVPharma\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"dose\":\"\",\"totalDoses\":\"\",\"verifier\":{\"name\":\"Sooraj Singh\"},\"facility\":{\"name\":\"ABC Medical Center\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"Bengaluru\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-01-15T17:21:13Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..mJlHZZRD7VQwVJchfI21ZavjxNKglbf3LSaF1SAjELOWn9MARALkugsmOzG0mBon9R7zXSVPkPM8EDbUZxR4FsRlAFFszFv-0BjyAeIqRv-9MRnlm4cScQi8aCBgBnvsWfNIE175cGNbPUluVv5n6G66tVinioL5IL6uCZNQnSGp4jJrEAZa0t5s3jXfq7soHz1LTfQbLs7cH5-fDi3JW1-WeF4_ELy_9l_OxAc2CoACqYLOLJB-NnPsnz2bwAvH8yXHsjZJphzaBNqpn8DmJvcRHzhz7OjpGfhyouiOyGo_XncadFmftqwfilJkC1EISkSb6QVsyhHLOudY4PTTaA\"}}";
   const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://divoc.dev/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:2342343334\",\"refId\":\"12346\",\"name\":\"Bhaya Mitra\",\"gender\":\"Male\",\"age\":\"26\",\"nationality\":\"Indian\",\"address\":{\"streetAddress\":\"\",\"streetAddress2\":\"\",\"district\":\"\",\"city\":\"\",\"addressRegion\":\"\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}},\"issuer\":\"https://divoc.dev/\",\"issuanceDate\":\"2021-08-28T11:35:43.776Z\",\"evidence\":[{\"id\":\"https://divoc.dev/vaccine/undefined\",\"feedbackUrl\":\"https://divoc.dev/?undefined\",\"infoUrl\":\"https://divoc.dev/?undefined\",\"type\":[\"Vaccination\"],\"batch\":\"MB3428BX\",\"vaccine\":\"CoVax\",\"manufacturer\":\"COVPharma\",\"date\":\"2020-12-02T19:21:18.646Z\",\"effectiveStart\":\"2020-12-02\",\"effectiveUntil\":\"2025-12-02\",\"dose\":\"\",\"totalDoses\":\"\",\"verifier\":{\"name\":\"Sooraj Singh\"},\"facility\":{\"name\":\"ABC Medical Center\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"Bengaluru\",\"addressRegion\":\"Karnataka\",\"addressCountry\":\"IN\",\"postalCode\":\"\"}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-08-28T11:35:43Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..mtPTvxJmW4XKwuxdvSTmwKAzzNZwCzwODEDpZ6zUNDbGeKSM9gfcdcO_jCtXc9PQ-8ilP717PngA9YmPPeqop8qmqv5wcYnCVrhYSrw-cTYH8N2Hqrh8oPIeD_XLhu8rKAficMBTvGvanwnuDgJgo4w4akxkKEcCHO_H3CWOIbv8Elv6GXQidklmrs_F3uZnwEs4ZkhCylqA4IUXo_kkSN_q5tQgaCIEINmqMGYqxd08mXEq2Ze97TwQ24i3e0uabjoQMFiJ1giXFNPY5V_vCW_DPmKMVWtgvnLEt7TJ9RkHJdmQQz7R0nWQz_FMWWP4vSGcs-xR17CRLu46cAktqg\"}}";
-
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(JSON.parse(signed));
   // console.log(result);
   expect(result.verified).toBe(true)
 });
@@ -336,13 +311,8 @@ test('Sign json with invalid uri identity and verify for did identity', async ()
 test('Verify: Modify signed json credSubj.id did value, and ensure verification fails', async () => {
   const signed = "{\"@context\":[\"https://www.w3.org/2018/credentials/v1\",\"https://divoc.dev/credentials/vaccination/v1\"],\"type\":[\"VerifiableCredential\",\"ProofOfVaccinationCredential\"],\"credentialSubject\":{\"type\":\"Person\",\"id\":\"did:in.gov.uidai.aadhaar:1111222233\",\"refId\":\"36\",\"name\":\"Sam21\",\"gender\":\"Male\",\"age\":\"31\",\"nationality\":\"India\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"\",\"addressRegion\":\"bihar\",\"addressCountry\":\"IN\",\"postalCode\":\"560033\"}},\"issuer\":\"https://divoc.dev/\",\"issuanceDate\":\"2021-07-29T11:23:51.377Z\",\"evidence\":[{\"id\":\"https://divoc.dev/vaccine/244768056\",\"feedbackUrl\":\"https://divoc.dev/?244768056\",\"infoUrl\":\"https://divoc.dev/?244768056\",\"certificateId\":\"244768056\",\"type\":[\"Vaccination\"],\"batch\":\"AB348FS\",\"vaccine\":\"covaxin\",\"manufacturer\":\"Bharat Biotech\",\"date\":\"2021-07-12T19:21:19.646Z\",\"effectiveStart\":\"2021-07-12\",\"effectiveUntil\":\"2021-08-12\",\"dose\":2,\"totalDoses\":2,\"verifier\":{\"name\":\"Sooraj Singh\"},\"facility\":{\"name\":\"ABCD Medical Center\",\"address\":{\"streetAddress\":\"123, Koramangala\",\"streetAddress2\":\"\",\"district\":\"Bengaluru South\",\"city\":\"\",\"addressRegion\":\"bihar\",\"addressCountry\":\"IN\",\"postalCode\":\"560033\"}}}],\"nonTransferable\":\"true\",\"proof\":{\"type\":\"RsaSignature2018\",\"created\":\"2021-07-29T11:23:51Z\",\"verificationMethod\":\"did:india\",\"proofPurpose\":\"assertionMethod\",\"jws\":\"eyJhbGciOiJQUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il19..PQ51yXe27fF3MJ3jP5VBBMAAHBd88LFZH7S73kzfW7BJz4WunN320Qvlt-wt7zX-ykx7BpKsPgoaHDTWM4S_j_-2W8TXY1p7veUOikh5TbqomJzz5_n3a-VVMXRA-cwDSDQLJt1cvAa-52P6-Pwiw_kL-PEZCgzPhkzeRndNkLwSNfVdt_ck3a_GArouAe0rjT18Z6-PsRriruDHaTWHR_TYIwEPAfUUWLIRGJlO4ZkvakfPu9UO_IskQlmm3NVr1mG6pT-FRoIDiDi0MQDFSaKbuIQ8hq4tN_gLLo2a-4CmW1s4WXNpbhIMk3Hw1XEHCo24xAewZOK-w3lnRdVaxw\"}}";
 
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(JSON.parse(signed));
+
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -355,13 +325,8 @@ test('Verify: Modify signed json credSubj.id https value, and ensure verificatio
   let signed = await signJSON(transformW3(certModified, certificateId));
   signed.credentialSubject.id = modifiedCredSubId;
 
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
+
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -372,13 +337,8 @@ test('Verify: For empty recipient.identity payload, Modify the signed json credS
   let signed = await signJSON(transformW3(certModified, certificateId));
   signed.credentialSubject.name = "mitra bhaiya";
 
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
+
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -387,13 +347,8 @@ test('Verify: Modify signed json credSubj.name value, and ensure verification fa
   let signed = await signJSON(transformW3(cert2, certificateId));
   signed.credentialSubject.name = "mitra bhaiya";
 
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
+
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -401,13 +356,7 @@ test('Verify: Modify signed json credSubj.name value, and ensure verification fa
 test('Verify: Modify signed json evidence.dose value, and ensure verification fails', async () => {
   let signed = await signJSON(transformW3(cert2, certificateId));
   signed.evidence[0].dose = 2;
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -415,13 +364,7 @@ test('Verify: Modify signed json evidence.dose value, and ensure verification fa
 test('Verify: Modify signed json evidence.vaccine value, and ensure verification fails', async () => {
   let signed = await signJSON(transformW3(cert2, certificateId));
   signed.evidence[0].vaccine = 'Moderna';
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
   // console.log(result);
   expect(result.verified).toBe(false)
 });
@@ -429,13 +372,7 @@ test('Verify: Modify signed json evidence.vaccine value, and ensure verification
 test('Verify: Modify signed json credSubj.effectiveStart value, and ensure verification fails', async () => {
   let signed = await signJSON(transformW3(cert2, certificateId));
   signed.evidence[0].effectiveStart = "2020-12-03";
-  const {AssertionProofPurpose} = jsigs.purposes;
-  const result = await jsigs.verify(signed, {
-    suite: new RsaSignature2018({key}),
-    purpose: new AssertionProofPurpose({controller}),
-    compactProof: false,
-    documentLoader: customLoader
-  });
+  const result = await verifyJSON(signed);
   // console.log(result);
   expect(result.verified).toBe(false)
 });
