@@ -20,42 +20,30 @@ import {useHistory} from "react-router-dom";
 import axios from "axios";
 import {Loader} from "../Loader";
 import {useTranslation} from "react-i18next";
-import * as vc from "vc-js";
 
-const jsigs = require('jsonld-signatures');
-const {RSAKeyPair, Ed25519KeyPair} = require('crypto-ld');
-const {documentLoaders} = require('jsonld');
-const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('../../utils/credentials.json');
 const {vaccinationContext, vaccinationContextV2} = require('vaccination-context');
 
-const customLoader = url => {
-    const c = {
-        [CERTIFICATE_DID]: config.certificatePublicKey,
-        [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
-        "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
-        'https://www.w3.org/2018/credentials#': credentialsv1,
-        "https://www.w3.org/2018/credentials/v1": credentialsv1,
-        [CERTIFICATE_NAMESPACE]: vaccinationContext,
-        [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
-    };
-    let context = c[url];
-    if (context === undefined) {
-        context = contexts[url];
-    }
-    if (context !== undefined) {
-        return {
-            contextUrl: null,
-            documentUrl: url,
-            document: context
-        };
-    }
-    if (url.startsWith("{")) {
-        return JSON.parse(url);
-    }
-    return documentLoader()(url);
+const {verifyJSON, init_signer} = require('certificate-signer-library');
+
+let signingConfig = {
+    publicKeyPem: config.certificatePublicKey,
+    publicKeyBase58: config.certificatePublicKeyBase58,
+    CERTIFICATE_DID: CERTIFICATE_DID,
+    CERTIFICATE_PUBKEY_ID: CERTIFICATE_PUBKEY_ID,
+    CERTIFICATE_CONTROLLER_ID: CERTIFICATE_CONTROLLER_ID,
+    keyType: CERTIFICATE_SIGNED_KEY_TYPE
 };
+let documentLoaderMapping = {
+    [CERTIFICATE_DID]: config.certificatePublicKey,
+    [CERTIFICATE_PUBKEY_ID]: config.certificatePublicKey,
+    "https://w3id.org/security/v1": contexts.get("https://w3id.org/security/v1"),
+    'https://www.w3.org/2018/credentials#': credentialsv1,
+    "https://www.w3.org/2018/credentials/v1": credentialsv1,
+    [CERTIFICATE_NAMESPACE]: vaccinationContext,
+    [CERTIFICATE_NAMESPACE_V2]: vaccinationContextV2,
+}
 
 export const CertificateStatus = ({certificateData, goBack}) => {
     const [isLoading, setLoading] = useState(true);
@@ -80,68 +68,11 @@ export const CertificateStatus = ({certificateData, goBack}) => {
     const dispatch = useDispatch();
     useEffect(() => {
         setLoading(true);
+        init_signer(signingConfig, {}, documentLoaderMapping);
         async function verifyData() {
             try {
                 const signedJSON = JSON.parse(certificateData);
-                const {AssertionProofPurpose} = jsigs.purposes;
-                let result;
-                if(CERTIFICATE_SIGNED_KEY_TYPE === "RSA") {
-                    const publicKey = {
-                        '@context': jsigs.SECURITY_CONTEXT_URL,
-                        id: 'did:india',
-                        type: 'RsaVerificationKey2018',
-                        controller: CERTIFICATE_CONTROLLER_ID,
-                        publicKeyPem: config.certificatePublicKey
-                    };
-                    const controller = {
-                        '@context': jsigs.SECURITY_CONTEXT_URL,
-                        id: CERTIFICATE_CONTROLLER_ID,
-                        publicKey: [publicKey],
-                        // this authorizes this key to be used for making assertions
-                        assertionMethod: [publicKey.id]
-                    };
-                    const key = new RSAKeyPair({...publicKey});
-                    const {RsaSignature2018} = jsigs.suites;
-                    result = await jsigs.verify(signedJSON, {
-                        suite: new RsaSignature2018({key}),
-                        purpose: new AssertionProofPurpose({controller}),
-                        documentLoader: customLoader,
-                        compactProof: false
-                    });
-                } else if (CERTIFICATE_SIGNED_KEY_TYPE === "ED25519") {
-                    const publicKey = {
-                        '@context': jsigs.SECURITY_CONTEXT_URL,
-                        id: CERTIFICATE_DID,
-                        type: 'Ed25519VerificationKey2018',
-                        controller: CERTIFICATE_CONTROLLER_ID,
-                    };
-
-                    const controller = {
-                        '@context': jsigs.SECURITY_CONTEXT_URL,
-                        id: CERTIFICATE_CONTROLLER_ID,
-                        publicKey: [publicKey],
-                        // this authorizes this key to be used for making assertions
-                        assertionMethod: [publicKey.id]
-                    };
-
-                    const purpose = new AssertionProofPurpose({
-                        controller: controller
-                    });
-                    const {Ed25519Signature2018} = jsigs.suites;
-                    const key = new Ed25519KeyPair(
-                        {
-                            publicKeyBase58: certificatePublicKeyBase58,
-                            id: CERTIFICATE_DID
-                        }
-                    );
-                    result = await vc.verifyCredential({
-                        credential: signedJSON,
-                        suite: new Ed25519Signature2018({key}),
-                        purpose: purpose,
-                        documentLoader: customLoader,
-                        compactProof: false
-                    });
-                }
+                const result = await verifyJSON(signedJSON);
                 if (result.verified) {
                     const revokedResponse = await checkIfRevokedCertificate(signedJSON);
                     if (revokedResponse.status === 404) {
