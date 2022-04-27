@@ -40,3 +40,4 @@ flagr:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
+env_type: PROD

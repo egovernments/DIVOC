@@ -63,20 +63,21 @@ var Config = struct {
 		}
 	}
 	Kafka struct {
-		BootstrapServers string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
-		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
-		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
-		EnrollmentTopic  string `default:"enrollment" yaml:"enrollmenttopic"`
-		EnrollmentACKTopic	string	`default:"enrollment_ack" yaml:"enrollmentacktopic"`
+		BootstrapServers   string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapServers"`
+		NotifyTopic        string `default:"notify" yaml:"notifyTopic"`
+		CertifiedTopic     string `default:"certified" yaml:"certifiedTopic"`
+		EnrollmentTopic    string `default:"enrollment" yaml:"enrollmenttopic"`
+		EnrollmentACKTopic string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
 	}
 	SearchRegistry struct {
 		DefaultLimit  int `default:"100"`
 		DefaultOffset int `default:"0"`
 	}
-	EnrollmentCreation struct{
+	EnrollmentCreation struct {
 		MaxRetryCount                  int `default:"10" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
+	Env_Type string `env:"ENV_TYPE" yaml:"env_type" default:"PROD"`
 }{}
 
 func Initialize() {

@@ -12,6 +12,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+const Prod = "PROD"
+
+const Dev = "DEV"
+
 func IsEqual(arr1 []string, arr2 []string) bool {
 	// If one is nil, the other must also be nil.
 	if (arr1 == nil) != (arr2 == nil) {
@@ -86,9 +90,9 @@ func GenerateEnrollmentCode(phoneNumber string) string {
 		config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode, config.Config.EnrollmentCreation.MaxRetryCount)
 	digits := 0
 
-	n:= config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode
-	for ;n>=1;n-- {
-		digits  = digits * 10 + 9
+	n := config.Config.EnrollmentCreation.LengthOfSuffixedEnrollmentCode
+	for ; n >= 1; n-- {
+		digits = digits*10 + 9
 	}
 	return strconv.Itoa(rand.Intn(digits))
 }

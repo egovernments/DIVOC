@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"text/template"
+
 	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/notification-service/config"
 	eventModels "github.com/divoc/notification-service/pkg/models"
@@ -11,7 +13,6 @@ import (
 	"github.com/divoc/notification-service/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"text/template"
 )
 
 const RecipientCertified = "recipientCertified"
@@ -38,7 +39,10 @@ func certifiedEmailNotificationConsumer() {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+					fmt.Printf("Topic: %s ", msg.TopicPartition)
+					if config.Config.Env_Type == services.Dev {
+						fmt.Printf("Message:  %s", string(msg.Value))
+					}
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -103,13 +107,16 @@ func certifiedSMSNotificationConsumer() {
 		log.Error(err)
 	} else {
 		topicName := config.Config.Kafka.CertifiedTopic
-		if err := c.SubscribeTopics([]string{topicName}, nil); err!=nil {
+		if err := c.SubscribeTopics([]string{topicName}, nil); err != nil {
 			log.Errorf("Error in subscribing to %s : %+v", topicName, err)
 		} else {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+					fmt.Printf("Topic: %s ", msg.TopicPartition)
+					if config.Config.Env_Type == services.Dev {
+						fmt.Printf("Message:  %s", string(msg.Value))
+					}
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -131,7 +138,11 @@ func certifiedSMSNotificationConsumer() {
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
 										if err == nil {
 											if resp, err := services.SendSMS(mobileNumber, buf.String()); err == nil {
-												log.Debugf("SMS sent response %+v", resp)
+												if config.Config.Env_Type == services.Dev {
+													log.Debugf("SMS sent response %+v", resp)
+												} else {
+													log.Debugf("SMS sent response")
+												}
 											} else {
 												log.Errorf("Error in sending SMS %+v", err)
 											}
@@ -177,7 +188,10 @@ func notifyConsumer() {
 		for {
 			msg, err := c.ReadMessage(-1)
 			if err == nil {
-				fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+				fmt.Printf("Topic: %s ", msg.TopicPartition)
+				if config.Config.Env_Type == services.Dev {
+					fmt.Printf("Message:  %s", string(msg.Value))
+				}
 				var request models.NotificationRequest
 				if err := json.Unmarshal([]byte(string(msg.Value)), &request); err != nil {
 					log.Errorf("Received message is not in required format %+v", err)
@@ -187,7 +201,11 @@ func notifyConsumer() {
 					mobileNumber, err := services.GetMobileNumber(*request.Recipient)
 					if err == nil {
 						if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
-							log.Debugf("SMS sent response %+v", resp)
+							if config.Config.Env_Type == services.Dev {
+								log.Debugf("SMS sent response %+v", resp)
+							} else {
+								log.Debugf("SMS sent response")
+							}
 
 						} else {
 							log.Errorf("Error in sending SMS %+v", err)

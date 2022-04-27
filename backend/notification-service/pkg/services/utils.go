@@ -13,6 +13,10 @@ const Email = "email"
 
 const SMS = "sms"
 
+const Prod = "PROD"
+
+const Dev = "DEV"
+
 func GetMobileNumber(raw string) (string, error) {
 	if strings.Contains(raw, MobileNumberPrefix) {
 		return strings.Split(raw, MobileNumberPrefix)[1], nil

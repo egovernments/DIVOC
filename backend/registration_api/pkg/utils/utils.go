@@ -15,6 +15,10 @@ import (
 	"github.com/aws/aws-sdk-go/service/sns"
 )
 
+const Prod = "PROD"
+
+const Dev = "DEV"
+
 func GenerateEnrollmentCode(phoneNumber string, code int) string {
 	generatedCode := phoneNumber + "-" + strconv.Itoa(code)
 	log.Info("Generated Code: " + generatedCode)

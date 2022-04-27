@@ -5,10 +5,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
-	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
-	"github.com/go-openapi/runtime/middleware"
 	"strings"
 	"text/template"
+
+	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
+	"github.com/go-openapi/runtime/middleware"
+
+	"errors"
 
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
@@ -16,7 +19,6 @@ import (
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	openApiError "github.com/go-openapi/errors"
-	"errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,7 +28,7 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 }
 
 const EnrollmentEntity = "Enrollment"
-const DUPLICATE_MSG = "duplicate key value violates unique constraint";
+const DUPLICATE_MSG = "duplicate key value violates unique constraint"
 
 func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64, enrollmentOsid string) {
 	enrollmentResponse, err := kernelService.ReadRegistry(EnrollmentEntity, enrollmentOsid)
@@ -253,7 +255,12 @@ func NotifyRecipient(enrollment *models.Enrollment) error {
 
 	recipient := "sms:" + enrollment.Phone
 	message := "Your enrollment code for vaccination is " + enrollment.Code
-	log.Infof("Sending SMS %s %s", recipient, message)
+	if config.Config.Env_Type == utils.Dev {
+		log.Infof("Sending SMS %s %s", recipient, message)
+	} else {
+		log.Infof("Sending NotifyRecipient SMS")
+	}
+
 	buf := bytes.Buffer{}
 	err := enrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {
@@ -278,7 +285,11 @@ func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotifica
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	if config.Config.Env_Type == utils.Dev {
+		log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	} else {
+		log.Infof("Sending NotifyAppointmentBooked SMS")
+	}
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
@@ -303,7 +314,11 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	if config.Config.Env_Type == utils.Dev {
+		log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+	} else {
+		log.Infof("Sending NotifyAppointmentCancelled SMS")
+	}
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
@@ -392,9 +407,9 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 
 func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
-		"phone": enrollment.Phone,
+		"phone":        enrollment.Phone,
 		"updatedCount": 0, //to restrict multiple updates
-		"osid":  osid,
+		"osid":         osid,
 	}
 	_, err := SetHMSet(enrollment.Code, data)
 	if err != nil {
@@ -527,7 +542,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 		return operations.NewRegisterRecipientToProgramUnauthorized()
 	}
 	updatedAppointments := removeAppointmentWithProgramId(enrollment.Appointments, params.ProgramID)
-	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1{
+	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1 {
 		if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
 			"osid":         enrollment.Osid,
 			"appointments": updatedAppointments,
@@ -540,7 +555,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 }
 
 func removeAppointmentWithProgramId(appointments []*models.EnrollmentAppointmentsItems0, programId string) []*models.EnrollmentAppointmentsItems0 {
-	appointmentList:=  make([]*models.EnrollmentAppointmentsItems0, 0, 1)
+	appointmentList := make([]*models.EnrollmentAppointmentsItems0, 0, 1)
 	for _, appointment := range appointments {
 		if !(appointment.ProgramID == programId && appointment.Dose == "1" && appointment.EnrollmentScopeID == "" && !appointment.Certified) && appointment.ProgramID != "" {
 			appointmentList = append(appointmentList, appointment)

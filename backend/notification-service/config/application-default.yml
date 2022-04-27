@@ -15,3 +15,5 @@ emailsmtp:
 
 flagr:
   url: https://divoc.xiv.in/config
+
+env_type: PROD
