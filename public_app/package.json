@@ -17,7 +17,7 @@
     "i18next": "^20.3.5",
     "i18next-browser-languagedetector": "^6.1.2",
     "i18next-http-backend": "^1.2.8",
-    "jsonld-signatures": "^6.0.0",
+    "jsonld-signatures": "^8.0.0",
     "jszip": "^3.5.0",
     "jwt-decode": "^3.1.2",
     "keycloak-js": "^11.0.3",
