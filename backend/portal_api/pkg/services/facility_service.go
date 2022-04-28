@@ -48,8 +48,8 @@ func NotifyFacilities(params operations.NotifyFacilitiesParams, claimBody *model
 }
 
 func NotifyFacilityUpdate(field string, value string, mobile string, email string) {
-	facilityUpdateTemplateString := kernelService.EtcdConfigs.NotificationTemplates[FacilityUpdate].Message
-	subject := kernelService.EtcdConfigs.NotificationTemplates[FacilityUpdate].Subject
+	facilityUpdateTemplateString := kernelService.AppConfigs.NotificationTemplates[FacilityUpdate].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[FacilityUpdate].Subject
 
 	var facilityUpdateTemplate = template.Must(template.New("").Parse(facilityUpdateTemplateString))
 

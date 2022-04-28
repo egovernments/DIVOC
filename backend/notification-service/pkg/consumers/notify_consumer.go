@@ -53,8 +53,8 @@ func certifiedEmailNotificationConsumer() {
 											"VaccineName": vaccineName,
 										}
 										buf := bytes.Buffer{}
-										facilityRegisteredTemplateString := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Message
-										subject := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Subject
+										facilityRegisteredTemplateString := kernelServices.AppConfigs.NotificationTemplates[RecipientCertified].Message
+										subject := kernelServices.AppConfigs.NotificationTemplates[RecipientCertified].Subject
 										facilityRegisteredTemplate := template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
@@ -126,7 +126,7 @@ func certifiedSMSNotificationConsumer() {
 											"VaccineName": vaccineName,
 										}
 										buf := bytes.Buffer{}
-										facilityRegisteredTemplateString := kernelServices.EtcdConfigs.NotificationTemplates[RecipientCertified].Message
+										facilityRegisteredTemplateString := kernelServices.AppConfigs.NotificationTemplates[RecipientCertified].Message
 										facilityRegisteredTemplate := template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
 										if err == nil {

@@ -14,7 +14,7 @@ type NotificationTemplatesType map[string]struct {
 	Message string
 }
 
-var EtcdConfigs = struct {
+var AppConfigs = struct {
 	// add other keys which need tracking here
 	NotificationTemplates NotificationTemplatesType
 }{}
@@ -24,7 +24,7 @@ var etcdKeysToWatch []string
 
 const NotificationTemplates = "NOTIFICATION_TEMPLATES"
 
-func InitializeEtcd() {
+func Initialize() {
 	log.Println("Etcd init")
 	if config.Config.Etcd.Url == "" {
 		log.Errorf("ETCD Url is not configured")
@@ -44,7 +44,7 @@ func InitializeEtcd() {
 		return
 	}
 
-	loadInitialEtcdConfig()
+	loadInitialConfig()
 
 	// watchers
 	for _, key := range etcdKeysToWatch {
@@ -52,9 +52,9 @@ func InitializeEtcd() {
 	}
 }
 
-func loadInitialEtcdConfig() {
+func loadInitialConfig() {
 	for _, key := range etcdKeysToWatch {
-		getUpdatedValueForEtcdKey(key)
+		getUpdatedValueForKey(key)
 	}
 }
 
@@ -63,13 +63,13 @@ func setupWatcher(key string) {
 	for watchResp := range watchRespChannel {
 		for _, ev := range watchResp.Events {
 			if ev.IsCreate() || ev.IsModify() {
-				getUpdatedValueForEtcdKey(string(ev.Kv.Key))
+				getUpdatedValueForKey(string(ev.Kv.Key))
 			}
 		}
 	}
 }
 
-func getUpdatedValueForEtcdKey(key string) {
+func getUpdatedValueForKey(key string) {
 	ctx, cancel := context.WithCancel(context.Background())
 	resp, err := etcdClient.Get(ctx, key)
 	cancel()
@@ -86,7 +86,7 @@ func getUpdatedValueForEtcdKey(key string) {
 			if err != nil {
 				log.Errorf("notification templates not in defined format, %v", err)
 			} else {
-				EtcdConfigs.NotificationTemplates = notificationTemplate
+				AppConfigs.NotificationTemplates = notificationTemplate
 			}
 		}
 	default:
