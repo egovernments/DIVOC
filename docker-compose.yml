@@ -50,14 +50,16 @@ services:
   keycloak:
     image: divoc/keycloak
     environment:
-      - DB_VENDOR=postgres
-      - DB_ADDR=db
-      - DB_PORT=5432
-      - DB_DATABASE=registry
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
+      DB_VENDOR: postgres
+      DB_ADDR: db
+      DB_PORT: 5432
+      DB_DATABASE: registry
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ENABLE_SEND_OTP: $ENABLE_SEND_OTP
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
