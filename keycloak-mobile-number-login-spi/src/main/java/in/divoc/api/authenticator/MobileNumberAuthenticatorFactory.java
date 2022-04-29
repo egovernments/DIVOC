@@ -1,5 +1,8 @@
 package in.divoc.api.authenticator;
 
+import com.fasterxml.jackson.databind.JsonSerializer;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.keycloak.Config;
 import org.keycloak.authentication.Authenticator;
 import org.keycloak.authentication.AuthenticatorFactory;
@@ -8,7 +11,9 @@ import org.keycloak.models.KeycloakSession;
 import org.keycloak.models.KeycloakSessionFactory;
 import org.keycloak.provider.ProviderConfigProperty;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static in.divoc.api.authenticator.Constants.PROVIDER_DISPLAY_TEXT;
 import static in.divoc.api.authenticator.Constants.PROVIDER_ID;
@@ -23,7 +28,16 @@ public class MobileNumberAuthenticatorFactory implements AuthenticatorFactory {
 
     @Override
     public Authenticator create(KeycloakSession session) {
-        return new MobileNumberAuthenticator();
+        Map<String, String> map = new HashMap<>();
+        map.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, System.getenv("KAFKA_BOOTSTRAP_SERVERS"));
+        map.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        map.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+
+        Thread.currentThread().setContextClassLoader(null);
+        KafkaProducer<String, String> producer = new KafkaProducer(map);
+        KafkaService kafkaService = new KafkaService(producer);
+        OtpService otpService = new OtpService(kafkaService);
+        return new MobileNumberAuthenticator(otpService);
     }
 
     @Override

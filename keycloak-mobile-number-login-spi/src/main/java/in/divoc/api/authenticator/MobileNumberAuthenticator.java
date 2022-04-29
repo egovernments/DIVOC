@@ -11,14 +11,22 @@ import org.keycloak.models.UserModel;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+
 import static in.divoc.api.authenticator.Constants.*;
 
 public class MobileNumberAuthenticator extends AbstractUsernameFormAuthenticator implements Authenticator {
+
+    private final OtpService otpService;
+
+    public MobileNumberAuthenticator(OtpService otpService) {
+        this.otpService = otpService;
+    }
+
     @Override
     public void action(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
         String type = formData.getFirst(FORM_TYPE);
-        FormExecutor executor = new FormExecutorMap().getExecutor(type);
+        FormExecutor executor = new FormExecutorMap().getExecutor(type, otpService);
         executor.execute(formData, context);
     }
 

@@ -1,6 +1,6 @@
 {
   "realm": "divoc",
-  "auth-server-url": "/auth/",
+  "auth-server-url": "http://localhost:8080/auth/",
   "ssl-required": "external",
   "resource": "facility-admin-portal",
   "public-client": true,
