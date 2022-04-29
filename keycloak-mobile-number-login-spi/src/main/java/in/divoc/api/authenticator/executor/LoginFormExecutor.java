@@ -37,12 +37,14 @@ public class LoginFormExecutor implements FormExecutor{
                 return;
             }
             String otp = otpService.createOtp(mobileNumber);
-            String recipient = "tel:"+mobileNumber;
-            String otpMessage = "Your otp is : " + otp;
-            try {
-                otpService.sendOtp(recipient, otpMessage);
-            } catch (UnsupportedEncodingException | JsonProcessingException e) {
-                e.printStackTrace();
+            if(System.getenv("ENABLE_SEND_OTP").equalsIgnoreCase("true")) {
+                String recipient = "tel:"+mobileNumber;
+                String otpMessage = "Your otp is : " + otp;
+                try {
+                    otpService.sendOtp(recipient, otpMessage);
+                } catch (UnsupportedEncodingException | JsonProcessingException e) {
+                    e.printStackTrace();
+                }
             }
             context.getAuthenticationSession().setAuthNote(OTP, otp);
             context.setUser(user);

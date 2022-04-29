@@ -59,7 +59,7 @@ services:
       KEYCLOAK_USER: admin
       KEYCLOAK_PASSWORD: admin
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      ENABLE_KAFKA: $ENABLE_KAFKA
+      ENABLE_SEND_OTP: $ENABLE_SEND_OTP
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
