@@ -31,7 +31,7 @@ func NotifyFacilities(params operations.NotifyFacilitiesParams, claimBody *model
 		if err == nil {
 			facility := searchRespone["Facility"].(map[string]interface{})
 			if facility != nil {
-				log.Infof("Notifying facility %s", facilityID)				
+				log.Infof("Notifying facility %s", facilityID)
 				contact := facility["contact"].(string)
 				email := facility["email"].(string)
 				if len(contact) > 0 {
@@ -48,8 +48,8 @@ func NotifyFacilities(params operations.NotifyFacilitiesParams, claimBody *model
 }
 
 func NotifyFacilityUpdate(field string, value string, mobile string, email string) {
-	facilityUpdateTemplateString := kernelService.FlagrConfigs.NotificationTemplates[FacilityUpdate].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[FacilityUpdate].Subject
+	facilityUpdateTemplateString := kernelService.AppConfigs.NotificationTemplates[FacilityUpdate].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[FacilityUpdate].Subject
 
 	var facilityUpdateTemplate = template.Must(template.New("").Parse(facilityUpdateTemplateString))
 

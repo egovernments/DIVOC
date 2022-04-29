@@ -12,6 +12,3 @@ emailsmtp:
   fromAddress: from@gmail.com
   password: secret
   enable: true
-
-flagr:
-  url: https://divoc.xiv.in/config

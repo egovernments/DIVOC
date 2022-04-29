@@ -13,8 +13,8 @@ const FacilityRegistered = "facilityRegistered"
 
 func sendFacilityRegisteredNotification(facility models.Facility) {
 
-	facilityRegisteredTemplateString := kernelService.FlagrConfigs.NotificationTemplates[FacilityRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[FacilityRegistered].Subject
+	facilityRegisteredTemplateString := kernelService.AppConfigs.NotificationTemplates[FacilityRegistered].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[FacilityRegistered].Subject
 
 	var facilityRegisteredTemplate = template.Must(template.New("").Parse(facilityRegisteredTemplateString))
 

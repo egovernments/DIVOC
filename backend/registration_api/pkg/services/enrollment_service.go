@@ -4,19 +4,19 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"strconv"
 	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
 	"github.com/go-openapi/runtime/middleware"
+	"strconv"
 	"strings"
 	"text/template"
 
+	"errors"
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"
 	"github.com/divoc/registration-api/pkg/utils"
 	"github.com/divoc/registration-api/swagger_gen/models"
 	openApiError "github.com/go-openapi/errors"
-	"errors"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -26,7 +26,7 @@ var DuplicateEnrollmentCriteria = map[string]func(e1, e2 models.Enrollment) bool
 }
 
 const EnrollmentEntity = "Enrollment"
-const DUPLICATE_MSG = "duplicate key value violates unique constraint";
+const DUPLICATE_MSG = "duplicate key value violates unique constraint"
 
 func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name string, dose float64, certificateId string, vaccine string, programId string, totalDoses float64, enrollmentOsid string) {
 	enrollmentResponse, err := kernelService.ReadRegistry(EnrollmentEntity, enrollmentOsid)
@@ -246,8 +246,8 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 
 func NotifyRecipient(enrollment *models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
-	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+	enrollmentTemplateString := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Subject
 
 	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 
@@ -272,8 +272,8 @@ func NotifyRecipient(enrollment *models.Enrollment) error {
 
 func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotification) error {
 	appointmentBooked := "appointmentBooked"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Subject
+	appointmentBookedTemplateString := kernelService.AppConfigs.NotificationTemplates[appointmentBooked].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[appointmentBooked].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
@@ -297,8 +297,8 @@ func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotifica
 
 func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotification) error {
 	appointmentCancelled := "appointmentCancelled"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Subject
+	appointmentBookedTemplateString := kernelService.AppConfigs.NotificationTemplates[appointmentCancelled].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[appointmentCancelled].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
@@ -322,8 +322,8 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 
 func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string) error {
 	EnrollmentRegistered := "enrollmentDeleted"
-	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+	enrollmentTemplateString := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Subject
 
 	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 	enrollment["enrollmentCode"] = enrollmentCode
@@ -392,9 +392,9 @@ func FetchEnrollments(mobile string) ([]byte, error) {
 
 func cacheEnrollmentInfo(enrollment *models.Enrollment, osid string) {
 	data := map[string]interface{}{
-		"phone": enrollment.Phone,
+		"phone":        enrollment.Phone,
 		"updatedCount": 0, //to restrict multiple updates
-		"osid":  osid,
+		"osid":         osid,
 	}
 	_, err := SetHMSet(enrollment.Code, data)
 	if err != nil {
@@ -527,7 +527,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 		return operations.NewRegisterRecipientToProgramUnauthorized()
 	}
 	updatedAppointments := removeAppointmentWithProgramId(enrollment.Appointments, params.ProgramID)
-	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1{
+	if len(updatedAppointments) < len(enrollment.Appointments) || len(updatedAppointments) == 1 {
 		if _, err = kernelService.UpdateRegistry("Enrollment", map[string]interface{}{
 			"osid":         enrollment.Osid,
 			"appointments": updatedAppointments,
@@ -540,7 +540,7 @@ func DeleteProgramInEnrollment(params operations.DeleteRecipientProgramParams, c
 }
 
 func removeAppointmentWithProgramId(appointments []*models.EnrollmentAppointmentsItems0, programId string) []*models.EnrollmentAppointmentsItems0 {
-	appointmentList:=  make([]*models.EnrollmentAppointmentsItems0, 0, 1)
+	appointmentList := make([]*models.EnrollmentAppointmentsItems0, 0, 1)
 	for _, appointment := range appointments {
 		if !(appointment.ProgramID == programId && appointment.Dose == "1" && appointment.EnrollmentScopeID == "" && !appointment.Certified) && appointment.ProgramID != "" {
 			appointmentList = append(appointmentList, appointment)
