@@ -12,4 +12,3 @@ emailsmtp:
   fromAddress: from@gmail.com
   password: secret
   enable: true
-log_level: info
