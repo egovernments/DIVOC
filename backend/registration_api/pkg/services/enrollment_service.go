@@ -4,12 +4,11 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
+	"github.com/go-openapi/runtime/middleware"
 	"strconv"
 	"strings"
 	"text/template"
-
-	"github.com/divoc/registration-api/swagger_gen/restapi/operations"
-	"github.com/go-openapi/runtime/middleware"
 
 	"errors"
 

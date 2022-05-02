@@ -14,7 +14,7 @@ import (
 
 func main() {
 	
-	services.InitializeFlagr()
+	services.Initialize()
 	config.Initialize()
 	consumers.Init()
 

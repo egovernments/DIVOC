@@ -13,7 +13,4 @@ emailsmtp:
   password: secret
   enable: true
 
-flagr:
-  url: https://divoc.xiv.in/config
-
 log_level: info
