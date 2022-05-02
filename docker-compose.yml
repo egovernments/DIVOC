@@ -149,11 +149,11 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      LOG_LEVEL: "$LOG_LEVEL"
       ETCD_URL: $ETCD_URL
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy

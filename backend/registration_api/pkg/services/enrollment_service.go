@@ -11,7 +11,6 @@ import (
 	"text/template"
 
 	"errors"
-
 	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/divoc/registration-api/config"
 	models2 "github.com/divoc/registration-api/pkg/models"

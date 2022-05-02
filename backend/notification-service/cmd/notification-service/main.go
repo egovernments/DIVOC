@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	
 	services.Initialize()
 	config.Initialize()
 	consumers.Init()
