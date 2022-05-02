@@ -12,10 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-const Prod = "PROD"
-
-const Dev = "DEV"
-
 func IsEqual(arr1 []string, arr2 []string) bool {
 	// If one is nil, the other must also be nil.
 	if (arr1 == nil) != (arr2 == nil) {

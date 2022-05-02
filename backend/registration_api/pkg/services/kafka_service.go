@@ -5,7 +5,6 @@ import (
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/models"
-	"github.com/divoc/registration-api/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -32,9 +31,7 @@ func InitializeKafka() {
 				Value:          msg,
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic ", topic)
-				if config.Config.Env_Type == utils.Dev {
-					log.Infof("Error message %+v", msg)
-				}
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -47,11 +44,8 @@ func InitializeKafka() {
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
 			}, nil); err != nil {
-
 				log.Infof("Error while publishing message to %s topic ", topic)
-				if config.Config.Env_Type == utils.Dev {
-					log.Infof("Error message %+v", msg)
-				}
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -65,9 +59,7 @@ func InitializeKafka() {
 				Value:          msg,
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic ", topic)
-				if config.Config.Env_Type == utils.Dev {
-					log.Infof("Error message %+v", msg)
-				}
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -81,9 +73,7 @@ func InitializeKafka() {
 				Value:          msg,
 			}, nil); err != nil {
 				log.Infof("Error while publishing message to %s topic ", topic)
-				if config.Config.Env_Type == utils.Dev {
-					log.Infof("Error message %+v", msg)
-				}
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()

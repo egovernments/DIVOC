@@ -39,10 +39,8 @@ func certifiedEmailNotificationConsumer() {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Topic: %s ", msg.TopicPartition)
-					if config.Config.Env_Type == services.Dev {
-						fmt.Printf("Message:  %s", string(msg.Value))
-					}
+					log.Debugf("Message:  %s", string(msg.Value))
+					log.Infof("Topic: %s ", msg.TopicPartition)
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -113,10 +111,8 @@ func certifiedSMSNotificationConsumer() {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Topic: %s ", msg.TopicPartition)
-					if config.Config.Env_Type == services.Dev {
-						fmt.Printf("Message:  %s", string(msg.Value))
-					}
+					log.Debugf("Message:  %s", string(msg.Value))
+					log.Infof("Topic: %s ", msg.TopicPartition)
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -138,11 +134,8 @@ func certifiedSMSNotificationConsumer() {
 										err := facilityRegisteredTemplate.Execute(&buf, templateObject)
 										if err == nil {
 											if resp, err := services.SendSMS(mobileNumber, buf.String()); err == nil {
-												if config.Config.Env_Type == services.Dev {
-													log.Debugf("SMS sent response %+v", resp)
-												} else {
-													log.Debugf("SMS sent response")
-												}
+												log.Debugf("SMS sent response %+v", resp)
+												log.Infof("SMS is sent")
 											} else {
 												log.Errorf("Error in sending SMS %+v", err)
 											}
@@ -188,10 +181,8 @@ func notifyConsumer() {
 		for {
 			msg, err := c.ReadMessage(-1)
 			if err == nil {
-				fmt.Printf("Topic: %s ", msg.TopicPartition)
-				if config.Config.Env_Type == services.Dev {
-					fmt.Printf("Message:  %s", string(msg.Value))
-				}
+				log.Debugf("Message:  %s", string(msg.Value))
+				log.Infof("Topic: %s ", msg.TopicPartition)
 				var request models.NotificationRequest
 				if err := json.Unmarshal([]byte(string(msg.Value)), &request); err != nil {
 					log.Errorf("Received message is not in required format %+v", err)
@@ -201,12 +192,8 @@ func notifyConsumer() {
 					mobileNumber, err := services.GetMobileNumber(*request.Recipient)
 					if err == nil {
 						if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
-							if config.Config.Env_Type == services.Dev {
-								log.Debugf("SMS sent response %+v", resp)
-							} else {
-								log.Debugf("SMS sent response")
-							}
-
+							log.Debugf("SMS sent response %+v", resp)
+							log.Infof("SMS is sent")
 						} else {
 							log.Errorf("Error in sending SMS %+v", err)
 						}

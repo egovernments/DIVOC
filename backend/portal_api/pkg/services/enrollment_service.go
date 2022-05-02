@@ -5,8 +5,6 @@ import (
 	"text/template"
 
 	kernelService "github.com/divoc/kernel_library/services"
-	"github.com/divoc/portal-api/config"
-	"github.com/divoc/portal-api/pkg/utils"
 	"github.com/divoc/portal-api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,11 +19,8 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 
 	recipient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
-	if config.Config.Env_Type == utils.Dev {
-		log.Infof("Sending SMS %s %s", recipient, message)
-	} else {
-		log.Infof("Sending NotifyRecipient SMS")
-	}
+	log.Infof("Sending SMS %s %s", recipient, message)
+	log.Debugf("Sending NotifyRecipient SMS")
 	buf := bytes.Buffer{}
 	err := preEnrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {

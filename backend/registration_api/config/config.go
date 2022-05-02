@@ -51,7 +51,7 @@ var Config = struct {
 	MinCancellationHours         int    `default:"24"`
 	MaxAppointmentUpdatesAllowed int    `default:"3"`
 	TimeZoneOffset               string `default:"+05:30"`
-	Env_Type                     string `env:"ENV_TYPE" yaml:"env_type" default:"PROD"`
+	LogLevel 					 string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}
 
 func Initialize() {

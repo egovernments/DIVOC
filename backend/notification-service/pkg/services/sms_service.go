@@ -23,11 +23,8 @@ func SendSMS(mobileNumber string, message string) (map[string]interface{}, error
 			"authkey":      config.Config.SmsAPI.AuthKey,
 			"Content-Type": "application/json",
 		}
-		if config.Config.Env_Type == "DEV" {
-			log.Info("SMS request ", smsRequest)
-		} else {
-			log.Info("SMS resqust is processing")
-		}
+		log.Debugf("SMS request ", smsRequest)
+		log.Infof("SMS resqust is processing")
 
 		response, err := req.Post(config.Config.SmsAPI.URL, header, req.BodyJSON(smsRequest))
 		if err != nil {

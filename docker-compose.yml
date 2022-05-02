@@ -149,6 +149,7 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -169,6 +170,7 @@ services:
       CACHE_TTL: 60
       AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
       AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -268,6 +270,7 @@ services:
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy

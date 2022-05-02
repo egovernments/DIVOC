@@ -77,7 +77,7 @@ var Config = struct {
 		MaxRetryCount                  int `default:"10" yaml:"maxretrycount"`
 		LengthOfSuffixedEnrollmentCode int `default:"10" yaml:"lengthofsuffixedenrollmentcode"`
 	}
-	Env_Type string `env:"ENV_TYPE" yaml:"env_type" default:"PROD"`
+	LogLevel string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}
 
 func Initialize() {

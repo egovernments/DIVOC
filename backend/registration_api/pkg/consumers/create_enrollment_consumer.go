@@ -5,7 +5,6 @@ import (
 
 	"github.com/divoc/registration-api/config"
 	"github.com/divoc/registration-api/pkg/services"
-	"github.com/divoc/registration-api/pkg/utils"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 )
@@ -44,12 +43,9 @@ func StartEnrollmentConsumer() {
 				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
-
-			if config.Config.Env_Type == utils.Dev {
-				log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
-			} else {
-				log.Infof("Message on %s", msg.TopicPartition)
-			}
+			
+			log.Infof("Topic %s", msg.TopicPartition)
+			log.Debugf("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))	
 			err = services.CreateEnrollment(&enrollment, 0)
 			services.PublishEnrollmentACK(enrollment, err)
 			if err != nil {
