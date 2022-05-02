@@ -14,6 +14,7 @@ import {comorbiditiesDb} from "../../Services/ComorbiditiesDB";
 import {CONSTANT} from "../../utils/constants";
 import {useHistory} from "react-router";
 import config from "../../config"
+import {EtcdConfigService} from "../../Services/EtcdConfigService";
 
 export const SelectComorbidity = ({}) => {
     const {goNext} = useWalkInEnrollment();
@@ -28,6 +29,7 @@ export const SelectComorbidity = ({}) => {
     const [minAge, setMinAge] = useState(0);
     const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
     const [formData, setFormData] = useState(initialWalkInEnrollmentState)
+    const configurationService = new EtcdConfigService();
 
     function setComorbidities(result) {
         setConditions(result.commorbidities || [])
@@ -43,23 +45,15 @@ export const SelectComorbidity = ({}) => {
                 if (res) {
                     setComorbidities(res.comorbidities);
                 } else {
-                    const data = {
-                        "flagKey": "programs",
-                        "entityContext": {
-                            "programId": programId
-                        }
-                    };
-                    ApiServices.fetchFlagrConfigs(data)
-                        .catch((err) => {
-                            console.log(err)
+                    configurationService.getProgramComorbidities(CONSTANT.PROGRAM_COMORBIDITIES_KEY)
+                        .then((res) => {
+                            const configs = res;
+                            setComorbidities(configs)
+                            comorbiditiesDb.saveComorbidities(programId, configs)
                         })
-                        .then((result) => {
-                            if (CONSTANT.VariantAttachment in result) {
-                                setComorbidities(result[CONSTANT.VariantAttachment]);
-                                comorbiditiesDb.saveComorbidities(programId, result[CONSTANT.VariantAttachment])
-                            } else {
-                                console.error("program comorbidities is not configure");
-                            }
+                        .catch((err) => {
+                            console.log("Error occurred while fetching comorbidity config from etcd");
+                            console.log(err)
                         })
                 }
             })

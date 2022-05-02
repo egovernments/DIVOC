@@ -18,7 +18,7 @@ import MapView from "./components/MapView/MapView"
 import config from "./config"
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
-import {getApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
+import {getApplicationConfigFromEtcd} from "./redux/reducers/etcdConfig";
 import FacilityInfo from './components/FacilityInfo/FacilityInfo';
 import {addFacilityDetails} from "./redux/reducers/facilityReducer";
 import {useAxios} from "./utils/useAxios";
@@ -28,7 +28,7 @@ export default function App() {
     const {initialized, keycloak} = useKeycloak();
     const axiosInstance = useAxios('');
     useEffect(() => {
-        getApplicationConfigFromFlagr(store.dispatch);
+        getApplicationConfigFromEtcd(store.dispatch);
     }, []);
 
     useEffect(() => {
@@ -42,7 +42,7 @@ export default function App() {
                         }
                     })
                     .catch((err) => {
-                        console.log("Error occurred while fetching application config from flagr");
+                        console.log("Error occurred while fetching facility details");
                         console.log(err)
                     })
             } catch (e) {

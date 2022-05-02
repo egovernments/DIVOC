@@ -11,6 +11,7 @@
     "@testing-library/user-event": "^12.1.10",
     "bootstrap": "^4.5.3",
     "crypto-ld": "latest",
+    "etcd3": "^1.1.0",
     "idb": "^5.0.7",
     "jsonld": "latest",
     "jsonld-signatures": "^6.0.0",

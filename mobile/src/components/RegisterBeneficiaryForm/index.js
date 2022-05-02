@@ -257,7 +257,7 @@ const IdDetails = ({verifyDetails, formData, setValue, errors}) => {
 };
 
 const BeneficiaryDetails = ({verifyDetails, formData, setValue, errors}) => {
-    const state_and_districts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
+    const state_and_districts = useSelector(state => state.etcd.appConfig.stateAndDistricts);
     const STATES = Object.values(state_and_districts['states']).map(obj => obj.name);
 
     const [districts, setDistricts] = useState([]);

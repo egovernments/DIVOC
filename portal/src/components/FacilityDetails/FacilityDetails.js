@@ -6,9 +6,9 @@ import info from "../../assets/img/info.png";
 import check from "../../assets/img/check.png";
 import {API_URL, CONSTANTS} from "../../utils/constants";
 import {useAxios} from "../../utils/useAxios";
-import {getNotificationTemplates} from "../../utils/config";
 import DetailsCard from "../DetailsCard/DetailsCard";
 import { formatDate } from "../../utils/dateutil";
+import {EtcdConfigService} from "../../Services/EtcdConfigService";
 
 function FacilityDetails({
                              facilities, setFacilities, selectedState, onStateSelected, districtList, selectedDistrict,
@@ -22,9 +22,10 @@ function FacilityDetails({
     const [selectedRow, setSelectedRow] = useState([]);
 
     const [allChecked, setAllChecked] = useState(false);
+    const configurationService = new EtcdConfigService();
     useEffect(() => {
         resetFilter({status: CONSTANTS.ACTIVE});
-        getNotificationTemplates()
+        configurationService.getNotificationTemplates(CONSTANTS.NOTIFICATION_TEMPLATES_KEY)
             .then(res => {
                 setNotificationTemplate(res?.facilityPendingTasks?.html)
             })

@@ -28,8 +28,8 @@ function FacilityController() {
     const [facilities, setFacilities] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [districts, setDistricts] = useState([]);
-    const countryName = useSelector(state => state.flagr.appConfig.countryName);
-    const state_and_districts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
+    const countryName = useSelector(state => state.etcd.appConfig.countryName);
+    const state_and_districts = useSelector(state => state.etcd.appConfig.stateAndDistricts);
     const stateList = [{
         value: CONSTANTS.ALL,
         label: CONSTANTS.ALL

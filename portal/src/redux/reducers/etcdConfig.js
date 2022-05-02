@@ -1,8 +1,11 @@
-import axios from "axios";
 import state_and_districts from '../../utils/state_and_districts.json';
+import { EtcdConfigService } from "../../Services/EtcdConfigService";
+import {CONSTANTS} from "../../utils/constants";
 import NavbarLogo from "../../assets/img/nav-logo.png";
 
-const FLAGR_ACTION_TYPES = {
+const configurationService = new EtcdConfigService();
+
+const ETCD_ACTION_TYPES = {
     "LOAD_APPLICATION_CONFIG": "LOAD_APPLICATION_CONFIG"
 };
 const initialState = {
@@ -15,9 +18,9 @@ const initialState = {
     }
 };
 
-export function flagrConfigReducer(state = initialState, action) {
+export function etcdConfigReducer(state = initialState, action) {
     switch (action.type) {
-        case FLAGR_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
+        case ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
             if (action.payload) {
                 return {
                     ...state,
@@ -33,23 +36,19 @@ export function flagrConfigReducer(state = initialState, action) {
 
 export const loadApplicationConfig = (data) => {
     return {
-        type: FLAGR_ACTION_TYPES.LOAD_APPLICATION_CONFIG,
+        type: ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG,
         payload: data
     }
 };
 
-export const getApplicationConfigFromFlagr = (dispatch) => {
-    const data = {
-        "flagKey": "country_specific_features"
-    };
+export const getApplicationConfigFromEtcd = (dispatch) => {
     try {
-        axios
-            .post("/config/api/v1/evaluation", data)
+        configurationService.getCountrySpecificFeatures(CONSTANTS.COUNTRY_SPECIFIC_FEATURES_KEY)
             .then((res) => {
-                return dispatch(loadApplicationConfig(res.data["variantAttachment"]))
+                return dispatch(loadApplicationConfig(res))
             })
             .catch((err) => {
-                console.log("Error occurred while fetching application config from flagr");
+                console.log("Error occurred while fetching application config from etcd");
                 console.log(err)
             })
     } catch (e) {
