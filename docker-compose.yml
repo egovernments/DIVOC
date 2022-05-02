@@ -153,7 +153,6 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
-      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -178,7 +177,6 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
-      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -282,7 +280,6 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
-      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
