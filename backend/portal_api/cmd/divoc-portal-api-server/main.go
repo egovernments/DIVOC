@@ -19,7 +19,7 @@ func main() {
 	config.Initialize()
 	services.InitializeKafka()
 	pkg.InitClickHouseConnection()
-	kernelServices.InitializeFlagr()
+	kernelServices.Initialize()
 	db.Init()
 
 	ll, err := log.ParseLevel(config.Config.LogLevel)

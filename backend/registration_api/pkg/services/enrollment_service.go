@@ -246,8 +246,8 @@ func EnrichFacilityDetails(enrollments []map[string]interface{}) {
 
 func NotifyRecipient(enrollment *models.Enrollment) error {
 	EnrollmentRegistered := "enrollmentRegistered"
-	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+	enrollmentTemplateString := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Subject
 
 	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 
@@ -275,8 +275,8 @@ func NotifyRecipient(enrollment *models.Enrollment) error {
 
 func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotification) error {
 	appointmentBooked := "appointmentBooked"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentBooked].Subject
+	appointmentBookedTemplateString := kernelService.AppConfigs.NotificationTemplates[appointmentBooked].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[appointmentBooked].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
@@ -303,8 +303,8 @@ func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotifica
 
 func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotification) error {
 	appointmentCancelled := "appointmentCancelled"
-	appointmentBookedTemplateString := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[appointmentCancelled].Subject
+	appointmentBookedTemplateString := kernelService.AppConfigs.NotificationTemplates[appointmentCancelled].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[appointmentCancelled].Subject
 
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
@@ -331,8 +331,8 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 
 func NotifyDeletedRecipient(enrollmentCode string, enrollment map[string]string) error {
 	EnrollmentRegistered := "enrollmentDeleted"
-	enrollmentTemplateString := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Message
-	subject := kernelService.FlagrConfigs.NotificationTemplates[EnrollmentRegistered].Subject
+	enrollmentTemplateString := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Message
+	subject := kernelService.AppConfigs.NotificationTemplates[EnrollmentRegistered].Subject
 
 	var enrollmentTemplate = template.Must(template.New("").Parse(enrollmentTemplateString))
 	enrollment["enrollmentCode"] = enrollmentCode

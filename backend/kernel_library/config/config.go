@@ -37,8 +37,11 @@ var Config = struct {
 			GroupId  string `yaml:"groupId"`
 		} `yaml:"facilityStaff"`
 	}
-	Flagr struct {
-		Url                 string `env:"FLAGR_URL"`
-		NotificationFlagKey string `default:"notification_templates"`
+	Etcd struct {
+		Url         string `env:"ETCD_URL"`
+		AuthEnabled bool   `env:"ETCD_AUTH_ENABLED" yaml:"enable"`
+		UserName    string `env:"ETCD_USERNAME"`
+		Password    string `env:"ETCD_PASSWORD"`
+		Keys        string `default:"NOTIFICATION_TEMPLATES"`
 	}
 }{}

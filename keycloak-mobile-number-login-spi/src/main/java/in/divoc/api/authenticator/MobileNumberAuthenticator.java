@@ -11,9 +11,11 @@ import org.keycloak.models.UserModel;
 
 import javax.ws.rs.core.MultivaluedMap;
 
+
 import static in.divoc.api.authenticator.Constants.*;
 
 public class MobileNumberAuthenticator extends AbstractUsernameFormAuthenticator implements Authenticator {
+
     @Override
     public void action(AuthenticationFlowContext context) {
         MultivaluedMap<String, String> formData = context.getHttpRequest().getDecodedFormParameters();
