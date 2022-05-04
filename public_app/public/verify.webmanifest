@@ -16,7 +16,7 @@
   ],
   "name": "Verify vaccination certificate (DiVoc)",
   "short_name": "DiVoc",
-  "start_url": "/verify-certificate/",
+  "start_url": "/verification_app/",
   "display": "standalone",
   "theme_color": "#005050",
   "background_color": "#afafaf"

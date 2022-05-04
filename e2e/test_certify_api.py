@@ -17,7 +17,7 @@ FIELDS_KEY_PATH = "test_data/fields_key_path.json"
 def service_check():
     try:
         vacc_api_resp = r.get(VACCINATION_API + "ping")
-        registry_resp = r.get(utils.REGISTRY_SEARCH)
+        registry_resp = r.post(utils.REGISTRY_SEARCH)
     except Exception as e:
         print("Error : %s" % (e))
         return False

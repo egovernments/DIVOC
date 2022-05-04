@@ -35,7 +35,11 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
-      - search_provider=io.opensaber.registry.service.ElasticSearchService
+      - search_providerName=dev.sunbirdrc.registry.service.ElasticSearchService
+      - registry_base_apis_enable=true
+      - signature_enabled=false
+      - taskExecutor_index_queueCapacity=100
+      - auditTaskExecutor_queueCapacity=100
     ports:
       - "8081:8081"
     depends_on:
@@ -46,14 +50,16 @@ services:
   keycloak:
     image: divoc/keycloak
     environment:
-      - DB_VENDOR=postgres
-      - DB_ADDR=db
-      - DB_PORT=5432
-      - DB_DATABASE=registry
-      - DB_USER=postgres
-      - DB_PASSWORD=postgres
-      - KEYCLOAK_USER=admin
-      - KEYCLOAK_PASSWORD=admin
+      DB_VENDOR: postgres
+      DB_ADDR: db
+      DB_PORT: 5432
+      DB_DATABASE: registry
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ENABLE_SEND_OTP: $ENABLE_SEND_OTP
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -145,6 +151,10 @@ services:
       ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
       DB_HOST: db
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -165,6 +175,10 @@ services:
       CACHE_TTL: 60
       AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
       AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -211,8 +225,12 @@ services:
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
+      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
       FACILITY_COUNTRY_CODE: "IND"
       ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
       CONFIGURATION_LAYER: "etcd"
     depends_on:
       kafka:
@@ -234,6 +252,7 @@ services:
       CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
       CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_TEST_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
+      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
     depends_on:
       kafka:
         condition: service_healthy
@@ -259,6 +278,10 @@ services:
       SMS_AUTH_KEY: xxxx
       SENDER_EMAIL: xxxx@mail.com
       SENDER_PASSWORD: xxxx
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -298,8 +321,11 @@ services:
       REDIS_URL: redis://redis:6379
       REDIS_KEY_EXPIRE: 172800
       REDIS_ENABLED: "true"
-      ETCD_URL: etcd:2379
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       CONFIGURATION_LAYER: "etcd"
+      ETCD_USERNAME: $ETCD_USERNAME
+      ETCD_PASSWORD: $ETCD_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy

@@ -129,7 +129,7 @@ function CertificateView() {
         return (
             <div id="certificate">
                 <Document
-                    file={{ url: '/certificate/api/certificatePDF?certificateId='+certificateData.certificateId, httpHeaders: { 'Authorization': config.headers.Authorization }, withCredentials: true }}
+                    file={{ url: '/certificate/api/certificatePDF/'+certificateData.preEnrollmentCode, httpHeaders: { 'Authorization': config.headers.Authorization }, withCredentials: true }}
                     onLoadSuccess={onDocumentLoadSuccess}
                 >
                     {Array.from(
@@ -159,7 +159,16 @@ function CertificateView() {
     }
 
     function downloadAsEUCertificate() {
-        axios.get(`/certificate/api/eu-certificate?refId=${certificateData.preEnrollmentCode}`, {...config, responseType: 'blob'})
+        const fullName = certificateData.name.trim();
+        const lastName = fullName.substring(fullName.lastIndexOf(" ")+1)
+        const firstName = fullName.substring(0,(fullName.length - lastName.length)).trim();
+        const requestBody = {
+            "fn": firstName,
+            "fnt": "TRANSLATED>GIVEN>NAME",
+            "gn": lastName,
+            "gnt": "TRANSLATED>LAST>NAME",
+        }
+        axios.post(`/certificate/api/eu-certificate?refId=${certificateData.preEnrollmentCode}`, requestBody, {...config, responseType: 'blob'})
         .then((blob) => {
             const file = new Blob([blob.data], {type: 'application/pdf'});
             var url = URL.createObjectURL(file);

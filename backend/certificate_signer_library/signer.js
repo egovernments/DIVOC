@@ -1,6 +1,4 @@
 const jsigs = require('jsonld-signatures');
-const registry = require('./registry');
-const R = require('ramda');
 const {RsaSignature2018} = jsigs.suites;
 const {Ed25519Signature2018} = jsigs.suites;
 const {Ed25519KeyPair} = require('crypto-ld');
@@ -10,12 +8,7 @@ const {documentLoaders} = require('jsonld');
 const {node: documentLoader} = documentLoaders;
 const {contexts} = require('security-context');
 const credentialsv1 = require('./credentials.json');
-const redis = require('./redis');
 const vc = require('vc-js');
-
-const UNSUCCESSFUL = "UNSUCCESSFUL";
-const SUCCESSFUL = "SUCCESSFUL";
-const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
 let documentLoaderMapping = {"https://w3id.org/security/v1" : contexts.get("https://w3id.org/security/v1")};
 documentLoaderMapping['https://www.w3.org/2018/credentials#'] = credentialsv1;
@@ -57,7 +50,7 @@ const getPublicKey = (config) => {
 const setDocumentLoader = (customLoaderMapping, config) => {
     privateKeyPem = config.privateKeyPem;
     maxRetrycount = config.CERTIFICATE_RETRY_COUNT;
-    signingKeyType = config?.keyType || KeyType.RSA;
+    signingKeyType = config.keyType || KeyType.RSA;
     publicKey = getPublicKey(config);
     controller = {
         '@context': jsigs.SECURITY_CONTEXT_URL,
@@ -70,8 +63,8 @@ const setDocumentLoader = (customLoaderMapping, config) => {
     documentLoaderMapping[config.CERTIFICATE_PUBKEY_ID] = publicKey;
     documentLoaderMapping = {...documentLoaderMapping, ...customLoaderMapping}
     certificateDID = config.CERTIFICATE_DID;
-    publicKeyBase58 = config?.publicKeyBase58 || '';
-    privateKeyBase58 = config?.privateKeyBase58 || '';
+    publicKeyBase58 = config.publicKeyBase58 || '';
+    privateKeyBase58 = config.privateKeyBase58 || '';
 };
 
 const customLoader = url => {
@@ -133,49 +126,44 @@ async function signJSON(certificate) {
   return signed;
 }
 
-async function signAndSave(certificate, transformW3, redisUniqueKey, retryCount = 0) {
-  const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
-  const name = certificate.recipient.name;
-  const contact = certificate.recipient.contact;
-  const mobile = getContactNumber(contact);
-  const preEnrollmentCode = certificate.preEnrollmentCode;
-  const w3cCertificate = transformW3(certificate, certificateId);
-  const signedCertificate = await signJSON(w3cCertificate);
-  const programId = certificate["programId"] || "";
-  const signedCertificateForDB = {
-    name: name,
-    contact: contact,
-    mobile: mobile,
-    preEnrollmentCode: preEnrollmentCode,
-    certificateId: certificateId,
-    certificate: JSON.stringify(signedCertificate),
-    programId: programId,
-    meta: certificate["meta"]
-  };
-  const resp = await registry.saveCertificate(signedCertificateForDB);
-  if (R.pathOr("", ["data", "params", "status"], resp) === UNSUCCESSFUL && R.pathOr("", ["data", "params", "errmsg"], resp).includes(DUPLICATE_MSG)) {
-    if (retryCount <= maxRetrycount) {
-      console.error("Duplicate certificate id found, retrying attempt " + retryCount + " of " + maxRetrycount);
-      return await signAndSave(certificate, transformW3, redisUniqueKey, retryCount + 1)
-    } else {
-      console.error("Max retry attempted");
-      throw new Error(resp.data.params.errmsg)
-    }
+async function verifyJSON(signedJSON) {
+  const {AssertionProofPurpose} = jsigs.purposes;
+  let result;
+  if(signingKeyType === "RSA") {
+    const key = new RSAKeyPair({...publicKey});
+    const {RsaSignature2018} = jsigs.suites;
+    result = await jsigs.verify(signedJSON, {
+      suite: new RsaSignature2018({key}),
+      purpose: new AssertionProofPurpose({controller}),
+      documentLoader: customLoader,
+      compactProof: false
+    });
+  } else if (signingKeyType === "ED25519") {
+    const purpose = new AssertionProofPurpose({
+      controller: controller
+    });
+    const {Ed25519Signature2018} = jsigs.suites;
+    const key = new Ed25519KeyPair(
+      {
+        publicKeyBase58: publicKeyBase58,
+        id: certificateDID
+      }
+    );
+    result = await vc.verifyCredential({
+      credential: signedJSON,
+      suite: new Ed25519Signature2018({key}),
+      purpose: purpose,
+      documentLoader: customLoader,
+      compactProof: false
+    });
   }
-  resp.signedCertificate = signedCertificateForDB;
-  if (R.pathOr("", ["data", "params", "status"], resp) === SUCCESSFUL){
-    redis.storeKeyWithExpiry(redisUniqueKey, certificateId)
-  }
-  return resp;
-}
 
-function getContactNumber(contact) {
-  return contact.find(value => /^tel/.test(value)).split(":")[1];
+  return result
 }
 
 module.exports = {
-  signAndSave,
   signJSON,
+  verifyJSON,
   customLoader,
   setDocumentLoader,
   KeyType

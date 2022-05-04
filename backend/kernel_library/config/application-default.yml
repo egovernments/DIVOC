@@ -16,3 +16,5 @@ keycloak:
     roleId: e5573b4d-2805-475b-8e59-d2c7c9de499e
     clientId: f806ea15-8a99-48f9-9c5d-a4602ae7b9db
     groupId: 84682840-4c21-428d-b2d5-06e6298be1cc
+etcd:
+  enable: true

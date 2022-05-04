@@ -4008,7 +4008,7 @@ func init() {
         },
         "certifiedUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/certifiedUpdatedAt"
         },
         "id": {
@@ -4016,7 +4016,7 @@ func init() {
         },
         "statusUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/statusUpdatedAt"
         }
       }

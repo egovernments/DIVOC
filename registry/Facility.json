@@ -172,12 +172,12 @@
         "statusUpdatedAt": {
           "$id": "#/properties/statusUpdatedAt",
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         },
         "rateUpdatedAt": {
           "$id": "#/properties/rateUpdatedAt",
           "type": "string",
-          "format": "date"
+          "format": "date-time"
         },
         "schedule": {
           "$id": "#/properties/schedule",

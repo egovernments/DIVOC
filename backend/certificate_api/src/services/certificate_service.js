@@ -4,6 +4,57 @@ const countries = require('i18n-iso-countries');
 const configService = require('./configuration_service');
 const {formatDate, formatId, getNumberWithOrdinal, concatenateReadableString} = require('./utils');
 
+const mapCertificatesByPreEnrollmentCode = (certificates) => {
+  const map = new Map();
+  for(let certificate of certificates) {
+    const preEnrollmentCode = certificate.preEnrollmentCode;
+    let arr;
+    if(map.get(preEnrollmentCode) === undefined) {
+      arr = new Array();
+    }
+    else {
+      arr = map.get(preEnrollmentCode)
+    }
+    arr.push(certificate);
+    map.set(preEnrollmentCode, arr);
+  }
+  return map;
+}
+
+function filterByDob(certificates, dob) {
+  let certificateData = getBasicBeneficiaryDataFromCert(certificates);
+  return certificateData.filter(certificate => isEqualsDOB(certificate.dob, dob));
+}
+
+function isEqualsDOB(certificateDob, dob) {
+  const dateCertificateDob = new Date(certificateDob);
+  const dateRequestDob = new Date(dob);
+  return dateRequestDob.getTime() === dateCertificateDob.getTime();
+}
+
+const sortCertificatesForEachBeneficiary = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = mapCertificatesByPreEnrollmentCode(certificates);
+  for([preEnrollmentCode, certificates] of certificatesMapByPreEnrollmentCode) {
+    certificatesMapByPreEnrollmentCode.set(preEnrollmentCode, ((sortCertificatesInDoseAndUpdateTimeAscOrder(certificates))[certificates.length - 1]));
+  }
+  return certificatesMapByPreEnrollmentCode;
+}
+
+const getBasicBeneficiaryDataFromCert = (certificates) => {
+  const certificatesMapByPreEnrollmentCode = sortCertificatesForEachBeneficiary(certificates);
+  const certificateData = new Array();
+  for(let certificate of certificatesMapByPreEnrollmentCode.values()) {
+    const credentialSubject = JSON.parse(certificate.certificate).credentialSubject;
+    certificateData.push({
+      preEnrollmentCode: certificate.preEnrollmentCode,
+      name: credentialSubject.name,
+      gender: credentialSubject.gender,
+      dob: credentialSubject.dob
+    });
+  }
+  return certificateData;
+}
+
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -49,10 +100,16 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     age: credentialSubject.age,
     gender: credentialSubject.gender,
     identity: formatId(credentialSubject.id),
+    nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
     recipientAddress: formatRecipientAddress(credentialSubject.address),
     vaccine: evidence[0].vaccine,
-    vaccinationDate: formatDate(evidence[0].date) + ` (Batch no. ${evidence[0].batch} )`,
+    vaccinationDate: formatDate(evidence[0].date),
+    vaccineBatch: evidence[0].batch,
+    vaccineICD11Code: evidence[0].icd11Code || "",
+    vaccineProphylaxis: evidence[0].prophylaxis || "",
+    vaccineType: getVaxType(evidence[0].icd11Code, evidence[0].prophylaxis),
+    vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
     vaccinatedBy: evidence[0].verifier.name,
     vaccinatedAt: formatFacilityAddress(evidence[0]),
@@ -63,7 +120,9 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     isBoosterDose: evidence[0].dose > evidence[0].totalDoses,
     isBoosterOrFinalDose: evidence[0].dose >= evidence[0].totalDoses,
     currentDoseText: `(${getNumberWithOrdinal(evidence[0].dose)} Dose)`,
-    meta: certificateRaw.meta
+    certificateId: certificateRaw.certificateId,
+    meta: certificateRaw.meta,
+    raw: certificateRaw
   };
   certificateData["vaxEvents"] = getVaccineDetails(doseToVaccinationDetailsMap);
   return certificateData;
@@ -78,6 +137,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
         ("Booster Dose " + (value.dose - value.totalDoses)),
       vaxName: value.name || "",
       vaxBatch: value.batch || "",
+      vaxManufacturer : value.manufacturer || "",
       dateOfVax: formatDate(value.date || ""),
       countryOfVax: value.vaccinatedCountry || "",
       validity: value.validity || "",
@@ -96,6 +156,7 @@ function fetchVaccinationDetailsFromCert(evidence) {
     name: evidence.vaccine,
     vaxType: getVaxType(evidence.icd11Code, evidence.prophylaxis),
     batch: evidence.batch,
+    manufacturer: evidence.manufacturer,
     vaccinatedCountry: evidence.facility.address.addressCountry,
   };
   return vaccineDetails;
@@ -209,5 +270,6 @@ module.exports = {
   getLatestCertificate,
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
-  prepareDataForVaccineCertificateTemplate
+  prepareDataForVaccineCertificateTemplate,
+  filterByDob
 };

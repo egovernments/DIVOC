@@ -5,8 +5,10 @@ const CONFIG_KEYS = {
   DDCC_TEMPLATE: "DDCC_TEMPLATE",
   W3C_TEMPLATE: "W3C_TEMPLATE"
 };
+const PROC_TOPIC = 'proc_status'
 Object.freeze(CONFIG_KEYS);
 
 module.exports = {
-  CONFIG_KEYS
+  CONFIG_KEYS,
+  PROC_TOPIC
 }

@@ -45,7 +45,7 @@ func StartEnrollmentConsumer() {
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 			
-			err = services.CreateEnrollment(&enrollment)
+			err = services.CreateEnrollment(&enrollment, 0)
 			services.PublishEnrollmentACK(enrollment,err)
 			if err != nil {
 				// Push to error topic

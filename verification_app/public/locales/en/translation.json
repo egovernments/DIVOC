@@ -1,0 +1,248 @@
+{
+  "home": {
+    "registrationTitle": "Register for vaccination program",
+    "registrationSubTitle": "Enter your mobile number and book an appointment at your nearest facility center",
+    "registrationInfo": "An OTP will be sent to you for verification",
+    "mobPlaceholder": "Enter mobile number",
+    "login": "Log In",
+    "infoCard": [
+      {
+        "title": "Enter Mobile",
+        "subTitle": "Verify your mobile number"
+      },
+      {
+        "title": "Verify ID Details",
+        "subTitle": "Add Beneficiaries"
+      },
+      {
+        "title": "Add Beneficiaries",
+        "subTitle": "Get enrollment number"
+      },
+      {
+        "title": "Book Appointment or Walkin",
+        "subTitle": "Search for the nearest facility center"
+      }
+    ],
+    "homeCard": [
+      {
+        "title": "Download your Vaccination Certificate",
+        "subTitle": "You would need your unique id and Mobile number to verify OTP in order to access your digital certificate.",
+        "button": "Download"
+      },
+      {
+        "title": "Verify your Vaccination Certificate",
+        "subTitle": "Ensure that your vaccination certificate is a authentic by digitally verifying it here.",
+        "button": "Verify"
+      },
+      {
+        "title": "Report symptoms",
+        "subTitle": "By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.",
+        "button": "Report Side-effects"
+      }
+    ],
+    "onGoingProgramTitle": "Ongoing Vaccination Programs"
+  },
+  "login": {
+    "title": "Registration and Appointment Portal",
+    "subTitle": "Get started by entering your mobile number",
+    "mobPlaceholder": "Mobile number",
+    "otpPlaceholder": "OTP",
+    "otpButton": "Get OTP ",
+    "verifyButton": "Verify ",
+    "backButton": "Back"
+  },
+  "button": {
+    "continue": "Continue",
+    "ok": "Ok",
+    "back": "Back",
+    "confirm": "Confirm",
+    "yesDelete": "Yes, Delete",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "download": "Download",
+    "print": "Print"
+  },
+  "common": {
+    "select": "Select",
+    "yes": "Yes",
+    "no": "No"
+  },
+  "registration": {
+    "title": "Registered Beneficiaries",
+    "titleSpan": "You can add upto 4 members",
+    "emptyMembers": "No members have enrolled yet.",
+    "delete": "delete",
+    "bookAppointment": "book appointment",
+    "cancelAppointment": "cancel appointment",
+    "deleteRegistration": "Delete Registration",
+    "programDeleteForBeneficiaryInfo": "'{{program}}' program registration will be deleted for {{beneficiaryName}}",
+    "downloadCertificate": "Download Certificate",
+    "downloadQRCode": "Download QR Code",
+    "newProgram": "New Program",
+    "selectProgram": {
+      "title": "Please select vaccination program"
+    },
+    "checkEligibility": {
+      "title": "Check beneficiary's eligibility for {{program}}",
+      "yobTitle": "Enter beneficiary's year of birth",
+      "yob": "Year of birth",
+      "comorbiditiesTitle": "Does the beneficiary have any of the following comorbidities?",
+      "comorbiditiesSelectInfo": "If yes, please select (all) applicable comorbidities"
+    },
+    "formDetails": {
+      "verifyBeneficiaryTitle": "Verify beneficiary details",
+      "addBeneficiaryTitle": "Add details to register beneficiary",
+      "idDetails": "ID details",
+      "idTypeLabel": "ID Type",
+      "selectIdType": "Select ID Type",
+      "idNumberLabel": "ID Number",
+      "idNumberPlaceholder": "Enter ID Number",
+      "nameLabel": "Name  (As per ID card)",
+      "namePlaceholder": "Enter Name",
+      "ageLabel": "Age",
+      "genderLabel": "Gender",
+      "genderPlaceholder": "Select Gender",
+      "residenceDetails": "Residence Details",
+      "stateLabel": "State",
+      "statePlaceholder": "Select State",
+      "districtLabel": "District",
+      "districtPlaceholder": "Select District",
+      "nationalityLabel": "Nationality",
+      "nationalityPlaceholder": "Select Nationality",
+      "localityLabel": "Locality",
+      "localityPlaceholder": "Enter your locality",
+      "pincodeLabel": "Pin code",
+      "pincodePlaceholder": "Enter your pin code",
+      "contactInfoTitle": "Contact information for vaccination certificate",
+      "mobileLabel": "Mobile",
+      "emailLabel": "Beneficiary Email ID",
+      "emailPlaceholder": "Enter Email ID",
+      "verifyEmailLabel": "Verify Beneficiary Email ID",
+      "confirmEmailPlaceholder": "Confirm Email ID"
+    },
+    "success": {
+      "title": "Successfully registered for {{program}}",
+      "enrollmentDetails": "Enrolment details will be sent to",
+      "vaccinationInfo": "On the day of vaccination, please carry your original {{identity}} for verification"
+    },
+    "beneficiaryName": "Beneficiary Name"
+  },
+  "appointment": {
+    "title": "Book Appointment",
+    "subTitle": "Select Facility center to book appointment for {{state}}",
+    "pincodePlaceholder": "Search by Pincode",
+    "availableSearchTitle": "Availability for next few days",
+    "noResultSearchTitle": "No results found",
+    "timeSlotTitle": "Available Time Slots for {{facility}}",
+    "confirmAppointment": "Confirm Appointment",
+    "success": {
+      "title": "Successfully booked appointment for {{program}}",
+      "enrollmentCode": "Enrolment number: {{enrollmentCode}}",
+      "enrollmentDetails": "Appointment details will be sent to the registered mobile number and/or email."
+    }
+  },
+  "sideEffect": {
+    "title": "Report symptoms",
+    "subTitle": "By reporting any side-effects of the vaccine, you will ensure the safety of others in the community and help the government contain the pandemic effectively.",
+    "formTitle": "Report Side-effects",
+    "formSubTitle": "Select Symptoms",
+    "confirmSymptom": "Confirm Symptoms",
+    "infoCard": [
+      {
+        "text": "Verify Certificate"
+      },
+      {
+        "text": "Learn about the Vaccination process"
+      }
+    ],
+    "submitSymptom": {
+      "title": "Can you help us identify the patient with these symptoms",
+      "choosePatient": "Please choose the patient",
+      "confirmationMsg": "I confirm that this patient is having the identified symptoms",
+      "confirmPatient": "Confirm Patient",
+      "completeMsgTitle": "The healthcare facility has been notified. You will receive a call back soon.",
+      "completeMsgTitle2": "If the symptoms worsen, please visit the facility so that the doctors can attend to at the earliest.",
+      "completeMsgSubTitle": "If you need to contact the facility immediately"
+    }
+  },
+  "certificate": {
+    "Name": "Name",
+    "Age": "Age",
+    "DOB": "DOB",
+    "Gender": "Gender",
+    "Certificate ID": "Certificate ID",
+    "Vaccine Name": "Vaccine Name",
+    "Vaccine Type": "Vaccine Type",
+    "Date of Issue": "Date of Issue",
+    "Valid Until": "Valid Until",
+    "Dose": "Dose",
+    "Total Doses": "Total Doses",
+    "Vaccination Facility": "Vaccination Facility"
+  },
+  "certificateView": {
+    "title": "Vaccination certificate",
+    "subTitle": "There are multiple certificates associated with phone : {{mobileNumber}}",
+    "chooseCertificate": "Please choose the certificate for ",
+    "asImg": "As Image",
+    "asSvg": "As SVG",
+    "asVerifiableCertificate": "As Verifiable Certificate",
+    "asEuCertificate": "As EU Certificate",
+    "asFhirCertificate": "As Fhir Certificate"
+  },
+  "verifyCertificate": {
+    "title": "Verify a vaccination certificate",
+    "scanWithQR": "SCAN WITH QR",
+    "validStatus": "Successful",
+    "invalidStatus": "Invalid Certificate",
+    "revokedStatus": "Certificate Revoked",
+    "revokeText": "Your Certificate has been revoked",
+    "verifyAnotherCertificate": "Verify Another Certificate",
+    "infoCard": [
+      {
+        "text": "Provide Feedback"
+      },
+      {
+        "text": "Learn about the Vaccination process"
+      }
+    ],
+    "timeoutTitle": "Camera could not read QR Code, Please try again.",
+    "timeoutInfo": "Note to scan the QR code",
+    "timeoutInfoList": [
+      "QR code should cover at-lease 70%-80% of screen",
+      "Complete QR code should be part of camera frame",
+      "QR code should be parallel to the camera",
+      "Camera should be hold steady for at-least 5 sec"
+    ],
+    "tryAgain": "Try Again"
+  },
+  "entity": {
+    "program": "program",
+    "enrollmentNumber": "Enrolment number",
+    "registration": "Registered",
+    "scheduled": "scheduled",
+    "dose": "dose",
+    "vaccinated": "vaccinated"
+  },
+  "errors": {
+    "invalidMobileNumber": "* Invalid mobile number",
+    "invalidOTP": "* Invalid OTP",
+    "selectComorbidity": "* Please select at least one comorbidity",
+    "selectYob": "Please select year of birth",
+    "invalidBeneficiary": "Sorry, the beneficiary is currently not eligible to register for the {{program}} program",
+    "nationalIdTypeErr": "* ID Type is require",
+    "nationalIdNumberErr": "* ID Number is required",
+    "aadhaarErr": "* Invalid Aadhaar number",
+    "duplicateNationalIdErr": "* Beneficiary with this ID already exists",
+    "beneficiaryNameRequired": "* Beneficiary Name is required",
+    "nameMinLength": "* Name should have at least 1 characters",
+    "nameMaxLength": "* Name should have maximum 99 characters",
+    "nameAlphabetOnly": "* Beneficiary Name should have only alphabets",
+    "nameDuplicate": "* Beneficiary with same Name and Age already exists",
+    "stateRequired": "* State is required",
+    "districtRequired": "* District is required",
+    "nationalityRequired": "* Nationality is required",
+    "pincodeInvalid": "* Invalid pin code",
+    "genderRequired": "* Gender is required",
+    "emailMismatch": "* Email ID is not matching"
+  }
+}

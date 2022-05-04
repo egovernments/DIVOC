@@ -21,6 +21,10 @@
     background: transparent linear-gradient(91deg, #8DA2FF 0%, #4E67D1 100%) 0% 0% no-repeat padding-box;
 }
 
+.violet-btn {
+    background: transparent linear-gradient(91deg, #7953CA 0%, #7397F4 100%) 0% 0% no-repeat padding-box;
+}
+
 #custom-link-button {
     color: #5C9EF8;
     font-weight: bold;

@@ -5,6 +5,7 @@ import CenterSmallImg from '../../assets/img/center-small.svg'
 import CertificateImg from '../../assets/img/download-certificate-home.svg'
 import VerifyCertificateImg from '../../assets/img/verify-certificate-home.svg'
 import SideEffectsBannerImg from '../../assets/img/side-effects-banner-img.png'
+import EmployeeLoginImg from '../../assets/img/employee-login-home.svg'
 import DashboardBannerImg from '../../assets/img/dashboard-banner.png'
 import GetVaccinatedImg from '../../assets/img/img-getvaccinated.png'
 import enterMobileImg from '../../assets/img/icon-entermobile.svg'
@@ -23,7 +24,7 @@ import {PROGRAM_API} from "../../constants";
 import {useTranslation} from "react-i18next";
 
 const HomeCard = ({img, title, subtitle, buttonText, buttonOnClick, buttonClassName, backgroundColor}) => (
-    <Col lg={4}>
+    <Col lg={3}>
         <div className="d-flex flex-column justify-content-center align-items-center pb-3 pl-4 pr-4 pt-0 mt-3"
              style={{width: "100%", height: "65vh", backgroundColor: backgroundColor, borderRadius: "20px"}}>
             <div className="d-inline-flex justify-content-center" style={{height: "30%"}}>
@@ -155,7 +156,7 @@ export const Home = () => {
             <div className="section " style={{maxWidth:"1300px", margin:"auto"}}>
                 <div className="d-flex flex-column" style={{height: "100%"}}>
                     <div className="p-4 p-lg-5 d-flex flex-column justify-content-center align-items-center" style={{margin:"20px"}}>
-                        <Row className="d-flex justify-content-center mb-3">
+                        <Row className="d-flex justify-content-center mb-4">
                             <HomeCard img={<img src={CertificateImg} alt={""} width={"80%"}/>}
                                       title={t('home.homeCard.0.title')}
                                       subtitle={t('home.homeCard.0.subTitle')}
@@ -171,7 +172,7 @@ export const Home = () => {
                                       subtitle={t('home.homeCard.1.subTitle')}
                                       buttonText={t('home.homeCard.1.button')}
                                       buttonOnClick={() => {
-                                          history.push("/verify-certificate/")
+                                          history.push("/verification_app/")
                                       }}
                                       buttonClassName="green-btn"
                                       backgroundColor={"#F2FAF6"}
@@ -186,6 +187,17 @@ export const Home = () => {
                                       }}
                                       buttonClassName={"yellow-btn"}
                                       backgroundColor={"#FFFBF0"}
+                            />
+
+                            <HomeCard img={<img src={EmployeeLoginImg} alt={""}/>}
+                                      title={t('home.homeCard.3.title')}
+                                      subtitle={t('home.homeCard.3.subTitle')}
+                                      buttonText={t('home.homeCard.3.button')}
+                                      buttonOnClick={() => {
+                                          history.push("/portal")
+                                      }}
+                                      buttonClassName={"violet-btn"}
+                                      backgroundColor={"#F5F6FF"}
                             />
                         </Row>
                     </div>

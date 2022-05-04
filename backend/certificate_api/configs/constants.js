@@ -1,5 +1,6 @@
 const EU_DISEASE = {"covid-19": "840539006"};
 const TEMPLATES = {
+  EU_VACCINATION_CERTIFICATE: "euVaccineCertificateTemplate",
   VACCINATION_CERTIFICATE: "vaccineCertificateTemplate",
   TEST_CERTIFICATE: "testCertificateTemplate"
 };

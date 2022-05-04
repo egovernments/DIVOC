@@ -243,6 +243,30 @@ async function createCertificateQRCodeCitizen(phone, certificateId, res) {
     return await createCertificateQRCode(certificateResp, res, certificateId);
 }
 
+async function getCertificateByPhnoAndDob(req, res) {
+    var queryData = url.parse(req.url, true).query;
+    let claimBody = "";
+    try {
+        claimBody = await verifyKeycloakToken(req.headers.authorization);
+    } catch(e) {
+        console.error(e);
+        res.statusCode = 403;
+        return;
+    }
+    if(isNaN(Date.parse(queryData.dob)) || queryData.dob === undefined || queryData.phoneno === undefined || queryData.phoneno.trim() === '' )  {
+        let error = {
+            date: new Date(),
+            source: 'getCertificateByPhnoAndDob',
+            type: "invalid-input",
+            extra: "Invalid Date of Birth or Phone number"
+        }
+        res.statusCode = 400;
+        return error;
+    }
+    const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno);
+    return certificateService.filterByDob(certificatesByPhno, queryData.dob);
+}
+
 async function getCertificate(req, res) {
     try {
         var queryData = url.parse(req.url, true).query;
@@ -562,5 +586,6 @@ module.exports = {
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,
     getCertificateQRCode,
-    certificateAsSHCPayload
+    certificateAsSHCPayload,
+    getCertificateByPhnoAndDob
 };

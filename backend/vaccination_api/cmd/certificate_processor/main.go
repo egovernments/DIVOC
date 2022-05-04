@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
+	"sync"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"sync"
-	"time"
 )
 
 const mobilePhonePrefix = "tel:"
@@ -74,17 +75,18 @@ func main() {
 	wg.Add(2)
 	log.Infof("CreateRecipientInKeycloakService enabled %s", config.Config.EnabledServices.CreateRecipientInKeycloakService)
 	if config.Config.EnabledServices.CreateRecipientInKeycloakService == "true" {
-		go initializeCreateUserInKeycloak()
+		go initializeCreateUserInKeycloak(&wg)
 	}
 
 	log.Infof("RevokeCertificateService enabled %s", config.Config.EnabledServices.RevokeCertificateService)
 	if config.Config.EnabledServices.RevokeCertificateService == "true" {
-		go initializeRevokeCertificate()
+		go initializeRevokeCertificate(&wg)
 	}
 	wg.Wait()
 }
 
-func initializeCreateUserInKeycloak() {
+func initializeCreateUserInKeycloak(wg *sync.WaitGroup) {
+	defer wg.Done()
 	log.Infof("Using kafka for certificate_processor %s", config.Config.Kafka.BootstrapServers)
 	c := createConsumer("certificate_processor", "earliest", "false")
 	if err := c.SubscribeTopics([]string{config.Config.Kafka.CertifyTopic}, nil); err != nil {
@@ -99,11 +101,20 @@ func initializeCreateUserInKeycloak() {
 			//push to back up queue -- todo what do we do with these requests?
 			//}
 			//message := signCertificate(message)
-			if err := processCertificateMessage(string(msg.Value)); err == nil {
+			var err error
+			var preEnrollmentCode string
+			var status models.Status
+			if preEnrollmentCode, status, err = processCertificateMessage(string(msg.Value)); err == nil {
 				c.CommitMessage(msg)
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
 			}
+			services.PublishProcStatus(models.ProcStatus{
+				Date:              time.Now(),
+				PreEnrollmentCode: preEnrollmentCode,
+				ProcType:          "keycloak_user_creation",
+				Status:            string(status),
+			})
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
@@ -113,7 +124,8 @@ func initializeCreateUserInKeycloak() {
 	c.Close()
 }
 
-func initializeRevokeCertificate() {
+func initializeRevokeCertificate(wg *sync.WaitGroup) {
+	defer wg.Done()
 	log.Infof("Using kafka for revoke_cert %s", config.Config.Kafka.BootstrapServers)
 
 	servers := config.Config.Kafka.BootstrapServers
@@ -130,10 +142,10 @@ func initializeRevokeCertificate() {
 		if err == nil {
 			fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
 			preEnrollmentCode, revokeStatus, err := handleCertificateRevocationMessage(string(msg.Value))
-			if revokeStatus == SUCCESS || revokeStatus == ERROR {
+			if revokeStatus == models.SUCCESS || revokeStatus == models.ERROR {
 				c.CommitMessage(msg)
 			}
-			if revokeStatus == ERROR {
+			if revokeStatus == models.ERROR {
 				log.Errorf("Error in revoking the certificate %+v", err)
 				publishRevokeCertificateErrorMessage(msg.Value)
 			}
