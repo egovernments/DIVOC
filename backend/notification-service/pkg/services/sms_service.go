@@ -24,7 +24,7 @@ func SendSMS(mobileNumber string, message string) (map[string]interface{}, error
 			"Content-Type": "application/json",
 		}
 		log.Debugf("SMS request ", smsRequest)
-		log.Infof("SMS resqust is processing")
+		log.Infof("Processing SMS request")
 
 		response, err := req.Post(config.Config.SmsAPI.URL, header, req.BodyJSON(smsRequest))
 		if err != nil {
