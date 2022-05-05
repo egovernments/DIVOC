@@ -29,7 +29,8 @@ func notifyConsumer() {
 		for {
 			msg, err := c.ReadMessage(-1)
 			if err == nil {
-				fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+				log.Debugf("Message:  %s", string(msg.Value))
+				log.Infof("Topic: %s ", msg.TopicPartition)
 				var request models.NotificationRequest
 				if err = json.Unmarshal([]byte(string(msg.Value)), &request); err != nil {
 					log.Errorf("Received message is not in required format %+v", err)

@@ -20,6 +20,7 @@ func NotifyRecipient(enrollment models.Enrollment) error {
 	recipient := "sms:" + enrollment.Phone
 	message := "Your pre enrollment for vaccination is " + enrollment.Code
 	log.Infof("Sending SMS %s %s", recipient, message)
+	log.Debugf("Sending NotifyRecipient SMS")
 	buf := bytes.Buffer{}
 	err := preEnrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {

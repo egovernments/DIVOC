@@ -22,3 +22,4 @@ registry:
 keycloak:
   url: https://divoc.xiv.in/keycloak/auth
   realm: divoc
+log_level: info
