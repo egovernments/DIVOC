@@ -30,7 +30,8 @@ func InitializeKafka() {
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
 			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+				log.Infof("Error while publishing message to %s topic ", topic)
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -43,7 +44,8 @@ func InitializeKafka() {
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
 			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+				log.Infof("Error while publishing message to %s topic ", topic)
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -56,7 +58,8 @@ func InitializeKafka() {
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
 			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+				log.Infof("Error while publishing message to %s topic ", topic)
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -69,7 +72,8 @@ func InitializeKafka() {
 				TopicPartition: kafka.TopicPartition{Topic: &topic, Partition: kafka.PartitionAny},
 				Value:          msg,
 			}, nil); err != nil {
-				log.Infof("Error while publishing message to %s topic %+v", topic, msg)
+				log.Infof("Error while publishing message to %s topic ", topic)
+				log.Debugf("Error message : %+v", msg)
 			}
 		}
 	}()
@@ -85,9 +89,9 @@ func PublishEnrollmentACK(enrollmentPayload EnrollmentPayload, e error) {
 		errMsg = e.Error()
 	}
 	msg, _ := json.Marshal(struct {
-		RowID              uint   `json:"rowID,omitempty"`
-		ErrMsg             string `json:"errMsg,omitempty"`
-		EnrollmentType     string `json:"enrollmentType"`
+		RowID              uint                   `json:"rowID,omitempty"`
+		ErrMsg             string                 `json:"errMsg,omitempty"`
+		EnrollmentType     string                 `json:"enrollmentType"`
 		VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
 	}{
 		RowID:              enrollmentPayload.RowID,
