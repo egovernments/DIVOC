@@ -2,12 +2,12 @@ package services
 
 import (
 	"encoding/json"
-
 	"github.com/divoc/api/config"
-	"github.com/divoc/api/swagger_gen/models"
+	"github.com/divoc/api/pkg/models"
 	models2 "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
+	"time"
 )
 
 //StartEnrollmentACKConsumer : consumes enrollment_ack and updates CSV upload errors
@@ -23,6 +23,7 @@ func StartEnrollmentACKConsumer() {
 		log.Errorf("Failed connecting to kafka", err)
 	}
 	go func() {
+		var status models.Status
 		err := consumer.SubscribeTopics([]string{config.Config.Kafka.EnrollmentACKTopic}, nil)
 		if err != nil {
 			panic(err)
@@ -38,10 +39,11 @@ func StartEnrollmentACKConsumer() {
 			var message struct {
 				Err                *string `json:"errMsg"`
 				EnrollmentType     string  `json:"enrollmentType"`
-				VaccinationDetails models.CertificationRequest  `json:"vaccinationDetails"`
+				VaccinationDetails models2.CertificationRequest  `json:"vaccinationDetails"`
 			}
 			if err := json.Unmarshal(msg.Value, &message); err != nil {
 				log.Error("Error unmarshalling to expected format : ", err)
+				status = models.ERROR
 				continue
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
@@ -50,8 +52,19 @@ func StartEnrollmentACKConsumer() {
 				certifyMsg, _ := json.Marshal(message.VaccinationDetails)
 				log.Infof("Certifying recepient[preEnrollmentCode: %s]", *message.VaccinationDetails.PreEnrollmentCode)
 				PublishCertifyMessage(certifyMsg, nil, nil)
+				
 			}
+			status = models.SUCCESS
 			consumer.CommitMessage(msg)
+			if message.VaccinationDetails.PreEnrollmentCode != nil {
+				PublishProcStatus(models.ProcStatus{
+					Date:              time.Now(),
+					PreEnrollmentCode: *message.VaccinationDetails.PreEnrollmentCode,
+					ProcType:          "enrollment_ack",
+					Status:            string(status),
+				})
+			}
+
 		}
 	}()
 }
