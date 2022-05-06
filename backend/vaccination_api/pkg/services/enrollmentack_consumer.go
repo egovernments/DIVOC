@@ -40,6 +40,7 @@ func StartEnrollmentACKConsumer() {
 				Err                *string `json:"errMsg"`
 				EnrollmentType     string  `json:"enrollmentType"`
 				VaccinationDetails models2.CertificationRequest  `json:"vaccinationDetails"`
+				PreEnrollmentCode  string  `json:"code"`
 			}
 			if err := json.Unmarshal(msg.Value, &message); err != nil {
 				log.Error("Error unmarshalling to expected format : ", err)
@@ -50,16 +51,16 @@ func StartEnrollmentACKConsumer() {
 
 			if message.EnrollmentType == models2.EnrollmentEnrollmentTypeWALKIN {
 				certifyMsg, _ := json.Marshal(message.VaccinationDetails)
-				log.Infof("Certifying recepient[preEnrollmentCode: %s]", *message.VaccinationDetails.PreEnrollmentCode)
+				log.Infof("Certifying recepient[preEnrollmentCode: %s]", message.PreEnrollmentCode)
 				PublishCertifyMessage(certifyMsg, nil, nil)
-				
 			}
 			status = models.SUCCESS
 			consumer.CommitMessage(msg)
-			if message.VaccinationDetails.PreEnrollmentCode != nil {
+
+			if message.PreEnrollmentCode != "" {
 				PublishProcStatus(models.ProcStatus{
 					Date:              time.Now(),
-					PreEnrollmentCode: *message.VaccinationDetails.PreEnrollmentCode,
+					PreEnrollmentCode: message.PreEnrollmentCode,
 					ProcType:          "enrollment_ack",
 					Status:            string(status),
 				})

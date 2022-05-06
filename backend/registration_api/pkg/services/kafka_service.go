@@ -89,11 +89,13 @@ func PublishEnrollmentACK(enrollmentPayload EnrollmentPayload, e error) {
 		ErrMsg             string `json:"errMsg,omitempty"`
 		EnrollmentType     string `json:"enrollmentType"`
 		VaccinationDetails map[string]interface{} `json:"vaccinationDetails"`
+		PreEnrollmentCode  string `json:"code"`
 	}{
 		RowID:              enrollmentPayload.RowID,
 		VaccinationDetails: enrollmentPayload.VaccinationDetails,
 		EnrollmentType:     enrollmentPayload.EnrollmentType,
 		ErrMsg:             errMsg,
+		PreEnrollmentCode:  enrollmentPayload.Code,
 	})
 	enrollmentACKMessages <- msg
 }
