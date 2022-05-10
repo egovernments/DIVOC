@@ -56,15 +56,12 @@ func StartEnrollmentACKConsumer() {
 			}
 			status = models.SUCCESS
 			consumer.CommitMessage(msg)
-
-			if message.PreEnrollmentCode != "" {
-				PublishProcStatus(models.ProcStatus{
-					Date:              time.Now(),
-					PreEnrollmentCode: message.PreEnrollmentCode,
-					ProcType:          "enrollment_ack",
-					Status:            string(status),
-				})
-			}
+			PublishProcStatus(models.ProcStatus{
+				Date:              time.Now(),
+				PreEnrollmentCode: message.PreEnrollmentCode,
+				ProcType:          "enrollment_ack",
+				Status:            string(status),
+			})
 
 		}
 	}()

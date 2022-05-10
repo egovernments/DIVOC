@@ -217,15 +217,12 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
 			}
-			if preEnrollmentCode != ""{
-				services.PublishProcStatus(models.ProcStatus{
-					Date:              time.Now(),
-					PreEnrollmentCode: preEnrollmentCode,
-					ProcType:          procType,
-					Status:            string(status),
-				})
-			}
-
+			services.PublishProcStatus(models.ProcStatus{
+				Date:              time.Now(),
+				PreEnrollmentCode: preEnrollmentCode,
+				ProcType:          procType,
+				Status:            string(status),
+			})
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
