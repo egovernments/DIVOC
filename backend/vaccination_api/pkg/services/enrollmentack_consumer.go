@@ -45,6 +45,12 @@ func StartEnrollmentACKConsumer() {
 			if err := json.Unmarshal(msg.Value, &message); err != nil {
 				log.Error("Error unmarshalling to expected format : ", err)
 				status = models.ERROR
+				PublishProcStatus(models.ProcStatus{
+					Date:              time.Now(),
+					PreEnrollmentCode: "",
+					ProcType:          "enrollment_ack",
+					Status:            string(status),
+				})
 				continue
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
