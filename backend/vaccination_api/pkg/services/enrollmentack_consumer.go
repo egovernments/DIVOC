@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
-	models2 "github.com/divoc/api/swagger_gen/models"
+	swaggerModels "github.com/divoc/api/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
 	"time"
@@ -39,7 +39,7 @@ func StartEnrollmentACKConsumer() {
 			var message struct {
 				Err                *string `json:"errMsg"`
 				EnrollmentType     string  `json:"enrollmentType"`
-				VaccinationDetails models2.CertificationRequest  `json:"vaccinationDetails"`
+				VaccinationDetails swaggerModels.CertificationRequest  `json:"vaccinationDetails"`
 				PreEnrollmentCode  string  `json:"code"`
 			}
 			if err := json.Unmarshal(msg.Value, &message); err != nil {
@@ -55,7 +55,7 @@ func StartEnrollmentACKConsumer() {
 			}
 			log.Infof("Message on %s: %v \n", msg.TopicPartition, message)
 
-			if message.EnrollmentType == models2.EnrollmentEnrollmentTypeWALKIN {
+			if message.EnrollmentType == swaggerModels.EnrollmentEnrollmentTypeWALKIN {
 				certifyMsg, _ := json.Marshal(message.VaccinationDetails)
 				log.Infof("Certifying recepient[preEnrollmentCode: %s]", message.PreEnrollmentCode)
 				PublishCertifyMessage(certifyMsg, nil, nil)
