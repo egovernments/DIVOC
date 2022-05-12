@@ -253,7 +253,10 @@ func NotifyRecipient(enrollment *models.Enrollment) error {
 
 	recipient := "sms:" + enrollment.Phone
 	message := "Your enrollment code for vaccination is " + enrollment.Code
-	log.Infof("Sending SMS %s %s", recipient, message)
+
+	log.Infof("Sending NotifyRecipient SMS")
+	log.Debugf("SMS: %s %s", recipient, message)
+	
 	buf := bytes.Buffer{}
 	err := enrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {
@@ -278,7 +281,10 @@ func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotifica
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+
+	log.Infof("Sending NotifyAppointmentBooked SMS")
+	log.Debugf("SMS: %s %s", recipient, appointmentNotification)
+
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
@@ -303,7 +309,10 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+
+	log.Infof("Sending NotifyAppointmentCancelled SMS")
+	log.Debugf("SMS: %s %s", recipient, appointmentNotification)
+
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {

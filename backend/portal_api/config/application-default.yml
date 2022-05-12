@@ -38,3 +38,4 @@ kafka:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3
+log_level: info

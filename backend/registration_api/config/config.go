@@ -2,6 +2,7 @@ package config
 
 import (
 	"errors"
+
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -16,10 +17,10 @@ var Config = struct {
 		OTPLength            int    `yaml:"otp_length" env:"OTP_LENGTH" default:"6"`
 	}
 	Keycloak struct {
-		Pubkey               string `env:"PUBLIC_KEY"`
-		Url                  string `env:"KEYCLOAK_URL"`
-		Realm                string `env:"KEYCLOAK_REALM"`
-		Enable               bool   `env:"ENABLE_KEYCLOAK" default:"true"`
+		Pubkey string `env:"PUBLIC_KEY"`
+		Url    string `env:"KEYCLOAK_URL"`
+		Realm  string `env:"KEYCLOAK_REALM"`
+		Enable bool   `env:"ENABLE_KEYCLOAK" default:"true"`
 	}
 	Kafka struct {
 		BootstrapServers          string `env:"KAFKA_BOOTSTRAP_SERVERS" yaml:"bootstrapservers"`
@@ -59,6 +60,7 @@ var Config = struct {
 		PrivateKey      string     `env:"MOSIP_PRIVATE_KEY"`
 		PublicKey       string     `env:"MOSIP_PUBLIC_KEY"`
 	}
+	LogLevel 					 string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}
 
 func Initialize() {

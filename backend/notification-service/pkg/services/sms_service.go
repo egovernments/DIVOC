@@ -2,7 +2,9 @@ package services
 
 import (
 	"errors"
+
 	"github.com/divoc/notification-service/config"
+
 	"github.com/imroc/req"
 	log "github.com/sirupsen/logrus"
 )
@@ -21,7 +23,9 @@ func SendSMS(mobileNumber string, message string) (map[string]interface{}, error
 			"authkey":      config.Config.SmsAPI.AuthKey,
 			"Content-Type": "application/json",
 		}
-		log.Info("SMS request ", smsRequest)
+		log.Debugf("SMS request ", smsRequest)
+		log.Infof("Processing SMS request")
+
 		response, err := req.Post(config.Config.SmsAPI.URL, header, req.BodyJSON(smsRequest))
 		if err != nil {
 			return nil, nil

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os"
 	"github.com/divoc/kernel_library/services"
 	"github.com/divoc/notification-service/config"
 	"github.com/divoc/notification-service/pkg/consumers"
@@ -9,13 +10,16 @@ import (
 	"github.com/go-openapi/loads"
 	"github.com/jessevdk/go-flags"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 func main() {
 	services.Initialize()
 	config.Initialize()
 	consumers.Init()
+
+	ll, err := log.ParseLevel(config.Config.LogLevel)
+	log.SetLevel(ll)
+
 	log.Infof("Starting certificate processor")
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
