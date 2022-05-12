@@ -53,6 +53,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.RegisterRecipientToProgramHandler = operations.RegisterRecipientToProgramHandlerFunc(services.RegisterEnrollmentToProgram)
 	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
 	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
+	api.MosipGenerateOTPHandler = operations.MosipGenerateOTPHandlerFunc(mosipGenerateOTP)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
@@ -122,6 +123,21 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 		log.Errorf("Error occurred while trying to cache the otp details %+v", err)
 		return operations.NewGenerateOTPInternalServerError()
 	}
+}
+
+func mosipGenerateOTP(params operations.MosipGenerateOTPParams) middleware.Responder {
+	individualId := *params.Body.IndividualID
+	individualIDType := *params.Body.IndividualIDType
+	if individualId == "" || individualIDType == "" {
+		return operations.NewMosipGenerateOTPBadRequest()
+	}
+
+	if err := services.MosipOTPRequest(individualIDType, individualId); err != nil {
+		return operations.NewMosipGenerateOTPInternalServerError()
+	}
+
+	return operations.NewMosipGenerateOTPOK()
+
 }
 
 func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
