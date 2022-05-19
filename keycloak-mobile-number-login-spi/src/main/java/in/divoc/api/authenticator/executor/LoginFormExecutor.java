@@ -23,11 +23,18 @@ public class LoginFormExecutor implements FormExecutor{
 
     @Override
     public void execute(MultivaluedMap<String, String> formData, AuthenticationFlowContext context) {
+        String countryCode = Optional.ofNullable(formData.getFirst("country_code"))
+                                .orElseGet(() -> "");
         String mobileNumber = formData.getFirst(MOBILE_NUMBER);
         RealmModel realmModel = context.getSession().getContext().getRealm();
         Optional<UserModel> optUser = context.getSession().users()
                 .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, mobileNumber)
                 .findFirst();
+        if(System.getenv("IS_JAMAICA").equalsIgnoreCase("true")) {
+            optUser = context.getSession().users()
+                    .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, countryCode + mobileNumber)
+                    .findFirst();
+        }
         optUser.ifPresentOrElse(user -> {
             if (context.getProtector().isTemporarilyDisabled(context.getSession(), realmModel, user)) {
                 Response challengeResponse = context.form()
@@ -38,7 +45,7 @@ public class LoginFormExecutor implements FormExecutor{
             }
             String otp = otpService.createOtp(mobileNumber);
             if(System.getenv("ENABLE_SEND_OTP").equalsIgnoreCase("true")) {
-                String recipient = "tel:"+mobileNumber;
+                String recipient = "tel:"+ countryCode + mobileNumber;
                 String otpMessage = "Your otp is : " + otp;
                 try {
                     otpService.sendOtp(recipient, otpMessage);

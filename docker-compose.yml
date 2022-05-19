@@ -60,6 +60,8 @@ services:
       KEYCLOAK_PASSWORD: admin
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
+      COUNTRY_CODE: $COUNTRY_CODE
+      IS_JAMAICA: $IS_JAMAICA
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
