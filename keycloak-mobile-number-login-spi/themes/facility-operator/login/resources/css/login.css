@@ -9,6 +9,7 @@
     border-radius: 4px;
     padding: 15px;
     align-items: center;
+    width: 230px;
 }
 
 .input-field:focus-within {
