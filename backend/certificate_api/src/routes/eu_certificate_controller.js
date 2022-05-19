@@ -87,8 +87,8 @@ async function certificateAsEUPayload(req, res) {
         let certificateData = certificateService.prepareDataForVaccineCertificateTemplate(certificateRaw, dataURL, doseToVaccinationDetailsMap);
         // Overriding the name to as passed in request body
         certificateData["name"] = [requestBody.fn, requestBody.gn].join(" ").trim();
-        certificateData["fn"] = requestBody.fn.trim();
-        certificateData["gn"] = requestBody.gn.trim();
+        certificateData["fn"] = requestBody.fn;
+        certificateData["gn"] = requestBody.gn;
         const htmlData = await configurationService.getCertificateTemplate(TEMPLATES.EU_VACCINATION_CERTIFICATE);
         try {
           buffer = await createPDF(htmlData, certificateData);
