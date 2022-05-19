@@ -63,7 +63,7 @@ func MosipOTPRequest(individualIDType string, individualId string) error {
 		return err
 	}
 
-	log.Infof("Response of OTP request - %V", resp)
+	log.Debugf("Response of OTP request - %V", resp)
 
 	return nil
 }
