@@ -21,20 +21,24 @@ public class LoginFormExecutor implements FormExecutor{
         this.otpService = otpService;
     }
 
+    private Optional<UserModel> findUserByMobileNumber(AuthenticationFlowContext context, RealmModel realmModel, String countryCode, String mobileNumber) {
+        if(System.getenv("IS_COUNTRY_CODE_PREFIXED").equalsIgnoreCase("true")) {
+            return context.getSession().users()
+                    .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, countryCode + mobileNumber)
+                    .findFirst();
+        }
+        return context.getSession().users()
+                .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, mobileNumber)
+                .findFirst();
+    }
+
     @Override
     public void execute(MultivaluedMap<String, String> formData, AuthenticationFlowContext context) {
         String countryCode = Optional.ofNullable(formData.getFirst("country_code"))
                                 .orElseGet(() -> "");
         String mobileNumber = formData.getFirst(MOBILE_NUMBER);
         RealmModel realmModel = context.getSession().getContext().getRealm();
-        Optional<UserModel> optUser = context.getSession().users()
-                .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, mobileNumber)
-                .findFirst();
-        if(System.getenv("IS_JAMAICA").equalsIgnoreCase("true")) {
-            optUser = context.getSession().users()
-                    .searchForUserByUserAttributeStream(realmModel, MOBILE_NUMBER, countryCode + mobileNumber)
-                    .findFirst();
-        }
+        Optional<UserModel> optUser = findUserByMobileNumber(context, realmModel, countryCode, mobileNumber);
         optUser.ifPresentOrElse(user -> {
             if (context.getProtector().isTemporarilyDisabled(context.getSession(), realmModel, user)) {
                 Response challengeResponse = context.form()
