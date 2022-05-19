@@ -13,6 +13,7 @@ VACCINE_ICD_REQUEST_BODY = "test_data/vaccine_icd.json"
 DDCC_TEMPLATE = "test_data/ddcc_w3c_payload.template"
 W3C_TEMPLATE = "test_data/w3c_payload.template"
 FIELDS_KEY_PATH = "test_data/fields_key_path.json"
+NOTIFICATION_TEMPLATES = "test_data/notification_templates.json"
 
 def service_check():
     try:
@@ -44,6 +45,8 @@ def call_and_verify():
     etcd.put('W3C_TEMPLATE', str(w3c_template.read()))
     etcd.put('DDCC_TEMPLATE', str(ddcc_template.read()))
     etcd.put('certificateOptionalFieldsKeyPaths', str(fields_key_path).replace("'", '"'))
+    etcd.put('NOTIFICATION_TEMPLATES', str(NOTIFICATION_TEMPLATES).replace("'", '"'))
+
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
     certify_data["preEnrollmentCode"] = cid
     certify_res = r.post(VACCINATION_API + "certify", headers=headers, json=[certify_data])
@@ -69,6 +72,7 @@ def call_and_verify():
     etcd.delete('W3C_TEMPLATE')
     etcd.delete('DDCC_TEMPLATE')
     etcd.delete('certificateOptionalFieldsKeyPaths')
+    etcd.delete('NOTIFICATION_TEMPLATES')
 
 def test_certify():
     test_ran = False
