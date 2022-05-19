@@ -28,11 +28,21 @@
                           action="${url.loginAction}" method="post">
                         <div class="input-wrapper">
                             <div class="input-field mobile">
-<#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
+                                <#if properties.kcCountryCode != "0">
+                                    <span>+</span>
+                                    <input
+                                        style="width: 15%"
+                                        id="country_code"
+                                        class="login-field"
+                                        value=${properties.kcCountryCode!}
+                                        type="text"
+                                        name="country_code"
+                                        autofocus />
+                                </#if>
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
-                                       name="mobile_number"
-                                       tabindex="1" autofocus/>
+                                       name="mobile_number" autofocus
+                                       tabindex="1"/>
                             </div>
 
                         </div>
