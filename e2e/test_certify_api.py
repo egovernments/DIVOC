@@ -39,13 +39,15 @@ def call_and_verify():
     w3c_template = open(W3C_TEMPLATE)
     ddcc_template = open(DDCC_TEMPLATE)
     fields_key_path = json.load(open(FIELDS_KEY_PATH))
+    notification_templates = json.load(open(NOTIFICATION_TEMPLATES))
+    
     etcd = etcd3.client(host='etcd')
     etcd.put('ICD', str(icd_data).replace("'", '"'))
     etcd.put('VACCINE_ICD', str(vaccine_icd_data).replace("'", '"'))
     etcd.put('W3C_TEMPLATE', str(w3c_template.read()))
     etcd.put('DDCC_TEMPLATE', str(ddcc_template.read()))
     etcd.put('certificateOptionalFieldsKeyPaths', str(fields_key_path).replace("'", '"'))
-    etcd.put('NOTIFICATION_TEMPLATES', str(NOTIFICATION_TEMPLATES).replace("'", '"'))
+    etcd.put('NOTIFICATION_TEMPLATES', str(notification_templates).replace("'", '"'))
 
     certify_data = json.load(open(CERTIFY_REQUEST_BODY))[0]
     certify_data["preEnrollmentCode"] = cid
