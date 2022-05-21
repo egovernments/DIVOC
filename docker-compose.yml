@@ -60,6 +60,8 @@ services:
       KEYCLOAK_PASSWORD: admin
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
+      COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
+      IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -155,6 +157,7 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -179,6 +182,7 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy
@@ -282,6 +286,7 @@ services:
       ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      LOG_LEVEL: "$LOG_LEVEL"
     depends_on:
       kafka:
         condition: service_healthy

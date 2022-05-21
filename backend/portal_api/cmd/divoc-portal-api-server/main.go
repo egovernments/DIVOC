@@ -22,6 +22,9 @@ func main() {
 	kernelServices.Initialize()
 	db.Init()
 
+	ll, err := log.ParseLevel(config.Config.LogLevel)
+	log.SetLevel(ll)
+	
 	swaggerSpec, err := loads.Embedded(restapi.SwaggerJSON, restapi.FlatSwaggerJSON)
 	if err != nil {
 		log.Fatalln(err)

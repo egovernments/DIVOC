@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"text/template"
+
 	kernelServices "github.com/divoc/kernel_library/services"
 	"github.com/divoc/notification-service/config"
 	eventModels "github.com/divoc/notification-service/pkg/models"
@@ -11,7 +13,6 @@ import (
 	"github.com/divoc/notification-service/swagger_gen/models"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"text/template"
 )
 
 const RecipientCertified = "recipientCertified"
@@ -34,7 +35,8 @@ func certifiedEmailNotificationConsumer() {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+					log.Debugf("Message:  %s", string(msg.Value))
+					log.Infof("Topic: %s ", msg.TopicPartition)
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -107,7 +109,8 @@ func certifiedSMSNotificationConsumer() {
 			for {
 				msg, err := c.ReadMessage(-1)
 				if err == nil {
-					fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+					log.Debugf("Message:  %s", string(msg.Value))
+					log.Infof("Topic: %s ", msg.TopicPartition)
 					var certifyMessage eventModels.CertifiedMessage
 					if err := json.Unmarshal([]byte(string(msg.Value)), &certifyMessage); err != nil {
 						log.Errorf("Received message is not in required format %+v", err)
@@ -132,6 +135,7 @@ func certifiedSMSNotificationConsumer() {
 										if err == nil {
 											if resp, err := services.SendSMS(mobileNumber, buf.String()); err == nil {
 												log.Debugf("SMS sent response %+v", resp)
+												log.Infof("SMS is sent")
 											} else {
 												log.Errorf("Error in sending SMS %+v", err)
 											}
@@ -177,7 +181,8 @@ func notifyConsumer() {
 		for {
 			msg, err := c.ReadMessage(-1)
 			if err == nil {
-				fmt.Printf("Message on %s: %s\n", msg.TopicPartition, string(msg.Value))
+				log.Debugf("Message:  %s", string(msg.Value))
+				log.Infof("Topic: %s ", msg.TopicPartition)
 				var request models.NotificationRequest
 				if err := json.Unmarshal([]byte(string(msg.Value)), &request); err != nil {
 					log.Errorf("Received message is not in required format %+v", err)
@@ -188,7 +193,7 @@ func notifyConsumer() {
 					if err == nil {
 						if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
 							log.Debugf("SMS sent response %+v", resp)
-
+							log.Infof("SMS is sent")
 						} else {
 							log.Errorf("Error in sending SMS %+v", err)
 						}
