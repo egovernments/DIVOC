@@ -46,7 +46,7 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 					}
 				}
 				if dose < totalDoses {
-					log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
+					log.Infof("Registering %s to next program %s dose %f", preEnrollmentCode, programId, dose)
 					enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
 				}
 				response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
@@ -57,7 +57,7 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 				}
 			}
 		} else {
-			log.Error("Enrollment not found for osid %v", enrollmentOsid)
+			log.Errorf("Enrollment not found for osid %v", enrollmentOsid)
 		}
 	} else {
 		log.Error("Failed reading enrollments registry for osid", enrollmentOsid)
@@ -152,7 +152,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload, retryCount int) erro
 		if strings.Contains(err.Error(), DUPLICATE_MSG) {
 			// enrollmentCode already exists, trying with new enrollment code
 			if retryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-				log.Infof("Duplicate enrollmentCode found, retrying attempt ", retryCount, " of ", config.Config.EnrollmentCreation.MaxRetryCount)
+				log.Info("Duplicate enrollmentCode found, retrying attempt ", retryCount, " of ", config.Config.EnrollmentCreation.MaxRetryCount)
 				retryCount = retryCount + 1
 				return CreateEnrollment(enrollmentPayload, retryCount)
 			} else {

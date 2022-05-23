@@ -51,6 +51,15 @@ var Config = struct {
 	MinCancellationHours         int    `default:"24"`
 	MaxAppointmentUpdatesAllowed int    `default:"3"`
 	TimeZoneOffset               string `default:"+05:30"`
+	Mosip struct {
+		ClientId        string     `env:"MOSIP_CLIENT_ID"`
+		ClientSecret    string     `env:"MOSIP_CLIENT_SECRET"`
+		AuthHeader      string 	   `env:"MOSIP_AUTH_TOKEN"`
+		OTPUrl          string     `env:"MOSIP_OTP_URL"`
+		AuthUrl         string     `env:"MOSIP_AUTH_URL"`
+		PrivateKey      string     `env:"MOSIP_PRIVATE_KEY"`
+		PublicKey       string     `env:"MOSIP_PUBLIC_KEY"`
+	}
 	LogLevel 					 string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}
 

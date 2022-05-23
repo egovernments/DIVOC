@@ -58,7 +58,7 @@ func createFacilityWiseAppointmentSlots(schedule models.FacilitySchedule) {
 	if err == nil {
 		err = SetValue(key, schedule.Slots, schedule.GetTTL())
 		if err != nil {
-			log.Errorf("Error while creating key: %s slots: %d %v", key, schedule.Slots, err)
+			log.Errorf("Error while creating key: %s slots: %v %v", key, schedule.Slots, err)
 		}
 	} else {
 		log.Errorf("Error while inserting %s to set %s %v", key, schedule.FacilityCode, err)
@@ -70,7 +70,7 @@ func ClearOldSlots(facilityCode string, beforeTimeStamp int64) {
 	if e := RemoveElementsByScoreInSet(facilityCode, "-inf", fmt.Sprintf("(%d", beforeTimeStamp)); e != nil {
 		log.Errorf("Error clearing old slots for FacilityCode: %s, timeStamp: %d", facilityCode, beforeTimeStamp)
 	}
-	log.Infof("Clearing old slots for %d[FacilityCode] before %d[epoch]", facilityCode, beforeTimeStamp)
+	log.Infof("Clearing old slots for %v[FacilityCode] before %d[epoch]", facilityCode, beforeTimeStamp)
 }
 
 func BookAppointmentSlot(slotId string) error {
@@ -116,13 +116,13 @@ func RevokeEnrollmentBookedStatus(enrollmentCode string, programId string, dose 
 	updatedCountKey := fmt.Sprintf("%s-%s-updatedCount", programId, dose)
 	success, err := RemoveHastField(enrollmentCode, slotKey)
 	if err != nil {
-		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, err)
+		log.Errorf("Failed to mark %s code for slot %s as booked %v", enrollmentCode, slotKey, err)
 	} else {
-		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode)
+		log.Infof("Successfully marked %s code for slot %s as booked", enrollmentCode, slotKey)
 	}
 	_, err = IncrHashField(enrollmentCode, updatedCountKey)
 	if err != nil {
-		log.Errorf("Failed to increase %s updated count", enrollmentCode, err)
+		log.Errorf("Failed to increase %s updated count - %v", enrollmentCode, err)
 	} else {
 		log.Infof("Successfully increased %s updated count", enrollmentCode)
 	}
@@ -186,12 +186,12 @@ func GetOpenFacilitySlot(facilityCode, programID string) (string, error) {
 		for i , rc := range remainingCounts {
 			countStr, ok := rc.(string)
 			if !ok {
-				log.Error("Error parsing %s to string", rc)
+				log.Errorf("Error parsing %s to string", rc)
 				continue
 			}
 			count, err := strconv.Atoi(countStr)
 			if err != nil {
-				log.Error("Error parsing %s to int", countStr)
+				log.Errorf("Error parsing %s to int", countStr)
 				continue
 			}
 			if count > 0 {

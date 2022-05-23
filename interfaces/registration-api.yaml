@@ -352,6 +352,33 @@ paths:
          description: Internal Error
        '400':
          description: Bad request
+  /external/mosip/generateOTP:
+    post:
+      summary: Generate OTP
+      operationId: mosipGenerateOTP
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - individualIdType
+              - individualId
+            properties:
+              individualIdType:
+                type: string
+                enum: ["UIN", "VID"]
+              individualId:
+                type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Error
+        '400':
+          description: Bad request
   /verifyOTP:
     post:
       summary: Verify OTP
