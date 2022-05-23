@@ -62,15 +62,6 @@ var Config = struct {
 		IDACertKey      string     `env:"MOSIP_IDA_CERT_KEY"`
 	}
 	LogLevel 					 string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
-	Mosip struct {
-		ClientId        string     `env:"MOSIP_CLIENT_ID"`
-		ClientSecret    string     `env:"MOSIP_CLIENT_SECRET"`
-		AuthHeader      string 	   `env:"MOSIP_AUTH_TOKEN"`
-		OTPUrl          string     `env:"MOSIP_OTP_URL"`
-		AuthUrl         string     `env:"MOSIP_AUTH_URL"`
-		PrivateKey      string     `env:"MOSIP_PRIVATE_KEY"`
-		PublicKey       string     `env:"MOSIP_PUBLIC_KEY"`
-	}
 }{}
 
 func Initialize() {
