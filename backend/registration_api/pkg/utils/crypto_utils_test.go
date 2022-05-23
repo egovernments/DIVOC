@@ -32,8 +32,8 @@ func TestSymmetricEncrypt(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got := ""
-			if got = symmetricEncrypt(tt.args.stringToEncrypt, tt.args.keyString); symmetricDecrypt(got, tt.args.keyString) != tt.args.stringToEncrypt {
-				t.Errorf("symmetricEncrypt() = %v, want %v", got, tt.want)
+			if got = SymmetricEncrypt(tt.args.stringToEncrypt, tt.args.keyString); SymmetricDecrypt(got, tt.args.keyString) != tt.args.stringToEncrypt {
+				t.Errorf("SymmetricEncrypt() = %v, want %v", got, tt.want)
 			}
 		})
 	}
@@ -67,14 +67,14 @@ func TestASymmetricEncryptionDecryption(t *testing.T) {
 			got := ""
 			decryptedString := ""
 			var err error
-			if got, err = asymmetricEncrypt(tt.args.stringToEncrypt, tt.args.publicKeyPem); err != nil {
-				t.Errorf("symmetricEncrypt() throwed error %v", err)
+			if got, err = AsymmetricEncrypt(tt.args.stringToEncrypt, tt.args.publicKeyPem); err != nil {
+				t.Errorf("SymmetricEncrypt() throwed error %v", err)
 			}
-			if decryptedString, err = asymmetricDecrypt(got, privateKeyPem); err != nil {
-				t.Errorf("asymmetricDecrypt() throwed error %v", err)
+			if decryptedString, err = AsymmetricDecrypt(got, privateKeyPem); err != nil {
+				t.Errorf("AsymmetricDecrypt() throwed error %v", err)
 			}
 			if decryptedString != tt.want {
-				t.Errorf("symmetricEncrypt() = %v, want %v", got, tt.want)
+				t.Errorf("SymmetricEncrypt() = %v, want %v", got, tt.want)
 			}
 
 		})

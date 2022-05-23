@@ -12,9 +12,21 @@ import (
 	"github.com/gospotcheck/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"io"
+	"strings"
 )
 
-func symmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString string) {
+func GenSecKey() string {
+	bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
+	if _, err := rand.Read(bytes); err != nil {
+		panic(err.Error())
+	}
+
+	key := hex.EncodeToString(bytes) //encode key in bytes to string and keep as secret, put in a vault
+	fmt.Printf("key to encrypt/decrypt : %s\n", key)
+	return key
+}
+
+func SymmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString string) {
 
 	//Since the key is in string, we need to convert decode it to bytes
 	key, _ := hex.DecodeString(keyString)
@@ -46,7 +58,7 @@ func symmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString
 	return fmt.Sprintf("%x", ciphertext)
 }
 
-func symmetricDecrypt(encryptedString string, keyString string) (decryptedString string) {
+func SymmetricDecrypt(encryptedString string, keyString string) (decryptedString string) {
 
 	key, _ := hex.DecodeString(keyString)
 	enc, _ := hex.DecodeString(encryptedString)
@@ -78,7 +90,7 @@ func symmetricDecrypt(encryptedString string, keyString string) (decryptedString
 	return fmt.Sprintf("%s", plaintext)
 }
 
-func asymmetricEncrypt(stringToEncrypt string, publicKey string) (encryptedString string, err error) {
+func AsymmetricEncrypt(stringToEncrypt string, publicKey string) (encryptedString string, err error) {
 
 	plaintext := []byte(stringToEncrypt)
 	publicKeyFromPem, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
@@ -92,7 +104,7 @@ func asymmetricEncrypt(stringToEncrypt string, publicKey string) (encryptedStrin
 	return base64.StdEncoding.EncodeToString(encryptedData), nil
 }
 
-func asymmetricDecrypt(encryptedString string, privateKey string) (decryptedString string, err error) {
+func AsymmetricDecrypt(encryptedString string, privateKey string) (decryptedString string, err error) {
 	base64DecodeBytes, err := base64.StdEncoding.DecodeString(encryptedString)
 	if err != nil {
 		log.Errorf("Error in asymmetric encryption - ")
@@ -108,4 +120,16 @@ func asymmetricDecrypt(encryptedString string, privateKey string) (decryptedStri
 	}
 
 	return string(decryptedData), nil
+}
+
+func DigestAsPlainText(bytes []byte) string {
+	hasher := sha256.New()
+	hasher.Write(bytes)
+	return strings.ToUpper(hex.EncodeToString(hasher.Sum(nil)))
+}
+
+func Sha256Hash(bytes []byte) []byte {
+	hasher := sha256.New()
+	hasher.Write(bytes)
+	return hasher.Sum(nil)
 }
