@@ -14,13 +14,13 @@ type NotificationTemplatesType map[string]struct {
 	Message string
 }
 
-type ProgramComorbiditiesType map[string]struct {
+type ProgramComorbiditiesType struct {
 	Comorbidities []string
 	MaxAge        int
 	MinAge        int
 }
 
-type CountrySpecificFeaturesType map[string]struct {
+type CountrySpecificFeaturesType struct {
 	Features interface{}
 }
 
