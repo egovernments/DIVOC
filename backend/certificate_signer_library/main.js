@@ -53,7 +53,13 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
 
   const kafka = new Kafka({
     clientId: 'divoc-cert',
-    brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
+    brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(","),
+    ssl: config.KAFKA_ENABLE_SSL,
+    sasl: {
+      mechanism: config.KAFKA_SASL_MECHANISM,
+      username: config.KAFKA_SASL_USERNAME,
+      password: config.KAFKA_SASL_PASSWORD
+    },
   });
   producer = kafka.producer({allowAutoTopicCreation: true});
 

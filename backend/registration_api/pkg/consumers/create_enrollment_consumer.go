@@ -16,6 +16,10 @@ func StartEnrollmentConsumer() {
 		"group.id":           "enroll-recipient",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 	if err != nil {
 		log.Errorf("Failed connecting to kafka %+v", err)

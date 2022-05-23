@@ -20,7 +20,13 @@ console.log('Using ' + publicKeyPem);
 
 const kafka = new Kafka({
   clientId: 'divoc-cert',
-  brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
+  brokers: config.KAFKA_BOOTSTRAP_SERVER.split(","),
+  ssl: config.KAFKA_ENABLE_SSL,
+  sasl: {
+    mechanism: config.KAFKA_SASL_MECHANISM,
+    username: config.KAFKA_SASL_USERNAME,
+    password: config.KAFKA_SASL_PASSWORD
+  },
 });
 
 const consumer = kafka.consumer({ groupId: 'test_certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });

@@ -16,13 +16,16 @@ import (
 )
 
 const RecipientCertified = "recipientCertified"
-
 func certifiedEmailNotificationConsumer() {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
 		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
 		"group.id":           "certified_email_notifier",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 
 	if err != nil {
@@ -97,6 +100,10 @@ func certifiedSMSNotificationConsumer() {
 		"group.id":           "certified_sms_notifier",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 
 	if err != nil {
@@ -169,6 +176,10 @@ func notifyConsumer() {
 		"group.id":           "notifier",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 
 	if err != nil {

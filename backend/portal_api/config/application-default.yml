@@ -35,6 +35,10 @@ kafka:
   notifyTopic: notify
   certifiedTopic: certified
   enrollmenttopic: enrollment
+  securityProtocol:
+  saslMechanism:
+  saslUsername:
+  saslPassword:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3

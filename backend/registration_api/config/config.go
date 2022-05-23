@@ -30,6 +30,11 @@ var Config = struct {
 		AppointmentAckTopic       string `default:"appointment_ack" yaml:"appointmentacktopic"`
 		RecipientAppointmentTopic string `default:"recipientappointment" yaml:"recipientappointmenttopic"`
 		CertifiedTopic            string `default:"certified" yaml:"certifiedtopic"`
+		SecurityProtocol string `env:"KAFKA_SECURITY_PROTOCOL" yaml:"securityProtocol"`
+		SaslMechanism    string `env:"KAFKA_SASL_MECHANISM" yaml:"saslMechanism"`
+		SaslUsername     string `env:"KAFKA_SASL_USERNAME" yaml:"saslUsername"`
+		SaslPassword     string `env:"KAFKA_SASL_PASSWORD" yaml:"saslPassword"`
+		SslCaLocation     string `env:"KAFKA_SSL_CA_LOCATION" yaml:"sslCaLocation"`
 	}
 
 	EnrollmentCreation struct {

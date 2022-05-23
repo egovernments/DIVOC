@@ -2,6 +2,10 @@ kafka:
   bootstrapServers: localhost
   certifyTopic: certify
   notifyTopic: notify
+  securityProtocol:
+  saslMechanism:
+  saslUsername:
+  saslPassword:
 
 smsapi:
   url: https://api.msg91.com/api/v2/sendsms

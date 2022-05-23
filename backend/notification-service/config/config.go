@@ -20,6 +20,10 @@ var Config = struct {
 		CertifyTopic     string `default:"certify" yaml:"certifyTopic"`
 		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
+		SecurityProtocol string `env:"KAFKA_SECURITY_PROTOCOL" yaml:"securityProtocol"`
+		SaslMechanism    string `env:"KAFKA_SASL_MECHANISM" yaml:"saslMechanism"`
+		SaslUsername     string `env:"KAFKA_SASL_USERNAME" yaml:"saslUsername"`
+		SaslPassword     string `env:"KAFKA_SASL_PASSWORD" yaml:"saslPassword"`
 	}
 	SmsAPI struct {
 		URL     string `env:"SMS_URL" default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`

@@ -1,9 +1,15 @@
 const {Kafka} = require('kafkajs');
-const {KAFKA_BOOTSTRAP_SERVER} = require('../../configs/config');
+const {KAFKA_BOOTSTRAP_SERVER,KAFKA_ENABLE_SSL,KAFKA_SASL_MECHANISM,KAFKA_SASL_USERNAME,KAFKA_SASL_PASSWORD} = require('../../configs/config');
 
 const kafka = new Kafka({
     clientId: 'certificate_api',
-    brokers: KAFKA_BOOTSTRAP_SERVER.split(",")
+    brokers: KAFKA_BOOTSTRAP_SERVER.split(","),
+    ssl: KAFKA_ENABLE_SSL,
+    sasl: {
+        mechanism: KAFKA_SASL_MECHANISM,
+        username: KAFKA_SASL_USERNAME,
+        password: KAFKA_SASL_PASSWORD
+    },
 });
 
 let producer = undefined;

@@ -66,6 +66,10 @@ var Config = struct {
 		RevokeCertTopic          string `default:"revoke_cert" yaml:"revokeCertTopic"`
 		RevokeCertErrTopic       string `default:"revoke_cert_err" yaml:"revokeCertErrTopic"`
 		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
+		SecurityProtocol string `env:"KAFKA_SECURITY_PROTOCOL" yaml:"securityProtocol"`
+		SaslMechanism    string `env:"KAFKA_SASL_MECHANISM" yaml:"saslMechanism"`
+		SaslUsername     string `env:"KAFKA_SASL_USERNAME" yaml:"saslUsername"`
+		SaslPassword     string `env:"KAFKA_SASL_PASSWORD" yaml:"saslPassword"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`

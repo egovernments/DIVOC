@@ -28,8 +28,15 @@ type Message struct {
 }
 
 func InitializeKafka() {
+	log.Info("initializing kafka")
 	servers := config.Config.Kafka.BootstrapServers
-	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": servers,
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
+	})
 	if err != nil {
 		panic(err)
 	}
@@ -38,6 +45,10 @@ func InitializeKafka() {
 		"group.id":           "certify_ack",
 		"auto.offset.reset":  "earliest",
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 	if err != nil {
 		panic(err)
@@ -289,6 +300,10 @@ func startCertificateRevocationConsumer(servers string) {
 			"group.id":           "certificate_revocation",
 			"auto.offset.reset":  "earliest",
 			"enable.auto.commit": "false",
+			"security.protocol": config.Config.Kafka.SecurityProtocol,
+			"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+			"sasl.username": config.Config.Kafka.SaslUsername,
+			"sasl.password": config.Config.Kafka.SaslPassword,
 		})
 		if err != nil {
 			panic(err)

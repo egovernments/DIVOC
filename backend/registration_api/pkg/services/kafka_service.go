@@ -16,7 +16,14 @@ var enrollmentACKMessages = make(chan []byte)
 
 func InitializeKafka() {
 	servers := config.Config.Kafka.BootstrapServers
-	producer, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": servers})
+	producer, err := kafka.NewProducer(&kafka.ConfigMap{
+		"bootstrap.servers": servers,
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
+	})
 	if err != nil {
 		panic(err)
 	}

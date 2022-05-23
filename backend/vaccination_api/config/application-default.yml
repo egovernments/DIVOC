@@ -14,6 +14,10 @@ kafka:
   testCertifyTopic: test_certify
   eventsTopic: events
   reportedSideEffectsTopic: reported_side_effects
+  securityProtocol:
+  saslMechanism:
+  saslUsername:
+  saslPassword:
 database:
   host: localhost
   port: 5432

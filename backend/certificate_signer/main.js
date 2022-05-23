@@ -40,7 +40,13 @@ let W3C_TEMPLATE;
 
 const kafka = new Kafka({
   clientId: 'divoc-cert',
-  brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
+  brokers: config.KAFKA_BOOTSTRAP_SERVER.split(","),
+  ssl: config.KAFKA_ENABLE_SSL,
+  sasl: {
+    mechanism: config.KAFKA_SASL_MECHANISM,
+    username: config.KAFKA_SASL_USERNAME,
+    password: config.KAFKA_SASL_PASSWORD
+  },
 });
 
 const consumer = kafka.consumer({ groupId: 'certificate_signer', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
@@ -76,6 +82,10 @@ let signingConfig = {
   CERTIFICATE_RETRY_COUNT: config.CERTIFICATE_RETRY_COUNT,
   DUPLICATE_CERTIFICATE_TOPIC: config.DUPLICATE_CERTIFICATE_TOPIC,
   CERTIFICATE_ACK_TOPIC: config.CERTIFICATE_ACK_TOPIC,
+  KAFKA_SASL_MECHANISM: config.KAFKA_SASL_MECHANISM,
+  KAFKA_SASL_USERNAME: config.KAFKA_SASL_USERNAME,
+  KAFKA_SASL_PASSWORD: config.KAFKA_SASL_PASSWORD,
+  KAFKA_ENABLE_SSL: config.KAFKA_ENABLE_SSL,
 
 };
 

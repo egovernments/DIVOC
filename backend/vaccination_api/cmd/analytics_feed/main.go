@@ -193,6 +193,10 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 		"group.id":           "analytics_feed",
 		"auto.offset.reset":  resetOption,
 		"enable.auto.commit": "false",
+		"security.protocol": config.Config.Kafka.SecurityProtocol,
+		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
+		"sasl.username": config.Config.Kafka.SaslUsername,
+		"sasl.password": config.Config.Kafka.SaslPassword,
 	})
 
 	if err != nil {

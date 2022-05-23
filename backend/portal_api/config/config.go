@@ -68,6 +68,10 @@ var Config = struct {
 		CertifiedTopic     string `default:"certified" yaml:"certifiedTopic"`
 		EnrollmentTopic    string `default:"enrollment" yaml:"enrollmenttopic"`
 		EnrollmentACKTopic string `default:"enrollment_ack" yaml:"enrollmentacktopic"`
+		SecurityProtocol string `env:"KAFKA_SECURITY_PROTOCOL" yaml:"securityProtocol"`
+		SaslMechanism    string `env:"KAFKA_SASL_MECHANISM" yaml:"saslMechanism"`
+		SaslUsername     string `env:"KAFKA_SASL_USERNAME" yaml:"saslUsername"`
+		SaslPassword     string `env:"KAFKA_SASL_PASSWORD" yaml:"saslPassword"`
 	}
 	SearchRegistry struct {
 		DefaultLimit  int `default:"100"`
