@@ -7,7 +7,13 @@ import {CustomButton} from "../../CustomButton";
 import DefaultProgramLogo from "../../../assets/img/logo-noprogram.svg"
 import SelectedLogo from "../../../assets/img/check.svg"
 import {Success} from "./Success";
-import {CITIZEN_TOKEN_COOKIE_NAME, PROGRAM_API, RECIPIENTS_API} from "../../../constants";
+import {
+    CITIZEN_TOKEN_COOKIE_NAME,
+    CONFIG_API,
+    CONFIG_KEY,
+    PROGRAM_API, PROGRAM_COMORBIDITIES_KEY,
+    RECIPIENTS_API
+} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {useHistory} from "react-router";
 import "./index.css"
@@ -145,29 +151,21 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
   const {t} = useTranslation();
 
   useEffect(() => {
-    const data = {
-      "flagKey": "programs",
-      "entityContext": {
-        "programId": formData.programId
-      }
-    };
-    axios
-      .post("/config/api/v1/evaluation", data)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      .then((result) => {
-        if(result["variantAttachment"]) {
-          setConditions(result["variantAttachment"].commorbidities || [])
-          setMinAge(result["variantAttachment"].minAge || 0)
-          setMaxAge(result["variantAttachment"].maxAge || MINIMUM_SUPPORT_AGE)
-        } else {
-          console.error("program eligibility criteria is not configure");
-        }
-      })
+      let apiUrl = CONFIG_API.replace(CONFIG_KEY, PROGRAM_COMORBIDITIES_KEY)
+      const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+      const config = {
+          headers: {"Authorization": token, "Content-Type": "application/json"},
+      };
+      axios
+          .get(apiUrl, config)
+          .catch((err) => {
+              console.log(err)
+          })
+          .then((result) => {
+              setConditions(result.data.comorbidities || [])
+              setMinAge(result.data.minAge || 0)
+              setMaxAge(result.data.maxAge || MINIMUM_SUPPORT_AGE)
+          })
   }, []);
 
   for (let i = curYear - maxAge; i < curYear; i++) {

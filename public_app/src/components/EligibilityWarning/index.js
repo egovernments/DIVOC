@@ -4,7 +4,7 @@ import {Alert} from "react-bootstrap";
 export const EligibilityWarning = ({programEligibility}) => {
 
     function isCommorbidityAvailable(program) {
-        return "commorbidities" in program && program["commorbidities"].length > 0;
+        return "comorbidities" in program && program["comorbidities"].length > 0;
     }
 
     function isMinAgeAvailable(program) {

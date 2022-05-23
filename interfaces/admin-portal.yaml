@@ -40,6 +40,27 @@ paths:
       responses:
         '200':
           description: OK
+  /config/{key}:
+    get:
+      summary: get config
+      operationId: getConfig
+      parameters:
+        - in: path
+          name: key
+          type: string
+          required: true
+          description: key in etcd
+      security:
+        - hasRole: ["facility-admin", "admin", "facility-staff", "controller"]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
   /facility:
     get:
       summary: get user facility details

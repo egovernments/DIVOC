@@ -15,7 +15,7 @@ import FacilityController from "./components/FacilityController/FacilityControll
 import PrintCertificate from "./components/PrintCertificate/PrintCertificate";
 import {Analytics} from "./components/Analytics/Anlaytics";
 import MapView from "./components/MapView/MapView"
-import config from "./config"
+import config from "./config.json"
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
 import {getApplicationConfigFromEtcd} from "./redux/reducers/etcdConfig";

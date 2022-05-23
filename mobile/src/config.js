@@ -6,11 +6,6 @@ const CERTIFICATE_NAMESPACE = process.env.REACT_APP_CERTIFICATE_NAMESPACE || "ht
 const CERTIFICATE_NAMESPACE_V2 = process.env.REACT_APP_CERTIFICATE_NAMESPACE_V2 || "https://cowin.gov.in/credentials/vaccination/v2";
 const CERTIFICATE_PUBKEY_ID = process.env.REACT_APP_CERTIFICATE_PUBKEY_ID || 'https://example.com/i/india';
 const CERTIFICATE_DID = process.env.REACT_APP_CERTIFICATE_DID || 'did:india';
-const ETCD_URL = process.env.REACT_APP_ETCD_URL || 'etcd:2379';
-const CONFIGURATION_LAYER = process.env.REACT_APP_CONFIGURATION_LAYER || 'etcd';
-const ETCD_AUTH_ENABLED = process.env.REACT_APP_ETCD_AUTH_ENABLED === "true"
-const ETCD_USERNAME = process.env.REACT_APP_ETCD_USERNAME;
-const ETCD_PASSWORD = process.env.REACT_APP_ETCD_PASSWORD;
 
 module.exports = {
     urlPath,
@@ -20,9 +15,4 @@ module.exports = {
     CERTIFICATE_DID,
     CERTIFICATE_NAMESPACE,
     CERTIFICATE_PUBKEY_ID,
-    ETCD_URL,
-    CONFIGURATION_LAYER,
-    ETCD_AUTH_ENABLED,
-    ETCD_USERNAME,
-    ETCD_PASSWORD
 };

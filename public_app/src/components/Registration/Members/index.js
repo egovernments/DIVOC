@@ -4,8 +4,8 @@ import "./index.css";
 import { useHistory } from "react-router-dom";
 import { CustomButton } from "../../CustomButton";
 import {
-  CITIZEN_TOKEN_COOKIE_NAME,
-  PROGRAM_API,
+  CITIZEN_TOKEN_COOKIE_NAME, CONFIG_API, CONFIG_KEY,
+  PROGRAM_API, PROGRAM_COMORBIDITIES_KEY,
   RECIPIENTS_API,
 } from "../../../constants";
 import axios from "axios";
@@ -79,57 +79,34 @@ export const Members = () => {
     if (!getUserNumberFromRecipientToken()) {
       history.push("/citizen");
     }
-    const data = {
-      entityContext: {},
-      flagKey: "country_specific_features",
-    };
-    axios
-      .post("/config/api/v1/evaluation", data)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-      .then((result) => {
-        // if (result["variantAttachment"]) {
-        //     setMarqueeMsg(result["variantAttachment"].registrationMaxAgeMessage)
-        // }
-      });
   }, []);
 
   function fetchProgramEligibility(programs) {
-    let data = {
-      flagKeys: ["programs"],
-      entities: [],
+    let eligibility = []
+    let programEligibility;
+    let apiUrl = CONFIG_API.replace(CONFIG_KEY, PROGRAM_COMORBIDITIES_KEY)
+    const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+    const config = {
+      headers: {"Authorization": token, "Content-Type": "application/json"},
     };
+    axios
+        .get(apiUrl, config)
+        .catch((err) => {
+          console.log(err)
+        })
+        .then((res) => {
+          programEligibility = res.data
+        })
     programs.forEach((program) => {
-      data.entities.push({
-        entityContext: {
-          programId: program.id,
-          programName: program.name,
-        },
+      let programId = program.id
+      let programName = program.name
+      eligibility.push({
+        ...programEligibility,
+        programName,
+        programId,
       });
     });
-    axios.post("/config/api/v1/evaluation/batch", data).then((res) => {
-      const { data } = res;
-      let eligibility = [];
-      data.evaluationResults.forEach((result) => {
-        const {
-          evalContext: {
-            entityContext: { programId, programName },
-          },
-        } = result;
-        if ("variantAttachment" in result) {
-          eligibility.push({
-            ...result["variantAttachment"],
-            programName,
-            programId,
-          });
-        }
-      });
-      setProgramEligibility(eligibility);
-    });
+    setProgramEligibility(eligibility);
   }
 
   function fetchPrograms() {

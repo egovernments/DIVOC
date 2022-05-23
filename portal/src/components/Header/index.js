@@ -7,7 +7,7 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
-import config from "../../config";
+import config from "../../config.json";
 import {useSelector} from "react-redux";
 import {NavLink, useHistory} from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";

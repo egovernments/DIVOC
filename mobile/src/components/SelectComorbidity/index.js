@@ -14,7 +14,6 @@ import {comorbiditiesDb} from "../../Services/ComorbiditiesDB";
 import {CONSTANT} from "../../utils/constants";
 import {useHistory} from "react-router";
 import config from "../../config"
-import {EtcdConfigService} from "../../Services/EtcdConfigService";
 
 export const SelectComorbidity = ({}) => {
     const {goNext} = useWalkInEnrollment();
@@ -29,7 +28,6 @@ export const SelectComorbidity = ({}) => {
     const [minAge, setMinAge] = useState(0);
     const [maxAge, setMaxAge] = useState(curYear - MINIMUM_SUPPORT_YEAR);
     const [formData, setFormData] = useState(initialWalkInEnrollmentState)
-    const configurationService = new EtcdConfigService();
 
     function setComorbidities(result) {
         setConditions(result.commorbidities || [])
@@ -45,15 +43,16 @@ export const SelectComorbidity = ({}) => {
                 if (res) {
                     setComorbidities(res.comorbidities);
                 } else {
-                    configurationService.getProgramComorbidities(CONSTANT.PROGRAM_COMORBIDITIES_KEY)
-                        .then((res) => {
-                            const configs = res;
-                            setComorbidities(configs)
-                            comorbiditiesDb.saveComorbidities(programId, configs)
-                        })
+                    const data = {
+                        "key": CONSTANT.PROGRAM_COMORBIDITIES_KEY,
+                    };
+                    ApiServices.fetchEtcdConfigs(data)
                         .catch((err) => {
-                            console.log("Error occurred while fetching comorbidity config from etcd");
                             console.log(err)
+                        })
+                        .then((result) => {
+                            setComorbidities(result);
+                            comorbiditiesDb.saveComorbidities(programId, result)
                         })
                 }
             })

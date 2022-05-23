@@ -5,11 +5,8 @@ import {comorbiditiesDb} from "./Services/ComorbiditiesDB";
 import {queueDb} from "./Services/QueueDB";
 import {getSelectedProgram, getSelectedProgramId} from "./components/ProgramSelection";
 import {CONSTANT} from "./utils/constants";
-import {EtcdConfigService} from "./Services/EtcdConfigService"
 
 const LAST_SYNC_KEY = "lastSyncedDate";
-
-const configurationService = new EtcdConfigService();
 
 export const is24hoursAgo = (date) => {
 
@@ -31,7 +28,10 @@ export class SyncFacade {
         const programs = await ApiServices.fetchPrograms();
         await programDb.savePrograms(programs);
         for (const program of programs) {
-            await configurationService.getProgramComorbidities(CONSTANT.PROGRAM_COMORBIDITIES_KEY)
+            const data = {
+                "key": CONSTANT.PROGRAM_COMORBIDITIES_KEY
+            }
+            await ApiServices.fetchEtcdConfigs(data)
                 .catch((err) => {
                     console.log("Error occurred while fetching comorbidity config from etcd");
                     console.log(err)

@@ -1,4 +1,5 @@
 import {appIndexDb} from "../AppDatabase";
+import {CONSTANT} from "../utils/constants";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
@@ -10,9 +11,11 @@ const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
 const FACILITY_ID = "FACILITY_ID"
 const ENROLLMENT_ID = "ENROLLMENT_ID"
 const PROGRAM_ID = "PROGRAM_ID"
+const ETCD_KEY = "ETCD_KEY"
 const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/schedule`
 const ENROLLMENT_BY_CODE = `/divoc/api/v1/preEnrollments/${ENROLLMENT_ID}`
 const VERIFY_CERTIFICATE = "/divoc/api/v1/certificate/revoked"
+const ETCD_APPLICATION_CONFIG = `/divoc/admin/api/v1/config/${ETCD_KEY}`;
 
 export class ApiServices {
 
@@ -170,6 +173,33 @@ export class ApiServices {
         };
         return fetch(FACILITY_DETAILS, requestOptions)
             .then(response => {
+                return response.json()
+            })
+    }
+
+    static async fetchApplicationConfigFromEtcd() {
+        const data = {
+            "key": CONSTANT.COUNTRY_SPECIFIC_FEATURES_KEY
+        };
+        return this.fetchEtcdConfigs(data);
+    }
+
+    static fetchEtcdConfigs(data) {
+        const requestOptions = {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+        };
+
+        const apiURL = ETCD_APPLICATION_CONFIG
+            .replace(ETCD_KEY, data.key);
+
+        return fetch(apiURL, requestOptions)
+            .then(response => {
+                console.log(response.json())
                 return response.json()
             })
     }

@@ -5,7 +5,7 @@ import "./index.css"
 import Button from "react-bootstrap/Button";
 import {CheckboxItem} from "../FacilityFilterTab";
 import {useHistory} from "react-router-dom";
-import config from "../../config"
+import config from "../../config.json"
 import {useAxios} from "../../utils/useAxios";
 import {API_URL, TAB_INDICES} from "../../utils/constants";
 import {

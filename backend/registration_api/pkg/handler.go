@@ -53,10 +53,15 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.RegisterRecipientToProgramHandler = operations.RegisterRecipientToProgramHandlerFunc(services.RegisterEnrollmentToProgram)
 	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
 	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
+	api.GetConfigHandler = operations.GetConfigHandlerFunc(getConfigHandler)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
 	return operations.NewGetPingOK()
+}
+
+func getConfigHandler(params operations.GetConfigParams, principal *models3.JWTClaimBody) middleware.Responder {
+	return model.NewGenericJSONResponse(kernelService.GetConfig(params.Key))
 }
 
 func getRecipients(params operations.GetRecipientsParams, principal *models3.JWTClaimBody) middleware.Responder {
@@ -288,7 +293,7 @@ func getFacilitySlots(params operations.GetSlotsForFacilitiesParams, principal *
 }
 
 func bookSlot(params operations.BookSlotOfFacilityParams, principal *models3.JWTClaimBody) middleware.Responder {
-	enrollmentCode, facilitySlotID, phone := params.Body.EnrollmentCode,  params.Body.FacilitySlotID, principal.Phone
+	enrollmentCode, facilitySlotID, phone := params.Body.EnrollmentCode, params.Body.FacilitySlotID, principal.Phone
 	if enrollmentCode == nil || facilitySlotID == nil || phone == "" {
 		return operations.NewBookSlotOfFacilityBadRequest()
 	}
@@ -362,7 +367,7 @@ func deleteAppointmentInEnrollment(enrollmentCode string, phone string, dose str
 
 func deleteRecipient(params operations.DeleteRecipientParams, principal *models3.JWTClaimBody) middleware.Responder {
 
-	badReqResponse := func (errMsg string) *operations.DeleteRecipientBadRequest {
+	badReqResponse := func(errMsg string) *operations.DeleteRecipientBadRequest {
 		r := operations.NewDeleteRecipientBadRequest()
 		r.Payload = &operations.DeleteRecipientBadRequestBody{
 			Message: errMsg,
@@ -386,12 +391,12 @@ func deleteRecipient(params operations.DeleteRecipientParams, principal *models3
 		log.Error("Error deleting from registry : ", err)
 		return operations.NewDeleteRecipientInternalServerError()
 	}
-	
+
 	if err := services.DeleteValue(enrollmentCode); err != nil {
 		log.Error("Error deleting from redis : ", err)
 	}
 
-	services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)	
+	services.NotifyDeletedRecipient(enrollmentCode, enrollmentInfo)
 	return operations.NewDeleteRecipientOK()
 }
 
@@ -430,7 +435,7 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 		"appointments.appointmentDate": map[string]interface{}{
 			"between": []strfmt.Date{params.StartDate, params.EndDate},
 		},
-		"appointments.certified" : map[string]interface{}{
+		"appointments.certified": map[string]interface{}{
 			"eq": false,
 		},
 	}
@@ -445,7 +450,7 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 		"appointments.osUpdatedAt": map[string]interface{}{
 			"between": []strfmt.Date{params.StartDate, params.EndDate},
 		},
-		"appointments.certified" : map[string]interface{}{
+		"appointments.certified": map[string]interface{}{
 			"eq": true,
 		},
 	}
@@ -474,7 +479,7 @@ func getBeneficiaries(params operations.GetBeneficiariesParams, principal *model
 
 func getAllBeneficiaries(openAppointmentFilter map[string]interface{}, certifiedFilter map[string]interface{}) ([]map[string]interface{}, error) {
 
-	response1FromRegistry, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter);
+	response1FromRegistry, err := services.GetBeneficiariesFromRegistry(openAppointmentFilter)
 	if err != nil {
 		return nil, err
 	}
@@ -483,7 +488,7 @@ func getAllBeneficiaries(openAppointmentFilter map[string]interface{}, certified
 		response1BeneficiaryCodes = append(response1BeneficiaryCodes, b["code"].(string))
 	}
 
-	response2FromRegistry, err2 := services.GetBeneficiariesFromRegistry(certifiedFilter);
+	response2FromRegistry, err2 := services.GetBeneficiariesFromRegistry(certifiedFilter)
 	if err2 != nil {
 		return nil, err
 	}

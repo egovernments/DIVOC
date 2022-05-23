@@ -207,6 +207,40 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facility/slots": {
       "get": {
         "security": [
@@ -797,6 +831,40 @@ func init() {
                 "$ref": "#/definitions/enrollment"
               }
             }
+          }
+        }
+      }
+    },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

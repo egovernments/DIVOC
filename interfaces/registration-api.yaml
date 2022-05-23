@@ -92,6 +92,27 @@ paths:
           description: Bad Request
         '401':
           description: Unauthorized
+  /config/{key}:
+    get:
+      summary: get config
+      operationId: getConfig
+      parameters:
+        - in: path
+          name: key
+          type: string
+          required: true
+          description: key in etcd
+      security:
+        - Bearer: [ ]
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
   /facility/slots:
     get:
       summary: Get slots for facilites

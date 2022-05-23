@@ -1,10 +1,6 @@
 import state_and_districts from '../../utils/state_and_districts.json';
 import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
-import { EtcdConfigService } from "../../Services/EtcdConfigService";
-import {CONSTANT} from "../../utils/constants";
-const constants = require('../../constants')
-
-const configurationService = new EtcdConfigService();
+import {ApiServices} from "../../Services/ApiServices";
 
 const ETCD_ACTION_TYPES = {
     "LOAD_APPLICATION_CONFIG": "LOAD_APPLICATION_CONFIG"
@@ -45,7 +41,7 @@ export const loadApplicationConfig = (data) => {
 
 export const storeApplicationConfigFromEtcd = (dispatch) => {
     try {
-        configurationService.getCountrySpecificFeatures(CONSTANT.COUNTRY_SPECIFIC_FEATURES_KEY)
+        ApiServices.fetchApplicationConfigFromEtcd()
             .then((res) => {
                 const configs = res;
                 return applicationConfigsDB.saveApplicationConfigs(configs)

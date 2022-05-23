@@ -4,7 +4,7 @@ import {useHistory} from 'react-router-dom'
 
 import {useKeycloak} from '@react-keycloak/web'
 import {CONSTANTS} from "../utils/constants";
-import config from "../config"
+import config from "../config.json"
 
 const Login = () => {
     const {keycloak} = useKeycloak();

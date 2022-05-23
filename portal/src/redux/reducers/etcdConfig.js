@@ -1,9 +1,7 @@
+import axios from "axios";
 import state_and_districts from '../../utils/state_and_districts.json';
-import { EtcdConfigService } from "../../Services/EtcdConfigService";
 import {CONSTANTS} from "../../utils/constants";
 import NavbarLogo from "../../assets/img/nav-logo.png";
-
-const configurationService = new EtcdConfigService();
 
 const ETCD_ACTION_TYPES = {
     "LOAD_APPLICATION_CONFIG": "LOAD_APPLICATION_CONFIG"
@@ -43,9 +41,12 @@ export const loadApplicationConfig = (data) => {
 
 export const getApplicationConfigFromEtcd = (dispatch) => {
     try {
-        configurationService.getCountrySpecificFeatures(CONSTANTS.COUNTRY_SPECIFIC_FEATURES_KEY)
+        let params = {
+            key: CONSTANTS.COUNTRY_SPECIFIC_FEATURES_KEY
+        };
+        axios.get(`/divoc/admin/api/v1/config/${params.key}`)
             .then((res) => {
-                return dispatch(loadApplicationConfig(res))
+                return dispatch(loadApplicationConfig(res.data))
             })
             .catch((err) => {
                 console.log("Error occurred while fetching application config from etcd");
