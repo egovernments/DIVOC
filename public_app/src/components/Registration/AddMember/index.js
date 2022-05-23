@@ -162,9 +162,9 @@ export const SelectComorbidity = ({setValue, formData, navigation, programs, hid
               console.log(err)
           })
           .then((result) => {
-              setConditions(result.data.comorbidities || [])
-              setMinAge(result.data.minAge || 0)
-              setMaxAge(result.data.maxAge || MINIMUM_SUPPORT_AGE)
+              setConditions(result.data.Comorbidities || [])
+              setMinAge(result.data.MinAge || 0)
+              setMaxAge(result.data.MaxAge || MINIMUM_SUPPORT_AGE)
           })
   }, []);
 
