@@ -19,7 +19,8 @@ const ETCD_PASSWORD = process.env.ETCD_PASSWORD;
 const KAFKA_SASL_MECHANISM = process.env.KAFKA_SASL_MECHANISM;
 const KAFKA_SASL_USERNAME = process.env.KAFKA_SASL_USERNAME;
 const KAFKA_SASL_PASSWORD = process.env.KAFKA_SASL_PASSWORD;
-const KAFKA_ENABLE_SSL = (process.env.KAFKA_ENABLE_SSL == "true" ? true : false);
+const KAFKA_ENABLE_SSL = process.env.KAFKA_ENABLE_SSL;
+const KAFKA_SSL_CA_LOCATION = process.env.KAFKA_SSL_CA_LOCATION;
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
@@ -42,5 +43,6 @@ module.exports = {
     KAFKA_SASL_MECHANISM,
     KAFKA_SASL_USERNAME,
     KAFKA_SASL_PASSWORD,
-    KAFKA_ENABLE_SSL
+    KAFKA_ENABLE_SSL,
+    KAFKA_SSL_CA_LOCATION
 };

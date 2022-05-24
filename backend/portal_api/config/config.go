@@ -72,6 +72,7 @@ var Config = struct {
 		SaslMechanism    string `env:"KAFKA_SASL_MECHANISM" yaml:"saslMechanism"`
 		SaslUsername     string `env:"KAFKA_SASL_USERNAME" yaml:"saslUsername"`
 		SaslPassword     string `env:"KAFKA_SASL_PASSWORD" yaml:"saslPassword"`
+		SslCaLocation     string `env:"KAFKA_SSL_CA_LOCATION" yaml:"sslCaLocation"`
 	}
 	SearchRegistry struct {
 		DefaultLimit  int `default:"100"`

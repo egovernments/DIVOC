@@ -24,6 +24,7 @@ func StartRecipientsAppointmentBookingConsumer() {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 	if err != nil {
 		log.Errorf("Connection failed for the kafka",  err)

@@ -4,6 +4,7 @@ const redis = require('./redis');
 const R = require('ramda');
 const {initRegistry} = require('./registry')
 const registry = require('./registry');
+const fs = require('fs');
 
 let producer;
 
@@ -54,7 +55,7 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
   const kafka = new Kafka({
     clientId: 'divoc-cert',
     brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(","),
-    ssl: config.KAFKA_ENABLE_SSL,
+    ssl: (config.KAFKA_ENABLE_SSL == "true" ? { rejectUnauthorized: false, ca: [fs.readFileSync(config.KAFKA_SSL_CA_LOCATION, 'utf-8')]} : false),
     sasl: {
       mechanism: config.KAFKA_SASL_MECHANISM,
       username: config.KAFKA_SASL_USERNAME,

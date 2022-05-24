@@ -145,6 +145,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -178,6 +179,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy
@@ -222,6 +224,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       clickhouse-server:
         condition: service_started
@@ -241,6 +244,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       registry:
         condition: service_started
@@ -273,6 +277,7 @@ services:
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
       KAFKA_ENABLE_SSL: $KAFKA_ENABLE_SSL
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy
@@ -298,6 +303,7 @@ services:
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
       KAFKA_ENABLE_SSL: $KAFKA_ENABLE_SSL
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy
@@ -332,6 +338,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy
@@ -348,6 +355,7 @@ services:
       KAFKA_SASL_MECHANISM: $KAFKA_SASL_MECHANISM
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy
@@ -384,6 +392,7 @@ services:
       KAFKA_SASL_USERNAME: $KAFKA_SASL_USERNAME
       KAFKA_SASL_PASSWORD: $KAFKA_SASL_PASSWORD
       KAFKA_ENABLE_SSL: $KAFKA_ENABLE_SSL
+      KAFKA_SSL_CA_LOCATION: $KAFKA_SSL_CA_LOCATION
     depends_on:
       kafka:
         condition: service_healthy

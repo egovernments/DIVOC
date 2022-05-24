@@ -14,6 +14,7 @@ const {testCertificateContext} = require("test-certificate-context");
 const signer = require('certificate-signer-library');
 const {publicKeyPem, privateKeyPem, signingKeyType} = require('./config/keys');
 const identityRejectionRegex = new RegExp(IDENTITY_REJECTION_PATTERN);
+const fs = require('fs');
 
 console.log('Using ' + config.KAFKA_BOOTSTRAP_SERVER);
 console.log('Using ' + publicKeyPem);
@@ -21,7 +22,7 @@ console.log('Using ' + publicKeyPem);
 const kafka = new Kafka({
   clientId: 'divoc-cert',
   brokers: config.KAFKA_BOOTSTRAP_SERVER.split(","),
-  ssl: config.KAFKA_ENABLE_SSL,
+  ssl: (config.KAFKA_ENABLE_SSL == "true" ? { rejectUnauthorized: false, ca: [fs.readFileSync(config.KAFKA_SSL_CA_LOCATION, 'utf-8')]} : false),
   sasl: {
     mechanism: config.KAFKA_SASL_MECHANISM,
     username: config.KAFKA_SASL_USERNAME,
@@ -60,7 +61,12 @@ let signingConfig = {
   ERROR_CERTIFICATE_TOPIC: config.ERROR_CERTIFICATE_TOPIC,
   CERTIFICATE_RETRY_COUNT: config.CERTIFICATE_RETRY_COUNT,
   DUPLICATE_CERTIFICATE_TOPIC: config.DUPLICATE_CERTIFICATE_TOPIC,
-  CERTIFICATE_ACK_TOPIC: config.CERTIFICATE_ACK_TOPIC
+  CERTIFICATE_ACK_TOPIC: config.CERTIFICATE_ACK_TOPIC,
+  KAFKA_SASL_MECHANISM: config.KAFKA_SASL_MECHANISM,
+  KAFKA_SASL_USERNAME: config.KAFKA_SASL_USERNAME,
+  KAFKA_SASL_PASSWORD: config.KAFKA_SASL_PASSWORD,
+  KAFKA_ENABLE_SSL: config.KAFKA_ENABLE_SSL,
+  KAFKA_SSL_CA_LOCATION: config.KAFKA_SSL_CA_LOCATION
 
 };
 

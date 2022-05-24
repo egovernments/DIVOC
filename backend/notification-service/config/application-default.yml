@@ -6,7 +6,7 @@ kafka:
   saslMechanism:
   saslUsername:
   saslPassword:
-
+  sslCaLocation:
 smsapi:
   url: https://api.msg91.com/api/v2/sendsms
   authKey: secret

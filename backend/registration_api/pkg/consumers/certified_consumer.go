@@ -20,6 +20,7 @@ func StartCertifiedConsumer() {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 	if err != nil {
 		logrus.Errorf("Failed connecting to kafka", err)

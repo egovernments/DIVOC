@@ -39,6 +39,7 @@ kafka:
   saslMechanism:
   saslUsername:
   saslPassword:
+  sslCaLocation:
 enrollmentcreation:
   maxretrycount: 10
   lengthofsuffixedenrollmentcode: 3

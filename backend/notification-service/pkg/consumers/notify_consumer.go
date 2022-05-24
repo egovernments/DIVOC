@@ -26,6 +26,7 @@ func certifiedEmailNotificationConsumer() {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 
 	if err != nil {
@@ -104,6 +105,7 @@ func certifiedSMSNotificationConsumer() {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 
 	if err != nil {
@@ -180,6 +182,7 @@ func notifyConsumer() {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 
 	if err != nil {

@@ -135,6 +135,7 @@ func initializeRevokeCertificate(wg *sync.WaitGroup) {
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 	services.InitializeKafkaForRevocationService(producer)
 	services.InitRedis()
@@ -181,6 +182,7 @@ func createConsumer(groupId string, autoOffsetReset string, enableAutoCommit str
 		"sasl.mechanism"    : config.Config.Kafka.SaslMechanism,
 		"sasl.username": config.Config.Kafka.SaslUsername,
 		"sasl.password": config.Config.Kafka.SaslPassword,
+		"ssl.ca.location": config.Config.Kafka.SslCaLocation,
 	})
 	if err != nil {
 		panic(err)
