@@ -30,9 +30,9 @@ export const SelectComorbidity = ({}) => {
     const [formData, setFormData] = useState(initialWalkInEnrollmentState)
 
     function setComorbidities(result) {
-        setConditions(result.commorbidities || [])
-        setMinAge(result.minAge || 0)
-        setMaxAge(result.maxAge || curYear - MINIMUM_SUPPORT_YEAR)
+        setConditions(result.Comorbidities || [])
+        setMinAge(result.MinAge || 0)
+        setMaxAge(result.MaxAge || curYear - MINIMUM_SUPPORT_YEAR)
     }
 
     useEffect(() => {

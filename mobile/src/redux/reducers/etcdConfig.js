@@ -19,7 +19,7 @@ const initialState = {
 export function etcdConfigReducer(state = initialState, action) {
     switch (action.type) {
         case ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
-            if (action.payload) {
+            if (action.payload && Object.keys(action.payload).length !== 0) {
                 return {
                     ...state,
                     appConfig: action.payload

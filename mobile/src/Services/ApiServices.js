@@ -199,7 +199,6 @@ export class ApiServices {
 
         return fetch(apiURL, requestOptions)
             .then(response => {
-                console.log(response.json())
                 return response.json()
             })
     }
