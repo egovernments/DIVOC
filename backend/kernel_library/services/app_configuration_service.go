@@ -12,6 +12,7 @@ import (
 type NotificationTemplatesType map[string]struct {
 	Subject string
 	Message string
+	Html    string
 }
 
 type ProgramComorbiditiesType struct {
@@ -21,7 +22,6 @@ type ProgramComorbiditiesType struct {
 }
 
 type CountrySpecificFeaturesType struct {
-	Features interface{}
 }
 
 var AppConfigs = struct {

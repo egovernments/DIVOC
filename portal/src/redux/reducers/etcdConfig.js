@@ -1,4 +1,3 @@
-import axios from "axios";
 import state_and_districts from '../../utils/state_and_districts.json';
 import {CONSTANTS} from "../../utils/constants";
 import NavbarLogo from "../../assets/img/nav-logo.png";
@@ -19,7 +18,7 @@ const initialState = {
 export function etcdConfigReducer(state = initialState, action) {
     switch (action.type) {
         case ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
-            if (action.payload) {
+            if (action.payload && Object.keys(action.payload).length !== 0) {
                 return {
                     ...state,
                     appConfig: action.payload
@@ -39,12 +38,12 @@ export const loadApplicationConfig = (data) => {
     }
 };
 
-export const getApplicationConfigFromEtcd = (dispatch) => {
+export const getApplicationConfigFromEtcd = (dispatch, axiosInstance) => {
     try {
         let params = {
             key: CONSTANTS.COUNTRY_SPECIFIC_FEATURES_KEY
         };
-        axios.get(`/divoc/admin/api/v1/config/${params.key}`)
+        axiosInstance.current.get(`/divoc/admin/api/v1/config/${params.key}`)
             .then((res) => {
                 return dispatch(loadApplicationConfig(res.data))
             })

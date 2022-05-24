@@ -27,13 +27,11 @@ import FacilityConfigureSlot from "./components/FacilityConfigureSlot";
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
     const axiosInstance = useAxios('');
-    useEffect(() => {
-        getApplicationConfigFromEtcd(store.dispatch);
-    }, []);
 
     useEffect(() => {
         if (keycloak.authenticated) {
             try {
+                getApplicationConfigFromEtcd(store.dispatch, axiosInstance);
                 axiosInstance.current
                     .get(API_URL.USER_FACILITY_API)
                     .then((res) => {
