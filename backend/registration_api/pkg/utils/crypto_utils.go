@@ -6,7 +6,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"encoding/base64"
 	"encoding/hex"
 	"fmt"
 	"github.com/gospotcheck/jwt-go"
@@ -15,23 +14,16 @@ import (
 	"strings"
 )
 
-func GenSecKey() string {
+func GenSecKey() []byte {
 	bytes := make([]byte, 32) //generate a random 32 byte key for AES-256
 	if _, err := rand.Read(bytes); err != nil {
 		panic(err.Error())
 	}
 
-	key := hex.EncodeToString(bytes) //encode key in bytes to string and keep as secret, put in a vault
-	fmt.Printf("key to encrypt/decrypt : %s\n", key)
-	return key
+	return bytes
 }
 
-func SymmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString string) {
-
-	//Since the key is in string, we need to convert decode it to bytes
-	key, _ := hex.DecodeString(keyString)
-	plaintext := []byte(stringToEncrypt)
-
+func SymmetricEncrypt(plaintext []byte, key []byte) (encryptedString string) {
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
 	if err != nil {
@@ -40,7 +32,7 @@ func SymmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString
 
 	//Create a new GCM - https://en.wikipedia.org/wiki/Galois/Counter_Mode
 	//https://golang.org/pkg/crypto/cipher/#NewGCM
-	aesGCM, err := cipher.NewGCM(block)
+	aesGCM, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -53,15 +45,14 @@ func SymmetricEncrypt(stringToEncrypt string, keyString string) (encryptedString
 
 	//Encrypt the data using aesGCM.Seal
 	//Since we don't want to save the nonce somewhere else in this case, we add it as a prefix to the encrypted data. The first nonce argument in Seal is the prefix.
-	ciphertext := aesGCM.Seal(nonce, nonce, plaintext, nil)
+	ciphertext := aesGCM.Seal(nil, nonce, plaintext, nil)
 
-	return fmt.Sprintf("%x", ciphertext)
+	return string(ciphertext)+string(nonce)
 }
 
-func SymmetricDecrypt(encryptedString string, keyString string) (decryptedString string) {
+func SymmetricDecrypt(encryptedString string, key []byte) (decryptedString string) {
 
-	key, _ := hex.DecodeString(keyString)
-	enc, _ := hex.DecodeString(encryptedString)
+	enc := []byte(encryptedString)
 
 	//Create a new Cipher Block from the key
 	block, err := aes.NewCipher(key)
@@ -70,7 +61,7 @@ func SymmetricDecrypt(encryptedString string, keyString string) (decryptedString
 	}
 
 	//Create a new GCM
-	aesGCM, err := cipher.NewGCM(block)
+	aesGCM, err := cipher.NewGCMWithNonceSize(block, 16)
 	if err != nil {
 		panic(err.Error())
 	}
@@ -79,7 +70,7 @@ func SymmetricDecrypt(encryptedString string, keyString string) (decryptedString
 	nonceSize := aesGCM.NonceSize()
 
 	//Extract the nonce from the encrypted data
-	nonce, ciphertext := enc[:nonceSize], enc[nonceSize:]
+	ciphertext, nonce := enc[:len(enc)-nonceSize], enc[len(enc)-nonceSize:]
 
 	//Decrypt the data
 	plaintext, err := aesGCM.Open(nil, nonce, ciphertext, nil)
@@ -90,30 +81,22 @@ func SymmetricDecrypt(encryptedString string, keyString string) (decryptedString
 	return fmt.Sprintf("%s", plaintext)
 }
 
-func AsymmetricEncrypt(stringToEncrypt string, publicKey string) (encryptedString string, err error) {
+func AsymmetricEncrypt(plaintext []byte, publicKey *rsa.PublicKey) (encryptedString []byte, err error) {
 
-	plaintext := []byte(stringToEncrypt)
-	publicKeyFromPem, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicKey))
-
-	encryptedData, err := rsa.EncryptOAEP(sha256.New(), rand.Reader,publicKeyFromPem, plaintext, nil)
+	encryptedData, err := rsa.EncryptOAEP(sha256.New(), rand.Reader,publicKey, plaintext, nil)
 	if err != nil {
 		log.Errorf("Error during asymmetric encrypt - %v", err)
-		return "", err
+		return nil, err
 	}
 
-	return base64.StdEncoding.EncodeToString(encryptedData), nil
+	return encryptedData, nil
 }
 
-func AsymmetricDecrypt(encryptedString string, privateKey string) (decryptedString string, err error) {
-	base64DecodeBytes, err := base64.StdEncoding.DecodeString(encryptedString)
-	if err != nil {
-		log.Errorf("Error in asymmetric encryption - ")
-		return "", err
-	}
+func AsymmetricDecrypt(encryptedString []byte, privateKey string) (decryptedString string, err error) {
 
 	keyFromPem, _ := jwt.ParseRSAPrivateKeyFromPEM([]byte(privateKey))
 
-	decryptedData, decryptErr := rsa.DecryptOAEP(sha256.New(), rand.Reader, keyFromPem, base64DecodeBytes, nil)
+	decryptedData, decryptErr := rsa.DecryptOAEP(sha256.New(), rand.Reader, keyFromPem, encryptedString, nil)
 	if decryptErr != nil {
 		log.Errorf(" Error while decrypt - %v ", decryptErr)
 		return "", decryptErr

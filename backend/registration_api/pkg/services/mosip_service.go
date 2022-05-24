@@ -1,6 +1,8 @@
 package services
 
 import (
+	"crypto/rsa"
+	"crypto/x509"
 	"encoding/base64"
 	"encoding/json"
 	"encoding/pem"
@@ -66,7 +68,7 @@ func MosipOTPRequest(individualIDType string, individualId string) error {
 	}
 	log.Infof("requestBody before signature - %s", reqJson)
 	signedPayload := getSignature(reqJson, config.Config.Mosip.PrivateKey, config.Config.Mosip.PublicKey)
-	log.Infof("signed payload - %v", signedPayload)
+	log.Debugf("signed payload - %v", signedPayload)
 
 	resp, err := generateOTP(requestBody, RequestHeader{
 		Signature:   signedPayload,
@@ -88,20 +90,24 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 
 	requestTime := time.Now().UTC().Format("2006-01-02T15:04:05.999Z")
 	identityBlock, _ := json.Marshal(map[string] string {
-		requestTime: requestTime,
-		otp: otp,
+		"timestamp": requestTime,
+		"otp": otp,
 	})
 	secretKey := utils.GenSecKey()
-	encryptedIdentityBlock := utils.SymmetricEncrypt(string(identityBlock), secretKey)
-	encryptedSessionKeyByte, err := utils.AsymmetricEncrypt(secretKey, config.Config.Mosip.IDACertKey)
+	encryptedIdentityBlock := utils.SymmetricEncrypt(identityBlock, secretKey)
+	block, _ := pem.Decode([]byte(config.Config.Mosip.IDACertKey))
+
+	var cert* x509.Certificate
+	cert, _ = x509.ParseCertificate(block.Bytes)
+	rsaPublicKey := cert.PublicKey.(*rsa.PublicKey)
+	encryptedSessionKeyByte, err := utils.AsymmetricEncrypt(secretKey, rsaPublicKey)
 	if err != nil {
 		return nil, err
 	}
-	RequestHMAC, err := utils.AsymmetricEncrypt(utils.DigestAsPlainText([]byte(secretKey)), config.Config.Mosip.IDACertKey)
-	if err != nil {
-		return nil, err
-	}
-	certificateThumbnail := utils.Sha256Hash([]byte(config.Config.Mosip.IDACertKey))
+	RequestHMAC := utils.SymmetricEncrypt([]byte(utils.DigestAsPlainText(identityBlock)), secretKey)
+
+	pemBlock, _ := pem.Decode([]byte(config.Config.Mosip.IDACertKey))
+	certificateThumbnail := utils.Sha256Hash(pemBlock.Bytes)
 
 	authBody := AuthRequest{
 		Id:                "mosip.identity.auth",
@@ -115,18 +121,18 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 		IndividualIdType:  individualIDType,
 		RequestHMAC:       base64.URLEncoding.EncodeToString([]byte(RequestHMAC)),
 		Thumbprint:        base64.URLEncoding.EncodeToString(certificateThumbnail),
-		RequestSessionKey: base64.URLEncoding.EncodeToString([]byte(encryptedSessionKeyByte)),
+		RequestSessionKey: base64.URLEncoding.EncodeToString(encryptedSessionKeyByte),
 	}
 
 	reqJson, err :=json.Marshal(authBody)
 	if err != nil {
-		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+		log.Errorf("Error occurred while trying to unmarshal authBody (%v)", err)
 		return nil, err
 	}
-	log.Infof("requestBody before signature - %s", reqJson)
+	log.Debugf("requestBody before signature - %s", reqJson)
 
 	signedPayload := getSignature(reqJson, config.Config.Mosip.PrivateKey, config.Config.Mosip.PublicKey)
-	log.Infof("signed payload - %v", signedPayload)
+	log.Debugf("signed payload - %v", signedPayload)
 
 	authToken := getMosipAuthToken()
 
@@ -134,14 +140,14 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 		Signature:   signedPayload,
 		ContentType: "application/json",
 		Authorisation: "Authorization="+authToken,
-	});
+	})
 
 	if err != nil {
-		log.Errorf("Error Response from MOSIP OTP Generate API - %v", err)
+		log.Errorf("HTTP call to MOSIP Auth API failed - %v", err)
 		return nil, err
 	}
 
-	log.Debugf("Response of OTP request - %V", resp)
+	log.Debugf("Response of Auth request - %V", resp)
 
 	return resp, nil
 }
