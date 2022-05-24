@@ -10,7 +10,7 @@
                 document.getElementById("mobile_number").addEventListener("change", function(evt) {
                     console.log(evt.target.value)
                     sessionStorage.setItem("mobile_number", evt.target.value)
-                })
+                });
                 if(window.location.protocol === "https:") {
                     let formField = document.getElementById("kc-form-login");
                     if (formField) {
@@ -29,7 +29,17 @@
                         <div class="input-wrapper">
                             <div class="input-field mobile">
                                 <img class="mobile-logo"/>
-<#--                                <label for="mobile_number" class="mobile-prefix">+91</label>-->
+                                <span>+</span>
+                                <#if properties.kcCountryCode != "0">
+                                    <input
+                                        style="width: 15%"
+                                        id="country_code"
+                                        class="login-field"
+                                        value=${properties.kcCountryCode!}
+                                        type="text"
+                                        name="country_code"
+                                        autofocus />
+                                </#if>
                                 <input id="mobile_number" class="login-field" placeholder="XXXXXXXXXX"
                                        type="text"
                                        name="mobile_number" autofocus

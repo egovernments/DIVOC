@@ -207,6 +207,50 @@ func init() {
         }
       }
     },
+    "/external/mosip/generateOTP": {
+      "post": {
+        "security": [],
+        "summary": "Generate OTP",
+        "operationId": "mosipGenerateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal Error"
+          }
+        }
+      }
+    },
     "/facility/slots": {
       "get": {
         "security": [
@@ -797,6 +841,50 @@ func init() {
                 "$ref": "#/definitions/enrollment"
               }
             }
+          }
+        }
+      }
+    },
+    "/external/mosip/generateOTP": {
+      "post": {
+        "security": [],
+        "summary": "Generate OTP",
+        "operationId": "mosipGenerateOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "500": {
+            "description": "Internal Error"
           }
         }
       }
