@@ -31,4 +31,5 @@ var Config = struct {
 		Password    string `env:"SENDER_PASSWORD" yaml:"password"`
 		Enable      bool   `env:"ENABLE_EMAIL" yaml:"enable"`
 	}
+	LogLevel string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}

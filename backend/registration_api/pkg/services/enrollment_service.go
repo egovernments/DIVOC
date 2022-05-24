@@ -46,7 +46,7 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 					}
 				}
 				if dose < totalDoses {
-					log.Infof("Registering %s to next program %s dose %s", preEnrollmentCode, programId, dose)
+					log.Infof("Registering %s to next program %s dose %f", preEnrollmentCode, programId, dose)
 					enrollmentObj["appointments"] = append(appointments, registerToNextDose(programId, dose))
 				}
 				response, err := kernelService.UpdateRegistry(EnrollmentEntity, enrollmentObj)
@@ -57,7 +57,7 @@ func MarkPreEnrolledUserCertified(preEnrollmentCode string, phone string, name s
 				}
 			}
 		} else {
-			log.Error("Enrollment not found for osid %v", enrollmentOsid)
+			log.Errorf("Enrollment not found for osid %v", enrollmentOsid)
 		}
 	} else {
 		log.Error("Failed reading enrollments registry for osid", enrollmentOsid)
@@ -152,7 +152,7 @@ func CreateEnrollment(enrollmentPayload *EnrollmentPayload, retryCount int) erro
 		if strings.Contains(err.Error(), DUPLICATE_MSG) {
 			// enrollmentCode already exists, trying with new enrollment code
 			if retryCount <= config.Config.EnrollmentCreation.MaxRetryCount {
-				log.Infof("Duplicate enrollmentCode found, retrying attempt ", retryCount, " of ", config.Config.EnrollmentCreation.MaxRetryCount)
+				log.Info("Duplicate enrollmentCode found, retrying attempt ", retryCount, " of ", config.Config.EnrollmentCreation.MaxRetryCount)
 				retryCount = retryCount + 1
 				return CreateEnrollment(enrollmentPayload, retryCount)
 			} else {
@@ -253,7 +253,10 @@ func NotifyRecipient(enrollment *models.Enrollment) error {
 
 	recipient := "sms:" + enrollment.Phone
 	message := "Your enrollment code for vaccination is " + enrollment.Code
-	log.Infof("Sending SMS %s %s", recipient, message)
+
+	log.Infof("Sending NotifyRecipient SMS")
+	log.Debugf("SMS: %s %s", recipient, message)
+	
 	buf := bytes.Buffer{}
 	err := enrollmentTemplate.Execute(&buf, enrollment)
 	if err == nil {
@@ -278,7 +281,10 @@ func NotifyAppointmentBooked(appointmentNotification models2.AppointmentNotifica
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+
+	log.Infof("Sending NotifyAppointmentBooked SMS")
+	log.Debugf("SMS: %s %s", recipient, appointmentNotification)
+
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {
@@ -303,7 +309,10 @@ func NotifyAppointmentCancelled(appointmentNotification models2.AppointmentNotif
 	var appointmentBookedTemplate = template.Must(template.New("").Parse(appointmentBookedTemplateString))
 
 	recipient := "sms:" + appointmentNotification.RecipientPhone
-	log.Infof("Sending SMS %s %s", recipient, appointmentNotification)
+
+	log.Infof("Sending NotifyAppointmentCancelled SMS")
+	log.Debugf("SMS: %s %s", recipient, appointmentNotification)
+
 	buf := bytes.Buffer{}
 	err := appointmentBookedTemplate.Execute(&buf, appointmentNotification)
 	if err == nil {

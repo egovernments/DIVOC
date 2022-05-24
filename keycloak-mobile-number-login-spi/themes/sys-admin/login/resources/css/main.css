@@ -57,6 +57,7 @@
     border: 1px solid #E9E9F0;
     border-radius: 4px;
     padding: 20px;
+    width: 230px;
 }
 
 .input-field:focus-within {
@@ -74,7 +75,7 @@
 }
 
 .mobile input {
-    width: 150px !important;
+    width: 150px;
 }
 
 .login-arrow {

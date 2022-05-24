@@ -43,10 +43,11 @@ func StartEnrollmentConsumer() {
 				_, _ = consumer.CommitMessage(msg)
 				continue
 			}
-			log.Infof("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))
 			
+			log.Infof("Topic %s", msg.TopicPartition)
+			log.Debugf("Message on %s: %v \n", msg.TopicPartition, string(msg.Value))	
 			err = services.CreateEnrollment(&enrollment, 0)
-			services.PublishEnrollmentACK(enrollment,err)
+			services.PublishEnrollmentACK(enrollment, err)
 			if err != nil {
 				// Push to error topic
 				log.Errorf("Error occurred while trying to create the enrollment (%v)", err)
@@ -61,5 +62,3 @@ func StartEnrollmentConsumer() {
 		}
 	}()
 }
-
-
