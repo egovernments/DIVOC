@@ -5,6 +5,7 @@ services:
     image: redis
     ports:
       - "6379:6379"
+    command: redis-server --requirepass $REDIS_PASSWORD
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
     environment:
@@ -129,6 +130,7 @@ services:
       DB_HOST: db
       REDIS_URL: redis://redis:6379
       ENABLE_KEYCLOAK: "true"
+      REDIS_PASSWORD: $REDIS_PASSWORD
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000"]
       interval: 10s
@@ -187,6 +189,7 @@ services:
       MOSIP_PRIVATE_KEY: $MOSIP_PRIVATE_KEY
       MOSIP_PUBLIC_KEY: $MOSIP_PUBLIC_KEY
       LOG_LEVEL: "$LOG_LEVEL"
+      REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -212,6 +215,7 @@ services:
       ENABLE_PROGRAM_ID_CACHING_KEY: "true"
       ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE: "true"
       ENABLE_REVOKE_CERTIFICATION_SERVICE: "true"
+      REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
       registry:
         condition: service_started
@@ -240,6 +244,7 @@ services:
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
       CONFIGURATION_LAYER: "etcd"
+      REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -261,6 +266,7 @@ services:
       CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_TEST_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
       SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
+      REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy
@@ -335,6 +341,7 @@ services:
       CONFIGURATION_LAYER: "etcd"
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
+      REDIS_PASSWORD: $REDIS_PASSWORD
     depends_on:
       kafka:
         condition: service_healthy

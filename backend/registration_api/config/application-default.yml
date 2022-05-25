@@ -14,6 +14,7 @@ auth:
   ttlforotpinminutes: 5
 redis:
   redisurl: "redis://0.0.0.0:6379"
+  redisPassword: 
 registry:
   url: http://localhost:8081
   addoperationid: add

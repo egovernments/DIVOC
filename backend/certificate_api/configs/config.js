@@ -16,6 +16,7 @@ const CONFIGURATION_LAYER = process.env.CONFIGURATION_LAYER;
 const ETCD_AUTH_ENABLED = process.env.ETCD_AUTH_ENABLED === "true"
 const ETCD_USERNAME = process.env.ETCD_USERNAME;
 const ETCD_PASSWORD = process.env.ETCD_PASSWORD;
+const REDIS_PASSWORD = process.env.REDIS_PASSWORD;
 module.exports = {
     REGISTRY_URL,
     JWT_PUBLIC_KEY,
@@ -34,5 +35,6 @@ module.exports = {
     CONFIGURATION_LAYER,
     ETCD_AUTH_ENABLED,
     ETCD_USERNAME,
-    ETCD_PASSWORD
+    ETCD_PASSWORD,
+    REDIS_PASSWORD
 };

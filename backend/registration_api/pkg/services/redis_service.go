@@ -17,7 +17,10 @@ func InitRedis() {
 	if err != nil {
 		panic(err)
 	}
-	redisClient = redis.NewClient(options)
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     options.Addr,
+		Password: config.Config.Redis.Password, // Addr is part of options struct
+	})
 	_, err = redisClient.Ping(ctx).Result()
 	if err != nil {
 		panic(err)

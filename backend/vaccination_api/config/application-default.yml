@@ -44,6 +44,7 @@ auth:
 redis:
   redisurl: "redis://redis:6379"
   programidcaching: "true"
+  redisPassword:
 enabledServices:
   createRecipientInKeycloakService: "false"
   revokeCertificateService: "true"

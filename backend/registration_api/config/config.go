@@ -41,6 +41,7 @@ var Config = struct {
 	Redis struct {
 		Url      string `env:"REDIS_URL" yaml:"redisurl"`
 		CacheTTL int    `default:"60" env:"CACHE_TTL"`
+		Password string `env:"REDIS_PASSWORD" yaml:"redisPassword"`
 	}
 	AppointmentScheduler struct {
 		ChannelSize    int `default:"100"`

@@ -105,6 +105,7 @@ var Config = struct {
 	Redis struct {
 		Url              string `env:"REDIS_URL" yaml:"redisurl"`
 		ProgramIdCaching string `env:"ENABLE_PROGRAM_ID_CACHING_KEY" yaml:"programidcaching"`
+		Password string `env:"REDIS_PASSWORD" yaml:"redisPassword"`
 	}
 	EnabledServices struct {
 		CreateRecipientInKeycloakService string `env:"ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE" yaml:"createRecipientInKeycloakService" default:"false"`

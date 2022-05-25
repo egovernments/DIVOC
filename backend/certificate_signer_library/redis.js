@@ -9,6 +9,7 @@ async function initRedis(config) {
   isRedisEnabled = config.REDIS_ENABLED;
   if(isRedisEnabled) {
     client = redis.createClient(config.REDIS_URL);
+    client.auth(config.REDIS_PASSWORD);
     redisConnectionEventListeners({ conn: client });
     existsAsync = promisify(client.exists).bind(client);
   }

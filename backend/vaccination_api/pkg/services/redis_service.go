@@ -17,7 +17,14 @@ func InitRedis() {
 	if err != nil {
 		log.Errorf("Error while parsing Redis URL : %v", err)
 	}
-	redisClient = redis.NewClient(options)
+	redisClient = redis.NewClient(&redis.Options{
+		Addr:     options.Addr,  // Addr is part of options struct
+		Password: config.Config.Redis.Password,
+	})
+	_, err = redisClient.Ping(ctx).Result()
+	if err != nil {
+		panic(err)
+	}
 }
 
 func DeleteValue(key string) error {
