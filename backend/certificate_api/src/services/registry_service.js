@@ -1,15 +1,13 @@
 const config = require('../../configs/config');
 const axios = require('axios');
-const VaccinationCertificate = "VaccinationCertificate";
-const TestCertificate = "TestCertificate";
 
-const getCertificate = (mobileNumber, certificateId) => {
+const getCertificate = (mobileNumber, certificateId, entityType) => {
     const certificateRequest = {
         id:  "open-saber.registry.search",
         ver: "1.0",
         ets: "",
         "request":{
-            "entityType": [VaccinationCertificate],
+            "entityType": [entityType],
             "filters": {
                 mobile: {
                     eq: mobileNumber
@@ -25,16 +23,16 @@ const getCertificate = (mobileNumber, certificateId) => {
     return axios.post(
         config.REGISTRY_URL + "/search",
         certificateRequest
-    ).then(res => res.data.result[VaccinationCertificate])
+    ).then(res => res.data.result[entityType])
 };
 
-const getCertificateByPreEnrollmentCode = (preEnrollmentCode) => {
+const getCertificateByPreEnrollmentCode = (preEnrollmentCode, entityType) => {
     const certificateRequest = {
         id:  "open-saber.registry.search",
         ver: "1.0",
         ets: "",
         "request":{
-            "entityType": [VaccinationCertificate],
+            "entityType": [entityType],
             "filters": {
                 preEnrollmentCode: {
                     eq: preEnrollmentCode
@@ -46,16 +44,16 @@ const getCertificateByPreEnrollmentCode = (preEnrollmentCode) => {
     return axios.post(
         config.REGISTRY_URL + "/search",
         certificateRequest
-    ).then(res => res.data.result[VaccinationCertificate])
+    ).then(res => res.data.result[entityType])
 };
 
-const getCertificateByPhno = (phoneno) => {
+const getCertificateByPhno = (phoneno, entityType) => {
     const certificateRequest = {
         id: "open-saber.registry.search",
         ver: "1.0",
         ets: "",
         "request": {
-            "entityType": [VaccinationCertificate],
+            "entityType": [entityType],
             "filters": {
                 mobile: {
                     eq: phoneno
@@ -67,16 +65,16 @@ const getCertificateByPhno = (phoneno) => {
     return axios.post(
         config.REGISTRY_URL + "/search",
         certificateRequest
-    ).then(res => res.data.result[VaccinationCertificate])
+    ).then(res => res.data.result[entityType])
 }
 
-const getTestCertificateByPreEnrollmentCode = (preEnrollmentCode) => {
+const getTestCertificateByPreEnrollmentCode = (preEnrollmentCode, entityType) => {
     const certificateRequest = {
         id:  "open-saber.registry.search",
         ver: "1.0",
         ets: "",
         "request":{
-            "entityType": [TestCertificate],
+            "entityType": [entityType],
             "filters": {
                 preEnrollmentCode: {
                     eq: preEnrollmentCode
@@ -88,7 +86,7 @@ const getTestCertificateByPreEnrollmentCode = (preEnrollmentCode) => {
     return axios.post(
       config.REGISTRY_URL + "/search",
       certificateRequest
-    ).then(res => res.data.result[TestCertificate])
+    ).then(res => res.data.result[entityType])
 };
 
 module.exports = {
