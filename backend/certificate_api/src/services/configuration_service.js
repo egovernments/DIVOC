@@ -6,6 +6,7 @@ const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS} = require('../../configs/const
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null, euVaccineCertificateTemplate = null;
+let healthProfessionalCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 let addHandlerHelper = null;
 function init() {
@@ -63,6 +64,9 @@ function updateConfigValues(key, value) {
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
       break;
+    case TEMPLATES.HEALTH_PROFESSIONAL_CERTIFICATE:
+      healthProfessionalCertificateTemplate = value;
+      break;
     case TEMPLATES.EU_VACCINATION_CERTIFICATE:
       euVaccineCertificateTemplate = value;
       break;
@@ -110,6 +114,9 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
       break;
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
+      break;
+    case TEMPLATES.HEALTH_PROFESSIONAL_CERTIFICATE:
+      value = healthProfessionalCertificateTemplate;
       break;
     case TEMPLATES.EU_VACCINATION_CERTIFICATE:
       euVaccineCertificateTemplate = value;
