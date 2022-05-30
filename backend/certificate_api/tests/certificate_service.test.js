@@ -6,6 +6,7 @@ const constants = require('../configs/constants');
 config.DISEASE_CODE = 'COVID-19';
 config.PUBLIC_HEALTH_AUTHORITY = 'Govt Of India';
 config.ETCD_URL = 'etcd:2379'
+config.GROUP_BY_PARAM = "dose";
 var mockConstructor = {
     getEUVaccineDetails: jest.fn().mockImplementation((args) => {
         let vaccineDetails;

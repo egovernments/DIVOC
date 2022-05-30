@@ -56,11 +56,26 @@ const getBasicBeneficiaryDataFromCert = (certificates) => {
 }
 
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
+  const param = config.GROUP_BY_PARAM;
   if (certificates.length > 0) {
+    if(!param){
+      certificates = certificates.sort(function (a, b) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
+        return 0;
+      }).reverse();
+      return certificates;
+    }
     certificates = certificates.sort(function (a, b) {
       const parsedEvidenceOfA = JSON.parse(a.certificate);
       const parsedEvidenceOfB = JSON.parse(b.certificate);
-      if (parsedEvidenceOfA.evidence[0].dose === parsedEvidenceOfB.evidence[0].dose) {
+      ParamValueofA = getParamValue(parsedEvidenceOfA, param);
+      ParamValueofB = getParamValue(parsedEvidenceOfB, param);
+      if (ParamValueofA === ParamValueofB) {
         if (a.osUpdatedAt < b.osUpdatedAt) {
           return 1;
         }
@@ -68,11 +83,24 @@ const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
           return -1;
         }
       }
-      return parsedEvidenceOfB.evidence[0].dose - parsedEvidenceOfA.evidence[0].dose;
+      return ParamValueofB - ParamValueofA;
     }).reverse();
     return certificates;
   }
 };
+function getParamValue(obj, param, result){
+  for (const prop in obj) {
+      const value = obj[prop];
+      if (typeof value === 'object') {
+          result = getParamValue(value, param,result);
+      }
+      else if(prop == param){
+          result = value;
+      }
+  }
+  return result;
+}
+
 const getLatestCertificate = (certificates) => {
   if(certificates.length > 0) {
     let sortedCerts = sortCertificatesInDoseAndUpdateTimeAscOrder(certificates);
