@@ -137,7 +137,7 @@ configuration_service.init();
           }
         );
         await producer.send({
-          topic: config.NOTIFY,
+          topic: config.NOTIFY_TOPIC,
           messages: [{key: null, value: JSON.stringify({
             recipient: R.pathOr("", ["recipient", "contact"], jsonMessage).toString(),
             message: customMessage,
