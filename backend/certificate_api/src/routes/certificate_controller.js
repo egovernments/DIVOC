@@ -64,6 +64,17 @@ function getTemplateKey(entityType) {
     }
 }
 
+function getGroupingParam(entityType) {
+    switch (entityType.toLowerCase()) {
+        case constants.ENTITY_TYPES.VACCINATION_CERTIFICATE.toLowerCase():
+            return constants.GROUPING_PARAMS.VACCINATION;
+        case constants.ENTITY_TYPES.HEALTH_PROFESSIONAL_CERTIFICATE.toLowerCase():
+            return constants.GROUPING_PARAMS.HEALTH_PROFESSIONAL;
+        case constants.ENTITY_TYPES.TEST_CERTIFICATE.toLowerCase():
+            return constants.GROUPING_PARAMS.TEST_CERTIFICATE;
+    }
+}
+
 async function getQRCodeData(certificate, isDataURL) {
     const zip = new JSZip();
         zip.file("certificate.json", certificate, {
@@ -160,7 +171,7 @@ async function createCertificatePDFV2(filterKey, filterValue, res, entityType) {
         certificateResp = await registryService.getCertificateByPreEnrollmentCode(filterValue, entityType);
     }
     if (certificateResp?.length > 0) {
-        let certificateRaw = certificateService.getLatestCertificate(certificateResp);
+        let certificateRaw = certificateService.getLatestCertificateV2(certificateResp, getGroupingParam(entityType));
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let certificateData;
         let previousEventInfo;

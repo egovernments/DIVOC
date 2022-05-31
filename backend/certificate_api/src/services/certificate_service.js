@@ -55,6 +55,59 @@ const getBasicBeneficiaryDataFromCert = (certificates) => {
   return certificateData;
 }
 
+const sortCertificates = (certificates, groupingParam) => {
+  if (certificates.length > 0) {
+    if(!groupingParam){
+      certificates = certificates.sort(function (a, b) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
+        return 0;
+      }).reverse();
+      return certificates;
+    }
+    certificates = certificates.sort(function (a, b) {
+      let parsedCertificate = JSON.parse(a.certificate);
+      let groupingParamValueA = getParamValue(parsedCertificate, groupingParam);
+      parsedCertificate = JSON.parse(b.certificate);
+      let groupingParamValueB = getParamValue(parsedCertificate, groupingParam);
+      if (groupingParamValueA === groupingParamValueB) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
+      }
+      return groupingParamValueB - groupingParamValueA;
+    }).reverse();
+    return certificates;
+  }
+};
+
+function getParamValue(obj, param, result){
+  for (const prop in obj) {
+    const value = obj[prop];
+    if (typeof value === 'object') {
+      result = getParamValue(value, param,result);
+    }
+    else if(prop == param){
+      result = value;
+    }
+  }
+  return result;
+}
+
+const getLatestCertificateV2 = (certificates, groupingParam) => {
+  if(certificates.length > 0) {
+    let sortedCerts = sortCertificates(certificates, groupingParam);
+    return sortedCerts[sortedCerts.length - 1];
+  }
+};
+
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -268,6 +321,7 @@ function dobOfRecipient(credentialSubject) {
 module.exports = {
   sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
+  getLatestCertificateV2,
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
   prepareDataForVaccineCertificateTemplate,

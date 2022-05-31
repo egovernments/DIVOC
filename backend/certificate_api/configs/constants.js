@@ -23,6 +23,12 @@ const ENTITY_TYPES = {
   HEALTH_PROFESSIONAL_CERTIFICATE: "HealthProfessionalCertificate"
 }
 
+const GROUPING_PARAMS = {
+  VACCINATION: "dose",
+  TEST_CERTIFICATE: "",
+  HEALTH_PROFESSIONAL : ""
+}
+
 const QR_TYPE = "qrcode";
 
 module.exports = {
@@ -31,5 +37,6 @@ module.exports = {
   EU_VACCINE_CONFIG_KEYS,
   QR_TYPE,
   HELPERS,
-  ENTITY_TYPES
+  ENTITY_TYPES,
+  GROUPING_PARAMS
 }
