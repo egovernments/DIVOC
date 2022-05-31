@@ -77,6 +77,12 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		InitializeFacilitySlotsHandler: InitializeFacilitySlotsHandlerFunc(func(params InitializeFacilitySlotsParams) middleware.Responder {
 			return middleware.NotImplemented("operation InitializeFacilitySlots has not yet been implemented")
 		}),
+		MosipGenerateOTPHandler: MosipGenerateOTPHandlerFunc(func(params MosipGenerateOTPParams) middleware.Responder {
+			return middleware.NotImplemented("operation MosipGenerateOTP has not yet been implemented")
+		}),
+		MosipVerifyOTPHandler: MosipVerifyOTPHandlerFunc(func(params MosipVerifyOTPParams) middleware.Responder {
+			return middleware.NotImplemented("operation MosipVerifyOTP has not yet been implemented")
+		}),
 		RegisterRecipientToProgramHandler: RegisterRecipientToProgramHandlerFunc(func(params RegisterRecipientToProgramParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation RegisterRecipientToProgram has not yet been implemented")
 		}),
@@ -160,6 +166,10 @@ type RegistrationAPIAPI struct {
 	GetSlotsForFacilitiesHandler GetSlotsForFacilitiesHandler
 	// InitializeFacilitySlotsHandler sets the operation handler for the initialize facility slots operation
 	InitializeFacilitySlotsHandler InitializeFacilitySlotsHandler
+	// MosipGenerateOTPHandler sets the operation handler for the mosip generate o t p operation
+	MosipGenerateOTPHandler MosipGenerateOTPHandler
+	// MosipVerifyOTPHandler sets the operation handler for the mosip verify o t p operation
+	MosipVerifyOTPHandler MosipVerifyOTPHandler
 	// RegisterRecipientToProgramHandler sets the operation handler for the register recipient to program operation
 	RegisterRecipientToProgramHandler RegisterRecipientToProgramHandler
 	// VerifyOTPHandler sets the operation handler for the verify o t p operation
@@ -279,6 +289,12 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.InitializeFacilitySlotsHandler == nil {
 		unregistered = append(unregistered, "InitializeFacilitySlotsHandler")
+	}
+	if o.MosipGenerateOTPHandler == nil {
+		unregistered = append(unregistered, "MosipGenerateOTPHandler")
+	}
+	if o.MosipVerifyOTPHandler == nil {
+		unregistered = append(unregistered, "MosipVerifyOTPHandler")
 	}
 	if o.RegisterRecipientToProgramHandler == nil {
 		unregistered = append(unregistered, "RegisterRecipientToProgramHandler")
@@ -434,6 +450,14 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/facility/slots/init"] = NewInitializeFacilitySlots(o.context, o.InitializeFacilitySlotsHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/external/mosip/generateOTP"] = NewMosipGenerateOTP(o.context, o.MosipGenerateOTPHandler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/external/mosip/verifyOTP"] = NewMosipVerifyOTP(o.context, o.MosipVerifyOTPHandler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}

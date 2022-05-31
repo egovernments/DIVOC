@@ -15,7 +15,7 @@ const {createPDF} = require("../services/pdf_service")
 
 const configurationService = new ConfigurationService();
 
-async function certificateAsEUPayload(req, res) {
+async function certificateAsEUPayload(req, res, entityType) {
   try {
     var queryData = url.parse(req.url, true).query;
     let requestBody = {};
@@ -57,7 +57,7 @@ async function certificateAsEUPayload(req, res) {
       };
       return JSON.stringify(error);
     }
-    let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+    let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId, entityType);
     if (certificateResp.length > 0) {
       let certificateRaw = certificateService.getLatestCertificate(certificateResp);
       // convert certificate to EU Json

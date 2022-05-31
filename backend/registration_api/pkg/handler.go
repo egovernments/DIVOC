@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -53,6 +54,8 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.RegisterRecipientToProgramHandler = operations.RegisterRecipientToProgramHandlerFunc(services.RegisterEnrollmentToProgram)
 	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
 	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
+	api.MosipGenerateOTPHandler = operations.MosipGenerateOTPHandlerFunc(mosipGenerateOTP)
+	api.MosipVerifyOTPHandler = operations.MosipVerifyOTPHandlerFunc(mosipVerifyOTP)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
@@ -124,6 +127,21 @@ func generateOTP(params operations.GenerateOTPParams) middleware.Responder {
 	}
 }
 
+func mosipGenerateOTP(params operations.MosipGenerateOTPParams) middleware.Responder {
+	individualId := *params.Body.IndividualID
+	individualIDType := *params.Body.IndividualIDType
+	if individualId == "" || individualIDType == "" {
+		return operations.NewMosipGenerateOTPBadRequest()
+	}
+
+	if err := services.MosipOTPRequest(individualIDType, individualId); err != nil {
+		return operations.NewMosipGenerateOTPInternalServerError()
+	}
+
+	return operations.NewMosipGenerateOTPOK()
+
+}
+
 func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 	phone := params.Body.Phone
 	receivedOTP := params.Body.Otp
@@ -164,6 +182,27 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		}
 		return operations.NewVerifyOTPOK().WithPayload(&response)
 	}
+}
+
+func mosipVerifyOTP(params operations.MosipVerifyOTPParams) middleware.Responder {
+	individualId := *params.Body.IndividualID
+	individualIDType := *params.Body.IndividualIDType
+	otp := *params.Body.Otp
+	if individualId == "" || individualIDType == "" || otp == "" {
+		return operations.NewMosipVerifyOTPBadRequest()
+	}
+
+	mResp, err := services.MosipAuthRequest(individualIDType, individualId, otp)
+	if err != nil {
+		return operations.NewMosipVerifyOTPInternalServerError()
+	}
+
+	if mResp.Response().StatusCode == http.StatusOK {
+		// TODO: Handle MOSIP error response in body
+		return operations.NewMosipVerifyOTPOK()
+	}
+
+	return operations.NewMosipVerifyOTPInternalServerError()
 }
 
 func canInitializeSlots() bool {

@@ -331,6 +331,33 @@ paths:
          description: Internal Error
        '400':
          description: Bad request
+  /external/mosip/generateOTP:
+    post:
+      summary: Generate OTP
+      operationId: mosipGenerateOTP
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - individualIdType
+              - individualId
+            properties:
+              individualIdType:
+                type: string
+                enum: ["UIN", "VID"]
+              individualId:
+                type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Internal Error
+        '400':
+          description: Bad request
   /verifyOTP:
     post:
       summary: Verify OTP
@@ -363,6 +390,43 @@ paths:
           description: Internal error
         '429':
           description: Verify otp attempts exceeded, generate new OTP
+  /external/mosip/verifyOTP:
+    post:
+      summary: Verify OTP
+      operationId: mosipVerifyOTP
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - individualIdType
+              - individualId
+              - otp
+            properties:
+              individualIdType:
+                type: string
+                enum: ["UIN", "VID"]
+              individualId:
+                type: string
+              otp:
+                type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+        '401':
+          description: Invalid OTP
+        '400':
+          description: Bad request
+        '500':
+          description: Internal error
   /ping:
     get:
       summary: Server heartbeat operation

@@ -219,31 +219,31 @@ async function createTestCertificatePDF(certificateResp, res, source) {
     return res;
 }
 
-async function createCertificatePDFByCertificateId(phone, certificateId, res) {
-    const certificateResp = await registryService.getCertificate(phone, certificateId);
+async function createCertificatePDFByCertificateId(phone, certificateId, res, entityType) {
+    const certificateResp = await registryService.getCertificate(phone, certificateId, entityType);
     return await createCertificatePDF(certificateResp, res, certificateId);
 }
 
-async function createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
-    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+async function createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res, entityType) {
+    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode, entityType);
     return await createCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
 
-async function createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res) {
-    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+async function createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res, entityType) {
+    const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode, entityType);
     return await createCertificateQRCode(certificateResp, res, preEnrollmentCode);
 }
 
-async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res) {
-    const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode);
+async function createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res, entityType) {
+    const certificateResp = await registryService.getTestCertificateByPreEnrollmentCode(preEnrollmentCode, entityType);
     return await createTestCertificatePDF(certificateResp, res, preEnrollmentCode);
 }
-async function createCertificateQRCodeCitizen(phone, certificateId, res) {
-    const certificateResp = await registryService.getCertificate(phone, certificateId);
+async function createCertificateQRCodeCitizen(phone, certificateId, res, entityType) {
+    const certificateResp = await registryService.getCertificate(phone, certificateId, entityType);
     return await createCertificateQRCode(certificateResp, res, certificateId);
 }
 
-async function getCertificateByPhnoAndDob(req, res) {
+async function getCertificateByPhnoAndDob(req, res, entityType) {
     var queryData = url.parse(req.url, true).query;
     let claimBody = "";
     try {
@@ -263,11 +263,11 @@ async function getCertificateByPhnoAndDob(req, res) {
         res.statusCode = 400;
         return error;
     }
-    const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno);
+    const certificatesByPhno = await registryService.getCertificateByPhno(queryData.phoneno, entityType);
     return certificateService.filterByDob(certificatesByPhno, queryData.dob);
 }
 
-async function getCertificate(req, res) {
+async function getCertificate(req, res, entityType) {
     try {
         var queryData = url.parse(req.url, true).query;
         let claimBody = "";
@@ -279,14 +279,14 @@ async function getCertificate(req, res) {
             return;
         }
         const certificateId = req.url.replace("/certificate/api/certificate/", "").split("?")[0];
-        res = await createCertificatePDFByCertificateId(claimBody.Phone, certificateId, res);
+        res = await createCertificatePDFByCertificateId(claimBody.Phone, certificateId, res, entityType);
         return res
     } catch (err) {
         console.error(err);
         res.statusCode = 404;
     }
 }
-async function getCertificateQRCode(req, res) {
+async function getCertificateQRCode(req, res, entityType) {
     try {
         var queryData = url.parse(req.url, true).query;
         let claimBody = "";
@@ -298,7 +298,7 @@ async function getCertificateQRCode(req, res) {
             return;
         }
         const certificateId = req.url.replace("/certificate/api/certificate/QRCode/", "").split("?")[0];
-        res = await createCertificateQRCodeCitizen(claimBody.Phone, certificateId, res);
+        res = await createCertificateQRCodeCitizen(claimBody.Phone, certificateId, res, entityType);
         return res
     } catch (err) {
         console.error(err);
@@ -306,7 +306,7 @@ async function getCertificateQRCode(req, res) {
     }
 }
 
-async function getCertificatePDF(req, res) {
+async function getCertificatePDF(req, res, entityType) {
     try {
         var queryData = url.parse(req.url, true).query;
         let claimBody = "";
@@ -319,7 +319,7 @@ async function getCertificatePDF(req, res) {
             res.statusCode = 403;
             return;
         }
-        res = await createCertificatePDFByCertificateId(claimBody.preferred_username, certificateId, res);
+        res = await createCertificatePDFByCertificateId(claimBody.preferred_username, certificateId, res, entityType);
         return res
     } catch (err) {
         console.error(err);
@@ -327,7 +327,7 @@ async function getCertificatePDF(req, res) {
     }
 }
 
-async function getCertificateQRCodeByPreEnrollmentCode(req, res) {
+async function getCertificateQRCodeByPreEnrollmentCode(req, res, entityType) {
     try {
         let claimBody = "";
         let preEnrollmentCode = "";
@@ -339,7 +339,7 @@ async function getCertificateQRCodeByPreEnrollmentCode(req, res) {
             res.statusCode = 403;
             return;
         }
-        res = await createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res);
+        res = await createCertificateQRCodeByPreEnrollmentCode(preEnrollmentCode, res, entityType);
         return res
     } catch (err) {
         console.error(err);
@@ -347,7 +347,7 @@ async function getCertificateQRCodeByPreEnrollmentCode(req, res) {
     }
 }
 
-async function getCertificatePDFByPreEnrollmentCode(req, res) {
+async function getCertificatePDFByPreEnrollmentCode(req, res, entityType) {
     try {
         let claimBody = "";
         let preEnrollmentCode = "";
@@ -359,7 +359,7 @@ async function getCertificatePDFByPreEnrollmentCode(req, res) {
             res.statusCode = 403;
             return;
         }
-        res = await createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res);
+        res = await createCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res, entityType);
         return res
     } catch (err) {
         console.error(err);
@@ -367,7 +367,7 @@ async function getCertificatePDFByPreEnrollmentCode(req, res) {
     }
 }
 
-async function getTestCertificatePDFByPreEnrollmentCode(req, res) {
+async function getTestCertificatePDFByPreEnrollmentCode(req, res, entityType) {
     try {
         let claimBody = "";
         let preEnrollmentCode = "";
@@ -379,7 +379,7 @@ async function getTestCertificatePDFByPreEnrollmentCode(req, res) {
             res.statusCode = 403;
             return;
         }
-        res = await createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res);
+        res = await createTestCertificatePDFByPreEnrollmentCode(preEnrollmentCode, res, entityType);
         return res
     } catch (err) {
         console.error(err);
@@ -387,7 +387,7 @@ async function getTestCertificatePDFByPreEnrollmentCode(req, res) {
     }
 }
 
-async function checkIfCertificateGenerated(req, res) {
+async function checkIfCertificateGenerated(req, res, entityType) {
     try {
         let claimBody = "";
         let preEnrollmentCode = "";
@@ -399,7 +399,7 @@ async function checkIfCertificateGenerated(req, res) {
             res.statusCode = 403;
             return;
         }
-        const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode);
+        const certificateResp = await registryService.getCertificateByPreEnrollmentCode(preEnrollmentCode, entityType);
         if (certificateResp.length > 0) {
             res.statusCode = 200;
             return;
@@ -412,7 +412,7 @@ async function checkIfCertificateGenerated(req, res) {
     }
 }
 
-async function certificateAsFHIRJson(req, res) {
+async function certificateAsFHIRJson(req, res, entityType) {
     try {
         var queryData = url.parse(req.url, true).query;
         let claimBody = "";
@@ -438,7 +438,7 @@ async function certificateAsFHIRJson(req, res) {
             };
             return JSON.stringify(error);
         }
-        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId, entityType);
 
         const meta = {
             "diseaseCode": config.DISEASE_CODE,
@@ -481,7 +481,7 @@ async function certificateAsFHIRJson(req, res) {
     }
 }
 
-async function certificateAsSHCPayload(req, res) {
+async function certificateAsSHCPayload(req, res, entityType) {
     let refId;
     let type;
     try {
@@ -508,7 +508,7 @@ async function certificateAsSHCPayload(req, res) {
             };
             return JSON.stringify(error);
         }
-        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId);
+        let certificateResp = await registryService.getCertificateByPreEnrollmentCode(refId, entityType);
         if (certificateResp.length > 0) {
             let certificateRaw = certificateService.getLatestCertificate(certificateResp);
             let certificate = JSON.parse(certificateRaw.certificate);
