@@ -3,6 +3,7 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -54,6 +55,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.DeleteRecipientProgramHandler = operations.DeleteRecipientProgramHandlerFunc(services.DeleteProgramInEnrollment)
 	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
 	api.MosipGenerateOTPHandler = operations.MosipGenerateOTPHandlerFunc(mosipGenerateOTP)
+	api.MosipVerifyOTPHandler = operations.MosipVerifyOTPHandlerFunc(mosipVerifyOTP)
 }
 
 func pingHandler(params operations.GetPingParams) middleware.Responder {
@@ -180,6 +182,27 @@ func verifyOTP(params operations.VerifyOTPParams) middleware.Responder {
 		}
 		return operations.NewVerifyOTPOK().WithPayload(&response)
 	}
+}
+
+func mosipVerifyOTP(params operations.MosipVerifyOTPParams) middleware.Responder {
+	individualId := *params.Body.IndividualID
+	individualIDType := *params.Body.IndividualIDType
+	otp := *params.Body.Otp
+	if individualId == "" || individualIDType == "" || otp == "" {
+		return operations.NewMosipVerifyOTPBadRequest()
+	}
+
+	mResp, err := services.MosipAuthRequest(individualIDType, individualId, otp)
+	if err != nil {
+		return operations.NewMosipVerifyOTPInternalServerError()
+	}
+
+	if mResp.Response().StatusCode == http.StatusOK {
+		// TODO: Handle MOSIP error response in body
+		return operations.NewMosipVerifyOTPOK()
+	}
+
+	return operations.NewMosipVerifyOTPInternalServerError()
 }
 
 func canInitializeSlots() bool {
