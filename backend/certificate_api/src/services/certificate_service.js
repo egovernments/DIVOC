@@ -96,6 +96,7 @@ function getParamValue(obj, param, result){
     }
     else if(prop == param){
       result = value;
+      return result;
     }
   }
   return result;
