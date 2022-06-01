@@ -7,7 +7,7 @@
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
-    "axios": "^0.21.0",
+    "axios": "^0.21.2",
     "bootstrap": "^4.5.3",
     "certificate-signer-library": "^2.0.4",
     "i18next": "^20.3.5",
