@@ -78,6 +78,9 @@ func NewDivocPortalAPIAPI(spec *loads.Document) *DivocPortalAPIAPI {
 		GetAnalyticsHandler: GetAnalyticsHandlerFunc(func(params GetAnalyticsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetAnalytics has not yet been implemented")
 		}),
+		GetConfigHandler: GetConfigHandlerFunc(func(params GetConfigParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetConfig has not yet been implemented")
+		}),
 		GetEnrollmentUploadHistoryHandler: GetEnrollmentUploadHistoryHandlerFunc(func(params GetEnrollmentUploadHistoryParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetEnrollmentUploadHistory has not yet been implemented")
 		}),
@@ -228,6 +231,8 @@ type DivocPortalAPIAPI struct {
 	EnrollRecipientHandler EnrollRecipientHandler
 	// GetAnalyticsHandler sets the operation handler for the get analytics operation
 	GetAnalyticsHandler GetAnalyticsHandler
+	// GetConfigHandler sets the operation handler for the get config operation
+	GetConfigHandler GetConfigHandler
 	// GetEnrollmentUploadHistoryHandler sets the operation handler for the get enrollment upload history operation
 	GetEnrollmentUploadHistoryHandler GetEnrollmentUploadHistoryHandler
 	// GetEnrollmentsHandler sets the operation handler for the get enrollments operation
@@ -395,6 +400,9 @@ func (o *DivocPortalAPIAPI) Validate() error {
 	}
 	if o.GetAnalyticsHandler == nil {
 		unregistered = append(unregistered, "GetAnalyticsHandler")
+	}
+	if o.GetConfigHandler == nil {
+		unregistered = append(unregistered, "GetConfigHandler")
 	}
 	if o.GetEnrollmentUploadHistoryHandler == nil {
 		unregistered = append(unregistered, "GetEnrollmentUploadHistoryHandler")
@@ -618,6 +626,10 @@ func (o *DivocPortalAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/analytics"] = NewGetAnalytics(o.context, o.GetAnalyticsHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/config/{key}"] = NewGetConfig(o.context, o.GetConfigHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

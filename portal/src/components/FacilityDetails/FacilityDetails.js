@@ -24,9 +24,9 @@ function FacilityDetails({
     const [allChecked, setAllChecked] = useState(false);
     useEffect(() => {
         resetFilter({status: CONSTANTS.ACTIVE});
-        getNotificationTemplates()
+        getNotificationTemplates(axiosInstance)
             .then(res => {
-                setNotificationTemplate(res?.facilityPendingTasks?.html)
+                setNotificationTemplate(res?.facilityPendingTasks?.Html)
             })
     }, []);
     const handleChange = (value, setValue) => {

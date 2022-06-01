@@ -1,18 +1,11 @@
-import axios from "axios";
+import {CONSTANTS} from "./constants";
 
-export function getNotificationTemplates() {
-    const data = {
-        "flagKey": "notification_templates"
-    };
-    return axios
-        .post("/config/api/v1/evaluation", data)
+export function getNotificationTemplates(axiosInstance) {
+    return axiosInstance.current.get(`/divoc/admin/api/v1/config/${CONSTANTS.NOTIFICATION_TEMPLATES_KEY}`)
         .then((res) => {
             return res.data;
         })
         .catch((err) => {
             console.log(err)
-        })
-        .then((result) => {
-            return result["variantAttachment"]
         })
 }

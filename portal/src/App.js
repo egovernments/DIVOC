@@ -15,10 +15,10 @@ import FacilityController from "./components/FacilityController/FacilityControll
 import PrintCertificate from "./components/PrintCertificate/PrintCertificate";
 import {Analytics} from "./components/Analytics/Anlaytics";
 import MapView from "./components/MapView/MapView"
-import config from "./config"
+import config from "./config.json"
 import {Provider} from "react-redux";
 import {store} from "./redux/store";
-import {getApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
+import {getApplicationConfigFromEtcd} from "./redux/reducers/etcdConfig";
 import FacilityInfo from './components/FacilityInfo/FacilityInfo';
 import {addFacilityDetails} from "./redux/reducers/facilityReducer";
 import {useAxios} from "./utils/useAxios";
@@ -27,13 +27,11 @@ import FacilityConfigureSlot from "./components/FacilityConfigureSlot";
 export default function App() {
     const {initialized, keycloak} = useKeycloak();
     const axiosInstance = useAxios('');
-    useEffect(() => {
-        getApplicationConfigFromFlagr(store.dispatch);
-    }, []);
 
     useEffect(() => {
         if (keycloak.authenticated) {
             try {
+                getApplicationConfigFromEtcd(store.dispatch, axiosInstance);
                 axiosInstance.current
                     .get(API_URL.USER_FACILITY_API)
                     .then((res) => {
@@ -42,7 +40,7 @@ export default function App() {
                         }
                     })
                     .catch((err) => {
-                        console.log("Error occurred while fetching application config from flagr");
+                        console.log("Error occurred while fetching facility details");
                         console.log(err)
                     })
             } catch (e) {

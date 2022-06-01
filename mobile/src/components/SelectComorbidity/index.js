@@ -30,9 +30,9 @@ export const SelectComorbidity = ({}) => {
     const [formData, setFormData] = useState(initialWalkInEnrollmentState)
 
     function setComorbidities(result) {
-        setConditions(result.commorbidities || [])
-        setMinAge(result.minAge || 0)
-        setMaxAge(result.maxAge || curYear - MINIMUM_SUPPORT_YEAR)
+        setConditions(result.Comorbidities || [])
+        setMinAge(result.MinAge || 0)
+        setMaxAge(result.MaxAge || curYear - MINIMUM_SUPPORT_YEAR)
     }
 
     useEffect(() => {
@@ -44,22 +44,15 @@ export const SelectComorbidity = ({}) => {
                     setComorbidities(res.comorbidities);
                 } else {
                     const data = {
-                        "flagKey": "programs",
-                        "entityContext": {
-                            "programId": programId
-                        }
+                        "key": CONSTANT.PROGRAM_COMORBIDITIES_KEY,
                     };
-                    ApiServices.fetchFlagrConfigs(data)
+                    ApiServices.fetchEtcdConfigs(data)
                         .catch((err) => {
                             console.log(err)
                         })
                         .then((result) => {
-                            if (CONSTANT.VariantAttachment in result) {
-                                setComorbidities(result[CONSTANT.VariantAttachment]);
-                                comorbiditiesDb.saveComorbidities(programId, result[CONSTANT.VariantAttachment])
-                            } else {
-                                console.error("program comorbidities is not configure");
-                            }
+                            setComorbidities(result);
+                            comorbiditiesDb.saveComorbidities(programId, result)
                         })
                 }
             })

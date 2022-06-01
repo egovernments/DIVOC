@@ -1,0 +1,26 @@
+{
+  "comorbidities": [
+    "Heart Failure with hospital admission in past one year",
+    "Post Cardiac Transplant/Left Ventricular Assist Device (LVAD)",
+    "Significant Left ventricular systolic dysfunction (LVEF \\u003c40%)",
+    "Moderate or Severe Valvular Heart Disease",
+    "Congenital heart disease with severe PAH or Idiopathic PAH",
+    "Coronary Artery Disease with past CABG/PTCA/MI AND Hypertension/Diabetes on treatment",
+    "Angina AND Hypertension/Diabetes on treatment",
+    "CT/MRI documented stroke AND Hypertension/Diabetes on treatment",
+    "Pulmonary artery hypertension AND Hypertension/Diabetes on treatment",
+    "Diabetes (\\u003e 10 years OR with complications) AND Hypertension on treatment",
+    "Kidney/ Liver/ Hematopoietic stem cell transplant: Recipient/On wait-list",
+    "End Stage Kidney Disease on haemodialysis/ CAPD",
+    "Current prolonged use of oral corticosteroids/ immunosuppressant medications",
+    "Decompensated cirrhosis",
+    "Severe respiratory disease with hospitalizations in last two years/FEV1 \\u003c50%",
+    "Lymphoma/ Leukaemia/ Myeloma",
+    "Diagnosis of any solid cancer on or after 1st July 2020 OR currently on any cancer therapy",
+    "Sickle Cell Disease/ Bone marrow failure/ Aplastic Anaemia/ Thalassemia Major",
+    "Primary Immunodeficiency Diseases/ HIV infection",
+    "Persons with disabilities due to Intellectual disabilities/ Muscular Dystrophy/ Acid attack with involvement of respiratory system/ Persons with disabilities having high support needs/ Multiple disabilities including deaf-blindness"
+  ],
+  "maxAge": 120,
+  "minAge": 50
+}

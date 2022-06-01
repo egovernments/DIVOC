@@ -1,4 +1,5 @@
 import {appIndexDb} from "../AppDatabase";
+import {CONSTANT} from "../utils/constants";
 
 const AUTHORIZE = "/divoc/api/v1/authorize"
 const PRE_ENROLLMENT = "/divoc/api/v1/preEnrollments"
@@ -7,13 +8,14 @@ const VACCINATORS = "/divoc/admin/api/v1/vaccinators"
 const CERTIFY = "/divoc/api/v1/certify"
 const USER_INFO = "/divoc/api/v1/users/me"
 const FACILITY_DETAILS = "/divoc/admin/api/v1/facility";
-const FLAGR_APPLICATION_CONFIG = "/config/api/v1/evaluation";
 const FACILITY_ID = "FACILITY_ID"
 const ENROLLMENT_ID = "ENROLLMENT_ID"
 const PROGRAM_ID = "PROGRAM_ID"
+const ETCD_KEY = "ETCD_KEY"
 const FACILITY_SLOTS = `/divoc/admin/api/v1/facility/${FACILITY_ID}/schedule`
 const ENROLLMENT_BY_CODE = `/divoc/api/v1/preEnrollments/${ENROLLMENT_ID}`
 const VERIFY_CERTIFICATE = "/divoc/api/v1/certificate/revoked"
+const ETCD_APPLICATION_CONFIG = `/divoc/admin/api/v1/config/${ETCD_KEY}`;
 
 export class ApiServices {
 
@@ -175,23 +177,27 @@ export class ApiServices {
             })
     }
 
-    static async fetchApplicationConfigFromFlagr() {
+    static async fetchApplicationConfigFromEtcd() {
         const data = {
-            "flagKey": "country_specific_features"
+            "key": CONSTANT.COUNTRY_SPECIFIC_FEATURES_KEY
         };
-        return this.fetchFlagrConfigs(data);
+        return this.fetchEtcdConfigs(data);
     }
 
-    static fetchFlagrConfigs(data) {
+    static fetchEtcdConfigs(data) {
         const requestOptions = {
-            method: 'POST',
+            method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
-                'accept': 'application/json'
+                'accept': 'application/json',
+                'Authorization': 'Bearer ' + localStorage.getItem("token")
             },
-            body: JSON.stringify(data)
         };
-        return fetch(FLAGR_APPLICATION_CONFIG, requestOptions)
+
+        const apiURL = ETCD_APPLICATION_CONFIG
+            .replace(ETCD_KEY, data.key);
+
+        return fetch(apiURL, requestOptions)
             .then(response => {
                 return response.json()
             })

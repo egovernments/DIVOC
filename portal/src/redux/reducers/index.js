@@ -1,5 +1,5 @@
 import { combineReducers } from "redux";
-import {flagrConfigReducer} from "./flagrConfig";
 import {facilityReducer} from "./facilityReducer";
+import {etcdConfigReducer} from "./etcdConfig";
 
-export default combineReducers({flagr: flagrConfigReducer, facility: facilityReducer})
+export default combineReducers({etcd: etcdConfigReducer, facility: facilityReducer})

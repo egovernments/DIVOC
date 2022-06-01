@@ -61,6 +61,45 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "facility-admin",
+              "admin",
+              "facility-staff",
+              "controller"
+            ]
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/enrollments": {
       "get": {
         "summary": "get enrollments",
@@ -2153,6 +2192,45 @@ func init() {
             "schema": {
               "type": "object"
             }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "hasRole": [
+              "admin",
+              "controller",
+              "facility-admin",
+              "facility-staff"
+            ]
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
           },
           "401": {
             "description": "Unauthorized"

@@ -42,6 +42,6 @@ var Config = struct {
 		AuthEnabled bool   `env:"ETCD_AUTH_ENABLED" yaml:"enable"`
 		UserName    string `env:"ETCD_USERNAME"`
 		Password    string `env:"ETCD_PASSWORD"`
-		Keys        string `default:"NOTIFICATION_TEMPLATES"`
+		Keys        string `default:"NOTIFICATION_TEMPLATES,PROGRAM_COMORBIDITIES,COUNTRY_SPECIFIC_FEATURES"`
 	}
 }{}
