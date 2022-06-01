@@ -2,7 +2,7 @@ const {Etcd3} = require('etcd3');
 const config = require('./config/config');
 const {CONFIG_KEYS} = require('./config/constants');
 
-let ICD11_MAPPINGS = null, VACCINE_ICD11_MAPPINGS = null, DDCC_TEMPLATE = null, W3C_TEMPLATE = null, CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH = null;
+let ICD11_MAPPINGS = null, VACCINE_ICD11_MAPPINGS = null, DDCC_TEMPLATE = null, W3C_TEMPLATE = null, CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH = null, NOTIFICATION_TEMPLATES = null;
 let etcdClient;
 let configuration;
 
@@ -26,6 +26,7 @@ function init() {
     setUpWatcher(CONFIG_KEYS.DDCC_TEMPLATE);
     setUpWatcher(CONFIG_KEYS.W3C_TEMPLATE);
     setUpWatcher(CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH);
+    setUpWatcher(CONFIG_KEYS.NOTIFICATION_TEMPLATES);
     configuration = config.CONFIGURATION_LAYER.toLowerCase() === 'etcd' ? new etcd() : null
 }
 
@@ -68,6 +69,8 @@ function loadConfigValues(key) {
         case CONFIG_KEYS.W3C_TEMPLATE:
             mapping = W3C_TEMPLATE;
             break;
+        case CONFIG_KEYS.NOTIFICATION_TEMPLATES:
+            mapping = NOTIFICATION_TEMPLATES;
     }
     return mapping;
 }
@@ -109,6 +112,9 @@ function updateConfigValues(key, value) {
             break;
         case CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH:
             CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH = value;
+            break;
+        case CONFIG_KEYS.NOTIFICATION_TEMPLATES:
+            NOTIFICATION_TEMPLATES = value;
             break;
     }
 }

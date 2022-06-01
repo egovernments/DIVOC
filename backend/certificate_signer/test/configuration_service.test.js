@@ -58,7 +58,7 @@ describe('should retrieve all mappings if correct configuration layer passed', (
     
     test('should initialise five times watchers each for ICD, VACCINE_ICD, DDCC_TEMPLATE, W3C_TEMPLATE and FIELDS_KEY_PATH ', () => {
         expect(etcd3.Etcd3).toHaveBeenCalledWith({hosts: 'etcd:2379', auth:{username: 'etcd', password: 'etcd'}});
-        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(5);
+        expect(mockEtcd3Constructor.watch).toHaveBeenCalledTimes(6);
     });
     
     test('should fetch values of ICD Mapping and VACCINE_ICD mapping from etcd', async() => {

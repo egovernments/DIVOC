@@ -18,6 +18,7 @@ const CERTIFIED_TOPIC = process.env.CERTIFIED_TOPIC || 'certified';
 const ERROR_CERTIFICATE_TOPIC = process.env.ERROR_CERTIFICATE_TOPIC || 'error_certificate';
 const DUPLICATE_CERTIFICATE_TOPIC = process.env.DUPLICATE_CERTIFICATE_TOPIC || 'duplicate_certificate';
 const CERTIFICATE_ACK_TOPIC = process.env.CERTIFICATE_ACK_TOPIC || 'certify_ack';
+const NOTIFY_TOPIC = process.env.NOTIFY_TOPIC || 'notify';
 const ENABLE_CERTIFY_ACKNOWLEDGEMENT = process.env.ENABLE_CERTIFY_ACKNOWLEDGEMENT || true;
 const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
 const REDIS_ENABLED = process.env.REDIS_ENABLED || true;
@@ -63,5 +64,6 @@ module.exports = {
   ETCD_URL,
   ETCD_AUTH_ENABLED,
   ETCD_USERNAME,
-  ETCD_PASSWORD
+  ETCD_PASSWORD,
+  NOTIFY_TOPIC
 };

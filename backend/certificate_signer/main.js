@@ -35,8 +35,8 @@ Mustache.escape = function (value)
 const CERTIFICATE_TYPE_V2 = "certifyV2";
 const CERTIFICATE_TYPE_V3 = "certifyV3";
 
-let DDCC_TEMPLATE;
-let W3C_TEMPLATE;
+let RECIPIENT_CERTIFIED_NOTIFICATION_TEMPLATE;
+let DDCC_TEMPLATE, W3C_TEMPLATE;
 
 const kafka = new Kafka({
   clientId: 'divoc-cert',
@@ -106,6 +106,7 @@ configuration_service.init();
       certificateFieldsKeyPath = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.CERTIFICATES_OPTIONAL_FIELDS_KEY_PATH));
       DDCC_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.DDCC_TEMPLATE);
       W3C_TEMPLATE = await configLayerObj.getConfigValue(CONFIG_KEYS.W3C_TEMPLATE);
+      RECIPIENT_CERTIFIED_NOTIFICATION_TEMPLATE = JSON.parse(await configLayerObj.getConfigValue(CONFIG_KEYS.NOTIFICATION_TEMPLATES))["recipientCertified"];
       let jsonMessage = {};
       let preEnrollmentCode;
       try {
@@ -128,6 +129,21 @@ configuration_service.init();
             {key: null, value: JSON.stringify({preEnrollmentCode: preEnrollmentCode, date: new Date(), ProcType: 'sign_certificate', Status: 'success'})}
           ]
         });
+        let customMessage = Mustache.render(
+          RECIPIENT_CERTIFIED_NOTIFICATION_TEMPLATE.message, 
+          {
+            ".Name": R.pathOr("", ["recipient", "name"], jsonMessage),
+            ".VaccineName": R.pathOr("", ["vaccination", "name"], jsonMessage)
+          }
+        );
+        await producer.send({
+          topic: config.NOTIFY_TOPIC,
+          messages: [{key: null, value: JSON.stringify({
+            recipient: R.pathOr("", ["recipient", "contact"], jsonMessage).toString(),
+            message: customMessage,
+            subject: RECIPIENT_CERTIFIED_NOTIFICATION_TEMPLATE.subject
+          })}]
+        })
       } catch (e) {
         // const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], jsonMessage);
         // const currentDose = R.pathOr("", ["vaccination", "dose"], jsonMessage);
