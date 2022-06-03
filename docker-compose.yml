@@ -29,7 +29,7 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: divoc/registry-es
+    image: divoc/registry
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -242,6 +242,23 @@ services:
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
       CONFIGURATION_LAYER: "etcd"
+    depends_on:
+      kafka:
+        condition: service_healthy
+  hpr-certificate-signer:
+    image: divoc/hpr_certificate_signer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081/"
+      REDIS_URL: redis://redis:6379
+      CERTIFICATE_NAMESPACE: "https://gist.githubusercontent.com/varadeth/fff3a5a48bdf0adb4845410d507e97da/raw/8a2360c52595dcc595f69a7d8b320f22f82e6856/context.json"
+      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
+      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
     depends_on:
       kafka:
         condition: service_healthy

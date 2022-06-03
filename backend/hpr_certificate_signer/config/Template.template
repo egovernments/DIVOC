@@ -1,0 +1,34 @@
+{
+    "@context": [
+        "https://www.w3.org/2018/credentials/v1",
+        "{{{namespace}}}"
+    ],
+    "type": [
+        "VerifiableCredential",
+        "ProofOfHealthProfessionalCredential"
+    ],
+    "credentialSubject": {
+        "type": "Person",
+        "name": "{{recipient.name}}",
+        "registrationNumber": "{{recipient.registrationNumber}}",
+        "salutation": "{{recipient.salutation}}",
+        "hpid": "{{recipient.hpid}}",
+        "gender": "{{recipient.gender}}"
+    },
+    "evidence": {
+        "type": [
+            "HealthProfessional"
+        ],
+        "systemOfMedicine":"{{health.systemOfMedicine}}",
+        "speciality": "{{health.speciality}}",
+        "registeredWithCouncil": "{{health.registeredWithCouncil}}",
+        "degree": "{{health.degree}}",
+        "year": "{{health.year}}",
+        "validFrom": "{{health.validFrom}}",
+        "validTo": "{{health.validTo}}",
+        "certificateId": "{{certificateId}}"
+    },
+    "issuer": "{{issuer}}",
+    "issuanceDate": "{{issuanceDate}}",
+    "nonTransferable": "true"
+}
