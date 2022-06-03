@@ -7,7 +7,7 @@ import Nav from "react-bootstrap/Nav";
 import NavDropdown from "react-bootstrap/NavDropdown";
 import {useKeycloak} from "@react-keycloak/web";
 import {CONSTANTS} from "../../utils/constants";
-import config from "../../config";
+import config from "../../config.json";
 import {useSelector} from "react-redux";
 import {NavLink, useHistory} from "react-router-dom";
 import Dropdown from "react-bootstrap/Dropdown";
@@ -16,7 +16,7 @@ import Button from "react-bootstrap/Button";
 export const Header = (props) => {
     const {keycloak} = useKeycloak();
     const history = useHistory();
-    const logo = useSelector(state => state.flagr.appConfig.applicationLogo);
+    const logo = useSelector(state => state.etcd.appConfig.applicationLogo);
     const facility = useSelector(state => state.facility);
     const isFacilityUser = () => {
         return keycloak.hasResourceRole(CONSTANTS.FACILITY_ADMIN_ROLE, CONSTANTS.PORTAL_CLIENT)

@@ -1,8 +1,8 @@
 import state_and_districts from '../../utils/state_and_districts.json';
-import {ApiServices} from "../../Services/ApiServices";
 import {applicationConfigsDB} from "../../Services/ApplicationConfigsDB";
+import {ApiServices} from "../../Services/ApiServices";
 
-const FLAGR_ACTION_TYPES = {
+const ETCD_ACTION_TYPES = {
     "LOAD_APPLICATION_CONFIG": "LOAD_APPLICATION_CONFIG"
 };
 const initialState = {
@@ -16,10 +16,10 @@ const initialState = {
     }
 };
 
-export function flagrConfigReducer(state = initialState, action) {
+export function etcdConfigReducer(state = initialState, action) {
     switch (action.type) {
-        case FLAGR_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
-            if (action.payload) {
+        case ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG: {
+            if (action.payload && Object.keys(action.payload).length !== 0) {
                 return {
                     ...state,
                     appConfig: action.payload
@@ -34,23 +34,23 @@ export function flagrConfigReducer(state = initialState, action) {
 
 export const loadApplicationConfig = (data) => {
     return {
-        type: FLAGR_ACTION_TYPES.LOAD_APPLICATION_CONFIG,
+        type: ETCD_ACTION_TYPES.LOAD_APPLICATION_CONFIG,
         payload: data
     }
 };
 
-export const storeApplicationConfigFromFlagr = (dispatch) => {
+export const storeApplicationConfigFromEtcd = (dispatch) => {
     try {
-        ApiServices.fetchApplicationConfigFromFlagr()
+        ApiServices.fetchApplicationConfigFromEtcd()
             .then((res) => {
-                const configs = res["variantAttachment"];
+                const configs = res;
                 return applicationConfigsDB.saveApplicationConfigs(configs)
                     .finally(() => {
                         dispatch(loadApplicationConfig(configs))
                     })
             })
             .catch((err) => {
-                console.log("Error occurred while fetching application config from flagr");
+                console.log("Error occurred while fetching application config from etcd");
                 console.log(err)
             })
     } catch (e) {

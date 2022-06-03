@@ -10,7 +10,7 @@ import {useOnlineStatus} from "./utils/offlineStatus";
 import {getSelectedProgram, SelectProgram} from "./components/ProgramSelection";
 import {store} from "../src/redux/store";
 import {Provider} from "react-redux";
-import {storeApplicationConfigFromFlagr} from "./redux/reducers/flagrConfig";
+import {storeApplicationConfigFromEtcd} from "./redux/reducers/etcdConfig";
 import {CONSTANT} from "./utils/constants";
 
 function App({keycloak, initialized}) {
@@ -37,7 +37,7 @@ function App({keycloak, initialized}) {
                     keycloak.login({redirectUri: window.location.origin + config.urlPath})
                 }
             }
-            storeApplicationConfigFromFlagr(store.dispatch)
+            storeApplicationConfigFromEtcd(store.dispatch)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialized]);

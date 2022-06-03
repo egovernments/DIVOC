@@ -12,17 +12,31 @@ import (
 type NotificationTemplatesType map[string]struct {
 	Subject string
 	Message string
+	Html    string
+}
+
+type ProgramComorbiditiesType struct {
+	Comorbidities []string
+	MaxAge        int
+	MinAge        int
+}
+
+type CountrySpecificFeaturesType struct {
 }
 
 var AppConfigs = struct {
 	// add other keys which need tracking here
-	NotificationTemplates NotificationTemplatesType
+	NotificationTemplates   NotificationTemplatesType
+	ProgramComorbidities    ProgramComorbiditiesType
+	CountrySpecificFeatures CountrySpecificFeaturesType
 }{}
 var etcdClient *clientv3.Client
 var clientErr error
 var etcdKeysToWatch []string
 
 const NotificationTemplates = "NOTIFICATION_TEMPLATES"
+const ProgramComorbidities = "PROGRAM_COMORBIDITIES"
+const CountrySpecificFeatures = "COUNTRY_SPECIFIC_FEATURES"
 
 func Initialize() {
 	log.Println("Etcd init")
@@ -58,6 +72,19 @@ func loadInitialConfig() {
 	}
 }
 
+func GetConfig(key string) interface{} {
+	switch key {
+	case ProgramComorbidities:
+		return AppConfigs.ProgramComorbidities
+	case CountrySpecificFeatures:
+		return AppConfigs.CountrySpecificFeatures
+	case NotificationTemplates:
+		return AppConfigs.NotificationTemplates
+	default:
+		return nil
+	}
+}
+
 func setupWatcher(key string) {
 	watchRespChannel := etcdClient.Watch(context.Background(), key)
 	for watchResp := range watchRespChannel {
@@ -75,7 +102,6 @@ func getUpdatedValueForKey(key string) {
 	cancel()
 	if err != nil {
 		log.Errorf("Error while getting KV, %v", err)
-		//TODO: check what should happen if there is an error while getting from etcd
 		return
 	}
 	switch key {
@@ -87,6 +113,26 @@ func getUpdatedValueForKey(key string) {
 				log.Errorf("notification templates not in defined format, %v", err)
 			} else {
 				AppConfigs.NotificationTemplates = notificationTemplate
+			}
+		}
+	case ProgramComorbidities:
+		comorbidities := ProgramComorbiditiesType{}
+		for _, kv := range resp.Kvs {
+			err = json.Unmarshal(kv.Value, &comorbidities)
+			if err != nil {
+				log.Errorf("comorbidities are not in defined format, %v", err)
+			} else {
+				AppConfigs.ProgramComorbidities = comorbidities
+			}
+		}
+	case CountrySpecificFeatures:
+		features := CountrySpecificFeaturesType{}
+		for _, kv := range resp.Kvs {
+			err = json.Unmarshal(kv.Value, &features)
+			if err != nil {
+				log.Errorf("features are not in defined format, %v", err)
+			} else {
+				AppConfigs.CountrySpecificFeatures = features
 			}
 		}
 	default:

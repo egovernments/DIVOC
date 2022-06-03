@@ -68,6 +68,9 @@ func NewRegistrationAPIAPI(spec *loads.Document) *RegistrationAPIAPI {
 		GetBeneficiariesHandler: GetBeneficiariesHandlerFunc(func(params GetBeneficiariesParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetBeneficiaries has not yet been implemented")
 		}),
+		GetConfigHandler: GetConfigHandlerFunc(func(params GetConfigParams, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation GetConfig has not yet been implemented")
+		}),
 		GetRecipientsHandler: GetRecipientsHandlerFunc(func(params GetRecipientsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation GetRecipients has not yet been implemented")
 		}),
@@ -160,6 +163,8 @@ type RegistrationAPIAPI struct {
 	GenerateOTPHandler GenerateOTPHandler
 	// GetBeneficiariesHandler sets the operation handler for the get beneficiaries operation
 	GetBeneficiariesHandler GetBeneficiariesHandler
+	// GetConfigHandler sets the operation handler for the get config operation
+	GetConfigHandler GetConfigHandler
 	// GetRecipientsHandler sets the operation handler for the get recipients operation
 	GetRecipientsHandler GetRecipientsHandler
 	// GetSlotsForFacilitiesHandler sets the operation handler for the get slots for facilities operation
@@ -280,6 +285,9 @@ func (o *RegistrationAPIAPI) Validate() error {
 	}
 	if o.GetBeneficiariesHandler == nil {
 		unregistered = append(unregistered, "GetBeneficiariesHandler")
+	}
+	if o.GetConfigHandler == nil {
+		unregistered = append(unregistered, "GetConfigHandler")
 	}
 	if o.GetRecipientsHandler == nil {
 		unregistered = append(unregistered, "GetRecipientsHandler")
@@ -438,6 +446,10 @@ func (o *RegistrationAPIAPI) initHandlerCache() {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}
 	o.handlers["GET"]["/beneficiaries/search"] = NewGetBeneficiaries(o.context, o.GetBeneficiariesHandler)
+	if o.handlers["GET"] == nil {
+		o.handlers["GET"] = make(map[string]http.Handler)
+	}
+	o.handlers["GET"]["/config/{key}"] = NewGetConfig(o.context, o.GetConfigHandler)
 	if o.handlers["GET"] == nil {
 		o.handlers["GET"] = make(map[string]http.Handler)
 	}

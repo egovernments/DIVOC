@@ -27,7 +27,7 @@ export default function VaccinatorDetails({
     const [searchVaccinatorName, setSearchVaccinatorName] = useState('');
     const [searchVaccinatorResults, setSearchVaccinatorResults] = useState([]);
     const [togglePopup, setTogglePopup] = useState(false);
-    const countryCode = useSelector(state => state.flagr.appConfig.countryCode)
+    const countryCode = useSelector(state => state.etcd.appConfig.countryCode)
 
     const axiosInstance = useAxios('');
 

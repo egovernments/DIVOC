@@ -13,7 +13,7 @@ function VaccineRegistrationForm({vaccine, onSubmit, onBackClick}) {
 
     const [formData, setFormData] = useState(transformToFormData(vaccine));
     const [validationErrors, setValidationErrors] = useState();
-    const currency = useSelector(state => state.flagr.appConfig.currency);
+    const currency = useSelector(state => state.etcd.appConfig.currency);
 
     function transformToFormData(vaccine) {
         const data = {...vaccine};

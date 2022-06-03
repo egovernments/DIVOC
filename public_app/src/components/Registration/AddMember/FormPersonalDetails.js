@@ -3,7 +3,13 @@ import {Col, Container, Row} from "react-bootstrap";
 import {CustomButton} from "../../CustomButton";
 import {maskPersonalDetails} from "../../../utils/maskPersonalDetails";
 import axios from "axios";
-import {CITIZEN_TOKEN_COOKIE_NAME, RECIPIENTS_API} from "../../../constants";
+import {
+    CITIZEN_TOKEN_COOKIE_NAME,
+    CONFIG_API,
+    CONFIG_KEY,
+    COUNTRY_SPECIFIC_FEATURES_KEY,
+    RECIPIENTS_API
+} from "../../../constants";
 import {getUserNumberFromRecipientToken} from "../../../utils/reciepientAuth";
 import {getCookie} from "../../../utils/cookies";
 import {
@@ -46,25 +52,19 @@ export const FormPersonalDetails = ({ setValue, formData, navigation, verifyDeta
     const {t} = useTranslation();
 
     useEffect(() => {
-        const data = {
-            "entityContext": {},
-            "flagKey": "country_specific_features"
+        let apiUrl = CONFIG_API.replace(CONFIG_KEY, COUNTRY_SPECIFIC_FEATURES_KEY)
+        const token = getCookie(CITIZEN_TOKEN_COOKIE_NAME);
+        const config = {
+            headers: {"Authorization": token, "Content-Type": "application/json"},
         };
         axios
-            .post("/config/api/v1/evaluation", data)
-            .then((res) => {
-                return res.data;
-            })
+            .get(apiUrl, config)
             .catch((err) => {
                 console.log(err)
             })
             .then((result) => {
-                if(result["variantAttachment"]) {
-                    setStateAndDistricts(result["variantAttachment"].stateAndDistricts || {})
-                    setNationalities(result["variantAttachment"].nationalities || [])
-                } else {
-                    console.error("country specific criteria is not configure");
-                }
+                setStateAndDistricts(result.data.stateAndDistricts || {})
+                setNationalities(result.data.nationalities || [])
             })
     }, []);
 

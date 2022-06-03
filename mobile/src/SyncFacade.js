@@ -29,21 +29,15 @@ export class SyncFacade {
         await programDb.savePrograms(programs);
         for (const program of programs) {
             const data = {
-                "flagKey": "programs",
-                "entityContext": {
-                    "programId": program.id
-                }
-            };
-            await ApiServices.fetchFlagrConfigs(data)
+                "key": CONSTANT.PROGRAM_COMORBIDITIES_KEY
+            }
+            await ApiServices.fetchEtcdConfigs(data)
                 .catch((err) => {
+                    console.log("Error occurred while fetching comorbidity config from etcd");
                     console.log(err)
                 })
-                .then((result) => {
-                    if (CONSTANT.VariantAttachment in result) {
-                        comorbiditiesDb.saveComorbidities( program.id, result[CONSTANT.VariantAttachment])
-                    } else {
-                        console.error("program comorbidities is not configure");
-                    }
+                .then((res) => {
+                    comorbiditiesDb.saveComorbidities(program.id, res)
                 })
         }
 

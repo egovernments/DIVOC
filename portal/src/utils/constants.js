@@ -11,7 +11,9 @@ export const CONSTANTS = Object.freeze({
     GOVT: "GOVT",
     PRIVATE: "PRIVATE",
     ACTIVE: "Active",
-    IN_ACTIVE: "Inactive"
+    IN_ACTIVE: "Inactive",
+    COUNTRY_SPECIFIC_FEATURES_KEY: "COUNTRY_SPECIFIC_FEATURES",
+    NOTIFICATION_TEMPLATES_KEY: "NOTIFICATION_TEMPLATES"
 });
 
 export const FACILITY_TYPE = Object.freeze({
