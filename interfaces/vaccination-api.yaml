@@ -171,6 +171,31 @@ paths:
           description: Invalid input
           schema:
             $ref: '#/definitions/Error'
+  /v4/{entityType}/certify:
+    post:
+      tags:
+        - certification
+      summary: Certify the one or more events of given entityType
+      operationId: certifyV4
+      parameters:
+        - name: entityType
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: array
+            items:
+              type: object
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
   /v1/bulkCertify:
     post:
       tags:

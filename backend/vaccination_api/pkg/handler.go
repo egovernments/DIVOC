@@ -71,6 +71,9 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetTestCertifyUploadsHandler = certification.GetTestCertifyUploadsHandlerFunc(getTestCertifyUploads)
 	api.CertificationGetTestCertifyUploadErrorsHandler = certification.GetTestCertifyUploadErrorsHandlerFunc(getTestCertifyUploadErrors)
 	api.CertificationRevokeCertificateHandler = certification.RevokeCertificateHandlerFunc(revokeCertificate)
+
+	api.CertificationCertifyV4Handler = certification.CertifyV4HandlerFunc(certifyV4)
+
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -376,6 +379,25 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		}
 	}
 	return certification.NewCertifyOK()
+}
+
+func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimBody) middleware.Responder {
+	for _, request := range params.Body {
+		log.Debugf("CertificationRequest: %+v\n", request)
+
+		// TODO: Validate payload against entity schema
+
+		certifyRequestPayload := map[string]interface{}{
+			"entityType": params.EntityType,
+			"entityPayload": request,
+		}
+
+		if jsonRequestString, err := json.Marshal(certifyRequestPayload); err == nil {
+			services.PublishCertifyMessage(jsonRequestString, nil, nil)
+		} else {
+			return certification.NewCertifyV4BadRequest()
+		}
+	}
 }
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
