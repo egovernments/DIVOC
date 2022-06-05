@@ -74,6 +74,9 @@ func NewDivocAPI(spec *loads.Document) *DivocAPI {
 		CertificationCertifyV3Handler: certification.CertifyV3HandlerFunc(func(params certification.CertifyV3Params, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation certification.CertifyV3 has not yet been implemented")
 		}),
+		CertificationCertifyV4Handler: certification.CertifyV4HandlerFunc(func(params certification.CertifyV4Params, principal *models.JWTClaimBody) middleware.Responder {
+			return middleware.NotImplemented("operation certification.CertifyV4 has not yet been implemented")
+		}),
 		ReportSideEffectsCreateReportedSideEffectsHandler: report_side_effects.CreateReportedSideEffectsHandlerFunc(func(params report_side_effects.CreateReportedSideEffectsParams, principal *models.JWTClaimBody) middleware.Responder {
 			return middleware.NotImplemented("operation report_side_effects.CreateReportedSideEffects has not yet been implemented")
 		}),
@@ -198,6 +201,8 @@ type DivocAPI struct {
 	CertificationCertifyHandler certification.CertifyHandler
 	// CertificationCertifyV3Handler sets the operation handler for the certify v3 operation
 	CertificationCertifyV3Handler certification.CertifyV3Handler
+	// CertificationCertifyV4Handler sets the operation handler for the certify v4 operation
+	CertificationCertifyV4Handler certification.CertifyV4Handler
 	// ReportSideEffectsCreateReportedSideEffectsHandler sets the operation handler for the create reported side effects operation
 	ReportSideEffectsCreateReportedSideEffectsHandler report_side_effects.CreateReportedSideEffectsHandler
 	// EventsHandler sets the operation handler for the events operation
@@ -341,6 +346,9 @@ func (o *DivocAPI) Validate() error {
 	}
 	if o.CertificationCertifyV3Handler == nil {
 		unregistered = append(unregistered, "certification.CertifyV3Handler")
+	}
+	if o.CertificationCertifyV4Handler == nil {
+		unregistered = append(unregistered, "certification.CertifyV4Handler")
 	}
 	if o.ReportSideEffectsCreateReportedSideEffectsHandler == nil {
 		unregistered = append(unregistered, "report_side_effects.CreateReportedSideEffectsHandler")
@@ -530,6 +538,10 @@ func (o *DivocAPI) initHandlerCache() {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
 	o.handlers["POST"]["/v3/certify"] = certification.NewCertifyV3(o.context, o.CertificationCertifyV3Handler)
+	if o.handlers["POST"] == nil {
+		o.handlers["POST"] = make(map[string]http.Handler)
+	}
+	o.handlers["POST"]["/v4/{entityType}/certify"] = certification.NewCertifyV4(o.context, o.CertificationCertifyV4Handler)
 	if o.handlers["POST"] == nil {
 		o.handlers["POST"] = make(map[string]http.Handler)
 	}
