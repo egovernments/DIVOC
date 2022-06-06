@@ -270,3 +270,12 @@ func GetVaccinatorsForTheFacility(facilityCode string) (interface{}, error) {
 		return resp["Vaccinator"], nil
 	}
 }
+
+func GetAllSchemas() (map[string]interface{}, error){
+	if resp, err := QueryRegistry("Schema", map[string]interface{}{}, 100, 0); err != nil {
+		log.Errorf("Error in getting schemas from registry")
+		return nil, err
+	} else {
+		return resp, nil
+	}
+}

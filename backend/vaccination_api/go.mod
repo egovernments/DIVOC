@@ -5,8 +5,8 @@ go 1.15
 require (
 	github.com/ClickHouse/clickhouse-go v1.4.3
 	github.com/confluentinc/confluent-kafka-go v1.5.2 // indirect
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
 	github.com/divoc/kernel_library v0.0.0-00010101000000-000000000000
-	github.com/go-kit/kit v0.10.0 // indirect
 	github.com/go-openapi/errors v0.19.7
 	github.com/go-openapi/loads v0.19.5
 	github.com/go-openapi/runtime v0.19.24
@@ -26,6 +26,7 @@ require (
 	github.com/signintech/gopdf v0.9.12
 	github.com/sirupsen/logrus v1.7.0
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
+	github.com/xeipuuv/gojsonschema v1.2.0
 	golang.org/x/net v0.0.0-20210428140749-89ef3d95e781
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )

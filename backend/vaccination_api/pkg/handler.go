@@ -30,6 +30,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 const FacilityEntity = "Facility"
@@ -382,13 +383,22 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 }
 
 func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimBody) middleware.Responder {
+	entityType := params.EntityType
 	for _, request := range params.Body {
 		log.Debugf("CertificationRequest: %+v\n", request)
 
-		// TODO: Validate payload against entity schema
+		err := validatePayloadAgainstSchema(entityType, request)
+		if err != nil {
+			code := "VALIDATION_ERROR"
+			message := err.Error()
+			return certification.NewCertifyV4BadRequest().WithPayload(&models.Error{
+				Code:    &code,
+				Message: &message,
+			})
+		}
 
 		certifyRequestPayload := map[string]interface{}{
-			"entityType": params.EntityType,
+			"entityType": entityType,
 			"entityPayload": request,
 		}
 
@@ -398,6 +408,37 @@ func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimB
 			return certification.NewCertifyV4BadRequest()
 		}
 	}
+	return certification.NewCertifyOK()
+}
+
+func validatePayloadAgainstSchema(schemaName string, payload interface{}) error {
+	schemaStr := config.Config.Registry.VCSchemas[schemaName]
+	if schemaStr.(string) == "" {
+		message := "Unable to get schema "+schemaName+" from registry"
+		return errors.New(message)
+	}
+
+	schemaLoader := gojsonschema.NewStringLoader(schemaStr.(string))
+	documentLoader := gojsonschema.NewGoLoader(payload)
+
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	if err != nil {
+		return err
+	}
+
+	if result.Valid() {
+		log.Infof("The Payload is valid\n")
+		return nil
+	} else {
+		log.Error("The document is not valid. see errors :\n")
+		var messages []string
+		for _, desc := range result.Errors() {
+			log.Errorf("- %s\n", desc)
+			messages = append(messages, desc.String())
+		}
+		return errors.New(strings.Join(messages, "\n"))
+	}
+
 }
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {
