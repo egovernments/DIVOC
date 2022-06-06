@@ -71,9 +71,6 @@ function updateConfigValues(key, value) {
     case TEMPLATES.TEST_CERTIFICATE:
       testCertificateTemplate = value;
       break;
-    case TEMPLATES.HEALTH_PROFESSIONAL_CERTIFICATE:
-      healthProfessionalCertificateTemplate = value;
-      break;
     case TEMPLATES.EU_VACCINATION_CERTIFICATE:
       euVaccineCertificateTemplate = value;
       break;
@@ -123,9 +120,6 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
       break;
     case TEMPLATES.TEST_CERTIFICATE:
       value = testCertificateTemplate;
-      break;
-    case TEMPLATES.HEALTH_PROFESSIONAL_CERTIFICATE:
-      value = healthProfessionalCertificateTemplate;
       break;
     case TEMPLATES.EU_VACCINATION_CERTIFICATE:
       euVaccineCertificateTemplate = value;
