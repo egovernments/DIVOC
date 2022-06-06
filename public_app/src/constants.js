@@ -7,6 +7,10 @@ export const API_ROOT_URL = 'https://api.covid19india.org/v4';
 export const CERTIFICATE_FILE = "certificate.json";
 export const PROGRAM_API = "/divoc/admin/api/v1/public/programs?status=Active";
 export const RECIPIENTS_API = "/divoc/api/citizen/recipients";
+export const CONFIG_KEY = "key"
+export const CONFIG_API = `/divoc/api/citizen/config/${CONFIG_KEY}`
+export const COUNTRY_SPECIFIC_FEATURES_KEY = "COUNTRY_SPECIFIC_FEATURES"
+export const PROGRAM_COMORBIDITIES_KEY = "PROGRAM_COMORBIDITIES"
 export const CITIZEN_TOKEN_COOKIE_NAME = "citizenToken";
 export const STATE_NAMES = {
   AP: 'Andhra Pradesh',

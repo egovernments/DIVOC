@@ -251,6 +251,99 @@ func init() {
         }
       }
     },
+    "/external/mosip/verifyOTP": {
+      "post": {
+        "security": [],
+        "summary": "Verify OTP",
+        "operationId": "mosipVerifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId",
+                "otp"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                },
+                "otp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Invalid OTP"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/facility/slots": {
       "get": {
         "security": [
@@ -885,6 +978,99 @@ func init() {
           },
           "500": {
             "description": "Internal Error"
+          }
+        }
+      }
+    },
+    "/external/mosip/verifyOTP": {
+      "post": {
+        "security": [],
+        "summary": "Verify OTP",
+        "operationId": "mosipVerifyOTP",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId",
+                "otp"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                },
+                "otp": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          },
+          "401": {
+            "description": "Invalid OTP"
+          },
+          "500": {
+            "description": "Internal error"
+          }
+        }
+      }
+    },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }

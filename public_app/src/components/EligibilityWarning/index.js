@@ -4,15 +4,15 @@ import {Alert} from "react-bootstrap";
 export const EligibilityWarning = ({programEligibility}) => {
 
     function isCommorbidityAvailable(program) {
-        return "commorbidities" in program && program["commorbidities"].length > 0;
+        return "Comorbidities" in program && program["Comorbidities"].length > 0;
     }
 
     function isMinAgeAvailable(program) {
-        return "minAge" in program;
+        return "MinAge" in program;
     }
 
     function isMaxAgeAvailable(program) {
-        return "maxAge" in program;
+        return "MaxAge" in program;
     }
 
     function getProgramWiseMessage() {

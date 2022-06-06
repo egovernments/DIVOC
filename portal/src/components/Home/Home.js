@@ -12,7 +12,7 @@ import 'pure-react-carousel/dist/react-carousel.es.css';
 import {LatestUpdateCard} from "../LatestUpdateCard";
 import {Link, useHistory} from "react-router-dom";
 import {useKeycloak} from "@react-keycloak/web";
-import config from "../../config"
+import config from "../../config.json"
 
 export default function Home() {
     const {keycloak} = useKeycloak();

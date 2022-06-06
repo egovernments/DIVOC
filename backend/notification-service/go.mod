@@ -17,8 +17,9 @@ require (
 	github.com/imroc/req v0.3.0
 	github.com/jessevdk/go-flags v1.4.0
 	github.com/jinzhu/configor v1.2.1
+	github.com/prometheus/common v0.26.0
 	github.com/sirupsen/logrus v1.7.0
-	golang.org/x/net v0.0.0-20201224014010-6772e930b67b
+	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	gopkg.in/confluentinc/confluent-kafka-go.v1 v1.5.2
 )
 

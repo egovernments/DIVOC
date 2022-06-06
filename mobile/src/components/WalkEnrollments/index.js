@@ -84,9 +84,9 @@ function WalkInEnrollmentRouteCheck({pageName}) {
 
 function WalkEnrollmentForm(props) {
     const {state, goNext} = useWalkInEnrollment();
-    const stateAndDistricts = useSelector(state => state.flagr.appConfig.stateAndDistricts);
+    const stateAndDistricts = useSelector(state => state.etcd.appConfig.stateAndDistricts);
     const {getText, selectLanguage} = useLocale()
-    const countryCode = useSelector(state => state.flagr.appConfig.countryCode);
+    const countryCode = useSelector(state => state.etcd.appConfig.countryCode);
     const [enrollmentSchema, setEnrollmentSchema] = useState(schema);
     const [formData, setFormData] = useState(state);
     const [isFormTranslated, setFormTranslated] = useState(false);

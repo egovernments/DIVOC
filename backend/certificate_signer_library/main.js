@@ -62,6 +62,13 @@ async function init_signer(conf, signingPayloadTransformer, documentLoader) {
   await producer.connect();
 }
 
+
+async function  signCertificateWithoutPersisting(payload, transformW3, certificateId){
+  const w3cCertificate = transformW3(payload, certificateId);
+  const signedCertificate = await signJSON(w3cCertificate);
+  return signedCertificate;
+}
+
 async function signCertificate(certificateJson, headers, redisUniqueKey) {
   let uploadId = headers.uploadId ? headers.uploadId.toString() : '';
   let rowId = headers.rowId ? headers.rowId.toString() : '';
@@ -106,14 +113,13 @@ async function signCertificate(certificateJson, headers, redisUniqueKey) {
 }
 
 async function signAndSave(certificate, transformW3, redisUniqueKey, retryCount = 0) {
-  const certificateId = "" + Math.floor(1e8 + (Math.random() * 9e8));
   const name = certificate.recipient.name;
   const contact = certificate.recipient.contact;
   const mobile = getContactNumber(contact);
   const preEnrollmentCode = certificate.preEnrollmentCode;
-  const w3cCertificate = transformW3(certificate, certificateId);
-  const signedCertificate = await signJSON(w3cCertificate);
   const programId = certificate["programId"] || "";
+  const certificateId = getCertificateId();
+  const signedCertificate = await signCertificateWithoutPersisting(certificate, transformW3, certificateId);
   const signedCertificateForDB = {
     name: name,
     contact: contact,
@@ -169,6 +175,10 @@ async function sendCertifyAck(status, uploadId, rowId, errMsg="") {
   }
 }
 
+function getCertificateId(){
+  return "" + Math.floor(1e8 + (Math.random() * 9e8));
+}
+
 function getContactNumber(contact) {
   return contact.find(value => /^tel/.test(value)).split(":")[1];
 }
@@ -184,6 +194,7 @@ async function verifyJSON(signedJSON) {
 
 module.exports = {
   signCertificate,
+  signCertificateWithoutPersisting,
   init_signer,
   signJSON,
   verifyJSON
