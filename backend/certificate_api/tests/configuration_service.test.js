@@ -105,21 +105,21 @@ describe('should retrieve all mappings if correct configuration layer passed', (
 
     test('should retrieve EU_VACCINE_PROPH details from etcd', async() => {
         jest.spyOn(mockEtcd3Constructor, 'get')
-        const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE));
+        const proph = (await (new configuration.ConfigurationService()).getObject(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE));
         expect(proph).toEqual({"covaxin": "J07BX03"});
         expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
     });
 
     test('should retrieve EU_VACCINE_CODE details from etcd', async() => {
         jest.spyOn(mockEtcd3Constructor, 'get')
-        const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE));
+        const proph = (await (new configuration.ConfigurationService()).getObject(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE));
         expect(proph).toEqual({"covaxin": "Covaxin"});
         expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
     });
 
     test('should retrieve EU_VACCINE_MANUF details from etcd', async() => {
         jest.spyOn(mockEtcd3Constructor, 'get')
-        const proph = (await (new configuration.ConfigurationService()).getEUVaccineDetails(EU_VACCINE_CONFIG_KEYS.MANUFACTURER));
+        const proph = (await (new configuration.ConfigurationService()).getObject(EU_VACCINE_CONFIG_KEYS.MANUFACTURER));
         expect(proph).toEqual({"bharat": "Bharat-Biotech"});
         expect(mockEtcd3Constructor.get).toHaveBeenCalledWith(EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
     });

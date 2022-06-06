@@ -2,8 +2,7 @@ const EU_DISEASE = {"covid-19": "840539006"};
 const TEMPLATES = {
   EU_VACCINATION_CERTIFICATE: "euVaccineCertificateTemplate",
   VACCINATION_CERTIFICATE: "vaccineCertificateTemplate",
-  TEST_CERTIFICATE: "testCertificateTemplate",
-  HEALTH_PROFESSIONAL_CERTIFICATE: "healthProfessionalCertificateTemplate"
+  TEST_CERTIFICATE: "testCertificateTemplate"
 };
 Object.freeze(TEMPLATES);
 
@@ -19,17 +18,14 @@ const HELPERS = {
 
 const ENTITY_TYPES = {
   VACCINATION_CERTIFICATE: "VaccinationCertificate",
-  TEST_CERTIFICATE: "TestCertificate",
-  HEALTH_PROFESSIONAL_CERTIFICATE: "HealthProfessionalCertificate"
-}
-
-const GROUPING_PARAMS = {
-  VACCINATION: "dose",
-  TEST_CERTIFICATE: "",
-  HEALTH_PROFESSIONAL : ""
+  TEST_CERTIFICATE: "TestCertificate"
 }
 
 const QR_TYPE = "qrcode";
+
+const TEMPLATE_KEY = "certificateTemplate";
+const PARAMS_KEY = "programParams";
+const HELPER_FUNCTIONS_KEY = "programHelperFunctions";
 
 module.exports = {
   EU_DISEASE,
@@ -38,5 +34,7 @@ module.exports = {
   QR_TYPE,
   HELPERS,
   ENTITY_TYPES,
-  GROUPING_PARAMS
+  TEMPLATE_KEY,
+  PARAMS_KEY,
+  HELPER_FUNCTIONS_KEY
 }

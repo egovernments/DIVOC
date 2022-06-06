@@ -2,13 +2,14 @@ const {Etcd3} = require('etcd3');
 const sanitizeHtml = require('sanitize-html');
 const Handlebars = require('handlebars');
 const config = require('../../configs/config');
-const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS} = require('../../configs/constants');
+const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS, TEMPLATE_KEY, PARAMS_KEY, HELPER_FUNCTIONS_KEY} = require('../../configs/constants');
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null, euVaccineCertificateTemplate = null;
 let healthProfessionalCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 let addHandlerHelper = null;
+let etcdConfig = {};
 function init() {
   if(!config.ETCD_URL) {
     throw Error("ETCD_URL not set. Please set ETCD_URL")
@@ -24,6 +25,12 @@ function init() {
     }
   }
   etcdClient = new Etcd3(options);
+  let entityTypes = config.ENTITY_TYPES?.trim().split(",") || [];
+  entityTypes.forEach((entityType) => {
+    setUpWatcher(entityType + "/" + TEMPLATE_KEY);
+    setUpWatcher(entityType + "/" + PARAMS_KEY);
+    setUpWatcher(entityType + "/" + HELPER_FUNCTIONS_KEY);
+  });
   setUpWatcher(TEMPLATES.VACCINATION_CERTIFICATE, );
   setUpWatcher(TEMPLATES.TEST_CERTIFICATE);
   setUpWatcher(TEMPLATES.EU_VACCINATION_CERTIFICATE);
@@ -82,6 +89,8 @@ function updateConfigValues(key, value) {
     case EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE:
       EU_VACCINE_PROPH = value;
       break;
+    default:
+      etcdConfig[key] = value
   }
 }
 
@@ -133,6 +142,8 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
     case EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE:
       value = EU_VACCINE_PROPH;
       break;
+    default:
+      value = etcdConfig[key];
   }
   if(value === null || value === undefined) {
     if(configuration === null || configuration === undefined) {
@@ -145,36 +156,26 @@ async function loadConfigurationValues(key, fetchConfigCallbackFunc) {
 
 class ConfigurationService {
   async getCertificateTemplate(key) {
-    let certificateTemplate = await loadConfigurationValues(key, async() => await configuration.getCertificateTemplate(key));
+    let certificateTemplate = await loadConfigurationValues(key, async() => await configuration.getEtcdConfigValue(key));
     certificateTemplate = cleanHTML(certificateTemplate);
     updateConfigValues(key, certificateTemplate);
     return certificateTemplate;
   }
-  async addHelpers(key){
-    let helper = await loadConfigurationValues(key, async() => await configuration.addHelpers(key));
+  async getHelperFunctions(key){
+    let helper = await loadConfigurationValues(key, async() => await configuration.getEtcdConfigValue(key));
     updateConfigValues(key,helper);
     return helper;
   }
-  async getEUVaccineDetails(key) {
-    let details = await loadConfigurationValues(key, async() => await configuration.getEUVaccineDetails(key));
+  async getObject(key) {
+    let details = await loadConfigurationValues(key, async() => await configuration.getEtcdConfigValue(key));
     updateConfigValues(key, details);
     return JSON.parse(details);
   }
 }
 
 const etcd = function() {
-  this.getCertificateTemplate = async function(templateKey) {
-    const template = (await etcdClient.get(templateKey).string());
-    return template;
-  }
-  this.addHelpers = async function(key) {
-    const value = (await etcdClient.get(key).string());
-    return value;
-  }
-
-  this.getEUVaccineDetails = async function(key) {
-    const value = (await etcdClient.get(key).string());
-    return value;
+  this.getEtcdConfigValue = async function(key) {
+    return (await etcdClient.get(key).string());
   }
 }
 

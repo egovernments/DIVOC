@@ -53,26 +53,9 @@ function formatDateTime(givenDateTime) {
 
 }
 
-function getTemplateKey(entityType) {
-    switch (entityType.toLowerCase()) {
-        case constants.ENTITY_TYPES.VACCINATION_CERTIFICATE.toLowerCase():
-            return constants.TEMPLATES.VACCINATION_CERTIFICATE;
-        case constants.ENTITY_TYPES.TEST_CERTIFICATE.toLowerCase():
-            return constants.TEMPLATES.TEST_CERTIFICATE;
-        case constants.ENTITY_TYPES.HEALTH_PROFESSIONAL_CERTIFICATE.toLowerCase():
-            return constants.TEMPLATES.HEALTH_PROFESSIONAL_CERTIFICATE
-    }
-}
-
-function getGroupingParam(entityType) {
-    switch (entityType.toLowerCase()) {
-        case constants.ENTITY_TYPES.VACCINATION_CERTIFICATE.toLowerCase():
-            return constants.GROUPING_PARAMS.VACCINATION;
-        case constants.ENTITY_TYPES.HEALTH_PROFESSIONAL_CERTIFICATE.toLowerCase():
-            return constants.GROUPING_PARAMS.HEALTH_PROFESSIONAL;
-        case constants.ENTITY_TYPES.TEST_CERTIFICATE.toLowerCase():
-            return constants.GROUPING_PARAMS.TEST_CERTIFICATE;
-    }
+async function getGroupingParam(entityType) {
+    let programParams = await configurationService.getObject(entityType + "/" + constants.PARAMS_KEY);
+    return programParams?.groupBy;
 }
 
 async function getQRCodeData(certificate, isDataURL) {
@@ -171,16 +154,14 @@ async function createCertificatePDFV2(filterKey, filterValue, res, entityType) {
         certificateResp = await registryService.getCertificateByPreEnrollmentCode(filterValue, entityType);
     }
     if (certificateResp?.length > 0) {
-        let certificateRaw = certificateService.getLatestCertificateV2(certificateResp, getGroupingParam(entityType));
+        let groupingParam = await getGroupingParam(entityType);
+        let certificateRaw = certificateService.getLatestCertificateV2(certificateResp, groupingParam);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let certificateData;
-        let previousEventInfo;
-        if (entityType.toLowerCase() === constants.ENTITY_TYPES.VACCINATION_CERTIFICATE.toLowerCase()) {
-            previousEventInfo = certificateService.getVaccineDetailsOfPreviousDoses(certificateResp);
-        }
+        let previousEventInfo = certificateService.getPreviousEventsInfo(certificateResp, groupingParam);
         certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
         certificateData = {...certificateRaw, qrCode: dataURL, previousEventInfo: previousEventInfo}
-        const htmlData = await configurationService.getCertificateTemplate(getTemplateKey(entityType));
+        const htmlData = await configurationService.getCertificateTemplate(entityType + "/" + constants.TEMPLATE_KEY);
         let pdfBuffer;
         try {
             pdfBuffer = await createPDF(htmlData, certificateData);
@@ -454,6 +435,12 @@ async function getCertificateV2(req, res) {
         let queryObject;
         try {
             await verifyKeycloakToken(req.headers.authorization);
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        try {
             entityType = req.url.replace("/certificate/api/v2/", "").split("/")[0];
             queryObject = url.parse(req.url, true).query;
             if (queryObject[preEnrollmentCode]) {
@@ -461,7 +448,7 @@ async function getCertificateV2(req, res) {
             }
         } catch (e) {
             console.error(e);
-            res.statusCode = 403;
+            res.statusCode = 400;
             return;
         }
         switch (filterKey) {

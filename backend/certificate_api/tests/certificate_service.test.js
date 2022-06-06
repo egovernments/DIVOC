@@ -7,7 +7,7 @@ config.DISEASE_CODE = 'COVID-19';
 config.PUBLIC_HEALTH_AUTHORITY = 'Govt Of India';
 config.ETCD_URL = 'etcd:2379'
 var mockConstructor = {
-    getEUVaccineDetails: jest.fn().mockImplementation((args) => {
+    getObject: jest.fn().mockImplementation((args) => {
         let vaccineDetails;
         switch(args) {
             case constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER:
