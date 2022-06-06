@@ -40,6 +40,7 @@ services:
       - signature_enabled=false
       - taskExecutor_index_queueCapacity=100
       - auditTaskExecutor_queueCapacity=100
+      - sunbird_sso_url=http://keycloak:8080/auth
     ports:
       - "8081:8081"
     depends_on:
