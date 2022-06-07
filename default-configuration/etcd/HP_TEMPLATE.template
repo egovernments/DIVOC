@@ -28,7 +28,7 @@
         "validTo": "{{health.validTo}}",
         "certificateId": "{{certificateId}}"
     },
-    "issuer": "{{issuer}}",
+    "issuer": "{{{issuer}}}",
     "issuanceDate": "{{issuanceDate}}",
     "nonTransferable": "true"
 }

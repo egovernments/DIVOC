@@ -1,8 +1,5 @@
 const signer_library = require('certificate-signer-library');
-const Mustache = require('mustache');
 const R = require('ramda');
-const fs = require('fs');
-const path = require('path')
 
 const registry = require('./registry');
 const redis = require('./redis');
@@ -14,18 +11,7 @@ const UNSUCCESSFUL = "UNSUCCESSFUL";
 const SUCCESSFUL = "SUCCESSFUL";
 const DUPLICATE_MSG = "duplicate key value violates unique constraint";
 
-const transformW3 = (certificate, certificateId) => {
-    const namespace = config.CERTIFICATE_NAMESPACE;
-    const template = fs.readFileSync(path.join('config/Template.template')).toString();
-    const issuer = config.CERTIFICATE_ISSUER;
-    const issuanceDate = new Date().toISOString();
-    const data = {
-        namespace, issuer, certificateId, ...certificate, issuanceDate
-    };
-    return JSON.parse(Mustache.render(template, data));
-}
-
-async function signCertificate(certificateJson) {
+async function signCertificate(certificateJson, transformW3) {
     const preEnrollmentCode = R.pathOr("", ["preEnrollmentCode"], certificateJson);
     const isSigned = await redis.checkIfKeyExists(preEnrollmentCode);
     const isUpdateRequest = R.pathOr(false, ["meta", "previousCertificateId"], certificateJson);
@@ -73,7 +59,6 @@ async function saveCertificate(signedCertificate, redisUniqueKey, retryCount = 0
 
 
 module.exports = {
-    transformW3,
     signCertificate,
     saveCertificate
 }

@@ -1,17 +1,18 @@
 {
-  "name": "hpr_certificate_signer",
+  "name": "generic_certificate_signer",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
   "scripts": {
     "start": "node main.js",
-    "test": "jest --coverage"
+    "test": "jest"
   },
   "author": "",
   "license": "GPL",
   "dependencies": {
     "axios": "^0.27.2",
     "certificate-signer-library": "^2.0.4",
+    "etcd3": "^1.1.0",
     "kafkajs": "^2.0.1",
     "mustache": "^4.2.0",
     "ramda": "^0.28.0",

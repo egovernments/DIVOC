@@ -29,7 +29,7 @@ services:
     volumes:
       - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
-    image: divoc/registry
+    image: divoc/registry-es
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -233,8 +233,8 @@ services:
     depends_on:
       kafka:
         condition: service_healthy
-  hpr-certificate-signer:
-    image: divoc/hpr_certificate_signer
+  generic-certificate-signer:
+    image: divoc/generic_certificate_signer
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       REGISTRY_URL: "http://registry:8081/"
@@ -247,6 +247,11 @@ services:
       SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
       CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
       CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      CONFIGURATION_LAYER: "etcd"
+      CONFIG_KEYS: $CONFIG_KEYS
+      TEMPLATE: $TEMPLATE
     depends_on:
       kafka:
         condition: service_healthy

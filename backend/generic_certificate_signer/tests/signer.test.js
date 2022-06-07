@@ -31,7 +31,6 @@ jest.mock('../registry', () => {
 
 const signer = require('../signer');
 jest.mock('../config/config', () => mockConfig);
-jest.mock('../config/constant', () => mockConstants);
 
 beforeAll(() => {
     jest.useFakeTimers('modern');
@@ -41,53 +40,6 @@ beforeAll(() => {
 
 beforeEach(() => {
     console.error = jest.fn()
-})
-
-test('should transform the input into required template form', () => {
-    const certificate = {
-        recipient: {
-            name: "test",
-            registrationNumber: "1",
-            salutation: "Dr"
-        }
-    };
-    const date = new Date(2022, 6, 2).toISOString();
-    const expectedPayload = {
-        "@context": [
-            "https://www.w3.org/2018/credentials/v1",
-            "namespace"
-        ],
-        "type": [
-            "VerifiableCredential",
-            "ProofOfHealthProfessionalCredential"
-        ],
-        "credentialSubject": {
-            "type": "Person",
-            "name": "test",
-            "registrationNumber": "1",
-            "salutation": "Dr",
-            "hpid": "",
-            "gender": ""
-        },
-        "evidence": {
-            "type": [
-                "HealthProfessional"
-            ],
-            "systemOfMedicine":"",
-            "speciality": "",
-            "registeredWithCouncil": "",
-            "degree": "",
-            "year": "",
-            "validFrom": "",
-            "validTo": "",
-            "certificateId": "123"
-        },
-        "issuer": "issuer",
-        "issuanceDate": date,
-        "nonTransferable": "true"
-    }
-    const actualPayload = signer.transformW3(certificate, "123");
-    expect(actualPayload).toEqual(expectedPayload);
 });
 
 test('should sign certificate', async() => {
