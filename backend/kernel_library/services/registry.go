@@ -279,3 +279,17 @@ func GetAllSchemas() (map[string]interface{}, error){
 		return resp, nil
 	}
 }
+
+func GetSchema(schemaName string) (map[string]interface{}, error) {
+	filter := map[string]interface{}{
+		"name": map[string]interface{}{
+			"eq": schemaName,
+		},
+	}
+	if resp, err := QueryRegistry("Schema", filter, 100, 0); err != nil {
+		log.Errorf("Error in getting schemas %s from registry", schemaName)
+		return nil, err
+	} else {
+		return resp, nil
+	}
+}

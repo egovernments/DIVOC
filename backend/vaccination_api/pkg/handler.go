@@ -387,7 +387,16 @@ func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimB
 	for _, request := range params.Body {
 		log.Debugf("CertificationRequest: %+v\n", request)
 
-		err := validatePayloadAgainstSchema(entityType, request)
+		schemaStr, err := fetchSchema(entityType)
+		if err != nil {
+			code := "SCHEMA_NOT_FOUND"
+			message := err.Error()
+			return certification.NewCertifyV4BadRequest().WithPayload(&models.Error{
+				Code:    &code,
+				Message: &message,
+			})
+		}
+		err = validatePayloadAgainstSchema(schemaStr, request)
 		if err != nil {
 			code := "VALIDATION_ERROR"
 			message := err.Error()
@@ -411,14 +420,9 @@ func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimB
 	return certification.NewCertifyOK()
 }
 
-func validatePayloadAgainstSchema(schemaName string, payload interface{}) error {
-	schemaStr := config.Config.Registry.VCSchemas[schemaName]
-	if schemaStr.(string) == "" {
-		message := "Unable to get schema "+schemaName+" from registry"
-		return errors.New(message)
-	}
+func validatePayloadAgainstSchema(schemaStr string, payload interface{}) error {
 
-	schemaLoader := gojsonschema.NewStringLoader(schemaStr.(string))
+	schemaLoader := gojsonschema.NewStringLoader(schemaStr)
 	documentLoader := gojsonschema.NewGoLoader(payload)
 
 	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
