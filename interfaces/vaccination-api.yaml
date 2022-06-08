@@ -175,7 +175,7 @@ paths:
     post:
       tags:
         - certification
-      summary: Certify the one or more events of given entityType
+      summary: Certify one or more events of given entityType
       operationId: certifyV4
       parameters:
         - name: entityType
