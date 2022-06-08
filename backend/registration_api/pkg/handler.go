@@ -136,14 +136,15 @@ func mosipGenerateOTP(params operations.MosipGenerateOTPParams) middleware.Respo
 	individualId := *params.Body.IndividualID
 	individualIDType := *params.Body.IndividualIDType
 	if individualId == "" || individualIDType == "" {
-		return operations.NewMosipGenerateOTPBadRequest()
+		return operations.NewMosipGenerateOTPBadRequest().WithPayload("individualIDType, individualId are mandatory")
 	}
 
-	if err := services.MosipOTPRequest(individualIDType, individualId); err != nil {
-		return operations.NewMosipGenerateOTPInternalServerError()
+	response, err := services.MosipOTPRequest(individualIDType, individualId)
+	if err != nil {
+		return operations.NewMosipGenerateOTPInternalServerError().WithPayload(err.Error())
 	}
 
-	return operations.NewMosipGenerateOTPOK()
+	return operations.NewMosipGenerateOTPOK().WithPayload(response)
 
 }
 
