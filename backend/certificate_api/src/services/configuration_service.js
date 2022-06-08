@@ -6,7 +6,6 @@ const {TEMPLATES, EU_VACCINE_CONFIG_KEYS,HELPERS, TEMPLATE_KEY, PARAMS_KEY, HELP
 let etcdClient;
 let configuration;
 let vaccineCertificateTemplate = null, testCertificateTemplate = null, euVaccineCertificateTemplate = null;
-let healthProfessionalCertificateTemplate = null;
 let EU_VACCINE_PROPH = null, EU_VACCINE_CODE = null, EU_VACCINE_MANUF = null;
 let addHandlerHelper = null;
 let etcdConfig = {};
