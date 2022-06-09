@@ -375,10 +375,16 @@ paths:
       responses:
         '200':
           description: OK
+          schema:
+            type: object
         '500':
           description: Internal Error
+          schema:
+            type: object
         '400':
           description: Bad request
+          schema:
+            type: object
   /verifyOTP:
     post:
       summary: Verify OTP

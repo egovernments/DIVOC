@@ -13,7 +13,10 @@ import (
 	"github.com/imroc/req"
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jws"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -48,7 +51,20 @@ type AuthRequest struct {
 	RequestSessionKey       string `json:"requestSessionKey"`
 }
 
-func MosipOTPRequest(individualIDType string, individualId string) error {
+type MosipResponse struct {
+	ID            string                   `json:"id"`
+	Version       string	 			   `json:"version"`
+	ResponseTime  string                   `json:"responseTime"`
+	TransactionID string                   `json:"transactionID"`
+	Response      map[string]interface{}   `json:"response"`
+	Errors        []struct{
+		ErrorCode   string `json:"errorCode"`
+		ErrorMessage   string `json:"errorMessage"`
+		ActionMessage string `json:"actionMessage"`
+	}`json:"errors"`
+}
+
+func MosipOTPRequest(individualIDType string, individualId string) (map[string]interface{}, error) {
 
 	authToken := getMosipAuthToken()
 	requestBody := OTPRequest{
@@ -64,7 +80,7 @@ func MosipOTPRequest(individualIDType string, individualId string) error {
 	reqJson, err :=json.Marshal(requestBody)
 	if err != nil {
 		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
-		return err
+		return nil, err
 	}
 	log.Infof("requestBody before signature - %s", reqJson)
 	signedPayload := getSignature(reqJson, config.Config.Mosip.PrivateKey, config.Config.Mosip.PublicKey)
@@ -78,12 +94,36 @@ func MosipOTPRequest(individualIDType string, individualId string) error {
 
 	if err != nil {
 		log.Errorf("Error Response from MOSIP OTP Generate API - %v", err)
-		return err
+		return nil, err
 	}
 
 	log.Debugf("Response of OTP request - %V", resp)
 
-	return nil
+	return analyseResponse(resp, err)
+}
+
+func analyseResponse(response *req.Resp, err error) (map[string]interface{}, error) {
+	if err != nil {
+		return nil, errors.Errorf("Error while requesting MOSIP %v", err)
+	}
+	if response.Response().StatusCode != 200 {
+		return nil, errors.New("Request failed with " + strconv.Itoa(response.Response().StatusCode))
+	}
+	responseObject := MosipResponse{}
+	err = response.ToJSON(&responseObject)
+	if err != nil {
+		return nil, errors.Wrap(err, "Unable to parse response from MOSIP.")
+	}
+	log.Debugf("Response %+v", responseObject)
+	if len(responseObject.Errors) > 0 {
+		log.Errorf("Response from MOSIP %+v", responseObject)
+		var errorMsgs []string
+		for _, err := range responseObject.Errors {
+			errorMsgs = append(errorMsgs, err.ErrorMessage)
+		}
+		return nil, errors.New(strings.Join(errorMsgs, ","))
+	}
+	return responseObject.Response, nil
 }
 
 func MosipAuthRequest(individualIDType string, individualId string, otp string) (*req.Resp, error) {
