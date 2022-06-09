@@ -207,6 +207,40 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/external/mosip/generateOTP": {
       "post": {
         "security": [],
@@ -240,13 +274,22 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
           },
           "500": {
-            "description": "Internal Error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -306,40 +349,6 @@ func init() {
           },
           "500": {
             "description": "Internal error"
-          }
-        }
-      }
-    },
-    "/config/{key}": {
-      "get": {
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "get config",
-        "operationId": "getConfig",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "key in etcd",
-            "name": "key",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -938,6 +947,40 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/external/mosip/generateOTP": {
       "post": {
         "security": [],
@@ -971,13 +1014,22 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
           },
           "500": {
-            "description": "Internal Error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -1037,40 +1089,6 @@ func init() {
           },
           "500": {
             "description": "Internal error"
-          }
-        }
-      }
-    },
-    "/config/{key}": {
-      "get": {
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "get config",
-        "operationId": "getConfig",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "key in etcd",
-            "name": "key",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "schema": {
-              "type": "object"
-            }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }

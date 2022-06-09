@@ -19,6 +19,11 @@ const MosipGenerateOTPOKCode int = 200
 swagger:response mosipGenerateOTPOK
 */
 type MosipGenerateOTPOK struct {
+
+	/*
+	  In: Body
+	*/
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewMosipGenerateOTPOK creates MosipGenerateOTPOK with default headers values
@@ -27,12 +32,25 @@ func NewMosipGenerateOTPOK() *MosipGenerateOTPOK {
 	return &MosipGenerateOTPOK{}
 }
 
+// WithPayload adds the payload to the mosip generate o t p o k response
+func (o *MosipGenerateOTPOK) WithPayload(payload interface{}) *MosipGenerateOTPOK {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the mosip generate o t p o k response
+func (o *MosipGenerateOTPOK) SetPayload(payload interface{}) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *MosipGenerateOTPOK) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(200)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // MosipGenerateOTPBadRequestCode is the HTTP code returned for type MosipGenerateOTPBadRequest
@@ -43,6 +61,11 @@ const MosipGenerateOTPBadRequestCode int = 400
 swagger:response mosipGenerateOTPBadRequest
 */
 type MosipGenerateOTPBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewMosipGenerateOTPBadRequest creates MosipGenerateOTPBadRequest with default headers values
@@ -51,12 +74,25 @@ func NewMosipGenerateOTPBadRequest() *MosipGenerateOTPBadRequest {
 	return &MosipGenerateOTPBadRequest{}
 }
 
+// WithPayload adds the payload to the mosip generate o t p bad request response
+func (o *MosipGenerateOTPBadRequest) WithPayload(payload interface{}) *MosipGenerateOTPBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the mosip generate o t p bad request response
+func (o *MosipGenerateOTPBadRequest) SetPayload(payload interface{}) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *MosipGenerateOTPBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
 
 // MosipGenerateOTPInternalServerErrorCode is the HTTP code returned for type MosipGenerateOTPInternalServerError
@@ -67,6 +103,11 @@ const MosipGenerateOTPInternalServerErrorCode int = 500
 swagger:response mosipGenerateOTPInternalServerError
 */
 type MosipGenerateOTPInternalServerError struct {
+
+	/*
+	  In: Body
+	*/
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewMosipGenerateOTPInternalServerError creates MosipGenerateOTPInternalServerError with default headers values
@@ -75,10 +116,23 @@ func NewMosipGenerateOTPInternalServerError() *MosipGenerateOTPInternalServerErr
 	return &MosipGenerateOTPInternalServerError{}
 }
 
+// WithPayload adds the payload to the mosip generate o t p internal server error response
+func (o *MosipGenerateOTPInternalServerError) WithPayload(payload interface{}) *MosipGenerateOTPInternalServerError {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the mosip generate o t p internal server error response
+func (o *MosipGenerateOTPInternalServerError) SetPayload(payload interface{}) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *MosipGenerateOTPInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(500)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
