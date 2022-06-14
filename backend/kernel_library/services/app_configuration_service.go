@@ -21,7 +21,7 @@ type ProgramComorbiditiesType struct {
 	MinAge        int
 }
 
-type CountrySpecificFeaturesType struct {
+type CountrySpecificFeaturesType map[string]interface {
 }
 
 var AppConfigs = struct {
