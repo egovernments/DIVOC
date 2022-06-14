@@ -58,6 +58,11 @@ async function getGroupingParam(entityType) {
     return programParams?.groupBy;
 }
 
+async function includePreviousEventInfo(entityType) {
+    let programParams = await configurationService.getObject(entityType + "/" + constants.PARAMS_KEY);
+    return programParams?.includePreviousEventInfo;
+}
+
 async function getQRCodeData(certificate, isDataURL) {
     const zip = new JSZip();
         zip.file("certificate.json", certificate, {
@@ -158,9 +163,13 @@ async function createCertificatePDFV2(filterKey, filterValue, res, entityType) {
         let certificateRaw = certificateService.getLatestCertificateV2(certificateResp, groupingParam);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let certificateData;
-        let previousEventInfo = certificateService.getPreviousEventsInfo(certificateResp, groupingParam);
         certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
-        certificateData = {...certificateRaw, qrCode: dataURL, previousEventInfo: previousEventInfo}
+        certificateData = {...certificateRaw, qrCode: dataURL}
+        let previousEventInfoInclude = await includePreviousEventInfo(entityType)
+        if (previousEventInfoInclude) {
+            let previousEventInfo = certificateService.getPreviousEventsInfo(certificateResp, groupingParam);
+            certificateData = {...certificateData, previousEventInfo: previousEventInfo}
+        }
         const htmlData = await configurationService.getCertificateTemplate(entityType + "/" + constants.TEMPLATE_KEY);
         let pdfBuffer;
         try {

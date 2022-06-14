@@ -1,3 +1,4 @@
 {
-  "groupBy": "dose"
+  "groupBy": "dose",
+  "includePreviousEventInfo": true
 }
