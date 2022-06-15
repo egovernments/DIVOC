@@ -81,6 +81,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
   let vaxEvents = [];
   for (let [key, value] of doseToVaccinationDetailsMap) {
     let vaxEventMap = {
+      dose: value.dose || "",
       doseType: (value.dose <= value.totalDoses) ?
         ("Primary Dose " + value.dose) :
         ("Booster Dose " + (value.dose - value.totalDoses)),
@@ -91,6 +92,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
       countryOfVax: value.vaccinatedCountry || "",
       validity: value.validity || "",
       vaxType: value.vaxType || "",
+      vaxEvent: value || "" ,
     };
     vaxEvents.push(vaxEventMap);
   }
@@ -107,6 +109,7 @@ function fetchVaccinationDetailsFromCert(evidence) {
     batch: evidence.batch,
     manufacturer: evidence.manufacturer,
     vaccinatedCountry: evidence.facility.address.addressCountry,
+    evidence: evidence,
   };
   return vaccineDetails;
 }
