@@ -267,6 +267,17 @@ services:
         condition: service_started
       digilocker-support-api:
         condition: service_started
+  # public-app:
+  #   image: divoc/public-app
+  #   depends_on:
+  #     vaccination-api:
+  #       condition: service_started
+  #     portal-api:
+  #       condition: service_started
+  #     registration-api:
+  #       condition: service_started
+  #     digilocker-support-api:
+  #       condition: service_started
   notification-service:
     image: divoc/notification-service
     ports:
