@@ -1,1 +1,0 @@
-# Vaccination React Application (PWA)
