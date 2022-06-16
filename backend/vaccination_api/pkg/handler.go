@@ -30,6 +30,7 @@ import (
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jinzhu/gorm"
 	log "github.com/sirupsen/logrus"
+	"github.com/xeipuuv/gojsonschema"
 )
 
 const FacilityEntity = "Facility"
@@ -71,6 +72,9 @@ func SetupHandlers(api *operations.DivocAPI) {
 	api.CertificationGetTestCertifyUploadsHandler = certification.GetTestCertifyUploadsHandlerFunc(getTestCertifyUploads)
 	api.CertificationGetTestCertifyUploadErrorsHandler = certification.GetTestCertifyUploadErrorsHandlerFunc(getTestCertifyUploadErrors)
 	api.CertificationRevokeCertificateHandler = certification.RevokeCertificateHandlerFunc(revokeCertificate)
+
+	api.CertificationCertifyV4Handler = certification.CertifyV4HandlerFunc(certifyV4)
+
 }
 
 const CertificateEntity = "VaccinationCertificate"
@@ -376,6 +380,69 @@ func certifyV3(params certification.CertifyV3Params, principal *models.JWTClaimB
 		}
 	}
 	return certification.NewCertifyOK()
+}
+
+func certifyV4(params certification.CertifyV4Params, principal *models.JWTClaimBody) middleware.Responder {
+	entityType := params.EntityType
+	for _, request := range params.Body {
+		log.Debugf("CertificationRequest: %+v\n", request)
+
+		schemaStr, err := fetchSchema(entityType)
+		if err != nil {
+			code := "SCHEMA_NOT_FOUND"
+			message := err.Error()
+			return certification.NewCertifyV4BadRequest().WithPayload(&models.Error{
+				Code:    &code,
+				Message: &message,
+			})
+		}
+		err = validatePayloadAgainstSchema(schemaStr, request)
+		if err != nil {
+			code := "VALIDATION_ERROR"
+			message := err.Error()
+			return certification.NewCertifyV4BadRequest().WithPayload(&models.Error{
+				Code:    &code,
+				Message: &message,
+			})
+		}
+
+		certifyRequestPayload := map[string]interface{}{
+			"entityType": entityType,
+			"entityPayload": request,
+		}
+
+		if jsonRequestString, err := json.Marshal(certifyRequestPayload); err == nil {
+			services.PublishCertifyMessage(jsonRequestString, nil, nil)
+		} else {
+			return certification.NewCertifyV4BadRequest()
+		}
+	}
+	return certification.NewCertifyOK()
+}
+
+func validatePayloadAgainstSchema(schemaStr string, payload interface{}) error {
+
+	schemaLoader := gojsonschema.NewStringLoader(schemaStr)
+	documentLoader := gojsonschema.NewGoLoader(payload)
+
+	result, err := gojsonschema.Validate(schemaLoader, documentLoader)
+	if err != nil {
+		return err
+	}
+
+	if result.Valid() {
+		log.Infof("The Payload is valid\n")
+		return nil
+	} else {
+		log.Error("The document is not valid. see errors :\n")
+		var messages []string
+		for _, desc := range result.Errors() {
+			log.Errorf("- %s\n", desc)
+			messages = append(messages, desc.String())
+		}
+		return errors.New(strings.Join(messages, "\n"))
+	}
+
 }
 
 func convertCertRequestV2ToCertificationRequest(requestV2 *models.CertificationRequestV2) models.CertificationRequest {

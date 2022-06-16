@@ -3,6 +3,7 @@ package config
 import (
 	"errors"
 
+	kernelService "github.com/divoc/kernel_library/services"
 	"github.com/imroc/req"
 	"github.com/jinzhu/configor"
 	log "github.com/sirupsen/logrus"
@@ -16,6 +17,20 @@ func Initialize() {
 	}
 	if Config.Keycloak.Enable && Config.Keycloak.Pubkey == "" {
 		updatePublicKeyFromKeycloak()
+	}
+	if len(Config.Registry.VCSchemas) == 0 {
+		schemas, err := kernelService.GetAllSchemas()
+		if err != nil {
+			log.Errorf("Error while fetch schemas from registry - %v", err)
+		} else {
+			log.Info("Fetched schemas from registry.")
+			vcSchemas := map[string]string{}
+			for _, sc := range schemas["Schema"].([]interface{}) {
+				vcSchemas[sc.(map[string]interface{})["name"].(string)] = sc.(map[string]interface{})["schema"].(string)
+			}
+			Config.Registry.VCSchemas = vcSchemas
+			log.Debugf("Setting VCSchemas - %v", Config.Registry.VCSchemas)
+		}
 	}
 }
 
@@ -43,6 +58,7 @@ var Config = struct {
 		SearchOperationId string `default:"search"`
 		ReadOperationId   string `default:"read"`
 		ApiVersion        string `default:"1"`
+		VCSchemas         map[string]string
 	}
 	Keycloak struct {
 		Url                  string `env:"KEYCLOAK_URL"`

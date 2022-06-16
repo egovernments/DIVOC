@@ -905,6 +905,45 @@ func init() {
           }
         }
       }
+    },
+    "/v4/{entityType}/certify": {
+      "post": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more events of given entityType",
+        "operationId": "certifyV4",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "entityType",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -2609,6 +2648,45 @@ func init() {
           }
         }
       }
+    },
+    "/v4/{entityType}/certify": {
+      "post": {
+        "tags": [
+          "certification"
+        ],
+        "summary": "Certify the one or more events of given entityType",
+        "operationId": "certifyV4",
+        "parameters": [
+          {
+            "type": "string",
+            "name": "entityType",
+            "in": "path",
+            "required": true
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Invalid input",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
+          }
+        }
+      }
     }
   },
   "definitions": {
@@ -4197,7 +4275,7 @@ func init() {
         },
         "certifiedUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/certifiedUpdatedAt"
         },
         "id": {
@@ -4205,7 +4283,7 @@ func init() {
         },
         "statusUpdatedAt": {
           "type": "string",
-          "format": "date",
+          "format": "date-time",
           "$id": "#/properties/statusUpdatedAt"
         }
       }
