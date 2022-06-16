@@ -342,13 +342,19 @@ func init() {
             }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Invalid OTP"
           },
           "500": {
-            "description": "Internal error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -740,6 +746,23 @@ func init() {
       }
     }
   },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
   "securityDefinitions": {
     "Bearer": {
       "type": "apiKey",
@@ -1082,13 +1105,19 @@ func init() {
             }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Invalid OTP"
           },
           "500": {
-            "description": "Internal error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -1522,6 +1551,21 @@ func init() {
           "x-omitempty": false
         },
         "vaccine": {
+          "type": "string"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
           "type": "string"
         }
       }

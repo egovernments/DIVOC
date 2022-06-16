@@ -9,6 +9,8 @@ import (
 	"net/http"
 
 	"github.com/go-openapi/runtime"
+
+	"github.com/divoc/registration-api/swagger_gen/models"
 )
 
 // MosipVerifyOTPOKCode is the HTTP code returned for type MosipVerifyOTPOK
@@ -63,6 +65,11 @@ const MosipVerifyOTPBadRequestCode int = 400
 swagger:response mosipVerifyOTPBadRequest
 */
 type MosipVerifyOTPBadRequest struct {
+
+	/*
+	  In: Body
+	*/
+	Payload *models.Error `json:"body,omitempty"`
 }
 
 // NewMosipVerifyOTPBadRequest creates MosipVerifyOTPBadRequest with default headers values
@@ -71,12 +78,27 @@ func NewMosipVerifyOTPBadRequest() *MosipVerifyOTPBadRequest {
 	return &MosipVerifyOTPBadRequest{}
 }
 
+// WithPayload adds the payload to the mosip verify o t p bad request response
+func (o *MosipVerifyOTPBadRequest) WithPayload(payload *models.Error) *MosipVerifyOTPBadRequest {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the mosip verify o t p bad request response
+func (o *MosipVerifyOTPBadRequest) SetPayload(payload *models.Error) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *MosipVerifyOTPBadRequest) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(400)
+	if o.Payload != nil {
+		payload := o.Payload
+		if err := producer.Produce(rw, payload); err != nil {
+			panic(err) // let the recovery middleware deal with this
+		}
+	}
 }
 
 // MosipVerifyOTPUnauthorizedCode is the HTTP code returned for type MosipVerifyOTPUnauthorized
@@ -106,11 +128,16 @@ func (o *MosipVerifyOTPUnauthorized) WriteResponse(rw http.ResponseWriter, produ
 // MosipVerifyOTPInternalServerErrorCode is the HTTP code returned for type MosipVerifyOTPInternalServerError
 const MosipVerifyOTPInternalServerErrorCode int = 500
 
-/*MosipVerifyOTPInternalServerError Internal error
+/*MosipVerifyOTPInternalServerError Internal Error
 
 swagger:response mosipVerifyOTPInternalServerError
 */
 type MosipVerifyOTPInternalServerError struct {
+
+	/*
+	  In: Body
+	*/
+	Payload interface{} `json:"body,omitempty"`
 }
 
 // NewMosipVerifyOTPInternalServerError creates MosipVerifyOTPInternalServerError with default headers values
@@ -119,10 +146,23 @@ func NewMosipVerifyOTPInternalServerError() *MosipVerifyOTPInternalServerError {
 	return &MosipVerifyOTPInternalServerError{}
 }
 
+// WithPayload adds the payload to the mosip verify o t p internal server error response
+func (o *MosipVerifyOTPInternalServerError) WithPayload(payload interface{}) *MosipVerifyOTPInternalServerError {
+	o.Payload = payload
+	return o
+}
+
+// SetPayload sets the payload to the mosip verify o t p internal server error response
+func (o *MosipVerifyOTPInternalServerError) SetPayload(payload interface{}) {
+	o.Payload = payload
+}
+
 // WriteResponse to the client
 func (o *MosipVerifyOTPInternalServerError) WriteResponse(rw http.ResponseWriter, producer runtime.Producer) {
 
-	rw.Header().Del(runtime.HeaderContentType) //Remove Content-Type on empty responses
-
 	rw.WriteHeader(500)
+	payload := o.Payload
+	if err := producer.Produce(rw, payload); err != nil {
+		panic(err) // let the recovery middleware deal with this
+	}
 }
