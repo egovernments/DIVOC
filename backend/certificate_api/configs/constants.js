@@ -16,12 +16,25 @@ const HELPERS = {
   CERTIFICATE_HELPER_FUNCTIONS: "certificateHelperFunctions"
 }
 
+const ENTITY_TYPES = {
+  VACCINATION_CERTIFICATE: "VaccinationCertificate",
+  TEST_CERTIFICATE: "TestCertificate"
+}
+
 const QR_TYPE = "qrcode";
+
+const TEMPLATE_KEY = "certificateTemplate";
+const PARAMS_KEY = "programParams";
+const HELPER_FUNCTIONS_KEY = "programHelperFunctions";
 
 module.exports = {
   EU_DISEASE,
   TEMPLATES,
   EU_VACCINE_CONFIG_KEYS,
   QR_TYPE,
-  HELPERS
+  HELPERS,
+  ENTITY_TYPES,
+  TEMPLATE_KEY,
+  PARAMS_KEY,
+  HELPER_FUNCTIONS_KEY
 }
