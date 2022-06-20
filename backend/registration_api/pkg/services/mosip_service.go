@@ -79,7 +79,7 @@ func MosipOTPRequest(individualIDType string, individualId string) (map[string]i
 
 	reqJson, err :=json.Marshal(requestBody)
 	if err != nil {
-		log.Errorf("Error occurred while trying to unmarshal the array of enrollments (%v)", err)
+		log.Errorf("Error occurred while trying to marshal the requestBody(%v)", err)
 		return nil, err
 	}
 	log.Infof("requestBody before signature - %s", reqJson)
@@ -126,7 +126,7 @@ func analyseResponse(response *req.Resp, err error) (map[string]interface{}, err
 	return responseObject.Response, nil
 }
 
-func MosipAuthRequest(individualIDType string, individualId string, otp string) (*req.Resp, error) {
+func MosipAuthRequest(individualIDType string, individualId string, otp string, isKycRequired bool) (map[string]interface{}, error) {
 
 	requestTime := time.Now().UTC().Format("2006-01-02T15:04:05.999Z")
 	identityBlock, _ := json.Marshal(map[string] string {
@@ -149,8 +149,13 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 	pemBlock, _ := pem.Decode([]byte(config.Config.Mosip.IDACertKey))
 	certificateThumbnail := utils.Sha256Hash(pemBlock.Bytes)
 
+	id := "mosip.identity.auth"
+	if isKycRequired {
+		id = "mosip.identity.kyc"
+	}
+
 	authBody := AuthRequest{
-		Id:                "mosip.identity.auth",
+		Id:               id,
 		Version:           "1.0",
 		RequestedAuth: 		map[string]bool{"otp": true},
 		TransactionId:     "1234567890",
@@ -166,7 +171,7 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 
 	reqJson, err :=json.Marshal(authBody)
 	if err != nil {
-		log.Errorf("Error occurred while trying to unmarshal authBody (%v)", err)
+		log.Errorf("Error occurred while trying to marshal authBody (%v)", err)
 		return nil, err
 	}
 	log.Debugf("requestBody before signature - %s", reqJson)
@@ -176,11 +181,20 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 
 	authToken := getMosipAuthToken()
 
-	resp, err := requestAuth(authBody, RequestHeader{
-		Signature:   signedPayload,
-		ContentType: "application/json",
-		Authorisation: "Authorization="+authToken,
-	})
+	var resp *req.Resp
+	if isKycRequired {
+		resp, err = requestKyc(authBody, RequestHeader{
+			Signature:   signedPayload,
+			ContentType: "application/json",
+			Authorisation: "Authorization="+authToken,
+		})
+	} else {
+		resp, err = requestAuth(authBody, RequestHeader{
+			Signature:   signedPayload,
+			ContentType: "application/json",
+			Authorisation: "Authorization="+authToken,
+		})
+	}
 
 	if err != nil {
 		log.Errorf("HTTP call to MOSIP Auth API failed - %v", err)
@@ -189,7 +203,67 @@ func MosipAuthRequest(individualIDType string, individualId string, otp string) 
 
 	log.Debugf("Response of Auth request - %V", resp)
 
-	return resp, nil
+	result, err := analyseResponse(resp, err)
+	if err != nil {
+		return nil, err
+	}
+
+	if isKycRequired {
+		status := result["kycStatus"].(bool)
+		if !status {
+			return nil, errors.New("KYC request failed!")
+		}
+
+		responseMap, err := formatEKycResponse(result)
+
+		result["identity"], err = decrypt(responseMap["identity"].(string), responseMap["sessionKey"].(string))
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return result, err
+}
+
+func decrypt(data string, sessionKey string) (map[string]interface{}, error) {
+	encKey, _ := base64.URLEncoding.DecodeString(sessionKey)
+	key, err := utils.AsymmetricDecrypt(encKey, config.Config.Mosip.PrivateKey)
+	if err != nil {
+		log.Errorf("error while decrypting key %v", err)
+	}
+
+	encIdentity, err := base64.URLEncoding.DecodeString(data)
+	if err != nil {
+		return nil, err
+	}
+
+	identityString := utils.SymmetricDecrypt(string(encIdentity), []byte(key))
+
+	var identity map[string]interface{}
+	err =json.Unmarshal([]byte(identityString), &identity)
+	if err != nil {
+		log.Errorf("Error during unmarshal of identity %v", err)
+		return nil, err
+	}
+
+	return identity, nil
+}
+
+func formatEKycResponse(response map[string]interface{}) (map[string]interface{}, error) {
+	decoded, err := base64.RawURLEncoding.DecodeString(response["identity"].(string))
+	if err != nil {
+		log.Errorf("Error while decoding base64 string %v", err)
+		return nil, err
+	}
+
+	separator := "#KEY_SPLITTER#"
+
+	// split the decoded string to get sessionKey and encrypted response
+	ret := strings.Split(string(decoded), separator)
+	response["sessionKey"] = base64.URLEncoding.EncodeToString([]byte(ret[0]))
+	response["identity"] = base64.URLEncoding.EncodeToString([]byte(ret[1]))
+
+	return response, nil
 }
 
 func generateOTP(requestBody OTPRequest, header RequestHeader) (*req.Resp, error) {
@@ -199,6 +273,11 @@ func generateOTP(requestBody OTPRequest, header RequestHeader) (*req.Resp, error
 func requestAuth(requestBody AuthRequest, header RequestHeader) (*req.Resp, error) {
 	return req.Post(config.Config.Mosip.AuthUrl, req.BodyJSON(requestBody), req.HeaderFromStruct(header))
 }
+
+func requestKyc(requestBody AuthRequest, header RequestHeader) (*req.Resp, error) {
+	return req.Post(config.Config.Mosip.KycUrl, req.BodyJSON(requestBody), req.HeaderFromStruct(header))
+}
+
 func getMosipAuthToken() string {
 	// TODO: Generate the token from API
 	return config.Config.Mosip.AuthHeader
