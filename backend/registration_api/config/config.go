@@ -11,7 +11,7 @@ import (
 var Config = struct {
 	Auth struct {
 		PublicKey            string `env:"AUTH_PUBLIC_KEY"`
-		PrivateKey           string `env:"AUTH_PRIVATE_KEY"`
+		PrivateKey           string `env:"AUTH_PRIVATE_KEY" yaml:"privateKey"`
 		TTLForOtp            int    `yaml:"ttlforotpinminutes"`
 		MAXOtpVerifyAttempts int64  `yaml:"maxotpverifyattempts"`
 		OTPLength            int    `yaml:"otp_length" env:"OTP_LENGTH" default:"6"`
@@ -54,12 +54,13 @@ var Config = struct {
 	Mosip struct {
 		ClientId        string     `env:"MOSIP_CLIENT_ID"`
 		ClientSecret    string     `env:"MOSIP_CLIENT_SECRET"`
-		AuthHeader      string 	   `env:"MOSIP_AUTH_TOKEN"`
-		OTPUrl          string     `env:"MOSIP_OTP_URL"`
-		AuthUrl         string     `env:"MOSIP_AUTH_URL"`
-		PrivateKey      string     `env:"MOSIP_PRIVATE_KEY"`
-		PublicKey       string     `env:"MOSIP_PUBLIC_KEY"`
-		IDACertKey      string     `env:"MOSIP_IDA_CERT_KEY"`
+		AuthHeader      string 	   `env:"MOSIP_AUTH_TOKEN" yaml:"AUTH_TOKEN"`
+		OTPUrl          string     `env:"MOSIP_OTP_URL" yaml:"OTP_URL"`
+		AuthUrl         string     `env:"MOSIP_AUTH_URL" yaml:"AUTH_URL"`
+		KycUrl          string     `env:"MOSIP_KYC_URL" yaml:"KYC_URL"`
+		PrivateKey      string     `env:"MOSIP_PRIVATE_KEY" yaml:"PRIVATE_KEY"`
+		PublicKey       string     `env:"MOSIP_PUBLIC_KEY" yaml:"PUBLIC_KEY"`
+		IDACertKey      string     `env:"MOSIP_IDA_CERT_KEY" yaml:"IDA_CERT_KEY"`
 	}
 	LogLevel 					 string `env:"LOG_LEVEL" yaml:"log_level" default:"info"`
 }{}
