@@ -51,7 +51,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     identity: formatId(credentialSubject.id),
     nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
-    recipientAddress: formatRecipientAddress(credentialSubject.address),
+    recipientAddress: credentialSubject.address ? formatRecipientAddress(credentialSubject.address) : "",
     vaccine: evidence[0].vaccine,
     vaccinationDate: formatDate(evidence[0].date),
     vaccineBatch: evidence[0].batch,
