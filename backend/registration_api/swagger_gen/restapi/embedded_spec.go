@@ -207,6 +207,40 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/external/mosip/generateOTP": {
       "post": {
         "security": [],
@@ -240,13 +274,22 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
           },
           "500": {
-            "description": "Internal Error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -299,47 +342,19 @@ func init() {
             }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Invalid OTP"
           },
           "500": {
-            "description": "Internal error"
-          }
-        }
-      }
-    },
-    "/config/{key}": {
-      "get": {
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "get config",
-        "operationId": "getConfig",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "key in etcd",
-            "name": "key",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
+            "description": "Internal Error",
             "schema": {
               "type": "object"
             }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -731,6 +746,23 @@ func init() {
       }
     }
   },
+  "definitions": {
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
   "securityDefinitions": {
     "Bearer": {
       "type": "apiKey",
@@ -938,6 +970,40 @@ func init() {
         }
       }
     },
+    "/config/{key}": {
+      "get": {
+        "security": [
+          {
+            "Bearer": []
+          }
+        ],
+        "summary": "get config",
+        "operationId": "getConfig",
+        "parameters": [
+          {
+            "type": "string",
+            "description": "key in etcd",
+            "name": "key",
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
     "/external/mosip/generateOTP": {
       "post": {
         "security": [],
@@ -971,13 +1037,22 @@ func init() {
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
           },
           "500": {
-            "description": "Internal Error"
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
           }
         }
       }
@@ -1030,47 +1105,19 @@ func init() {
             }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "schema": {
+              "$ref": "#/definitions/Error"
+            }
           },
           "401": {
             "description": "Invalid OTP"
           },
           "500": {
-            "description": "Internal error"
-          }
-        }
-      }
-    },
-    "/config/{key}": {
-      "get": {
-        "security": [
-          {
-            "Bearer": []
-          }
-        ],
-        "summary": "get config",
-        "operationId": "getConfig",
-        "parameters": [
-          {
-            "type": "string",
-            "description": "key in etcd",
-            "name": "key",
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
+            "description": "Internal Error",
             "schema": {
               "type": "object"
             }
-          },
-          "400": {
-            "description": "Bad Request"
-          },
-          "401": {
-            "description": "Unauthorized"
           }
         }
       }
@@ -1504,6 +1551,21 @@ func init() {
           "x-omitempty": false
         },
         "vaccine": {
+          "type": "string"
+        }
+      }
+    },
+    "Error": {
+      "type": "object",
+      "required": [
+        "code",
+        "message"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
           "type": "string"
         }
       }

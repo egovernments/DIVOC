@@ -55,6 +55,60 @@ const getBasicBeneficiaryDataFromCert = (certificates) => {
   return certificateData;
 }
 
+const sortCertificates = (certificates, groupingParam) => {
+  if (certificates.length > 0) {
+    if(!groupingParam){
+      certificates = certificates.sort(function (a, b) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
+        return 0;
+      }).reverse();
+      return certificates;
+    }
+    certificates = certificates.sort(function (a, b) {
+      let parsedCertificate = JSON.parse(a.certificate);
+      let groupingParamValueA = getParamValue(parsedCertificate, groupingParam);
+      parsedCertificate = JSON.parse(b.certificate);
+      let groupingParamValueB = getParamValue(parsedCertificate, groupingParam);
+      if (groupingParamValueA === groupingParamValueB) {
+        if (a.osUpdatedAt < b.osUpdatedAt) {
+          return 1;
+        }
+        if (a.osUpdatedAt > b.osUpdatedAt) {
+          return -1;
+        }
+      }
+      return groupingParamValueB - groupingParamValueA;
+    }).reverse();
+    return certificates;
+  }
+};
+
+function getParamValue(obj, param, result){
+  for (const prop in obj) {
+    const value = obj[prop];
+    if (typeof value === 'object') {
+      result = getParamValue(value, param,result);
+    }
+    else if(prop == param){
+      result = value;
+      return result;
+    }
+  }
+  return result;
+}
+
+const getLatestCertificateV2 = (certificates, groupingParam) => {
+  if(certificates.length > 0) {
+    let sortedCerts = sortCertificates(certificates, groupingParam);
+    return sortedCerts[sortedCerts.length - 1];
+  }
+};
+
 const sortCertificatesInDoseAndUpdateTimeAscOrder = (certificates) => {
   if (certificates.length > 0) {
     certificates = certificates.sort(function (a, b) {
@@ -92,6 +146,21 @@ const getVaccineDetailsOfPreviousDoses = (certificates) => {
   return new Map([...doseToVaccinationDetailsMap].reverse());
 }
 
+const getPreviousEventsInfo = (certificates, groupingParam) => {
+  let previousEventInfo = new Map();
+  if (certificates.length > 0) {
+    let sortedCerts = sortCertificates(certificates, groupingParam);
+    if (!groupingParam) {
+      return new Map([...sortedCerts]);
+    }
+    for (let i = 0; i < sortedCerts.length; i++) {
+      let certificateTmp = JSON.parse(sortedCerts[i].certificate);
+      previousEventInfo.set(getParamValue(certificateTmp, groupingParam), certificateTmp);
+    }
+  }
+  return new Map([...previousEventInfo].reverse());
+}
+
 const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseToVaccinationDetailsMap) => {
   certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
   const {certificate: {credentialSubject, evidence}} = certificateRaw;
@@ -102,7 +171,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     identity: formatId(credentialSubject.id),
     nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
-    recipientAddress: formatRecipientAddress(credentialSubject.address),
+    recipientAddress: credentialSubject.address ? formatRecipientAddress(credentialSubject.address) : "",
     vaccine: evidence[0].vaccine,
     vaccinationDate: formatDate(evidence[0].date),
     vaccineBatch: evidence[0].batch,
@@ -112,7 +181,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
     vaccinatedBy: evidence[0].verifier.name,
-    vaccinatedAt: formatFacilityAddress(evidence[0]),
+    vaccinatedAt:  evidence[0].facility.name ? evidence[0].facility.address.district ? formatFacilityAddress(evidence[0]) : evidence[0].facility.name : "" ,
     qrCode: dataURL,
     dose: evidence[0].dose,
     totalDoses: evidence[0].totalDoses,
@@ -132,6 +201,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
   let vaxEvents = [];
   for (let [key, value] of doseToVaccinationDetailsMap) {
     let vaxEventMap = {
+      dose: value.dose || "",
       doseType: (value.dose <= value.totalDoses) ?
         ("Primary Dose " + value.dose) :
         ("Booster Dose " + (value.dose - value.totalDoses)),
@@ -142,6 +212,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
       countryOfVax: value.vaccinatedCountry || "",
       validity: value.validity || "",
       vaxType: value.vaxType || "",
+      vaxEvent: value || "" ,
     };
     vaxEvents.push(vaxEventMap);
   }
@@ -158,6 +229,7 @@ function fetchVaccinationDetailsFromCert(evidence) {
     batch: evidence.batch,
     manufacturer: evidence.manufacturer,
     vaccinatedCountry: evidence.facility.address.addressCountry,
+    evidence: evidence,
   };
   return vaccineDetails;
 }
@@ -191,9 +263,9 @@ function getVaccineValidDays(start, end) {
 const convertCertificateToDCCPayload = async(certificateRaw, nameDetails) => {
   let certificate = JSON.parse(certificateRaw.certificate);
   const configurationService = new configService.ConfigurationService();
-  const VACCINE_MANUF = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
-  const EU_VACCINE_PROPH = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
-  const EU_VACCINE_CODE = await configurationService.getEUVaccineDetails(constants.EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
+  const VACCINE_MANUF = await configurationService.getObject(constants.EU_VACCINE_CONFIG_KEYS.MANUFACTURER);
+  const EU_VACCINE_PROPH = await configurationService.getObject(constants.EU_VACCINE_CONFIG_KEYS.PROPHYLAXIS_TYPE);
+  const EU_VACCINE_CODE = await configurationService.getObject(constants.EU_VACCINE_CONFIG_KEYS.VACCINE_CODE);
   if(VACCINE_MANUF === null || EU_VACCINE_PROPH === null || EU_VACCINE_CODE === null || EU_VACCINE_CODE === undefined || EU_VACCINE_PROPH === undefined || VACCINE_MANUF === undefined) {
     throw new Error("EU Vaccine Details are missing from Configuration");
   }
@@ -268,8 +340,10 @@ function dobOfRecipient(credentialSubject) {
 module.exports = {
   sortCertificatesInDoseAndUpdateTimeAscOrder,
   getLatestCertificate,
+  getLatestCertificateV2,
   convertCertificateToDCCPayload,
   getVaccineDetailsOfPreviousDoses,
+  getPreviousEventsInfo,
   prepareDataForVaccineCertificateTemplate,
   filterByDob
 };

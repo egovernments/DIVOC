@@ -375,10 +375,16 @@ paths:
       responses:
         '200':
           description: OK
+          schema:
+            type: object
         '500':
           description: Internal Error
+          schema:
+            type: object
         '400':
           description: Bad request
+          schema:
+            type: object
   /verifyOTP:
     post:
       summary: Verify OTP
@@ -446,8 +452,12 @@ paths:
           description: Invalid OTP
         '400':
           description: Bad request
+          schema:
+            $ref: '#/definitions/Error'
         '500':
-          description: Internal error
+          description: Internal Error
+          schema:
+            type: object
   /ping:
     get:
       summary: Server heartbeat operation
@@ -458,3 +468,14 @@ paths:
       responses:
         '200':
           description: OK
+definitions:
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+    required:
+      - code
+      - message

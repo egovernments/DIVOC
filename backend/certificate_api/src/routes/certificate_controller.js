@@ -14,6 +14,9 @@ const keyUtils = require("../services/key_utils");
 const { ConfigurationService, init } = require('../services/configuration_service');
 const {TEMPLATES, QR_TYPE} = require('../../configs/constants');
 const {formatDate, formatId, concatenateReadableString, padDigit} = require("./../services/utils");
+const constants = require('../../configs/constants');
+
+const preEnrollmentCode = "preEnrollmentCode";
 
 init();
 let shcKeyPair = [];
@@ -48,6 +51,16 @@ function formatDateTime(givenDateTime) {
 
     return `${padDigit(day)}-${monthName}-${year} ${hour}:${minutes}`;
 
+}
+
+async function getGroupingParam(entityType) {
+    let programParams = await configurationService.getObject(entityType + "/" + constants.PARAMS_KEY);
+    return programParams?.groupBy;
+}
+
+async function includePreviousEventInfo(entityType) {
+    let programParams = await configurationService.getObject(entityType + "/" + constants.PARAMS_KEY);
+    return programParams?.includePreviousEventInfo;
 }
 
 async function getQRCodeData(certificate, isDataURL) {
@@ -94,7 +107,7 @@ async function createCertificateQRCode(certificateResp, res, source) {
 }
 
 async function createCertificatePDF(certificateResp, res, source) {
-    if (certificateResp.length > 0) {
+    if (certificateResp?.length > 0) {
         let certificateRaw = certificateService.getLatestCertificate(certificateResp);
         const dataURL = await getQRCodeData(certificateRaw.certificate, true);
         let doseToVaccinationDetailsMap = certificateService.getVaccineDetailsOfPreviousDoses(certificateResp);
@@ -138,6 +151,63 @@ async function createCertificatePDF(certificateResp, res, source) {
         return  JSON.stringify(error);
     }
     return res;
+}
+
+async function createCertificatePDFV2(filterKey, filterValue, res, entityType) {
+    let certificateResp;
+    if (filterKey === preEnrollmentCode) {
+        certificateResp = await registryService.getCertificateByPreEnrollmentCode(filterValue, entityType);
+    }
+    if (certificateResp?.length > 0) {
+        let groupingParam = await getGroupingParam(entityType);
+        let certificateRaw = certificateService.getLatestCertificateV2(certificateResp, groupingParam);
+        const dataURL = await getQRCodeData(certificateRaw.certificate, true);
+        let certificateData;
+        certificateRaw.certificate = JSON.parse(certificateRaw.certificate);
+        certificateData = {...certificateRaw, qrCode: dataURL}
+        let previousEventInfoInclude = await includePreviousEventInfo(entityType)
+        if (previousEventInfoInclude) {
+            let previousEventInfo = certificateService.getPreviousEventsInfo(certificateResp, groupingParam);
+            certificateData = {...certificateData, previousEventInfo: previousEventInfo}
+        }
+        const htmlData = await configurationService.getCertificateTemplate(entityType + "/" + constants.TEMPLATE_KEY);
+        let pdfBuffer;
+        try {
+            pdfBuffer = await createPDF(htmlData, certificateData);
+        } catch(err) {
+            res.statusCode = 500;
+            res.setHeader("Content-Type", "application/json");
+            console.error(err);
+            let error = {
+                date: new Date(),
+                source: "GetPDFCertificate",
+                type: "internal-failed",
+                extra: err.message
+            };
+            sendEvents(error);
+            return;
+        }
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "application/pdf");
+        sendEvents({
+            date: new Date(),
+            source: filterValue,
+            type: "internal-success",
+            extra: "Certificate found"
+        });
+        return pdfBuffer;
+    } else {
+        res.statusCode = 404;
+        res.setHeader("Content-Type", "application/json");
+        let error = {
+            date: new Date(),
+            source: filterValue,
+            type: "internal-failed",
+            extra: "Certificate not found"
+        };
+        sendEvents(error)
+        return  JSON.stringify(error);
+    }
 }
 
 async function createTestCertificatePDF(certificateResp, res, source) {
@@ -367,6 +437,43 @@ async function getCertificatePDFByPreEnrollmentCode(req, res, entityType) {
     }
 }
 
+async function getCertificateV2(req, res) {
+    try {
+        let entityType = "";
+        let filterKey = "";
+        let queryObject;
+        try {
+            await verifyKeycloakToken(req.headers.authorization);
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 403;
+            return;
+        }
+        try {
+            entityType = req.url.replace("/certificate/api/v2/", "").split("/")[0];
+            queryObject = url.parse(req.url, true).query;
+            if (queryObject[preEnrollmentCode]) {
+                filterKey = preEnrollmentCode;
+            }
+        } catch (e) {
+            console.error(e);
+            res.statusCode = 400;
+            return;
+        }
+        switch (filterKey) {
+            case preEnrollmentCode:
+                res = await createCertificatePDFV2(preEnrollmentCode, queryObject[preEnrollmentCode], res, entityType)
+                break;
+            default:
+                console.log("No filters provided to retrieve certificate")
+        }
+        return res;
+    } catch (err) {
+        console.error(err);
+        res.statusCode = 404;
+    }
+}
+
 async function getTestCertificatePDFByPreEnrollmentCode(req, res, entityType) {
     try {
         let claimBody = "";
@@ -582,6 +689,7 @@ module.exports = {
     getCertificatePDF,
     getCertificateQRCodeByPreEnrollmentCode,
     getCertificatePDFByPreEnrollmentCode,
+    getCertificateV2,
     checkIfCertificateGenerated,
     certificateAsFHIRJson,
     getTestCertificatePDFByPreEnrollmentCode,

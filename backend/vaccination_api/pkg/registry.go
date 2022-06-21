@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"errors"
 	"github.com/divoc/api/config"
 	"github.com/divoc/kernel_library/services"
 	log "github.com/sirupsen/logrus"
@@ -44,4 +45,27 @@ func getVaccinatorsForFacility(facilityCode string, limit int, offset int) inter
 		return NewGenericServerError()
 	}
 	return response[typeId]
+}
+
+func fetchSchema(schemaName string) (string, error) {
+	schemaStr := config.Config.Registry.VCSchemas[schemaName]
+	if schemaStr == "" {
+		log.Infof("Schema %s not found in cache. Fetching schema from registry", schemaName)
+		schemas, err := services.GetSchema(schemaName)
+		if err != nil {
+			log.Errorf("Error in querying registry %v", err)
+			return "", err
+		}
+		if len(schemas["Schema"].([]interface{})) == 0 {
+			log.Errorf("No Schema returned by regisry for schemaName %s", schemaName)
+			return "", errors.New("Schema "+ schemaName + " Not found in Registry")
+		}
+		schema := schemas["Schema"].([]interface{})[0].(map[string]interface{})["schema"].(string)
+		// adding schema to cache
+		config.Config.Registry.VCSchemas[schemaName] = schema
+
+		return schema, nil
+	}
+	log.Debug("Returning schema from cache")
+	return schemaStr, nil
 }

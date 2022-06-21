@@ -3,7 +3,6 @@ package pkg
 import (
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -136,14 +135,15 @@ func mosipGenerateOTP(params operations.MosipGenerateOTPParams) middleware.Respo
 	individualId := *params.Body.IndividualID
 	individualIDType := *params.Body.IndividualIDType
 	if individualId == "" || individualIDType == "" {
-		return operations.NewMosipGenerateOTPBadRequest()
+		return operations.NewMosipGenerateOTPBadRequest().WithPayload("individualIDType, individualId are mandatory")
 	}
 
-	if err := services.MosipOTPRequest(individualIDType, individualId); err != nil {
-		return operations.NewMosipGenerateOTPInternalServerError()
+	response, err := services.MosipOTPRequest(individualIDType, individualId)
+	if err != nil {
+		return operations.NewMosipGenerateOTPInternalServerError().WithPayload(err.Error())
 	}
 
-	return operations.NewMosipGenerateOTPOK()
+	return operations.NewMosipGenerateOTPOK().WithPayload(response)
 
 }
 
@@ -197,17 +197,27 @@ func mosipVerifyOTP(params operations.MosipVerifyOTPParams) middleware.Responder
 		return operations.NewMosipVerifyOTPBadRequest()
 	}
 
-	mResp, err := services.MosipAuthRequest(individualIDType, individualId, otp)
+	mResp, err := services.MosipAuthRequest(individualIDType, individualId, otp, true)
 	if err != nil {
-		return operations.NewMosipVerifyOTPInternalServerError()
+		return operations.NewMosipVerifyOTPInternalServerError().WithPayload(err.Error())
 	}
 
-	if mResp.Response().StatusCode == http.StatusOK {
-		// TODO: Handle MOSIP error response in body
-		return operations.NewMosipVerifyOTPOK()
+	log.Debugf("Response from MOSIP %v", mResp)
+	if mResp["identity"].(map[string]interface{})["phoneNumber"] == ""  {
+		return operations.NewMosipVerifyOTPInternalServerError().WithPayload(errors.New("phoneNumber of recipient not found!"))
 	}
 
-	return operations.NewMosipVerifyOTPInternalServerError()
+	phone :=  mResp["identity"].(map[string]interface{})["phoneNumber"].(string)
+	token, err := services.CreateRecipientToken(phone)
+	if err != nil {
+		log.Errorf("Unable to create the jwt token %+v", err)
+		return model.NewGenericServerError()
+	}
+	response := operations.MosipVerifyOTPOKBody{
+		Token: token,
+	}
+	return operations.NewMosipVerifyOTPOK().WithPayload(&response)
+
 }
 
 func canInitializeSlots() bool {

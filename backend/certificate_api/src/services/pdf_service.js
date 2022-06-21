@@ -23,7 +23,7 @@ async function createPDF(htmlData, data) {
   if (browser === undefined || !browser.isConnected()) await initBrowser();
   const template = Handlebars.compile(htmlData);
 
-  const helperFunctions = new Function(await configurationService.addHelpers(HELPERS.CERTIFICATE_HELPER_FUNCTIONS))();
+  const helperFunctions = new Function(await configurationService.getHelperFunctions(HELPERS.CERTIFICATE_HELPER_FUNCTIONS))();
   
   let certificate = template(data, {helpers: helperFunctions});
 

@@ -295,15 +295,15 @@ type VaccinatorProgramsItems0 struct {
 	Certified bool `json:"certified,omitempty"`
 
 	// certified updated at
-	// Format: date
-	CertifiedUpdatedAt strfmt.Date `json:"certifiedUpdatedAt,omitempty"`
+	// Format: date-time
+	CertifiedUpdatedAt strfmt.DateTime `json:"certifiedUpdatedAt,omitempty"`
 
 	// id
 	ID string `json:"id,omitempty"`
 
 	// status updated at
-	// Format: date
-	StatusUpdatedAt strfmt.Date `json:"statusUpdatedAt,omitempty"`
+	// Format: date-time
+	StatusUpdatedAt strfmt.DateTime `json:"statusUpdatedAt,omitempty"`
 }
 
 // Validate validates this vaccinator programs items0
@@ -330,7 +330,7 @@ func (m *VaccinatorProgramsItems0) validateCertifiedUpdatedAt(formats strfmt.Reg
 		return nil
 	}
 
-	if err := validate.FormatOf("certifiedUpdatedAt", "body", "date", m.CertifiedUpdatedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("certifiedUpdatedAt", "body", "date-time", m.CertifiedUpdatedAt.String(), formats); err != nil {
 		return err
 	}
 
@@ -343,7 +343,7 @@ func (m *VaccinatorProgramsItems0) validateStatusUpdatedAt(formats strfmt.Regist
 		return nil
 	}
 
-	if err := validate.FormatOf("statusUpdatedAt", "body", "date", m.StatusUpdatedAt.String(), formats); err != nil {
+	if err := validate.FormatOf("statusUpdatedAt", "body", "date-time", m.StatusUpdatedAt.String(), formats); err != nil {
 		return err
 	}
 

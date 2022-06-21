@@ -1,7 +1,0 @@
-#root_dateRange {
-    display: flex;
-}
-
-#root_dateRange .field:nth-child(3){
-    margin-left: 2rem;
-}
