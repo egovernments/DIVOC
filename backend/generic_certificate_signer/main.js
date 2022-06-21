@@ -61,7 +61,7 @@ const signerConfig = {
             try {
                 const certificate = JSON.parse(message.value.toString());
                 const preEnrollmentCode = R.pathOr("", ['preEnrollmentCode'], certificate);
-                template = await (new configurationService.ConfigLayer().getConfigValue(config.TEMPLATE));
+                template = await (new configurationService.ConfigLayer().getConfigValue(config.ENTITY_TYPE + "/" + config.TEMPLATE));
                 const signedCertificate = await signCertificate(certificate, transformW3);
                 if(signedCertificate === null || signedCertificate === undefined) {
                     producer.send({

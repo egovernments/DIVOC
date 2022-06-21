@@ -12,9 +12,9 @@ const REGISTRY_CERTIFICATE_SCHEMA = process.env.REGISTRY_CERTIFICATE_SCHEMA || '
 const CERTIFICATE_RETRY_COUNT = process.env.CERTIFICATE_RETRY_COUNT || 5;
 const REGISTRY_URL = process.env.REGISTRY_URL || 'http://localhost:8081/';
 const REDIS_ENABLED = process.env.REDIS_ENABLED || true;
-const REDIS_URL = process.env.REDIS_URL || 'redis://0.0.0.0:6379';
+const REDIS_URL = process.env.REDIS_URL || 'redis://localhost:6379';
 const REDIS_KEY_EXPIRE = process.env.REDIS_KEY_EXPIRE || 2 * 24 * 60 * 60; // in secs
-const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || 'https://gist.githubusercontent.com/varadeth/fff3a5a48bdf0adb4845410d507e97da/raw/3799da91f3968ec4eaf1783775ee51cc60098e61/context.json';
+const CERTIFICATE_NAMESPACE = process.env.CERTIFICATE_NAMESPACE || 'https://github.com/egovernments/DIVOC/blob/main/default_configuration/Contexts/context.json';
 const ENABLE_CERTIFY_ACKNOWLEDGEMENT = true;
 const NOTIFY_TOPIC = process.env.NOTIFY_TOPIC || 'notify';
 const ERROR_CERTIFICATE_TOPIC = process.env.ERROR_CERTIFICATE_TOPIC || 'error_certificate';
@@ -25,6 +25,7 @@ const ETCD_USERNAME = process.env.ETCD_USERNAME;
 const ETCD_PASSWORD = process.env.ETCD_PASSWORD;
 const CONFIGURATION_LAYER = process.env.CONFIGURATION_LAYER;
 const CONFIG_KEYS = process.env.CONFIG_KEYS;
+const ENTITY_TYPE = process.env.ENTITY_TYPE;
 const TEMPLATE = process.env.TEMPLATE;
 
 module.exports = {
@@ -55,5 +56,6 @@ module.exports = {
     ETCD_PASSWORD,
     CONFIGURATION_LAYER,
     CONFIG_KEYS,
-    TEMPLATE
+    TEMPLATE,
+    ENTITY_TYPE
 };

@@ -1,0 +1,43 @@
+{
+    "@context": {
+        "@version": 1.1,
+        "@protected": true,
+        "id": "@id",
+        "type": "@type",
+        "schema": "https://schema.org/",
+        "vac": "https://divoc.dev/credentials/health/v1",
+        "ProofOfHealthProfessionalCredential": {
+            "@id": "schema:ProofOfHealthProfessionalCredential",
+            "@context": {
+                "@version": 1.1,
+                "@protected": true,
+                "nonTransferable": "vac:nonTransferable"
+            }
+        },
+        "Person": {
+            "@id": "schema:Person",
+            "@context": {
+                "@version": 1.1,
+                "@protected": true,
+                "name": "schema:name",
+                "registrationNumber": "schema:Text",
+                "salutation": "schema:Text",
+                "hpid": "schema:id",
+                "gender": "schema:gender"
+            }
+        },
+        "HealthProfessional": {
+            "@id": "vac:HealthProfessional",
+            "@context": {
+                "systemOfMedicine": "vac:systemOfMedicine",
+                "speciality": "schema:MedicalSpecialty",
+                "registeredWithCouncil": "vac:registeredWithCouncil",
+                "degree": "vac:degree",
+                "year": "schema:date",
+                "validFrom": "schema:date",
+                "validTo": "schema:date",
+                "certificateId": "schema:id"
+            }
+        }
+    }
+}
