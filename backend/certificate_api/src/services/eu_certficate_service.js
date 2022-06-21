@@ -1,4 +1,4 @@
-const ICAO9303_RE = new RegExp("^.*[A-Z<]$");
+const ICAO9303_RE = new RegExp("^[A-Z]+(<[A-Z]+)*$");
 
 function validateEURequestBody(requestBody) {
   /*
