@@ -1,7 +1,6 @@
 etcd=${1:-"127.0.0.1:2379"}
 export ETCDCTL_API=3
 FILE_LIST=`find . ! -name 'updateConfigs.sh' ! -name 'README.md' -type f`
-second=""
 declare -a ETCD_KEY_VALUE_FILES=(${FILE_LIST})
 for FILE in "${ETCD_KEY_VALUE_FILES[@]}";
 do

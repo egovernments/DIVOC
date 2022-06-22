@@ -12,6 +12,6 @@ docker:
 	$(MAKE) -C certificate_signer
 	$(MAKE) -C test_certificate_signer
 	$(MAKE) -C certificate_api
-	$(MAKE) -C hpr_certificate_signer
+	$(MAKE) -C generic_certificate_signer
 clean:
 	@rm -rf dockerdeps
