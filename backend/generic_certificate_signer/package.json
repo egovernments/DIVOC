@@ -1,0 +1,26 @@
+{
+  "name": "generic_certificate_signer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js",
+    "test": "jest"
+  },
+  "author": "",
+  "license": "GPL",
+  "dependencies": {
+    "axios": "^0.27.2",
+    "certificate-signer-library": "^2.0.4",
+    "etcd3": "^1.1.0",
+    "kafkajs": "^2.0.1",
+    "mustache": "^4.2.0",
+    "ramda": "^0.28.0",
+    "redis": "^3.0.2"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "redis-mock": "^0.56.3",
+    "util": "^0.12.4"
+  }
+}

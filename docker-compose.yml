@@ -175,6 +175,7 @@ services:
       MOSIP_AUTH_TOKEN: $MOSIP_AUTH_TOKEN
       MOSIP_OTP_URL: $MOSIP_BASE_URL/idauthentication/v1/otp/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
       MOSIP_AUTH_URL: $MOSIP_BASE_URL/idauthentication/v1/auth/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
+      MOSIP_KYC_URL: $MOSIP_BASE_URL/idauthentication/v1/kyc/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
       MOSIP_PRIVATE_KEY: $MOSIP_PRIVATE_KEY
       MOSIP_PUBLIC_KEY: $MOSIP_PUBLIC_KEY
       MOSIP_IDA_CERT_KEY: $MOSIP_IDA_CERT_KEY
@@ -232,6 +233,28 @@ services:
       ETCD_USERNAME: $ETCD_USERNAME
       ETCD_PASSWORD: $ETCD_PASSWORD
       CONFIGURATION_LAYER: "etcd"
+    depends_on:
+      kafka:
+        condition: service_healthy
+  generic-certificate-signer:
+    image: divoc/generic_certificate_signer
+    environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      REGISTRY_URL: "http://registry:8081/"
+      REDIS_URL: redis://redis:6379
+      CERTIFICATE_NAMESPACE: "https://gist.githubusercontent.com/varadeth/fff3a5a48bdf0adb4845410d507e97da/raw/8a2360c52595dcc595f69a7d8b320f22f82e6856/context.json"
+      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
+      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
+      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
+      ETCD_URL: $ETCD_URL
+      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+      CONFIGURATION_LAYER: "etcd"
+      CONFIG_KEYS: $CONFIG_KEYS
+      TEMPLATE: $TEMPLATE
     depends_on:
       kafka:
         condition: service_healthy

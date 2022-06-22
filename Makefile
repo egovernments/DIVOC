@@ -11,6 +11,8 @@ docker:
 	CERTIFICATE_PUBKEY_ID="https://example.com/i/india" \
 	CERTIFICATE_DID="did:india" \
 	docker build -t divoc/gateway .
+	$(MAKE) -C keycloak-mobile-number-login-spi
+	$(MAKE) -C keycloak
 	$(MAKE) -C backend
 	$(MAKE) -C registry
 test:
