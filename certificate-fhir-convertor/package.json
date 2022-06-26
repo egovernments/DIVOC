@@ -18,7 +18,7 @@
   ],
   "dependencies": {
     "base64url": "^3.0.1",
-    "jsrsasign": "^10.4.1",
+    "jsrsasign": "^10.5.25",
     "jszip": "^3.7.1",
     "mustache": "^4.2.0",
     "qrcode": "^1.4.4",
