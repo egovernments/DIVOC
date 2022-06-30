@@ -440,6 +440,7 @@ paths:
                 type: string
               otp:
                 type: string
+                minLength: 6
       responses:
         '200':
           description: OK
@@ -456,6 +457,43 @@ paths:
             $ref: '#/definitions/Error'
         '500':
           description: Internal Error
+          schema:
+            type: object
+  /external/mosip/kyc:
+    post:
+      summary: Get KYC information from MOSIP
+      operationId: mosipKYC
+      security: []
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+            required:
+              - individualIdType
+              - individualId
+              - otp
+            properties:
+              individualIdType:
+                type: string
+                enum: ["UIN", "VID"]
+              individualId:
+                type: string
+              otp:
+                type: string
+                minLength: 6
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '500':
+          description: Internal Error
+          schema:
+            type: object
+        '400':
+          description: Bad request
           schema:
             type: object
   /ping:

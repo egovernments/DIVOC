@@ -294,6 +294,64 @@ func init() {
         }
       }
     },
+    "/external/mosip/kyc": {
+      "post": {
+        "security": [],
+        "summary": "Get KYC information from MOSIP",
+        "operationId": "mosipKYC",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId",
+                "otp"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                },
+                "otp": {
+                  "type": "string",
+                  "minLength": 6
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
     "/external/mosip/verifyOTP": {
       "post": {
         "security": [],
@@ -1030,6 +1088,64 @@ func init() {
                     "UIN",
                     "VID"
                   ]
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "schema": {
+              "type": "object"
+            }
+          },
+          "500": {
+            "description": "Internal Error",
+            "schema": {
+              "type": "object"
+            }
+          }
+        }
+      }
+    },
+    "/external/mosip/kyc": {
+      "post": {
+        "security": [],
+        "summary": "Get KYC information from MOSIP",
+        "operationId": "mosipKYC",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "individualIdType",
+                "individualId",
+                "otp"
+              ],
+              "properties": {
+                "individualId": {
+                  "type": "string"
+                },
+                "individualIdType": {
+                  "type": "string",
+                  "enum": [
+                    "UIN",
+                    "VID"
+                  ]
+                },
+                "otp": {
+                  "type": "string",
+                  "minLength": 6
                 }
               }
             }
