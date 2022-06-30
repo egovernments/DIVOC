@@ -42,6 +42,7 @@ services:
       - auditTaskExecutor_queueCapacity=100
       - sunbird_sso_url=http://keycloak:8080/auth
       - sunbird_sso_realm=divoc
+      - registry_perRequest_indexCreation_enabled=false
     ports:
       - "8081:8081"
     depends_on:
