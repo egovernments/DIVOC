@@ -55,6 +55,7 @@ func SetupHandlers(api *operations.RegistrationAPIAPI) {
 	api.GetBeneficiariesHandler = operations.GetBeneficiariesHandlerFunc(getBeneficiaries)
 	api.MosipGenerateOTPHandler = operations.MosipGenerateOTPHandlerFunc(mosipGenerateOTP)
 	api.MosipVerifyOTPHandler = operations.MosipVerifyOTPHandlerFunc(mosipVerifyOTP)
+	api.MosipKYCHandler = operations.MosipKYCHandlerFunc(mosipKYC)
 	api.GetConfigHandler = operations.GetConfigHandlerFunc(getConfigHandler)
 }
 
@@ -218,6 +219,26 @@ func mosipVerifyOTP(params operations.MosipVerifyOTPParams) middleware.Responder
 	}
 	return operations.NewMosipVerifyOTPOK().WithPayload(&response)
 
+}
+
+func mosipKYC(params operations.MosipKYCParams) middleware.Responder {
+	individualId := *params.Body.IndividualID
+	individualIDType := *params.Body.IndividualIDType
+	otp := *params.Body.Otp
+	if individualId == "" || individualIDType == "" || otp == "" {
+		return operations.NewMosipVerifyOTPBadRequest()
+	}
+
+	mResp, err := services.MosipAuthRequest(individualIDType, individualId, otp, true)
+	if err != nil {
+		return operations.NewMosipVerifyOTPInternalServerError().WithPayload(err.Error())
+	}
+
+	log.Debugf("Response from MOSIP %v", mResp)
+	if len(mResp["identity"].(map[string]interface{})) == 0 {
+		return operations.NewMosipKYCInternalServerError().WithPayload("KYC information not found")
+	}
+	return operations.NewMosipKYCOK().WithPayload(mResp["identity"])
 }
 
 func canInitializeSlots() bool {
