@@ -51,7 +51,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     identity: formatId(credentialSubject.id),
     nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
-    recipientAddress: formatRecipientAddress(credentialSubject.address),
+    recipientAddress: credentialSubject.address ? formatRecipientAddress(credentialSubject.address) : "",
     vaccine: evidence[0].vaccine,
     vaccinationDate: formatDate(evidence[0].date),
     vaccineBatch: evidence[0].batch,
@@ -61,7 +61,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
     vaccinatedBy: evidence[0].verifier.name,
-    vaccinatedAt: formatFacilityAddress(evidence[0]),
+    vaccinatedAt:  evidence[0].facility.name ? evidence[0].facility.address.district ? formatFacilityAddress(evidence[0]) : evidence[0].facility.name : "" ,
     qrCode: dataURL,
     dose: evidence[0].dose,
     totalDoses: evidence[0].totalDoses,
@@ -81,6 +81,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
   let vaxEvents = [];
   for (let [key, value] of doseToVaccinationDetailsMap) {
     let vaxEventMap = {
+      dose: value.dose || "",
       doseType: (value.dose <= value.totalDoses) ?
         ("Primary Dose " + value.dose) :
         ("Booster Dose " + (value.dose - value.totalDoses)),
@@ -91,6 +92,7 @@ function getVaccineDetails(doseToVaccinationDetailsMap) {
       countryOfVax: value.vaccinatedCountry || "",
       validity: value.validity || "",
       vaxType: value.vaxType || "",
+      vaxEvent: value || "" ,
     };
     vaxEvents.push(vaxEventMap);
   }
@@ -107,6 +109,7 @@ function fetchVaccinationDetailsFromCert(evidence) {
     batch: evidence.batch,
     manufacturer: evidence.manufacturer,
     vaccinatedCountry: evidence.facility.address.addressCountry,
+    evidence: evidence,
   };
   return vaccineDetails;
 }
