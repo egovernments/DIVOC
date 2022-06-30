@@ -61,7 +61,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
     vaccinatedBy: evidence[0].verifier.name,
-    vaccinatedAt:  evidence[0].facility.name ? evidence[0].facility.address.district ? formatFacilityAddress(evidence[0]) : evidence[0].facility.name : "" ,
+    vaccinatedAt: formatFacilityAddress(evidence[0]),
     qrCode: dataURL,
     dose: evidence[0].dose,
     totalDoses: evidence[0].totalDoses,
