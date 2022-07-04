@@ -47,7 +47,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
   const certificateData = {
     name: credentialSubject.name,
     age: credentialSubject.age,
-    gender: credentialSubject.gender,
+    gender: credentialSubject.gender ? credentialSubject.gender : credentialSubject.sex,
     identity: formatId(credentialSubject.id),
     nationality: credentialSubject.nationality,
     beneficiaryId: credentialSubject.refId,
@@ -60,7 +60,7 @@ const prepareDataForVaccineCertificateTemplate = (certificateRaw, dataURL, doseT
     vaccineType: getVaxType(evidence[0].icd11Code, evidence[0].prophylaxis),
     vaccineManufacturer: evidence[0].manufacturer,
     vaccineValidDays: `after ${getVaccineValidDays(evidence[0].effectiveStart, evidence[0].effectiveUntil)} days`,
-    vaccinatedBy: evidence[0].verifier.name,
+    vaccinatedBy: evidence[0].verifier ? evidence[0].verifier.name : "",
     vaccinatedAt:  evidence[0].facility.name ? evidence[0].facility.address.district ? formatFacilityAddress(evidence[0]) : evidence[0].facility.name : "" ,
     qrCode: dataURL,
     dose: evidence[0].dose,
