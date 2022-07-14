@@ -9,10 +9,6 @@ const port = process.env.PORT || 7654;
 const server = http.createServer(async (req, res) => {
     console.time(req.url)
     console.log(`API ${req.method} ${req.url} called`);
-    if (req.method === 'POST' && req.url.startsWith(constants.BASE_PATH + "v1/schema")) {
-        const data = await schemaController.createSchema(req, res);
-        res.end(data)
-    }
     if (req.method === 'POST' && req.url.match(constants.BASE_PATH + "v1/certify/.+")) {
         const data = await certificateController.createCertificate(req, res);
         res.end(data)

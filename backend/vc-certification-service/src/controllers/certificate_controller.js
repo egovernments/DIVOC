@@ -17,7 +17,12 @@ async function createCertificate(req, res) {
                 "status": "Unsuccessful"
             }
         }
-        const certificateAddResponse = await sunbirdRegistryService.createCertificate(requestBody, entityType)
+        let registryRequestConfig = {
+            "headers": {
+                "Authorization": req.headers.authorization
+            }
+        }
+        const certificateAddResponse = await sunbirdRegistryService.createCertificate(requestBody, entityType, registryRequestConfig)
         res.statusCode = 200;
         return JSON.stringify(certificateAddResponse)
     } catch (err) {

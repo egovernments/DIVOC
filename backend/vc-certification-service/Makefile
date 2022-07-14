@@ -1,5 +1,5 @@
 
-IMAGE:=divoc/vc-certify-service
+IMAGE:=divoc/vc-certification-service
 
 docker:
 	@docker build -t $(IMAGE) .
