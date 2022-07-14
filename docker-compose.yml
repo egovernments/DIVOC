@@ -396,7 +396,6 @@ services:
       - sunbird_sso_admin_client_id=admin-api
       - sunbird_sso_client_id=registry-frontend
       - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
-      - claims_url=http://claim-ms:8082
       - sign_url=http://sunbird-certificate-signer:8079/sign
       - verify_url=http://sunbird-certificate-signer:8079/verify
       - signature_enabled=true
