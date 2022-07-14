@@ -51,7 +51,9 @@ services:
       db:
         condition: service_started
   keycloak:
-    image: divoc/keycloak
+    image: divoc/keycloak:2.0.0-generic
+    volumes:
+      - ${PWD}/imports:/opt/jboss/keycloak/imports
     environment:
       DB_VENDOR: postgres
       DB_ADDR: db
@@ -65,6 +67,8 @@ services:
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
       COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/realm-export.json
+      PROXY_ADDRESS_FORWARDING: true
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -362,20 +366,6 @@ services:
     ports:
       - $ETCD_CLIENT_CONNECTIONS_PORT:$ETCD_CLIENT_CONNECTIONS_PORT
       - $ETCD_PEER_CONNECTIONS_PORT:$ETCD_PEER_CONNECTIONS_PORT
-  claim-ms:
-    image: dockerhub/sunbird-rc-claim-ms:v0.0.8
-    environment:
-      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
-      - connectionInfo_username=postgres
-      - connectionInfo_password=postgres
-      - sunbirdrc_url=http://sunbird-registry:8081
-    ports:
-      - "6084:8082"
-    depends_on:
-      db:
-        condition: service_started
-      sunbird-registry:
-        condition: service_started
   sunbird-certificate-signer:
     image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
     environment:
