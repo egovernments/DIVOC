@@ -20,14 +20,14 @@ services:
         retries: 4
   db:
     image: postgres
+    volumes:
+      - ./db-data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     environment:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-    volumes:
-      - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
     image: divoc/registry-es
     environment:
@@ -35,21 +35,67 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
-      - search_providerName=dev.sunbirdrc.registry.service.ElasticSearchService
-      - registry_base_apis_enable=true
-      - signature_enabled=false
-      - taskExecutor_index_queueCapacity=100
-      - auditTaskExecutor_queueCapacity=100
+      - search_provider=dev.sunbirdrc.registry.service.ElasticSearchService
+      - sunbird_sso_realm=sunbird-rc
       - sunbird_sso_url=http://keycloak:8080/auth
-      - sunbird_sso_realm=divoc
-      - registry_perRequest_indexCreation_enabled=false
+      - sunbird_sso_admin_client_id=admin-api
+      - sunbird_sso_client_id=registry-frontend
+      - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
+      - sign_url=http://sunbird-certificate-signer:8079/sign
+      - verify_url=http://sunbird-certificate-signer:8079/verify
+      - signature_enabled=true
+      - pdf_url=http://sunbird-certificate-api:8078/api/v1/certificatePDF
+      - template_base_url=http://registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
+      - sunbird_keycloak_user_set_password=true
+      - filestorage_connection_url=http://file-storage:9000
+      - filestorage_access_key=admin
+      - filestorage_secret_key=12345678
+      - filestorage_bucket_key=issuance
+      - registry_base_apis_enable=false
+      - sunbird_keycloak_user_password=abcd@123
+      - logging.level.root=DEBUG
+      - enable_external_templates=true
+      - authentication_enabled=true
     ports:
       - "8081:8081"
     depends_on:
       es:
-        condition: service_healthy
+        condition: service_started
       db:
         condition: service_started
+      keycloak:
+        condition: service_started
+  sunbird-certificate-signer:
+    image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
+    environment:
+      - PORT=8079
+    ports:
+      - "6079:8079"
+  sunbird-certificate-api:
+    image: dockerhub/sunbird-rc-certificate-api:v0.0.8
+    volumes:
+      - ${PWD}/scripts:/scripts
+    entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
+    environment:
+      - PORT=8078
+    ports:
+      - "6078:8078"
+  file-storage:
+    image: quay.io/minio/minio
+    volumes:
+      - ${HOME}/minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=12345678
+    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:9001 /data
+    ports:
+      - "6000:9000"
+      - "6001:9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
   keycloak:
     image: divoc/keycloak:2.0.0-generic
     volumes:
@@ -109,334 +155,256 @@ services:
       interval: 30s
       timeout: 10s
       retries: 4
-  clickhouse-server:
-    image: yandex/clickhouse-server
-    ports:
-      - "8123:8123"
-      - "9000:9000"
-  vaccination-api:
-    image: divoc/vaccination_api
-    environment:
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      DB_HOST: db
-      REDIS_URL: redis://redis:6379
-      ENABLE_KEYCLOAK: "true"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000"]
-      interval: 10s
-      timeout: 10s
-      retries: 10
-    ports:
-      - "8000:8000"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-  portal-api:
-    image: divoc/portal_api
-    ports:
-      - "8001:8001"
-    environment:
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
-      DB_HOST: db
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      ETCD_URL: $ETCD_URL
-      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
-      ETCD_USERNAME: $ETCD_USERNAME
-      ETCD_PASSWORD: $ETCD_PASSWORD
-      LOG_LEVEL: "$LOG_LEVEL"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-  registration-api:
-    image: divoc/registration_api
-    ports:
-      - "8002:8002"
-    environment:
-      REDIS_URL: redis://redis:6379
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      DB_HOST: db
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      # in min
-      CACHE_TTL: 60
-      AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
-      AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
-      ETCD_URL: $ETCD_URL
-      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
-      ETCD_USERNAME: $ETCD_USERNAME
-      ETCD_PASSWORD: $ETCD_PASSWORD
-      MOSIP_AUTH_TOKEN: $MOSIP_AUTH_TOKEN
-      MOSIP_OTP_URL: $MOSIP_BASE_URL/idauthentication/v1/otp/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
-      MOSIP_AUTH_URL: $MOSIP_BASE_URL/idauthentication/v1/auth/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
-      MOSIP_KYC_URL: $MOSIP_BASE_URL/idauthentication/v1/kyc/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
-      MOSIP_PRIVATE_KEY: $MOSIP_PRIVATE_KEY
-      MOSIP_PUBLIC_KEY: $MOSIP_PUBLIC_KEY
-      MOSIP_IDA_CERT_KEY: $MOSIP_IDA_CERT_KEY
-      LOG_LEVEL: "$LOG_LEVEL"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy  
-  analytics-feed:
-    image: divoc/analytics_feed
-    environment:
-      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-    depends_on:
-      clickhouse-server:
-        condition: service_started
-  certificate-processor:
-    image: divoc/certificate_processor
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
-      REDIS_URL: "redis://redis:6379"
-      ENABLE_PROGRAM_ID_CACHING_KEY: "true"
-      ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE: "true"
-      ENABLE_REVOKE_CERTIFICATION_SERVICE: "true"
-    depends_on:
-      registry:
-        condition: service_started
-  certificate-signer:
-    image: divoc/certificate_signer
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      REDIS_URL: redis://redis:6379
-      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
-      CERTIFICATE_NAMESPACE_V2: "https://cowin.gov.in/credentials/vaccination/v2"
-      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
-      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
-      CERTIFICATE_DID: "did:india"
-      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
-      CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
-      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
-      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
-      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
-      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
-      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
-      FACILITY_COUNTRY_CODE: "IND"
-      ETCD_URL: $ETCD_URL
-      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
-      ETCD_USERNAME: $ETCD_USERNAME
-      ETCD_PASSWORD: $ETCD_PASSWORD
-      CONFIGURATION_LAYER: "etcd"
-    depends_on:
-      kafka:
-        condition: service_healthy
-  test-certificate-signer:
-    image: divoc/test_certificate_signer
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      REDIS_URL: redis://redis:6379
-      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/testCertificate/v1"
-      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
-      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
-      CERTIFICATE_DID: "did:india"
-      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
-      CERTIFICATE_BASE_URL: "https://cowin.gov.in/test/"
-      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
-      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
-      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_TEST_SIGNER_PUBLIC_KEY"
-      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
-      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
-    depends_on:
-      kafka:
-        condition: service_healthy
-  gateway:
-    image: divoc/gateway
-    ports:
-      - "80:80"
-    depends_on:
-      vaccination-api:
-        condition: service_started
-      portal-api:
-        condition: service_started
-      registration-api:
-        condition: service_started
-      digilocker-support-api:
-        condition: service_started
-  # public-app:
-  #   image: divoc/public-app
-  #   depends_on:
-  #     vaccination-api:
-  #       condition: service_started
-  #     portal-api:
-  #       condition: service_started
-  #     registration-api:
-  #       condition: service_started
-  #     digilocker-support-api:
-  #       condition: service_started
-  notification-service:
-    image: divoc/notification-service
-    ports:
-      - "8765:8765"
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      SMS_AUTH_KEY: xxxx
-      SENDER_EMAIL: xxxx@mail.com
-      SENDER_PASSWORD: xxxx
-      ETCD_URL: $ETCD_URL
-      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
-      ETCD_USERNAME: $ETCD_USERNAME
-      ETCD_PASSWORD: $ETCD_PASSWORD
-      LOG_LEVEL: "$LOG_LEVEL"
-    depends_on:
-      kafka:
-        condition: service_healthy
-  digilocker-support-api:
-    image: divoc/digilocker_support_api
-    environment:
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      REGISTRY_URL: "http://registry:8081"
-      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
-      DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      REGISTRATION_API_PUBLIC_KEY: "$REGISTRATION_API_PUBLIC_KEY"
-    depends_on:
-      kafka:
-        condition: service_healthy
-      keycloak:
-        condition: service_healthy
-  certificate-api:
-    image: divoc/certificate_api
-    ports:
-      - "4321:4321"
-    environment:
-      KEYCLOAK_URL: "http://keycloak:8080/auth"
-      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      REGISTRY_URL: "http://registry:8081"
-      AUTH_PUBLIC_KEY: "$CERTIFICATE_API_AUTH_PUBLIC_KEY"
-      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_API_PUBLIC_KEY"
-      EU_CERTIFICATE_PUBLIC_KEY: "$EU_CERTIFICATE_PUBLIC_KEY"
-      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_API_PRIVATE_KEY"
-      EU_CERTIFICATE_PRIVATE_KEY: "$EU_CERTIFICATE_PRIVATE_KEY"
-      SHC_CERTIFICATE_PRIVATE_KEY: "$SHC_CERTIFICATE_PRIVATE_KEY"
-      EU_CERTIFICATE_EXPIRY: 12
-      SHC_CERTIFICATE_EXPIRY: 12
-      CERTIFICATE_ISSUER: "https://divoc.dev"
-      FHIR_PUBLIC_HEALTH_AUTHORITY: "Govt Of India"
-      DISEASE_CODE: "COVID-19"
-      REDIS_URL: redis://redis:6379
-      REDIS_KEY_EXPIRE: 172800
-      REDIS_ENABLED: "true"
-      ETCD_URL: $ETCD_URL
-      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
-      CONFIGURATION_LAYER: "etcd"
-      ETCD_USERNAME: $ETCD_USERNAME
-      ETCD_PASSWORD: $ETCD_PASSWORD
-    depends_on:
-      kafka:
-        condition: service_healthy
-  etcd:
-    image: gcr.io/etcd-development/etcd:v3.5.1
-    entrypoint: /usr/local/bin/etcd
-    environment: 
-      ETCD_NAME: '$ETCD_NAME'
-      ETCD_DATA_DIR: '$ETCD_DATA_DIR'
-      ETCD_LISTEN_CLIENT_URLS: '$ETCD_LISTEN_CLIENT_URLS'
-      ETCD_ADVERTISE_CLIENT_URLS: '$ETCD_ADVERTISE_CLIENT_URLS'
-      ETCD_LISTEN_PEER_URLS: '$ETCD_LISTEN_PEER_URLS'
-      ETCD_INITIAL_ADVERTISE_PEER_URLS: '$ETCD_ADVERTISE_PEER_URLS'
-      ETCD_INITIAL_CLUSTER: '$ETCD_NAME=$ETCD_INITIAL_CLUSTER'
-      ETCD_INITIAL_CLUSTER_TOKEN: '$ETCD_INITIAL_CLUSTER_TOKEN'
-      ETCD_INITIAL_CLUSTER_STATE: '$ETCD_INITIAL_CLUSTER_STATE'
-      ETCD_LOG_LEVEL: '$ETCD_LOG_LEVEL'
-      ETCD_LOGGER: '$ETCD_LOGGER'
-      ETCD_LOG_OUTPUTS: '$ETCD_LOG_OUTPUTS'
-    ports:
-      - $ETCD_CLIENT_CONNECTIONS_PORT:$ETCD_CLIENT_CONNECTIONS_PORT
-      - $ETCD_PEER_CONNECTIONS_PORT:$ETCD_PEER_CONNECTIONS_PORT
-  sunbird-certificate-signer:
-    image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
-    environment:
-      - PORT=8079
-    ports:
-      - "6079:8079"
-  sunbird-certificate-api:
-    image: dockerhub/sunbird-rc-certificate-api:v0.0.8
-    volumes:
-      - ${PWD}/scripts:/scripts
-    entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
-    environment:
-      - PORT=8078
-    ports:
-      - "6078:8078"
-  sunbird-registry:
-    image: dockerhub/sunbird-rc-core:v0.0.8
-    volumes:
-      - ${PWD}/schemas:/home/sunbirdrc/config/public/_schemas
-    environment:
-      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
-      - connectionInfo_username=postgres
-      - connectionInfo_password=postgres
-      - elastic_search_connection_url=es:9200
-      - search_provider=dev.sunbirdrc.registry.service.ElasticSearchService
-      - sunbird_sso_realm=sunbird-rc
-      - sunbird_sso_url=http://keycloak:8080/auth
-      - sunbird_sso_admin_client_id=admin-api
-      - sunbird_sso_client_id=registry-frontend
-      - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
-      - sign_url=http://sunbird-certificate-signer:8079/sign
-      - verify_url=http://sunbird-certificate-signer:8079/verify
-      - signature_enabled=true
-      - pdf_url=http://sunbird-certificate-api:8078/api/v1/certificatePDF
-      - template_base_url=http://sunbird-registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
-      - sunbird_keycloak_user_set_password=true
-      - filestorage_connection_url=http://file-storage:9000
-      - filestorage_access_key=admin
-      - filestorage_secret_key=12345678
-      - filestorage_bucket_key=issuance
-      - registry_base_apis_enable=false
-      - sunbird_keycloak_user_password=abcd@123
-      - logging.level.root=DEBUG
-      - enable_external_templates=true
-      - authentication_enabled=true
-    ports:
-      - "6083:8081"
-    depends_on:
-      es:
-        condition: service_healthy
-      db:
-        condition: service_started
-  file-storage:
-    image: quay.io/minio/minio
-    volumes:
-      - ${HOME}/minio/data:/data
-    environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=12345678
-    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:9001 /data
-    ports:
-      - "6000:9000"
-      - "6001:9001"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 30s
-      timeout: 20s
-      retries: 3
   vc-certification-service:
     image: divoc/vc-certification-service
     ports:
       - "7654:7654"
     environment:
-      SUNBIRD_REGISTRY_URL: "http://sunbird-registry:8081"
+      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+#  clickhouse-server:
+#    image: yandex/clickhouse-server
+#    ports:
+#      - "8123:8123"
+#      - "9000:9000"
+#  vaccination-api:
+#    image: divoc/vaccination_api
+#    environment:
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      DB_HOST: db
+#      REDIS_URL: redis://redis:6379
+#      ENABLE_KEYCLOAK: "true"
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8000"]
+#      interval: 10s
+#      timeout: 10s
+#      retries: 10
+#    ports:
+#      - "8000:8000"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#      keycloak:
+#        condition: service_healthy
+#  portal-api:
+#    image: divoc/portal_api
+#    ports:
+#      - "8001:8001"
+#    environment:
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+#      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+#      DB_HOST: db
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      ETCD_URL: $ETCD_URL
+#      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+#      ETCD_USERNAME: $ETCD_USERNAME
+#      ETCD_PASSWORD: $ETCD_PASSWORD
+#      LOG_LEVEL: "$LOG_LEVEL"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#      keycloak:
+#        condition: service_healthy
+#  registration-api:
+#    image: divoc/registration_api
+#    ports:
+#      - "8002:8002"
+#    environment:
+#      REDIS_URL: redis://redis:6379
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      DB_HOST: db
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      # in min
+#      CACHE_TTL: 60
+#      AUTH_PRIVATE_KEY: "$AUTH_PRIVATE_KEY"
+#      AUTH_PUBLIC_KEY: "$AUTH_PUBLIC_KEY"
+#      ETCD_URL: $ETCD_URL
+#      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+#      ETCD_USERNAME: $ETCD_USERNAME
+#      ETCD_PASSWORD: $ETCD_PASSWORD
+#      MOSIP_AUTH_TOKEN: $MOSIP_AUTH_TOKEN
+#      MOSIP_OTP_URL: $MOSIP_BASE_URL/idauthentication/v1/otp/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
+#      MOSIP_AUTH_URL: $MOSIP_BASE_URL/idauthentication/v1/auth/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
+#      MOSIP_KYC_URL: $MOSIP_BASE_URL/idauthentication/v1/kyc/$MOSIP_MISP_LICENSE_KEY/$MOSIP_PARTNER_ID/$MOSIP_PARTNER_API_KEY
+#      MOSIP_PRIVATE_KEY: $MOSIP_PRIVATE_KEY
+#      MOSIP_PUBLIC_KEY: $MOSIP_PUBLIC_KEY
+#      MOSIP_IDA_CERT_KEY: $MOSIP_IDA_CERT_KEY
+#      LOG_LEVEL: "$LOG_LEVEL"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#      keycloak:
+#        condition: service_healthy
+#  analytics-feed:
+#    image: divoc/analytics_feed
+#    environment:
+#      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#    depends_on:
+#      clickhouse-server:
+#        condition: service_started
+#  certificate-processor:
+#    image: divoc/certificate_processor
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      ADMIN_API_CLIENT_SECRET: "$ADMIN_API_CLIENT_SECRET"
+#      REDIS_URL: "redis://redis:6379"
+#      ENABLE_PROGRAM_ID_CACHING_KEY: "true"
+#      ENABLE_CREATE_RECIPIENT_IN_KEYCLOAK_SERVICE: "true"
+#      ENABLE_REVOKE_CERTIFICATION_SERVICE: "true"
+#    depends_on:
+#      registry:
+#        condition: service_started
+#  certificate-signer:
+#    image: divoc/certificate_signer
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      REDIS_URL: redis://redis:6379
+#      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/vaccination/v1"
+#      CERTIFICATE_NAMESPACE_V2: "https://cowin.gov.in/credentials/vaccination/v2"
+#      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+#      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+#      CERTIFICATE_DID: "did:india"
+#      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+#      CERTIFICATE_BASE_URL: "https://cowin.gov.in/vaccine/"
+#      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
+#      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+#      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_SIGNER_PUBLIC_KEY"
+#      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_SIGNER_PRIVATE_KEY"
+#      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
+#      FACILITY_COUNTRY_CODE: "IND"
+#      ETCD_URL: $ETCD_URL
+#      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+#      ETCD_USERNAME: $ETCD_USERNAME
+#      ETCD_PASSWORD: $ETCD_PASSWORD
+#      CONFIGURATION_LAYER: "etcd"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#  test-certificate-signer:
+#    image: divoc/test_certificate_signer
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      REDIS_URL: redis://redis:6379
+#      CERTIFICATE_NAMESPACE: "https://cowin.gov.in/credentials/testCertificate/v1"
+#      CERTIFICATE_CONTROLLER_ID: "https://cowin.gov.in/"
+#      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+#      CERTIFICATE_DID: "did:india"
+#      CERTIFICATE_ISSUER: "https://cowin.gov.in/"
+#      CERTIFICATE_BASE_URL: "https://cowin.gov.in/test/"
+#      CERTIFICATE_FEEDBACK_BASE_URL: "https://cowin.gov.in/?"
+#      CERTIFICATE_INFO_BASE_URL: "https://cowin.gov.in/?"
+#      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_TEST_SIGNER_PUBLIC_KEY"
+#      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_TEST_SIGNER_PRIVATE_KEY"
+#      SIGNING_KEY_TYPE: "$SIGNING_KEY_TYPE"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#  gateway:
+#    image: divoc/gateway
+#    ports:
+#      - "80:80"
+#    depends_on:
+#      vaccination-api:
+#        condition: service_started
+#      portal-api:
+#        condition: service_started
+#      registration-api:
+#        condition: service_started
+#      digilocker-support-api:
+#        condition: service_started
+#  notification-service:
+#    image: divoc/notification-service
+#    ports:
+#      - "8765:8765"
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      SMS_AUTH_KEY: xxxx
+#      SENDER_EMAIL: xxxx@mail.com
+#      SENDER_PASSWORD: xxxx
+#      ETCD_URL: $ETCD_URL
+#      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+#      ETCD_USERNAME: $ETCD_USERNAME
+#      ETCD_PASSWORD: $ETCD_PASSWORD
+#      LOG_LEVEL: "$LOG_LEVEL"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#  digilocker-support-api:
+#    image: divoc/digilocker_support_api
+#    environment:
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      REGISTRY_URL: "http://registry:8081"
+#      REGISTRY_WITH_ES_URL: "http://registry-es:8081"
+#      DIGILOCKER_HMAC_AUTHKEY: "UPDATE_KEY_GIVEN_IN_DIGILOCKER"
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      REGISTRATION_API_PUBLIC_KEY: "$REGISTRATION_API_PUBLIC_KEY"
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#      keycloak:
+#        condition: service_healthy
+#  certificate-api:
+#    image: divoc/certificate_api
+#    ports:
+#      - "4321:4321"
+#    environment:
+#      KEYCLOAK_URL: "http://keycloak:8080/auth"
+#      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      REGISTRY_URL: "http://registry:8081"
+#      AUTH_PUBLIC_KEY: "$CERTIFICATE_API_AUTH_PUBLIC_KEY"
+#      CERTIFICATE_PUBLIC_KEY: "$CERTIFICATE_API_PUBLIC_KEY"
+#      EU_CERTIFICATE_PUBLIC_KEY: "$EU_CERTIFICATE_PUBLIC_KEY"
+#      CERTIFICATE_PRIVATE_KEY: "$CERTIFICATE_API_PRIVATE_KEY"
+#      EU_CERTIFICATE_PRIVATE_KEY: "$EU_CERTIFICATE_PRIVATE_KEY"
+#      SHC_CERTIFICATE_PRIVATE_KEY: "$SHC_CERTIFICATE_PRIVATE_KEY"
+#      EU_CERTIFICATE_EXPIRY: 12
+#      SHC_CERTIFICATE_EXPIRY: 12
+#      CERTIFICATE_ISSUER: "https://divoc.dev"
+#      FHIR_PUBLIC_HEALTH_AUTHORITY: "Govt Of India"
+#      DISEASE_CODE: "COVID-19"
+#      REDIS_URL: redis://redis:6379
+#      REDIS_KEY_EXPIRE: 172800
+#      REDIS_ENABLED: "true"
+#      ETCD_URL: $ETCD_URL
+#      ETCD_AUTH_ENABLED: $ETCD_AUTH_ENABLED
+#      CONFIGURATION_LAYER: "etcd"
+#      ETCD_USERNAME: $ETCD_USERNAME
+#      ETCD_PASSWORD: $ETCD_PASSWORD
+#    depends_on:
+#      kafka:
+#        condition: service_healthy
+#  etcd:
+#    image: gcr.io/etcd-development/etcd:v3.5.1
+#    entrypoint: /usr/local/bin/etcd
+#    environment:
+#      ETCD_NAME: '$ETCD_NAME'
+#      ETCD_DATA_DIR: '$ETCD_DATA_DIR'
+#      ETCD_LISTEN_CLIENT_URLS: '$ETCD_LISTEN_CLIENT_URLS'
+#      ETCD_ADVERTISE_CLIENT_URLS: '$ETCD_ADVERTISE_CLIENT_URLS'
+#      ETCD_LISTEN_PEER_URLS: '$ETCD_LISTEN_PEER_URLS'
+#      ETCD_INITIAL_ADVERTISE_PEER_URLS: '$ETCD_ADVERTISE_PEER_URLS'
+#      ETCD_INITIAL_CLUSTER: '$ETCD_NAME=$ETCD_INITIAL_CLUSTER'
+#      ETCD_INITIAL_CLUSTER_TOKEN: '$ETCD_INITIAL_CLUSTER_TOKEN'
+#      ETCD_INITIAL_CLUSTER_STATE: '$ETCD_INITIAL_CLUSTER_STATE'
+#      ETCD_LOG_LEVEL: '$ETCD_LOG_LEVEL'
+#      ETCD_LOGGER: '$ETCD_LOGGER'
+#      ETCD_LOG_OUTPUTS: '$ETCD_LOG_OUTPUTS'
+#    ports:
+#      - $ETCD_CLIENT_CONNECTIONS_PORT:$ETCD_CLIENT_CONNECTIONS_PORT
+#      - $ETCD_PEER_CONNECTIONS_PORT:$ETCD_PEER_CONNECTIONS_PORT
+# VC Issuance as a service

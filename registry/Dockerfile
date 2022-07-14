@@ -1,4 +1,4 @@
-FROM dockerhub/sunbird-rc-core:v0.0.4
+FROM dockerhub/sunbird-rc-core:v0.0.8
 
 ADD *.json /home/sunbirdrc/config/public/_schemas/
 
