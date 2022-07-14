@@ -10,6 +10,5 @@ const createCertificate = (certificateRequest, entityType, config) => {
 };
 
 module.exports = {
-    createSchema,
     createCertificate
 }
