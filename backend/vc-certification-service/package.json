@@ -4,8 +4,7 @@
   "description": "Verifiable credentials certification service",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node main.js"
   },
   "author": "",
   "license": "GPL",
