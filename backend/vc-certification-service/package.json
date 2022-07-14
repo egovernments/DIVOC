@@ -1,0 +1,14 @@
+{
+  "name": "vc-certification-service",
+  "version": "1.0.0",
+  "description": "Verifiable credentials certification service",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "author": "",
+  "license": "GPL",
+  "dependencies": {
+    "axios": "^0.21.1"
+  }
+}
