@@ -1,6 +1,5 @@
 const constants = require('./configs/constants');
 const http = require("http");
-const schemaController = require("./src/controllers/schema_controller")
 const certificateController = require("./src/controllers/certificate_controller")
 
 const port = process.env.PORT || 7654;

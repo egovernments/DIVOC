@@ -1,6 +1,5 @@
 const constants = require('../../configs/constants');
 const utils = require("../services/utils");
-const schemaService = require("../services/schema_service");
 const sunbirdRegistryService = require('../services/sunbird_service')
 
 async function createCertificate(req, res) {
