@@ -1,7 +1,6 @@
 version: "2.4"
 
 services:
-# External Dependencies
   redis:
     image: redis
     ports:
@@ -15,10 +14,10 @@ services:
       - "9200:9200"
       - "9300:9300"
     healthcheck:
-        test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
-        interval: 30s
-        timeout: 10s
-        retries: 4
+      test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
   db:
     image: postgres
     ports:
@@ -27,11 +26,8 @@ services:
       - POSTGRES_DB=registry
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
-  clickhouse-server:
-    image: yandex/clickhouse-server
-    ports:
-      - "8123:8123"
-      - "9000:9000"
+    volumes:
+      - ./flagr_dump.sql:/docker-entrypoint-initdb.d/flagr_dump.sql
   registry:
     image: divoc/registry-es
     environment:
@@ -39,71 +35,23 @@ services:
       - connectionInfo_username=postgres
       - connectionInfo_password=postgres
       - elastic_search_connection_url=es:9200
-      - search_provider=dev.sunbirdrc.registry.service.ElasticSearchService
-      - sunbird_sso_realm=sunbird-rc
+      - search_providerName=dev.sunbirdrc.registry.service.ElasticSearchService
+      - registry_base_apis_enable=true
+      - signature_enabled=false
+      - taskExecutor_index_queueCapacity=100
+      - auditTaskExecutor_queueCapacity=100
       - sunbird_sso_url=http://keycloak:8080/auth
-      - sunbird_sso_admin_client_id=admin-api
-      - sunbird_sso_client_id=registry-frontend
-      - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
-      - sign_url=http://sunbird-certificate-signer:8079/sign
-      - verify_url=http://sunbird-certificate-signer:8079/verify
-      - signature_enabled=true
-      - pdf_url=http://sunbird-certificate-api:8078/api/v1/certificatePDF
-      - template_base_url=http://registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
-      - sunbird_keycloak_user_set_password=true
-      - filestorage_connection_url=http://file-storage:9000
-      - filestorage_access_key=admin
-      - filestorage_secret_key=12345678
-      - filestorage_bucket_key=issuance
-      - registry_base_apis_enable=false
-      - sunbird_keycloak_user_password=abcd@123
-      - logging.level.root=DEBUG
-      - enable_external_templates=true
-      - authentication_enabled=true
+      - sunbird_sso_realm=divoc
+      - registry_perRequest_indexCreation_enabled=false
     ports:
       - "8081:8081"
     depends_on:
       es:
-        condition: service_started
+        condition: service_healthy
       db:
         condition: service_started
-      keycloak:
-        condition: service_started
-  sunbird-certificate-signer:
-    image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
-    environment:
-      - PORT=8079
-    ports:
-      - "6079:8079"
-  sunbird-certificate-api:
-    image: dockerhub/sunbird-rc-certificate-api:v0.0.8
-    volumes:
-      - ./scripts:/scripts
-    entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
-    environment:
-      - PORT=8078
-    ports:
-      - "6078:8078"
-  file-storage:
-    image: quay.io/minio/minio
-    volumes:
-      - ${HOME}/minio/data:/data
-    environment:
-      - MINIO_ROOT_USER=admin
-      - MINIO_ROOT_PASSWORD=12345678
-    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:9001 /data
-    ports:
-      - "6000:9000"
-      - "6001:9001"
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
-      interval: 30s
-      timeout: 20s
-      retries: 3
   keycloak:
-    image: divoc/keycloak:2.1.0-generic
-    volumes:
-      - ./keycloak:/opt/jboss/keycloak/imports
+    image: divoc/keycloak
     environment:
       DB_VENDOR: postgres
       DB_ADDR: db
@@ -117,8 +65,6 @@ services:
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
       COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
-      KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/src-realm-export.json
-      PROXY_ADDRESS_FORWARDING: true
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -159,28 +105,11 @@ services:
       interval: 30s
       timeout: 10s
       retries: 4
-  # VC Issuance as a platform
-  vc-certification-service:
-    image: divoc/vc-certification-service
+  clickhouse-server:
+    image: yandex/clickhouse-server
     ports:
-      - "7654:7654"
-    environment:
-      SUNBIRD_REGISTRY_URL: "http://registry:8081"
-      PORT: "7654"
-      KEYCLOAK_URL: "http://keycloak:8080"
-
-  vc-issuer-service:
-    image: divoc/vc-issuer-service
-    ports:
-      - "7655:7655"
-    environment:
-      SUNBIRD_REGISTRY_URL: "http://registry:8081"
-      PORT: "7655"
-      KEYCLOAK_URL: "http://keycloak:8080"
-
-# DIVOC Services
-
-
+      - "8123:8123"
+      - "9000:9000"
   vaccination-api:
     image: divoc/vaccination_api
     environment:
@@ -342,6 +271,17 @@ services:
         condition: service_started
       digilocker-support-api:
         condition: service_started
+  # public-app:
+  #   image: divoc/public-app
+  #   depends_on:
+  #     vaccination-api:
+  #       condition: service_started
+  #     portal-api:
+  #       condition: service_started
+  #     registration-api:
+  #       condition: service_started
+  #     digilocker-support-api:
+  #       condition: service_started
   notification-service:
     image: divoc/notification-service
     ports:

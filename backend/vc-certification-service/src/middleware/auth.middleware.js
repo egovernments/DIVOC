@@ -15,7 +15,7 @@ async function verifyKeycloakToken(bearerToken) {
 
 module.exports = function (req, res, next) {
     const token = req.header("Authorization");
-    if (!token) return res.status(400).send({error: "Access Denied!, no token entered"});
+    if (!token) return res.status(403).send({error: "Access Denied!, no token entered"});
     try {
         const verified = verifyKeycloakToken(token);
         req.user = verified;
