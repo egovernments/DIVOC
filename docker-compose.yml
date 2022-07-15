@@ -20,7 +20,7 @@ services:
         timeout: 10s
         retries: 4
   db:
-    image: postgres:13.0-alpine
+    image: postgres
     ports:
       - "5432:5432"
     environment:
