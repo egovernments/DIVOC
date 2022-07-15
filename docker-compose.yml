@@ -166,6 +166,8 @@ services:
       - "7654:7654"
     environment:
       SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      PORT: "7654"
+      KEYCLOAK_URL: "http://keycloak:8080"
 
   vc-issuer-service:
     image: divoc/vc-issuer-service

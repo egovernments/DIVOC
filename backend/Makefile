@@ -12,6 +12,7 @@ docker:
 	$(MAKE) -C certificate_signer
 	$(MAKE) -C test_certificate_signer
 	$(MAKE) -C certificate_api
-	$(MAKE) -C vc_certification_service
+	$(MAKE) -C vc-certification-service
+	$(MAKE) -C vc-issuer-service
 clean:
 	@rm -rf dockerdeps
