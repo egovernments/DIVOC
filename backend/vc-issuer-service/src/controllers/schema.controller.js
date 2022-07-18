@@ -4,7 +4,7 @@ async function createSchema(req, res) {
     try {
         const schemaAddResponse = await sunbirdRegistryService.createSchema(req.body);
         res.status(200).json({
-            message: "Successfully Inserted Schema",
+            message: "Successfully created Schema",
             schemaAddResponse: schemaAddResponse
         });
     } catch (err) {

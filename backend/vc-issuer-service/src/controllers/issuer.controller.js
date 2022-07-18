@@ -4,7 +4,7 @@ async function createIssuer(req, res) {
     try {
         const issuerAddResponse = await sunbirdRegistryService.createIssuer(req.body);
         res.status(200).json({
-            message: "Successfully Inserted",
+            message: "Successfully created Issuer",
             issuerAddResponse: issuerAddResponse
         });
     } catch (err) {

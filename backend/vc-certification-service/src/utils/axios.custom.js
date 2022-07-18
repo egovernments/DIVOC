@@ -1,11 +1,12 @@
 const axios = require('axios');
+const config = require('../configs/config');
 // const axios = require('axios');
 
 // Step-1: Create a new Axios instance with a custom config.
 // The timeout is set to 10s. If the request takes longer than
 // that then the request will be aborted.
 const customAxios = axios.create({
-    timeout: 10000
+    timeout: config.REQUEST_TIMEOUT
 });
 
 // // Step-2: Create request, response & error handlers

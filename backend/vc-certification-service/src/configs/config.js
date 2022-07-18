@@ -3,7 +3,8 @@ const PORT = process.env.PORT || 7654;
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL;
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'sunbird-rc';
 const JWT_PUBLIC_KEY = process.env.AUTH_PUBLIC_KEY;
-const BASE_URL = process.env.ISSUER_SERVICE_BASE_URL || '/vc-certification/';
+const BASE_URL = process.env.ISSUER_SERVICE_BASE_URL || '/';
+const REQUEST_TIMEOUT = process.env.REQUEST_TIMEOUT || 10000
 
 module.exports = {
     SUNBIRD_REGISTRY_URL,
@@ -11,5 +12,6 @@ module.exports = {
     KEYCLOAK_URL,
     KEYCLOAK_REALM,
     JWT_PUBLIC_KEY,
-    BASE_URL
+    BASE_URL,
+    REQUEST_TIMEOUT
 }

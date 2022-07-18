@@ -1,5 +1,4 @@
 const constants = require('../configs/constants');
-const utils = require("../utils/utils");
 const sunbirdRegistryService = require('../services/sunbird.service')
 
 async function createCertificate(req, res) {
@@ -8,7 +7,7 @@ async function createCertificate(req, res) {
         console.log("EntityType: ", entityType);
         const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType)
         res.status(200).json({
-            message: "Successfully Inserted",
+            message: "Successfully Certified",
             certificateAddResponse: certificateAddResponse
         });
     } catch (err) {
