@@ -1,7 +1,7 @@
 {
-  "name": "vc-certification-service",
+  "name": "vc-management-service",
   "version": "1.0.0",
-  "description": "Verifiable credentials certification service",
+  "description": "Service to manage issuers for Verifiable Credentials",
   "main": "main.js",
   "scripts": {
     "start": "node main.js"

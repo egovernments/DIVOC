@@ -1,16 +1,18 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const certifyConfig = require('./src/configs/config');
+const issuerConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
-let certifyRouter = require('./src/routes/certify.route');
+let issuerRouter = require('./src/routes/issuer.routes');
+let schemaRouter = require('./src/routes/schema.routes');
 
 const app = express();
-const port = certifyConfig.PORT;
+const port = issuerConfig.PORT;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 
-app.use(`${BASE_URL}v1/certify`, certifyRouter);
+app.use(`${BASE_URL}v1/issuer`, issuerRouter);
+app.use(`${BASE_URL}v1/schema`, schemaRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

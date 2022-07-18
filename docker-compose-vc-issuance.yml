@@ -1,0 +1,181 @@
+version: "2.4"
+
+services:
+  # External Dependencies
+  redis:
+    image: redis
+    ports:
+      - "6379:6379"
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=registry
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  clickhouse-server:
+    image: yandex/clickhouse-server
+    ports:
+      - "8123:8123"
+      - "9000:9000"
+  registry:
+    image: dockerhub/sunbird-rc-core:v0.0.8
+    volumes:
+      - ./registry:/home/sunbirdrc/config/public/_schemas
+    environment:
+      - connectionInfo_uri=jdbc:postgresql://db:5432/registry
+      - connectionInfo_username=postgres
+      - connectionInfo_password=postgres
+      - elastic_search_connection_url=es:9200
+      - search_provider=dev.sunbirdrc.registry.service.ElasticSearchService
+      - sunbird_sso_realm=sunbird-rc
+      - sunbird_sso_url=http://keycloak:8080/auth
+      - sunbird_sso_admin_client_id=admin-api
+      - sunbird_sso_client_id=registry-frontend
+      - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
+      - sign_url=http://sunbird-certificate-signer:8079/sign
+      - verify_url=http://sunbird-certificate-signer:8079/verify
+      - signature_enabled=true
+      - pdf_url=http://sunbird-certificate-api:8078/api/v1/certificatePDF
+      - template_base_url=http://registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
+      - sunbird_keycloak_user_set_password=true
+      - filestorage_connection_url=http://file-storage:9000
+      - filestorage_access_key=admin
+      - filestorage_secret_key=12345678
+      - filestorage_bucket_key=issuance
+      - registry_base_apis_enable=false
+      - sunbird_keycloak_user_password=abcd@123
+      - logging.level.root=DEBUG
+      - enable_external_templates=true
+      - authentication_enabled=true
+    ports:
+      - "8081:8081"
+    depends_on:
+      es:
+        condition: service_started
+      db:
+        condition: service_started
+      keycloak:
+        condition: service_started
+  sunbird-certificate-signer:
+    image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
+    environment:
+      - PORT=8079
+    ports:
+      - "6079:8079"
+  sunbird-certificate-api:
+    image: dockerhub/sunbird-rc-certificate-api:v0.0.8
+    volumes:
+      - ./scripts:/scripts
+    entrypoint: ["sh", "/scripts/docker-entrypoint.sh"]
+    environment:
+      - PORT=8078
+    ports:
+      - "6078:8078"
+  file-storage:
+    image: quay.io/minio/minio
+    volumes:
+      - ${HOME}/minio/data:/data
+    environment:
+      - MINIO_ROOT_USER=admin
+      - MINIO_ROOT_PASSWORD=12345678
+    command: server --address 0.0.0.0:9000 --console-address 0.0.0.0:9001 /data
+    ports:
+      - "6000:9000"
+      - "6001:9001"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/live" ]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+  keycloak:
+    image: divoc/keycloak:2.1.0-generic
+    volumes:
+      - ./keycloak:/opt/jboss/keycloak/imports
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: db
+      DB_PORT: 5432
+      DB_DATABASE: registry
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      KEYCLOAK_USER: admin
+      KEYCLOAK_PASSWORD: admin
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      ENABLE_SEND_OTP: $ENABLE_SEND_OTP
+      COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
+      IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
+      KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/src-realm-export.json
+      PROXY_ADDRESS_FORWARDING: true
+    #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
+    healthcheck:
+      test:
+        ["CMD-SHELL", "curl -f http://localhost:9990/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "8080:8080"
+      - "9990:9990"
+    depends_on:
+      db:
+        condition: service_started
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: "2181"
+      ZOOKEEPER_TICK_TIME: "2000"
+  kafka:
+    image: confluentinc/cp-kafka:5.2.5-10
+    depends_on:
+      zookeeper:
+        condition: service_started
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: "1"
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: "INTERNAL://kafka:9092,OUTSIDE://localhost:9094"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "INTERNAL:PLAINTEXT,OUTSIDE:PLAINTEXT"
+      KAFKA_INTER_BROKER_LISTENER_NAME: "INTERNAL"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: "1"
+    healthcheck:
+      test:
+        ["CMD", "kafka-topics", "--list", "--zookeeper", "zookeeper:2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
+  # VC Issuance as a platform
+  vc-certification-service:
+    image: divoc/vc-certification-service
+    ports:
+      - "7654:7654"
+    environment:
+      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      PORT: "7654"
+      KEYCLOAK_URL: "http://keycloak:8080"
+
+  vc-management-service:
+    image: divoc/vc-management-service
+    ports:
+      - "7655:7655"
+    environment:
+      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      PORT: "7655"
+      KEYCLOAK_URL: "http://keycloak:8080"
