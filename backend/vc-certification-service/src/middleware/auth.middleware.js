@@ -1,6 +1,6 @@
 const jwt = require('jsonwebtoken');
-const customAxios = require('../utils/axios.custom');
 const {KeycloakFactory} = require("../services/keycloak.service");
+const axios = require("axios");
 
 async function verifyKeycloakToken(bearerToken) {
     try {
@@ -21,7 +21,7 @@ module.exports = function (req, res, next) {
         req.user = verified;
         console.log("Token is: ", token);
         console.log("Verified: ", verified);
-        customAxios.interceptors.request.use(
+        axios.interceptors.request.use(
             (config) => {
                 config.headers["Authorization"] = token;
                 return config;
