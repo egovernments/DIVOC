@@ -120,7 +120,7 @@ services:
       COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
       KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/src-realm-export.json
-      PROXY_ADDRESS_FORWARDING: true
+      PROXY_ADDRESS_FORWARDING: "true"
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -170,6 +170,9 @@ services:
       SUNBIRD_REGISTRY_URL: "http://registry:8081"
       PORT: "7654"
       KEYCLOAK_URL: "http://keycloak:8080"
+    depends_on:
+      registry:
+        condition: service_started
 
   vc-management-service:
     image: divoc/vc-management-service
@@ -179,3 +182,17 @@ services:
       SUNBIRD_REGISTRY_URL: "http://registry:8081"
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
+    depends_on:
+      registry:
+        condition: service_started
+
+ # Gateway as a Proxy for forwarding ports
+  gateway:
+    image: divoc/gateway
+    ports:
+      - "80:80"
+    depends_on:
+      vc-management-service:
+        condition: service_started
+      vc-certification-service:
+        condition: service_started
