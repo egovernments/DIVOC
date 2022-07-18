@@ -5,6 +5,7 @@ const issuerConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
 let issuerRouter = require('./src/routes/issuer.routes');
 let schemaRouter = require('./src/routes/schema.routes');
+let templateRouter = require('./src/routes/template.routes');
 
 const app = express();
 const port = issuerConfig.PORT;
@@ -13,6 +14,7 @@ app.use((bodyParser.json()));
 
 app.use(`${BASE_URL}v1/issuer`, issuerRouter);
 app.use(`${BASE_URL}v1/schema`, schemaRouter);
+app.use(`${BASE_URL}v1/templates`, templateRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

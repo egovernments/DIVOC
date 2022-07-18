@@ -17,7 +17,19 @@ const createSchema = async (schemaRequest) => {
     })
 }
 
+const uploadTemplate = async(formData, issuer, issuerId, headers) => {
+    const url = constants.SUNBIRD_TEMPLATE_UPLOAD_URL
+                    .replace(':issuerId', issuerId)
+                    .replace(':issuerName', issuer);
+    return customAxios.post(url, formData, headers)
+            .then(res => res.data)
+            .catch(error => {
+                console.log(error);
+            });
+}
+
 module.exports = {
     createIssuer,
-    createSchema
+    createSchema,
+    uploadTemplate
 }
