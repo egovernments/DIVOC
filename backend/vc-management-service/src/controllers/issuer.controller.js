@@ -9,8 +9,9 @@ async function createIssuer(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.statusCode = err.response.status;
-        return JSON.stringify(err.response.data);
+        res.status(500).json({
+            message: err
+        });
     }
 }
 
