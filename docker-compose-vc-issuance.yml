@@ -171,8 +171,8 @@ services:
       PORT: "7654"
       KEYCLOAK_URL: "http://keycloak:8080"
 
-  vc-issuer-service:
-    image: divoc/vc-issuer-service
+  vc-management-service:
+    image: divoc/vc-management-service
     ports:
       - "7655:7655"
     environment:
