@@ -4,11 +4,10 @@ const FormData = require('form-data');
 async function uploadTemplate(req, res) {
     try {
         const formData = getFormData(req);
-        const header = getHeaders(formData);
         const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
             formData,
             req.params.issuer,
-            header
+            req.header('Authorization')
         );
         console.log('Successfully uploaded template');
         res.status(200).json({
@@ -20,14 +19,6 @@ async function uploadTemplate(req, res) {
         res.statusCode = err.response.status;
         return JSON.stringify(err.response.data);
     }
-}
-
-function getHeaders(formData) {
-    return {
-        headers: {
-            ...formData.getHeaders()
-        }
-    };
 }
 
 function getFormData(req) {
