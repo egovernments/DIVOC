@@ -65,8 +65,7 @@ services:
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
       COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
-      KEYCLOAK_IMPORT: /opt/jboss/keycloak/imports/realm-export.json
-      PROXY_ADDRESS_FORWARDING: true
+      PROXY_ADDRESS_FORWARDING: "true"
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:

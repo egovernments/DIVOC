@@ -2,6 +2,7 @@ const axios = require('axios');
 
 const constants = require('../configs/constants');
 const customAxios = require('../utils/axios.custom');
+const config = require('../configs/config');
 
 const createIssuer = async (issuerRequest) => {
     return axios.post(constants.SUNBIRD_ISSUER_INVITE_URL, issuerRequest).then((res) => {
@@ -17,7 +18,8 @@ const createSchema = async (schemaRequest) => {
     })
 }
 
-const uploadTemplate = async(formData, issuer, issuerId, headers) => {
+const uploadTemplate = async(formData, issuer, headers) => {
+    const issuerId = await getIssuerId();
     const url = constants.SUNBIRD_TEMPLATE_UPLOAD_URL
                     .replace(':issuerId', issuerId)
                     .replace(':issuerName', issuer);
@@ -28,8 +30,19 @@ const uploadTemplate = async(formData, issuer, issuerId, headers) => {
             });
 }
 
+const getIssuerId = async() => {
+    const url = config.SUNBIRD_REGISTRY_URL + "/api/v1/Issuer"
+    return customAxios.get(url)
+            .then(res => {
+                return res.data[0].osid.substring(2);
+            })
+            .catch(error => {
+                console.error('ERROR : ' + error);
+            });
+}
+
 module.exports = {
     createIssuer,
     createSchema,
-    uploadTemplate
+    uploadTemplate,
 }

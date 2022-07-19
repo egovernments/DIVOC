@@ -8,7 +8,6 @@ async function uploadTemplate(req, res) {
         const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
             formData,
             req.params.issuer,
-            req.params.issuerId,
             header
         );
         console.log('Successfully uploaded template');
