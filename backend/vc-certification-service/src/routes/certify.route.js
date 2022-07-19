@@ -4,6 +4,7 @@ const certificateController = require('../controllers/certificate.controller');
 
 const router = express.Router();
 
-router.post(`/:entityType`, authMiddleware, certificateController.createCertificate)
+router.post(`/certify/:entityType`, authMiddleware, certificateController.createCertificate)
+router.get(`/downloadCertificate/:entityName/:certificateId`, authMiddleware, certificateController.getCertificate)
 
 module.exports = router;
