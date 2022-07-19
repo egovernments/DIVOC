@@ -21,15 +21,21 @@ const createSchema = async (schemaRequest, token) => {
 
 const uploadTemplate = async(formData, issuer, token) => {
     const headers = getHeaders(formData, token);
-    const issuerId = await getIssuerId(token);
-    const url = constants.SUNBIRD_TEMPLATE_UPLOAD_URL
-                    .replace(':issuerId', issuerId)
-                    .replace(':issuerName', issuer);
-    return axios.post(url, formData, headers)
+    try {
+        const issuerId = await getIssuerId(token);
+        let url = constants.SUNBIRD_TEMPLATE_UPLOAD_URL
+                    .replace(':issuerName', issuer)
+                    .replace(':issuerId', issuerId);
+        return axios.post(url, formData, headers)
             .then(res => res.data)
             .catch(error => {
-                console.log(error);
+                console.error(error);
+                return error;
             });
+    } catch(err) {
+        console.error(err);
+        throw err;
+    }
 }
 
 
@@ -46,10 +52,15 @@ const getIssuerId = async(token) => {
     const url = config.SUNBIRD_REGISTRY_URL + "/api/v1/Issuer"
     return axios.get(url, {headers: {Authorization: token}})
             .then(res => {
-                return res.data[0].osid.substring(2);
+                try {
+                    return res.data[0].osid.substring(2);
+                } catch(err) {
+                    throw new axios.AxiosError("Some error in uploading template", "BAD_REQUEST", undefined, null, {status: 400});
+                }
             })
             .catch(error => {
-                console.error('ERROR : ' + error);
+                console.error('ERROR : ', error);
+                throw error;
             });
 }
 
