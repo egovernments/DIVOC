@@ -1,9 +1,13 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs')
 
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
 let certifyRouter = require('./src/routes/certify.route');
+
+const swaggerDocument = yaml.load('./certification-service-swagger.yml');
 
 const app = express();
 const port = certifyConfig.PORT;
@@ -11,6 +15,12 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 
 app.use(`${BASE_URL}v1/certify`, certifyRouter);
+
+app.use(
+    `${BASE_URL}api-docs`,
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerDocument)
+);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
