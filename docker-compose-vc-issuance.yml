@@ -185,7 +185,7 @@ services:
     depends_on:
       registry:
         condition: service_started
-      
+
  # Gateway as a Proxy for forwarding ports
   gateway:
     image: divoc/gateway
