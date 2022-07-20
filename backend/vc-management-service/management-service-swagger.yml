@@ -1,0 +1,155 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: VC Management
+  description: verifiable credentials management service
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/issuer:
+    post:
+      tags:
+        - issuerInvite
+      summary: Invite a new issuer
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: issuerInvite
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/InviteIssuerRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/IssuerInviteSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/schema:
+    post:
+      tags:
+        - schema
+      summary: Add a new schema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: schemaV1
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AddSchemaRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SchemaSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  AddSchemaRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      schema:
+        type: string
+        minLength: 1
+    required:
+      - name
+      - schema
+  SchemaSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      schemaAddResponse:
+        type: object
+        properties:
+          result:
+            type: object
+            properties:
+              Schema:
+                type: object
+                properties:
+                  osid:
+                    type: string
+  IssuerInviteSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+  InviteIssuerRequest:
+    type: object
+    properties:
+      contactDetails:
+        type: object
+        properties:
+          name:
+            type: string
+          email:
+            type: string
+          mobile:
+            type: string
+      schemas:
+        type: array
+        items:
+          type: string
+      accountDetails:
+        type: object
+        properties:
+          userId:
+            type: string
+        required:
+          - userId
+      websiteUrl:
+        type: string
+      logoUrl:
+        type: string
+      name:
+        type: string
+      sectorType:
+        type: string
+    required:
+      - accountDetails
+      - name
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /vc-management/
