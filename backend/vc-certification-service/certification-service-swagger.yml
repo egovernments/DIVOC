@@ -8,6 +8,43 @@ consumes:
 produces:
   - application/json
 paths:
+  '/v1/certificate/{entityType}':
+    get:
+      operationId: certificate
+      parameters:
+        - in: path
+          name: entityName
+          required: true
+          type: string
+        - in: path
+          name: certificateId
+          required: true
+          type: string
+      produces:
+        - application/pdf
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+            application/pdf:
+              schema:
+                type: file
+          description: OK
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - Bearer: [ ]
+      summary: Creates certficate for the requested entity and certificate ID
+      tags:
+        - certificate
   /v1/certify/{entityType}:
     post:
       tags:

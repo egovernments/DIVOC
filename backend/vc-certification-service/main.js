@@ -5,7 +5,7 @@ const yaml = require('yamljs')
 
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
-let certifyRouter = require('./src/routes/certify.route');
+let certifyRouter = require('./src/routes/certificate.route');
 
 const swaggerDocument = yaml.load('./certification-service-swagger.yml');
 
@@ -14,7 +14,7 @@ const port = certifyConfig.PORT;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 
-app.use(`${BASE_URL}v1/certify`, certifyRouter);
+app.use(`${BASE_URL}v1`, certifyRouter);
 
 app.use(
     `${BASE_URL}api-docs`,
