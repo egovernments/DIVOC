@@ -6,6 +6,7 @@ const issuerConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
 let issuerRouter = require('./src/routes/issuer.routes');
 let schemaRouter = require('./src/routes/schema.routes');
+let templateRouter = require('./src/routes/template.routes');
 
 const swaggerDocument = yaml.load('./management-service-swagger.yml');
 
@@ -16,6 +17,7 @@ app.use((bodyParser.json()));
 
 app.use(`${BASE_URL}v1/issuer`, issuerRouter);
 app.use(`${BASE_URL}v1/schema`, schemaRouter);
+app.use(`${BASE_URL}v1/templates`, templateRouter);
 
 app.use(
     `${BASE_URL}api-docs`,
