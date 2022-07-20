@@ -74,6 +74,38 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+    /v1/templates/:issuer:
+      post:
+        tags:
+          - upload template
+        summary: Upload a templated
+        consumes:
+          - multipart/form-data
+        produces:
+          - application/json
+        operationId: templatesV1
+        parameters:
+          - in: formData
+            name: files
+            type: file
+            required: true
+        responses:
+          '200':
+            description: OK
+            schema:
+              $ref: '#/definitions/UploadTemplateSuccess'
+          '400':
+            description: Invalid input
+            schema:
+              $ref: '#/definitions/Error'
+          '401':
+            description: Unauthorized
+            schema:
+              $ref: '#/definitions/Error'
+          '500':
+            description: Internal server error
+            schema:
+              $ref: '#/definitions/Error'
 definitions:
   AddSchemaRequest:
     type: object
@@ -142,6 +174,20 @@ definitions:
     required:
       - accountDetails
       - name
+  UploadTemplateSuccess:
+    type: object
+    properties:
+      uploadTemplateResponse: 
+        type: object
+        properties:
+          documentLocations: 
+            type: array
+            items:
+              type: string
+          errors: 
+            type: array
+            items:
+              type: string
   Error:
     type: object
     properties:

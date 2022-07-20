@@ -1,5 +1,5 @@
 const sunbirdRegistryService = require('../services/sunbird.service');
-const {getFormData, isValid} = require('../services/utils');
+const {getFormData, isValid} = require('../utils/utils');
 
 async function uploadTemplate(req, res) {
     try {
@@ -18,7 +18,7 @@ async function uploadTemplate(req, res) {
             });
             return;
         }
-        res.status(500).json({
+        res.status(400).json({
             message: "Issuer invalid"
         })
     } catch(err) {
