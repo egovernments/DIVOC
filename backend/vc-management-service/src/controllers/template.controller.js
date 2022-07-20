@@ -24,7 +24,7 @@ async function uploadTemplate(req, res) {
     } catch(err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({
-            message: err?.message || err
+            message: err?.response?.data || err
         });
     }
 }
