@@ -1,10 +1,10 @@
 const sunbirdRegistryService = require('../services/sunbird.service');
-const {getFormData, isValid} = require('../utils/utils');
+const {getFormData, isValidIssuerName} = require('../utils/utils');
 
 async function uploadTemplate(req, res) {
     try {
         const formData = getFormData(req);
-        const isValidIssuer = isValid(req.params.issuer);
+        const isValidIssuer = isValidIssuerName(req.params.issuer);
         if(isValidIssuer) {
             const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
                 formData,

@@ -13,7 +13,7 @@ function getFormData(req) {
     return formData;
 }
 
-function isValid(val) {
+function isValidIssuerName(val) {
     const regex = /^[a-zA-Z]*$/
     return val !== "" && regex.test(val);
 }
@@ -21,5 +21,5 @@ function isValid(val) {
 module.exports = {
     validateUserId,
     getFormData,
-    isValid
+    isValidIssuerName
 }
