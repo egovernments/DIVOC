@@ -3,7 +3,7 @@ const bodyParser = require('body-parser');
 
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
-let certifyRouter = require('./src/routes/certify.route');
+let certifyRouter = require('./src/routes/certificate.route');
 
 const app = express();
 const port = certifyConfig.PORT;

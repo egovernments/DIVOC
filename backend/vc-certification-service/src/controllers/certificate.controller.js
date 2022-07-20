@@ -6,7 +6,6 @@ async function createCertificate(req, res) {
         const token = req.header("Authorization");
         console.log("EntityType: ", entityType);
         const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token)
-        console.log("certificateAddResponse: ", certificateAddResponse);
         res.status(200).json({
             message: "Successfully Certified",
             certificateAddResponse: certificateAddResponse
@@ -25,8 +24,6 @@ async function getCertificate(req, res) {
         const certificateId = req.params.certificateId;
         const outputType = req.header("Accept");
         const token = req.header("Authorization");
-
-        console.log("certificateId: ", certificateId, " entityName:", entityName);
         const certificateDownloadResponse = await sunbirdRegistryService.getCertificate(entityName, certificateId, outputType, token);
         res.setHeader("content-type", outputType);
         res.status(200).send(certificateDownloadResponse);

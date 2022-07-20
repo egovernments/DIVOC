@@ -18,8 +18,7 @@ module.exports = function (req, res, next) {
     try {
         const verified = verifyKeycloakToken(token);
         req.user = verified;
-        console.log("Token is: ", token);
-        console.log("Verified: ", verified);
+        console.log("token is verified");
         next();
     } catch (err) {
         console.error("Error in verifying token: ", err);
