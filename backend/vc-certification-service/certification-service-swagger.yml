@@ -1,0 +1,75 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: VC certification
+  description: verifiable credentials certification service
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/certify/{entityType}:
+    post:
+      tags:
+        - certification
+      summary: Certify event of given entityType
+      operationId: certifyVC
+      parameters:
+        - name: entityType
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CertificationSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  CertificationSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      certificateAddResponse:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              msgid:
+                type: string
+              status:
+                type: string
+          result:
+            type: object
+            properties:
+              osid:
+                type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /vc-certification/
