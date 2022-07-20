@@ -62,7 +62,7 @@ services:
       - logging.level.root=DEBUG
       - enable_external_templates=true
       - authentication_enabled=true
-      - async_enabled=true
+      - async_enabled=$ASYNC_ENABLED
       - kafka_bootstrap_address=kafka:9092
     ports:
       - "8081:8081"
