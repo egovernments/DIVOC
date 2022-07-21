@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "title":"common",
+  "definitions": {
+    "@type": {
+      "type": "string"
+    },
+    "Gender": {
+      "type": "string",
+      "enum": [
+        "MALE",
+        "FEMALE",
+        "OTHER"
+      ]
+    },
+    "Date": {
+      "type": "string",
+      "format": "date",
+      "$comment": "YYYY-MM-DD format",
+      "examples": [
+        "1990-12-01"
+      ]
+    },
+    "Year": {
+      "type": "string",
+      "pattern": "(^[0-9]{4}$)"
+    },
+    "YesNoCode": {
+      "type": "string",
+      "enum": [
+        "YesNoCode-YES",
+        "YesNoCode-NO"
+      ]
+    },
+    "Address": {
+      "type": "object",
+      "title": "Address",
+      "description": "Indian address format",
+      "examples": [{
+        "addressLine1": "no. 23, some lane, some road",
+        "addressLine2": "some nagar",
+        "district": "bangalore south",
+        "state": "Karnataka",
+        "pincode": "560000"
+      }],
+      "required": [
+        "addressLine1",
+        "district",
+        "state",
+        "pincode"
+      ],
+      "properties": {
+        "addressLine1": {
+          "$id": "#/properties/address/properties/addressLine1",
+          "type": "string",
+          "title": "The address line 1",
+          "description": "Address line 1"
+        },
+        "addressLine2": {
+          "$id": "#/properties/address/properties/addressLine2",
+          "type": "string",
+          "title": "The address2 schema"
+        },
+        "district": {
+          "$id": "#/properties/address/properties/district",
+          "type": "string",
+          "title": "The district schema"
+        },
+        "pincode": {
+          "$id": "#/properties/address/properties/pincode",
+          "type": "string",
+          "title": "The pincode schema"
+        },
+        "state": {
+          "$id": "#/properties/address/properties/state",
+          "type": "string",
+          "title": "The state schema",
+          "description": "State of address",
+          "examples": [
+            "Karnataka"
+          ]
+        }
+      }
+    }
+  }
+}

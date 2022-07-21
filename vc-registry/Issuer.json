@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "Issuer": {
+      "$ref": "#/definitions/Issuer"
+    }
+  },
+  "required": [
+    "Issuer"
+  ],
+  "title":"Issuer",
+  "definitions": {
+    "Issuer": {
+      "$id": "#/properties/Issuer",
+      "type": "object",
+      "title": "Issuer",
+      "required": [
+
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Issuer/Organisation Name"
+        },
+        "sectorType": {
+          "type": "string",
+          "enum": [
+            "Education"
+          ],
+          "title": "Sector Type"
+        },
+        "logoUrl": {
+          "type": "string",
+          "title": "Logo url"
+        },
+        "websiteUrl": {
+          "type": "string",
+          "title": "Website url"
+        },
+        "accountDetails": {
+          "$ref": "#/definitions/AccountDetails"
+        },
+        "contactDetails": {
+          "$ref": "#/definitions/ContactDetails"
+        },
+        "schemas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "documentType": {
+                "type": "string"
+              },
+              "schemaOsid": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ContactDetails": {
+      "type": "object",
+      "description": "Enter administrator details",
+      "title": "Contact Details",
+      "properties": {
+        "name": {
+          "type": "string",
+          "title": "Contact Name"
+        },
+        "mobile": {
+          "type": "string",
+          "title": "Mobile number"
+        },
+        "email": {
+          "type": "string",
+          "title": "Email ID"
+        }
+      }
+    },
+    "AccountDetails": {
+      "description": "Enter Email id or Phone number that you would use for login",
+      "title": "Account Details",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "title": "Email Id or Mobile number"
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "osComment": [],
+    "privateFields": [],
+    "signedFields": [],
+    "indexFields": [],
+    "uniqueIndexFields": [],
+    "systemFields": [
+      "osCreatedAt",
+      "osUpdatedAt",
+      "osCreatedBy",
+      "osUpdatedBy"
+    ],
+    "roles": ["anonymous"],
+    "inviteRoles": ["anonymous"],
+    "ownershipAttributes": [
+      {
+        "email": "/accountDetails/userId",
+        "mobile": "/accountDetails/userId",
+        "userId": "/accountDetails/userId"
+      }
+    ]
+  }
+}
