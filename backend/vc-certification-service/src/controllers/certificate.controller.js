@@ -22,11 +22,8 @@ async function getCertificate(req, res) {
     try {
         const entityName = req.params.entityName;
         const certificateId = req.params.certificateId;
-        const outputType = req.header("Accept");
-        const token = req.header("Authorization");
-        const certificateDownloadResponse = await sunbirdRegistryService.getCertificate(entityName, certificateId, outputType, token);
-        res.setHeader("content-type", outputType);
-        res.status(200).send(certificateDownloadResponse);
+        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateId, req.headers);
+        data.pipe(res);
     } catch (err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({
