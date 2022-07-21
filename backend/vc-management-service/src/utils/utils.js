@@ -1,10 +1,8 @@
 const FormData = require('form-data');
 
-function validateUserId(userId) {
+function isValidUserId(userId) {
     let userIdRegex = new RegExp("^[a-zA-Z0-9][a-zA-Z0-9.-_@]+$")
-    if (!userIdRegex.test(userId)) {
-        throw "Invalid userId. It must start with an alphabet or a number and can only contain .-_@";
-    }
+    return userId && userIdRegex.test(userId)
 }
 
 function getFormData(req) {
@@ -19,7 +17,7 @@ function isValidIssuerName(val) {
 }
 
 module.exports = {
-    validateUserId,
+    isValidUserId,
     getFormData,
     isValidIssuerName
 }

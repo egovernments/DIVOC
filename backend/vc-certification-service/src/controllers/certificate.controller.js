@@ -12,8 +12,8 @@ async function createCertificate(req, res) {
         });
     } catch (err) {
         console.error(err);
-        res.status(500).json({
-            message: err
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
         });
     }
 }
@@ -29,7 +29,7 @@ async function getCertificate(req, res) {
         res.status(200).send(certificateDownloadResponse);
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        res.status(err?.response?.status || 500).json({
             message: err
         });
     }
