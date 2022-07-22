@@ -8,7 +8,7 @@ consumes:
 produces:
   - application/json
 paths:
-  '/v1/certificate/{entityType}':
+  '/v1/certificate/{entityType}/{certificateId}':
     get:
       operationId: certificate
       parameters:

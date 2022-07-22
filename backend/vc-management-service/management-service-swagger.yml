@@ -74,6 +74,43 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/schema/{schemaId}:
+    put:
+      tags:
+        - schemaUpdate
+      summary: Update a schema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: updateSchemaV1
+      parameters:
+        - in: path
+          name: schemaId
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateSchemaRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateSchemaSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
   /v1/templates/:issuer:
     post:
       tags:
@@ -119,6 +156,31 @@ definitions:
     required:
       - name
       - schema
+  UpdateSchemaRequest:
+    type: object
+    properties:
+      schema:
+        type: string
+        minLength: 1
+    required:
+      - schema
+  UpdateSchemaSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      schemaUpdateResponse:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              msgid:
+                type: string
+              status:
+                type: string
+          responseCode:
+            type: string
   SchemaSuccess:
     type: object
     properties:
