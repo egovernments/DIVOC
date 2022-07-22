@@ -53,11 +53,9 @@ test('should call get api to get certificate', async() => {
     axios.get.mockImplementation((url, headers) => Promise.resolve(response));
     const entityName = 'TrainingCertificate';
     const certificateId = '1';
-    const outputType = 'pdf';
-    const token = 'abc';
-    const actualResponse = await sunbirdService.getCertificate(entityName, certificateId, outputType, token);
-    expect(axios.get).toHaveBeenCalledWith('/api/v1/TrainingCertificate/1', {headers: {Accept: 'pdf', Authorization: 'abc'}});
-    expect(actualResponse).toEqual(response.data);
+    const actualResponse = await sunbirdService.getCertificate(entityName, certificateId, {});
+    expect(axios.get).toHaveBeenCalledWith('/api/v1/TrainingCertificate/1', {responseType: 'stream', headers: {}});
+    expect(actualResponse).toEqual(response);
 });
 
 test('put api should throw error while updating certificate', async() => {

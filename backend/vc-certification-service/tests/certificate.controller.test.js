@@ -70,7 +70,8 @@ test('should call sunbird rc to get certificate', async() => {
         body: {
             name: 'Dummy'
         },
-        header: jest.fn().mockReturnValue('1'),
+        headers: {
+        },
     }
     const res = {
         send: function(){},
@@ -83,7 +84,7 @@ test('should call sunbird rc to get certificate', async() => {
         setHeader: function(h, v) {}
     };
     certificateController.getCertificate(req, res);
-    expect(sunbirdRegistryService.getCertificate).toHaveBeenCalledWith('Dummy', '1', '1', '1')
+    expect(sunbirdRegistryService.getCertificate).toHaveBeenCalledWith('Dummy', '1', {})
 });
 
 test('update certificate should throw error', async() => {
