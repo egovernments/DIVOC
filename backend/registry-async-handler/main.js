@@ -6,30 +6,28 @@ async function init_handler(conf){
         clientId: 'async-handler',
         brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
     });
-    init_postCreateEntity_consumer();
+    init_postCreateEntity_consumer(conf,kafka);
 }
 
-async function init_postCreateEntity_consumer(){
+async function init_postCreateEntity_consumer(conf,kafka){
     console.log("post create entity");
+    const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout: conf.KAFKA_CONSUMER_SESSION_TIMEOUT });
     await consumer.connect();
-    const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
-
     
     await consumer.subscribe({topic: conf.POST_CREATE_ENTITY_TOPIC, fromBeginning: true});
-    const entityType = conf.ENTITY_TYPE;
+    const entityType = conf.OSID_ENTITY_TYPE;
     await consumer.run({
-    eachMessage: async ({topic, partition, message}) => {
-      console.log({
-        value: message.value.toString(),
-      });
-      try{
-        const certificateOsidMapResponse = await  axios.post(`${conf.SUNBIRD_CERTIFICATE_URL}${entityType}`, JSON.parse(message.value.toString()),
-        {headers: {Authorization: conf.token}});
-        console.log("certificateOsidMapResponse: ",certificateOsidMapResponse);
-      } catch (err){
+    eachMessage: async ({ message}) => {
+      const certificateOsidMessage = JSON.parse(message.value.toString());
+      console.log( {entitytype: certificateOsidMessage.entityType});
+      if(certificateOsidMessage.entityType == conf.CERTIFICATE_ENTITY_TYPE){
+        try{
+          const certificateOsidMapResponse = await  axios.post(`${conf.SUNBIRD_CERTIFICATE_URL}${entityType}`, JSON.parse(message.value.toString()),
+          {headers: {Authorization: conf.AUTHORISATION_TOKEN}});
+        } catch (err){
           console.error(err);
+        }
       }
-
       }
     });
 };
