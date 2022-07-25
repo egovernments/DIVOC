@@ -9,15 +9,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/egovernments/DIVOC/tree/main/backend/registry_async_handler"
+    "url": "https://github.com/egovernments/DIVOC/tree/vc-issuance-platform/backend/registry-async-handler"
   },
   "author": "divoc",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "axios": "^0.21.1",
-    "kafkajs": "^1.15.0"
+    "axios": "^0.27.2",
+    "kafkajs": "^2.1.0"
   },
   "devDependencies": {
-    "jest": "^26.6.3"
+    "jest": "^28.1.3"
   }
 }

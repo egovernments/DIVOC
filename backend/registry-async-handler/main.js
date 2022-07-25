@@ -1,36 +1,37 @@
 const {Kafka} = require('kafkajs');
-const axios = require("axios");
+const sunbirdRegistryService = require('./src/services/sunbird.service');
+const config = require('./src/configs/config');
 
-async function init_handler(conf){
-    const kafka = new Kafka({
-        clientId: 'async-handler',
-        brokers: conf.KAFKA_BOOTSTRAP_SERVER.split(",")
-    });
-    init_postCreateEntity_consumer(conf,kafka);
-}
+console.log("registry async handler");
+const kafka = new Kafka({
+    clientId: 'registry-async-handler',
+    brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
+});
+const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 
-async function init_postCreateEntity_consumer(conf,kafka){
-    console.log("post create entity");
-    const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout: conf.KAFKA_CONSUMER_SESSION_TIMEOUT });
+(async function (){
     await consumer.connect();
+    await consumer.subscribe({topic: config.POST_CREATE_ENTITY_TOPIC, fromBeginning: true});
     
-    await consumer.subscribe({topic: conf.POST_CREATE_ENTITY_TOPIC, fromBeginning: true});
-    const entityType = conf.OSID_ENTITY_TYPE;
+    console.log("Stored Entity type: ", config.STORED_ENTITY_TYPE);
+    console.log("Transaction Entity type: ", config.TRANSACTION_ENTITY_TYPE);
+
     await consumer.run({
-    eachMessage: async ({ message}) => {
-      const certificateOsidMessage = JSON.parse(message.value.toString());
-      console.log( {entitytype: certificateOsidMessage.entityType});
-      if(certificateOsidMessage.entityType == conf.CERTIFICATE_ENTITY_TYPE){
-        try{
-          const certificateOsidMapResponse = await  axios.post(`${conf.SUNBIRD_CERTIFICATE_URL}${entityType}`, JSON.parse(message.value.toString()),
-          {headers: {Authorization: conf.AUTHORISATION_TOKEN}});
-        } catch (err){
-          console.error(err);
+      eachMessage: async ({message}) => {
+        const postCreateEntityMessage = JSON.parse(message.value.toString());
+        if(postCreateEntityMessage.entityType == config.TRANSACTION_ENTITY_TYPE){
+          console.log({ entityMessage : postCreateEntityMessage});
+          try{
+            const transactionResponse = await sunbirdRegistryService.addTransaction(postCreateEntityMessage,config.STORED_ENTITY_TYPE);
+            if(transactionResponse?.status == 200){
+              console.log("Successfully added Transaction to: ",config.STORED_ENTITY_TYPE);
+            }else{
+              console.log("Failed to add Transaction", transactionResponse);
+            }
+          }catch(err){
+            console.error("Error in adding transaction",err);
+          }
         }
       }
-      }
     });
-};
-module.exports = {
-  init_handler
-};
+})();
