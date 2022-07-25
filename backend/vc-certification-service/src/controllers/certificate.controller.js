@@ -34,7 +34,7 @@ async function getCertificate(req, res) {
 
 async function updateCertificate(req, res) {
     const entityName = req.params.entityName;
-    const entityId = req.params.entityId;
+    const entityId = req.params.certificateId;
     const token = req.header("Authorization");
     try {
         const certificateUpdateResponse = await sunbirdRegistryService.updateCertificate(req.body, entityName, entityId, token);

@@ -17,7 +17,7 @@ test('should call sunbird rc to update certificate', async() => {
     const req = {
         params: {
             entityName: 'Dummy',
-            entityId: '1'
+            certificateId: '1'
         },
         body: {
             name: 'Dummy'
