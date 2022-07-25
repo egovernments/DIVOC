@@ -7,6 +7,14 @@ consumes:
   - application/json
 produces:
   - application/json
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
 paths:
   '/v1/certificate/{entityType}':
     get:
@@ -78,6 +86,45 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/certify/{entityName}/{entityId}:
+    put:
+      tags:
+        - update certificate
+      summary: Update certificate of given entityName and entityType
+      operation: updateCertificate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityName
+          in: path
+          required: true
+          type: string
+        - name: entityId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CertificationSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   CertificationSuccess:
     type: object
@@ -109,4 +156,5 @@ definitions:
 host: divoc.xiv.in
 schemes:
   - https
-basePath: /vc-certification/
+servers:
+  - url: /vc-certification

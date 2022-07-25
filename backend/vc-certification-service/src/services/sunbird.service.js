@@ -21,7 +21,19 @@ const getCertificate = (entityName, certificateId, headers) => {
 
 };
 
+const updateCertificate = (certificateRequestBody, entityName, entityId, token) => {
+    return axios.put(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
+                    certificateRequestBody,
+                    {headers: {Authorization: token}}
+        ).then(res => res.data)
+        .catch(err => {
+            console.error("Error in updating certificate : ", err);
+            throw err;
+        });
+}
+
 module.exports = {
     createCertificate,
-    getCertificate
+    getCertificate,
+    updateCertificate
 }
