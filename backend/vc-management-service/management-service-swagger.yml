@@ -111,6 +111,80 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/schema/{schemaId}/updateTemplateUrl:
+    put:
+      tags:
+        - templateUpdateInSchema
+      summary: Update certificate template URLs in schema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: updateTemplateUrlV1
+      parameters:
+        - in: path
+          name: schemaId
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateUrlRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /v1/schema/{schemaId}/updateTemplate:
+    put:
+      tags:
+        - uploadtemplateUpdateSchema
+      summary: Upload a template and update schema
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: updateTemplateV1
+      parameters:
+        - in: query
+          name: template-key
+          type: string
+          default: 'html'
+        - in: formData
+          name: files
+          type: file
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
   /v1/templates/:issuer:
     post:
       tags:
@@ -164,12 +238,31 @@ definitions:
         minLength: 1
     required:
       - schema
+  UpdateSchemaTemplateUrlRequest:
+    type: object
   UpdateSchemaSuccess:
     type: object
     properties:
       message:
         type: string
       schemaUpdateResponse:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              msgid:
+                type: string
+              status:
+                type: string
+          responseCode:
+            type: string
+  UpdateSchemaTemplateSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      templateUpdateResponse:
         type: object
         properties:
           params:
