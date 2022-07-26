@@ -31,6 +31,16 @@ const updateSchema = async (schemaRequest, token, schemaId) => {
     });
 }
 
+const getSchema = async (token, schemaId) => {
+    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId)
+    return axios.get(url, { headers: {Authorization: token}}).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
 const uploadTemplate = async(formData, issuer, token) => {
     const headers = getHeaders(formData, token);
     try {
@@ -80,5 +90,6 @@ module.exports = {
     createIssuer,
     createSchema,
     uploadTemplate,
-    updateSchema
+    updateSchema,
+    getSchema
 }
