@@ -48,17 +48,8 @@ async function updateTemplate(req, res) {
             token
         );
         const uploadUrl = MINIO_URL_SCHEME + uploadTemplateResponse?.documentLocations[0];
-        const getSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
-        let schema = JSON.parse(getSchemaResponse?.schema);
-        if (schema?._osConfig) {
-            if (!schema._osConfig.certificateTemplates) {
-                schema._osConfig.certificateTemplates = {};
-            }
-            schema._osConfig.certificateTemplates[templateKey] = uploadUrl;
-        }
-        const schemaString = JSON.stringify(schema);
-        const updateSchemaRequestBody = {"schema": schemaString}
-        const templateUpdateResponse = await sunbirdRegistryService.updateSchema(updateSchemaRequestBody, token, schemaId);
+        let urlUpdates = {[templateKey]: uploadUrl};
+        const templateUpdateResponse = await updateSchemaTemplateUrls(urlUpdates, schemaId, token);
         res.status(200).json({
             message: "Successfully updated Schema",
             templateUpdateResponse: templateUpdateResponse
@@ -76,19 +67,7 @@ async function updateTemplateUrls(req, res) {
         const schemaId = req.params.schemaId;
         const token = req.header("Authorization");
         const urlUpdates = req.body;
-        const getSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
-        let schema = JSON.parse(getSchemaResponse?.schema);
-        if (schema?._osConfig) {
-            if (!schema._osConfig.certificateTemplates) {
-                schema._osConfig.certificateTemplates = {};
-            }
-            for (const key in urlUpdates) {
-                schema._osConfig.certificateTemplates[key] = urlUpdates[key];
-            }
-        }
-        const schemaString = JSON.stringify(schema);
-        const updateSchemaRequestBody = {"schema": schemaString};
-        const templateUpdateResponse = await sunbirdRegistryService.updateSchema(updateSchemaRequestBody, token, schemaId);
+        const templateUpdateResponse = await updateSchemaTemplateUrls(urlUpdates, schemaId, token);
         res.status(200).json({
             message: "Successfully updated Schema with template URLs",
             templateUpdateResponse: templateUpdateResponse
@@ -99,6 +78,22 @@ async function updateTemplateUrls(req, res) {
             message: err?.response?.data
         });
     }
+}
+
+async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
+    const getSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+    let schema = JSON.parse(getSchemaResponse?.schema);
+    if (schema?._osConfig) {
+        if (!schema._osConfig.certificateTemplates) {
+            schema._osConfig.certificateTemplates = {};
+        }
+        for (const key in urlMap) {
+            schema._osConfig.certificateTemplates[key] = urlMap[key];
+        }
+    }
+    const schemaString = JSON.stringify(schema);
+    const updateSchemaRequestBody = {"schema": schemaString};
+    return await sunbirdRegistryService.updateSchema(updateSchemaRequestBody, token, schemaId);
 }
 
 module.exports = {
