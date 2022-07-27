@@ -32,10 +32,10 @@ services:
     ports:
       - "8123:8123"
       - "9000:9000"
-  registry:
+  vc-registry:
     image: dockerhub/sunbird-rc-core:v0.0.8
     volumes:
-      - ./registry:/home/sunbirdrc/config/public/_schemas
+      - ./vc-registry:/home/sunbirdrc/config/public/_schemas
     environment:
       - connectionInfo_uri=jdbc:postgresql://db:5432/registry
       - connectionInfo_username=postgres
@@ -51,7 +51,7 @@ services:
       - verify_url=http://sunbird-certificate-signer:8079/verify
       - signature_enabled=true
       - pdf_url=http://sunbird-certificate-api:8078/api/v1/certificatePDF
-      - template_base_url=http://registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
+      - template_base_url=http://vc-registry:8081/api/v1/templates/ #Looks for certificate templates for pdf copy of the signed certificate
       - sunbird_keycloak_user_set_password=true
       - filestorage_connection_url=http://file-storage:9000
       - filestorage_access_key=admin
@@ -169,11 +169,11 @@ services:
     ports:
       - "7654:7654"
     environment:
-      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       PORT: "7654"
       KEYCLOAK_URL: "http://keycloak:8080"
     depends_on:
-      registry:
+      vc-registry:
         condition: service_started
 
   vc-management-service:
@@ -181,12 +181,12 @@ services:
     ports:
       - "7655:7655"
     environment:
-      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
       STORED_ENTITY_TYPE: 'TransactionOsidMap'
     depends_on:
-      registry:
+      vc-registry:
         condition: service_started
 
  # Gateway as a Proxy for forwarding ports

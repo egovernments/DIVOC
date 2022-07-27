@@ -21,6 +21,26 @@ const createSchema = async (schemaRequest, token) => {
     });
 }
 
+const updateSchema = async (schemaRequest, token, schemaId) => {
+    let url = constants.SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId)
+    return axios.put(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
+const getSchema = async (token, schemaId) => {
+    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId)
+    return axios.get(url, { headers: {Authorization: token}}).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
 const uploadTemplate = async(formData, issuer, token) => {
     const headers = getHeaders(formData, token);
     try {
@@ -90,5 +110,7 @@ module.exports = {
     createIssuer,
     createSchema,
     uploadTemplate,
+    updateSchema,
+    getSchema,
     getTransaction
 }

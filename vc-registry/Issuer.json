@@ -26,7 +26,8 @@
         "sectorType": {
           "type": "string",
           "enum": [
-            "Education"
+            "Education",
+            "Health"
           ],
           "title": "Sector Type"
         },
@@ -37,6 +38,10 @@
         "websiteUrl": {
           "type": "string",
           "title": "Website url"
+        },
+        "callbackUrl": {
+          "type": "string",
+          "title": "Callback url"
         },
         "accountDetails": {
           "$ref": "#/definitions/AccountDetails"

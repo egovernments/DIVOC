@@ -9,15 +9,11 @@ const createCertificate = (certificateRequest, entityType, token) => {
         });
 };
 
-const getCertificate = (entityName, certificateId, outputType, token) => {
+const getCertificate = (entityName, certificateId, headers) => {
 
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
-        headers: {
-            Authorization: token,
-            Accept: outputType
-        }
-    }).then(res => {
-        return res.data;
+        responseType: "stream",
+        headers: headers
     }).catch(error => {
         console.error("Error in downloading certificate: ", error);
         throw error;
@@ -25,7 +21,19 @@ const getCertificate = (entityName, certificateId, outputType, token) => {
 
 };
 
+const updateCertificate = (certificateRequestBody, entityName, entityId, token) => {
+    return axios.put(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
+                    certificateRequestBody,
+                    {headers: {Authorization: token}}
+        ).then(res => res.data)
+        .catch(err => {
+            console.error("Error in updating certificate : ", err);
+            throw err;
+        });
+}
+
 module.exports = {
     createCertificate,
-    getCertificate
+    getCertificate,
+    updateCertificate
 }

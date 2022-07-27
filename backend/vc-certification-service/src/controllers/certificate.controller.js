@@ -22,11 +22,8 @@ async function getCertificate(req, res) {
     try {
         const entityName = req.params.entityName;
         const certificateId = req.params.certificateId;
-        const outputType = req.header("Accept");
-        const token = req.header("Authorization");
-        const certificateDownloadResponse = await sunbirdRegistryService.getCertificate(entityName, certificateId, outputType, token);
-        res.setHeader("content-type", outputType);
-        res.status(200).send(certificateDownloadResponse);
+        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateId, req.headers);
+        data.pipe(res);
     } catch (err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({
@@ -35,7 +32,26 @@ async function getCertificate(req, res) {
     }
 }
 
+async function updateCertificate(req, res) {
+    const entityName = req.params.entityName;
+    const entityId = req.params.certificateId;
+    const token = req.header("Authorization");
+    try {
+        const certificateUpdateResponse = await sunbirdRegistryService.updateCertificate(req.body, entityName, entityId, token);
+        res.status(200).json({
+            message: "Certificate Updated Successfully",
+            certificateUpdateResponse: certificateUpdateResponse
+        });
+    } catch(err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 module.exports = {
     createCertificate,
-    getCertificate
+    getCertificate,
+    updateCertificate
 }
