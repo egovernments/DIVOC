@@ -125,6 +125,38 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/certificate/{entityName}/{certificateId}:
+    delete:
+      tags:
+        - delete certificate
+      summary: Delete certificate of given entityName and entityType
+      operation: deleteCertificate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityName
+          in: path
+          required: true
+          type: string
+        - name: certificateId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   CertificationSuccess:
     type: object
