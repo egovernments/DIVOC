@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "TransactionOsidMap": {
+      "$ref": "#/definitions/TransactionOsidMap"
+    }
+  },
+  "required": [
+    "TransactionOsidMap"
+  ],
+  "title": "TransactionOsidMap",
+  "definitions": {
+    "TransactionOsidMap": {
+      "type": "object",
+      "title": "Transaction Osid map",
+      "required": [
+        "transactionId",
+        "entityOsid"
+      ],
+      "properties": {
+        "transactionId": {
+          "type": "string"
+        },
+        "entityOsid": {
+          "type": "string"
+        },
+        "status": {
+            "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "entityType": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "privateFields": [],
+    "signedFields": [],
+    "indexFields": ["transactionId"],
+    "uniqueIndexFields": [],
+    "systemFields": [],
+    "roles": ["anonymous"],
+    "inviteRoles": ["anonymous"]
+  }
+}
