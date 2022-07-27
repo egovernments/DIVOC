@@ -184,6 +184,7 @@ services:
       SUNBIRD_REGISTRY_URL: "http://registry:8081"
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
+      STORED_ENTITY_TYPE: 'TransactionOsidMap'
     depends_on:
       registry:
         condition: service_started
@@ -211,4 +212,3 @@ services:
         condition: service_started
       kafka:
         condition: service_healthy
-

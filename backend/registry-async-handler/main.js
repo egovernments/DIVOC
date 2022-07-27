@@ -20,9 +20,10 @@ const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout:
       eachMessage: async ({message}) => {
         const postCreateEntityMessage = JSON.parse(message.value.toString());
         if(postCreateEntityMessage.entityType == config.TRANSACTION_ENTITY_TYPE){
-          console.log({ entityMessage : postCreateEntityMessage});
+          const addTransactionRequest = sunbirdRegistryService.createTransactionRequest(postCreateEntityMessage);
+          console.log({addTransactionRequest: addTransactionRequest});
           try{
-            const transactionResponse = await sunbirdRegistryService.addTransaction(postCreateEntityMessage,config.STORED_ENTITY_TYPE);
+            const transactionResponse = await sunbirdRegistryService.addTransaction(addTransactionRequest,config.STORED_ENTITY_TYPE);
             if(transactionResponse?.status == 200){
               console.log("Successfully added Transaction to: ",config.STORED_ENTITY_TYPE);
             }else{

@@ -66,8 +66,29 @@ const getIssuerId = async(token) => {
             });
 }
 
+const getTransaction = async (transactionId, token) => {
+    console.log({transctionUrl: constants.SUNBIRD_GET_TRANSACTION_URL, 
+                transactionId: transactionId});
+    const transactionRequest = {
+        id:  "sunbird-rc.registry.search",
+        ver: "1.0",
+        ets: "",
+        filters: {
+            transactionId: {
+                eq: transactionId
+            }
+        }
+    };
+    return axios.post(constants.SUNBIRD_GET_TRANSACTION_URL, transactionRequest ,{headers:{Authorization: token}})
+            .catch(error => {
+                console.error(error);
+                throw error;
+            });
+}
+
 module.exports = {
     createIssuer,
     createSchema,
     uploadTemplate,
+    getTransaction
 }

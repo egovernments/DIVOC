@@ -10,6 +10,19 @@ const addTransaction = (postCreateEntityMessage, entityType) => {
     })
 }
 
+function createTransactionRequest (postCreateEntityMessage) {
+    const request = {
+        "transactionId" : postCreateEntityMessage.transactionId,
+        "entityOsid" : postCreateEntityMessage.osid,
+        "entityType" : postCreateEntityMessage.entityType,
+        "status" : postCreateEntityMessage.status,
+        "message" : postCreateEntityMessage.message,
+        "userId" : postCreateEntityMessage.userId
+      }
+    return request;
+}
+
 module.exports={
-    addTransaction
+    addTransaction,
+    createTransactionRequest
 }
