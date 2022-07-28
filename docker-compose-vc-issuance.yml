@@ -172,6 +172,7 @@ services:
       SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       PORT: "7654"
       KEYCLOAK_URL: "http://keycloak:8080"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       vc-registry:
         condition: service_started
@@ -184,6 +185,7 @@ services:
       SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
     depends_on:
       vc-registry:
         condition: service_started
