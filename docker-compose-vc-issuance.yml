@@ -202,13 +202,13 @@ services:
   registry-async-handler:
     image: divoc/registry-async-handler
     environment:
-      SUNBIRD_REGISTRY_URL: "http://registry:8081"
+      SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       POST_CREATE_ENTITY_TOPIC: 'post_create_entity'
       STORED_ENTITY_TYPE: 'TransactionOsidMap'
       TRANSACTION_ENTITY_TYPE: 'VaccinationCertificate1'
     depends_on:
-      registry:
+      vc-registry:
         condition: service_started
       kafka:
         condition: service_healthy
