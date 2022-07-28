@@ -54,6 +54,7 @@ type CertifyMessage struct {
 
 func main() {
 	config.Initialize()
+	services.InitializeKafka()
 	log.Infof("Starting analytics collector")
 	connect := initClickhouse()
 	_, err := connect.Exec(`
@@ -147,6 +148,20 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
+	_,err = connect.Exec(`
+	CREATE TABLE IF NOT EXISTS transactionResponseV1 (
+		transactionId String,
+		entityOsid String,
+		entityType String,
+		message String,
+		status String,
+		userId String,
+		dt Date
+	) engine = MergeTree() order by dt
+	`)
+	if err !=nil {
+		log.Fatal(err)
+	}
 	//	_, err = connect.Exec(`
 	//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
 	//`)
@@ -160,6 +175,7 @@ dt Date
 	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveProcStatusEvent, config.Config.Kafka.ProcStatusTopic, "earliest")
+	go startCertificateEventConsumer(err, connect, saveVcTransactionEvent, config.Config.Kafka.VcTransactionTopic,"earliest")
 
 	wg.Wait()
 }
@@ -217,12 +233,14 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 			} else {
 				log.Errorf("Error in processing the certificate %+v", err)
 			}
-			services.PublishProcStatus(models.ProcStatus{
-				Date:              time.Now(),
-				PreEnrollmentCode: preEnrollmentCode,
-				ProcType:          procType,
-				Status:            string(status),
-			})
+			if(procType != "procStatus_event"){
+				services.PublishProcStatus(models.ProcStatus{
+					Date:              time.Now(),
+					PreEnrollmentCode: preEnrollmentCode,
+					ProcType:          procType,
+					Status:            string(status),
+				})
+			}
 		} else {
 			// The client will automatically try to recover from all errors.
 			fmt.Printf("Consumer error: %v \n", err)
@@ -509,4 +527,44 @@ func saveCertificateEvent(connect *sql.DB, msg string) (string,string, models.St
 	}
 
 	return "certificate_event",certifyMessage.PreEnrollmentCode, models.SUCCESS, nil
+}
+
+func saveVcTransactionEvent(connect *sql.DB, msg string) (string,string, models.Status, error){
+	log.Info("Saving transaction event")
+	response := models.TransactionResponse{}
+	if err := json.Unmarshal([]byte(msg), &response); err != nil {
+		log.Errorf("Kafka message unmarshalling error %v",err);
+		return "transaction_event", "", models.ERROR, errors.New("kafka message unmarshalling failed")
+	}
+	var (
+		tx,_ = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO transactionResponseV1 (
+			transactionId ,
+			entityOsid ,
+			entityType ,
+			message ,
+			status ,
+			userId ,
+			dt
+		) VALUES (?,?,?,?,?,?,?)`)
+	)
+	if err != nil {
+		log.Infof("Error in preparing stmt %+v", err)
+	}
+	if _, err := stmt.Exec(
+		response.TransactionId,
+		response.Osid,
+		response.EntityType,
+		response.Message,
+		response.Status,
+		response.UserId,
+		time.Now(),
+	); err != nil {
+		log.Errorf("Error in saving %+v", err)
+	}
+	defer stmt.Close()
+	if err := tx.Commit(); err != nil {
+		log.Fatal(err)
+	}
+	return "transaction_event", "", models.SUCCESS,nil
 }
