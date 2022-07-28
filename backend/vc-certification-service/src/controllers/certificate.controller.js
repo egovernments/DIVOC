@@ -50,8 +50,27 @@ async function updateCertificate(req, res) {
     }
 }
 
+async function deleteCertificate(req, res) {
+    const entityName = req.params.entityName;
+    const entityId = req.params.certificateId;
+    const token = req.header("Authorization");
+    try {
+        const certificateRevokeResponse = await sunbirdRegistryService.deleteCertificate(req.body, entityName, entityId, token);
+        res.status(200).json({
+            message: "Certificate revoked",
+            certificateRevokeResponse: certificateRevokeResponse
+        });
+    } catch(err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
-    updateCertificate
+    updateCertificate,
+    deleteCertificate
 }
