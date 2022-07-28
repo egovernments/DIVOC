@@ -86,11 +86,11 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
-  /v1/certify/{entityName}/{entityId}:
+  /v1/certify/{entityName}/{certificateId}:
     put:
       tags:
         - update certificate
-      summary: Update certificate of given entityName and entityType
+      summary: Update certificate of given entityName and certificateId
       operation: updateCertificate
       security:
         - bearerAuth: []
@@ -99,7 +99,7 @@ paths:
           in: path
           required: true
           type: string
-        - name: entityId
+        - name: certificateId
           in: path
           required: true
           type: string
