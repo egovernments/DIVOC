@@ -129,7 +129,7 @@ paths:
     delete:
       tags:
         - delete certificate
-      summary: Delete certificate of given entityName and entityType
+      summary: Delete certificate of given entityName and certificateId
       operation: deleteCertificate
       security:
         - bearerAuth: []
