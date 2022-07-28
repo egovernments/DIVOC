@@ -4,6 +4,6 @@ const issuerController = require('../controllers/issuer.controller');
 const {BASE_URL} = require("../configs/config");
 const router = express.Router();
 
-router.post(`/`, issuerController.createIssuer)
+router.post(`/`, authMiddleware, issuerController.createIssuer)
 
 module.exports = router;
