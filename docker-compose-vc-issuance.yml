@@ -206,7 +206,6 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       POST_CREATE_ENTITY_TOPIC: 'post_create_entity'
       STORED_ENTITY_TYPE: 'TransactionOsidMap'
-      TRANSACTION_ENTITY_TYPE: 'VaccinationCertificate1'
     depends_on:
       vc-registry:
         condition: service_started

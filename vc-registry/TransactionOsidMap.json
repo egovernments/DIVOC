@@ -45,7 +45,12 @@
     "signedFields": [],
     "indexFields": ["transactionId"],
     "uniqueIndexFields": [],
-    "systemFields": [],
+    "systemFields": [
+      "osCreatedAt",
+      "osUpdatedAt",
+      "osCreatedBy",
+      "osUpdatedBy"
+    ],
     "roles": ["anonymous"],
     "inviteRoles": ["anonymous"]
   }

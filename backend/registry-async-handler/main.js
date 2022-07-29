@@ -14,12 +14,11 @@ const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout:
     await consumer.subscribe({topic: config.POST_CREATE_ENTITY_TOPIC, fromBeginning: true});
     
     console.log("Stored Entity type: ", config.STORED_ENTITY_TYPE);
-    console.log("Transaction Entity type: ", config.TRANSACTION_ENTITY_TYPE);
 
     await consumer.run({
       eachMessage: async ({message}) => {
         const postCreateEntityMessage = JSON.parse(message.value.toString());
-        if(postCreateEntityMessage.entityType == config.TRANSACTION_ENTITY_TYPE){
+        if(postCreateEntityMessage.entityType != config.STORED_ENTITY_TYPE){
           const addTransactionRequest = sunbirdRegistryService.createTransactionRequest(postCreateEntityMessage);
           console.log({addTransactionRequest: addTransactionRequest});
           try{
