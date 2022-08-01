@@ -162,6 +162,21 @@ dt Date
 	if err !=nil {
 		log.Fatal(err)
 	}
+	_, err = connect.Exec(`
+CREATE TABLE IF NOT EXISTS logAPIV1 (
+transactionId String,
+url String,
+requestHeaders String,
+requestBody String,
+requestMethod String,
+statusCode UInt8,
+dt DateTime
+) engine = MergeTree() order by dt
+`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	//	_, err = connect.Exec(`
 	//ALTER TABLE eventsv1 ADD COLUMN IF NOT EXISTS info String;
 	//`)
