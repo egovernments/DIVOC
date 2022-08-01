@@ -149,7 +149,7 @@ dt Date
 		log.Fatal(err)
 	}
 	_,err = connect.Exec(`
-	CREATE TABLE IF NOT EXISTS transactionResponseV1 (
+	CREATE TABLE IF NOT EXISTS vcTransactionEventV1 (
 		transactionId String,
 		entityOsid String,
 		entityType String,
@@ -553,7 +553,7 @@ func saveVcTransactionEvent(connect *sql.DB, msg string) (string,string, models.
 	}
 	var (
 		tx,_ = connect.Begin()
-		stmt, err = tx.Prepare(`INSERT INTO transactionResponseV1 (
+		stmt, err = tx.Prepare(`INSERT INTO vcTransactionEventV1 (
 			transactionId ,
 			entityOsid ,
 			entityType ,
