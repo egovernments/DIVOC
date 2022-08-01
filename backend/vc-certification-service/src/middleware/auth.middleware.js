@@ -11,7 +11,7 @@ async function verifyKeycloakToken(bearerToken) {
         throw err
     }
 }
-async function tokenValidator(req, res, next) {
+async function tokenValidationMiddleware(req, res, next) {
     const token = req.header("Authorization");
     if (!token) return res.status(403).send({error: "Access Denied!, no token entered"});
     try {
@@ -44,6 +44,6 @@ async function roleAuthorizer(req, res, next){
     }
 }
 module.exports = {
-    tokenValidator,
+    tokenValidationMiddleware,
     roleAuthorizer
 };

@@ -11,7 +11,7 @@ async function verifyKeycloakToken(bearerToken) {
         throw err
     }
 }
-async function tokenValidator(req, res, next) {
+async function tokenValidationMiddleware(req, res, next) {
     const token = req.header("Authorization");
     if (!token) return res.status(403).send({error: "Access Denied!, no token entered"});
     try {
@@ -36,14 +36,14 @@ async function roleAuthorizer(req, res, next){
         if(payloadRoles.includes("api")){
             next();
         }else{
-            res.status(400).send({error: "role not authorized"});
+            res.status(403).send({error: "role not authorized"});
         }
     } catch (err) {
         console.error("Error in verifying token: ", err);
-        res.status(400).send({error: "auth failed, check bearer token"});
+        res.status(401).send({error: "auth failed, check bearer token"});
     }
 }
 module.exports = {
-    tokenValidator,
+    tokenValidationMiddleware,
     roleAuthorizer
 };
