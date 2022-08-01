@@ -90,9 +90,6 @@ const getTransaction = async (transactionId, token) => {
     console.log({transctionUrl: constants.SUNBIRD_GET_TRANSACTION_URL, 
                 transactionId: transactionId});
     const transactionRequest = {
-        id:  "sunbird-rc.registry.search",
-        ver: "1.0",
-        ets: "",
         filters: {
             transactionId: {
                 eq: transactionId
