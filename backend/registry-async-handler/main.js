@@ -1,6 +1,7 @@
 const {Kafka} = require('kafkajs');
 const sunbirdRegistryService = require('./src/services/sunbird.service');
 const config = require('./src/configs/config');
+const constants = require('./src/configs/constants');
 
 console.log("registry async handler");
 const kafka = new Kafka({
@@ -13,18 +14,18 @@ const consumer = kafka.consumer({ groupId: 'post_create_entity', sessionTimeout:
     await consumer.connect();
     await consumer.subscribe({topic: config.POST_CREATE_ENTITY_TOPIC, fromBeginning: true});
     
-    console.log("Stored Entity type: ", config.STORED_ENTITY_TYPE);
+    console.log("Stored Entity type: ", constants.STORED_ENTITY_TYPE);
 
     await consumer.run({
       eachMessage: async ({message}) => {
         const postCreateEntityMessage = JSON.parse(message.value.toString());
-        if(postCreateEntityMessage.entityType != config.STORED_ENTITY_TYPE){
+        if(postCreateEntityMessage.entityType != constants.STORED_ENTITY_TYPE){
           const addTransactionRequest = sunbirdRegistryService.createTransactionRequest(postCreateEntityMessage);
           console.log({addTransactionRequest: addTransactionRequest});
           try{
-            const transactionResponse = await sunbirdRegistryService.addTransaction(addTransactionRequest,config.STORED_ENTITY_TYPE);
+            const transactionResponse = await sunbirdRegistryService.addTransaction(addTransactionRequest,constants.STORED_ENTITY_TYPE);
             if(transactionResponse?.status == 200){
-              console.log("Successfully added Transaction to: ",config.STORED_ENTITY_TYPE);
+              console.log("Successfully added Transaction to: ",constants.STORED_ENTITY_TYPE);
             }else{
               console.log("Failed to add Transaction", transactionResponse);
             }

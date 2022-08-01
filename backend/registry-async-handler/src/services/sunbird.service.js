@@ -1,5 +1,4 @@
 const axios = require("axios");
-const config = require('../configs/config');
 const constants = require('../configs/constants');
 
 const addTransaction = (postCreateEntityMessage, entityType) => {
