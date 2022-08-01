@@ -62,7 +62,6 @@ services:
       - logging.level.root=DEBUG
       - enable_external_templates=true
       - authentication_enabled=true
-      - async_enabled=$ASYNC_ENABLED
       - kafka_bootstrap_address=kafka:9092
     ports:
       - "8081:8081"
@@ -197,4 +196,12 @@ services:
       vc-management-service:
         condition: service_started
       vc-certification-service:
+        condition: service_started
+  analytics-feed:
+    image: divoc/analytics_feed
+    environment:
+      CLICK_HOUSE_URL: tcp://clickhouse-server:9000?debug=true
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      clickhouse-server:
         condition: service_started

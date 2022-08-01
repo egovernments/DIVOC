@@ -82,6 +82,7 @@ var Config = struct {
 		RevokeCertTopic          string `default:"revoke_cert" yaml:"revokeCertTopic"`
 		RevokeCertErrTopic       string `default:"revoke_cert_err" yaml:"revokeCertErrTopic"`
 		ProcStatusTopic          string `default:"proc_status" yaml:"procStatusTopic"`
+		TracingTopic             string `default:"tracing" yaml:"tracingStatusTopic"`
 	}
 	Database struct {
 		Host     string `default:"localhost" yaml:"host" env:"DB_HOST"`
