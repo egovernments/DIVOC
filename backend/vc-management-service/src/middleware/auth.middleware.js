@@ -22,6 +22,6 @@ module.exports = function (req, res, next) {
         next();
     } catch (err) {
         console.error("Error in verifying token: ", err);
-        res.status(400).send({error: "auth failed, check bearer token"});
+        res.status(401).send({error: "auth failed, check bearer token"});
     }
 };
