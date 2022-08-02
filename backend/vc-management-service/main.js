@@ -10,6 +10,7 @@ const {BASE_URL} = require("./src/configs/config");
 let issuerRouter = require('./src/routes/issuer.routes');
 let schemaRouter = require('./src/routes/schema.routes');
 let templateRouter = require('./src/routes/template.routes');
+let transactionRouter = require('./src/routes/transaction.routes');
 
 const swaggerDocument = yaml.load('./management-service-swagger.yml');
 
@@ -62,6 +63,7 @@ app.use(function(req, res, next) {
 app.use(`${BASE_URL}v1/issuer`, issuerRouter);
 app.use(`${BASE_URL}v1/schema`, schemaRouter);
 app.use(`${BASE_URL}v1/templates`, templateRouter);
+app.use(`${BASE_URL}V1/transaction`,transactionRouter);
 
 app.use(
     `${BASE_URL}api-docs`,

@@ -200,3 +200,14 @@ services:
         condition: service_started
       vc-certification-service:
         condition: service_started
+  registry-async-handler:
+    image: divoc/registry-async-handler
+    environment:
+      SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
+      KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      POST_CREATE_ENTITY_TOPIC: 'post_create_entity'
+    depends_on:
+      vc-registry:
+        condition: service_started
+      kafka:
+        condition: service_healthy

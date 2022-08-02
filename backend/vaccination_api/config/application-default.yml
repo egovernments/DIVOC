@@ -13,6 +13,7 @@ kafka:
   certifiedTopic: certified
   testCertifyTopic: test_certify
   eventsTopic: events
+  vcTransactionTopic: post_create_entity
   reportedSideEffectsTopic: reported_side_effects
 database:
   host: localhost
