@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"strconv"
+	"sync"
+	"time"
+
 	"github.com/divoc/api/config"
 	"github.com/divoc/api/pkg/models"
 	"github.com/divoc/api/pkg/services"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/confluentinc/confluent-kafka-go.v1/kafka"
-	"strconv"
-	"sync"
-	"time"
 
 	"github.com/ClickHouse/clickhouse-go"
 )
@@ -137,6 +138,7 @@ dt Date
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	_, err = connect.Exec(`
 CREATE TABLE IF NOT EXISTS procStatusV1 (
 preEnrollmentCode String,
@@ -145,6 +147,7 @@ procType String,
 dt Date
 ) engine = MergeTree() order by dt
 `)
+
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -190,6 +193,7 @@ dt DateTime
 	go startCertificateEventConsumer(err, connect, saveAnalyticsEvent, config.Config.Kafka.EventsTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveReportedSideEffects, config.Config.Kafka.ReportedSideEffectsTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveProcStatusEvent, config.Config.Kafka.ProcStatusTopic, "earliest")
+	go tracingEventConsumer(connect, config.Config.Kafka.TracingTopic, "earliest")
 	go startCertificateEventConsumer(err, connect, saveVcTransactionEvent, config.Config.Kafka.VcTransactionTopic,"earliest")
 
 	wg.Wait()
@@ -216,7 +220,7 @@ func initClickhouse() *sql.DB {
 	return connect
 }
 
-type MessageCallback func(*sql.DB, string) (string,string, models.Status, error)
+type MessageCallback func(*sql.DB, string) (string, string, models.Status, error)
 
 func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageCallback, topic string, resetOption string) {
 	c, err := kafka.NewConsumer(&kafka.ConfigMap{
@@ -242,7 +246,7 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 					log.Fatal("Unable to get clickhouse connection")
 				}
 			}
-			procType,preEnrollmentCode,status,err := callback(connect, string(msg.Value)); 
+			procType, preEnrollmentCode, status, err := callback(connect, string(msg.Value))
 			if err == nil {
 				c.CommitMessage(msg)
 			} else {
@@ -265,21 +269,113 @@ func startCertificateEventConsumer(err error, connect *sql.DB, callback MessageC
 	c.Close()
 }
 
-func saveCertifiedEventV1(connect *sql.DB, msg string) (string,string, models.Status, error) {
+func tracingEventConsumer(connect *sql.DB, topic string, resetOption string) {
+	c, err := kafka.NewConsumer(&kafka.ConfigMap{
+		"bootstrap.servers":  config.Config.Kafka.BootstrapServers,
+		"group.id":           "distributed logAPIV1",
+		"auto.offset.reset":  resetOption,
+		"enable.auto.commit": "false",
+	})
+	if err != nil {
+		panic(err)
+	}
+	c.SubscribeTopics([]string{topic}, nil)
+	for {
+		fmt.Println("Waiting for message")
+		msg, err := c.ReadMessage(-1)
+		if err != nil {
+			fmt.Printf("Error : %v", err)
+		} else {
+			if connect == nil {
+				connect = initClickhouse()
+				if connect == nil {
+					log.Fatal("Unable to get clickhouse connection")
+				}
+			}
+			fmt.Printf("Message : %v", string(msg.Value))
+			if err := saveTracingEvent(connect, string(msg.Value)); err == nil {
+				c.CommitMessage(msg)
+			}
+
+		}
+	}
+	c.Close()
+}
+
+func saveTracingEvent(connect *sql.DB, msg string) error {
+	var (
+		tx, _     = connect.Begin()
+		stmt, err = tx.Prepare(`INSERT INTO logAPIV1
+		(
+	transactionId,
+	url,
+	requestHeaders,
+	requestBody,
+	requestMethod,
+	statusCode,
+	dt
+	) VALUES (?, ?, ?, ?, ?, ?, ?)
+			`)
+	)
+	if err != nil {
+		log.Errorf("Error in preparing prepared statement : %v", err)
+		return err
+	}
+	var tracingObj models.Tracing
+	if err := json.Unmarshal([]byte(msg), &tracingObj); err != nil {
+		log.Errorf("Error : %v", err)
+		return err
+	} else {
+		var requestHeader string
+		var requestBody string
+		if requestHeaders, err := json.Marshal(tracingObj.RequestHeaders); err == nil {
+			requestHeader = string(requestHeaders)
+		} else {
+			log.Errorf("Error while parsing request headers : %v", err)
+			return err
+		}
+		if requestBodyJson, err := json.Marshal(tracingObj.RequestBody); err == nil {
+			requestBody = string(requestBodyJson)
+		} else {
+			log.Errorf("Error while parsing request body : %v", err)
+			return err
+		}
+		if _, err = stmt.Exec(
+			tracingObj.TransactionId,
+			tracingObj.Url,
+			requestHeader,
+			requestBody,
+			tracingObj.RequestMethod,
+			uint8(tracingObj.StatusCode.(float64)),
+			tracingObj.Date,
+		); err != nil {
+			log.Errorf("Error in executing statement : %v", err)
+			return err
+		}
+		defer stmt.Close()
+		if err = tx.Commit(); err != nil {
+			log.Errorf("Error while committing transaction : %v", err)
+			return err
+		}
+	}
+	return nil
+}
+
+func saveCertifiedEventV1(connect *sql.DB, msg string) (string, string, models.Status, error) {
 	var certifiedMessage models.CertifiedMessage
 	if err := json.Unmarshal([]byte(msg), &certifiedMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "certified_event_v1",certifiedMessage.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
+		return "certified_event_v1", certifiedMessage.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 	if certifiedMessage.Certificate == "" {
 		log.Infof("Ignoring invalid message %+v", msg)
-		return "certified_event_v1",certifiedMessage.PreEnrollmentCode, models.SUCCESS, nil
+		return "certified_event_v1", certifiedMessage.PreEnrollmentCode, models.SUCCESS, nil
 	}
 
 	var certificate models.Certificate
 	if err := json.Unmarshal([]byte(certifiedMessage.Certificate), &certificate); err != nil {
 		log.Errorf("certificate string unmarshalling error %+v", err)
-		return "certified_event_v1",certifiedMessage.PreEnrollmentCode, models.ERROR, errors.New("certificate string unmarshalling failed")
+		return "certified_event_v1", certifiedMessage.PreEnrollmentCode, models.ERROR, errors.New("certificate string unmarshalling failed")
 	}
 
 	updatedCertificate := 0
@@ -363,14 +459,14 @@ func saveCertifiedEventV1(connect *sql.DB, msg string) (string,string, models.St
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
-	return "certified_event_v1",certifiedMessage.PreEnrollmentCode, models.SUCCESS, nil
+	return "certified_event_v1", certifiedMessage.PreEnrollmentCode, models.SUCCESS, nil
 }
 
-func saveAnalyticsEvent(connect *sql.DB, msg string) (string,string, models.Status, error) {
+func saveAnalyticsEvent(connect *sql.DB, msg string) (string, string, models.Status, error) {
 	event := models.Event{}
 	if err := json.Unmarshal([]byte(msg), &event); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "analytics_event","", models.ERROR, errors.New("kafka message unmarshalling failed")
+		return "analytics_event", "", models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 	// push to click house - todo: batch it
 	var (
@@ -403,15 +499,15 @@ func saveAnalyticsEvent(connect *sql.DB, msg string) (string,string, models.Stat
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
-	return "analytics_event","", models.SUCCESS, nil
+	return "analytics_event", "", models.SUCCESS, nil
 }
 
-func saveProcStatusEvent(connect *sql.DB, msg string) (string,string, models.Status, error) {
+func saveProcStatusEvent(connect *sql.DB, msg string) (string, string, models.Status, error) {
 	log.Infof("Saving proc status event")
 	event := models.ProcStatus{}
 	if err := json.Unmarshal([]byte(msg), &event); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "procStatus_event",event.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
+		return "procStatus_event", event.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 	// push to click house - todo: batch it
 	var (
@@ -438,14 +534,14 @@ func saveProcStatusEvent(connect *sql.DB, msg string) (string,string, models.Sta
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
-	return "procStatus_event",event.PreEnrollmentCode, models.SUCCESS, nil
+	return "procStatus_event", event.PreEnrollmentCode, models.SUCCESS, nil
 }
 
-func saveReportedSideEffects(connect *sql.DB, msg string) (string,string, models.Status, error) {
+func saveReportedSideEffects(connect *sql.DB, msg string) (string, string, models.Status, error) {
 	event := models.ReportedSideEffectsEvent{}
 	if err := json.Unmarshal([]byte(msg), &event); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "reported_side_effects","", models.ERROR, errors.New("kafka message unmarshalling failed")
+		return "reported_side_effects", "", models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 	// push to click house - todo: batch it
 	var (
@@ -472,14 +568,14 @@ func saveReportedSideEffects(connect *sql.DB, msg string) (string,string, models
 	if err := tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
-	return "reported_side_effects","", models.SUCCESS, nil
+	return "reported_side_effects", "", models.SUCCESS, nil
 }
 
-func saveCertificateEvent(connect *sql.DB, msg string) (string,string, models.Status, error) {
+func saveCertificateEvent(connect *sql.DB, msg string) (string, string, models.Status, error) {
 	var certifyMessage CertifyMessage
 	if err := json.Unmarshal([]byte(msg), &certifyMessage); err != nil {
 		log.Errorf("Kafka message unmarshalling error %+v", err)
-		return "certificate_event",certifyMessage.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
+		return "certificate_event", certifyMessage.PreEnrollmentCode, models.ERROR, errors.New("kafka message unmarshalling failed")
 	}
 	// push to click house - todo: batch it
 	var (
@@ -541,7 +637,7 @@ func saveCertificateEvent(connect *sql.DB, msg string) (string,string, models.St
 		log.Fatal(err)
 	}
 
-	return "certificate_event",certifyMessage.PreEnrollmentCode, models.SUCCESS, nil
+	return "certificate_event", certifyMessage.PreEnrollmentCode, models.SUCCESS, nil
 }
 
 func saveVcTransactionEvent(connect *sql.DB, msg string) (string,string, models.Status, error){
