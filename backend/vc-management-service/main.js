@@ -19,7 +19,6 @@ const port = issuerConfig.PORT;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 
-// var fileWrite = fs.createWriteStream(path.join(__dirname, 'logs.log'), {flags: 'a'});
 var fileWrite = rfs.createStream('reqres.log', {
     interval: '1d',
     path: path.join(__dirname, 'log')
