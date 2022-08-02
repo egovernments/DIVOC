@@ -7,6 +7,7 @@ const BASE_URL = process.env.ISSUER_SERVICE_BASE_URL || '/vc-management/';
 const REQUEST_TIMEOUT = process.env.REQUEST_TIMEOUT || 10000;
 const ISSUER_NAME = process.env.ISSUER_NAME || 'Issuer';
 
+
 module.exports = {
     SUNBIRD_REGISTRY_URL,
     PORT,
