@@ -13,11 +13,10 @@ async function verifyKeycloakToken(bearerToken) {
 }
 async function tokenValidationMiddleware(req, res, next) {
     const token = req.header("Authorization");
-    if (!token) return res.status(403).send({error: "Access Denied!, no token entered"});
+    if (!token) return res.status(403).send({error: "Access Denied. No Token Provided"});
     try {
         const verified = await verifyKeycloakToken(token);
         req.user = verified;
-        console.log("token is verified");
         next();
     } catch (err) {
         console.error("Error in verifying token: ", err);
@@ -26,13 +25,13 @@ async function tokenValidationMiddleware(req, res, next) {
 }
 async function roleAuthorizer(req, res, next){
     const bearerToken = req.header("Authorization");
-    if (!bearerToken) return res.status(403).send({error: "Access Denied!, no token entered"});
+    if (!bearerToken) return res.status(403).send({error: "Access Denied. No Token Provided"});
     try {
         const verified = await verifyKeycloakToken(bearerToken);
         req.user = verified;
         const token = bearerToken.split(" ")[1];
-        let decodedPayload=jwt.decode(token);
-        let payloadRoles= decodedPayload.resource_access["admin-api"]?.roles;
+        const decodedPayload = jwt.decode(token);
+        const payloadRoles = decodedPayload.resource_access["admin-api"]?.roles;
         if(payloadRoles.includes("api")){
             next();
         }else{
