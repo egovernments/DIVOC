@@ -30,10 +30,21 @@ const updateCertificate = (certificateRequestBody, entityName, entityId, token) 
             console.error("Error in updating certificate : ", err);
             throw err;
         });
-}
+};
+const deleteCertificate = (certificateRequestBody, entityName, entityId, token) => {
+    return axios.delete(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
+                    certificateRequestBody,
+                    {headers: {Authorization: token}}
+        ).then(res => res.data)
+        .catch(err => {
+            console.error("Error in revoking certificate : ", err);
+            throw err;
+        });
+};
 
 module.exports = {
     createCertificate,
     getCertificate,
-    updateCertificate
+    updateCertificate,
+    deleteCertificate
 }
