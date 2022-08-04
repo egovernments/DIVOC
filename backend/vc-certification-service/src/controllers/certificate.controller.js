@@ -23,9 +23,6 @@ async function getCertificate(req, res) {
         const entityName = req.params.entityName;
         const certificateId = req.params.certificateId;
         const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateId, req.headers);
-        if (req.headers.accept === "image/svg+xml") {
-            res.type('svg');
-        };
         data.pipe(res);
     } catch (err) {
         console.error(err);
