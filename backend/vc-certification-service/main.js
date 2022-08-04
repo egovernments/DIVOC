@@ -1,7 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
-const yaml = require('yamljs')
+const yaml = require('yamljs');
+const morganBody = require('morgan-body');
 
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
@@ -13,6 +14,11 @@ const app = express();
 const port = certifyConfig.PORT;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
+
+morganBody(app, {
+    dateTimeFormat: 'iso',
+    maxBodyLength: 1000000
+});
 
 app.use(`${BASE_URL}v1`, certifyRouter);
 
