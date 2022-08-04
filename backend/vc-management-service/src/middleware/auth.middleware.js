@@ -27,8 +27,6 @@ async function roleAuthorizer(req, res, next){
     const bearerToken = req.header("Authorization");
     if (!bearerToken) return res.status(403).send({error: "Access Denied. No Token Provided"});
     try {
-        const verified = await verifyKeycloakToken(bearerToken);
-        req.user = verified;
         const token = bearerToken.split(" ")[1];
         const decodedPayload = jwt.decode(token);
         const payloadRoles = decodedPayload.resource_access["admin-api"]?.roles;
