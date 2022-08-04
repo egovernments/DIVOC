@@ -1,4 +1,5 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
+const certifyConstants = require('../configs/constants');
 
 async function createCertificate(req, res) {
     try {
@@ -23,6 +24,9 @@ async function getCertificate(req, res) {
         const entityName = req.params.entityName;
         const certificateId = req.params.certificateId;
         const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateId, req.headers);
+        if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
+            res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
+        };
         data.pipe(res);
     } catch (err) {
         console.error(err);
