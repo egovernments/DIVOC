@@ -4,7 +4,6 @@ const constants = require('../configs/constants');
 const config = require('../configs/config');
 
 const createIssuer = async (issuerRequest) => {
-    console.log("!!!!!!!!!!!!!!!!!!",issuerRequest);
     return axios.post(constants.SUNBIRD_ISSUER_INVITE_URL, issuerRequest).then(res =>
         res.data
     ).catch(error => {
