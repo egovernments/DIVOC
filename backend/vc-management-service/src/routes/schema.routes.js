@@ -1,13 +1,13 @@
 const express = require('express');
 const multer = require('multer');
 const upload = multer();
-const authMiddleware = require('../middleware/auth.middleware');
+const { tokenValidationMiddleware } = require('../middleware/auth.middleware');
 const schemaController = require('../controllers/schema.controller');
 
 const router = express.Router();
 
-router.post(`/`, authMiddleware, schemaController.createSchema)
-router.put(`/:schemaId/updateTemplate`, [authMiddleware, upload.single('files')], schemaController.updateTemplate)
-router.put(`/:schemaId/updateTemplateUrl`, authMiddleware, schemaController.updateTemplateUrls)
+router.post(`/`, [tokenValidationMiddleware], schemaController.createSchema)
+router.put(`/:schemaId/updateTemplate`, [tokenValidationMiddleware, upload.single('files')], schemaController.updateTemplate)
+router.put(`/:schemaId/updateTemplateUrl`, [tokenValidationMiddleware], schemaController.updateTemplateUrls)
 
 module.exports = router;
