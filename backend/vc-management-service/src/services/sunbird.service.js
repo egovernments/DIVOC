@@ -32,7 +32,7 @@ const updateSchema = async (schemaRequest, token, schemaId) => {
 }
 
 const getSchema = async (token, schemaId) => {
-    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId)
+    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
     return axios.get(url, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {

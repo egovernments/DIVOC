@@ -19,6 +19,23 @@ async function createSchema(req, res) {
     }
 }
 
+async function getSchema(req, res) {
+    try {
+        const token = req.header("Authorization");
+        const schemaId = req.params.schemaId;
+        const fetchSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+        res.status(200).json({
+            message: "Successfully fetched Schema",
+            getSchemaResponse: fetchSchemaResponse
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
 async function updateSchema(req, res) {
     try {
         const schemaId = req.params.schemaId;
@@ -98,6 +115,7 @@ async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
 
 module.exports = {
     createSchema,
+    getSchema,
     updateSchema,
     updateTemplate,
     updateTemplateUrls
