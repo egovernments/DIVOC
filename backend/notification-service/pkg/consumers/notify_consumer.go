@@ -102,41 +102,40 @@ func createNotificationConsumer() {
 				}
 				log.Infof("notificationPayload: %v",notificationPayload)
 				request,err := services.ConstructMessage(notificationPayload)
-				if(err==nil){
-					for _, recipient := range strings.Split(*request.Recipient, ",") {
-						contactType, err := services.GetContactType(recipient)
-						if err != nil {
-							log.Error(err)
+				if(err!=nil){
+					log.Errorf(" message can't be converted to NotificationRequestformat %+v", err)
+					continue
+				}
+				for _, recipient := range strings.Split(*request.Recipient, ",") {
+					contactType, err := services.GetContactType(recipient)
+					if err != nil {
+						log.Error(err)
+					}
+					if contactType == services.SMS {
+						mobileNumber, err := services.GetMobileNumber(recipient)
+						if err == nil {
+							if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
+								log.Debugf("SMS sent response %+v", resp)
+							} else {
+								log.Errorf("Error in sending SMS %+v", err)
+							}
+						} else {
+							log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
 						}
-						if contactType == services.SMS {
-							mobileNumber, err := services.GetMobileNumber(recipient)
-							if err == nil {
-								if resp, err := services.SendSMS(mobileNumber, *request.Message); err == nil {
-									log.Debugf("SMS sent response %+v", resp)
-								} else {
-									log.Errorf("Error in sending SMS %+v", err)
-								}
+					} else if contactType == services.Email {
+						emailId, err := services.GetEmailId(recipient)
+						if err == nil {
+							if err := services.SendEmail(emailId, request.Subject, *request.Message); err == nil {
+								log.Debugf("Email sent successfully")
+
 							} else {
-								log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
+								log.Errorf("Error in sending Email %+v", err)
 							}
-						} else if contactType == services.Email {
-							emailId, err := services.GetEmailId(recipient)
-							if err == nil {
-								if err := services.SendEmail(emailId, request.Subject, *request.Message); err == nil {
-									log.Debugf("Email sent successfully")
-	
-								} else {
-									log.Errorf("Error in sending Email %+v", err)
-								}
-							} else {
-								log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
-							}
+						} else {
+							log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
 						}
 					}
-				}else{
-					log.Errorf(" message can't be converted to NotificationRequestformat %+v", err)
 				}
-				
 			} else {
 				// The client will automatically try to recover from all errors.
 				fmt.Printf("Consumer error: %v \n", err)
