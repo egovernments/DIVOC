@@ -144,7 +144,7 @@ func createNotificationConsumer() {
 				_, err = c.CommitMessage(msg)
 			}
 			if err != nil {
-				log.Errorf("Error in committing notify2 message %+v", err)
+				log.Errorf("Error in committing createNotification message %+v", err)
 			}
 		}
 		c.Close()
