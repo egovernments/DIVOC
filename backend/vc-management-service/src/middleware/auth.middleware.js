@@ -40,7 +40,17 @@ async function roleAuthorizer(req, res, next){
         res.status(401).send({error: "auth failed, check bearer token"});
     }
 }
+
+async function rolePresentValidatorMiddleware(req, res, next) {
+    const schema = JSON.parse(req.body.schema);
+    if(schema._osConfig.roles === undefined || schema._osConfig.roles === null || schema._osConfig.roles.length === 0) {
+        res.status(400).send({error: "Bad Request. Roles property not present in request body"});
+        return;
+    }
+    next();
+}
 module.exports = {
     tokenValidationMiddleware,
-    roleAuthorizer
+    roleAuthorizer,
+    rolePresentValidatorMiddleware
 };
