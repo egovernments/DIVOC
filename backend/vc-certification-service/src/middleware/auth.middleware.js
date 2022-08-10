@@ -34,12 +34,9 @@ module.exports = function (req, res, next) {
         if (!(roleAuthorizer(token))) {
             console.error("role not authorized: ", err);
             res.status(403).send({ error: "role not authorized" });
-
         } else {
-            
-            next();
+           next();
         }
-
     } catch (err) {
         console.error("Error in verifying token: ", err);
         res.status(401).send({ error: "auth failed, check bearer token" });
