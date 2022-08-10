@@ -1,7 +1,8 @@
 const express = require('express');
 const multer = require('multer');
 const upload = multer();
-const { tokenValidationMiddleware, rolePresentValidatorMiddleware } = require('../middleware/auth.middleware');
+const { tokenValidationMiddleware} = require('../middleware/auth.middleware');
+const { rolePresentValidatorMiddleware } = require('../middleware/body-validator.middleware');
 const schemaController = require('../controllers/schema.controller');
 
 const router = express.Router();
