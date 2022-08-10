@@ -23,10 +23,10 @@ async function getSchema(req, res) {
     try {
         const token = req.header("Authorization");
         const schemaId = req.params.schemaId;
-        const fetchSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+        const schemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+        let schemas = schemaId ? [schemaResponse] : schemaResponse
         res.status(200).json({
-            message: "Successfully fetched Schema",
-            getSchemaResponse: fetchSchemaResponse
+            schemas: schemas
         });
     } catch (err) {
         console.error(err);
