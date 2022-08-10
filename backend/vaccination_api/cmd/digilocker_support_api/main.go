@@ -56,7 +56,6 @@ const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
-const MaxDisplayCharacters = 40
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
 
 var vaccineProphylaxis = map[string]string{
@@ -406,19 +405,33 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
+	pdf.SetX(offsetNewX)
+	pdf.SetY(offsetNewY)
+	_ = pdf.Cell(nil, displayLabels[i])
+	offsetNewY = offsetNewY + 20
 	displayLabels = []string{
-		certificate.Evidence[0].Verifier.Name,
 		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
 			certificate.Evidence[0].Facility.Address.District),
 			certificate.Evidence[0].Facility.Address.AddressRegion),
 	}
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
-	for i = 0; i < len(displayLabels); i++ {
+	if len(displayLabels) > 1 {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		typeOffsetY := offsetNewY - float64(3*(len(displayLabels)))
+		for k := 0; k < len(displayLabels); k++ {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(typeOffsetY + float64(k)*9)
+			_ = pdf.Cell(nil, displayLabels[k])
+		}
+	} else {
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, displayLabels[i])
-		offsetNewY = offsetNewY + 20
+		_ = pdf.Cell(nil, displayLabels[0])
 	}
+	offsetNewY = offsetNewY + 20
 	if latestDose < totalDoses {
 		pdf.SetX(offsetX)
 		pdf.SetY(offsetNewY)
@@ -856,7 +869,7 @@ func wrapLongerText(text string, lineWidth int) []string {
 
 func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
 	address := displayLabels[len(displayLabels)-1]
-	wrap := wrapLongerText(address, MaxDisplayCharacters)
+	wrap := wrapLongerText(address, 50)
 	displayLabels = displayLabels[:len(displayLabels)-1]
 	displayLabels = append(displayLabels, wrap...)
 	return displayLabels
