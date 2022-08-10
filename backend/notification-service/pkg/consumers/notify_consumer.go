@@ -60,7 +60,7 @@ func notifyConsumer() {
 								log.Errorf("Error in sending Email %+v", err)
 							}
 						} else {
-							log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
+							log.Errorf("Invalid notification email address %+v, %+v", request, err)
 						}
 					}
 				}
@@ -132,7 +132,7 @@ func createNotificationConsumer() {
 								log.Errorf("Error in sending Email %+v", err)
 							}
 						} else {
-							log.Errorf("Invalid notification mobile number %+v, %+v", request, err)
+							log.Errorf("Invalid notification email address %+v, %+v", request, err)
 						}
 					}
 				}
