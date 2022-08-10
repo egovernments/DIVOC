@@ -29,6 +29,7 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -65,14 +66,16 @@ var vaccineProphylaxis = map[string]string{
 	"zycov":      "COVID-19 vaccine, DNA based",
 	"covovax":    "COVID-19 vaccine, virus protein subunit",
 	"corbevax":   "COVID-19 vaccine, virus protein subunit",
-
 }
 
 type DoseWiseData struct {
-	dose        int
-	doseDate    string
-	batchNumber string
-	country     string
+	dose         int
+	doseDate     string
+	batchNumber  string
+	country      string
+	name         string
+	vaccineType  string
+	manufacturer string
 }
 
 var (
@@ -259,6 +262,26 @@ func getCertificateVariant(certificate models.Certificate) string {
 	}
 }
 
+func sortDoseWiseData(data []DoseWiseData) []DoseWiseData {
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].dose < data[j].dose
+	})
+	return data
+}
+
+func getProphylaxis(certificate models.Certificate) string {
+	prophylaxis := certificate.Evidence[0].Prophylaxis
+	if prophylaxis == "" {
+		vaccine := strings.ToLower(certificate.Evidence[0].Vaccine)
+		for vaccName, proph := range vaccineProphylaxis {
+			if strings.Contains(vaccine, vaccName) {
+				prophylaxis = proph
+			}
+		}
+	}
+	return prophylaxis
+}
+
 func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, language string) ([]byte, error) {
 	var certificate models.Certificate
 	latestCertificate := getLatestCertificate(certificateByDoses)
@@ -271,11 +294,14 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			return nil, err
 		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
-			dose:        dose,
-			doseDate:    formatDate(certificate.Evidence[0].Date),
-			batchNumber: certificate.Evidence[0].Batch,
-			country:     certificate.Evidence[0].Facility.Address.AddressCountry,
+			dose:         dose,
+			doseDate:     formatDate(certificate.Evidence[0].Date),
+			batchNumber:  certificate.Evidence[0].Batch,
+			name:         certificate.Evidence[0].Vaccine,
+			vaccineType:  getProphylaxis(certificate),
+			manufacturer: certificate.Evidence[0].Manufacturer,
 		})
+		doseWiseData = sortDoseWiseData(doseWiseData)
 	}
 	latestCertificateText := latestCertificate["certificate"].(string)
 	if err := json.Unmarshal([]byte(latestCertificateText), &certificate); err != nil {
@@ -380,57 +406,6 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
-	// older certificates doesnt have prophylaxis
-	prophylaxis := certificate.Evidence[0].Prophylaxis
-	if prophylaxis == "" {
-		vaccine := strings.ToLower(certificate.Evidence[0].Vaccine)
-		for vaccName, proph := range vaccineProphylaxis {
-			if strings.Contains(vaccine, vaccName) {
-				prophylaxis = proph
-			}
-		}
-	}
-	displayLabels = []string{
-		certificate.Evidence[0].Vaccine,
-		prophylaxis,
-		certificate.Evidence[0].Manufacturer,
-	}
-	for i = 0; i < len(displayLabels); i++ {
-		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY + float64(i)*20)
-		_ = pdf.Cell(nil, displayLabels[i])
-	}
-	offsetNewY = offsetNewY + float64(len(displayLabels))*20
-	previousOffsetNewY := offsetNewY
-	for i = 0; i < len(doseWiseData); i++ {
-		data, _ := getDataForDose(doseWiseData, i+1)
-		offsetNewY = previousOffsetNewY
-		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY)
-		if data.dose > totalDoses {
-			_ = pdf.Cell(nil, "Precaution dose")
-		} else {
-			_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
-		}
-		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 20
-		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, data.doseDate)
-		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 20
-		pdf.SetY(offsetNewY)
-		_ = pdf.Cell(nil, data.batchNumber)
-		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 21
-		pdf.SetY(offsetNewY)
-		offsetNewX = offsetNewX + 100
-	}
-	if latestDose < totalDoses {
-		pdf.SetX(offsetX)
-		pdf.SetY(offsetNewY)
-		offsetNewY = offsetNewY + 20
-		_ = pdf.Cell(nil, certificate.GetNextDueDateInfo())
-	}
 	displayLabels = []string{
 		certificate.Evidence[0].Verifier.Name,
 		concatenateReadableString(concatenateReadableString(certificate.Evidence[0].Facility.Name,
@@ -439,9 +414,85 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 	}
 	displayLabels = splitAddressTextIfLengthIsLonger(pdf, displayLabels)
 	for i = 0; i < len(displayLabels); i++ {
-		pdf.SetX(offsetX)
-		pdf.SetY(offsetNewY + float64(i)*20)
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, displayLabels[i])
+		offsetNewY = offsetNewY + 20
+	}
+	if latestDose < totalDoses {
+		pdf.SetX(offsetX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, certificate.GetNextDueDateInfo())
+	}
+	offsetNewY = offsetNewY + 73
+	tableOffsetX := 41.0
+	for _, data := range doseWiseData {
+		offsetNewX = tableOffsetX
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		if data.dose > totalDoses {
+			_ = pdf.Cell(nil, "Precaution dose")
+		} else {
+			_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
+		}
+		offsetNewX = offsetNewX + 87
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.doseDate)
+		offsetNewX = offsetNewX + 88
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.name)
+		offsetNewX = offsetNewX + 90
+		pdf.SetX(offsetNewX)
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.batchNumber)
+		offsetNewX = offsetNewX + 92
+		wrappedVaccinationType := splitVaccinationTypeIfLengthIsLonger(pdf, data.vaccineType)
+		if len(wrappedVaccinationType) > 1 {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			typeOffsetY := offsetNewY - float64(3*(len(wrappedVaccinationType)))
+			for k := 0; k < len(wrappedVaccinationType); k++ {
+				pdf.SetX(offsetNewX)
+				pdf.SetY(typeOffsetY + float64(k)*8)
+				_ = pdf.Cell(nil, wrappedVaccinationType[k])
+			}
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.vaccineType)
+		}
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		offsetNewX = offsetNewX + 88
+		wrappedVaccManufacturer := splitVaccManufacturerIfLengthIsLonger(pdf, data.manufacturer)
+		if len(wrappedVaccManufacturer) > 1 {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			typeOffsetY := offsetNewY - float64(3*(len(wrappedVaccManufacturer)))
+			for k := 0; k < len(wrappedVaccManufacturer); k++ {
+				pdf.SetX(offsetNewX)
+				pdf.SetY(typeOffsetY + float64(k)*8)
+				_ = pdf.Cell(nil, wrappedVaccManufacturer[k])
+			}
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.manufacturer)
+		}
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		offsetNewY = offsetNewY + 25
+		pdf.SetY(offsetNewY)
 	}
 	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
@@ -470,10 +521,13 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			country = "IND"
 		}
 		doseWiseData = append(doseWiseData, DoseWiseData{
-			dose:        dose,
-			doseDate:    formatDateYYYYMMDD(certificate.Evidence[0].Date),
-			batchNumber: certificate.Evidence[0].Batch,
-			country:     country,
+			dose:         dose,
+			doseDate:     formatDateYYYYMMDD(certificate.Evidence[0].Date),
+			batchNumber:  certificate.Evidence[0].Batch,
+			country:      country,
+			name:         certificate.Evidence[0].Vaccine,
+			vaccineType:  certificate.Evidence[0].Prophylaxis,
+			manufacturer: certificate.Evidence[0].Manufacturer,
 		})
 	}
 	latestCertificateText := latestCertificate["certificate"].(string)
@@ -504,21 +558,21 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 
 	// header certificateId
 	doffsetX := 300.0
-	doffsetY := 174.0
+	doffsetY := 156.0
 	pdf.SetX(doffsetX)
 	pdf.SetY(doffsetY)
 	dText := latestCertificate["certificateId"].(string)
 	_ = pdf.Cell(nil, dText)
 
-	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
 
 	offsetX := 290.0
-	offsetY := 220.0
+	offsetY := 204.0
 	offsetNewX := 290.0
-	offsetNewY := 390.0
+	offsetNewY := 412.0
 	rowSize := 6
 
 	displayLabels := []string{
@@ -550,13 +604,13 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		}
 		i += 1
 	}
-	if err := pdf.SetFont("Proxima-Nova-Bold", "", 12); err != nil {
+	if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
 		log.Print(err.Error())
 		return nil, err
 	}
 	for ; i < rowSize-2; i++ {
 		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*24)
+		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	wrappedVaccinationStatus := splitVaccinationStatusIfLengthIsLonger(pdf, displayLabels[i])
@@ -565,7 +619,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Print(err.Error())
 			return nil, err
 		}
-		statusOffsetY := offsetY + float64(i)*24 - float64(4*(len(wrappedVaccinationStatus)))
+		statusOffsetY := offsetY + float64(i)*20 - float64(4*(len(wrappedVaccinationStatus)))
 		for k := 0; k < len(wrappedVaccinationStatus); k++ {
 			pdf.SetX(offsetX)
 			pdf.SetY(statusOffsetY + float64(k)*10)
@@ -573,28 +627,16 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		}
 	} else {
 		pdf.SetX(offsetX)
-		pdf.SetY(offsetY + float64(i)*24)
+		pdf.SetY(offsetY + float64(i)*20)
 		_ = pdf.Cell(nil, displayLabels[i])
 	}
 	i += 1
 	pdf.SetX(offsetX)
-	pdf.SetY(offsetY + float64(i)*24)
+	pdf.SetY(offsetY + float64(i)*20)
 	_ = pdf.Cell(nil, displayLabels[i])
-	displayLabels = []string{
-		certificate.Evidence[0].Vaccine,
-		certificate.Evidence[0].Prophylaxis,
-		certificate.Evidence[0].Manufacturer,
-	}
-	for i = 0; i < len(displayLabels); i++ {
-		pdf.SetX(offsetNewX)
-		pdf.SetY(offsetNewY + float64(i)*24)
-		_ = pdf.Cell(nil, displayLabels[i])
-	}
-	offsetNewY = offsetNewY + float64(3)*24
-	previousOffsetNewY := offsetNewY
-	for i = 0; i < len(doseWiseData); i++ {
-		data, _ := getDataForDose(doseWiseData, i+1)
-		offsetNewY = previousOffsetNewY
+	tableOffsetX := 41.0
+	for _, data := range doseWiseData {
+		offsetNewX = tableOffsetX
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
 		if data.dose > totalDoses {
@@ -602,18 +644,64 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		} else {
 			_ = pdf.Cell(nil, ordinalSuffixOf(data.dose))
 		}
+		offsetNewX = offsetNewX + 87
 		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 23
 		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, data.doseDate)
+		offsetNewX = offsetNewX + 88
 		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 23
+		pdf.SetY(offsetNewY)
+		_ = pdf.Cell(nil, data.name)
+		offsetNewX = offsetNewX + 90
+		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, data.batchNumber)
-		pdf.SetX(offsetNewX)
-		offsetNewY = offsetNewY + 24
+		offsetNewX = offsetNewX + 92
+		wrappedVaccinationType := splitVaccinationTypeIfLengthIsLonger(pdf, data.vaccineType)
+		if len(wrappedVaccinationType) > 1 {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			typeOffsetY := offsetNewY - float64(3*(len(wrappedVaccinationType)))
+			for k := 0; k < len(wrappedVaccinationType); k++ {
+				pdf.SetX(offsetNewX)
+				pdf.SetY(typeOffsetY + float64(k)*8)
+				_ = pdf.Cell(nil, wrappedVaccinationType[k])
+			}
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.vaccineType)
+		}
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		offsetNewX = offsetNewX + 88
+		wrappedVaccManufacturer := splitVaccManufacturerIfLengthIsLonger(pdf, data.manufacturer)
+		if len(wrappedVaccManufacturer) > 1 {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
+				log.Print(err.Error())
+				return nil, err
+			}
+			typeOffsetY := offsetNewY - float64(3*(len(wrappedVaccManufacturer)))
+			for k := 0; k < len(wrappedVaccManufacturer); k++ {
+				pdf.SetX(offsetNewX)
+				pdf.SetY(typeOffsetY + float64(k)*8)
+				_ = pdf.Cell(nil, wrappedVaccManufacturer[k])
+			}
+		} else {
+			pdf.SetX(offsetNewX)
+			pdf.SetY(offsetNewY)
+			_ = pdf.Cell(nil, data.manufacturer)
+		}
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 10); err != nil {
+			log.Print(err.Error())
+			return nil, err
+		}
+		offsetNewY = offsetNewY + 28
 		pdf.SetY(offsetNewY)
-		offsetNewX = offsetNewX + 100
 	}
 	e := pasteQrCodeOnPage(latestCertificateText, &pdf, 352, 576)
 	if e != nil {
@@ -782,6 +870,16 @@ func splitNameIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string
 
 func splitVaccinationStatusIfLengthIsLonger(pdf gopdf.GoPdf, vaccinationStatus string) []string {
 	wrap := wrapLongerText(vaccinationStatus, 50)
+	return wrap
+}
+
+func splitVaccinationTypeIfLengthIsLonger(pdf gopdf.GoPdf, vaccinationType string) []string {
+	wrap := wrapLongerText(vaccinationType, 26)
+	return wrap
+}
+
+func splitVaccManufacturerIfLengthIsLonger(pdf gopdf.GoPdf, vaccManufacturer string) []string {
+	wrap := wrapLongerText(vaccManufacturer, 24)
 	return wrap
 }
 
