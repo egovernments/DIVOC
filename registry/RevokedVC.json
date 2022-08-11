@@ -49,8 +49,7 @@
       "(previousCertificateId,refId)"
     ],
     "uniqueIndexFields": [
-      "previousCertificateId",
-      "certificateId"
+      "previousCertificateId"
     ],
     "systemFields": [
       "_osCreatedAt",
