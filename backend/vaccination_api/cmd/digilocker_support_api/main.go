@@ -56,6 +56,7 @@ const EventTagInternalHead = "internal-head"
 const YYYYMMDD = "2006-01-02"
 
 const DEFAULT_DUE_DATE_N_DAYS = 28
+const MaxDisplayCharacters = 50
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
 
 var vaccineProphylaxis = map[string]string{
@@ -944,7 +945,7 @@ func wrapLongerText(text string, lineWidth int) []string {
 
 func splitAddressTextIfLengthIsLonger(pdf gopdf.GoPdf, displayLabels []string) []string {
 	address := displayLabels[len(displayLabels)-1]
-	wrap := wrapLongerText(address, 50)
+	wrap := wrapLongerText(address, MaxDisplayCharacters)
 	displayLabels = displayLabels[:len(displayLabels)-1]
 	displayLabels = append(displayLabels, wrap...)
 	return displayLabels
