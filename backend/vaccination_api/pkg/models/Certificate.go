@@ -3,7 +3,27 @@ package models
 import (
 	"strconv"
 	"time"
+	"encoding/json"
 )
+
+type CustomTime time.Time
+
+func (mt *CustomTime) UnmarshalJSON(bs []byte) error {
+	var s string
+	err := json.Unmarshal(bs, &s)
+	if err != nil {
+		return err
+	}
+	t, err := time.ParseInLocation("2006-01-02", s, time.UTC)
+	if err != nil {
+		t, err = time.ParseInLocation("2006-01-02", s, time.UTC)
+		if err != nil {
+			return err
+		}
+	}
+	*mt = CustomTime(t)
+	return nil
+}
 
 type Certificate struct {
 	Context           []string `json:"@context"`
@@ -35,7 +55,7 @@ type Certificate struct {
 		Batch          string    `json:"batch"`
 		Vaccine        string    `json:"vaccine"`
 		Manufacturer   string    `json:"manufacturer"`
-		Date           time.Time `json:"date"`
+		Date           CustomTime `json:"date"`
 		EffectiveStart string    `json:"effectiveStart"`
 		EffectiveUntil string    `json:"effectiveUntil"`
 		CertificateId  string    `json:"certificateId"`
