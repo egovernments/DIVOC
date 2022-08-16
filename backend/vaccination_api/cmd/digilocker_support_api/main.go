@@ -455,11 +455,11 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		} else {
 			_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
 		}
-		offsetNewX = offsetNewX + 87
+		offsetNewX = offsetNewX + 78
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, data.doseDate)
-		offsetNewX = offsetNewX + 88
+		offsetNewX = offsetNewX + 78
 		wrappedName := splitVaccInfoIfLengthIsLonger(pdf, data.name)
 		if len(wrappedName) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
@@ -481,7 +481,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 90
+		offsetNewX = offsetNewX + 79
 		wrappedBatchNumber := splitVaccInfoIfLengthIsLonger(pdf, data.batchNumber)
 		if len(wrappedBatchNumber) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
@@ -503,7 +503,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 92
+		offsetNewX = offsetNewX + 80
 		wrappedVaccinationType := splitVaccinationTypeIfLengthIsLonger(pdf, data.vaccineType)
 		if len(wrappedVaccinationType) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
@@ -525,8 +525,8 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 88
-		wrappedVaccManufacturer := splitVaccInfoIfLengthIsLonger(pdf, data.manufacturer)
+		offsetNewX = offsetNewX + 105
+		wrappedVaccManufacturer := splitVaccManufIfLengthIsLonger(pdf, data.manufacturer)
 		if len(wrappedVaccManufacturer) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
 				log.Print(err.Error())
@@ -971,12 +971,17 @@ func splitVaccinationStatusIfLengthIsLonger(pdf gopdf.GoPdf, vaccinationStatus s
 }
 
 func splitVaccinationTypeIfLengthIsLonger(pdf gopdf.GoPdf, vaccinationType string) []string {
-	wrap := wrapLongerText(vaccinationType, 26)
+	wrap := wrapLongerText(vaccinationType, 28)
+	return wrap
+}
+
+func splitVaccManufIfLengthIsLonger(pdf gopdf.GoPdf, vaccInfo string) []string {
+	wrap := wrapLongerText(vaccInfo, 32)
 	return wrap
 }
 
 func splitVaccInfoIfLengthIsLonger(pdf gopdf.GoPdf, vaccInfo string) []string {
-	wrap := wrapLongerText(vaccInfo, 24)
+	wrap := wrapLongerText(vaccInfo, 19)
 	return wrap
 }
 
