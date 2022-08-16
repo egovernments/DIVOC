@@ -74,6 +74,38 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/schema/{schemaId}:
+    get:
+      tags:
+        - getSchema
+      summary: Get one or all schemas
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: getSchemaV1
+      parameters:
+        - in: path
+          name: schemaId
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SchemaList'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
   /v1/schema/{schemaId}/updateTemplateUrl:
     put:
       tags:
@@ -193,6 +225,28 @@ definitions:
     required:
       - name
       - schema
+  SchemaList:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: object
+          properties:
+            schema:
+              type: string
+              minLength: 1
+            name:
+              type: string
+              minLength: 1
+            osid:
+              type: string
+              minLength: 1
+            osOwner:
+              type: array
+              items:
+                type: string
+        minLength: 1
   UpdateSchemaRequest:
     type: object
     properties:

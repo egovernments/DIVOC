@@ -7,6 +7,7 @@ const schemaController = require('../controllers/schema.controller');
 const router = express.Router();
 
 router.post(`/`, [tokenValidationMiddleware], schemaController.createSchema)
+router.get(`/:schemaId?`, [tokenValidationMiddleware], schemaController.getSchema)
 router.put(`/:schemaId/updateTemplate`, [tokenValidationMiddleware, upload.single('files')], schemaController.updateTemplate)
 router.put(`/:schemaId/updateTemplateUrl`, [tokenValidationMiddleware], schemaController.updateTemplateUrls)
 
