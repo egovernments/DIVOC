@@ -1,0 +1,61 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "type": "object",
+  "properties": {
+    "RevokedVC": {
+      "$ref": "#/definitions/RevokedVC"
+    }
+  },
+  "required": [
+    "RevokedVC"
+  ],
+  "title": "RevokedVC",
+  "definitions": {
+    "RevokedVC": {
+      "type": "object",
+      "title": "Certification Revocation List",
+      "required": [
+        "previousCertificateId"
+      ],
+      "properties": {
+        "refId": {
+          "type": "string"
+        },
+        "certificateId": {
+          "type": "string"
+        },
+        "previousCertificateId": {
+          "type": "string"
+        },
+        "schema": {
+          "type": "string"
+        },
+        "startDate": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endDate": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  },
+  "_osConfig": {
+    "osComment": [],
+    "privateFields": [],
+    "signedFields": [],
+    "indexFields": [
+      "(previousCertificateId,refId)"
+    ],
+    "uniqueIndexFields": [
+      "previousCertificateId"
+    ],
+    "systemFields": [
+      "_osCreatedAt",
+      "_osUpdatedAt",
+      "_osCreatedBy",
+      "_osUpdatedBy"
+    ]
+  }
+}
