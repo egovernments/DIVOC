@@ -2,6 +2,7 @@ kafka:
   bootstrapServers: localhost
   certifyTopic: certify
   notifyTopic: notify
+  createNotificationTopic: create_notification
 
 smsapi:
   url: https://api.msg91.com/api/v2/sendsms

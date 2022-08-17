@@ -20,6 +20,7 @@ var Config = struct {
 		CertifyTopic     string `default:"certify" yaml:"certifyTopic"`
 		CertifiedTopic   string `default:"certified" yaml:"certifiedTopic"`
 		NotifyTopic      string `default:"notify" yaml:"notifyTopic"`
+		CreateNotificationTopic      string `default:"create_notification" yaml:"createNotificationTopic"`
 	}
 	SmsAPI struct {
 		URL     string `env:"SMS_URL" default:"https://api.msg91.com/api/v2/sendsms" yaml:"url"`
