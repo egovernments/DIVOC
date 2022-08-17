@@ -1,5 +1,6 @@
 const certifyConstants = require('../configs/constants');
 const axios = require("axios");
+const { token } = require('morgan');
 
 const createCertificate = (certificateRequest, entityType, token) => {
     return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}`, certificateRequest, {headers: {Authorization: token}})
@@ -42,9 +43,29 @@ const deleteCertificate = (certificateRequestBody, entityName, entityId, token) 
         });
 };
 
+const revokeCertificate = (body, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}RevokedVC`, body, {headers: {Authorization: token}})
+        .then(res => res.data)
+        .catch(error => {
+            console.error("Error in revoking certificate : ", error);
+            throw error;
+        });
+}
+
+const searchCertificate = (entityType, filters, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data.length >= 1)
+        .catch(err => {
+            console.error(err);
+            return false;
+        })
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
-    deleteCertificate
+    deleteCertificate,
+    revokeCertificate,
+    searchCertificate
 }
