@@ -1,6 +1,5 @@
 const certifyConstants = require('../configs/constants');
 const axios = require("axios");
-const { token } = require('morgan');
 
 const createCertificate = (certificateRequest, entityType, token) => {
     return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}`, certificateRequest, {headers: {Authorization: token}})
