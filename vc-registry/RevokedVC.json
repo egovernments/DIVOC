@@ -46,7 +46,7 @@
     "privateFields": [],
     "signedFields": [],
     "indexFields": [
-      "(previousCertificateId,refId)"
+      "previousCertificateId"
     ],
     "uniqueIndexFields": [
       "previousCertificateId"
