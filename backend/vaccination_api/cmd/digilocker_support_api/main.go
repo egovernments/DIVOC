@@ -455,14 +455,14 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 		} else {
 			_ = pdf.Cell(nil, pkg.ToString(data.dose)+"/"+pkg.ToString(certificate.Evidence[0].TotalDoses))
 		}
-		offsetNewX = offsetNewX + 78
+		offsetNewX = offsetNewX + 74
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, data.doseDate)
-		offsetNewX = offsetNewX + 78
+		offsetNewX = offsetNewX + 77
 		wrappedName := splitVaccInfoIfLengthIsLonger(pdf, data.name)
 		if len(wrappedName) > 1 {
-			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 				log.Print(err.Error())
 				return nil, err
 			}
@@ -477,14 +477,14 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			pdf.SetY(offsetNewY)
 			_ = pdf.Cell(nil, data.name)
 		}
-		if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 79
+		offsetNewX = offsetNewX + 86
 		wrappedBatchNumber := splitVaccInfoIfLengthIsLonger(pdf, data.batchNumber)
 		if len(wrappedBatchNumber) > 1 {
-			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 				log.Print(err.Error())
 				return nil, err
 			}
@@ -499,14 +499,14 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			pdf.SetY(offsetNewY)
 			_ = pdf.Cell(nil, data.batchNumber)
 		}
-		if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 80
+		offsetNewX = offsetNewX + 73
 		wrappedVaccinationType := splitVaccinationTypeIfLengthIsLonger(pdf, data.vaccineType)
 		if len(wrappedVaccinationType) > 1 {
-			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 				log.Print(err.Error())
 				return nil, err
 			}
@@ -521,14 +521,14 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			pdf.SetY(offsetNewY)
 			_ = pdf.Cell(nil, data.vaccineType)
 		}
-		if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 105
+		offsetNewX = offsetNewX + 109
 		wrappedVaccManufacturer := splitVaccManufIfLengthIsLonger(pdf, data.manufacturer)
 		if len(wrappedVaccManufacturer) > 1 {
-			if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 				log.Print(err.Error())
 				return nil, err
 			}
@@ -543,7 +543,7 @@ func getCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface{}, 
 			pdf.SetY(offsetNewY)
 			_ = pdf.Cell(nil, data.manufacturer)
 		}
-		if err := pdf.SetFont("Proxima-Nova-Bold", "", 8); err != nil {
+		if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 			log.Print(err.Error())
 			return nil, err
 		}
@@ -981,7 +981,7 @@ func splitVaccManufIfLengthIsLonger(pdf gopdf.GoPdf, vaccInfo string) []string {
 }
 
 func splitVaccInfoIfLengthIsLonger(pdf gopdf.GoPdf, vaccInfo string) []string {
-	wrap := wrapLongerText(vaccInfo, 19)
+	wrap := wrapLongerText(vaccInfo, 21)
 	return wrap
 }
 
