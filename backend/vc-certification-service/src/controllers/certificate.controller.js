@@ -83,44 +83,10 @@ async function revokeCertificate(req, res) {
         "limit": 1,
         "offset": 0
     }
-    // const flag = await sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
-    // if(!flag) {
-    //     res.status(400).json({
-    //         message: `Entry for ${req.body.entityName} not found`
-    //     });
-    //     return;
-    // }
-    // let body = {
-    //     previousCertificateId: req.body.certificateId,
-    //     schema: req.body.entityName,
-    //     startDate: new Date(),
-    // }
-    // if(req.body.endDate) {
-    //     body = {...body, endDate: req.body.endDate}
-    // }
-    // try {
-    //     const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
-    //     res.status(200).json({
-    //         message: "Certificate Revoked",
-    //         certificateRevokeResponse: certificateRevokeResponse
-    //     })
-    // } catch(err) {
-    //     console.error(err);
-    //     res.status(err?.response?.status || 500).json({
-    //         message: err?.response?.data
-    //     });
-    // }
     sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
     .then(async(result) => {
         if(result === true) {
-            let body = {
-                previousCertificateId: req.body.certificateId,
-                schema: req.body.entityName,
-                startDate: new Date(),
-            }
-            if(req.body.endDate) {
-                body = {...body, endDate: req.body.endDate}
-            }
+            let body = getRevokeBody(req);
             const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
             res.status(200).json({
                 message: "Certificate Revoked",
@@ -139,6 +105,18 @@ async function revokeCertificate(req, res) {
             message: err?.response?.data
         })
     })
+}
+
+function getRevokeBody(req) {
+    let body = {
+        previousCertificateId: req.body.certificateId,
+        schema: req.body.entityName,
+        startDate: new Date(),
+    }
+    if(req.body.endDate) {
+        body = {...body, endDate: req.body.endDate}
+    }
+    return body;
 }
 
 module.exports = {
