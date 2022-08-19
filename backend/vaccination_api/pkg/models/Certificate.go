@@ -14,7 +14,7 @@ func (mt *CustomTime) UnmarshalJSON(bs []byte) error {
 	if err != nil {
 		return err
 	}
-	t, err := time.ParseInLocation("2006-01-02T15:04:05.123Z", s, time.UTC)
+	t, err := time.ParseInLocation("2006-01-02T15:04:05.000Z", s, time.UTC)
 	if err != nil {
 		t, err = time.ParseInLocation("2006-01-02", s, time.UTC)
 		if err != nil {
