@@ -52,11 +52,8 @@ const revokeCertificate = (body, token) => {
 }
 
 const searchCertificate = (entityType, filters, token) => {
-    return axios.default.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
-        .then(res => {
-            console.log('RES : ' , res.data);
-            return res.data.length >= 1
-        })
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data.length >= 1)
         .catch(err => {
             console.error(err);
             throw err;
