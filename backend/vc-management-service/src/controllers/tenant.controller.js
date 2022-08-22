@@ -4,9 +4,17 @@ const utils = require('../utils/utils')
 
 async function createTenant(req, res) {
     try {
-        const isValidUserId = utils.isValidUserId(req.body?.accountDetails?.userId);
+        const userId = req.body?.accountDetails?.userId;
+        const token = req.header("Authorization");
+        const isValidUserId = utils.isValidUserId(userId);
         if (isValidUserId) {
-            const tenantAddResponse = await sunbirdRegistryService.createTenant(req.body);
+            let tenantAddResponse;
+            await sunbirdRegistryService.createTenant(req.body).then(async (res) => {
+                tenantAddResponse = res;
+                await createAndAssignNewRole(userId, token)
+            }).catch(err => {
+                throw err
+            });
             res.status(200).json({
                 message: "Successfully created Tenant",
                 tenantAddResponse: tenantAddResponse
@@ -21,6 +29,35 @@ async function createTenant(req, res) {
         res.status(err?.response?.status || 500).json({
             message: err?.response?.data
         });
+    }
+}
+
+async function createAndAssignNewRole(userName, token) {
+    console.log("creating new role");
+    const roleName = userName + "-realm-role";
+    const adminRoleName = "admin";
+    try {
+        await keycloakService.createNewRole(roleName, token);
+        const users = await keycloakService.getUserInfo(userName, token);
+        const userId = users[0]?.id;
+        const role = await keycloakService.getRoleInfo(roleName, token);
+        const roleId = role?.id;
+        const adminRole = await keycloakService.getRoleInfo(adminRoleName, token);
+        const adminRoleId = adminRole?.id;
+        const assigningRoles = [
+            {
+                "id": roleId,
+                "name": roleName
+            },
+            {
+                "id": adminRoleId,
+                "name": adminRoleName
+            }
+        ]
+        await keycloakService.assignNewRole(assigningRoles, userId, token);
+    } catch (err) {
+        console.log("error while creating and assigning role to a user ", err)
+        throw err;
     }
 }
 
