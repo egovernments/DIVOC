@@ -56,7 +56,7 @@ const searchCertificate = (entityType, filters, token) => {
         .then(res => res.data.length >= 1)
         .catch(err => {
             console.error(err);
-            return false;
+            throw err;
         })
 }
 
