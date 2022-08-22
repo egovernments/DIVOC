@@ -1,6 +1,6 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
-
+const {validationResult} = require('express-validator');
 async function createCertificate(req, res) {
     try {
         const entityType = req.params.entityType;
@@ -73,6 +73,12 @@ async function deleteCertificate(req, res) {
 }
 
 async function revokeCertificate(req, res) {
+    const errors = validationResult(req);
+    console.log(errors);
+    if (!errors.isEmpty()) {
+        res.status(400).json(errors);
+        return;
+    }
     const token = req.header("Authorization");
     const filters = {
         "filters": {
