@@ -70,9 +70,57 @@ async function deleteCertificate(req, res) {
     }
 }
 
+async function revokeCertificate(req, res) {
+    const token = req.header("Authorization");
+    const filters = {
+        "filters": {
+            "osid": {
+                "eq": req.body.certificateId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
+    .then(async(result) => {
+        if(result === true) {
+            let body = getRevokeBody(req);
+            const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
+            res.status(200).json({
+                message: "Certificate Revoked",
+                certificateRevokeResponse: certificateRevokeResponse
+            });
+        }
+        else {
+            console.log('RESULT : ',result);
+            res.status(400).json({
+                message: `Entry for ${req.body.entityName} not found`
+            })
+        }
+    }).catch(err => {
+        console.log('ERROR : ',err?.response?.status || '');
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        })
+    })
+}
+
+function getRevokeBody(req) {
+    let body = {
+        previousCertificateId: req.body.certificateId,
+        schema: req.body.entityName,
+        startDate: new Date(),
+    }
+    if(req.body.endDate) {
+        body = {...body, endDate: req.body.endDate}
+    }
+    return body;
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
-    deleteCertificate
+    deleteCertificate,
+    revokeCertificate
 }

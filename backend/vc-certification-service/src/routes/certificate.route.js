@@ -12,5 +12,5 @@ router.post(`/certify/:entityType`, authMiddleware, (req, res) => certificateCon
 router.get(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.getCertificate)
 router.put(`/certify/:entityName/:certificateId`, authMiddleware, certificateController.updateCertificate);
 router.delete(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.deleteCertificate);
-
+router.post(`/certificate/revoke`, authMiddleware, certificateController.revokeCertificate);
 module.exports = {certifyRouter: router, setKafkaProducer}
