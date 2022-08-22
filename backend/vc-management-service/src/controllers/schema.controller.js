@@ -1,6 +1,6 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
-const {ISSUER_NAME} = require("../configs/config");
+const {TENANT_NAME} = require("../configs/config");
 const {MINIO_URL_SCHEME} = require("../configs/constants");
 
 async function createSchema(req, res) {
@@ -61,7 +61,7 @@ async function updateTemplate(req, res) {
         const formData = getFormData(req);
         const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
             formData,
-            ISSUER_NAME,
+            TENANT_NAME,
             token
         );
         const uploadUrl = MINIO_URL_SCHEME + uploadTemplateResponse?.documentLocations[0];

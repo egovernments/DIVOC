@@ -1,14 +1,15 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
+const keycloakService = require('../services/keycloak.service')
 const utils = require('../utils/utils')
 
-async function createIssuer(req, res) {
+async function createTenant(req, res) {
     try {
-        const isValidUserId = utils.isValidUserId(req.body?.accountDetails?.userId)
+        const isValidUserId = utils.isValidUserId(req.body?.accountDetails?.userId);
         if (isValidUserId) {
-            const issuerAddResponse = await sunbirdRegistryService.createIssuer(req.body);
+            const tenantAddResponse = await sunbirdRegistryService.createTenant(req.body);
             res.status(200).json({
-                message: "Successfully created Issuer",
-                issuerAddResponse: issuerAddResponse
+                message: "Successfully created Tenant",
+                tenantAddResponse: tenantAddResponse
             });
             return;
         }
@@ -24,5 +25,5 @@ async function createIssuer(req, res) {
 }
 
 module.exports = {
-    createIssuer
+    createTenant
 }

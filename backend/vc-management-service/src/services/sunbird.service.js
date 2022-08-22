@@ -3,8 +3,8 @@ const axios = require('axios');
 const constants = require('../configs/constants');
 const config = require('../configs/config');
 
-const createIssuer = async (issuerRequest) => {
-    return axios.post(constants.SUNBIRD_ISSUER_INVITE_URL, issuerRequest).then(res =>
+const createTenant = async (tenantRequest) => {
+    return axios.post(constants.SUNBIRD_TENANT_INVITE_URL, tenantRequest).then(res =>
         res.data
     ).catch(error => {
         console.error(error);
@@ -41,13 +41,13 @@ const getSchema = async (token, schemaId) => {
     });
 }
 
-const uploadTemplate = async(formData, issuer, token) => {
+const uploadTemplate = async(formData, tenant, token) => {
     const headers = getHeaders(formData, token);
     try {
-        const issuerId = await getIssuerId(token);
+        const tenantId = await getTenantId(token);
         let url = constants.SUNBIRD_TEMPLATE_UPLOAD_URL
-                    .replace(':issuerName', issuer)
-                    .replace(':issuerId', issuerId);
+                    .replace(':tenantName', tenant)
+                    .replace(':tenantId', tenantId);
         return axios.post(url, formData, headers)
             .then(res => res.data)
             .catch(error => {
@@ -70,8 +70,8 @@ function getHeaders(formData, token) {
     };
 }
 
-const getIssuerId = async(token) => {
-    const url = config.SUNBIRD_REGISTRY_URL + "/api/v1/Issuer"
+const getTenantId = async(token) => {
+    const url = config.SUNBIRD_REGISTRY_URL + "/api/v1/Tenant"
     return axios.get(url, {headers: {Authorization: token}})
             .then(res => {
                 try {
@@ -104,7 +104,7 @@ const getTransaction = async (transactionId, token) => {
 }
 
 module.exports = {
-    createIssuer,
+    createTenant,
     createSchema,
     uploadTemplate,
     updateSchema,

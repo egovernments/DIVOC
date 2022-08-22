@@ -8,27 +8,27 @@ consumes:
 produces:
   - application/json
 paths:
-  /v1/issuer:
+  /v1/tenant:
     post:
       tags:
-        - issuerInvite
-      summary: Invite a new issuer
+        - tenantInvite
+      summary: Invite a new tenant
       consumes:
         - application/json
       produces:
         - application/json
-      operationId: issuerInvite
+      operationId: tenantInvite
       parameters:
         - in: body
           name: body
           required: true
           schema:
-            $ref: '#/definitions/InviteIssuerRequest'
+            $ref: '#/definitions/InviteTenantRequest'
       responses:
         '200':
           description: OK
           schema:
-            $ref: '#/definitions/IssuerInviteSuccess'
+            $ref: '#/definitions/TenantInviteSuccess'
         '400':
           description: Invalid input
           schema:
@@ -180,7 +180,7 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
-  /v1/templates/:issuer:
+  /v1/templates/:tenant:
     post:
       tags:
         - upload template
@@ -290,12 +290,12 @@ definitions:
                 properties:
                   osid:
                     type: string
-  IssuerInviteSuccess:
+  TenantInviteSuccess:
     type: object
     properties:
       message:
         type: string
-  InviteIssuerRequest:
+  InviteTenantRequest:
     type: object
     properties:
       contactDetails:
