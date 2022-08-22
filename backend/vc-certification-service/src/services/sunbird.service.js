@@ -10,7 +10,6 @@ const createCertificate = (certificateRequest, entityType, token) => {
 };
 
 const getCertificate = (entityName, certificateId, headers) => {
-
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
         responseType: "stream",
         headers: headers
@@ -31,9 +30,9 @@ const updateCertificate = (certificateRequestBody, entityName, entityId, token) 
             throw err;
         });
 };
-const deleteCertificate = (certificateRequestBody, entityName, entityId, token) => {
+const deleteCertificate = (entityName, entityId, token) => {
+    console.log(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`)
     return axios.delete(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
-                    certificateRequestBody,
                     {headers: {Authorization: token}}
         ).then(res => res.data)
         .catch(err => {

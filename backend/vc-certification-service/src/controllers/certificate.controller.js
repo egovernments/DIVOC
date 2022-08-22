@@ -59,7 +59,7 @@ async function deleteCertificate(req, res) {
     const entityId = req.params.certificateId;
     const token = req.header("Authorization");
     try {
-        const certificateRevokeResponse = await sunbirdRegistryService.deleteCertificate(req.body, entityName, entityId, token);
+        const certificateRevokeResponse = await sunbirdRegistryService.deleteCertificate(entityName, entityId, token);
         res.status(200).json({
             message: "Certificate revoked",
             certificateRevokeResponse: certificateRevokeResponse
