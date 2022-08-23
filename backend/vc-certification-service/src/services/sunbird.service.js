@@ -75,7 +75,7 @@ module.exports = {
     getCertificate,
     updateCertificate,
     deleteCertificate,
-    getCertificateForUpdate
+    getCertificateForUpdate,
     revokeCertificate,
     searchCertificate
 }
