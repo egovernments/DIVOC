@@ -1,7 +1,7 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {ISSUER_NAME} = require("../configs/config");
-const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_FIELD_EVIDENCE_INDEX_START} = require("../configs/constants");
+const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS} = require("../configs/constants");
 
 async function createSchema(req, res) {
     try {
@@ -117,40 +117,63 @@ async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
 
 function addMandatoryFields(schemaRequest) {
     const mandatoryFields = MANDATORY_FIELDS;
+    const mandatoryEvidenceFields = MANDATORY_EVIDENCE_FIELDS;
     const schemaName = schemaRequest.name;
     var schemaUnparsed = schemaRequest.schema;
     var schema = JSON.parse(schemaUnparsed);
 
     var reqFields = schema.definitions[schemaName].required;
+    addInRequiredFields(reqFields,mandatoryFields,mandatoryEvidenceFields)
+  
+    var properties = schema.definitions[schemaName].properties;  
+    addInProperties(properties,mandatoryFields,mandatoryEvidenceFields)
+    
+    var credTemp = schema._osConfig.credentialTemplate;
+    addInCredentialTemplate(credTemp,mandatoryFields,mandatoryEvidenceFields)
+    
+    schemaRequestFinal = {
+    "name":schemaName,
+    "schema": JSON.stringify(schema)
+    }
+    return schemaRequestFinal;
+}
+
+function addInRequiredFields(reqFields,mandatoryFields,mandatoryEvidenceFields){
     for (let field of mandatoryFields) {
         if (!reqFields.includes(field)) {
             reqFields.push(field);
         }
     };
-    
-    var properties = schema.definitions[schemaName].properties;
+    for (let field of mandatoryEvidenceFields) {
+        if (!reqFields.includes(field)) {
+            reqFields.push(field);
+        }
+    };
+    return 
+}
+
+function addInProperties(properties,mandatoryFields,mandatoryEvidenceFields){
     for (let field of mandatoryFields) {
         properties[field] = { type : 'string'};
     };
-    
-    var credTemp = schema._osConfig.credentialTemplate;
+    for (let field of mandatoryEvidenceFields) {
+        properties[field] = { type : 'string'};
+    };
+    return
+}
 
-    var index = 0;
-    for (index ; index<MANDATORY_FIELD_EVIDENCE_INDEX_START; index++) {
+function addInCredentialTemplate(credTemp,mandatoryFields,mandatoryEvidenceFields){
+    for (let index = 0; index<mandatoryFields.length; index++) {
         if (credTemp[mandatoryFields[index]] === "issuer") {
             credTemp[mandatoryFields[index]] = '{{{'+mandatoryFields[index]+'}}}';
             continue
         }
         credTemp[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}'
     };
-    for (index ; index<mandatoryFields.length; index++) {
-        credTemp.evidence[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}';
+    for (let index = 0; index<mandatoryEvidenceFields.length; index++) {
+        credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
     };
-    schemaRequestFinal = {
-    "name":schemaName,
-    "schema": JSON.stringify(schema)
-    }
-    return schemaRequestFinal;
+    return
 }
 
 module.exports = {

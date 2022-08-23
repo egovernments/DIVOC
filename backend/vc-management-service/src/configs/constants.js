@@ -7,8 +7,8 @@ const SUNBIRD_TEMPLATE_UPLOAD_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/:issu
 const SUNBIRD_GET_SCHEMA_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Schema/:schemaId`
 const MINIO_URL_SCHEME = "minio://"
 const SUNBIRD_GET_TRANSACTION_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/TransactionOsidMap/search`;
-const MANDATORY_FIELDS = ["issuer", "issuanceDate", "validFrom", "validUntil" , "certificateId"];
-const MANDATORY_FIELD_EVIDENCE_INDEX_START = 2 ;
+const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
+const MANDATORY_EVIDENCE_FIELDS = ["validFrom", "validUntil" , "certificateId"];
 
 module.exports = {
     SUNBIRD_ISSUER_INVITE_URL,
@@ -19,5 +19,5 @@ module.exports = {
     MINIO_URL_SCHEME,
     SUNBIRD_GET_TRANSACTION_URL,
     MANDATORY_FIELDS,
-    MANDATORY_FIELD_EVIDENCE_INDEX_START
+    MANDATORY_EVIDENCE_FIELDS
 }
