@@ -123,14 +123,14 @@ function addMandatoryFields(schemaRequest) {
     var schema = JSON.parse(schemaUnparsed);
 
     var reqFields = schema.definitions[schemaName].required;
-    addInRequiredFields(reqFields,mandatoryFields,mandatoryEvidenceFields)
+    addInRequiredFields(reqFields, mandatoryFields, mandatoryEvidenceFields)
   
     var properties = schema.definitions[schemaName].properties;  
-    addInProperties(properties,mandatoryFields,mandatoryEvidenceFields)
+    addInProperties(properties, mandatoryFields, mandatoryEvidenceFields)
     
     var credTemp = schema._osConfig.credentialTemplate;
-    addInCredentialTemplate(credTemp,mandatoryFields,mandatoryEvidenceFields)
-    
+    addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
+
     schemaRequestFinal = {
     "name":schemaName,
     "schema": JSON.stringify(schema)
@@ -138,7 +138,7 @@ function addMandatoryFields(schemaRequest) {
     return schemaRequestFinal;
 }
 
-function addInRequiredFields(reqFields,mandatoryFields,mandatoryEvidenceFields){
+function addInRequiredFields(reqFields, mandatoryFields, mandatoryEvidenceFields){
     for (let field of mandatoryFields) {
         if (!reqFields.includes(field)) {
             reqFields.push(field);
@@ -152,7 +152,7 @@ function addInRequiredFields(reqFields,mandatoryFields,mandatoryEvidenceFields){
     return 
 }
 
-function addInProperties(properties,mandatoryFields,mandatoryEvidenceFields){
+function addInProperties(properties, mandatoryFields, mandatoryEvidenceFields){
     for (let field of mandatoryFields) {
         properties[field] = { type : 'string'};
     };
@@ -162,13 +162,17 @@ function addInProperties(properties,mandatoryFields,mandatoryEvidenceFields){
     return
 }
 
-function addInCredentialTemplate(credTemp,mandatoryFields,mandatoryEvidenceFields){
+function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields){
     for (let index = 0; index<mandatoryFields.length; index++) {
-        if (credTemp[mandatoryFields[index]] === "issuer") {
-            credTemp[mandatoryFields[index]] = '{{{'+mandatoryFields[index]+'}}}';
-            continue
+        if (!credTemp[mandatoryFields[index]]) {
+            if(mandatoryFields[index] === "issuer") {
+                credTemp[mandatoryFields[index]] = '{{{'+mandatoryFields[index]+'}}}';
+                continue
+            } else {
+                credTemp[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}';
+            }          
         }
-        credTemp[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}'
+        
     };
     for (let index = 0; index<mandatoryEvidenceFields.length; index++) {
         credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
