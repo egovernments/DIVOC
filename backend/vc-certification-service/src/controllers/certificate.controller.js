@@ -104,6 +104,7 @@ function createDataForUpdate (certID , prevCertID , startDate){
     
  }
  return dataForUpdate;
+}
 
 async function revokeCertificate(req, res) {
     const errors = validationResult(req);
@@ -166,3 +167,4 @@ module.exports = {
     deleteCertificate,
     revokeCertificate
 }
+
