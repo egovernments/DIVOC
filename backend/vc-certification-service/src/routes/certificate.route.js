@@ -9,5 +9,5 @@ router.post(`/certify/:entityType`, authMiddleware, certificateController.create
 router.get(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.getCertificate)
 router.put(`/certify/:entityName/:certificateId`, authMiddleware, certificateController.updateCertificate);
 router.delete(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.deleteCertificate);
-router.post(`/certificate/revoke`, [authMiddleware, body(["entityName", "certificateId"], "Missing fields").exists()], certificateController.revokeCertificate);
+router.post(`/certificate/revoke`, [authMiddleware, body(["entityName", "certificateId"], "Missing entityName or CertificateId in request body").exists()], certificateController.revokeCertificate);
 module.exports = router;
