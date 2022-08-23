@@ -41,7 +41,7 @@ async function updateSchema(req, res) {
     try {
         const schemaId = req.params.schemaId;
         const token = req.header("Authorization");
-        schemaRequest = addMandatoryFields(req.body);
+        var schemaRequest = addMandatoryFields(req.body);
         const schemaUpdateResponse = await sunbirdRegistryService.updateSchema(schemaRequest, token, schemaId);
         res.status(200).json({
             message: "Successfully updated Schema",
