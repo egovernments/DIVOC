@@ -42,16 +42,10 @@ async function createAndAssignNewRole(userName, token) {
         const userId = users[0]?.id;
         const role = await keycloakService.getRoleInfo(roleName, token);
         const roleId = role?.id;
-        const adminRole = await keycloakService.getRoleInfo(adminRoleName, token);
-        const adminRoleId = adminRole?.id;
         const assigningRoles = [
             {
                 "id": roleId,
                 "name": roleName
-            },
-            {
-                "id": adminRoleId,
-                "name": adminRoleName
             }
         ]
         await keycloakService.assignNewRole(assigningRoles, userId, token);
