@@ -167,7 +167,6 @@ function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFie
         if (!credTemp[mandatoryFields[index]]) {
             if(mandatoryFields[index] === "issuer") {
                 credTemp[mandatoryFields[index]] = '{{{'+mandatoryFields[index]+'}}}';
-                continue
             } else {
                 credTemp[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}';
             }          
