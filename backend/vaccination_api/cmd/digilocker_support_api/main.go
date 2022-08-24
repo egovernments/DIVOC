@@ -60,12 +60,30 @@ const MaxDisplayCharacters = 50
 const VaccinationContextV2 = "https://cowin.gov.in/credentials/vaccination/v2"
 
 var vaccineProphylaxis = map[string]string{
-	"covaxin":    "COVID-19 vaccine, inactivated virus",
-	"covishield": "COVID-19 vaccine, non-replicating viral vector",
-	"sputnik":    "COVID-19 vaccine, non-replicating viral vector",
-	"zycov":      "COVID-19 vaccine, DNA based",
-	"covovax":    "COVID-19 vaccine, virus protein subunit",
-	"corbevax":   "COVID-19 vaccine, virus protein subunit",
+	"covaxin":     "COVID-19 vaccine, inactivated virus",
+	"covishield":  "COVID-19 vaccine, non-replicating viral vector",
+	"sputnik":     "COVID-19 vaccine, non-replicating viral vector",
+	"zycov":       "COVID-19 vaccine, DNA based",
+	"covovax":     "COVID-19 vaccine, virus protein subunit",
+	"corbevax":    "COVID-19 vaccine, virus protein subunit",
+	"novavax":     "COVID-19 vaccine, virus protein subunit",
+	"nuvaxovid":   "COVID-19 vaccine, virus protein subunit",
+	"spikevax":    "COVID-19 vaccine, mRNA based",
+	"spike vax":   "COVID-19 vaccine, mRNA based",
+	"moderna":     "COVID-19 vaccine, mRNA based",
+	"modema":      "COVID-19 vaccine, mRNA based",
+	"comirnaty":   "COVID-19 vaccine, mRNA based",
+	"pfizer":      "COVID-19 vaccine, mRNA based",
+	"biontech":    "COVID-19 vaccine, mRNA based",
+	"convidecia":  "COVID-19 vaccine, non-replicating viral vector",
+	"janssen":     "COVID-19 vaccine, replicating viral vector",
+	"vaxzevria":   "COVID-19 vaccine, non-replicating viral vector",
+	"astrazeneca": "COVID-19 vaccine, non-replicating viral vector",
+	"covilo":      "COVID-19 vaccine, inactivated virus",
+	"bbibp":       "COVID-19 vaccine, inactivated virus",
+	"sinopharm":   "COVID-19 vaccine, inactivated virus",
+	"coronavac":   "COVID-19 vaccine, inactivated virus",
+	"sinovac":     "COVID-19 vaccine, inactivated virus",
 }
 
 type DoseWiseData struct {
@@ -582,7 +600,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			batchNumber:  certificate.Evidence[0].Batch,
 			country:      country,
 			name:         certificate.Evidence[0].Vaccine,
-			vaccineType:  certificate.Evidence[0].Prophylaxis,
+			vaccineType:  getProphylaxis(certificate),
 			manufacturer: certificate.Evidence[0].Manufacturer,
 		})
 		doseWiseData = sortDoseWiseData(doseWiseData)
@@ -705,11 +723,11 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 		} else {
 			_ = pdf.Cell(nil, ordinalSuffixOf(data.dose))
 		}
-		offsetNewX = offsetNewX + 87
+		offsetNewX = offsetNewX + 74
 		pdf.SetX(offsetNewX)
 		pdf.SetY(offsetNewY)
 		_ = pdf.Cell(nil, data.doseDate)
-		offsetNewX = offsetNewX + 88
+		offsetNewX = offsetNewX + 77
 		wrappedName := splitVaccInfoIfLengthIsLonger(pdf, data.name)
 		if len(wrappedName) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
@@ -731,7 +749,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 90
+		offsetNewX = offsetNewX + 86
 		wrappedBatchNumber := splitVaccInfoIfLengthIsLonger(pdf, data.batchNumber)
 		if len(wrappedBatchNumber) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
@@ -753,7 +771,7 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 92
+		offsetNewX = offsetNewX + 73
 		wrappedVaccinationType := splitVaccinationTypeIfLengthIsLonger(pdf, data.vaccineType)
 		if len(wrappedVaccinationType) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
@@ -775,8 +793,8 @@ func getDDCCCertificateAsPdfV3(certificateByDoses map[int][]map[string]interface
 			log.Print(err.Error())
 			return nil, err
 		}
-		offsetNewX = offsetNewX + 88
-		wrappedVaccManufacturer := splitVaccInfoIfLengthIsLonger(pdf, data.manufacturer)
+		offsetNewX = offsetNewX + 109
+		wrappedVaccManufacturer := splitVaccManufIfLengthIsLonger(pdf, data.manufacturer)
 		if len(wrappedVaccManufacturer) > 1 {
 			if err := pdf.SetFont("Proxima-Nova-Bold", "", 7); err != nil {
 				log.Print(err.Error())
