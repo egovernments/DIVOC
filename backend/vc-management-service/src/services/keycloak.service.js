@@ -32,6 +32,70 @@ const KeycloakFactory = (function(){
     };
 })();
 
+const createNewRole = async (roleName, token) => {
+    const roleRepresentation = {
+        "name": roleName
+    }
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    return axios.post(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/roles`, roleRepresentation, reqConfig).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
+const assignNewRole = async (roles, userId, token) => {
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    return axios.post(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users/${userId}/role-mappings/realm`, roles, reqConfig).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
+const getUserInfo = async (userName, token) => {
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    return axios.get(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/users?username=${userName}`, reqConfig).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
+const getRoleInfo = async (roleName, token) => {
+    const reqConfig = {
+        headers: {
+            Authorization: token
+        }
+    }
+    return axios.get(`${config.KEYCLOAK_URL}/auth/admin/realms/${config.KEYCLOAK_REALM}/roles/${roleName}`, reqConfig).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
+}
+
+
 module.exports = {
-    KeycloakFactory
+    KeycloakFactory,
+    createNewRole,
+    assignNewRole,
+    getUserInfo,
+    getRoleInfo
 };

@@ -11,7 +11,7 @@ function getFormData(req) {
     return formData;
 }
 
-function isValidIssuerName(val) {
+function isValidTenantName(val) {
     const regex = /^[a-zA-Z]*$/
     return val !== "" && regex.test(val);
 }
@@ -19,5 +19,5 @@ function isValidIssuerName(val) {
 module.exports = {
     isValidUserId,
     getFormData,
-    isValidIssuerName
+    isValidTenantName
 }
