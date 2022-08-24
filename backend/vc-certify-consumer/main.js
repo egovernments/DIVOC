@@ -24,7 +24,6 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
         const createEntityMessage = JSON.parse(message.value.toString());
         const token = createEntityMessage.token;
         const payload = createEntityMessage.body;
-        let max =3;
         let resp = "";
         do {
           payload.certificateId = getCertificateId();
@@ -36,7 +35,7 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
             resp = error;
           }
         }
-        while (R.pathOr("",["response","data","params","status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("",["response","data","params","errmsg"], resp).includes(DUPLICATE_MSG) && max--);
+        while (R.pathOr("",["response","data","params","status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("",["response","data","params","errmsg"], resp).includes(DUPLICATE_MSG));
         if(R.pathOr("",["params","status"], resp) === REGISTRY_SUCCESS_STATUS){
           console.log("Certificate is created successfully");
           console.log("Response : ", resp);
