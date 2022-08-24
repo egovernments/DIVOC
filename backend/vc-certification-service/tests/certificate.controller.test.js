@@ -11,9 +11,10 @@ jest.mock('../src/services/sunbird.service', () => {
     }
 })
 
+
 beforeEach(() => {
    console.log = jest.fn()
-    console.error = jest.fn()
+   console.error = jest.fn()
 })
 
 test('should call sunbird rc to update certificate', async() => {
@@ -130,7 +131,7 @@ test('update certificate should throw error', async() => {
     jest.spyOn(sunbirdRegistryService,"createCertificate").mockReturnValue(Promise.resolve({result : {osid : "123"}}));
     
     jest.spyOn(sunbirdRegistryService , 'deleteCertificate').mockImplementation(() => {throw new Error('some problem');});;
-    //const response = await certificateController.updateCertificate.mockImplementation(() => {throw new Error('some problem');});
+    await certificateController.updateCertificate.mockImplementation(() => {throw new Error('some problem');});
     await certificateController.updateCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
 });

@@ -7,20 +7,12 @@ async function createCertificate(req, res) {
         const entityType = req.params.entityType;
         const token = req.header("Authorization");
         console.log("EntityType: ", entityType);
-        const isValidPayload = validationService.validateCertificateInput(req);
-        if ( isValidPayload === "valid"){
-            const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token)
-            res.status(200).json({
+        validationService.validateCertificateInput(req);
+        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token)
+        res.status(200).json({
             message: "Successfully Certified",
             certificateAddResponse: certificateAddResponse
         });
-        }
-        else {
-            res.status(400).json({
-                message: isValidPayload
-            });
-        }
-        
     } catch (err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({

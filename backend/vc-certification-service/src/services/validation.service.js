@@ -3,76 +3,75 @@ const isoDatestringValidator = require('iso-datestring-validator')
 
 
 function isURIFormat(param) {
-    let optionalCertificateFieldsObj;
-    let isURI;
-    try {
-      optionalCertificateFieldsObj = new URL(param);
-      isURI = true;
-    } catch (e) {
-      isURI = false;
-    }
-  
-    if (isURI && !optionalCertificateFieldsObj.protocol) {
-      isURI = false;
-    }
-    return isURI;
+  let optionalCertificateFieldsObj;
+  let isURI;
+  try {
+    optionalCertificateFieldsObj = new URL(param);
+    isURI = true;
+  } catch (e) {
+    isURI = false;
   }
-  
 
+  if (isURI && !optionalCertificateFieldsObj.protocol) {
+    isURI = false;
+  }
+  return isURI;
+}
 
 function validateCertificateInput(req) {
-    reqBody = req.body;
-   isValid = checkForNull(reqBody);
-   if(isValid!= "valid"){
-    return isValid;
-   } 
-
-   if(!(isoDatestringValidator.isValidISODateString(reqBody.IssuedOn))) 
-   {
-    return "Issued on date is not in valid format";
-   }
-   else if(!(isoDatestringValidator.isValidISODateString(reqBody.ValidFrom))) 
-   {
-    return "Valid from date is not in valid format";
-   }
-   else if(!(isoDatestringValidator.isValidISODateString(reqBody.ValidTill))) 
-   {
-    return "Valid till date is not in valid format";
-   }
-   else if(isURIFormat(reqBody.Issuer)){
-    return "Invalid Issuer format"
-   }
-   else {
+  reqBody = req.body;
+  let err = {
+    response: {
+      status: 400,
+      data: "error"
+    }
+  }
+  isValid = checkForNull(reqBody);
+  if (isValid !== "valid") {
+    err.response.data = isValid;
+    throw err;
+  }
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.IssuedOn))) {
+    err.response.data = "Issued on date is not in valid format";
+    throw err;
+  }
+  else if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidFrom))) {
+    err.response.data = "Valid from date is not in valid format";
+    throw err;
+  }
+  else if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidTill))) {
+    err.response.data = "Valid till date is not in valid format";
+    throw err;
+  }
+  else if (!(isURIFormat(reqBody.Issuer))) {
+    err.response.data = "Invalid Issuer format";
+    throw err;
+  }
+  else {
     return "valid";
-   }
-
   }
+}
 
-  function checkForNull(reqBody){
-    isValid = "valid";
+function checkForNull(reqBody) {
+  isValid = "valid";
 
-    if(!(reqBody.IssuedOn)){
-      isValid = "Issued on date is missing"
-   
-    }
-    if(!(reqBody.ValidFrom)){
-      isValid = "Valid from date is missing"
-   
-    }
-    if(!(reqBody.ValidTill)){
-      isValid = "Valid till date is missing"
-   
-    }
-    if(!(reqBody.Issuer)){
-      isValid = "Issuer detail is missing"
-   
-    }
-    return isValid ;
+  if (!(reqBody.IssuedOn)) {
+    isValid = "Issued on date is missing"
   }
-
-  module.exports = {
-    validateCertificateInput
-
+  if (!(reqBody.ValidFrom)) {
+    isValid = "Valid from date is missing"
   }
-        
-          
+  if (!(reqBody.ValidTill)) {
+    isValid = "Valid till date is missing"
+  }
+  if (!(reqBody.Issuer)) {
+    isValid = "Issuer detail is missing"
+  }
+  return isValid;
+}
+
+module.exports = {
+  validateCertificateInput
+
+}
+
