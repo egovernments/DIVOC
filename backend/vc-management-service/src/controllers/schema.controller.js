@@ -121,12 +121,13 @@ function addMandatoryFields(schemaRequest) {
     const schemaName = schemaRequest.name;
     var schemaUnparsed = schemaRequest.schema;
     var schema = JSON.parse(schemaUnparsed);
+    var totalMandatoryFields = [...new Set([...mandatoryFields,...mandatoryEvidenceFields])]
 
     var reqFields = schema.definitions[schemaName].required;
-    addInRequiredFields(reqFields, mandatoryFields, mandatoryEvidenceFields)
+    addInRequiredFields(reqFields, totalMandatoryFields)
   
     var properties = schema.definitions[schemaName].properties;  
-    addInProperties(properties, mandatoryFields, mandatoryEvidenceFields)
+    addInProperties(properties, totalMandatoryFields)
     
     var credTemp = schema._osConfig.credentialTemplate;
     addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
@@ -138,13 +139,8 @@ function addMandatoryFields(schemaRequest) {
     return schemaRequestFinal;
 }
 
-function addInRequiredFields(reqFields, mandatoryFields, mandatoryEvidenceFields){
-    for (let field of mandatoryFields) {
-        if (!reqFields.includes(field)) {
-            reqFields.push(field);
-        }
-    };
-    for (let field of mandatoryEvidenceFields) {
+function addInRequiredFields(reqFields, totalMandatoryFields){
+    for (let field of totalMandatoryFields) {
         if (!reqFields.includes(field)) {
             reqFields.push(field);
         }
@@ -152,12 +148,9 @@ function addInRequiredFields(reqFields, mandatoryFields, mandatoryEvidenceFields
     return 
 }
 
-function addInProperties(properties, mandatoryFields, mandatoryEvidenceFields){
-    for (let field of mandatoryFields) {
-        properties[field] = { type : 'string'};
-    };
-    for (let field of mandatoryEvidenceFields) {
-        properties[field] = { type : 'string'};
+function addInProperties(properties, totalMandatoryFields){
+    for (let field of totalMandatoryFields) {
+        properties[field] = { ...properties[field], type : 'string'};
     };
     return
 }
