@@ -35,21 +35,19 @@ function validateCertificateInput(req) {
     err.response.data = "Issued on date is not in valid format";
     throw err;
   }
-  else if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidFrom))) {
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidFrom))) {
     err.response.data = "Valid from date is not in valid format";
     throw err;
   }
-  else if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidTill))) {
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidTill))) {
     err.response.data = "Valid till date is not in valid format";
     throw err;
   }
-  else if (!(isURIFormat(reqBody.Issuer))) {
+  if (!(isURIFormat(reqBody.Issuer))) {
     err.response.data = "Invalid Issuer format";
     throw err;
   }
-  else {
-    return "valid";
-  }
+  return "valid";
 }
 
 function checkForNull(reqBody) {
