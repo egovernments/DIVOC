@@ -14,6 +14,6 @@ docker:
 	$(MAKE) -C certificate_api
 	$(MAKE) -C vc-certification-service
 	$(MAKE) -C vc-management-service
-	$(MAKE) -C registry-async-handler
+	$(MAKE) -C vc-certify-consumer
 clean:
 	@rm -rf dockerdeps
