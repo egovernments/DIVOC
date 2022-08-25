@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.27.2",
     "express": "^4.18.1",
+    "iso-datestring-validator": "^2.2.2",
     "express-validator": "^6.14.2",
     "jsonwebtoken": "^8.5.1",
     "morgan-body": "^2.6.6",

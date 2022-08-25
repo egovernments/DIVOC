@@ -1,11 +1,13 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
+const validationService = require('../services/validation.service')
 async function createCertificate(req, res) {
     try {
         const entityType = req.params.entityType;
         const token = req.header("Authorization");
         console.log("EntityType: ", entityType);
+        validationService.validateCertificateInput(req);
         const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token)
         res.status(200).json({
             message: "Successfully Certified",
@@ -46,7 +48,7 @@ async function updateCertificate(req, res) {
         //Get details of the cert to be updated
         const data = await sunbirdRegistryService.getCertificateForUpdate(entityName, entityId, token);
         //Creates a new certificate
-        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token);
+        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityName, token);
         //Get the osid of new cert
         const newCertID = certificateAddResponse.result.osid;
        //Prepare the data for inserting into revoke list table
@@ -94,6 +96,7 @@ function createDataForUpdate (certID , prevCertID , startDate){
     
  }
  return dataForUpdate;
+}
 
 async function revokeCertificate(req, res) {
     const errors = validationResult(req);
@@ -156,3 +159,4 @@ module.exports = {
     deleteCertificate,
     revokeCertificate
 }
+
