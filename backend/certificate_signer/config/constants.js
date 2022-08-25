@@ -66,6 +66,78 @@ const VACCINE_ICD11_MAPPINGS = [
     "vaccineName": "corbevax",
     "icd11Code": "XM5JC5"
   },
+  {
+    "vaccineName": "novavax",
+    "icd11Code": "XM5JC5"
+  },
+  {
+    "vaccineName": "nuvaxovid",
+    "icd11Code": "XM5JC5"
+  },
+  {
+    "vaccineName": "spikevax",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "spike vax",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "moderna",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "modema",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "comirnaty",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "pfizer",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "biontech",
+    "icd11Code": "XM0GQ8"
+  },
+  {
+    "vaccineName": "convidecia",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "janssen",
+    "icd11Code": "XM0CX4"
+  },
+  {
+    "vaccineName": "vaxzevria",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "astrazeneca",
+    "icd11Code": "XM9QW8"
+  },
+  {
+    "vaccineName": "covilo",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "bbibp",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "sinopharm",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "coronavac",
+    "icd11Code": "XM1NL1"
+  },
+  {
+    "vaccineName": "sinovac",
+    "icd11Code": "XM1NL1"
+  }
 ]
 
 module.exports = {
