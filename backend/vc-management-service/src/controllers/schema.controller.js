@@ -1,12 +1,12 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
-const {ISSUER_NAME} = require("../configs/config");
+const {TENANT_NAME} = require("../configs/config");
 const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS} = require("../configs/constants");
 
 async function createSchema(req, res) {
     try {
         const token = req.header("Authorization");
-        var schemaRequest = addMandatoryFields(req.body);     
+        var schemaRequest = addMandatoryFields(req.body);
         const schemaAddResponse = await sunbirdRegistryService.createSchema(schemaRequest, token);
         res.status(200).json({
             message: "Successfully created Schema",
@@ -63,7 +63,7 @@ async function updateTemplate(req, res) {
         const formData = getFormData(req);
         const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
             formData,
-            ISSUER_NAME,
+            TENANT_NAME,
             token
         );
         const uploadUrl = MINIO_URL_SCHEME + uploadTemplateResponse?.documentLocations[0];
@@ -125,10 +125,10 @@ function addMandatoryFields(schemaRequest) {
 
     var reqFields = schema.definitions[schemaName].required;
     addInRequiredFields(reqFields, totalMandatoryFields)
-  
-    var properties = schema.definitions[schemaName].properties;  
+
+    var properties = schema.definitions[schemaName].properties;
     addInProperties(properties, totalMandatoryFields)
-    
+
     var credTemp = schema._osConfig.credentialTemplate;
     addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
 
@@ -145,7 +145,7 @@ function addInRequiredFields(reqFields, totalMandatoryFields){
             reqFields.push(field);
         }
     };
-    return 
+    return
 }
 
 function addInProperties(properties, totalMandatoryFields){
@@ -162,9 +162,9 @@ function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFie
                 credTemp[mandatoryFields[index]] = '{{{'+mandatoryFields[index]+'}}}';
             } else {
                 credTemp[mandatoryFields[index]] = '{{'+mandatoryFields[index]+'}}';
-            }          
+            }
         }
-        
+
     };
     for (let index = 0; index<mandatoryEvidenceFields.length; index++) {
         credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
