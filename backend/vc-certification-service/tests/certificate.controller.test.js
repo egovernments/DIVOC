@@ -17,6 +17,7 @@ beforeEach(() => {
    console.error = jest.fn()
 })
 
+
 test('should call sunbird rc to update certificate', async() => {
     const req = {
         params: {
@@ -186,4 +187,10 @@ test('get certificate should throw error', async() => {
     const response = await sunbirdRegistryService.getCertificate.mockImplementation(() => {throw new Error('some problem');});
     certificateController.getCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
+}); 
+
+test('test issuer format', async () => {
+    expect(validationService.isURIFormat("2342343334")).toBe(false);
+    expect(validationService.isURIFormat("http://test.com/123")).toBe(true);
+    expect(validationService.isURIFormat("did:in.gov.uidai.aadhaar:2342343334")).toBe(true);
 });

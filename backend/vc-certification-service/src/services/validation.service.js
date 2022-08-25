@@ -70,7 +70,7 @@ function checkForNull(reqBody) {
 }
 
 module.exports = {
-  validateCertificateInput
-
+  validateCertificateInput,
+  isURIFormat
 }
 
