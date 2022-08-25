@@ -23,31 +23,32 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
       eachMessage: async ({message}) => {
         const createEntityMessage = JSON.parse(message.value.toString());
         const token = createEntityMessage.token;
-        const payload = createEntityMessage.body;
+        const certificatePayload = createEntityMessage.body;
         let resp = "";
         do {
-          payload.certificateId = getCertificateId();
-          console.log("Certificate Payload: ", JSON.stringify(payload));
+          certificatePayload.certificateId = getCertificateId();
+          console.log("Certificate Payload: ", JSON.stringify(certificatePayload));
           try{
-            resp = await sunbirdRegistryService.createCertificate(payload, createEntityMessage.entityType, token);
+            resp = await sunbirdRegistryService.createCertificate(certificatePayload, createEntityMessage.entityType, token);
           } catch (error){
             console.error("Error in creating certificate ", error);
             resp = error;
           }
         }
         while (R.pathOr("",["response","data","params","status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("",["response","data","params","errmsg"], resp).includes(DUPLICATE_MSG));
-        if(R.pathOr("",["params","status"], resp) === REGISTRY_SUCCESS_STATUS){
+        const certificateStatus = R.pathOr("",["params","status"], resp);
+        if(certificateStatus === REGISTRY_SUCCESS_STATUS){
           console.log("Certificate is created successfully");
           console.log("Response : ", resp);
-          producer.send({
-            topic: config.POST_VC_CERTIFY_TOPIC,
-            messages : [
-              {key: null, value: JSON.stringify({payload: payload, transactionId: createEntityMessage.transactionId, certificateId: payload.certificateId, token: token})}
-            ]
-          });
         }else {
           console.log("Unable to create certificate: ", resp);
         }
+        producer.send({
+          topic: config.POST_VC_CERTIFY_TOPIC,
+          messages : [
+            {key: null, value: JSON.stringify({payload: certificatePayload, transactionId: createEntityMessage.transactionId, certificateId: certificatePayload.certificateId, status: certificateStatus, token: token})}
+          ]
+        });
       }
     });
 })();
