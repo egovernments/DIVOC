@@ -27,7 +27,7 @@ function validateCertificateInput(req) {
     }
   }
   isValid = checkForNull(reqBody);
-  if (isValid !== "valid") {
+  if (isValid) {
     err.response.data = isValid;
     throw err;
   }
@@ -51,7 +51,7 @@ function validateCertificateInput(req) {
 }
 
 function checkForNull(reqBody) {
-  isValid = "valid";
+  isValid = false;
 
   if (!(reqBody.IssuedOn)) {
     isValid = "Issued on date is missing"
@@ -65,6 +65,7 @@ function checkForNull(reqBody) {
   if (!(reqBody.Issuer)) {
     isValid = "Issuer detail is missing"
   }
+  
   return isValid;
 }
 

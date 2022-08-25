@@ -48,7 +48,7 @@ async function updateCertificate(req, res) {
         //Get details of the cert to be updated
         const data = await sunbirdRegistryService.getCertificateForUpdate(entityName, entityId, token);
         //Creates a new certificate
-        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token);
+        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityName, token);
         //Get the osid of new cert
         const newCertID = certificateAddResponse.result.osid;
        //Prepare the data for inserting into revoke list table
