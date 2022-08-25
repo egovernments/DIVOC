@@ -1,4 +1,3 @@
-//import * as isoDatestringValidator from 'iso-datestring-validator';
 const isoDatestringValidator = require('iso-datestring-validator')
 
 
@@ -26,11 +25,7 @@ function validateCertificateInput(req) {
       data: "error"
     }
   }
-  isValid = checkForNull(reqBody);
-  if (isValid) {
-    err.response.data = isValid;
-    throw err;
-  }
+  checkForNull(reqBody, err);
   if (!(isoDatestringValidator.isValidISODateString(reqBody.IssuedOn))) {
     err.response.data = "Issued on date is not in valid format";
     throw err;
@@ -47,26 +42,25 @@ function validateCertificateInput(req) {
     err.response.data = "Invalid Issuer format";
     throw err;
   }
-  return "valid";
 }
 
-function checkForNull(reqBody) {
-  isValid = false;
-
+function checkForNull(reqBody, err) {
   if (!(reqBody.IssuedOn)) {
-    isValid = "Issued on date is missing"
+    err.response.data = "Issued on date is missing";
+    throw err;
   }
   if (!(reqBody.ValidFrom)) {
-    isValid = "Valid from date is missing"
+    err.response.data = "Valid from date is missing";
+    throw err;
   }
   if (!(reqBody.ValidTill)) {
-    isValid = "Valid till date is missing"
+    err.response.data = "Valid till date is missing";
+    throw err;
   }
   if (!(reqBody.Issuer)) {
-    isValid = "Issuer detail is missing"
+    err.response.data = "Issuer detail is missing";
+    throw err;
   }
-  
-  return isValid;
 }
 
 module.exports = {
