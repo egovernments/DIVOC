@@ -1,14 +1,14 @@
 const sunbirdRegistryService = require('../services/sunbird.service');
-const {getFormData, isValidIssuerName} = require('../utils/utils');
+const {getFormData, isValidTenantName} = require('../utils/utils');
 
 async function uploadTemplate(req, res) {
     try {
         const formData = getFormData(req);
-        const isValidIssuer = isValidIssuerName(req.params.issuer);
-        if(isValidIssuer) {
+        const isValidTenant = isValidTenantName(req.params.tenant);
+        if(isValidTenant) {
             const uploadTemplateResponse = await sunbirdRegistryService.uploadTemplate(
                 formData,
-                req.params.issuer,
+                req.params.tenant,
                 req.header('Authorization')
             );
             console.log('Successfully uploaded template');
@@ -19,7 +19,7 @@ async function uploadTemplate(req, res) {
             return;
         }
         res.status(400).json({
-            message: "Issuer invalid"
+            message: "tenant invalid"
         })
     } catch(err) {
         console.error(err);

@@ -10,11 +10,21 @@ const createCertificate = (certificateRequest, entityType, token) => {
 };
 
 const getCertificate = (entityName, certificateId, headers) => {
-
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
         responseType: "stream",
         headers: headers
     }).catch(error => {
+        console.error("Error in downloading certificate: ", error);
+        throw error;
+    })
+
+};
+
+const getCertificateForUpdate = (entityName, certificateId, token) => {
+
+    return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, 
+        {headers: {Authorization: token}}
+    ).catch(error => {
         console.error("Error in downloading certificate: ", error);
         throw error;
     })
@@ -31,9 +41,9 @@ const updateCertificate = (certificateRequestBody, entityName, entityId, token) 
             throw err;
         });
 };
-const deleteCertificate = (certificateRequestBody, entityName, entityId, token) => {
+const deleteCertificate = (entityName, entityId, token) => {
+    console.log(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`)
     return axios.delete(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
-                    certificateRequestBody,
                     {headers: {Authorization: token}}
         ).then(res => res.data)
         .catch(err => {
@@ -42,9 +52,30 @@ const deleteCertificate = (certificateRequestBody, entityName, entityId, token) 
         });
 };
 
+const revokeCertificate = (body, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}RevokedVC`, body, {headers: {Authorization: token}})
+        .then(res => res.data)
+        .catch(error => {
+            console.error("Error in revoking certificate : ", error);
+            throw error;
+        });
+}
+
+const searchCertificate = (entityType, filters, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data.length >= 1)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
-    deleteCertificate
+    deleteCertificate,
+    getCertificateForUpdate,
+    revokeCertificate,
+    searchCertificate
 }
