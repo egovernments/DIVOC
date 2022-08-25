@@ -1,22 +1,20 @@
+const uuid = require('uuid');
+
 const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 
-async function createCertificate(req, res) {
-    try {
-        const entityType = req.params.entityType;
-        const token = req.header("Authorization");
-        console.log("EntityType: ", entityType);
-        const certificateAddResponse = await sunbirdRegistryService.createCertificate(req.body, entityType, token)
-        res.status(200).json({
-            message: "Successfully Certified",
-            certificateAddResponse: certificateAddResponse
-        });
-    } catch (err) {
-        console.error(err);
-        res.status(err?.response?.status || 500).json({
-            message: err?.response?.data
-        });
-    }
+async function createCertificate(req, res, kafkaProducer) {
+    await kafkaProducer.connect();
+    const transactionId = uuid.v4();
+    kafkaProducer.send({
+        topic: certifyConstants.VC_CERTIFY_TOPIC,
+        messages: [
+            {key: null, value: JSON.stringify({body: req.body, transactionId: transactionId, entityType: req.params.entityType, token: req.header("Authorization")})}
+        ]
+    });
+    res.status(200).json({
+        transactionId 
+    });
 }
 
 async function getCertificate(req, res) {

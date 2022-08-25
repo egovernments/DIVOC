@@ -12,9 +12,11 @@
   "dependencies": {
     "axios": "^0.27.2",
     "express": "^4.18.1",
+    "kafkajs": "^2.2.0",
     "jsonwebtoken": "^8.5.1",
     "morgan-body": "^2.6.6",
     "swagger-ui-express": "^4.5.0",
+    "uuidv4": "^6.2.13",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
