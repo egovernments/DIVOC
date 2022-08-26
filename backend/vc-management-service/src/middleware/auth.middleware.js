@@ -30,8 +30,7 @@ async function roleAuthorizer(req, res, next){
         const token = bearerToken.split(" ")[1];
         const decodedPayload = jwt.decode(token);
         const payloadRoles = decodedPayload.resource_access["admin-api"]?.roles;
-        const payloadVcRoles = decodedPayload.resource_access["manage"].roles;
-        if(payloadRoles.includes("api") && payloadVcRoles.includes("vc-manage")){
+        if(payloadRoles.includes("api")){
             next();
         }else{
             res.status(403).send({error: "role not authorized"});
