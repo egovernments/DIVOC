@@ -2,11 +2,11 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ main, orchestration ]
+    branches: [ main, orchestration, vc-issuance-platform ]
     paths-ignore:
       - 'docs/**'
   pull_request:
-    branches: [ main, orchestration ]
+    branches: [ main, orchestration, vc-issuance-platform ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 jobs:

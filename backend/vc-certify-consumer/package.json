@@ -1,5 +1,5 @@
 {
-  "name": "registry-async-handler",
+  "name": "vc-certify-consumer",
   "version": "1.0.0",
   "description": "",
   "main": "main.js",
@@ -9,13 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/egovernments/DIVOC/tree/vc-issuance-platform/backend/registry-async-handler"
+    "url": "https://github.com/egovernments/DIVOC/tree/vc-issuance-platform/backend/vc-certify-consumer"
   },
   "author": "divoc",
   "license": "GPL-3.0-or-later",
   "dependencies": {
     "axios": "^0.27.2",
-    "kafkajs": "^2.1.0"
+    "kafkajs": "^2.2.0",
+    "ramda": "^0.27.1"
   },
   "devDependencies": {
     "jest": "^28.1.3"
