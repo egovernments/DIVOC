@@ -1,6 +1,12 @@
 const sunbirdRegistryService = require('../src/services/sunbird.service');
 const certificateController = require('../src/controllers/certificate.controller');
 const validationService = require('../src/services/validation.service');
+const uuid = require('uuid');
+jest.mock('uuid', () => {
+    return {
+        v4: jest.fn().mockReturnValue('123')
+    }
+})
 jest.mock('../src/services/sunbird.service', () => {
     return {
         updateCertificate: jest.fn(),
@@ -9,8 +15,7 @@ jest.mock('../src/services/sunbird.service', () => {
         deleteCertificate: jest.fn(),
         getCertificateForUpdate: jest.fn()
     }
-})
-
+});
 
 beforeEach(() => {
    console.log = jest.fn()
@@ -76,8 +81,21 @@ test('should call sunbird rc to create certificate', async() => {
     
     };
     jest.spyOn(validationService , 'validateCertificateInput').mockReturnValue ("valid");
-    certificateController.createCertificate(req, res);
-    expect(sunbirdRegistryService.createCertificate).toHaveBeenCalledWith(req.body, 'Dummy', '1')
+
+    const kafkaProducer = {
+        send: jest.fn(),
+        connect: jest.fn()
+    }
+    jest.spyOn(res, 'status');
+    jest.spyOn(kafkaProducer, 'send');
+    await certificateController.createCertificate(req, res, kafkaProducer);
+    expect(kafkaProducer.send).toHaveBeenCalledWith({
+        topic: 'vc-certify',
+        messages: [
+            {key: null, value: JSON.stringify({body: req.body, transactionId: '123', entityType: req.params.entityType, token: req.header("Authorization")})}
+        ]}
+    );
+    expect(res.status).toHaveBeenCalledWith(200);
 });
 
 test('should call sunbird rc to get certificate', async() => {
@@ -127,10 +145,10 @@ test('update certificate should throw error', async() => {
             return this;
         }
     };
-    jest.spyOn(res, 'status');
+    jest.spyOn(res, 'status')
     jest.spyOn(sunbirdRegistryService,"getCertificateForUpdate").mockReturnValue(Promise.resolve({issuanceDate : "12-12-2022"}));
     jest.spyOn(sunbirdRegistryService,"createCertificate").mockReturnValue(Promise.resolve({result : {osid : "123"}}));
-    jest.spyOn(sunbirdRegistryService , 'deleteCertificate').mockImplementation(() => {throw new Error('some problem');});
+    jest.spyOn(sunbirdRegistryService , 'deleteCertificate').mockImplementation(() => {throw new Error({response: {status: 500, data: 'some problem'}})});
     await certificateController.updateCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
 });

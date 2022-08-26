@@ -3,15 +3,24 @@ const bodyParser = require('body-parser');
 const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs');
 const morganBody = require('morgan-body');
+const {Kafka} = require('kafkajs');
 
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
-let certifyRouter = require('./src/routes/certificate.route');
+let {certifyRouter, setKafkaProducer} = require('./src/routes/certificate.route');
 
 const swaggerDocument = yaml.load('./certification-service-swagger.yml');
 
 const app = express();
 const port = certifyConfig.PORT;
+
+const kafka = new Kafka({
+    clientId: 'vc-signer',
+    brokers: certifyConfig.KAFKA_BOOTSTRAP_SERVERS.split(',')
+});
+const producer = kafka.producer({allowAutoTopicCreation: true});
+setKafkaProducer(producer);
+
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 

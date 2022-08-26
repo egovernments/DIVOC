@@ -1,5 +1,5 @@
 
-IMAGE:=divoc/registry-async-handler
+IMAGE:=divoc/vc-certify-consumer
 
 docker:
 	@docker build -t $(IMAGE) .
