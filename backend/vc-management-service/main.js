@@ -4,9 +4,9 @@ const swaggerUi = require('swagger-ui-express');
 const yaml = require('yamljs')
 const morganBody = require('morgan-body');
 
-const issuerConfig = require('./src/configs/config');
+const tenantConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
-let issuerRouter = require('./src/routes/issuer.routes');
+let tenantRouter = require('./src/routes/tenant.routes');
 let schemaRouter = require('./src/routes/schema.routes');
 let templateRouter = require('./src/routes/template.routes');
 let transactionRouter = require('./src/routes/transaction.routes');
@@ -14,7 +14,7 @@ let transactionRouter = require('./src/routes/transaction.routes');
 const swaggerDocument = yaml.load('./management-service-swagger.yml');
 
 const app = express();
-const port = issuerConfig.PORT;
+const port = tenantConfig.PORT;
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
 
@@ -23,7 +23,7 @@ morganBody(app, {
     maxBodyLength: 1000000
 });
 
-app.use(`${BASE_URL}v1/issuer`, issuerRouter);
+app.use(`${BASE_URL}v1/tenant`, tenantRouter);
 app.use(`${BASE_URL}v1/schema`, schemaRouter);
 app.use(`${BASE_URL}v1/templates`, templateRouter);
 app.use(`${BASE_URL}V1/transaction`,transactionRouter);

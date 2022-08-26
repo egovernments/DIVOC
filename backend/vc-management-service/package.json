@@ -1,7 +1,7 @@
 {
   "name": "vc-management-service",
   "version": "1.0.0",
-  "description": "Service to manage issuers for Verifiable Credentials",
+  "description": "Service to manage Verifiable Credentials",
   "main": "main.js",
   "scripts": {
     "start": "node main.js"
