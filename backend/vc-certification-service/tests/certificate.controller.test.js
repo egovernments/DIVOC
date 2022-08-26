@@ -146,8 +146,10 @@ test('update certificate should throw error', async() => {
         }
     };
     jest.spyOn(res, 'status')
-    const response = await sunbirdRegistryService.updateCertificate.mockImplementation(() => {throw new Error('some problem');});
-    certificateController.updateCertificate(req, res);
+    jest.spyOn(sunbirdRegistryService,"getCertificateForUpdate").mockReturnValue(Promise.resolve({issuanceDate : "12-12-2022"}));
+    jest.spyOn(sunbirdRegistryService,"createCertificate").mockReturnValue(Promise.resolve({result : {osid : "123"}}));
+    jest.spyOn(sunbirdRegistryService , 'deleteCertificate').mockImplementation(() => {throw new Error({response: {status: 500, data: 'some problem'}})});
+    await certificateController.updateCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
 });
 
