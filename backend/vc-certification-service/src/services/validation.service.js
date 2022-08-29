@@ -26,38 +26,38 @@ function validateCertificateInput(req) {
     }
   }
   checkForNull(reqBody, err);
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.IssuedOn))) {
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.issuedOn))) {
     err.response.data = "Issued on date is not in valid format";
     throw err;
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidFrom))) {
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
     err.response.data = "Valid from date is not in valid format";
     throw err;
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.ValidTill))) {
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
     err.response.data = "Valid till date is not in valid format";
     throw err;
   }
-  if (!(isURIFormat(reqBody.Issuer))) {
+  if (!(isURIFormat(reqBody.issuer))) {
     err.response.data = "Invalid Issuer format";
     throw err;
   }
 }
 
 function checkForNull(reqBody, err) {
-  if (!(reqBody.IssuedOn)) {
+  if (!(reqBody.issuedOn)) {
     err.response.data = "Issued on date is missing";
     throw err;
   }
-  if (!(reqBody.ValidFrom)) {
+  if (!(reqBody.validFrom)) {
     err.response.data = "Valid from date is missing";
     throw err;
   }
-  if (!(reqBody.ValidTill)) {
+  if (!(reqBody.validTill)) {
     err.response.data = "Valid till date is missing";
     throw err;
   }
-  if (!(reqBody.Issuer)) {
+  if (!(reqBody.issuer)) {
     err.response.data = "Issuer detail is missing";
     throw err;
   }
