@@ -9,8 +9,6 @@ async function getTransaction(req,res){
             "transactionId": response.data[0].transactionId,
             "certificateId": response.data[0].certificateId
         }
-        console.log(response.data);
-        console.log(responseMap);
         res.status(200).json( responseMap );
     }catch(err){
         console.error("Error in fetching transaction details",err);
