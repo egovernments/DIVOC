@@ -9,7 +9,7 @@ const MINIO_URL_SCHEME = "minio://"
 const SUNBIRD_GET_TRANSACTION_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/TransactionOsidMap/search`;
 const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
 const MANDATORY_EVIDENCE_FIELDS = ["validFrom", "validUntil" , "certificateId"];
-
+const ROLE_SUFFIX = '-realm-role';
 module.exports = {
     SUNBIRD_TENANT_INVITE_URL,
     SUNBIRD_SCHEMA_ADD_URL,
@@ -19,5 +19,6 @@ module.exports = {
     MINIO_URL_SCHEME,
     SUNBIRD_GET_TRANSACTION_URL,
     MANDATORY_FIELDS,
-    MANDATORY_EVIDENCE_FIELDS
+    MANDATORY_EVIDENCE_FIELDS,
+    ROLE_SUFFIX
 }

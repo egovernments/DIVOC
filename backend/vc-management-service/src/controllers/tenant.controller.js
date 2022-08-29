@@ -1,6 +1,7 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const keycloakService = require('../services/keycloak.service')
 const utils = require('../utils/utils')
+const {ROLE_SUFFIX} = require('../configs/constants');
 
 async function createTenant(req, res) {
     try {
@@ -34,7 +35,7 @@ async function createTenant(req, res) {
 
 async function createAndAssignNewRole(userName, token) {
     console.log("creating new role");
-    const roleName = userName + "-realm-role";
+    const roleName = userName + ROLE_SUFFIX;
     const adminRoleName = "admin";
     try {
         await keycloakService.createNewRole(roleName, token);
