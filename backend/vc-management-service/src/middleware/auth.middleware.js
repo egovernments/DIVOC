@@ -41,6 +41,7 @@ async function roleAuthorizer(req, res, next){
         res.status(401).send({error: "auth failed, check bearer token"});
     }
 }
+
 module.exports = {
     tokenValidationMiddleware,
     roleAuthorizer
