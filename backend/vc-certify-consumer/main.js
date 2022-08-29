@@ -36,12 +36,13 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
           }
         }
         while (R.pathOr("",["response","data","params","status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("",["response","data","params","errmsg"], resp).includes(DUPLICATE_MSG));
-        const certificateStatus = R.pathOr("",["params","status"], resp);
+        let certificateStatus = R.pathOr("",["params","status"], resp);
         if(certificateStatus === REGISTRY_SUCCESS_STATUS){
           console.log("Certificate is created successfully");
           console.log("Response : ", resp);
         }else {
-          console.log("Unable to create certificate: ", resp);
+          certificateStatus = REGISTRY_FAILED_STATUS;
+          console.log("Unable to create certificate : ", R.pathOr("",["response","data"], resp));
         }
         producer.send({
           topic: config.POST_VC_CERTIFY_TOPIC,
