@@ -152,7 +152,8 @@ dt Date
 	CREATE TABLE IF NOT EXISTS vcTransactionEventV1 (
 		transactionId String,
 		certificateId String,
-		status String,
+		entityType 	  String,
+		status        String,
 		dt Date
 	) engine = MergeTree() order by dt
 	`)
@@ -553,9 +554,10 @@ func saveVcTransactionEvent(connect *sql.DB, msg string) (string,string, models.
 		stmt, err = tx.Prepare(`INSERT INTO vcTransactionEventV1 (
 			transactionId ,
 			certificateId ,
+			entityType ,
 			status ,
 			dt
-		) VALUES (?,?,?,?)`)
+		) VALUES (?,?,?,?,?)`)
 	)
 	if err != nil {
 		log.Infof("Error in preparing stmt %+v", err)

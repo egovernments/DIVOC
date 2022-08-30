@@ -7,7 +7,9 @@ async function getTransaction(req,res){
         const response = await sunbirdRegistryService.getTransaction(transactionId,token);
         const responseMap = {
             "transactionId": response.data[0].transactionId,
-            "certificateId": response.data[0].certificateId
+            "certificateId": response.data[0].certificateId,
+            "entityType":    response.data[0].entityType,
+            "status":        response.data[0].status
         }
         res.status(200).json( responseMap );
     }catch(err){
