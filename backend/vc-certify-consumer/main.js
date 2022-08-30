@@ -1,6 +1,7 @@
 const {Kafka} = require('kafkajs');
 const sunbirdRegistryService = require('./src/services/sunbird.service');
 const config = require('./src/configs/config');
+const constants = require('./src/configs/constants')
 const R = require('ramda');
 
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
@@ -12,14 +13,15 @@ const kafka = new Kafka({
     clientId: 'vc-certify-consumer',
     brokers: config.KAFKA_BOOTSTRAP_SERVER.split(",")
 });
-const consumer = kafka.consumer({ groupId: 'vc_certify', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
+const vc_certify_consumer = kafka.consumer({ groupId: 'vc_certify', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
+const post_vc_certify_consumer = kafka.consumer({ groupId: 'post_vc_certify', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 (async function (){
-    await consumer.connect();
+    await vc_certify_consumer.connect();
     await producer.connect();
-    await consumer.subscribe({topic: config.VC_CERTIFY_TOPIC, fromBeginning: true});
+    await vc_certify_consumer.subscribe({topic: config.VC_CERTIFY_TOPIC, fromBeginning: true});
 
-    await consumer.run({
+    await vc_certify_consumer.run({
       eachMessage: async ({message}) => {
         const createEntityMessage = JSON.parse(message.value.toString());
         const token = createEntityMessage.token;
@@ -47,12 +49,44 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
         producer.send({
           topic: config.POST_VC_CERTIFY_TOPIC,
           messages : [
-            {key: null, value: JSON.stringify({payload: certificatePayload, transactionId: createEntityMessage.transactionId, certificateId: certificatePayload.certificateId, status: certificateStatus, token: token})}
+            {key: null, value: JSON.stringify({payload: certificatePayload, entityType: createEntityMessage.entityType, transactionId: createEntityMessage.transactionId, certificateId: certificatePayload.certificateId, status: certificateStatus, token: token})}
           ]
         });
       }
     });
 })();
+
+(async function (){
+    await post_vc_certify_consumer.connect();
+    await post_vc_certify_consumer.subscribe({topic: config.POST_VC_CERTIFY_TOPIC, fromBeginning: true});
+
+    await post_vc_certify_consumer.run({
+      eachMessage: async ({message}) => {
+        const postVCCertifyMessage = JSON.parse(message.value.toString());
+        if (postVCCertifyMessage.entityType !== constants.TRANSACTION_ENTITY_TYPE){
+          const token = postVCCertifyMessage.token;
+          const transactionEntityReq = {
+            transactionId: postVCCertifyMessage.transactionId,
+            certificateId: postVCCertifyMessage.certificateId,
+            status: postVCCertifyMessage.status,
+            payload: JSON.stringify(postVCCertifyMessage.payload),
+            entityType: postVCCertifyMessage.entityType
+          }
+          try {
+            const transactionEntityRes = await sunbirdRegistryService.addTransaction(transactionEntityReq, token);
+            if (transactionEntityRes?.params?.status === REGISTRY_SUCCESS_STATUS) {
+              console.log("Successfully added Transaction to: ",constants.TRANSACTION_ENTITY_TYPE);
+            } else {
+              console.log("Failed to add Transaction: ", transactionEntityRes);
+            }
+          } catch (err) {
+            console.error("Error while adding transaction: ", err);
+          }
+        }
+      }
+    });
+})();
+
 function getCertificateId(){
   return "" + Math.floor(1e11 + (Math.random() * 9e11));
 }
