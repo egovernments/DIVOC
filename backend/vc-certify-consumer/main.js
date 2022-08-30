@@ -20,54 +20,83 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
 consumeVCCertify();
 consumePostVCCertify();
 
+async function processVCCertifyMessage(payload)  {
+  const { topic, partition, message } = payload;
+  const createEntityMessage = JSON.parse(message.value.toString());
+  const token = createEntityMessage.token;
+  const certificatePayload = createEntityMessage.body;
+  let resp = "";
+  do {
+    certificatePayload.certificateId = getCertificateId();
+    console.log("Certificate Payload: ", JSON.stringify(certificatePayload));
+    try {
+      resp = await sunbirdRegistryService.createCertificate(certificatePayload, createEntityMessage.entityType, token);
+    } catch (error) {
+      console.error("Error in creating certificate ", error);
+      resp = error;
+    }
+  }
+  while (R.pathOr("", ["response", "data", "params", "status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("", ["response", "data", "params", "errmsg"], resp).includes(DUPLICATE_MSG));
+  let certificateStatus = R.pathOr("", ["params", "status"], resp);
+  if (certificateStatus === REGISTRY_SUCCESS_STATUS) {
+    console.log("Certificate is created successfully");
+    console.log("Response : ", resp);
+  } else {
+    certificateStatus = REGISTRY_FAILED_STATUS;
+    console.log("Unable to create certificate : ", R.pathOr("", ["response", "data"], resp));
+  }
+  producer.send({
+    topic: config.POST_VC_CERTIFY_TOPIC,
+    messages: [
+      {
+        key: null,
+        value: JSON.stringify({
+          payload: certificatePayload,
+          entityType: createEntityMessage.entityType,
+          transactionId: createEntityMessage.transactionId,
+          certificateId: certificatePayload.certificateId,
+          status: certificateStatus,
+          token: token
+        })
+      }
+    ]
+  });
+}
+
 async function consumeVCCertify() {
   await vc_certify_consumer.connect();
   await producer.connect();
   await vc_certify_consumer.subscribe({topic: config.VC_CERTIFY_TOPIC, fromBeginning: true});
 
   await vc_certify_consumer.run({
-    eachMessage: async ({message}) => {
-      const createEntityMessage = JSON.parse(message.value.toString());
-      const token = createEntityMessage.token;
-      const certificatePayload = createEntityMessage.body;
-      let resp = "";
-      do {
-        certificatePayload.certificateId = getCertificateId();
-        console.log("Certificate Payload: ", JSON.stringify(certificatePayload));
-        try {
-          resp = await sunbirdRegistryService.createCertificate(certificatePayload, createEntityMessage.entityType, token);
-        } catch (error) {
-          console.error("Error in creating certificate ", error);
-          resp = error;
-        }
-      }
-      while (R.pathOr("", ["response", "data", "params", "status"], resp) === REGISTRY_FAILED_STATUS && R.pathOr("", ["response", "data", "params", "errmsg"], resp).includes(DUPLICATE_MSG));
-      let certificateStatus = R.pathOr("", ["params", "status"], resp);
-      if (certificateStatus === REGISTRY_SUCCESS_STATUS) {
-        console.log("Certificate is created successfully");
-        console.log("Response : ", resp);
-      } else {
-        certificateStatus = REGISTRY_FAILED_STATUS;
-        console.log("Unable to create certificate : ", R.pathOr("", ["response", "data"], resp));
-      }
-      producer.send({
-        topic: config.POST_VC_CERTIFY_TOPIC,
-        messages: [
-          {
-            key: null,
-            value: JSON.stringify({
-              payload: certificatePayload,
-              entityType: createEntityMessage.entityType,
-              transactionId: createEntityMessage.transactionId,
-              certificateId: certificatePayload.certificateId,
-              status: certificateStatus,
-              token: token
-            })
-          }
-        ]
-      });
-    }
+    eachMessage: processVCCertifyMessage
   })
+}
+
+async function processPostVCCertifyMessage(payload) {
+  const { topic, partition, message } = payload;
+  const postVCCertifyMessage = JSON.parse(message.value.toString());
+  console.log(postVCCertifyMessage);
+  if (postVCCertifyMessage.entityType !== constants.TRANSACTION_ENTITY_TYPE){
+    const token = postVCCertifyMessage.token;
+    const transactionEntityReq = {
+      transactionId: postVCCertifyMessage.transactionId,
+      certificateId: postVCCertifyMessage.certificateId,
+      status: postVCCertifyMessage.status,
+      payload: JSON.stringify(postVCCertifyMessage.payload),
+      entityType: postVCCertifyMessage.entityType
+    }
+    try {
+      const transactionEntityRes = await sunbirdRegistryService.addTransaction(transactionEntityReq, token);
+      if (transactionEntityRes?.params?.status === REGISTRY_SUCCESS_STATUS) {
+        console.log("Successfully added Transaction to: ",constants.TRANSACTION_ENTITY_TYPE);
+      } else {
+        console.log("Failed to add Transaction: ", transactionEntityRes);
+      }
+    } catch (err) {
+      console.error("Error while adding transaction: ", err);
+    }
+  }
 }
 
 async function consumePostVCCertify() {
@@ -75,29 +104,7 @@ async function consumePostVCCertify() {
   await post_vc_certify_consumer.subscribe({topic: config.POST_VC_CERTIFY_TOPIC, fromBeginning: true});
 
   await post_vc_certify_consumer.run({
-    eachMessage: async ({message}) => {
-      const postVCCertifyMessage = JSON.parse(message.value.toString());
-      if (postVCCertifyMessage.entityType !== constants.TRANSACTION_ENTITY_TYPE){
-        const token = postVCCertifyMessage.token;
-        const transactionEntityReq = {
-          transactionId: postVCCertifyMessage.transactionId,
-          certificateId: postVCCertifyMessage.certificateId,
-          status: postVCCertifyMessage.status,
-          payload: JSON.stringify(postVCCertifyMessage.payload),
-          entityType: postVCCertifyMessage.entityType
-        }
-        try {
-          const transactionEntityRes = await sunbirdRegistryService.addTransaction(transactionEntityReq, token);
-          if (transactionEntityRes?.params?.status === REGISTRY_SUCCESS_STATUS) {
-            console.log("Successfully added Transaction to: ",constants.TRANSACTION_ENTITY_TYPE);
-          } else {
-            console.log("Failed to add Transaction: ", transactionEntityRes);
-          }
-        } catch (err) {
-          console.error("Error while adding transaction: ", err);
-        }
-      }
-    }
+    eachMessage: processPostVCCertifyMessage
   });
 }
 
