@@ -1,13 +1,13 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {TENANT_NAME} = require("../configs/config");
-const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS} = require("../configs/constants");
+const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL} = require("../configs/constants");
 
 async function createSchema(req, res) {
     try {
         const token = req.header("Authorization");
         var schemaRequest = addMandatoryFields(req.body);
-        const schemaAddResponse = await sunbirdRegistryService.createSchema(schemaRequest, token);
+        const schemaAddResponse = await sunbirdRegistryService.createEntity(SUNBIRD_SCHEMA_ADD_URL, schemaRequest, token);
         res.status(200).json({
             message: "Successfully created Schema",
             schemaAddResponse: schemaAddResponse
