@@ -10,6 +10,8 @@ const SUNBIRD_GET_TRANSACTION_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Trans
 const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
 const MANDATORY_EVIDENCE_FIELDS = ["validFrom", "validUntil" , "certificateId"];
 const ROLE_SUFFIX = '-realm-role';
+const MINIO_BUCKET_NAME = 'contexts';
+const MINIO_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL`
 module.exports = {
     SUNBIRD_TENANT_INVITE_URL,
     SUNBIRD_SCHEMA_ADD_URL,
@@ -20,5 +22,7 @@ module.exports = {
     SUNBIRD_GET_TRANSACTION_URL,
     MANDATORY_FIELDS,
     MANDATORY_EVIDENCE_FIELDS,
-    ROLE_SUFFIX
+    ROLE_SUFFIX,
+    MINIO_BUCKET_NAME,
+    MINIO_CONTEXT_URL
 }

@@ -184,6 +184,12 @@ services:
       - "7655:7655"
     environment:
       SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
+      MINIO_URL: "file-storage"
+      MINIO_PORT: "9000"
+      MINIO_USESSL: 'false'
+      MINIO_ACCESSKEY: 'admin'
+      MINIO_SECRETKEY: '12345678'
+      MINIO_REGION: 'us-west-1'
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
     depends_on:
