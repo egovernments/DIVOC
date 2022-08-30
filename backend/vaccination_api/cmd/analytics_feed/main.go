@@ -566,6 +566,7 @@ func saveVcTransactionEvent(connect *sql.DB, msg string) (string,string, models.
 		response.TransactionId,
 		response.CertificateId,
 		response.Status,
+		response.EntityType,
 		time.Now(),
 	); err != nil {
 		log.Errorf("Error in saving %+v", err)
