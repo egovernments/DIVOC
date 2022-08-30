@@ -76,7 +76,6 @@ async function consumeVCCertify() {
 async function processPostVCCertifyMessage(payload) {
   const { topic, partition, message } = payload;
   const postVCCertifyMessage = JSON.parse(message.value.toString());
-  console.log(postVCCertifyMessage);
   if (postVCCertifyMessage.entityType !== constants.TRANSACTION_ENTITY_TYPE){
     const token = postVCCertifyMessage.token;
     const transactionEntityReq = {
