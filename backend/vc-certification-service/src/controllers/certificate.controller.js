@@ -113,7 +113,7 @@ async function revokeCertificate(req, res) {
     const token = req.header("Authorization");
     const filters = {
         "filters": {
-            "osid": {
+            "certificateId": {
                 "eq": req.body.certificateId
             }
         },
