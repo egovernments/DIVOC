@@ -190,6 +190,8 @@ services:
       MINIO_ACCESSKEY: 'admin'
       MINIO_SECRETKEY: '12345678'
       MINIO_REGION: 'us-west-1'
+      REDIS_ENABLED: 'true'
+      REDIS_URL: 'redis://redis:6379'
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
     depends_on:

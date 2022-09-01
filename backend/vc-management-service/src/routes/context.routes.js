@@ -7,7 +7,9 @@ const {tokenValidationMiddleware} = require('../middleware/auth.middleware');
 const {addContext} = require('../controllers/context.controller');
 const config = require('../configs/config');
 const constants = require('../configs/constants');
+const redisService = require('../services/redis.service');
 let minioClient;
+
 
 (async function() {
     minioClient = new minio.Client({
@@ -19,6 +21,10 @@ let minioClient;
     });
     if(!(await minioClient.bucketExists(constants.MINIO_BUCKET_NAME)))
         await minioClient.makeBucket(constants.MINIO_BUCKET_NAME, config.MINIO_REGION);
+    if(config.REDIS_ENABLED) {
+        await redisService.initRedis({REDIS_URL: config.REDIS_URL});
+        redisService.storeKeyWithExpiry('123', '234');
+    }
 })();
 
 router.post('/', [tokenValidationMiddleware, upload.single('files')], (req, res) => addContext(req, res, minioClient));

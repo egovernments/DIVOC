@@ -5,6 +5,8 @@ const MINIO_ACCESSKEY = process.env.MINIO_ACCESSKEY;
 const MINIO_SECRETKEY = process.env.MINIO_SECRETKEY;
 const MINIO_USESSL = process.env.MINIO_USESSL === "true";
 const MINIO_REGION = process.env.MINIO_REGION;
+const REDIS_URL = process.env.REDIS_URL;
+const REDIS_ENABLED = process.env.REDIS_ENABLED === 'true';
 const PORT = process.env.PORT || 7655;
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL;
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'sunbird-rc';
@@ -21,6 +23,8 @@ module.exports = {
     MINIO_SECRETKEY,
     MINIO_USESSL,
     MINIO_REGION,
+    REDIS_URL,
+    REDIS_ENABLED,
     PORT,
     KEYCLOAK_URL,
     KEYCLOAK_REALM,
