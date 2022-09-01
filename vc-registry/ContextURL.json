@@ -30,7 +30,9 @@
       "privateFields": [],
       "signedFields": [],
       "indexFields": [],
-      "uniqueIndexFields": [],
+      "uniqueIndexFields": [
+        "url"
+      ],
       "systemFields": [
         "osCreatedAt",
         "osUpdatedAt",
