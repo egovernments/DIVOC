@@ -12,6 +12,7 @@ jest.mock('../src/services/sunbird.service', () => {
         updateCertificate: jest.fn(),
         createCertificate: jest.fn(),
         getCertificate: jest.fn(),
+        searchCertificate: jest.fn(),
         deleteCertificate: jest.fn(),
         getCertificateForUpdate: jest.fn()
     }
@@ -107,8 +108,8 @@ test('should call sunbird rc to get certificate', async() => {
         body: {
             name: 'Dummy'
         },
-        headers: {
-        },
+        header: jest.fn().mockReturnValue('1'),
+        headers: {}
     }
     const res = {
         send: function(){},
@@ -120,8 +121,17 @@ test('should call sunbird rc to get certificate', async() => {
         },
         setHeader: function(h, v) {}
     };
+    const filters = {
+        "filters": {
+            "certificateId": {
+                "eq": '1'
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
     certificateController.getCertificate(req, res);
-    expect(sunbirdRegistryService.getCertificate).toHaveBeenCalledWith('Dummy', '1', {})
+    expect(sunbirdRegistryService.searchCertificate).toHaveBeenCalledWith('Dummy', filters, req.header("Authorization"))
 });
 
 test('update certificate should throw error', async() => {
@@ -202,10 +212,10 @@ test('get certificate should throw error', async() => {
         setHeader: function(h, v) {}
     };
     jest.spyOn(res, 'status')
-    const response = await sunbirdRegistryService.getCertificate.mockImplementation(() => {throw new Error('some problem');});
+    const response = await sunbirdRegistryService.searchCertificate.mockImplementation(() => {throw new Error('some problem');});
     certificateController.getCertificate(req, res);
     expect(res.status).toHaveBeenCalledWith(500);
-}); 
+});
 
 test('test issuer format', async () => {
     expect(validationService.isURIFormat("2342343334")).toBe(false);
