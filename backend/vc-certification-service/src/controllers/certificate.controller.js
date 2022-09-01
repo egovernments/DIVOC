@@ -4,6 +4,7 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
 const validationService = require('../services/validation.service')
+const {truncateShard} = require("../utils/certification.utils");
 async function createCertificate(req, res, kafkaProducer) {
     try {
         validationService.validateCertificateInput(req);
@@ -40,7 +41,7 @@ async function getCertificate(req, res) {
             "offset": 0
         }
         let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, req.header("Authorization"))
-        let certificateOsId = certificateResponse[0]?.osid?.substring(2);
+        let certificateOsId = truncateShard(certificateResponse[0]?.osid);
         const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, req.headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
             res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
