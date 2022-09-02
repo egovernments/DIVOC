@@ -11,7 +11,7 @@ jest.mock('../src/services/sunbird.service', () => {
     return {
         updateCertificate: jest.fn(),
         createCertificate: jest.fn(),
-        getCertificatePDF: jest.fn(),
+        getCertificate: jest.fn(),
         searchCertificate: jest.fn(),
         deleteCertificate: jest.fn(),
         getCertificateForUpdate: jest.fn()

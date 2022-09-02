@@ -48,7 +48,7 @@ async function getCertificate(req, res) {
         }
         let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, req.header("Authorization"))
         let certificateOsId = truncateShard(certificateResponse[0]?.osid);
-        const {data} = await sunbirdRegistryService.getCertificatePDF(entityName, certificateOsId, req.headers);
+        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, req.headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
             res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
         }
@@ -201,7 +201,7 @@ async function verifyCertificate (req,res){
                 "offset": 0
             }
             const certificateResponse = await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
-            if(certificateResponse){
+            if(certificateResponse.length  >= 1){
                 const revokeFilter = {
                     "filters": {
                         "previousCertificateId": {
@@ -211,7 +211,7 @@ async function verifyCertificate (req,res){
                     "limit": 1,
                     "offset": 0
                 }
-                const revokeResp = await sunbirdRegistryService.getCertificate(revokeEntityType, revokeFilter, token);
+                const revokeResp = await sunbirdRegistryService.searchCertificate(revokeEntityType, revokeFilter, token);
                 const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
                 console.log("revokeEntityResp:", revokeEntityResp);
                 if(revokeEntityResp.length >= 1){
