@@ -4,11 +4,13 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
 const validationService = require('../services/validation.service');
+const {truncateShard} = require("../utils/certification.utils");
 
 const REVOKED = "REVOKED";
 const SUSPENDED = "SUSPENDED";
 const VALID = "VALID";
 const INVALID = "INVALID";
+
 async function createCertificate(req, res, kafkaProducer) {
     try {
         validationService.validateCertificateInput(req);
@@ -35,10 +37,21 @@ async function getCertificate(req, res) {
     try {
         const entityName = req.params.entityName;
         const certificateId = req.params.certificateId;
-        const {data} = await sunbirdRegistryService.getCertificatePDF(entityName, certificateId, req.headers);
+        const filters = {
+            "filters": {
+                "certificateId": {
+                    "eq": certificateId
+                }
+            },
+            "limit": 1,
+            "offset": 0
+        }
+        let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, req.header("Authorization"))
+        let certificateOsId = truncateShard(certificateResponse[0]?.osid);
+        const {data} = await sunbirdRegistryService.getCertificatePDF(entityName, certificateOsId, req.headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
             res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
-        };
+        }
         data.pipe(res);
     } catch (err) {
         console.error(err);
@@ -127,7 +140,7 @@ async function revokeCertificate(req, res) {
     }
     sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
     .then(async(result) => {
-        if(result === true) {
+        if(result.length >= 1) {
             let body = getRevokeBody(req);
             const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
             res.status(200).json({
