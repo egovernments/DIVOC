@@ -5,7 +5,7 @@ const {ROLE_SUFFIX} = require('../configs/constants');
 
 async function createTenant(req, res) {
     try {
-        const userId = req.body?.accountDetails?.userId;
+        const userId = req.body?.accountDetails?.userId.toLowerCase();
         const token = req.header("Authorization");
         const isValidUserId = utils.isValidUserId(userId);
         if (isValidUserId) {
