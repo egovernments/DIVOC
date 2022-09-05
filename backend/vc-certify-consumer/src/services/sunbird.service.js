@@ -16,8 +16,18 @@ const addTransaction = (transactionEntityReq, token) => {
             throw error;
         })
 }
-
+const deleteCertificate = (entityName, entityId, token) => {
+    console.log(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`)
+    return axios.delete(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${entityId}`,
+                    {headers: {Authorization: token}}
+        ).then(res => res.data)
+        .catch(err => {
+            console.error("Error in deleting certificate : ", err);
+            throw err;
+        });
+};
 module.exports={
     createCertificate,
-    addTransaction
+    addTransaction,
+    deleteCertificate
 }

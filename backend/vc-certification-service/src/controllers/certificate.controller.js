@@ -150,11 +150,46 @@ function getRevokeBody(req) {
 
 }
 
+async function deleteRevokeCertificate(req, res, kafkaProducer) {
+    const token = req.header("Authorization");
+    const filters = {
+        "filters": {
+            "osid": {
+                "eq": req.body.certificateId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    try{
+        let certificateResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters, token)
+        let certificateOsId = truncateShard(certificateResponse[0]?.osid);
+        await kafkaProducer.connect();
+        kafkaProducer.send({
+            topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
+            messages: [
+                { key: null, value: JSON.stringify({  certificateOsId: certificateOsId,token: token }) }
+            ]
+        });
+        res.status(200).json({
+            
+        });
+        
+    }
+    catch(err) {
+            console.log('ERROR : ', err?.response?.status || '');
+            res.status(err?.response?.status || 500).json({
+                message: err?.response?.data
+            })
+        }
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
     deleteCertificate,
-    revokeCertificate
+    revokeCertificate,
+    deleteRevokeCertificate
 }
 

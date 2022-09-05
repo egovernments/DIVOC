@@ -14,4 +14,5 @@ router.get(`/certificate/:entityName/:certificateId`, authMiddleware, certificat
 router.put(`/certify/:entityName/:certificateId`, authMiddleware, (req, res) => certificateController.updateCertificate(req, res, kafkaProducer));
 router.delete(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.deleteCertificate);
 router.post(`/certificate/revoke`, [authMiddleware, body(["entityName", "certificateId"], "Missing entityName or CertificateId in request body").exists()], certificateController.revokeCertificate);
+router.delete(`/certificate/revoke`, [authMiddleware, body([ "certificateId"], "Missing CertificateId in request body").exists()], (req, res) => certificateController.deleteRevokeCertificate(req, res, kafkaProducer));
 module.exports = {certifyRouter: router, setKafkaProducer}

@@ -16,10 +16,12 @@ const kafka = new Kafka({
 });
 const vc_certify_consumer = kafka.consumer({ groupId: 'vc_certify', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const post_vc_certify_consumer = kafka.consumer({ groupId: 'post_vc_certify', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
+const vc_rm_suspension_consumer = kafka.consumer({ groupId: 'vc-remove-suspension', sessionTimeout: config.KAFKA_CONSUMER_SESSION_TIMEOUT });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 
 consumeVCCertify();
 consumePostVCCertify();
+consumeRemoveSuspension();
 
 async function processVCCertifyMessage(payload)  {
   const { topic, partition, message } = payload;
@@ -113,6 +115,28 @@ async function consumePostVCCertify() {
 
   await post_vc_certify_consumer.run({
     eachMessage: processPostVCCertifyMessage
+  });
+}
+async function processRemoveSuspensionMessage(payload) {
+  const { topic, partition, message } = payload;
+  const removeSuspensionMessage = JSON.parse(message.value.toString());
+  const certificateOsId = removeSuspensionMessage.certificateOsId;
+  const token = removeSuspensionMessage.token;
+    try {
+      await sunbirdRegistryService.deleteCertificate('RevokedVC',certificateOsId,token);
+     
+    } catch (err) {
+      console.error("Error while removing suspension: ", err);
+    }
+  }
+
+
+async function consumeRemoveSuspension() {
+  await vc_rm_suspension_consumer.connect();
+  await vc_rm_suspension_consumer.subscribe({topic: config.VC_REMOVE_SUSPENSION_TOPIC, fromBeginning: true});
+
+  await vc_rm_suspension_consumer.run({
+    eachMessage: processRemoveSuspensionMessage
   });
 }
 
