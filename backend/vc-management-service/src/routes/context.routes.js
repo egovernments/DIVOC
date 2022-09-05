@@ -20,10 +20,9 @@ let minioClient;
         secretKey: config.MINIO_SECRETKEY,
     });
     if(!(await minioClient.bucketExists(constants.MINIO_BUCKET_NAME)))
-        await minioClient.makeBucket(constants.MINIO_BUCKET_NAME, config.MINIO_REGION);
+        await minioClient.makeBucket(constants.MINIO_BUCKET_NAME);
     if(config.REDIS_ENABLED) {
         await redisService.initRedis({REDIS_URL: config.REDIS_URL});
-        redisService.storeKeyWithExpiry('123', '234');
     }
 })();
 
