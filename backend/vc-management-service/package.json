@@ -4,7 +4,7 @@
   "description": "Service to manage Verifiable Credentials",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon main.js",
+    "start": "node main.js",
     "test": "jest"
   },
   "author": "",

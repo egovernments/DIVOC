@@ -5,14 +5,18 @@ const redisService = require('../services/redis.service');
 
 async function addContext(req, res, minioClient) {
     const filename = req.baseUrl + "/" + req.file.originalname;
-    await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, req.file.buffer);
+    const file = req.file.buffer;
+    let fileStr = file.toString();
+    fileStr = fileStr.replaceAll('\n', '');
+    await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
     try {
         const response = await sunbirdRegistryService.createEntity(constants.MINIO_CONTEXT_URL, {url: filename}, req.header('Authorization'));
         if(config.REDIS_ENABLED) {
-            redisService.storeKeyWithExpiry(response.result.ContextURL.osid.substring(2), filename);
+            redisService.storeKeyWithExpiry(response.result.ContextURL.osid.substring(2), fileStr);
         }
         res.status(200).json({
-            message: response
+            message: response,
+            url: req.baseUrl + "/" + response.result.ContextURL.osid.substring(2)
         });
     }
     catch(err) {
