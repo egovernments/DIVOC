@@ -1,5 +1,6 @@
 const {Kafka} = require('kafkajs');
 const sunbirdRegistryService = require('./src/services/sunbird.service');
+const vcCertificationService = require('./src/services/vc.certification.service');
 const config = require('./src/configs/config');
 const constants = require('./src/configs/constants')
 const R = require('ramda');
@@ -26,6 +27,7 @@ async function processVCCertifyMessage(payload)  {
   const token = createEntityMessage.token;
   const certificatePayload = createEntityMessage.body;
   let resp = "";
+  let previousCertId = certificatePayload?.certificateId || "" ;
   do {
     certificatePayload.certificateId = getCertificateId();
     console.log("Certificate Payload: ", JSON.stringify(certificatePayload));
@@ -44,6 +46,13 @@ async function processVCCertifyMessage(payload)  {
   } else {
     certificateStatus = REGISTRY_FAILED_STATUS;
     console.log("Unable to create certificate : ", R.pathOr("", ["response", "data"], resp));
+  }
+  if(previousCertId.trim() !== ""){
+    let revokeRequest = JSON.parse(JSON.stringify(certificatePayload));
+    revokeRequest.certificateId = previousCertId;
+    revokeRequest.newCertId = certificatePayload.certificateId;
+    revokeRequest.entityName = createEntityMessage.entityName || "";
+    await vcCertificationService.revokeCertificate(revokeRequest,token);
   }
   producer.send({
     topic: config.POST_VC_CERTIFY_TOPIC,
