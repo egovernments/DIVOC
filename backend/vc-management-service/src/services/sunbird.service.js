@@ -90,17 +90,36 @@ const getTransaction = async (transactionId, token) => {
     console.log({transctionUrl: constants.SUNBIRD_GET_TRANSACTION_URL, 
                 transactionId: transactionId});
     const transactionRequest = {
-        filters: {
-            transactionId: {
-                eq: transactionId
+        "filters": {
+            "transactionId": {
+                "eq": transactionId
             }
         }
     };
     return axios.post(constants.SUNBIRD_GET_TRANSACTION_URL, transactionRequest ,{headers:{Authorization: token}})
+            .then(res => res.data)
             .catch(error => {
                 console.error(error);
                 throw error;
             });
+}
+const getContext = async (osid, token) => {
+    console.log(constants.SUNBIRD_GET_CONTEXT_URL + osid );
+    return axios.get(constants.SUNBIRD_GET_CONTEXT_URL + osid ,{headers:{Authorization: token}})
+            .then(res => res.data)
+            .catch(error => {
+                console.error(error);
+                throw error;
+            });
+}
+const updateContext = async (osid,updateRequest, token ) => {
+    let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
+    return axios.put(url, updateRequest, { headers: {Authorization: token}}).then(res =>
+        res.data
+    ).catch(error => {
+        console.error(error);
+        throw error;
+    });
 }
 
 module.exports = {
@@ -108,6 +127,8 @@ module.exports = {
     createEntity,
     uploadTemplate,
     updateSchema,
+    updateContext,
     getSchema,
-    getTransaction
+    getTransaction,
+    getContext
 }

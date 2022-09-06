@@ -4,12 +4,11 @@ const multer = require('multer');
 const upload = multer();
 const minio = require('minio');
 const {tokenValidationMiddleware} = require('../middleware/auth.middleware');
-const {addContext} = require('../controllers/context.controller');
+const {addContext,updateContext} = require('../controllers/context.controller');
 const config = require('../configs/config');
 const constants = require('../configs/constants');
 const redisService = require('../services/redis.service');
 let minioClient;
-
 
 (async function() {
     minioClient = new minio.Client({
@@ -27,5 +26,6 @@ let minioClient;
 })();
 
 router.post('/', [tokenValidationMiddleware, upload.single('files')], (req, res) => addContext(req, res, minioClient));
+router.put('/update/:osid',[tokenValidationMiddleware, upload.single('files')],(req,res) => updateContext(req,res,minioClient));
 
 module.exports = router;
