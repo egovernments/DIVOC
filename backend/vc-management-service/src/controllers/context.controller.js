@@ -44,7 +44,7 @@ async function updateContext(req,res,minioClient){
         if(config.REDIS_ENABLED) {
             redisService.storeKeyWithExpiry(osid, fileStr);
         }
-        if(filename != getContextResp.url){
+        if(filename !== getContextResp.url){
             minioClient.removeObject(constants.MINIO_BUCKET_NAME, getContextResp.url);
         }
         res.status(200).json({

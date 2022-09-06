@@ -104,8 +104,7 @@ const getTransaction = async (transactionId, token) => {
             });
 }
 const getContext = async (osid, token) => {
-    console.log(constants.SUNBIRD_GET_CONTEXT_URL + osid );
-    return axios.get(constants.SUNBIRD_GET_CONTEXT_URL + osid ,{headers:{Authorization: token}})
+    return axios.get(`${constants.MINIO_CONTEXT_URL}/${osid}` ,{headers:{Authorization: token}})
             .then(res => res.data)
             .catch(error => {
                 console.error(error);

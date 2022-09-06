@@ -7,7 +7,6 @@ const SUNBIRD_TEMPLATE_UPLOAD_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/:tena
 const SUNBIRD_GET_SCHEMA_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Schema/:schemaId`
 const MINIO_URL_SCHEME = "minio://"
 const SUNBIRD_GET_TRANSACTION_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/TransactionCertificateMap/search`;
-const SUNBIRD_GET_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL/`;
 const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
 const MANDATORY_EVIDENCE_FIELDS = ["validFrom", "validUntil" , "certificateId"];
 const ROLE_SUFFIX = '-realm-role';
@@ -27,6 +26,5 @@ module.exports = {
     ROLE_SUFFIX,
     MINIO_BUCKET_NAME,
     MINIO_CONTEXT_URL,
-    SUNBIRD_GET_CONTEXT_URL,
     MINIO_UPDATE_CONTEXT_URL
 }
