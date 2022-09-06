@@ -17,12 +17,18 @@ function isURIFormat(param) {
   return isURI;
 }
 
-function validateCertificateInput(req) {
+function validateCertificateInput(req,reqType) {
   reqBody = req.body;
   let err = {
     response: {
       status: 400,
       data: "error"
+    }
+  }
+  if(reqType == "update"){
+    if (!(reqBody.certificateId)) {
+      err.response.data = "certificateId is missing";
+      throw err;
     }
   }
   checkForNull(reqBody, err);

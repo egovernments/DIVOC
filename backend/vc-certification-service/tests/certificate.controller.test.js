@@ -24,42 +24,7 @@ beforeEach(() => {
 })
 
 
-test('should call sunbird rc to update certificate', async() => {
-    const req = {
-        params: {
-            entityName: 'Dummy',
-            certificateId: '1'
-        },
-        body: {
-            name: 'Dummy',
-            issuanceDate : '12-12-2022'
-        },
-        header: jest.fn().mockReturnValue('1')
-    }
 
-    const res = {
-        send: function(){},
-        json: function(d) {
-        },
-        status: function(s) {
-            this.statusCode = s;
-            return this;
-        }
-    };
-    const dataForUpdate = {
-        certificateId : "123",
-        previousCertificateId : "1",
-        startDate : "12-12-2022",
-        
-     }
-    jest.spyOn(sunbirdRegistryService,"getCertificateForUpdate").mockReturnValue(Promise.resolve({issuanceDate : "12-12-2022"}));
-    jest.spyOn(sunbirdRegistryService,"createCertificate").mockReturnValue(Promise.resolve({result : {osid : "123"}}));
-    await certificateController.updateCertificate(req, res);
-    expect(sunbirdRegistryService.getCertificateForUpdate).toHaveBeenCalledWith('Dummy', '1', '1');
-    expect(sunbirdRegistryService.createCertificate).toHaveBeenCalledWith(req.body, 'Dummy', '1');
-    expect(sunbirdRegistryService.createCertificate).toHaveBeenCalledWith(dataForUpdate, 'RevokedCertificate', '1');
-    expect(sunbirdRegistryService.deleteCertificate).toHaveBeenCalledWith(req.body, 'Dummy', '1','1');
-});
 
 test('should call sunbird rc to create certificate', async() => {
     const req = {
@@ -132,35 +97,6 @@ test('should call sunbird rc to get certificate', async() => {
     }
     certificateController.getCertificate(req, res);
     expect(sunbirdRegistryService.searchCertificate).toHaveBeenCalledWith('Dummy', filters, req.header("Authorization"))
-});
-
-test('update certificate should throw error', async() => {
-    const req = {
-        params: {
-            entityName: 'Dummy',
-            entityId: '1'
-        },
-        body: {
-            name: 'Dummy'
-        },
-        header: jest.fn().mockReturnValue('1')
-    }
-
-    const res = {
-        send: function(){},
-        json: function(d) {
-        },
-        status: function(s) {
-            this.statusCode = s;
-            return this;
-        }
-    };
-    jest.spyOn(res, 'status')
-    jest.spyOn(sunbirdRegistryService,"getCertificateForUpdate").mockReturnValue(Promise.resolve({issuanceDate : "12-12-2022"}));
-    jest.spyOn(sunbirdRegistryService,"createCertificate").mockReturnValue(Promise.resolve({result : {osid : "123"}}));
-    jest.spyOn(sunbirdRegistryService , 'deleteCertificate').mockImplementation(() => {throw new Error({response: {status: 500, data: 'some problem'}})});
-    await certificateController.updateCertificate(req, res);
-    expect(res.status).toHaveBeenCalledWith(500);
 });
 
 test('create certificate should throw error', async() => {

@@ -47,7 +47,7 @@ const deleteCertificate = (entityName, entityId, token) => {
                     {headers: {Authorization: token}}
         ).then(res => res.data)
         .catch(err => {
-            console.error("Error in revoking certificate : ", err);
+            console.error("Error in deleting certificate : ", err);
             throw err;
         });
 };
