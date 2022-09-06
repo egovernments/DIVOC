@@ -12,8 +12,8 @@ const createTenant = async (tenantRequest) => {
     })
 }
 
-const createSchema = async (schemaRequest, token) => {
-    return axios.post(constants.SUNBIRD_SCHEMA_ADD_URL, schemaRequest, { headers: {Authorization: token}}).then(res =>
+const createEntity = async (url, schemaRequest, token) => {
+    return axios.post(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {
         console.error(error);
@@ -105,7 +105,7 @@ const getTransaction = async (transactionId, token) => {
 
 module.exports = {
     createTenant,
-    createSchema,
+    createEntity,
     uploadTemplate,
     updateSchema,
     getSchema,

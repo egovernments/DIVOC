@@ -10,6 +10,7 @@ let tenantRouter = require('./src/routes/tenant.routes');
 let schemaRouter = require('./src/routes/schema.routes');
 let templateRouter = require('./src/routes/template.routes');
 let transactionRouter = require('./src/routes/transaction.routes');
+const contextRouter = require('./src/routes/context.routes');
 
 const swaggerDocument = yaml.load('./management-service-swagger.yml');
 
@@ -27,6 +28,7 @@ app.use(`${BASE_URL}v1/tenant`, tenantRouter);
 app.use(`${BASE_URL}v1/schema`, schemaRouter);
 app.use(`${BASE_URL}v1/templates`, templateRouter);
 app.use(`${BASE_URL}V1/transaction`,transactionRouter);
+app.use(`${BASE_URL}v1/context`, contextRouter);
 
 app.use(
     `${BASE_URL}api-docs`,
