@@ -176,7 +176,6 @@ function getRevokeBody(req) {
 }
 
 async function verifyCertificate (req,res){
-    //decrypt
     const certificate = req.body;
     const certificateEntityType = certificate.evidence[0].type[0];
     const revokeEntityType = "RevokedVC";
@@ -191,41 +190,13 @@ async function verifyCertificate (req,res){
     try{
         const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
         if(verifyResp.verified){
-            const certificateFilter = {
-                "filters": {
-                    "certificateId": {
-                        "eq": certificateId
-                    }
-                },
-                "limit": 1,
-                "offset": 0
-            }
-            const certificateResponse = await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
+            const certificateResponse = await getCertificates(certificateId,certificateEntityType,token);
             if(certificateResponse.length  >= 1){
-                const revokeFilter = {
-                    "filters": {
-                        "previousCertificateId": {
-                            "eq": certificateId
-                        }
-                    },
-                    "limit": 1,
-                    "offset": 0
-                }
-                const revokeResp = await sunbirdRegistryService.searchCertificate(revokeEntityType, revokeFilter, token);
+                const revokeResp = await getRevokeCertificates(certificateId,revokeEntityType,token);
                 const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
                 console.log("revokeEntityResp:", revokeEntityResp);
-                if(revokeEntityResp.length >= 1){
-                    if(revokeEntityResp[0]?.endDate){
-                        certificateStatus = SUSPENDED;
-                        msg = `Certificate is Suspended till ${revokeEntityResp[0]?.endDate}`
-                    }else{
-                        certificateStatus = REVOKED
-                        msg = `Certificate is Permanently Revoked`
-                    }
-                }else{
-                    certificateStatus = VALID;
-                    msg = `certificate is Valid`;
-                }
+                [certificateStatus,msg] = revokeStatus(revokeEntityResp);
+                
             }else{
                 certificateStatus = INVALID;
                 msg = `Certificate is not available in ${certificateEntityType}`
@@ -255,6 +226,49 @@ async function verifyCertificate (req,res){
             message: err?.response?.data
         })
     }
+}
+
+function revokeStatus(revokeEntityResp){
+    let certificateStatus = "";
+    let msg = "";
+    if(revokeEntityResp.length >= 1){
+        if(revokeEntityResp[0]?.endDate){
+            certificateStatus = SUSPENDED;
+            msg = `Certificate is Suspended till ${revokeEntityResp[0]?.endDate}`
+        }else{
+            certificateStatus = REVOKED
+            msg = `Certificate is Permanently Revoked`
+        }
+    }else{
+        certificateStatus = VALID;
+        msg = `certificate is Valid`;
+    }
+    return [certificateStatus,msg];
+}
+
+async function getRevokeCertificates(certificateId,revokeEntityType,token){
+    const revokeFilter = {
+        "filters": {
+            "previousCertificateId": {
+                "eq": certificateId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    return await sunbirdRegistryService.searchCertificate(revokeEntityType, revokeFilter, token);
+}
+async function getCertificates(certificateId,certificateEntityType,token){
+    const certificateFilter = {
+        "filters": {
+            "certificateId": {
+                "eq": certificateId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
 }
 
 module.exports = {
