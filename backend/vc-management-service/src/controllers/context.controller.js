@@ -28,6 +28,48 @@ async function addContext(req, res, minioClient) {
     }
 }
 
+async function getContext(req, res, minioClient) {
+    try {
+        if(config.REDIS_ENABLED) {
+            let value = await redisService.getKey(req.params.osid);
+            if(value === undefined || value === null) {
+                return await getContextFromMinio(req, res, minioClient);
+            }
+            res
+            .status(200)
+            .set({'Content-Type': 'application/ld+json'})
+            .json(
+                JSON.parse(value)
+            );
+            return;
+        }
+        return await getContextFromMinio(req, res, minioClient);
+    } catch(err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
+async function getContextFromMinio(req, res, minioClient) {
+    const url = (await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL, req.header('Authorization')))[0].url;
+    const value = await minioClient.getObject(constants.MINIO_BUCKET_NAME, url);
+    let data = '';
+    value.on('data', function (chunk) {
+        data += chunk;
+    });
+    value.on('end', function (chunk) {
+        if (chunk !== undefined)
+            data += chunk;
+        res.status(200).set({ 'Content-Type': 'application/ld+json' }).json(JSON.parse(data.toString()));
+        redisService.storeKeyWithExpiry(req.params.osid, data.toString());
+    });
+    return;
+}
+
+
 module.exports = {
-    addContext
+    addContext,
+    getContext
 }

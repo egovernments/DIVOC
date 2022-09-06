@@ -24,7 +24,8 @@ async function getSchema(req, res) {
     try {
         const token = req.header("Authorization");
         const schemaId = req.params.schemaId;
-        const schemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+        let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+        const schemaResponse = await sunbirdRegistryService.getEntity(url, token);
         let schemas = schemaId ? [schemaResponse] : schemaResponse
         res.status(200).json({
             schemas: schemas
@@ -100,7 +101,8 @@ async function updateTemplateUrls(req, res) {
 }
 
 async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
-    const getSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+    const getSchemaResponse = await sunbirdRegistryService.getEntity(url, token);
     let schema = JSON.parse(getSchemaResponse?.schema);
     if (schema?._osConfig) {
         if (!schema._osConfig.certificateTemplates) {

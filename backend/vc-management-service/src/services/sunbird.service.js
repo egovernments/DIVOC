@@ -2,7 +2,6 @@ const axios = require('axios');
 
 const constants = require('../configs/constants');
 const config = require('../configs/config');
-
 const createTenant = async (tenantRequest) => {
     return axios.post(constants.SUNBIRD_TENANT_INVITE_URL, tenantRequest).then(res =>
         res.data
@@ -31,8 +30,7 @@ const updateSchema = async (schemaRequest, token, schemaId) => {
     });
 }
 
-const getSchema = async (token, schemaId) => {
-    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+const getEntity = async (url, token) => {
     return axios.get(url, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {
@@ -108,6 +106,6 @@ module.exports = {
     createEntity,
     uploadTemplate,
     updateSchema,
-    getSchema,
+    getEntity,
     getTransaction
 }
