@@ -72,7 +72,17 @@ const searchCertificate = (entityType, filters, token) => {
 
 const deleteExpiredSuspensions = (token, kafkaProducer) => {
     
-    searchExpiredSuspensions("RevokedVC", token)
+    const requestBody = {
+        "filters": {
+            "endDate": {
+                "lt": new Date()
+            }
+        },
+        "offset": 0,
+        "fields": ["osid"]
+    }
+    
+    searchCertificate("RevokedVC", requestBody, token)
     .then(async(results) => {
         await kafkaProducer.connect();
         for (i = 0; i < results.length; i++) {
@@ -85,25 +95,6 @@ const deleteExpiredSuspensions = (token, kafkaProducer) => {
         }       
     })
 };
-
-const searchExpiredSuspensions = (entityType, token) => {
-
-    const requestBody = {
-        "filters": {
-            "endDate": {
-                "lt": new Date()
-            }
-        },
-        "offset": 0,
-        "fields": ["osid"]
-    }
-    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, requestBody, {headers: {Authorization: token}})
-        .then(async res => res.data)
-        .catch(err => {
-            console.error(err);
-            throw err;
-        })
-}
 
 module.exports = {
     createCertificate,
