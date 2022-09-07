@@ -1,5 +1,5 @@
 const express = require('express');
-const {body} = require('express-validator');
+const {body, param} = require('express-validator');
 const authMiddleware = require('../middleware/auth.middleware');
 const certificateController = require('../controllers/certificate.controller');
 
@@ -14,5 +14,5 @@ router.get(`/certificate/:entityName/:certificateId`, authMiddleware, certificat
 router.put(`/certify/:entityType`, authMiddleware, (req, res) => certificateController.updateCertificate(req, res, kafkaProducer));
 router.delete(`/certificate/:entityName/:certificateId`, authMiddleware, certificateController.deleteCertificate);
 router.post(`/certificate/revoke`, [authMiddleware, body(["entityName", "certificateId"], "Missing entityName or CertificateId in request body").exists()], certificateController.revokeCertificate);
-router.delete(`/certificate/revoke`, [authMiddleware, body([ "certificateId"], "Missing CertificateId in request body").exists()], (req, res) => certificateController.deleteRevokeCertificate(req, res, kafkaProducer));
+router.delete(`/certificate/revoke/:entityName/:revokedCertificateId`, [authMiddleware, param([ "entityName","revokedCertificateId"], "Missing entityName or Revoked CertificateId in request body").exists()], (req, res) => certificateController.deleteRevokeCertificate(req, res, kafkaProducer));
 module.exports = {certifyRouter: router, setKafkaProducer}

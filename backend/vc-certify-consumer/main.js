@@ -61,7 +61,6 @@ async function processVCCertifyMessage(payload)  {
       resp = error;
     }
   }
-  }
   producer.send({
     topic: config.POST_VC_CERTIFY_TOPIC,
     messages: [
@@ -126,10 +125,10 @@ async function consumePostVCCertify() {
 async function processRemoveSuspensionMessage(payload) {
   const { topic, partition, message } = payload;
   const removeSuspensionMessage = JSON.parse(message.value.toString());
-  const certificateOsId = removeSuspensionMessage.certificateOsId;
+  const revokedCertificateOsId = removeSuspensionMessage.revokedCertificateOsId;
   const token = removeSuspensionMessage.token;
     try {
-      await sunbirdRegistryService.deleteCertificate('RevokedVC',certificateOsId,token);
+      await sunbirdRegistryService.deleteCertificate('RevokedVC',revokedCertificateOsId,token);
      
     } catch (err) {
       console.error("Error while removing suspension: ", err);
