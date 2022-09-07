@@ -1,4 +1,5 @@
 const certifyConstants = require('../configs/constants');
+const certifyConfigs= require('../configs/config');
 const axios = require("axios");
 
 const createCertificate = (certificateRequest, entityType, token) => {
@@ -69,6 +70,14 @@ const searchCertificate = (entityType, filters, token) => {
             throw err;
         })
 }
+const verifyCertificate = (body) => {
+    return axios.post(`${certifyConfigs.SUNBIRD_SIGNER_URL}/verify`,body)
+    .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
+}
 
 const deleteExpiredSuspensions = (token, kafkaProducer) => {
     
@@ -104,5 +113,6 @@ module.exports = {
     getCertificateForUpdate,
     revokeCertificate,
     deleteExpiredSuspensions,
-    searchCertificate
+    searchCertificate,
+    verifyCertificate
 }

@@ -3,8 +3,14 @@ const uuid = require('uuid');
 const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
-const validationService = require('../services/validation.service')
+const validationService = require('../services/validation.service');
 const {truncateShard} = require("../utils/certification.utils");
+
+const REVOKED = "REVOKED";
+const SUSPENDED = "SUSPENDED";
+const VALID = "VALID";
+const INVALID = "INVALID";
+
 async function createCertificate(req, res, kafkaProducer) {
     try {
         validationService.validateCertificateInput(req, "create");
@@ -104,16 +110,7 @@ async function revokeCertificate(req, res) {
         return;
     }
     const token = req.header("Authorization");
-    const filters = {
-        "filters": {
-            "certificateId": {
-                "eq": req.body.certificateId
-            }
-        },
-        "limit": 1,
-        "offset": 0
-    }
-    sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
+    getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
     .then(async(result) => {
         if(result.length >= 1) {
             let body = getRevokeBody(req);
@@ -150,11 +147,95 @@ function getRevokeBody(req) {
 
 }
 
+async function verifyCertificate (req,res){
+    const certificate = req.body;
+    const certificateEntityType = certificate.evidence[0].type[0];
+    const revokeEntityType = "RevokedVC";
+    const token = req.header("Authorization");
+    let certificateId= certificate.credentialSubject.id;
+    let certificateStatus = "";
+    let msg = "";
+    console.log({certificateId: certificateId});
+    let body = {
+        signedCredentials : certificate,
+    }
+    try{
+        const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
+        if(verifyResp.verified){
+            const certificateResponse = await getEntity(certificateId,"certificateId",certificateEntityType,token);
+            if(certificateResponse.length  >= 1){
+                const revokeResp = await getEntity(certificateId,"previousCertificateId",revokeEntityType,token);
+                const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
+                console.log("revokeEntityResp:", revokeEntityResp);
+                [certificateStatus,msg] = revokeStatus(revokeEntityResp);
+                
+            }else{
+                certificateStatus = INVALID;
+                msg = `Certificate is not available in ${certificateEntityType}`
+            }
+            res.status(200).json({
+                message: "Certificate verified",
+                status: {
+                    certificateStatus: certificateStatus,
+                    msg: msg
+                },
+                response: {verifyResp}
+            });
+        }else{
+            res.status(406).json({
+                message: "verification failed",
+                status: {
+                    certificateStatus: INVALID,
+                    msg: "Failed to verify certificate"
+                },
+                response: {verifyResp}
+            });
+        }
+    } catch(err) {
+        console.log('ERROR : ',err);
+        res.status(500).json({
+            message: err?.response?.data
+        })
+    }
+}
+
+function revokeStatus(revokeEntityResp){
+    let certificateStatus = "";
+    let msg = "";
+    if(revokeEntityResp.length >= 1){
+        if(revokeEntityResp[0]?.endDate){
+            certificateStatus = SUSPENDED;
+            msg = `Certificate is Suspended till ${revokeEntityResp[0]?.endDate}`
+        }else{
+            certificateStatus = REVOKED
+            msg = `Certificate is Permanently Revoked`
+        }
+    }else{
+        certificateStatus = VALID;
+        msg = `certificate is Valid`;
+    }
+    return [certificateStatus,msg];
+}
+
+async function getEntity(entityId,filterType,certificateEntityType,token){
+    const certificateFilter = {
+        "filters": {
+            [filterType]: {
+                "eq": entityId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
     deleteCertificate,
-    revokeCertificate
+    revokeCertificate,
+    verifyCertificate
 }
 
