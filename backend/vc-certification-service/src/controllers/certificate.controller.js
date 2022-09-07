@@ -190,9 +190,9 @@ async function verifyCertificate (req,res){
     try{
         const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
         if(verifyResp.verified){
-            const certificateResponse = await getCertificates(certificateId,certificateEntityType,token);
+            const certificateResponse = await getEntity(certificateId,"certificateId",certificateEntityType,token);
             if(certificateResponse.length  >= 1){
-                const revokeResp = await getRevokeCertificates(certificateId,revokeEntityType,token);
+                const revokeResp = await getEntity(certificateId,"previousCertificateId",revokeEntityType,token);
                 const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
                 console.log("revokeEntityResp:", revokeEntityResp);
                 [certificateStatus,msg] = revokeStatus(revokeEntityResp);
@@ -246,23 +246,11 @@ function revokeStatus(revokeEntityResp){
     return [certificateStatus,msg];
 }
 
-async function getRevokeCertificates(certificateId,revokeEntityType,token){
-    const revokeFilter = {
-        "filters": {
-            "previousCertificateId": {
-                "eq": certificateId
-            }
-        },
-        "limit": 1,
-        "offset": 0
-    }
-    return await sunbirdRegistryService.searchCertificate(revokeEntityType, revokeFilter, token);
-}
-async function getCertificates(certificateId,certificateEntityType,token){
+async function getEntity(entityId,filterType,certificateEntityType,token){
     const certificateFilter = {
         "filters": {
-            "certificateId": {
-                "eq": certificateId
+            [filterType]: {
+                "eq": entityId
             }
         },
         "limit": 1,
