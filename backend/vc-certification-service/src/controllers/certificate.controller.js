@@ -129,16 +129,7 @@ async function revokeCertificate(req, res) {
         return;
     }
     const token = req.header("Authorization");
-    const filters = {
-        "filters": {
-            "certificateId": {
-                "eq": req.body.certificateId
-            }
-        },
-        "limit": 1,
-        "offset": 0
-    }
-    sunbirdRegistryService.searchCertificate(req.body.entityName, filters, token)
+    getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
     .then(async(result) => {
         if(result.length >= 1) {
             let body = getRevokeBody(req);
@@ -219,7 +210,6 @@ async function verifyCertificate (req,res){
                 response: {verifyResp}
             });
         }
-        
     } catch(err) {
         console.log('ERROR : ',err);
         res.status(500).json({
