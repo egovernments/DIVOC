@@ -168,7 +168,6 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
 
         let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters, token)
         let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
-        console.log();
         await kafkaProducer.connect();
         kafkaProducer.send({
             topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
