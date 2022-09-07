@@ -53,8 +53,14 @@ async function processVCCertifyMessage(payload)  {
     let revokeRequest = JSON.parse(JSON.stringify(certificatePayload));
     revokeRequest.certificateId = previousCertId;
     revokeRequest.newCertId = certificatePayload.certificateId;
-    revokeRequest.entityName = createEntityMessage.entityName || "";
-    await vcCertificationService.revokeCertificate(revokeRequest,token);
+    revokeRequest.entityName = createEntityMessage.entityType || "";
+    try {
+      resp = await vcCertificationService.revokeCertificate(revokeRequest,token);
+    } catch (error) {
+      console.error("Error in revoking certificate during update request ", error);
+      resp = error;
+    }
+  }
   }
   producer.send({
     topic: config.POST_VC_CERTIFY_TOPIC,

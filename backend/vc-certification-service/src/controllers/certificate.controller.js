@@ -63,7 +63,7 @@ async function updateCertificate(req, res, kafkaProducer) {
         kafkaProducer.send({
             topic: certifyConstants.VC_CERTIFY_TOPIC,
             messages: [
-                { key: null, value: JSON.stringify({ body: req.body, transactionId: transactionId, entityName: req.params.entityName, token: req.header("Authorization") }) }
+                { key: null, value: JSON.stringify({ body: req.body, transactionId: transactionId, entityType: req.params.entityType, token: req.header("Authorization") }) }
             ]
         });
         res.status(200).json({
