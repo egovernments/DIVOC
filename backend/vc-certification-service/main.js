@@ -8,6 +8,7 @@ const {Kafka} = require('kafkajs');
 const certifyConfig = require('./src/configs/config');
 const {BASE_URL} = require("./src/configs/config");
 let {certifyRouter, setKafkaProducer} = require('./src/routes/certificate.route');
+let {cronJob, setKafkaProducerForScheduler} = require('./src/services/scheduler.service');
 
 const swaggerDocument = yaml.load('./certification-service-swagger.yml');
 
@@ -20,6 +21,9 @@ const kafka = new Kafka({
 });
 const producer = kafka.producer({allowAutoTopicCreation: true});
 setKafkaProducer(producer);
+
+setKafkaProducerForScheduler(producer);
+cronJob();
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use((bodyParser.json()));
