@@ -2,13 +2,13 @@ const constants = require('../configs/constants');
 const config = require('../configs/config');
 const sunbirdRegistryService = require('../services/sunbird.service');
 const redisService = require('../services/redis.service');
-
+const {getAdminToken} = require('../services/keycloak.service');
 async function addContext(req, res, minioClient) {
-    const filename = req.baseUrl + "/" + req.file.originalname;
-    const file = req.file.buffer;
-    let fileStr = file.toString();
-    fileStr = fileStr.replaceAll('\n', '');
     try {
+        const filename = req.baseUrl + "/" + req.file.originalname;
+        const file = req.file.buffer;
+        let fileStr = file.toString();
+        fileStr = fileStr.replaceAll('\n', '');
         JSON.parse(fileStr);
         await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
         const response = await sunbirdRegistryService.createEntity(constants.MINIO_CONTEXT_URL, {url: filename}, req.header('Authorization'));
@@ -29,17 +29,18 @@ async function addContext(req, res, minioClient) {
 }
 
 async function updateContext(req,res,minioClient){
-    const filename = req.baseUrl + "/" + req.file.originalname;
-    const file = req.file.buffer;
-    let fileStr = file.toString();
-    fileStr = fileStr.replaceAll('\n', '');
-    const osid = req.params.osid;
     try{
+        const filename = req.baseUrl + "/" + req.file.originalname;
+        const file = req.file.buffer;
+        let fileStr = file.toString();
+        fileStr = fileStr.replaceAll('\n', '');
+        const osid = req.params.osid;
         JSON.parse(fileStr);
-        const getContextResp = await sunbirdRegistryService.getContext(osid,req.header('Authorization'));
+        const getContextResp = await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + osid,req.header('Authorization'));
         console.log("getContextResp: " ,getContextResp);
         await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
-        const updateContextResp = await sunbirdRegistryService.updateContext(osid,{url: filename},req.header('Authorization'));
+        let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
+        const updateContextResp = await sunbirdRegistryService.updateEntity(url, {url: filename}, req.header('Authorization'));
         console.log("updateContextResp: ",updateContextResp);
         if(config.REDIS_ENABLED) {
             redisService.storeKeyWithExpiry(osid, fileStr);
@@ -60,7 +61,50 @@ async function updateContext(req,res,minioClient){
     }
 }
 
+async function getContext(req, res, minioClient) {
+    try {
+        if(config.REDIS_ENABLED) {
+            let value = await redisService.getKey(req.params.osid);
+            if(value === undefined || value === null) {
+                return await getContextFromMinio(req, res, minioClient);
+            }
+            res
+            .status(200)
+            .set({'Content-Type': 'application/ld+json'})
+            .json(
+                JSON.parse(value)
+            );
+            return;
+        }
+        return await getContextFromMinio(req, res, minioClient);
+    } catch(err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
+
+async function getContextFromMinio(req, res, minioClient) {
+    const adminToken = await getAdminToken();
+    const url = (await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + req.params.osid, 'Bearer '+ adminToken)).url;
+    const value = await minioClient.getObject(constants.MINIO_BUCKET_NAME, url);
+    let data = '';
+    value.on('data', function (chunk) {
+        data += chunk;
+    });
+    value.on('end', function (chunk) {
+        if (chunk !== undefined)
+            data += chunk;
+        res.status(200).set({ 'Content-Type': 'application/ld+json'}).json(JSON.parse(data.toString()));
+        redisService.storeKeyWithExpiry(req.params.osid, data.toString());
+    });
+    return;
+}
+
+
 module.exports = {
     addContext,
-    updateContext
+    updateContext,
+    getContext
 }

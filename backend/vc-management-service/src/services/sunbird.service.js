@@ -2,7 +2,6 @@ const axios = require('axios');
 
 const constants = require('../configs/constants');
 const config = require('../configs/config');
-
 const createTenant = async (tenantRequest) => {
     return axios.post(constants.SUNBIRD_TENANT_INVITE_URL, tenantRequest).then(res =>
         res.data
@@ -21,8 +20,7 @@ const createEntity = async (url, schemaRequest, token) => {
     });
 }
 
-const updateSchema = async (schemaRequest, token, schemaId) => {
-    let url = constants.SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId)
+const updateEntity = async (url, schemaRequest, token) => {
     return axios.put(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {
@@ -31,8 +29,7 @@ const updateSchema = async (schemaRequest, token, schemaId) => {
     });
 }
 
-const getSchema = async (token, schemaId) => {
-    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+const getEntity = async (url, token) => {
     return axios.get(url, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {
@@ -103,31 +100,12 @@ const getTransaction = async (transactionId, token) => {
                 throw error;
             });
 }
-const getContext = async (osid, token) => {
-    return axios.get(`${constants.MINIO_CONTEXT_URL}/${osid}` ,{headers:{Authorization: token}})
-            .then(res => res.data)
-            .catch(error => {
-                console.error(error);
-                throw error;
-            });
-}
-const updateContext = async (osid,updateRequest, token ) => {
-    let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
-    return axios.put(url, updateRequest, { headers: {Authorization: token}}).then(res =>
-        res.data
-    ).catch(error => {
-        console.error(error);
-        throw error;
-    });
-}
 
 module.exports = {
     createTenant,
     createEntity,
     uploadTemplate,
-    updateSchema,
-    updateContext,
-    getSchema,
-    getTransaction,
-    getContext
+    updateEntity,
+    getEntity,
+    getTransaction
 }
