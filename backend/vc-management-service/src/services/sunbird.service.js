@@ -21,6 +21,16 @@ const createEntity = async (url, schemaRequest, token) => {
     });
 }
 
+const deleteContext = async (osid, token) => {
+    let url = constants.MINIO_DELETE_CONTEXT_URL.replace(':osid', osid);
+    return axios.delete(url,  { headers: {Authorization: token}}).then(res => 
+        res.data
+        ).catch(error => {
+            console.error("Error while deleting Context :", error); 
+            throw error;
+    });
+}
+
 const updateSchema = async (schemaRequest, token, schemaId) => {
     let url = constants.SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId)
     return axios.put(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
@@ -106,6 +116,7 @@ const getTransaction = async (transactionId, token) => {
 module.exports = {
     createTenant,
     createEntity,
+    deleteContext,
     uploadTemplate,
     updateSchema,
     getSchema,

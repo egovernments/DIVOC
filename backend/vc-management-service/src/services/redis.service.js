@@ -12,7 +12,12 @@ function storeKeyWithExpiry(key, value) {
   client.set(key, value);
 }
 
+function deleteKey(key) {
+    client.del(key)
+}
+
 module.exports = {
   storeKeyWithExpiry,
+  deleteKey,
   initRedis
 };

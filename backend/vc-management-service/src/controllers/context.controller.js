@@ -28,6 +28,34 @@ async function addContext(req, res, minioClient) {
     }
 }
 
+async function deleteContext(req, res, minioClient) {
+    const osid = req.params.osid;
+    const token = req.header("Authorization");
+
+    try {
+        const getContextResp = await sunbirdRegistryService.getContext(osid, token);
+        const filename = getContextResp.url;
+        await minioClient.removeObject(constants.MINIO_BUCKET_NAME, filename);
+        
+        if(config.REDIS_ENABLED) {
+            redisService.deleteKey(osid);
+        }
+
+        const deleteContextResponse = await sunbirdRegistryService.deleteContext(osid, {url: filename}, token);
+        
+        res.status(200).json({
+            message: "Deleted Context",
+            deleteContextResponse: deleteContextResponse
+        });
+    }
+    catch(err) {
+        console.error(err);
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        });
+    }
+}
 module.exports = {
-    addContext
+    addContext,
+    deleteContext
 }
