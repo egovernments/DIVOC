@@ -2,7 +2,7 @@ const constants = require('../configs/constants');
 const config = require('../configs/config');
 const sunbirdRegistryService = require('../services/sunbird.service');
 const redisService = require('../services/redis.service');
-
+const {getAdminToken} = require('../services/keycloak.service');
 async function addContext(req, res, minioClient) {
     const filename = req.baseUrl + "/" + req.file.originalname;
     const file = req.file.buffer;
@@ -53,7 +53,8 @@ async function getContext(req, res, minioClient) {
 }
 
 async function getContextFromMinio(req, res, minioClient) {
-    const url = (await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL, req.header('Authorization')))[0].url;
+    const adminToken = await getAdminToken();
+    const url = (await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + req.params.osid, 'Bearer '+ adminToken)).url;
     const value = await minioClient.getObject(constants.MINIO_BUCKET_NAME, url);
     let data = '';
     value.on('data', function (chunk) {
@@ -62,7 +63,7 @@ async function getContextFromMinio(req, res, minioClient) {
     value.on('end', function (chunk) {
         if (chunk !== undefined)
             data += chunk;
-        res.status(200).set({ 'Content-Type': 'application/ld+json' }).json(JSON.parse(data.toString()));
+        res.status(200).set({ 'Content-Type': 'application/ld+json'}).json(JSON.parse(data.toString()));
         redisService.storeKeyWithExpiry(req.params.osid, data.toString());
     });
     return;

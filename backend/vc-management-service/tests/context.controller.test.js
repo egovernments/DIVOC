@@ -9,6 +9,7 @@ describe('when redis is disabled', () => {
     const {PassThrough} = require('stream');
     const mockedStream = new PassThrough();
     const redisService = require('../src/services/redis.service');
+    const keycloakService = require('../src/services/keycloak.service');
     jest.mock('../src/configs/constants', () => {
         return {
             MINIO_BUCKET_NAME: 'context',
@@ -25,6 +26,11 @@ describe('when redis is disabled', () => {
         return {
             storeKeyWithExpiry: jest.fn(),
             getKey: jest.fn()
+        }
+    });
+    jest.mock('../src/services/keycloak.service', () => {
+        return {
+            getAdminToken: jest.fn()
         }
     })
     const config = require('../src/configs/config');
@@ -54,7 +60,7 @@ describe('when redis is disabled', () => {
         let minioClient = {
             putObject: jest.fn()
         }
-        
+        jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValue({result: {ContextURL: {osid: '123'}}});
         await contextController.addContext(req, res, minioClient);
         expect(minioClient.putObject).toHaveBeenCalledWith('context', '/vc-management/v1/context/context.json', '123');
         expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url:'/vc-management/v1/context/context.json'}, '1');
@@ -88,7 +94,8 @@ describe('when redis is disabled', () => {
         jest.spyOn(res, 'status');
         jest.spyOn(res, 'json');
         jest.spyOn(minioClient, 'getObject').mockReturnValue(mockedStream);
-        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue('/vc-management/v1/context/123');
+        jest.spyOn(keycloakService, 'getAdminToken').mockReturnValue('123');
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue({url: '/vc-management/v1/context/123'});
         await contextController.getContext(req, res, minioClient);
         mockedStream.emit('data', '{"key": "123",');
         mockedStream.emit('end', '"value": "456"}');   //   <-- end. not close.
@@ -106,6 +113,7 @@ describe('when redis is enabled', () => {
     const {PassThrough} = require('stream');
     const mockedStream = new PassThrough();
     const redisService = require('../src/services/redis.service');
+    const keycloakService = require('../src/services/keycloak.service');
     jest.mock('../src/configs/constants', () => {
         return {
             MINIO_BUCKET_NAME: 'context',
@@ -128,6 +136,11 @@ describe('when redis is enabled', () => {
     jest.mock('../src/configs/config', () => {
         return {
             REDIS_ENABLED: true
+        }
+    })
+    jest.mock('../src/services/keycloak.service', () => {
+        return {
+            getAdminToken: jest.fn()
         }
     })
     test('should add context entry in registry', async() => {
@@ -253,8 +266,9 @@ describe('when redis is enabled', () => {
         jest.spyOn(res, 'status');
         jest.spyOn(res, 'json');
         jest.spyOn(redisService, 'getKey').mockReturnValue(undefined);
+        jest.spyOn(keycloakService, 'getAdminToken').mockReturnValue('123');
         jest.spyOn(minioClient, 'getObject').mockReturnValue(mockedStream);
-        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue(new Error('some error'))
+        jest.spyOn(sunbirdRegistryService, 'getEntity').mockReturnValue(Promise.reject('some error'))
         await contextController.getContext(req, res, minioClient);
         expect(res.status).toHaveBeenCalledWith(500);
         expect(res.json).toHaveBeenCalledWith({message: undefined});
