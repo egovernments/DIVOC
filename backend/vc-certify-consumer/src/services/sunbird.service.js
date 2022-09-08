@@ -17,7 +17,6 @@ const addTransaction = (transactionEntityReq, token) => {
         })
 }
 const deleteCertificate = (entityName, entityId, token) => {
-    console.log(`${constants.SUNBIRD_TRANSACTION_URL}${entityName}/${entityId}`)
     return axios.delete(`${constants.SUNBIRD_TRANSACTION_URL}${entityName}/${entityId}`,
                     {headers: {Authorization: token}}
         ).then(res => res.data)
