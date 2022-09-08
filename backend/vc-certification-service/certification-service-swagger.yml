@@ -59,16 +59,18 @@ paths:
         - certification
       summary: Certify event of given entityType
       operationId: certifyVC
+      requestBody:
+        description: body to be certified
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
       parameters:
         - name: entityType
           in: path
           required: true
           type: string
-        - in: body
-          name: body
-          required: true
-          schema:
-            type: object
       responses:
         '200':
           description: OK
@@ -142,6 +144,36 @@ paths:
           in: path
           required: true
           type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/certificate/revoke:
+    post:
+      tags:
+        - revoke certificate
+      summary: Revoke or suspend a certificate with given entityName, certificateId
+      operation: revokeCertificate
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: to revoke certificate
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
       responses:
         '200':
           description: OK

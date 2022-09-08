@@ -77,7 +77,7 @@ paths:
   /v1/schema/{schemaId}:
     get:
       tags:
-        - getSchema
+        - getEntity
       summary: Get one or all schemas
       consumes:
         - application/json
@@ -195,6 +195,105 @@ paths:
           name: files
           type: file
           required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UploadTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/context:
+    post:
+      tags: 
+        - upload context
+      summary: Upload a context json to minio
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: addContext
+      parameters:
+        - in: formData
+          name: files
+          type: file
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UploadTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/context/:osid:
+    get:
+      tags:
+        - get context
+      summary: Get context in json ld format
+      consumes:
+        - application/json
+      produces:
+        - application/ld + json
+      operationId: getContext
+      parameters:
+        - in: path
+          name: osid
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - update context
+      summary: update a context
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: updateContext
+      parameters:
+        - in: formData
+          name: files
+          type: file
+          required: true
+        - in: path
+          name: osid
+          required: true
+          type: string
       responses:
         '200':
           description: OK
