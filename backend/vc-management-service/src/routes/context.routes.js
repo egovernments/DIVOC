@@ -28,6 +28,5 @@ let minioClient;
 router.post('/', [tokenValidationMiddleware, upload.single('files')], (req, res) => addContext(req, res, minioClient));
 router.put('/:osid',[tokenValidationMiddleware, upload.single('files')],(req,res) => updateContext(req,res,minioClient));
 router.get('/:osid', (req, res) => getContext(req, res, minioClient));
-
-router.delete(`/delete/:osid`, [tokenValidationMiddleware], (req, res) => deleteContext(req, res, minioClient));
+router.delete('/:osid', [tokenValidationMiddleware], (req, res) => deleteContext(req, res, minioClient));
 module.exports = router;

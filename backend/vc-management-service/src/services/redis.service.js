@@ -20,7 +20,7 @@ async function getKey(key) {
 }
 
 function deleteKey(key) {
-    client.del(key)
+    client.del(key);
 }
 
 module.exports = {

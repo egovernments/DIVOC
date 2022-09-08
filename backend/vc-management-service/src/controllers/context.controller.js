@@ -3,6 +3,7 @@ const config = require('../configs/config');
 const sunbirdRegistryService = require('../services/sunbird.service');
 const redisService = require('../services/redis.service');
 const {getAdminToken} = require('../services/keycloak.service');
+
 async function addContext(req, res, minioClient) {
     try {
         const filename = req.baseUrl + "/" + req.file.originalname;
@@ -36,10 +37,11 @@ async function updateContext(req,res,minioClient){
         fileStr = fileStr.replaceAll('\n', '');
         const osid = req.params.osid;
         JSON.parse(fileStr);
-        const getContextResp = await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + osid,req.header('Authorization'));
+        let url = constants.MINIO_CONTEXT_URL + "/" + osid
+        const getContextResp = await sunbirdRegistryService.getEntity(url,req.header('Authorization'));
         console.log("getContextResp: " ,getContextResp);
         await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
-        let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
+        
         const updateContextResp = await sunbirdRegistryService.updateEntity(url, {url: filename}, req.header('Authorization'));
         console.log("updateContextResp: ",updateContextResp);
         if(config.REDIS_ENABLED) {
@@ -104,19 +106,18 @@ async function getContextFromMinio(req, res, minioClient) {
 
 
 async function deleteContext(req, res, minioClient) {
-    const osid = req.params.osid;
-    const token = req.header("Authorization");
-
     try {
-        const getContextResp = await sunbirdRegistryService.getContext(osid, token);
-        const filename = getContextResp.url;
-        await minioClient.removeObject(constants.MINIO_BUCKET_NAME, filename);
+        const osid = req.params.osid;
+        const token = req.header("Authorization");
+        let url = constants.MINIO_CONTEXT_URL + "/" + osid;
+
+        const getContextResp = await sunbirdRegistryService.getEntity(url, token);
+        await minioClient.removeObject(constants.MINIO_BUCKET_NAME, getContextResp.url);
 
         if(config.REDIS_ENABLED) {
             redisService.deleteKey(osid);
         }
-
-        const deleteContextResponse = await sunbirdRegistryService.deleteContext(osid, {url: filename}, token);
+        const deleteContextResponse = await sunbirdRegistryService.deleteEntity(url, token);
 
         res.status(200).json({
             message: "Deleted Context",
