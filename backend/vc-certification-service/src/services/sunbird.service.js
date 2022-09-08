@@ -91,14 +91,14 @@ const deleteExpiredSuspensions = (token, kafkaProducer) => {
         "fields": ["osid"]
     }
     
-    searchCertificate("RevokedVC", requestBody, token)
+    searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, requestBody, token)
     .then(async(results) => {
         await kafkaProducer.connect();
         for (i = 0; i < results.length; i++) {
             kafkaProducer.send({
                 topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
                 messages: [
-                    { key: null, value: JSON.stringify({  suspendOsId: results[i].osid,token: token }) }
+                    { key: null, value: JSON.stringify({  revokedCertificateOsId: results[i].osid,token: token }) }
                 ]
             });
         }       
