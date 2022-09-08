@@ -1,7 +1,7 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {TENANT_NAME} = require("../configs/config");
-const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL} = require("../configs/constants");
+const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
 
 async function createSchema(req, res) {
     try {
@@ -24,7 +24,7 @@ async function getSchema(req, res) {
     try {
         const token = req.header("Authorization");
         const schemaId = req.params.schemaId;
-        let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+        let url = SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
         const schemaResponse = await sunbirdRegistryService.getEntity(url, token);
         let schemas = schemaId ? [schemaResponse] : schemaResponse
         res.status(200).json({
@@ -43,7 +43,8 @@ async function updateSchema(req, res) {
         const schemaId = req.params.schemaId;
         const token = req.header("Authorization");
         var schemaRequest = addMandatoryFields(req.body);
-        const schemaUpdateResponse = await sunbirdRegistryService.updateSchema(schemaRequest, token, schemaId);
+        let url = SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId);
+        const schemaUpdateResponse = await sunbirdRegistryService.updateEntity(url, schemaRequest, token);
         res.status(200).json({
             message: "Successfully updated Schema",
             schemaUpdateResponse: schemaUpdateResponse
@@ -101,7 +102,7 @@ async function updateTemplateUrls(req, res) {
 }
 
 async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
-    let url = constants.SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+    let url = SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
     const getSchemaResponse = await sunbirdRegistryService.getEntity(url, token);
     let schema = JSON.parse(getSchemaResponse?.schema);
     if (schema?._osConfig) {
@@ -114,7 +115,7 @@ async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
     }
     const schemaString = JSON.stringify(schema);
     const updateSchemaRequestBody = {"schema": schemaString};
-    return await sunbirdRegistryService.updateSchema(updateSchemaRequestBody, token, schemaId);
+    return await sunbirdRegistryService.updateEntity(url, updateSchemaRequestBody, token);
 }
 
 function addMandatoryFields(schemaRequest) {

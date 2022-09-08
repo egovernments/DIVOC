@@ -1,4 +1,5 @@
 const SUNBIRD_REGISTRY_URL = process.env.SUNBIRD_REGISTRY_URL;
+const SUNBIRD_SIGNER_URL = process.env.SUNBIRD_SIGNER_URL;
 const PORT = process.env.PORT || 7654;
 const KEYCLOAK_URL = process.env.KEYCLOAK_URL;
 const KEYCLOAK_REALM = process.env.KEYCLOAK_REALM || 'sunbird-rc';
@@ -14,5 +15,6 @@ module.exports = {
     JWT_PUBLIC_KEY,
     BASE_URL,
     REQUEST_TIMEOUT,
-    KAFKA_BOOTSTRAP_SERVERS
+    KAFKA_BOOTSTRAP_SERVERS,
+    SUNBIRD_SIGNER_URL
 }

@@ -20,8 +20,7 @@ const createEntity = async (url, schemaRequest, token) => {
     });
 }
 
-const updateSchema = async (schemaRequest, token, schemaId) => {
-    let url = constants.SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId)
+const updateEntity = async (url, schemaRequest, token) => {
     return axios.put(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
         res.data
     ).catch(error => {
@@ -88,13 +87,14 @@ const getTransaction = async (transactionId, token) => {
     console.log({transctionUrl: constants.SUNBIRD_GET_TRANSACTION_URL, 
                 transactionId: transactionId});
     const transactionRequest = {
-        filters: {
-            transactionId: {
-                eq: transactionId
+        "filters": {
+            "transactionId": {
+                "eq": transactionId
             }
         }
     };
     return axios.post(constants.SUNBIRD_GET_TRANSACTION_URL, transactionRequest ,{headers:{Authorization: token}})
+            .then(res => res.data)
             .catch(error => {
                 console.error(error);
                 throw error;
@@ -105,7 +105,7 @@ module.exports = {
     createTenant,
     createEntity,
     uploadTemplate,
-    updateSchema,
+    updateEntity,
     getEntity,
     getTransaction
 }
