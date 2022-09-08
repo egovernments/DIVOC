@@ -19,11 +19,11 @@ async function createCertificate(req, res, kafkaProducer) {
         kafkaProducer.send({
             topic: certifyConstants.VC_CERTIFY_TOPIC,
             messages: [
-                {key: null, value: JSON.stringify({body: req.body, transactionId: transactionId, entityType: req.params.entityType, token: req.header("Authorization")})}
+                { key: null, value: JSON.stringify({ body: req.body, transactionId: transactionId, entityType: req.params.entityType, token: req.header("Authorization") }) }
             ]
         });
         res.status(200).json({
-            transactionId 
+            transactionId
         });
     } catch (err) {
         console.error(err);
@@ -69,7 +69,7 @@ async function updateCertificate(req, res, kafkaProducer) {
         kafkaProducer.send({
             topic: certifyConstants.VC_CERTIFY_TOPIC,
             messages: [
-                { key: null, value: JSON.stringify({ body: req.body, transactionId: transactionId, entityName: req.params.entityName, token: req.header("Authorization") }) }
+                { key: null, value: JSON.stringify({ body: req.body, transactionId: transactionId, entityType: req.params.entityType, token: req.header("Authorization") }) }
             ]
         });
         res.status(200).json({
@@ -81,7 +81,7 @@ async function updateCertificate(req, res, kafkaProducer) {
             message: err?.response?.data
         });
     }
-}  
+}
 
 async function deleteCertificate(req, res) {
     const entityName = req.params.entityName;
@@ -93,7 +93,7 @@ async function deleteCertificate(req, res) {
             message: "Certificate revoked",
             certificateRevokeResponse: certificateRevokeResponse
         });
-    } catch(err) {
+    } catch (err) {
         console.error(err);
         res.status(err?.response?.status || 500).json({
             message: err?.response?.data
@@ -133,19 +133,19 @@ async function revokeCertificate(req, res) {
         })
     })
 }
-
 function getRevokeBody(req) {
     let body = {
         previousCertificateId: req.body.certificateId,
         schema: req.body.entityName,
         startDate: new Date(),
     }
-    if(req.body.endDate) {
-        body = {...body, endDate: req.body.endDate}
+    if (req.body.endDate) {
+        body = { ...body, endDate: req.body.endDate }
     }
     return body;
 
 }
+
 
 async function verifyCertificate (req,res){
     const certificate = req.body;
@@ -230,12 +230,51 @@ async function getEntity(entityId,filterType,certificateEntityType,token){
     return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
 }
 
+async function deleteRevokeCertificate(req, res, kafkaProducer) {
+    try {
+        const token = req.header("Authorization");
+        const filters = {
+            "filters": {
+                "previousCertificateId": {
+                    "eq": req.params.revokedCertificateId
+                },
+                "schema": {
+                    "eq": req.params.entityName
+                }
+            },
+            "limit": 1,
+            "offset": 0
+        }
+
+        let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters, token)
+        let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
+        await kafkaProducer.connect();
+        kafkaProducer.send({
+            topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
+            messages: [
+                { key: null, value: JSON.stringify({ revokedCertificateOsId: revokedCertificateOsId, token: token }) }
+            ]
+        });
+        res.status(200).json({
+            message: "Delete revoked certificate request sent successfully"
+        });
+
+    }
+    catch (err) {
+        console.log('ERROR : ', err?.response?.status || '');
+        res.status(err?.response?.status || 500).json({
+            message: err?.response?.data
+        })
+    }
+}
+
 module.exports = {
     createCertificate,
     getCertificate,
     updateCertificate,
     deleteCertificate,
     revokeCertificate,
+    deleteRevokeCertificate,
     verifyCertificate
 }
 
