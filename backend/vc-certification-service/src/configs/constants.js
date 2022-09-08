@@ -5,10 +5,12 @@ const SVG_ACCEPT_HEADER = "image/svg+xml";
 const IMAGE_RESPONSE_TYPE = 'svg';
 const VC_CERTIFY_TOPIC = process.env.VC_CERTIFY_TOPIC || 'vc-certify';
 const VC_REMOVE_SUSPENSION_TOPIC = process.env.VC_REMOVE_SUSPENSION_TOPIC || 'vc-remove-suspension';
+const REVOKED_ENTITY_TYPE = "RevokedVC";
 module.exports = {
     SUNBIRD_CERTIFICATE_URL,
     SVG_ACCEPT_HEADER,
     IMAGE_RESPONSE_TYPE,
     VC_CERTIFY_TOPIC,
-    VC_REMOVE_SUSPENSION_TOPIC
+    VC_REMOVE_SUSPENSION_TOPIC,
+    REVOKED_ENTITY_TYPE
 }

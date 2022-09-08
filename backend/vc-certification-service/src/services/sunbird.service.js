@@ -1,4 +1,5 @@
 const certifyConstants = require('../configs/constants');
+const certifyConfigs= require('../configs/config');
 const axios = require("axios");
 
 const createCertificate = (certificateRequest, entityType, token) => {
@@ -9,7 +10,7 @@ const createCertificate = (certificateRequest, entityType, token) => {
         });
 };
 
-const getCertificate = (entityName, certificateId, headers) => {
+const getCertificatePDF = (entityName, certificateId, headers) => {
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
         responseType: "stream",
         headers: headers
@@ -18,6 +19,14 @@ const getCertificate = (entityName, certificateId, headers) => {
         throw error;
     })
 
+};
+const getCertificate = (entityType, filters, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
 };
 
 const getCertificateForUpdate = (entityName, certificateId, token) => {
@@ -69,13 +78,23 @@ const searchCertificate = (entityType, filters, token) => {
             throw err;
         })
 }
+const verifyCertificate = (body) => {
+    return axios.post(`${certifyConfigs.SUNBIRD_SIGNER_URL}/verify`,body)
+    .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
+}
 
 module.exports = {
     createCertificate,
+    getCertificatePDF,
     getCertificate,
     updateCertificate,
     deleteCertificate,
     getCertificateForUpdate,
     revokeCertificate,
-    searchCertificate
+    searchCertificate,
+    verifyCertificate
 }

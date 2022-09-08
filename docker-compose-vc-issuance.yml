@@ -76,7 +76,12 @@ services:
   sunbird-certificate-signer:
     image: dockerhub/sunbird-rc-certificate-signer:v0.0.8
     environment:
-      - PORT=8079
+      PORT: 8079
+      CERTIFICATE_NAMESPACE: "https://sunbird.org/credentials/vaccination/v1"
+      CERTIFICATE_CONTROLLER_ID: "https://sunbird.org/"
+      CERTIFICATE_PUBKEY_ID: "https://example.com/i/india"
+      CERTIFICATE_DID: "did:india"
+      CERTIFICATE_ISSUER: "https://sunbird.org/"
     ports:
       - "6079:8079"
   sunbird-certificate-api:
@@ -170,6 +175,7 @@ services:
       - "7654:7654"
     environment:
       SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
+      SUNBIRD_SIGNER_URL: "http://sunbird-certificate-signer:8079"
       PORT: "7654"
       KEYCLOAK_URL: "http://keycloak:8080"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
