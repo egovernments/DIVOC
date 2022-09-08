@@ -199,6 +199,8 @@ services:
       REDIS_URL: 'redis://redis:6379'
       PORT: "7655"
       KEYCLOAK_URL: "http://keycloak:8080"
+      SUNBIRD_SSO_CLIENT: 'admin-api'
+      SUNBIRD_SSO_ADMIN_CLIENT_SECRET: '0358fa30-6014-4192-9551-7c61b15b774c'
     depends_on:
       vc-registry:
         condition: service_started
