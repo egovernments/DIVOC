@@ -164,13 +164,13 @@ async function validateSchema(schemaRequest) {
         throw new CustomError("evidence doesn't have a valid type", 400).error();
     }
     try {
-        await checkIfEvidenceTypeExists(schema._osConfig.credentialTemplate, schemaName)
+        await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
     } catch (err) {
         throw err;
     }
 }
 
-async function checkIfEvidenceTypeExists(credentialTemplate, schemaName) {
+async function checkInContextsForEvidenceType(credentialTemplate, schemaName) {
     if (credentialTemplate && credentialTemplate["@context"]) {
         for (let i = 0; i < credentialTemplate["@context"].length; i++) {
             let context;
