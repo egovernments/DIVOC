@@ -1,4 +1,5 @@
 const isoDatestringValidator = require('iso-datestring-validator')
+const {CustomError} = require("../models/errors");
 
 
 function isURIFormat(param) {
@@ -18,54 +19,37 @@ function isURIFormat(param) {
 }
 
 function validateCertificateInput(req,reqType) {
-  reqBody = req.body;
-  let err = {
-    response: {
-      status: 400,
-      data: "error"
-    }
-  }
-  if(reqType == "update"){
+  let reqBody = req.body;
+  if(reqType === "update"){
     if (!(reqBody.certificateId)) {
-      err.response.data = "certificateId is missing";
-      throw err;
+      throw new CustomError("certificateId is missing", 400).error();
     }
   }
-  checkForNull(reqBody, err);
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.issuedOn))) {
-    err.response.data = "Issued on date is not in valid format";
+  try {
+    checkForNull(reqBody);
+  } catch (err) {
     throw err;
+  }
+  if (!(isoDatestringValidator.isValidISODateString(reqBody.issuanceDate))) {
+    throw new CustomError("IssuanceDate is not in valid format", 400).error();
   }
   if (!(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
-    err.response.data = "Valid from date is not in valid format";
-    throw err;
+    throw new CustomError("Valid from date is not in valid format", 400).error();
   }
   if (!(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
-    err.response.data = "Valid till date is not in valid format";
-    throw err;
+    throw new CustomError("Valid till date is not in valid format", 400).error();
   }
   if (!(isURIFormat(reqBody.issuer))) {
-    err.response.data = "Invalid Issuer format";
-    throw err;
+    throw new CustomError("Invalid Issuer format", 400).error();
   }
 }
 
-function checkForNull(reqBody, err) {
-  if (!(reqBody.issuedOn)) {
-    err.response.data = "Issued on date is missing";
-    throw err;
-  }
-  if (!(reqBody.validFrom)) {
-    err.response.data = "Valid from date is missing";
-    throw err;
-  }
-  if (!(reqBody.validTill)) {
-    err.response.data = "Valid till date is missing";
-    throw err;
+function checkForNull(reqBody) {
+  if (!(reqBody.issuanceDate)) {
+    throw new CustomError("IssuanceDate is missing", 400).error();
   }
   if (!(reqBody.issuer)) {
-    err.response.data = "Issuer detail is missing";
-    throw err;
+    throw new CustomError("Issuer detail is missing", 400).error();
   }
 }
 
