@@ -43,7 +43,7 @@ services:
       - elastic_search_connection_url=es:9200
       - search_provider=dev.sunbirdrc.registry.service.ElasticSearchService
       - sunbird_sso_realm=sunbird-rc
-      - sunbird_sso_url=http://keycloak:8080/auth
+      - sunbird_sso_url=${KEYCLOAK_URL}/auth
       - sunbird_sso_admin_client_id=admin-api
       - sunbird_sso_client_id=registry-frontend
       - sunbird_sso_admin_client_secret=0358fa30-6014-4192-9551-7c61b15b774c
@@ -177,7 +177,7 @@ services:
       SUNBIRD_REGISTRY_URL: "http://vc-registry:8081"
       SUNBIRD_SIGNER_URL: "http://sunbird-certificate-signer:8079"
       PORT: "7654"
-      KEYCLOAK_URL: "http://keycloak:8080"
+      KEYCLOAK_URL: "$KEYCLOAK_URL"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       VC_CERTIFY_TOPIC: 'vc-certify'
     depends_on:
@@ -198,7 +198,7 @@ services:
       REDIS_ENABLED: 'true'
       REDIS_URL: 'redis://redis:6379'
       PORT: "7655"
-      KEYCLOAK_URL: "http://keycloak:8080"
+      KEYCLOAK_URL: "$KEYCLOAK_URL"
       SUNBIRD_SSO_CLIENT: 'admin-api'
       SUNBIRD_SSO_ADMIN_CLIENT_SECRET: '0358fa30-6014-4192-9551-7c61b15b774c'
     depends_on:
@@ -222,7 +222,7 @@ services:
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       VC_CERTIFY_TOPIC: 'vc-certify'
       POST_VC_CERTIFY_TOPIC: 'post-vc-certify'
-      VC_CERTIFICATION_SERVICE_URL: 'http://vc-certification-service:7654'
+      VC_CERTIFICATION_SERVICE_URL: "http://vc-certification-service:7654"
     depends_on:
       vc-registry:
         condition: service_started
