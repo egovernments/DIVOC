@@ -3,7 +3,7 @@ const KAFKA_CONSUMER_SESSION_TIMEOUT = process.env.KAFKA_CONSUMER_SESSION_TIMEOU
 const VC_CERTIFY_TOPIC = process.env.VC_CERTIFY_TOPIC || 'vc-certify'
 const POST_VC_CERTIFY_TOPIC = process.env.POST_VC_CERTIFY_TOPIC || 'post-vc-certify'
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
-const VC_CERTIFICATION_SERVICE_URL = process.env.VC_CERTIFICATION_SERVICE_URL || 'http://localhost:7654/vc-certification';
+const VC_CERTIFICATION_SERVICE_URL = process.env.VC_CERTIFICATION_SERVICE_URL || 'http://localhost:7654';
 const VC_REMOVE_SUSPENSION_TOPIC = process.env.VC_REMOVE_SUSPENSION_TOPIC || 'vc-remove-suspension';
 module.exports = {
     SUNBIRD_REGISTRY_URL,

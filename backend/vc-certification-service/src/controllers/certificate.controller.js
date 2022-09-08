@@ -256,7 +256,7 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
             ]
         });
         res.status(200).json({
-            message: "Update request sent successfully"
+            message: "Delete revoked certificate request sent successfully"
         });
 
     }
