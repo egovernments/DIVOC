@@ -10,7 +10,7 @@ const createCertificate = (certificateRequest, entityType, token) => {
         });
 };
 
-const getCertificate = (entityName, certificateId, headers) => {
+const getCertificatePDF = (entityName, certificateId, headers) => {
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
         responseType: "stream",
         headers: headers
@@ -19,6 +19,14 @@ const getCertificate = (entityName, certificateId, headers) => {
         throw error;
     })
 
+};
+const getCertificate = (entityType, filters, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
 };
 
 const getCertificateForUpdate = (entityName, certificateId, token) => {
@@ -107,6 +115,7 @@ const deleteExpiredSuspensions = (token, kafkaProducer) => {
 
 module.exports = {
     createCertificate,
+    getCertificatePDF,
     getCertificate,
     updateCertificate,
     deleteCertificate,

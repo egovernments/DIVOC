@@ -1,11 +1,14 @@
 const sunbirdRegistryService = require('../services/sunbird.service')
 const {getFormData} = require("../utils/utils");
 const {TENANT_NAME} = require("../configs/config");
-const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL} = require("../configs/constants");
+const {MINIO_URL_SCHEME, MANDATORY_FIELDS, MANDATORY_EVIDENCE_FIELDS, SUNBIRD_SCHEMA_ADD_URL, SUNBIRD_SCHEMA_UPDATE_URL, SUNBIRD_GET_SCHEMA_URL} = require("../configs/constants");
+const axios = require("axios");
+const {CustomError} = require("../models/error");
 
 async function createSchema(req, res) {
     try {
         const token = req.header("Authorization");
+        await validateSchema(req.body)
         var schemaRequest = addMandatoryFields(req.body);
         const schemaAddResponse = await sunbirdRegistryService.createEntity(SUNBIRD_SCHEMA_ADD_URL, schemaRequest, token);
         res.status(200).json({
@@ -24,7 +27,8 @@ async function getSchema(req, res) {
     try {
         const token = req.header("Authorization");
         const schemaId = req.params.schemaId;
-        const schemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+        let url = SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+        const schemaResponse = await sunbirdRegistryService.getEntity(url, token);
         let schemas = schemaId ? [schemaResponse] : schemaResponse
         res.status(200).json({
             schemas: schemas
@@ -42,7 +46,8 @@ async function updateSchema(req, res) {
         const schemaId = req.params.schemaId;
         const token = req.header("Authorization");
         var schemaRequest = addMandatoryFields(req.body);
-        const schemaUpdateResponse = await sunbirdRegistryService.updateSchema(schemaRequest, token, schemaId);
+        let url = SUNBIRD_SCHEMA_UPDATE_URL.replace(':schemaId', schemaId);
+        const schemaUpdateResponse = await sunbirdRegistryService.updateEntity(url, schemaRequest, token);
         res.status(200).json({
             message: "Successfully updated Schema",
             schemaUpdateResponse: schemaUpdateResponse
@@ -100,7 +105,8 @@ async function updateTemplateUrls(req, res) {
 }
 
 async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
-    const getSchemaResponse = await sunbirdRegistryService.getSchema(token, schemaId);
+    let url = SUNBIRD_GET_SCHEMA_URL.replace(':schemaId', schemaId ? schemaId : '');
+    const getSchemaResponse = await sunbirdRegistryService.getEntity(url, token);
     let schema = JSON.parse(getSchemaResponse?.schema);
     if (schema?._osConfig) {
         if (!schema._osConfig.certificateTemplates) {
@@ -112,31 +118,75 @@ async function updateSchemaTemplateUrls(urlMap, schemaId, token) {
     }
     const schemaString = JSON.stringify(schema);
     const updateSchemaRequestBody = {"schema": schemaString};
-    return await sunbirdRegistryService.updateSchema(updateSchemaRequestBody, token, schemaId);
+    return await sunbirdRegistryService.updateEntity(url, updateSchemaRequestBody, token);
 }
 
 function addMandatoryFields(schemaRequest) {
     const mandatoryFields = MANDATORY_FIELDS;
     const mandatoryEvidenceFields = MANDATORY_EVIDENCE_FIELDS;
     const schemaName = schemaRequest.name;
-    var schemaUnparsed = schemaRequest.schema;
-    var schema = JSON.parse(schemaUnparsed);
-    var totalMandatoryFields = [...new Set([...mandatoryFields,...mandatoryEvidenceFields])]
+    const schemaUnparsed = schemaRequest.schema;
+    const schema = JSON.parse(schemaUnparsed);
+    let totalMandatoryFields = [...new Set([...mandatoryFields,...mandatoryEvidenceFields])]
 
-    var reqFields = schema.definitions[schemaName].required;
+    let reqFields = schema.definitions[schemaName].required;
     addInRequiredFields(reqFields, totalMandatoryFields)
 
-    var properties = schema.definitions[schemaName].properties;
+    let properties = schema.definitions[schemaName].properties;
     addInProperties(properties, totalMandatoryFields)
 
-    var credTemp = schema._osConfig.credentialTemplate;
+    let credTemp = schema._osConfig.credentialTemplate;
     addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
 
-    schemaRequestFinal = {
-    "name":schemaName,
-    "schema": JSON.stringify(schema)
+    return {
+        "name": schemaName,
+        "schema": JSON.stringify(schema)
+    };
+}
+
+async function validateSchema(schemaRequest) {
+    const schemaName = schemaRequest.name;
+    const schemaUnparsed = schemaRequest.schema;
+    const schema = JSON.parse(schemaUnparsed);
+
+    let vcEvidence = schema._osConfig.credentialTemplate?.evidence
+    if (vcEvidence) {
+        vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
+    } else {
+        throw new CustomError("evidence not available in VC", 400).error();
     }
-    return schemaRequestFinal;
+    let vcEvidenceType = vcEvidence.type;
+    if (vcEvidenceType) {
+        if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
+            throw new CustomError("evidence type doesn't match with schema", 400).error();
+        }
+    } else {
+        throw new CustomError("evidence doesn't have a valid type", 400).error();
+    }
+    try {
+        await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
+    } catch (err) {
+        throw err;
+    }
+}
+
+async function checkInContextsForEvidenceType(credentialTemplate, schemaName) {
+    if (credentialTemplate && credentialTemplate["@context"]) {
+        for (let i = 0; i < credentialTemplate["@context"].length; i++) {
+            let context;
+            await axios.get(credentialTemplate["@context"][i])
+                .then(res => { context = res.data })
+                .catch(err => {
+                    console.error(err);
+                    throw err;
+                });
+            if (context["@context"].hasOwnProperty(schemaName)) {
+                return
+            }
+        }
+        throw new CustomError("evidence type isn't defined in any context", 400).error();
+    }
+    throw new CustomError("context is not available", 400).error();
 }
 
 function addInRequiredFields(reqFields, totalMandatoryFields){
@@ -144,15 +194,13 @@ function addInRequiredFields(reqFields, totalMandatoryFields){
         if (!reqFields.includes(field)) {
             reqFields.push(field);
         }
-    };
-    return
+    }
 }
 
 function addInProperties(properties, totalMandatoryFields){
     for (let field of totalMandatoryFields) {
         properties[field] = { ...properties[field], type : 'string'};
-    };
-    return
+    }
 }
 
 function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields){
@@ -165,11 +213,10 @@ function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFie
             }
         }
 
-    };
+    }
     for (let index = 0; index<mandatoryEvidenceFields.length; index++) {
         credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
-    };
-    return
+    }
 }
 
 module.exports = {
