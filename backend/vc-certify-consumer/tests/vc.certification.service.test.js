@@ -19,6 +19,6 @@ test("should call post api to revoke certificate", async() => {
         newCertId: '123'
     };
     const actualResponse = await vcCertificationService.revokeCertificate(reqBody,token);
-    expect(axios.post).toHaveBeenCalledWith(`${constants.VC_CERTIFICATION_SERVICE_URL}`, reqBody, {headers: {Authorization:token}});
+    expect(axios.post).toHaveBeenCalledWith(`${constants.VC_CERTIFICATION_SERVICE_REVOKE_URL}`, reqBody, {headers: {Authorization:token}});
     expect(actualResponse).toEqual(response.data);
 });

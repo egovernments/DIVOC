@@ -180,6 +180,10 @@ services:
       KEYCLOAK_URL: "$KEYCLOAK_URL"
       KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       VC_CERTIFY_TOPIC: 'vc-certify'
+      VC_REMOVE_SUSPENSION_TOPIC: 'vc-remove-suspension'
+      SUNBIRD_SSO_CLIENT: 'admin-api'
+      SUNBIRD_SSO_ADMIN_CLIENT_SECRET: '0358fa30-6014-4192-9551-7c61b15b774c'
+      SUSPENSION_REMOVAL_SCHEDULE: '* * * * *'
     depends_on:
       vc-registry:
         condition: service_started
