@@ -87,6 +87,32 @@ const verifyCertificate = (body) => {
         })
 }
 
+const deleteExpiredSuspensions = (token, kafkaProducer) => {
+    
+    const requestBody = {
+        "filters": {
+            "endDate": {
+                "lt": new Date()
+            }
+        },
+        "offset": 0,
+        "fields": ["osid"]
+    }
+    
+    searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, requestBody, token)
+    .then(async(results) => {
+        await kafkaProducer.connect();
+        for (i = 0; i < results.length; i++) {
+            kafkaProducer.send({
+                topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
+                messages: [
+                    { key: null, value: JSON.stringify({  revokedCertificateOsId: results[i].osid,token: token }) }
+                ]
+            });
+        }       
+    })
+};
+
 module.exports = {
     createCertificate,
     getCertificatePDF,
@@ -95,6 +121,7 @@ module.exports = {
     deleteCertificate,
     getCertificateForUpdate,
     revokeCertificate,
+    deleteExpiredSuspensions,
     searchCertificate,
     verifyCertificate
 }
