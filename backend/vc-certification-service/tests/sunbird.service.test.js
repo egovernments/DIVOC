@@ -53,7 +53,7 @@ test('should call get api to get certificate', async() => {
     axios.get.mockImplementation((url, headers) => Promise.resolve(response));
     const entityName = 'TrainingCertificate';
     const certificateId = '1';
-    const actualResponse = await sunbirdService.getCertificatePDF(entityName, certificateId, {});
+    const actualResponse = await sunbirdService.getCertificate(entityName, certificateId, {});
     expect(axios.get).toHaveBeenCalledWith('/api/v1/TrainingCertificate/1', {responseType: 'stream', headers: {}});
     expect(actualResponse).toEqual(response);
 });
@@ -76,7 +76,7 @@ test('get api should throw error while getting certificate', async() => {
     const certificateId = '1';
     const outputType = 'pdf';
     const token = 'abc';
-    expect(sunbirdService.getCertificatePDF(entityName, certificateId, outputType, token)).rejects.toThrow('some problem');
+    expect(sunbirdService.getCertificate(entityName, certificateId, outputType, token)).rejects.toThrow('some problem');
 });
 
 test('post api should throw error while creating certificate', async() => {
