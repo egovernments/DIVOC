@@ -62,8 +62,9 @@ describe('when redis is disabled', () => {
         }
         jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValue({result: {ContextURL: {osid: '123'}}});
         await contextController.addContext(req, res, minioClient);
-        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching('context.json'), '123');
-        expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url: expect.stringMatching('context.json')}, '1');
+        const matchingString = /^(\/vc\-management\/v1\/context\/\d{13}\-context\.json)?$/;
+        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching(matchingString), '123');
+        expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url: expect.stringMatching(matchingString)}, '1');
         expect(redisService.storeKeyWithExpiry).not.toHaveBeenCalled();
     });
 
@@ -166,8 +167,9 @@ describe('when redis is enabled', () => {
         }
         jest.spyOn(sunbirdRegistryService, 'createEntity').mockReturnValue(Promise.resolve({result: {ContextURL: {osid: '1-123'}}}));
         await contextController.addContext(req, res, minioClient);
-        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching('context.json'), '456');
-        expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url:expect.stringMatching('context.json')}, '1');
+        const matchingString = /^(\/vc\-management\/v1\/context\/\d{13}\-context\.json)?$/;
+        expect(minioClient.putObject).toHaveBeenCalledWith('context', expect.stringMatching(matchingString), '456');
+        expect(sunbirdRegistryService.createEntity).toHaveBeenCalledWith('localhost:8081/api/v1/ContextURL', {url:expect.stringMatching(matchingString)}, '1');
         expect(redisService.storeKeyWithExpiry).toHaveBeenCalledWith('123', '456');
     });
 
