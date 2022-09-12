@@ -6,7 +6,7 @@ const {getAdminToken} = require('../services/keycloak.service');
 
 async function addContext(req, res, minioClient) {
     try {
-        const filename = req.baseUrl + "/" + Date.now() + req.file.originalname;
+        const filename = req.baseUrl + "/" + Date.now() +"-" + req.file.originalname;
         const file = req.file.buffer;
         let fileStr = file.toString();
         fileStr = fileStr.replaceAll('\n', '');
@@ -31,7 +31,7 @@ async function addContext(req, res, minioClient) {
 
 async function updateContext(req,res,minioClient){
     try{
-        const filename = req.baseUrl + "/" + Date.now() + req.file.originalname;
+        const filename = req.baseUrl + "/" + Date.now()+ "-"+ req.file.originalname;
         const file = req.file.buffer;
         let fileStr = file.toString();
         fileStr = fileStr.replaceAll('\n', '');
