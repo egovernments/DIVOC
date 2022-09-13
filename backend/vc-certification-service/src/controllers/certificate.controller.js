@@ -121,6 +121,7 @@ function getRevokeBody(req) {
         startDate: new Date(),
     }
     if (req.body.endDate) {
+        validationService.validPresentDate(req.body.endDate);
         body = { ...body, endDate: req.body.endDate }
     }
     return body;

@@ -53,8 +53,20 @@ function checkForNull(reqBody) {
   }
 }
 
+function validPresentDate(param){
+  if (!(isoDatestringValidator.isValidISODateString(param))) {
+    throw new CustomError("Valid End date is not in valid format", 400).error();
+  }
+  
+  if(new Date(param) < new Date()){
+    console.log("Valid End date can't be past date");
+    throw new CustomError("Valid End date can't be past date", 400).error();
+  }
+}
+
 module.exports = {
   validateCertificateInput,
-  isURIFormat
+  isURIFormat,
+  validPresentDate
 }
 
