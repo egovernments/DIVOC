@@ -33,10 +33,10 @@ function validateCertificateInput(req,reqType) {
   if (!(isoDatestringValidator.isValidISODateString(reqBody.issuanceDate))) {
     throw new CustomError("IssuanceDate is not in valid format", 400).error();
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
+  if (reqBody.validFrom && !(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
     throw new CustomError("Valid from date is not in valid format", 400).error();
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
+  if (reqBody.validTill && !(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
     throw new CustomError("Valid till date is not in valid format", 400).error();
   }
   if (!(isURIFormat(reqBody.issuer))) {
