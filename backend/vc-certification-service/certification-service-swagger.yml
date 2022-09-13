@@ -1,0 +1,224 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: VC certification
+  description: verifiable credentials certification service
+consumes:
+  - application/json
+produces:
+  - application/json
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+security:
+  - bearerAuth: []
+paths:
+  '/v1/certificate/{entityType}/{certificateId}':
+    get:
+      operationId: certificate
+      parameters:
+        - in: path
+          name: entityName
+          required: true
+          type: string
+        - in: path
+          name: certificateId
+          required: true
+          type: string
+      produces:
+        - application/pdf
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+            application/pdf:
+              schema:
+                type: file
+          description: OK
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+      security:
+        - Bearer: [ ]
+      summary: Creates certficate for the requested entity and certificate ID
+      tags:
+        - certificate
+  /v1/certify/{entityType}:
+    post:
+      tags:
+        - certification
+      summary: Certify event of given entityType
+      operationId: certifyVC
+      requestBody:
+        description: body to be certified
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+      parameters:
+        - name: entityType
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CertificationSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/certify/{entityName}/{certificateId}:
+    put:
+      tags:
+        - update certificate
+      summary: Update certificate of given entityName and certificateId
+      operation: updateCertificate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityName
+          in: path
+          required: true
+          type: string
+        - name: certificateId
+          in: path
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            type: object
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/CertificationSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/certificate/{entityName}/{certificateId}:
+    delete:
+      tags:
+        - delete certificate
+      summary: Delete certificate of given entityName and certificateId
+      operation: deleteCertificate
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: entityName
+          in: path
+          required: true
+          type: string
+        - name: certificateId
+          in: path
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/certificate/revoke:
+    post:
+      tags:
+        - revoke certificate
+      summary: Revoke or suspend a certificate with given entityName, certificateId
+      operation: revokeCertificate
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: to revoke certificate
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: OK
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  CertificationSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      certificateAddResponse:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              msgid:
+                type: string
+              status:
+                type: string
+          result:
+            type: object
+            properties:
+              osid:
+                type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+host: divoc.xiv.in
+schemes:
+  - https
+servers:
+  - url: /vc-certification

@@ -14,10 +14,10 @@ services:
       - "9200:9200"
       - "9300:9300"
     healthcheck:
-        test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
-        interval: 30s
-        timeout: 10s
-        retries: 4
+      test: ["CMD", "curl", "-f", "localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 4
   db:
     image: postgres
     ports:
@@ -65,6 +65,7 @@ services:
       ENABLE_SEND_OTP: $ENABLE_SEND_OTP
       COUNTRY_CALLING_CODE: $COUNTRY_CALLING_CODE
       IS_COUNTRY_CODE_PREFIXED: $IS_COUNTRY_CODE_PREFIXED
+      PROXY_ADDRESS_FORWARDING: "true"
     #      - ./keycloak-mobile-number-login-spi/themes:/opt/jboss/keycloak/themes/
     healthcheck:
       test:
@@ -185,7 +186,7 @@ services:
       kafka:
         condition: service_healthy
       keycloak:
-        condition: service_healthy  
+        condition: service_healthy
   analytics-feed:
     image: divoc/analytics_feed
     environment:
@@ -346,7 +347,7 @@ services:
   etcd:
     image: gcr.io/etcd-development/etcd:v3.5.1
     entrypoint: /usr/local/bin/etcd
-    environment: 
+    environment:
       ETCD_NAME: '$ETCD_NAME'
       ETCD_DATA_DIR: '$ETCD_DATA_DIR'
       ETCD_LISTEN_CLIENT_URLS: '$ETCD_LISTEN_CLIENT_URLS'

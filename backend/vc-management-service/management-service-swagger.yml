@@ -1,0 +1,455 @@
+openapi: '3.0.0'
+info:
+  version: 1.0.0
+  title: VC Management
+  description: verifiable credentials management service
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /v1/tenant:
+    post:
+      tags:
+        - tenantInvite
+      summary: Invite a new tenant
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: tenantInvite
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/InviteTenantRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/TenantInviteSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/schema:
+    post:
+      tags:
+        - schema
+      summary: Add a new schema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: schemaV1
+      parameters:
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/AddSchemaRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SchemaSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/schema/{schemaId}:
+    get:
+      tags:
+        - getEntity
+      summary: Get one or all schemas
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: getSchemaV1
+      parameters:
+        - in: path
+          name: schemaId
+          required: false
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/SchemaList'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/schema/{schemaId}/updateTemplateUrl:
+    put:
+      tags:
+        - templateUpdateInSchema
+      summary: Update certificate template URLs in schema
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      operationId: updateTemplateUrlV1
+      parameters:
+        - in: path
+          name: schemaId
+          required: true
+          type: string
+        - in: body
+          name: body
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateUrlRequest'
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /v1/schema/{schemaId}/updateTemplate:
+    put:
+      tags:
+        - uploadtemplateUpdateSchema
+      summary: Upload a template and update schema
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: updateTemplateV1
+      parameters:
+        - in: query
+          name: template-key
+          type: string
+          default: 'html'
+        - in: formData
+          name: files
+          type: file
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UpdateSchemaTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/templates/:tenant:
+    post:
+      tags:
+        - upload template
+      summary: Upload a templated
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: templatesV1
+      parameters:
+        - in: formData
+          name: files
+          type: file
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UploadTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/context:
+    post:
+      tags: 
+        - upload context
+      summary: Upload a context json to minio
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: addContext
+      parameters:
+        - in: formData
+          name: files
+          type: file
+          required: true
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UploadTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+  /v1/context/:osid:
+    get:
+      tags:
+        - get context
+      summary: Get context in json ld format
+      consumes:
+        - application/json
+      produces:
+        - application/ld + json
+      operationId: getContext
+      parameters:
+        - in: path
+          name: osid
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            type: object
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      tags:
+        - update context
+      summary: update a context
+      consumes:
+        - multipart/form-data
+      produces:
+        - application/json
+      operationId: updateContext
+      parameters:
+        - in: formData
+          name: files
+          type: file
+          required: true
+        - in: path
+          name: osid
+          required: true
+          type: string
+      responses:
+        '200':
+          description: OK
+          schema:
+            $ref: '#/definitions/UploadTemplateSuccess'
+        '400':
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/Error'
+        '401':
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  AddSchemaRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        minLength: 1
+      schema:
+        type: string
+        minLength: 1
+    required:
+      - name
+      - schema
+  SchemaList:
+    type: object
+    properties:
+      schemas:
+        type: array
+        items:
+          type: object
+          properties:
+            schema:
+              type: string
+              minLength: 1
+            name:
+              type: string
+              minLength: 1
+            osid:
+              type: string
+              minLength: 1
+            osOwner:
+              type: array
+              items:
+                type: string
+        minLength: 1
+  UpdateSchemaRequest:
+    type: object
+    properties:
+      schema:
+        type: string
+        minLength: 1
+    required:
+      - schema
+  UpdateSchemaTemplateUrlRequest:
+    type: object
+  UpdateSchemaTemplateSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      templateUpdateResponse:
+        type: object
+        properties:
+          params:
+            type: object
+            properties:
+              msgid:
+                type: string
+              status:
+                type: string
+          responseCode:
+            type: string
+  SchemaSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+      schemaAddResponse:
+        type: object
+        properties:
+          result:
+            type: object
+            properties:
+              Schema:
+                type: object
+                properties:
+                  osid:
+                    type: string
+  TenantInviteSuccess:
+    type: object
+    properties:
+      message:
+        type: string
+  InviteTenantRequest:
+    type: object
+    properties:
+      contactDetails:
+        type: object
+        properties:
+          name:
+            type: string
+          email:
+            type: string
+          mobile:
+            type: string
+      schemas:
+        type: array
+        items:
+          type: string
+      accountDetails:
+        type: object
+        properties:
+          userId:
+            type: string
+        required:
+          - userId
+      websiteUrl:
+        type: string
+      logoUrl:
+        type: string
+      name:
+        type: string
+      sectorType:
+        type: string
+    required:
+      - accountDetails
+      - name
+  UploadTemplateSuccess:
+    type: object
+    properties:
+      uploadTemplateResponse: 
+        type: object
+        properties:
+          documentLocations: 
+            type: array
+            items:
+              type: string
+          errors: 
+            type: array
+            items:
+              type: string
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+      message:
+        type: string
+host: divoc.xiv.in
+schemes:
+  - https
+basePath: /vc-management/
