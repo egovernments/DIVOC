@@ -33,10 +33,10 @@ function validateCertificateInput(req,reqType) {
   if (!(isoDatestringValidator.isValidISODateString(reqBody.issuanceDate))) {
     throw new CustomError("IssuanceDate is not in valid format", 400).error();
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
+  if (reqBody.validFrom && !(isoDatestringValidator.isValidISODateString(reqBody.validFrom))) {
     throw new CustomError("Valid from date is not in valid format", 400).error();
   }
-  if (!(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
+  if (reqBody.validTill && !(isoDatestringValidator.isValidISODateString(reqBody.validTill))) {
     throw new CustomError("Valid till date is not in valid format", 400).error();
   }
   if (!(isURIFormat(reqBody.issuer))) {
@@ -53,8 +53,20 @@ function checkForNull(reqBody) {
   }
 }
 
+function validPresentDate(param){
+  if (!(isoDatestringValidator.isValidISODateString(param))) {
+    throw new CustomError("Valid End date is not in valid format", 400).error();
+  }
+  
+  if(new Date(param) < new Date()){
+    console.log("Valid End date can't be past date");
+    throw new CustomError("Valid End date can't be past date", 400).error();
+  }
+}
+
 module.exports = {
   validateCertificateInput,
-  isURIFormat
+  isURIFormat,
+  validPresentDate
 }
 

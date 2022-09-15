@@ -36,7 +36,8 @@ describe('when redis is disabled', () => {
     const config = require('../src/configs/config');
     jest.mock('../src/configs/config', () => {
         return {
-            REDIS_ENABLED: false
+            REDIS_ENABLED: false,
+            MINIO_BUCKET_NAME: 'context'
         }
     })
     test('should add context entry in registry', async() => {
@@ -136,7 +137,8 @@ describe('when redis is enabled', () => {
     const config = require('../src/configs/config');
     jest.mock('../src/configs/config', () => {
         return {
-            REDIS_ENABLED: true
+            REDIS_ENABLED: true,
+            MINIO_BUCKET_NAME: 'context'
         }
     })
     jest.mock('../src/services/keycloak.service', () => {

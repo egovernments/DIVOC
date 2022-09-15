@@ -215,7 +215,9 @@ function addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFie
 
     }
     for (let index = 0; index<mandatoryEvidenceFields.length; index++) {
-        credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
+        Array.isArray(credTemp.evidence) ?
+            credTemp.evidence[0][mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}' :
+            credTemp.evidence[mandatoryEvidenceFields[index]] = '{{'+mandatoryEvidenceFields[index]+'}}';
     }
 }
 
