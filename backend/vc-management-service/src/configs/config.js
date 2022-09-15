@@ -13,7 +13,9 @@ const JWT_PUBLIC_KEY = process.env.AUTH_PUBLIC_KEY;
 const BASE_URL = process.env.VC_MANAGEMENT_SERVICE_BASE_URL || '/vc-management/';
 const REQUEST_TIMEOUT = process.env.REQUEST_TIMEOUT || 10000;
 const TENANT_NAME = process.env.TENANT_NAME || 'Tenant';
-
+const ROOT_URL = process.env.ROOT_URL || `http://vc-management-service:${PORT}`;
+const IS_MINIO = process.env.IS_MINIO === 'true';
+const MINIO_BUCKET_NAME = process.env.MINIO_BUCKET_NAME || 'contexts';
 module.exports = {
     SUNBIRD_REGISTRY_URL,
     MINIO_URL,
@@ -21,6 +23,7 @@ module.exports = {
     MINIO_ACCESSKEY,
     MINIO_SECRETKEY,
     MINIO_USESSL,
+    MINIO_BUCKET_NAME,
     REDIS_URL,
     REDIS_ENABLED,
     PORT,
@@ -29,5 +32,7 @@ module.exports = {
     JWT_PUBLIC_KEY,
     BASE_URL,
     REQUEST_TIMEOUT,
-    TENANT_NAME
+    TENANT_NAME,
+    ROOT_URL,
+    IS_MINIO
 }

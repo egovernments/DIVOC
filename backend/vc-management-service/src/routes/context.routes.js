@@ -11,17 +11,28 @@ const redisService = require('../services/redis.service');
 let minioClient;
 
 (async function() {
-    minioClient = new minio.Client({
-        endPoint: config.MINIO_URL,
-        port: parseInt(config.MINIO_PORT),
-        useSSL: config.MINIO_USESSL,
-        accessKey: config.MINIO_ACCESSKEY,
-        secretKey: config.MINIO_SECRETKEY,
-    });
-    if(!(await minioClient.bucketExists(constants.MINIO_BUCKET_NAME)))
-        await minioClient.makeBucket(constants.MINIO_BUCKET_NAME);
-    if(config.REDIS_ENABLED) {
-        await redisService.initRedis({REDIS_URL: config.REDIS_URL});
+    try {
+        let minioOptions = {
+            endPoint: config.MINIO_URL,
+            useSSL: config.MINIO_USESSL,
+            accessKey: config.MINIO_ACCESSKEY,
+            secretKey: config.MINIO_SECRETKEY
+        }
+        if(config.IS_MINIO) {
+            minioOptions = {
+                port: parseInt(config.MINIO_PORT),
+                ...minioOptions
+            }
+        }
+        minioClient = new minio.Client(minioOptions);
+        if(config.IS_MINIO && !(await minioClient.bucketExists(config.MINIO_BUCKET_NAME))) {
+            await minioClient.makeBucket(config.MINIO_BUCKET_NAME);
+        }
+        if(config.REDIS_ENABLED) {
+            await redisService.initRedis({REDIS_URL: config.REDIS_URL});
+        }
+    } catch(err) {
+        console.error(err);
     }
 })();
 
