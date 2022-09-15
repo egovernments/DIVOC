@@ -95,7 +95,7 @@ test('should call sunbird rc to get certificate', async() => {
         "offset": 0
     }
     certificateController.getCertificate(req, res);
-    expect(sunbirdRegistryService.searchCertificate).toHaveBeenCalledWith('Dummy', filters, req.header("Authorization"))
+    expect(sunbirdRegistryService.searchCertificate).toHaveBeenCalledWith('Dummy', filters)
 });
 
 test('create certificate should throw error', async() => {

@@ -46,7 +46,7 @@ async function getCertificate(req, res) {
             "limit": 1,
             "offset": 0
         }
-        let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, req.header("Authorization"))
+        let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters)
         let certificateOsId = truncateShard(certificateResponse[0]?.osid);
         const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, req.headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
@@ -131,10 +131,10 @@ function getRevokeBody(req) {
 
 async function verifyCertificate (req,res){
     const certificate = req.body;
-    const certificateEntityType = certificate.evidence[0].type[0];
+    const certificateEntityType = certificate.evidence.type;
     const revokeEntityType = "RevokedVC";
     const token = req.header("Authorization");
-    let certificateId= certificate.credentialSubject.id;
+    let certificateId= certificate.evidence.certificateId;
     let certificateStatus = "";
     let msg = "";
     console.log({certificateId: certificateId});
@@ -209,7 +209,7 @@ async function getEntity(entityId,filterType,certificateEntityType,token){
         "limit": 1,
         "offset": 0
     }
-    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
+    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter);
 }
 
 async function deleteRevokeCertificate(req, res, kafkaProducer) {
@@ -228,7 +228,7 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
             "offset": 0
         }
 
-        let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters, token)
+        let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters)
         let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
         await kafkaProducer.connect();
         kafkaProducer.send({
