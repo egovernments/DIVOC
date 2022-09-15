@@ -48,9 +48,6 @@
     "indexFields": [
       "previousCertificateId"
     ],
-    "uniqueIndexFields": [
-      "previousCertificateId"
-    ],
     "systemFields": [
       "_osCreatedAt",
       "_osUpdatedAt",

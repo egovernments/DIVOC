@@ -94,12 +94,30 @@ async function revokeCertificate(req, res) {
     getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
     .then(async(result) => {
         if(result.length >= 1) {
-            let body = getRevokeBody(req);
-            const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
-            res.status(200).json({
-                message: "Certificate Revoked",
-                certificateRevokeResponse: certificateRevokeResponse
-            });
+            const filters = {
+                "filters": {
+                    "previousCertificateId": {
+                        "eq": req.body.certificateId
+                    },
+                    "schema": {
+                        "eq": req.body.entityName
+                    }
+                },
+                "offset": 0
+            }
+            let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters, token);
+            if (revokedVCResponse[0]) {
+                res.status(409).json({
+                    message: `Certificate ${req.body.entityName} cannot be revoked as it is already revoked`
+                }); 
+            } else {
+                let body = getRevokeBody(req);
+                const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
+                res.status(200).json({
+                    message: "Certificate Revoked",
+                    certificateRevokeResponse: certificateRevokeResponse
+                });    
+            }
         }
         else {
             console.log('RESULT : ',result);
@@ -132,7 +150,7 @@ function getRevokeBody(req) {
 async function verifyCertificate (req,res){
     const certificate = req.body;
     const certificateEntityType = certificate.evidence[0].type[0];
-    const revokeEntityType = "RevokedVC";
+    const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
     const token = req.header("Authorization");
     let certificateId= certificate.credentialSubject.id;
     let certificateStatus = "";
@@ -224,23 +242,34 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
                     "eq": req.params.entityName
                 }
             },
-            "limit": 1,
             "offset": 0
         }
 
-        let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters, token)
-        let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
-        await kafkaProducer.connect();
-        kafkaProducer.send({
-            topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
-            messages: [
-                { key: null, value: JSON.stringify({ revokedCertificateOsId: revokedCertificateOsId, token: token }) }
-            ]
-        });
-        res.status(200).json({
-            message: "Delete revoked certificate request sent successfully"
-        });
-
+        let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters, token);
+        
+        if (revokedVCResponse[0]) {
+            if (revokedVCResponse[0].endDate != null) {
+                let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
+                await kafkaProducer.connect();
+                kafkaProducer.send({
+                    topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
+                    messages: [
+                        { key: null, value: JSON.stringify({ revokedCertificateOsId: revokedCertificateOsId, token: token }) }
+                    ]
+                });
+                res.status(200).json({
+                    message: "Delete revoked certificate request sent successfully"
+                });
+            } else {
+                res.status(400).json({
+                    message: "Deletion is not allowed as Certificate is revoked permanently."
+                });
+            }
+        } else {
+            res.status(400).json({
+                message: "Record not found."
+            });
+        }
     }
     catch (err) {
         console.log('ERROR : ', err?.response?.status || '');
