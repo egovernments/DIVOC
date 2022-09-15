@@ -37,6 +37,10 @@ services:
       - filestorage_access_key=admin
       - filestorage_secret_key=12345678
       - filestorage_bucket_key=issuance
+      # - filestorage_connection_url=https://s3.amazonaws.com/
+      # - filestorage_access_key=AKIAZ4W766BK5Z3WC65T
+      # - filestorage_secret_key=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
+      # - filestorage_bucket_key=divoc-vc-storage
       - registry_base_apis_enable=false
       - sunbird_keycloak_user_password=abcd@123
       - logging.level.root=DEBUG
@@ -177,8 +181,15 @@ services:
       MINIO_USESSL: 'false'
       MINIO_ACCESSKEY: 'admin'
       MINIO_SECRETKEY: '12345678'
+      # MINIO_URL: "s3.amazonaws.com"
+      # MINIO_USESSL: 'true'
+      # MINIO_ACCESSKEY: 'AKIAZ4W766BK5Z3WC65T'
+      # MINIO_SECRETKEY: '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'
+      MINIO_BUCKET_NAME: 'divoc-vc-storage'
+      ROOT_URL: ''
       REDIS_ENABLED: 'true'
       REDIS_URL: 'redis://redis:6379'
+      IS_MINIO: 'true'
       PORT: "7655"
       KEYCLOAK_URL: "$KEYCLOAK_URL"
       SUNBIRD_SSO_CLIENT: 'admin-api'
