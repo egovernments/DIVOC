@@ -36,10 +36,10 @@ async function updateContext(req,res,minioClient){
         fileStr = fileStr.replaceAll('\n', '');
         const osid = req.params.osid;
         JSON.parse(fileStr);
-        const getContextResp = await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + osid,req.header('Authorization'));
+        let url = constants.MINIO_CONTEXT_URL + "/" + osid ;
+        const getContextResp = await sunbirdRegistryService.getEntity(url, req.header('Authorization'));
         console.log("getContextResp: " ,getContextResp);
         await minioClient.putObject(config.MINIO_BUCKET_NAME, filename, file);
-        let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
         const updateContextResp = await sunbirdRegistryService.updateEntity(url, {url: filename}, req.header('Authorization'));
         console.log("updateContextResp: ",updateContextResp);
         if(config.REDIS_ENABLED) {
