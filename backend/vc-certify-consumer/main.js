@@ -144,7 +144,9 @@ async function sendTransactionDetails(token, webhookPayload) {
       webhookUrl = webhookDetails["webhookUrl"];
       webhookToken = webhookDetails["webhookToken"];
     }
-    await pushToWebhook(webhookToken, webhookUrl, webhookPayload);
+    if (webhookUrl) {
+      await pushToWebhook(webhookToken, webhookUrl, webhookPayload);
+    }
   } catch (e) {
     console.error("Error while calling webhook: ", e);
   }
