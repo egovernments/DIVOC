@@ -146,27 +146,34 @@ function addMandatoryFields(schemaRequest) {
     };
 }
 
+function validateEvidence(vcEvidence) {
+    if (vcEvidence) {
+        vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
+    } else {
+        throw new CustomError("evidence not available in VC", 400).error();
+    }
+}
+
+function validateEvidenceType(vcEvidenceType, schemaName) {
+    if (vcEvidenceType) {
+        if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
+            throw new CustomError("evidence type doesn't match with schema", 400).error();
+        }
+    } else {
+        throw new CustomError("evidence doesn't have a valid type", 400).error();
+    }
+}
+
 async function validateSchema(schemaRequest) {
     const schemaName = schemaRequest.name;
     const schemaUnparsed = schemaRequest.schema;
     const schema = JSON.parse(schemaUnparsed);
 
     if (schema._osConfig.credentialTemplate) {
-        let vcEvidence = schema._osConfig.credentialTemplate.evidence
-        if (vcEvidence) {
-            vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
-        } else {
-            throw new CustomError("evidence not available in VC", 400).error();
-        }
-        let vcEvidenceType = vcEvidence.type;
-        if (vcEvidenceType) {
-            if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
-                throw new CustomError("evidence type doesn't match with schema", 400).error();
-            }
-        } else {
-            throw new CustomError("evidence doesn't have a valid type", 400).error();
-        }
         try {
+            let vcEvidence = schema._osConfig.credentialTemplate.evidence;
+            validateEvidence(vcEvidence);
+            validateEvidenceType(vcEvidence.type, schemaName);
             await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
         } catch (err) {
             throw err;
