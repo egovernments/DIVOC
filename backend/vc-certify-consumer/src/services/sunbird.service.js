@@ -25,8 +25,17 @@ const deleteCertificate = (entityName, entityId, token) => {
             throw err;
         });
 };
+const searchCertificate = (entityType, filters, token) => {
+    return axios.post(`${constants.SUNBIRD_TRANSACTION_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
+        .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
+}
 module.exports={
     createCertificate,
     addTransaction,
-    deleteCertificate
+    deleteCertificate,
+    searchCertificate
 }

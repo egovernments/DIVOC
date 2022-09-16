@@ -16,7 +16,9 @@
   "dependencies": {
     "axios": "^0.27.2",
     "kafkajs": "^2.2.0",
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "redis": "^3.0.2",
+    "jsonwebtoken": "^8.5.1"
   },
   "devDependencies": {
     "jest": "^28.1.3"
