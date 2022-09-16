@@ -50,7 +50,7 @@ async function getCertificate(req, res) {
         const templateKey = req.header("template-key");
         const templateType = req.header("Accept");
         const headers = {"Authorization": token, "template-key": templateKey, "Accept": templateType};
-        let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters)
+        let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, token)
         let certificateOsId = truncateShard(certificateResponse[0]?.osid);
         const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
@@ -109,7 +109,7 @@ async function revokeCertificate(req, res) {
                 },
                 "offset": 0
             }
-            let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters);
+            let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters, token);
             if (revokedVCResponse[0]) {
                 res.status(409).json({
                     message: `Certificate ${req.body.entityName}, ${req.body.certificateId} cannot be revoked as it is already revoked`
@@ -231,7 +231,7 @@ async function getEntity(entityId,filterType,certificateEntityType,token){
         "limit": 1,
         "offset": 0
     }
-    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter);
+    return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
 }
 
 async function deleteRevokeCertificate(req, res, kafkaProducer) {
@@ -239,7 +239,7 @@ async function deleteRevokeCertificate(req, res, kafkaProducer) {
         const token = req.header("Authorization");
         const filters = createSearchFilterForRevokeCertifiate(req);
 
-        let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters);
+        let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters, token);
         
         if (revokedVCResponse[0]) {
             if (revokedVCResponse[0].endDate != null) {

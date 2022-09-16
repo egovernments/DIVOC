@@ -62,8 +62,8 @@ const revokeCertificate = (body, token) => {
         });
 }
 
-const searchCertificate = (entityType, filters) => {
-    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters)
+const searchCertificate = (entityType, filters, token) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters, {headers: {Authorization: token}})
         .then(res => res.data)
         .catch(err => {
             console.error(err);
@@ -91,7 +91,7 @@ const deleteExpiredSuspensions = (token, kafkaProducer) => {
         "fields": ["osid"]
     }
     
-    searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, requestBody)
+    searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, requestBody, token)
     .then(async(results) => {
         await kafkaProducer.connect();
         for (i = 0; i < results.length; i++) {
