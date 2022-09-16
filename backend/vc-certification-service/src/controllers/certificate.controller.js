@@ -46,9 +46,13 @@ async function getCertificate(req, res) {
             "limit": 1,
             "offset": 0
         }
+        const token = req.header("Authorization");
+        const templateKey = req.header("template-key");
+        const templateType = req.header("Accept");
+        const headers = {"Authorization": token, "template-key": templateKey, "Accept": templateType};
         let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters)
         let certificateOsId = truncateShard(certificateResponse[0]?.osid);
-        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, req.headers);
+        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
             res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
         }
@@ -94,12 +98,30 @@ async function revokeCertificate(req, res) {
     getEntity(req.body.certificateId,"certificateId",req.body.entityName,token)
     .then(async(result) => {
         if(result.length >= 1) {
-            let body = getRevokeBody(req);
-            const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
-            res.status(200).json({
-                message: "Certificate Revoked",
-                certificateRevokeResponse: certificateRevokeResponse
-            });
+            const filters = {
+                "filters": {
+                    "previousCertificateId": {
+                        "eq": req.body.certificateId
+                    },
+                    "schema": {
+                        "eq": req.body.entityName
+                    }
+                },
+                "offset": 0
+            }
+            let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters);
+            if (revokedVCResponse[0]) {
+                res.status(409).json({
+                    message: `Certificate ${req.body.entityName}, ${req.body.certificateId} cannot be revoked as it is already revoked`
+                }); 
+            } else {
+                let body = getRevokeBody(req);
+                const certificateRevokeResponse = await sunbirdRegistryService.revokeCertificate(body, token);
+                res.status(200).json({
+                    message: "Certificate Revoked",
+                    certificateRevokeResponse: certificateRevokeResponse
+                });    
+            }
         }
         else {
             console.log('RESULT : ',result);
@@ -132,7 +154,7 @@ function getRevokeBody(req) {
 async function verifyCertificate (req,res){
     const certificate = req.body;
     const certificateEntityType = certificate.evidence.type;
-    const revokeEntityType = "RevokedVC";
+    const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
     const token = req.header("Authorization");
     let certificateId= certificate.evidence.certificateId;
     let certificateStatus = "";
@@ -215,38 +237,57 @@ async function getEntity(entityId,filterType,certificateEntityType,token){
 async function deleteRevokeCertificate(req, res, kafkaProducer) {
     try {
         const token = req.header("Authorization");
-        const filters = {
-            "filters": {
-                "previousCertificateId": {
-                    "eq": req.params.revokedCertificateId
-                },
-                "schema": {
-                    "eq": req.params.entityName
-                }
-            },
-            "limit": 1,
-            "offset": 0
+        const filters = createSearchFilterForRevokeCertifiate(req);
+
+        let revokedVCResponse = await sunbirdRegistryService.searchCertificate(certifyConstants.REVOKED_ENTITY_TYPE, filters);
+        
+        if (revokedVCResponse[0]) {
+            if (revokedVCResponse[0].endDate != null) {
+                await sendRevokeCertifiateDeleteRequestToKafka(revokedVCResponse[0].osid, kafkaProducer, token);
+                res.status(200).json({
+                    message: "Delete revoked certificate request sent successfully"
+                });
+            } else {
+                res.status(400).json({
+                    message: "Deletion is not allowed as Certificate is revoked permanently."
+                });
+            }
+        } else {
+            res.status(400).json({
+                message: "Record not found."
+            });
         }
-
-        let revokedVCResponse = await sunbirdRegistryService.searchCertificate("RevokedVC", filters)
-        let revokedCertificateOsId = truncateShard(revokedVCResponse[0]?.osid);
-        await kafkaProducer.connect();
-        kafkaProducer.send({
-            topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
-            messages: [
-                { key: null, value: JSON.stringify({ revokedCertificateOsId: revokedCertificateOsId, token: token }) }
-            ]
-        });
-        res.status(200).json({
-            message: "Delete revoked certificate request sent successfully"
-        });
-
     }
     catch (err) {
         console.log('ERROR : ', err?.response?.status || '');
         res.status(err?.response?.status || 500).json({
             message: err?.response?.data
         })
+    }
+}
+
+async function sendRevokeCertifiateDeleteRequestToKafka(osid, kafkaProducer, token) {
+    let revokedCertificateOsId = truncateShard(osid);
+    await kafkaProducer.connect();
+    kafkaProducer.send({
+        topic: certifyConstants.VC_REMOVE_SUSPENSION_TOPIC,
+        messages: [
+            { key: null, value: JSON.stringify({ revokedCertificateOsId: revokedCertificateOsId, token: token }) }
+        ]
+    });
+}
+
+function createSearchFilterForRevokeCertifiate(req) {
+    return {
+        "filters": {
+            "previousCertificateId": {
+                "eq": req.params.revokedCertificateId
+            },
+            "schema": {
+                "eq": req.params.entityName
+            }
+        },
+        "offset": 0
     }
 }
 

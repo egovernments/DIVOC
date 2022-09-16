@@ -10,7 +10,6 @@ const SUNBIRD_GET_TRANSACTION_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Trans
 const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
 const MANDATORY_EVIDENCE_FIELDS = ["certificateId"];
 const ROLE_SUFFIX = '-realm-role';
-const MINIO_BUCKET_NAME = 'contexts';
 const MINIO_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL`;
 const MINIO_UPDATE_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL/:osid`;
 const SUNBIRD_SSO_CLIENT = process.env.SUNBIRD_SSO_CLIENT || 'admin-api';
@@ -26,7 +25,6 @@ module.exports = {
     MANDATORY_FIELDS,
     MANDATORY_EVIDENCE_FIELDS,
     ROLE_SUFFIX,
-    MINIO_BUCKET_NAME,
     MINIO_CONTEXT_URL,
     MINIO_UPDATE_CONTEXT_URL,
     SUNBIRD_SSO_CLIENT,

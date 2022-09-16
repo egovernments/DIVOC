@@ -10,14 +10,14 @@ async function addContext(req, res, minioClient) {
         let fileStr = file.toString();
         fileStr = fileStr.replaceAll('\n', '');
         JSON.parse(fileStr);
-        await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
+        await minioClient.putObject(config.MINIO_BUCKET_NAME, filename, file);
         const response = await sunbirdRegistryService.createEntity(constants.MINIO_CONTEXT_URL, {url: filename}, req.header('Authorization'));
         if(config.REDIS_ENABLED) {
             redisService.storeKeyWithExpiry(response.result.ContextURL.osid.substring(2), fileStr);
         }
         res.status(200).json({
             message: response,
-            url: req.baseUrl + "/" + response.result.ContextURL.osid.substring(2)
+            url: config.ROOT_URL + req.baseUrl + "/" + response.result.ContextURL.osid.substring(2)
         });
     }
     catch(err) {
@@ -38,7 +38,7 @@ async function updateContext(req,res,minioClient){
         JSON.parse(fileStr);
         const getContextResp = await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + osid,req.header('Authorization'));
         console.log("getContextResp: " ,getContextResp);
-        await minioClient.putObject(constants.MINIO_BUCKET_NAME, filename, file);
+        await minioClient.putObject(config.MINIO_BUCKET_NAME, filename, file);
         let url = constants.MINIO_UPDATE_CONTEXT_URL.replace(':osid', osid);
         const updateContextResp = await sunbirdRegistryService.updateEntity(url, {url: filename}, req.header('Authorization'));
         console.log("updateContextResp: ",updateContextResp);
@@ -46,7 +46,7 @@ async function updateContext(req,res,minioClient){
             redisService.storeKeyWithExpiry(osid, fileStr);
         }
         if(filename !== getContextResp.url){
-            minioClient.removeObject(constants.MINIO_BUCKET_NAME, getContextResp.url);
+            minioClient.removeObject(config.MINIO_BUCKET_NAME, getContextResp.url);
         }
         res.status(200).json({
             message: updateContextResp,
@@ -88,7 +88,7 @@ async function getContext(req, res, minioClient) {
 async function getContextFromMinio(req, res, minioClient) {
     const adminToken = await getAdminToken();
     const url = (await sunbirdRegistryService.getEntity(constants.MINIO_CONTEXT_URL + "/" + req.params.osid, 'Bearer '+ adminToken)).url;
-    const value = await minioClient.getObject(constants.MINIO_BUCKET_NAME, url);
+    const value = await minioClient.getObject(config.MINIO_BUCKET_NAME, url);
     let data = '';
     value.on('data', function (chunk) {
         data += chunk;

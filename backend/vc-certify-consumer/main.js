@@ -4,6 +4,9 @@ const vcCertificationService = require('./src/services/vc.certification.service'
 const config = require('./src/configs/config');
 const constants = require('./src/configs/constants')
 const R = require('ramda');
+const {getOsOwner} = require("./src/services/keycloak.service");
+const {getKey, storeKeyWithExpiry, initRedis} = require("./src/services/redis.service");
+const {getTenantWebhookDetails, pushToWebhook} = require("./src/services/webhook.service");
 
 const REGISTRY_SUCCESS_STATUS = "SUCCESSFUL";
 const REGISTRY_FAILED_STATUS = "UNSUCCESSFUL";
@@ -22,6 +25,13 @@ const producer = kafka.producer({allowAutoTopicCreation: true});
 consumeVCCertify();
 consumePostVCCertify();
 consumeRemoveSuspension();
+
+(async () => {
+  if(config.REDIS_ENABLED) {
+    await initRedis({REDIS_URL: config.REDIS_URL});
+  }
+})()
+
 
 async function processVCCertifyMessage(payload)  {
   const { topic, partition, message } = payload;
@@ -101,6 +111,7 @@ async function processPostVCCertifyMessage(payload) {
       payload: JSON.stringify(postVCCertifyMessage.payload),
       entityType: postVCCertifyMessage.entityType
     }
+    await sendTransactionDetails(token, transactionEntityReq);
     try {
       const transactionEntityRes = await sunbirdRegistryService.addTransaction(transactionEntityReq, token);
       if (transactionEntityRes?.params?.status === REGISTRY_SUCCESS_STATUS) {
@@ -111,6 +122,31 @@ async function processPostVCCertifyMessage(payload) {
     } catch (err) {
       console.error("Error while adding transaction: ", err);
     }
+  }
+}
+
+async function sendTransactionDetails(token, webhookPayload) {
+  try {
+    const osOwner = getOsOwner(token)
+    let webhookUrl;
+    let webhookToken;
+    if(config.REDIS_ENABLED) {
+      let value = await getKey(osOwner);
+      if (value) {
+        webhookUrl = JSON.parse(value).webhookUrl;
+        webhookToken = JSON.parse(value).webhookToken;
+      } else {
+        let webhookDetails = await getTenantWebhookDetails(osOwner, token);
+        storeKeyWithExpiry(osOwner, JSON.stringify(webhookDetails));
+      }
+    } else {
+      let webhookDetails = await getTenantWebhookDetails(osOwner, token);
+      webhookUrl = webhookDetails["webhookUrl"];
+      webhookToken = webhookDetails["webhookToken"];
+    }
+    await pushToWebhook(webhookToken, webhookUrl, webhookPayload);
+  } catch (e) {
+    console.error("Error while calling webhook: ", e);
   }
 }
 
