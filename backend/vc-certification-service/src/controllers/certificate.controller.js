@@ -49,9 +49,10 @@ async function getCertificate(req, res) {
         const token = req.header("Authorization");
         const templateKey = req.header("template-key");
         const templateType = req.header("Accept");
+        const headers = {"Authorization": token, "template-key": templateKey, "Accept": templateType};
         let certificateResponse = await sunbirdRegistryService.searchCertificate(entityName, filters, token)
         let certificateOsId = truncateShard(certificateResponse[0]?.osid);
-        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, token, templateKey, templateType);
+        const {data} = await sunbirdRegistryService.getCertificate(entityName, certificateOsId, headers);
         if (req.headers.accept === certifyConstants.SVG_ACCEPT_HEADER) {
             res.type(certifyConstants.IMAGE_RESPONSE_TYPE);
         }
