@@ -216,6 +216,8 @@ services:
       VC_CERTIFY_TOPIC: 'vc-certify'
       POST_VC_CERTIFY_TOPIC: 'post-vc-certify'
       VC_CERTIFICATION_SERVICE_URL: "http://vc-certification-service:7654"
+      REDIS_ENABLED: 'true'
+      REDIS_URL: 'redis://redis:6379'
     depends_on:
       vc-registry:
         condition: service_started

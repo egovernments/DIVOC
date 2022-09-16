@@ -5,6 +5,8 @@ const POST_VC_CERTIFY_TOPIC = process.env.POST_VC_CERTIFY_TOPIC || 'post-vc-cert
 const KAFKA_BOOTSTRAP_SERVER = process.env.KAFKA_BOOTSTRAP_SERVERS || 'localhost:9092';
 const VC_CERTIFICATION_SERVICE_URL = process.env.VC_CERTIFICATION_SERVICE_URL || 'http://localhost:7654';
 const VC_REMOVE_SUSPENSION_TOPIC = process.env.VC_REMOVE_SUSPENSION_TOPIC || 'vc-remove-suspension';
+const REDIS_URL = process.env.REDIS_URL;
+const REDIS_ENABLED = process.env.REDIS_ENABLED === 'true';
 module.exports = {
     SUNBIRD_REGISTRY_URL,
     KAFKA_CONSUMER_SESSION_TIMEOUT,
@@ -12,5 +14,7 @@ module.exports = {
     VC_CERTIFY_TOPIC,
     POST_VC_CERTIFY_TOPIC,
     VC_CERTIFICATION_SERVICE_URL,
-    VC_REMOVE_SUSPENSION_TOPIC
+    VC_REMOVE_SUSPENSION_TOPIC,
+    REDIS_ENABLED,
+    REDIS_URL
 }

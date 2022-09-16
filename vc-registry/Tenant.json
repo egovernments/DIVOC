@@ -43,6 +43,10 @@
           "type": "string",
           "title": "Callback url"
         },
+        "callbackToken": {
+          "type": "string",
+          "title": "Callback token"
+        },
         "accountDetails": {
           "$ref": "#/definitions/AccountDetails"
         },
