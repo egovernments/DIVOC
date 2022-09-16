@@ -10,10 +10,10 @@ const createCertificate = (certificateRequest, entityType, token) => {
         });
 };
 
-const getCertificate = (entityName, certificateId, headers) => {
+const getCertificate = (entityName, certificateId, token, templateKey, templateType) => {
     return axios.get(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityName}/${certificateId}`, {
         responseType: "stream",
-        headers: headers
+        headers: {"Authorization": token, "template-key": templateKey, "Accept": templateType}
     }).catch(error => {
         console.error("Error in downloading certificate: ", error);
         throw error;

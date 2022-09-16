@@ -53,8 +53,8 @@ test('should call get api to get certificate', async() => {
     axios.get.mockImplementation((url, headers) => Promise.resolve(response));
     const entityName = 'TrainingCertificate';
     const certificateId = '1';
-    const actualResponse = await sunbirdService.getCertificate(entityName, certificateId, {});
-    expect(axios.get).toHaveBeenCalledWith('/api/v1/TrainingCertificate/1', {responseType: 'stream', headers: {}});
+    const actualResponse = await sunbirdService.getCertificate(entityName, certificateId, "", "", "");
+    expect(axios.get).toHaveBeenCalledWith('/api/v1/TrainingCertificate/1', {responseType: 'stream', headers: {"Authorization": "", "template-key": "", "Accept": ""}});
     expect(actualResponse).toEqual(response);
 });
 

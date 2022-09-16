@@ -127,16 +127,18 @@ function addMandatoryFields(schemaRequest) {
     const schemaName = schemaRequest.name;
     const schemaUnparsed = schemaRequest.schema;
     const schema = JSON.parse(schemaUnparsed);
-    let totalMandatoryFields = [...new Set([...mandatoryFields,...mandatoryEvidenceFields])]
+    if (schema._osConfig.credentialTemplate) {
+        let totalMandatoryFields = [...new Set([...mandatoryFields, ...mandatoryEvidenceFields])]
 
-    let reqFields = schema.definitions[schemaName].required;
-    addInRequiredFields(reqFields, totalMandatoryFields)
+        let reqFields = schema.definitions[schemaName].required;
+        addInRequiredFields(reqFields, totalMandatoryFields)
 
-    let properties = schema.definitions[schemaName].properties;
-    addInProperties(properties, totalMandatoryFields)
+        let properties = schema.definitions[schemaName].properties;
+        addInProperties(properties, totalMandatoryFields)
 
-    let credTemp = schema._osConfig.credentialTemplate;
-    addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
+        let credTemp = schema._osConfig.credentialTemplate;
+        addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
+    }
 
     return {
         "name": schemaName,
@@ -149,24 +151,26 @@ async function validateSchema(schemaRequest) {
     const schemaUnparsed = schemaRequest.schema;
     const schema = JSON.parse(schemaUnparsed);
 
-    let vcEvidence = schema._osConfig.credentialTemplate?.evidence
-    if (vcEvidence) {
-        vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
-    } else {
-        throw new CustomError("evidence not available in VC", 400).error();
-    }
-    let vcEvidenceType = vcEvidence.type;
-    if (vcEvidenceType) {
-        if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
-            throw new CustomError("evidence type doesn't match with schema", 400).error();
+    if (schema._osConfig.credentialTemplate) {
+        let vcEvidence = schema._osConfig.credentialTemplate.evidence
+        if (vcEvidence) {
+            vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
+        } else {
+            throw new CustomError("evidence not available in VC", 400).error();
         }
-    } else {
-        throw new CustomError("evidence doesn't have a valid type", 400).error();
-    }
-    try {
-        await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
-    } catch (err) {
-        throw err;
+        let vcEvidenceType = vcEvidence.type;
+        if (vcEvidenceType) {
+            if ((Array.isArray(vcEvidenceType) && !vcEvidenceType.includes(schemaName)) || (!Array.isArray(vcEvidenceType) && (vcEvidenceType !== schemaName))) {
+                throw new CustomError("evidence type doesn't match with schema", 400).error();
+            }
+        } else {
+            throw new CustomError("evidence doesn't have a valid type", 400).error();
+        }
+        try {
+            await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
+        } catch (err) {
+            throw err;
+        }
     }
 }
 
