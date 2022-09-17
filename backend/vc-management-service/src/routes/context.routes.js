@@ -18,6 +18,12 @@ let minioClient;
             accessKey: config.MINIO_ACCESSKEY,
             secretKey: config.MINIO_SECRETKEY
         }
+        if (config.IS_CLOUD_STORAGE) {
+            minioOptions = {
+                region: config.STORAGE_REGION,
+                ...minioOptions
+            }
+        }
         if(config.IS_MINIO) {
             minioOptions = {
                 port: parseInt(config.MINIO_PORT),
