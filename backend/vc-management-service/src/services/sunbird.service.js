@@ -20,6 +20,15 @@ const createEntity = async (url, schemaRequest, token) => {
     });
 }
 
+const deleteEntity = async (url, token) => {
+    return axios.delete(url,  { headers: {Authorization: token}}).then(res =>
+        res.data
+        ).catch(error => {
+            console.error(error);
+            throw error;
+    });
+}
+
 const updateEntity = async (url, schemaRequest, token) => {
     return axios.put(url, schemaRequest, { headers: {Authorization: token}}).then(res =>
         res.data
@@ -104,6 +113,7 @@ const getTransaction = async (transactionId, token) => {
 module.exports = {
     createTenant,
     createEntity,
+    deleteEntity,
     uploadTemplate,
     updateEntity,
     getEntity,

@@ -1,5 +1,4 @@
 const config = require('./config');
-
 const SUNBIRD_TENANT_INVITE_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Tenant/invite`;
 const SUNBIRD_SCHEMA_ADD_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Schema`;
 const SUNBIRD_SCHEMA_UPDATE_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/Schema/:schemaId`;
@@ -11,9 +10,9 @@ const MANDATORY_FIELDS = ["issuer", "issuanceDate"];
 const MANDATORY_EVIDENCE_FIELDS = ["certificateId"];
 const ROLE_SUFFIX = '-realm-role';
 const MINIO_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL`;
-const MINIO_UPDATE_CONTEXT_URL = `${config.SUNBIRD_REGISTRY_URL}/api/v1/ContextURL/:osid`;
 const SUNBIRD_SSO_CLIENT = process.env.SUNBIRD_SSO_CLIENT || 'admin-api';
 const SUNBIRD_SSO_ADMIN_CLIENT_SECRET = process.env.SUNBIRD_SSO_ADMIN_CLIENT_SECRET || '0358fa30-6014-4192-9551-7c61b15b774c';
+
 module.exports = {
     SUNBIRD_TENANT_INVITE_URL,
     SUNBIRD_SCHEMA_ADD_URL,
@@ -26,7 +25,6 @@ module.exports = {
     MANDATORY_EVIDENCE_FIELDS,
     ROLE_SUFFIX,
     MINIO_CONTEXT_URL,
-    MINIO_UPDATE_CONTEXT_URL,
     SUNBIRD_SSO_CLIENT,
     SUNBIRD_SSO_ADMIN_CLIENT_SECRET
 }

@@ -19,8 +19,13 @@ async function getKey(key) {
   return await getAsync(key);
 }
 
+function deleteKey(key) {
+    client.del(key);
+}
+
 module.exports = {
   storeKeyWithExpiry,
   initRedis,
-  getKey
+  getKey,
+  deleteKey
 };
