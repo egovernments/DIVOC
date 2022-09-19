@@ -148,7 +148,7 @@ function addMandatoryFields(schemaRequest) {
 
 function validateEvidence(vcEvidence) {
     if (vcEvidence) {
-        vcEvidence = Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
+        return Array.isArray(vcEvidence) ? vcEvidence[0] : vcEvidence;
     } else {
         throw new CustomError("evidence not available in VC", 400).error();
     }
@@ -172,7 +172,7 @@ async function validateSchema(schemaRequest) {
     if (schema._osConfig.credentialTemplate) {
         try {
             let vcEvidence = schema._osConfig.credentialTemplate.evidence;
-            validateEvidence(vcEvidence);
+            vcEvidence = validateEvidence(vcEvidence);
             validateEvidenceType(vcEvidence.type, schemaName);
             await checkInContextsForEvidenceType(schema._osConfig.credentialTemplate, schemaName)
         } catch (err) {
