@@ -110,7 +110,7 @@ async function deleteContext(req, res, minioClient) {
         let url = constants.MINIO_CONTEXT_URL + "/" + osid;
 
         const getContextResp = await sunbirdRegistryService.getEntity(url, token);
-        await minioClient.removeObject(constants.MINIO_BUCKET_NAME, getContextResp.url);
+        await minioClient.removeObject(config.MINIO_BUCKET_NAME, getContextResp.url);
 
         if(config.REDIS_ENABLED) {
             redisService.deleteKey(osid);
