@@ -4,7 +4,7 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
 const validationService = require('../services/validation.service');
-const {truncateShard} = require("../utils/certification.utils");
+const {truncateShard, extractFromArray} = require("../utils/certification.utils");
 
 const REVOKED = "REVOKED";
 const SUSPENDED = "SUSPENDED";
@@ -153,17 +153,19 @@ function getRevokeBody(req) {
 
 async function verifyCertificate (req,res){
     const certificate = req.body;
-    const certificateEntityType = certificate.evidence[0].type[0];
     const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
-    const token = req.header("Authorization");
-    let certificateId= certificate.credentialSubject.id;
     let certificateStatus = "";
     let msg = "";
-    console.log({certificateId: certificateId});
-    let body = {
+    const token = "";
+
+    const body = {
         signedCredentials : certificate,
     }
     try{
+        const certificateEntityType = extractFromArray(extractFromArray(certificate.evidence).type);
+        const certificateId = extractFromArray(certificate.evidence).certificateId;
+        console.log({certificateEntityType: certificateEntityType, certificateId:certificateId });
+
         const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
         if(verifyResp.verified){
             const certificateResponse = await getEntity(certificateId,"certificateId",certificateEntityType,token);
