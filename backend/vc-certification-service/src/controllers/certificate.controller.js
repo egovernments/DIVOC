@@ -156,9 +156,9 @@ async function verifyCertificate (req,res){
     const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
     let certificateStatus = "";
     let msg = "";
-    const token = req.header("Authorization");
+    const token = "";
 
-    let body = {
+    const body = {
         signedCredentials : certificate,
     }
     try{
