@@ -1,7 +1,7 @@
 const truncateShard = (osId) => {
     return osId?.substring(2);
 }
-const checkIfArray = (object) => {
+const extractFromArray = (object) => {
     if (object) {
         object = Array.isArray(object) ? object[0] : object;
     } else {
@@ -11,5 +11,5 @@ const checkIfArray = (object) => {
 }
 module.exports = {
     truncateShard,
-    checkIfArray
+    extractFromArray
 }

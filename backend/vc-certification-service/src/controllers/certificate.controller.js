@@ -4,7 +4,7 @@ const sunbirdRegistryService = require('../services/sunbird.service')
 const certifyConstants = require('../configs/constants');
 const {validationResult} = require('express-validator');
 const validationService = require('../services/validation.service');
-const {truncateShard, checkIfArray} = require("../utils/certification.utils");
+const {truncateShard, extractFromArray} = require("../utils/certification.utils");
 
 const REVOKED = "REVOKED";
 const SUSPENDED = "SUSPENDED";
@@ -162,8 +162,8 @@ async function verifyCertificate (req,res){
         signedCredentials : certificate,
     }
     try{
-        const certificateEntityType = checkIfArray(checkIfArray(certificate.evidence).type);
-        const certificateId = checkIfArray(certificate.evidence).certificateId;
+        const certificateEntityType = extractFromArray(extractFromArray(certificate.evidence).type);
+        const certificateId = extractFromArray(certificate.evidence).certificateId;
         console.log({certificateEntityType: certificateEntityType, certificateId:certificateId });
 
         const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
