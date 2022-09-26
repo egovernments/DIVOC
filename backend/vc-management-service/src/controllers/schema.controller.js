@@ -139,7 +139,6 @@ function addMandatoryFields(schemaRequest) {
         let credTemp = schema._osConfig.credentialTemplate;
         addInCredentialTemplate(credTemp, mandatoryFields, mandatoryEvidenceFields)
     }
-    schemaRequest.name = schemaName;
     schemaRequest.schema = JSON.stringify(schema);
     console.log("schemaRequest: ",schemaRequest);
     return schemaRequest;
