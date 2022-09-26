@@ -39,9 +39,7 @@
                 </div>
             </div>
            
-            
-
-            <div class="${properties.kcFormGroupClass!}">
+        <div class="${properties.kcFormGroupClass!}">
                 <div class="${properties.kcLabelWrapperClass!}">
                     <label for="password-confirm" class="${properties.kcLabelClass!}">${msg("passwordConfirm")}</label>
                 </div>
