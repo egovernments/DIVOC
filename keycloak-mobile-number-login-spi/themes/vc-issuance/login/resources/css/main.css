@@ -1,0 +1,149 @@
+.navbar {
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.05);
+    padding-left: 30px;
+}
+
+.nav-link {
+    font-size: 12px;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.main-img-wrapper {
+    display: flex;
+    justify-content: flex-end;
+    width: 45%;
+}
+
+.main-img {
+    width: 85%;
+    height: 70%;
+}
+
+.footer-content {
+    height: 12vh;
+    border-top: 1px solid #d3d3d3;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+
+}
+
+.footer-gov-logo {
+    width: 25%;
+    margin: 0 5px;
+}
+
+.footer-link {
+    color: #040E28;
+    margin: 0 5px;
+}
+
+.form-title {
+    font-size: 25px;
+}
+
+.form-subtitle {
+    font-size: 35px;
+}
+
+.form-content {
+    padding-left: 9rem;
+    padding-right: 18rem;
+}
+
+.input-field {
+    display: flex;
+    border-radius: 4px;
+    width: 100%;
+    border: 1px solid #EFEFEF;
+    margin-top: 0.5rem;
+}
+.input-field input {
+    padding: 1rem;
+    border: 1px solid #EFEFEF;
+    border-radius: 4px;
+}
+
+.input-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.mobile-prefix, .otp-prefix {
+    padding: 1px 2px;
+    margin: 0;
+}
+
+.mobile input {
+    width: 100% !important;
+}
+
+.login-arrow {
+    width: 9%;
+    margin-left: 2rem;
+}
+
+.otp-prefix {
+    color: #4CA07A;
+}
+
+@media (max-width: 992px) {
+
+    .main-img-wrapper {
+        width: 100%;
+    }
+    .main-img-wrapper img {
+        height: 90%;
+
+    }
+    .form-content {
+        padding: 0 2rem;
+    }
+    .form {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    .form-subtitle {
+        font-size: 25px;
+        text-align: center;
+    }
+    .input-wrapper {
+        flex-direction: column;
+    }
+    .otp {
+        margin-top: 1rem
+    }
+}
+
+.banner {
+    background: black;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    padding: 11px 26px;
+    text-align: center;
+}
+
+.banner a {
+    text-decoration: underline;
+}
+
+footer {
+    background: black;
+    padding: 13px 30px;
+    color: #8D9091;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer a {
+    margin-right: 30px;
+}
+
+footer a:last-child {
+    margin-right: 0px;
+}
