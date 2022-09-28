@@ -156,7 +156,8 @@ async function verifyCertificate (req,res){
     const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
     let certificateStatus = "";
     let msg = "";
-    let meta = {};
+    let startDate = "";
+    let endDate = "";
     const body = {
         signedCredentials : certificate,
     }
@@ -172,7 +173,7 @@ async function verifyCertificate (req,res){
                 const revokeResp = await getEntityWithoutToken(certificateId,"previousCertificateId",revokeEntityType);
                 const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
                 console.log("revokeEntityResp:", revokeEntityResp);
-                [certificateStatus,msg,meta] = revokeStatus(revokeEntityResp);
+                [certificateStatus,msg,startDate,endDate] = revokeStatus(revokeEntityResp);
                 
             }else{
                 certificateStatus = INVALID;
@@ -183,7 +184,8 @@ async function verifyCertificate (req,res){
                 status: {
                     certificateStatus: certificateStatus,
                     msg: msg,
-                    meta: meta
+                    startDate: startDate,
+                    endDate:endDate
                 },
                 response: {verifyResp}
             });
@@ -193,7 +195,8 @@ async function verifyCertificate (req,res){
                 status: {
                     certificateStatus: INVALID,
                     msg: "Failed to verify certificate",
-                    meta: meta
+                    startDate: startDate,
+                    endDate:endDate
                 },
                 response: {verifyResp}
             });
@@ -209,27 +212,24 @@ async function verifyCertificate (req,res){
 function revokeStatus(revokeEntityResp){
     let certificateStatus = "";
     let msg = "";
-    let meta = {};
+    let startDate = "";
+    let endDate = "";
 ;    if(revokeEntityResp.length >= 1){
         if(revokeEntityResp[0]?.endDate){
             certificateStatus = SUSPENDED;
             msg = `Certificate is Suspended`;
-            meta = {
-                startDate: revokeEntityResp[0]?.startDate,
-                endDate: revokeEntityResp[0]?.endDate
-            }
+            startDate = revokeEntityResp[0]?.startDate,
+            endDate = revokeEntityResp[0]?.endDate
         }else{
             certificateStatus = REVOKED
             msg = `Certificate is Permanently Revoked`,
-            meta = {
-                startDate: revokeEntityResp[0]?.startDate
-            }
+            startDate = revokeEntityResp[0]?.startDate
         }
     }else{
         certificateStatus = VALID;
         msg = `certificate is Valid`;
     }
-    return [certificateStatus,msg,meta];
+    return [certificateStatus,msg,startDate,endDate];
 }
 
 async function getEntityWithoutToken(entityId,filterType,certificateEntityType){
