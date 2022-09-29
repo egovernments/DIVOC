@@ -70,6 +70,14 @@ const searchCertificate = (entityType, filters, token) => {
             throw err;
         })
 }
+const searchCertificateWithoutToken = (entityType, filters) => {
+    return axios.post(`${certifyConstants.SUNBIRD_CERTIFICATE_URL}${entityType}/search`, filters)
+        .then(res => res.data)
+        .catch(err => {
+            console.error(err);
+            throw err;
+        })
+}
 const verifyCertificate = (body) => {
     return axios.post(`${certifyConfigs.SUNBIRD_SIGNER_URL}/verify`,body)
     .then(res => res.data)
@@ -114,5 +122,6 @@ module.exports = {
     revokeCertificate,
     deleteExpiredSuspensions,
     searchCertificate,
+    searchCertificateWithoutToken,
     verifyCertificate
 }

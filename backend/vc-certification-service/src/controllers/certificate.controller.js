@@ -156,8 +156,8 @@ async function verifyCertificate (req,res){
     const revokeEntityType = certifyConstants.REVOKED_ENTITY_TYPE;
     let certificateStatus = "";
     let msg = "";
-    const token = "";
-
+    let startDate = "";
+    let endDate = "";
     const body = {
         signedCredentials : certificate,
     }
@@ -168,12 +168,12 @@ async function verifyCertificate (req,res){
 
         const verifyResp = await sunbirdRegistryService.verifyCertificate(body)
         if(verifyResp.verified){
-            const certificateResponse = await getEntity(certificateId,"certificateId",certificateEntityType,token);
+            const certificateResponse = await getEntityWithoutToken(certificateId,"certificateId",certificateEntityType);
             if(certificateResponse.length  >= 1){
-                const revokeResp = await getEntity(certificateId,"previousCertificateId",revokeEntityType,token);
+                const revokeResp = await getEntityWithoutToken(certificateId,"previousCertificateId",revokeEntityType);
                 const revokeEntityResp = revokeResp.filter(resp =>  resp.schema === certificateEntityType);
                 console.log("revokeEntityResp:", revokeEntityResp);
-                [certificateStatus,msg] = revokeStatus(revokeEntityResp);
+                [certificateStatus,msg,startDate,endDate] = revokeStatus(revokeEntityResp);
                 
             }else{
                 certificateStatus = INVALID;
@@ -183,7 +183,9 @@ async function verifyCertificate (req,res){
                 message: "Certificate verified",
                 status: {
                     certificateStatus: certificateStatus,
-                    msg: msg
+                    msg: msg,
+                    startDate: startDate,
+                    endDate:endDate
                 },
                 response: {verifyResp}
             });
@@ -192,7 +194,9 @@ async function verifyCertificate (req,res){
                 message: "verification failed",
                 status: {
                     certificateStatus: INVALID,
-                    msg: "Failed to verify certificate"
+                    msg: "Failed to verify certificate",
+                    startDate: startDate,
+                    endDate:endDate
                 },
                 response: {verifyResp}
             });
@@ -208,21 +212,38 @@ async function verifyCertificate (req,res){
 function revokeStatus(revokeEntityResp){
     let certificateStatus = "";
     let msg = "";
-    if(revokeEntityResp.length >= 1){
+    let startDate = "";
+    let endDate = "";
+;    if(revokeEntityResp.length >= 1){
         if(revokeEntityResp[0]?.endDate){
             certificateStatus = SUSPENDED;
-            msg = `Certificate is Suspended till ${revokeEntityResp[0]?.endDate}`
+            msg = `Certificate is Suspended`;
+            startDate = revokeEntityResp[0]?.startDate,
+            endDate = revokeEntityResp[0]?.endDate
         }else{
             certificateStatus = REVOKED
-            msg = `Certificate is Permanently Revoked`
+            msg = `Certificate is Permanently Revoked`,
+            startDate = revokeEntityResp[0]?.startDate
         }
     }else{
         certificateStatus = VALID;
         msg = `certificate is Valid`;
     }
-    return [certificateStatus,msg];
+    return [certificateStatus,msg,startDate,endDate];
 }
 
+async function getEntityWithoutToken(entityId,filterType,certificateEntityType){
+    const certificateFilter = {
+        "filters": {
+            [filterType]: {
+                "eq": entityId
+            }
+        },
+        "limit": 1,
+        "offset": 0
+    }
+    return await sunbirdRegistryService.searchCertificateWithoutToken(certificateEntityType,certificateFilter);
+}
 async function getEntity(entityId,filterType,certificateEntityType,token){
     const certificateFilter = {
         "filters": {
@@ -235,7 +256,6 @@ async function getEntity(entityId,filterType,certificateEntityType,token){
     }
     return await sunbirdRegistryService.searchCertificate(certificateEntityType,certificateFilter,token);
 }
-
 async function deleteRevokeCertificate(req, res, kafkaProducer) {
     try {
         const token = req.header("Authorization");
