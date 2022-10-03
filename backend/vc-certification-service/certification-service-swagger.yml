@@ -189,6 +189,28 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/Error'
+  /v1/certificate/verify:
+    post:
+      tags:
+        - verify certificate
+      summary: verify a certificate is valid,suspended,revoked or invalid
+      operation: verifyCertificate
+      requestBody:
+        description: to verify certificate
+        required: true
+        content: 
+          application/json:
+            schema:
+              type: object
+      responses:
+        '200':
+          description: OK
+        '406':
+          description: Invalid Certificate
+        '500':
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   CertificationSuccess:
     type: object
