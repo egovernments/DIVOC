@@ -173,7 +173,7 @@ paths:
         content: 
           application/json:
             schema:
-              type: object
+              $ref: '#/definitions/RevokeRequestBody'
       responses:
         '200':
           description: OK
@@ -183,6 +183,10 @@ paths:
             $ref: '#/definitions/Error'
         '401':
           description: Unauthorized
+          schema:
+            $ref: '#/definitions/Error'
+        '409':
+          description: Failed to revoke
           schema:
             $ref: '#/definitions/Error'
         '500':
@@ -205,8 +209,12 @@ paths:
       responses:
         '200':
           description: OK
+          schema:
+            $ref: '#/definitions/VerifyResponse'
         '406':
           description: Invalid Certificate
+          schema:
+            $ref: '#/definitions/VerifyResponse'
         '500':
           description: Internal server error
           schema:
@@ -239,6 +247,36 @@ definitions:
         type: string
       message:
         type: string
+  RevokeRequestBody:
+    type: object
+    required:
+      - certificateId
+      - entityName
+    properties: 
+      certificateId:
+        type: string
+      entityName:
+        type: string
+      endDate:
+        type: string
+  VerifyResponse:
+    type: object
+    properties:
+      message:
+        type: string
+      status:
+        type: object
+        properties:
+          certificateStatus:
+            type: string
+          msg:
+            type: string
+          startDate:
+            type: string
+          endDate:
+            type: string
+      response: 
+        type: object
 host: divoc.xiv.in
 schemes:
   - https
