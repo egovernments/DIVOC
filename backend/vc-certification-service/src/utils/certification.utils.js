@@ -1,3 +1,5 @@
+const {CustomError} = require("../models/errors");
+
 const truncateShard = (osId) => {
     return osId?.substring(2);
 }
